@@ -1,0 +1,309 @@
+{
+  "ad_integration": {
+    "domain": "corp.walmart.com",
+    "ldap_servers": [
+      "ldap://dc1.corp.walmart.com:389",
+      "ldap://dc2.corp.walmart.com:389",
+      "ldap://dc3.corp.walmart.com:389"
+    ],
+    "service_account": "WMT\\ActivityHub_ServiceAccount",
+    "sync_frequency_minutes": 15,
+    "emergency_sync_enabled": true,
+    "ssl_enabled": true,
+    "connection_timeout_seconds": 30,
+    "authentication_method": "SAML2"
+  },
+  "group_mappings": [
+    {
+      "ad_group": "WMT_ActivityHub_Executives",
+      "activity_hub_roles": ["c-level-executive"],
+      "permissions": ["enterprise.view.all", "strategic.planning.access"],
+      "department_specific": false,
+      "priority": 1,
+      "member_count": 12,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_VicePresidents",
+      "activity_hub_roles": ["vice-president"],
+      "permissions": ["business_unit.view.all", "resource.allocation.business_unit"],
+      "department_specific": false,
+      "priority": 2,
+      "member_count": 28,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_Directors",
+      "activity_hub_roles": ["director"],
+      "permissions": ["department.view.all", "team.performance.management"],
+      "department_specific": false,
+      "priority": 3,
+      "member_count": 156,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_Managers",
+      "activity_hub_roles": ["manager"],
+      "permissions": ["team.view.all", "task.assignment.team"],
+      "department_specific": false,
+      "priority": 4,
+      "member_count": 892,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_ProjectManagers",
+      "activity_hub_roles": ["project-manager"],
+      "permissions": ["projects.view.assigned", "project.management.full"],
+      "department_specific": false,
+      "priority": 4,
+      "member_count": 234,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_BusinessAnalysts",
+      "activity_hub_roles": ["business-analyst"],
+      "permissions": ["analytics.view.cross_department", "reports.create.custom"],
+      "department_specific": false,
+      "priority": 4,
+      "member_count": 178,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_TechnicalSpecialists",
+      "activity_hub_roles": ["technical-specialist"],
+      "permissions": ["system.administration.access", "configuration.system.manage"],
+      "department_specific": false,
+      "priority": 4,
+      "member_count": 89,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_Finance_Leadership",
+      "activity_hub_roles": ["director", "manager"],
+      "permissions": ["finance.sap.access", "finance.reporting.advanced", "finance.budget.management"],
+      "department_specific": true,
+      "department": "Finance",
+      "priority": 3,
+      "member_count": 45,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_Finance_Users",
+      "activity_hub_roles": ["team-member", "team-lead"],
+      "permissions": ["finance.sap.access", "finance.compliance.access"],
+      "department_specific": true,
+      "department": "Finance",
+      "priority": 5,
+      "member_count": 287,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_Operations_Leadership",
+      "activity_hub_roles": ["director", "manager"],
+      "permissions": ["operations.wms.access", "operations.supply_chain.view", "operations.logistics.management"],
+      "department_specific": true,
+      "department": "Operations",
+      "priority": 3,
+      "member_count": 78,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_Operations_Users",
+      "activity_hub_roles": ["team-member", "team-lead"],
+      "permissions": ["operations.wms.access", "operations.performance.monitoring"],
+      "department_specific": true,
+      "department": "Operations",
+      "priority": 5,
+      "member_count": 1456,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_Technology_Leadership",
+      "activity_hub_roles": ["director", "manager"],
+      "permissions": ["technology.development.tools", "technology.deployment.access", "technology.architecture.view"],
+      "department_specific": true,
+      "department": "Technology",
+      "priority": 3,
+      "member_count": 34,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_Technology_Users",
+      "activity_hub_roles": ["team-member", "team-lead"],
+      "permissions": ["technology.development.tools", "technology.security.management"],
+      "department_specific": true,
+      "department": "Technology",
+      "priority": 5,
+      "member_count": 567,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_HR_Leadership",
+      "activity_hub_roles": ["director", "manager"],
+      "permissions": ["hr.workday.access", "hr.employee_data.view", "hr.performance.management"],
+      "department_specific": true,
+      "department": "Human Resources",
+      "priority": 3,
+      "member_count": 23,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_HR_Users",
+      "activity_hub_roles": ["team-member", "team-lead"],
+      "permissions": ["hr.workday.access", "hr.compliance.access"],
+      "department_specific": true,
+      "department": "Human Resources",
+      "priority": 5,
+      "member_count": 134,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_SuperAdmins",
+      "activity_hub_roles": ["technical-specialist"],
+      "permissions": ["system.administration.access", "user.management.access", "security.administration.access"],
+      "department_specific": false,
+      "priority": 1,
+      "member_count": 5,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_RoleAdmins",
+      "activity_hub_roles": ["business-analyst"],
+      "permissions": ["role.management.access", "user.assignment.access"],
+      "department_specific": false,
+      "priority": 2,
+      "member_count": 12,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    },
+    {
+      "ad_group": "WMT_ActivityHub_ContentAdmins",
+      "activity_hub_roles": ["business-analyst"],
+      "permissions": ["content.management.access", "link.management.access"],
+      "department_specific": false,
+      "priority": 3,
+      "member_count": 8,
+      "last_sync": "2025-11-06T14:30:00Z",
+      "sync_status": "success"
+    }
+  ],
+  "access_policies": {
+    "session_timeout_minutes": 480,
+    "concurrent_sessions_allowed": 3,
+    "password_policy": {
+      "complexity_required": true,
+      "min_length": 12,
+      "expiration_days": 90,
+      "history_count": 24
+    },
+    "ip_restrictions": {
+      "enabled": true,
+      "allowed_ranges": [
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "192.168.0.0/16"
+      ],
+      "blocked_countries": ["CN", "RU", "KP"],
+      "vpn_required_for_external": true
+    },
+    "multi_factor_authentication": {
+      "enabled": true,
+      "required_roles": ["c-level-executive", "vice-president", "technical-specialist"],
+      "methods": ["authenticator_app", "sms", "hardware_token"]
+    },
+    "security_monitoring": {
+      "failed_login_threshold": 5,
+      "lockout_duration_minutes": 30,
+      "suspicious_activity_alerts": true,
+      "geolocation_tracking": true
+    }
+  },
+  "compliance_settings": {
+    "sox_compliance": {
+      "enabled": true,
+      "role_segregation_required": true,
+      "approval_workflows": true,
+      "audit_trail_retention_years": 7
+    },
+    "gdpr_compliance": {
+      "enabled": true,
+      "data_retention_days": 2555,
+      "right_to_be_forgotten": true,
+      "consent_management": true
+    },
+    "pci_compliance": {
+      "enabled": false,
+      "data_encryption_required": true,
+      "access_logging_required": true
+    }
+  },
+  "sync_configuration": {
+    "automatic_sync": {
+      "enabled": true,
+      "schedule": "0 */15 * * * *",
+      "retry_attempts": 3,
+      "retry_delay_seconds": 300
+    },
+    "manual_sync": {
+      "enabled": true,
+      "admin_approval_required": false,
+      "full_sync_available": true
+    },
+    "emergency_procedures": {
+      "immediate_disable_enabled": true,
+      "security_incident_lockdown": true,
+      "emergency_contact": "security@walmart.com"
+    }
+  },
+  "audit_trail": {
+    "enabled": true,
+    "log_retention_days": 2555,
+    "events_tracked": [
+      "user_login",
+      "user_logout",
+      "permission_change",
+      "role_assignment",
+      "group_membership_change",
+      "admin_action",
+      "system_configuration_change"
+    ],
+    "real_time_monitoring": true,
+    "compliance_reporting": {
+      "quarterly_reports": true,
+      "annual_certification": true,
+      "sox_reporting": true
+    }
+  },
+  "performance_metrics": {
+    "sync_success_rate": 99.2,
+    "average_sync_time_seconds": 45,
+    "failed_login_rate": 0.3,
+    "user_satisfaction_score": 4.7,
+    "system_uptime_percentage": 99.8
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "created_date": "2025-11-06T10:00:00Z",
+    "last_modified": "2025-11-06T15:45:00Z",
+    "created_by": "kendall.rush@walmart.com",
+    "total_users": 47892,
+    "total_groups": 17,
+    "schema_version": "2025.1"
+  }
+}

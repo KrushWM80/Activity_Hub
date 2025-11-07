@@ -14,6 +14,22 @@ A comprehensive, customizable interface designed for Walmart Enterprise employee
 
 ```
 Activity-Hub/
+├── Admin Area/             # Administrative tools and system management
+│   ├── README.md          # Admin area overview and navigation
+│   ├── ROLE_MANAGEMENT.md # Complete role system documentation
+│   ├── ACCESS_CONTROL.md  # AD Groups integration and access management
+│   ├── LINK_MANAGEMENT.md # Dynamic link and button management system
+│   ├── admin-dashboard.html # Interactive admin management interface
+│   ├── role-configuration.json # Role definitions and permissions matrix
+│   ├── access-groups.json # AD group mappings and access controls
+│   └── dynamic-links.json # Managed links and button configurations
+│
+├── Sparky AI/              # Intelligent AI assistant and platform integration
+│   ├── README.md          # Comprehensive Sparky AI system documentation
+│   ├── BACKEND_API.md     # Backend architecture and API documentation
+│   ├── INTEGRATION_GUIDE.md # Platform integration and deployment guide
+│   └── ai-assistant-demo.html # Interactive AI Assistant demonstration
+│
 ├── Design/                 # Design system, brand assets, and UI specifications
 │   ├── README.md          # Design documentation overview
 │   ├── DESIGN_SYSTEM.md   # Complete design system specifications
@@ -103,6 +119,20 @@ Activity-Hub/
 
 ## 📋 Getting Started
 
+### For System Administrators
+1. Review `Admin Area/README.md` for comprehensive admin overview
+2. Configure roles using `Admin Area/ROLE_MANAGEMENT.md` guidelines
+3. Set up AD Groups integration with `Admin Area/ACCESS_CONTROL.md`
+4. Manage dynamic links via `Admin Area/LINK_MANAGEMENT.md`
+5. Use `Admin Area/admin-dashboard.html` for live administration
+
+### For AI Assistant Implementation
+1. Review `Sparky AI/README.md` for comprehensive system overview
+2. Set up backend infrastructure using `Sparky AI/BACKEND_API.md`
+3. Follow platform integration guide in `Sparky AI/INTEGRATION_GUIDE.md`
+4. Test functionality with `Sparky AI/ai-assistant-demo.html`
+5. Experience the complete Sparky AI ecosystem with enterprise platform integration
+
 ### For Designers
 1. Review `Design/README.md` for complete design system documentation
 2. Use `Design/color-tester.html` to validate brand colors
@@ -112,16 +142,19 @@ Activity-Hub/
 1. Import `Design/walmart-brand-variables.css` for brand-compliant styling
 2. Follow `Strategy/TECHNICAL_ROADMAP.md` for development timeline
 3. Use design specifications in `Design/INTERFACE_COMPONENTS.md`
+4. Integrate Sparky AI using documentation in `Sparky AI/` folder
 
 ### For Project Managers
 1. Start with `Strategy/EXECUTIVE_SUMMARY.md` for business case
 2. Follow implementation phases in `Strategy/TECHNICAL_ROADMAP.md`
 3. Use success metrics for progress tracking
+4. Plan Sparky AI rollout using integration guides
 
 ### For Stakeholders
 1. Review `Strategy/PROJECT_OUTLINE.md` for comprehensive overview
 2. Reference ROI analysis in `Strategy/EXECUTIVE_SUMMARY.md`
 3. View live demo at `Design/activity-hub-demo.html`
+4. Experience Sparky AI demo at `Sparky AI/ai-assistant-demo.html`
 
 ## 📞 Support
 - **Design Questions**: Refer to Design folder documentation
@@ -140,10 +173,11 @@ This repository uses Git for version control. All documentation, design assets, 
 **Initiative**: Digital Workplace Transformation  
 
 ## 📊 Project Metrics
-- **Documentation**: 19 comprehensive files created
-- **Lines of Code/Content**: 5,878+ lines
+- **Documentation**: 23 comprehensive files created
+- **Lines of Code/Content**: 8,500+ lines
 - **Design System**: Complete with official Walmart branding
 - **Strategic Planning**: 12-month roadmap with phase-by-phase rollout
+- **Admin System**: Full role, access, and link management capabilities
 
 ---
 

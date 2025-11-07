@@ -1,0 +1,515 @@
+{
+  "links": [
+    {
+      "id": "sap-financial-reports",
+      "name": "SAP Financial Reports",
+      "description": "Access monthly and quarterly financial reports, budget analysis, and financial planning tools",
+      "category": "finance",
+      "type": "external",
+      "url": "https://sap.walmart.com/reports/financial",
+      "display": {
+        "button_text": "Financial Reports",
+        "icon": "chart-bar",
+        "color": "#1E3A8A",
+        "size": "medium",
+        "position": "finance-dashboard",
+        "tooltip": "View comprehensive financial reports and analytics"
+      },
+      "ownership": {
+        "primary_owner": "john.doe@walmart.com",
+        "primary_owner_name": "John Doe",
+        "secondary_owner": "jane.smith@walmart.com",
+        "secondary_owner_name": "Jane Smith",
+        "department": "Finance",
+        "review_frequency": "quarterly",
+        "next_review_date": "2026-02-06"
+      },
+      "visibility": {
+        "roles": ["finance-manager", "finance-analyst", "director", "c-level-executive"],
+        "departments": ["Finance", "Accounting"],
+        "ad_groups": ["WMT_ActivityHub_Finance_Leadership", "WMT_ActivityHub_Finance_Users"],
+        "conditions": {
+          "active_hours": "06:00-22:00",
+          "business_days_only": true,
+          "geo_restrictions": ["US", "CA", "MX"]
+        }
+      },
+      "tracking": {
+        "google_analytics": "UA-12345678-1",
+        "custom_events": ["finance_report_access", "sap_integration_usage"],
+        "monthly_clicks": 1247,
+        "unique_users": 89,
+        "avg_session_duration": "4m 32s"
+      },
+      "health": {
+        "last_check": "2025-11-06T14:45:00Z",
+        "status": "healthy",
+        "response_time_ms": 340,
+        "uptime_percentage": 99.7,
+        "ssl_valid": true
+      },
+      "metadata": {
+        "created_date": "2025-11-06T10:00:00Z",
+        "created_by": "admin@walmart.com",
+        "last_modified": "2025-11-06T14:30:00Z",
+        "modified_by": "john.doe@walmart.com",
+        "version": "1.2",
+        "status": "active",
+        "change_log": [
+          {
+            "date": "2025-11-06T14:30:00Z",
+            "user": "john.doe@walmart.com",
+            "change": "Updated visibility rules for new finance team structure",
+            "version": "1.2"
+          }
+        ]
+      }
+    },
+    {
+      "id": "workday-self-service",
+      "name": "Workday Self-Service",
+      "description": "Employee self-service portal for HR functions, benefits, time tracking, and personal information management",
+      "category": "hr",
+      "type": "external",
+      "url": "https://workday.walmart.com/selfservice",
+      "display": {
+        "button_text": "Workday HR",
+        "icon": "users",
+        "color": "#059669",
+        "size": "large",
+        "position": "main-dashboard",
+        "tooltip": "Access your HR self-service portal"
+      },
+      "ownership": {
+        "primary_owner": "sarah.johnson@walmart.com",
+        "primary_owner_name": "Sarah Johnson",
+        "secondary_owner": "mike.wilson@walmart.com",
+        "secondary_owner_name": "Mike Wilson",
+        "department": "Human Resources",
+        "review_frequency": "monthly",
+        "next_review_date": "2025-12-06"
+      },
+      "visibility": {
+        "roles": ["team-member", "team-lead", "manager", "director", "vice-president", "c-level-executive"],
+        "departments": ["All"],
+        "ad_groups": ["WMT_ActivityHub_All_Users"],
+        "conditions": {
+          "active_hours": "00:00-23:59",
+          "business_days_only": false,
+          "geo_restrictions": ["US", "CA", "MX", "UK"]
+        }
+      },
+      "tracking": {
+        "google_analytics": "UA-12345678-1",
+        "custom_events": ["workday_access", "hr_self_service_usage"],
+        "monthly_clicks": 3456,
+        "unique_users": 2134,
+        "avg_session_duration": "6m 18s"
+      },
+      "health": {
+        "last_check": "2025-11-06T14:45:00Z",
+        "status": "healthy",
+        "response_time_ms": 280,
+        "uptime_percentage": 99.9,
+        "ssl_valid": true
+      },
+      "metadata": {
+        "created_date": "2025-11-06T10:00:00Z",
+        "created_by": "admin@walmart.com",
+        "last_modified": "2025-11-06T12:15:00Z",
+        "modified_by": "sarah.johnson@walmart.com",
+        "version": "1.1",
+        "status": "active",
+        "change_log": [
+          {
+            "date": "2025-11-06T12:15:00Z",
+            "user": "sarah.johnson@walmart.com",
+            "change": "Expanded geographic access to include UK operations",
+            "version": "1.1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "project-management-portal",
+      "name": "Enterprise Project Portal",
+      "description": "Centralized project management system for tracking initiatives, resources, timelines, and deliverables",
+      "category": "operations",
+      "type": "internal",
+      "url": "/projects/dashboard",
+      "display": {
+        "button_text": "Project Portal",
+        "icon": "clipboard-list",
+        "color": "#3B82F6",
+        "size": "medium",
+        "position": "operations-dashboard",
+        "tooltip": "Manage and track all your projects"
+      },
+      "ownership": {
+        "primary_owner": "alex.brown@walmart.com",
+        "primary_owner_name": "Alex Brown",
+        "secondary_owner": "lisa.garcia@walmart.com",
+        "secondary_owner_name": "Lisa Garcia",
+        "department": "Operations",
+        "review_frequency": "monthly",
+        "next_review_date": "2025-12-06"
+      },
+      "visibility": {
+        "roles": ["project-manager", "team-lead", "manager", "director", "vice-president"],
+        "departments": ["Operations", "Technology", "Finance"],
+        "ad_groups": ["WMT_ActivityHub_ProjectManagers", "WMT_ActivityHub_Operations_Leadership"],
+        "conditions": {
+          "active_hours": "05:00-23:00",
+          "business_days_only": false,
+          "geo_restrictions": []
+        }
+      },
+      "tracking": {
+        "google_analytics": "UA-12345678-1",
+        "custom_events": ["project_portal_access", "project_creation", "milestone_update"],
+        "monthly_clicks": 892,
+        "unique_users": 156,
+        "avg_session_duration": "12m 45s"
+      },
+      "health": {
+        "last_check": "2025-11-06T14:45:00Z",
+        "status": "healthy",
+        "response_time_ms": 120,
+        "uptime_percentage": 99.8,
+        "ssl_valid": true
+      },
+      "metadata": {
+        "created_date": "2025-11-06T10:00:00Z",
+        "created_by": "admin@walmart.com",
+        "last_modified": "2025-11-06T11:20:00Z",
+        "modified_by": "alex.brown@walmart.com",
+        "version": "1.0",
+        "status": "active",
+        "change_log": []
+      }
+    },
+    {
+      "id": "business-intelligence-dashboard",
+      "name": "BI Analytics Dashboard",
+      "description": "Advanced business intelligence platform with real-time analytics, KPI tracking, and custom reporting",
+      "category": "analytics",
+      "type": "external",
+      "url": "https://bi.walmart.com/dashboard",
+      "display": {
+        "button_text": "BI Dashboard",
+        "icon": "chart-pie",
+        "color": "#8B5CF6",
+        "size": "large",
+        "position": "analytics-section",
+        "tooltip": "Access advanced business intelligence and analytics"
+      },
+      "ownership": {
+        "primary_owner": "david.lee@walmart.com",
+        "primary_owner_name": "David Lee",
+        "secondary_owner": "maria.rodriguez@walmart.com",
+        "secondary_owner_name": "Maria Rodriguez",
+        "department": "Analytics",
+        "review_frequency": "monthly",
+        "next_review_date": "2025-12-06"
+      },
+      "visibility": {
+        "roles": ["business-analyst", "manager", "director", "vice-president", "c-level-executive"],
+        "departments": ["Analytics", "Finance", "Operations", "Technology"],
+        "ad_groups": ["WMT_ActivityHub_BusinessAnalysts", "WMT_ActivityHub_Directors"],
+        "conditions": {
+          "active_hours": "00:00-23:59",
+          "business_days_only": false,
+          "geo_restrictions": ["US", "CA", "MX"]
+        }
+      },
+      "tracking": {
+        "google_analytics": "UA-12345678-1",
+        "custom_events": ["bi_dashboard_access", "report_generation", "data_export"],
+        "monthly_clicks": 674,
+        "unique_users": 89,
+        "avg_session_duration": "18m 32s"
+      },
+      "health": {
+        "last_check": "2025-11-06T14:45:00Z",
+        "status": "healthy",
+        "response_time_ms": 450,
+        "uptime_percentage": 99.5,
+        "ssl_valid": true
+      },
+      "metadata": {
+        "created_date": "2025-11-06T10:00:00Z",
+        "created_by": "admin@walmart.com",
+        "last_modified": "2025-11-06T13:10:00Z",
+        "modified_by": "david.lee@walmart.com",
+        "version": "1.3",
+        "status": "active",
+        "change_log": [
+          {
+            "date": "2025-11-06T13:10:00Z",
+            "user": "david.lee@walmart.com",
+            "change": "Added new analytics modules for supply chain insights",
+            "version": "1.3"
+          }
+        ]
+      }
+    },
+    {
+      "id": "supply-chain-wms",
+      "name": "Warehouse Management System",
+      "description": "Real-time warehouse operations, inventory tracking, and supply chain optimization tools",
+      "category": "operations",
+      "type": "external",
+      "url": "https://wms.walmart.com/operations",
+      "display": {
+        "button_text": "WMS Portal",
+        "icon": "truck",
+        "color": "#EF4444",
+        "size": "medium",
+        "position": "operations-dashboard",
+        "tooltip": "Access warehouse management and supply chain tools"
+      },
+      "ownership": {
+        "primary_owner": "tom.anderson@walmart.com",
+        "primary_owner_name": "Tom Anderson",
+        "secondary_owner": "jennifer.white@walmart.com",
+        "secondary_owner_name": "Jennifer White",
+        "department": "Supply Chain",
+        "review_frequency": "weekly",
+        "next_review_date": "2025-11-13"
+      },
+      "visibility": {
+        "roles": ["team-member", "team-lead", "manager", "director"],
+        "departments": ["Operations", "Supply Chain", "Logistics"],
+        "ad_groups": ["WMT_ActivityHub_Operations_Users", "WMT_ActivityHub_Operations_Leadership"],
+        "conditions": {
+          "active_hours": "00:00-23:59",
+          "business_days_only": false,
+          "geo_restrictions": ["US", "CA", "MX"]
+        }
+      },
+      "tracking": {
+        "google_analytics": "UA-12345678-1",
+        "custom_events": ["wms_access", "inventory_check", "shipment_tracking"],
+        "monthly_clicks": 2341,
+        "unique_users": 567,
+        "avg_session_duration": "8m 15s"
+      },
+      "health": {
+        "last_check": "2025-11-06T14:45:00Z",
+        "status": "healthy",
+        "response_time_ms": 390,
+        "uptime_percentage": 99.6,
+        "ssl_valid": true
+      },
+      "metadata": {
+        "created_date": "2025-11-06T10:00:00Z",
+        "created_by": "admin@walmart.com",
+        "last_modified": "2025-11-06T09:30:00Z",
+        "modified_by": "tom.anderson@walmart.com",
+        "version": "1.0",
+        "status": "active",
+        "change_log": []
+      }
+    },
+    {
+      "id": "learning-development-portal",
+      "name": "Learning & Development",
+      "description": "Corporate training programs, skill development courses, and certification tracking",
+      "category": "hr",
+      "type": "external",
+      "url": "https://learning.walmart.com/portal",
+      "display": {
+        "button_text": "Learning Portal",
+        "icon": "academic-cap",
+        "color": "#F59E0B",
+        "size": "medium",
+        "position": "personal-development",
+        "tooltip": "Access training and development resources"
+      },
+      "ownership": {
+        "primary_owner": "karen.davis@walmart.com",
+        "primary_owner_name": "Karen Davis",
+        "secondary_owner": "robert.miller@walmart.com",
+        "secondary_owner_name": "Robert Miller",
+        "department": "Learning & Development",
+        "review_frequency": "quarterly",
+        "next_review_date": "2026-02-06"
+      },
+      "visibility": {
+        "roles": ["team-member", "team-lead", "manager", "director", "vice-president", "c-level-executive"],
+        "departments": ["All"],
+        "ad_groups": ["WMT_ActivityHub_All_Users"],
+        "conditions": {
+          "active_hours": "00:00-23:59",
+          "business_days_only": false,
+          "geo_restrictions": []
+        }
+      },
+      "tracking": {
+        "google_analytics": "UA-12345678-1",
+        "custom_events": ["learning_portal_access", "course_enrollment", "certification_completion"],
+        "monthly_clicks": 1567,
+        "unique_users": 892,
+        "avg_session_duration": "25m 18s"
+      },
+      "health": {
+        "last_check": "2025-11-06T14:45:00Z",
+        "status": "healthy",
+        "response_time_ms": 310,
+        "uptime_percentage": 99.7,
+        "ssl_valid": true
+      },
+      "metadata": {
+        "created_date": "2025-11-06T10:00:00Z",
+        "created_by": "admin@walmart.com",
+        "last_modified": "2025-11-06T10:00:00Z",
+        "modified_by": "admin@walmart.com",
+        "version": "1.0",
+        "status": "active",
+        "change_log": []
+      }
+    }
+  ],
+  "templates": [
+    {
+      "id": "external-system-template",
+      "name": "External System Link Template",
+      "description": "Standard template for external system integrations",
+      "default_values": {
+        "type": "external",
+        "display": {
+          "size": "medium",
+          "color": "#1E3A8A"
+        },
+        "visibility": {
+          "conditions": {
+            "active_hours": "06:00-22:00",
+            "business_days_only": true
+          }
+        },
+        "tracking": {
+          "google_analytics": "UA-12345678-1"
+        }
+      }
+    },
+    {
+      "id": "internal-tool-template",
+      "name": "Internal Tool Link Template",
+      "description": "Standard template for internal Activity Hub tools",
+      "default_values": {
+        "type": "internal",
+        "display": {
+          "size": "medium",
+          "color": "#3B82F6"
+        },
+        "visibility": {
+          "conditions": {
+            "active_hours": "00:00-23:59",
+            "business_days_only": false
+          }
+        },
+        "tracking": {
+          "google_analytics": "UA-12345678-1"
+        }
+      }
+    },
+    {
+      "id": "hr-system-template",
+      "name": "HR System Link Template",
+      "description": "Template for HR and employee-related systems",
+      "default_values": {
+        "category": "hr",
+        "type": "external",
+        "display": {
+          "size": "medium",
+          "color": "#059669",
+          "icon": "users"
+        },
+        "visibility": {
+          "departments": ["All"],
+          "conditions": {
+            "active_hours": "00:00-23:59",
+            "business_days_only": false
+          }
+        }
+      }
+    }
+  ],
+  "categories": [
+    {
+      "id": "finance",
+      "name": "Finance",
+      "description": "Financial systems, reporting, and budget management tools",
+      "color": "#1E3A8A",
+      "default_icon": "chart-bar"
+    },
+    {
+      "id": "hr",
+      "name": "Human Resources",
+      "description": "Employee services, benefits, and HR management tools",
+      "color": "#059669",
+      "default_icon": "users"
+    },
+    {
+      "id": "operations",
+      "name": "Operations",
+      "description": "Supply chain, logistics, and operational management tools",
+      "color": "#EF4444",
+      "default_icon": "truck"
+    },
+    {
+      "id": "technology",
+      "name": "Technology",
+      "description": "IT systems, development tools, and technical resources",
+      "color": "#8B5CF6",
+      "default_icon": "code"
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics",
+      "description": "Business intelligence, reporting, and data analysis tools",
+      "color": "#F59E0B",
+      "default_icon": "chart-pie"
+    }
+  ],
+  "global_settings": {
+    "default_health_check_interval_minutes": 15,
+    "broken_link_threshold_failures": 3,
+    "performance_alert_threshold_ms": 5000,
+    "ssl_certificate_expiry_warning_days": 30,
+    "link_usage_analytics_retention_days": 365,
+    "emergency_disable_all_enabled": true,
+    "bulk_operations_max_items": 100
+  },
+  "performance_metrics": {
+    "total_active_links": 156,
+    "average_uptime_percentage": 99.6,
+    "average_response_time_ms": 325,
+    "total_monthly_clicks": 12847,
+    "unique_monthly_users": 4567,
+    "broken_links_count": 2,
+    "links_requiring_review": 5
+  },
+  "audit_trail": {
+    "enabled": true,
+    "retention_days": 2555,
+    "events_tracked": [
+      "link_created",
+      "link_modified",
+      "link_deleted",
+      "link_accessed",
+      "health_check_failed",
+      "bulk_operation_performed"
+    ]
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "created_date": "2025-11-06T10:00:00Z",
+    "last_modified": "2025-11-06T15:45:00Z",
+    "created_by": "kendall.rush@walmart.com",
+    "total_links": 156,
+    "active_links": 154,
+    "inactive_links": 2,
+    "schema_version": "2025.1"
+  }
+}

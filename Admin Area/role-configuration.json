@@ -1,0 +1,330 @@
+{
+  "roles": [
+    {
+      "id": "c-level-executive",
+      "name": "C-Level Executive",
+      "category": "executive",
+      "level": 1,
+      "description": "CEO, CFO, CTO, and other C-suite leaders with enterprise-wide visibility",
+      "permissions": [
+        "enterprise.view.all",
+        "dashboard.executive.access",
+        "metrics.enterprise.view",
+        "reports.all.access",
+        "strategic.planning.access",
+        "resource.allocation.enterprise"
+      ],
+      "inherits_from": null,
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["department.specific.permissions"],
+        "restricted_removals": ["enterprise.view.all"]
+      },
+      "user_count": 12,
+      "created_date": "2025-11-06T10:00:00Z",
+      "last_modified": "2025-11-06T14:30:00Z"
+    },
+    {
+      "id": "vice-president",
+      "name": "Vice President",
+      "category": "executive",
+      "level": 2,
+      "description": "VPs across all business units and functions with cross-functional visibility",
+      "permissions": [
+        "business_unit.view.all",
+        "dashboard.management.access",
+        "metrics.business_unit.view",
+        "reports.business_unit.access",
+        "resource.allocation.business_unit"
+      ],
+      "inherits_from": null,
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["business_unit.specific.permissions"],
+        "restricted_removals": ["business_unit.view.all"]
+      },
+      "user_count": 28,
+      "created_date": "2025-11-06T10:00:00Z",
+      "last_modified": "2025-11-06T14:30:00Z"
+    },
+    {
+      "id": "director",
+      "name": "Director",
+      "category": "management",
+      "level": 3,
+      "description": "Directors managing specific departments or major functions",
+      "permissions": [
+        "department.view.all",
+        "dashboard.management.access",
+        "metrics.department.view",
+        "reports.department.access",
+        "team.performance.management",
+        "resource.allocation.department"
+      ],
+      "inherits_from": null,
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["department.tools.access"],
+        "restricted_removals": []
+      },
+      "user_count": 156,
+      "created_date": "2025-11-06T10:00:00Z",
+      "last_modified": "2025-11-06T14:30:00Z"
+    },
+    {
+      "id": "manager",
+      "name": "Manager",
+      "category": "management",
+      "level": 4,
+      "description": "Team managers and supervisors with team-focused access",
+      "permissions": [
+        "team.view.all",
+        "dashboard.management.access",
+        "metrics.team.view",
+        "reports.team.access",
+        "task.assignment.team",
+        "performance.review.team"
+      ],
+      "inherits_from": null,
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["team.specific.tools"],
+        "restricted_removals": []
+      },
+      "user_count": 892,
+      "created_date": "2025-11-06T10:00:00Z",
+      "last_modified": "2025-11-06T14:30:00Z"
+    },
+    {
+      "id": "project-manager",
+      "name": "Project Manager",
+      "category": "operational",
+      "level": 4,
+      "description": "Professional project managers and coordinators with cross-functional coordination",
+      "permissions": [
+        "projects.view.assigned",
+        "dashboard.project.access",
+        "metrics.project.view",
+        "reports.project.access",
+        "project.management.full",
+        "resource.coordination.projects"
+      ],
+      "inherits_from": null,
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["project.tools.access"],
+        "restricted_removals": []
+      },
+      "user_count": 234,
+      "created_date": "2025-11-06T10:00:00Z",
+      "last_modified": "2025-11-06T14:30:00Z"
+    },
+    {
+      "id": "team-lead",
+      "name": "Team Lead",
+      "category": "operational",
+      "level": 5,
+      "description": "Senior team members with leadership responsibilities",
+      "permissions": [
+        "team.view.assigned",
+        "dashboard.team.access",
+        "metrics.team.view",
+        "reports.team.access",
+        "task.coordination.team",
+        "communication.team.facilitate"
+      ],
+      "inherits_from": null,
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["team.lead.tools"],
+        "restricted_removals": []
+      },
+      "user_count": 567,
+      "created_date": "2025-11-06T10:00:00Z",
+      "last_modified": "2025-11-06T14:30:00Z"
+    },
+    {
+      "id": "team-member",
+      "name": "Team Member",
+      "category": "operational",
+      "level": 6,
+      "description": "Individual contributors and specialists with personal productivity focus",
+      "permissions": [
+        "personal.view.all",
+        "dashboard.personal.access",
+        "metrics.personal.view",
+        "reports.personal.access",
+        "task.management.personal",
+        "collaboration.team.access"
+      ],
+      "inherits_from": null,
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["role.specific.tools"],
+        "restricted_removals": []
+      },
+      "user_count": 45789,
+      "created_date": "2025-11-06T10:00:00Z",
+      "last_modified": "2025-11-06T14:30:00Z"
+    },
+    {
+      "id": "business-analyst",
+      "name": "Business Analyst",
+      "category": "specialist",
+      "level": 4,
+      "description": "Data analysts and business intelligence specialists with cross-functional data access",
+      "permissions": [
+        "analytics.view.cross_department",
+        "dashboard.analytics.access",
+        "metrics.advanced.view",
+        "reports.create.custom",
+        "data.export.advanced",
+        "business_intelligence.tools.access"
+      ],
+      "inherits_from": null,
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["analytics.tools.specialized"],
+        "restricted_removals": []
+      },
+      "user_count": 178,
+      "created_date": "2025-11-06T10:00:00Z",
+      "last_modified": "2025-11-06T14:30:00Z"
+    },
+    {
+      "id": "technical-specialist",
+      "name": "Technical Specialist",
+      "category": "specialist",
+      "level": 4,
+      "description": "IT professionals and system administrators with technical oversight",
+      "permissions": [
+        "system.administration.access",
+        "dashboard.technical.access",
+        "metrics.system.view",
+        "reports.technical.access",
+        "configuration.system.manage",
+        "troubleshooting.advanced.access"
+      ],
+      "inherits_from": null,
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["technical.tools.specialized"],
+        "restricted_removals": []
+      },
+      "user_count": 89,
+      "created_date": "2025-11-06T10:00:00Z",
+      "last_modified": "2025-11-06T14:30:00Z"
+    }
+  ],
+  "permission_groups": {
+    "dashboard_access": [
+      "dashboard.executive.access",
+      "dashboard.management.access",
+      "dashboard.project.access",
+      "dashboard.team.access",
+      "dashboard.personal.access",
+      "dashboard.analytics.access",
+      "dashboard.technical.access"
+    ],
+    "data_access": [
+      "metrics.enterprise.view",
+      "metrics.business_unit.view",
+      "metrics.department.view",
+      "metrics.team.view",
+      "metrics.personal.view",
+      "metrics.project.view",
+      "metrics.advanced.view",
+      "metrics.system.view"
+    ],
+    "management_tools": [
+      "resource.allocation.enterprise",
+      "resource.allocation.business_unit",
+      "resource.allocation.department",
+      "task.assignment.team",
+      "task.coordination.team",
+      "task.management.personal",
+      "project.management.full"
+    ],
+    "reporting": [
+      "reports.all.access",
+      "reports.business_unit.access",
+      "reports.department.access",
+      "reports.team.access",
+      "reports.personal.access",
+      "reports.project.access",
+      "reports.create.custom",
+      "reports.technical.access"
+    ],
+    "administrative": [
+      "system.administration.access",
+      "configuration.system.manage",
+      "user.management.access",
+      "security.administration.access"
+    ]
+  },
+  "role_hierarchy": {
+    "executive": {
+      "level_1": ["c-level-executive"],
+      "level_2": ["vice-president"]
+    },
+    "management": {
+      "level_3": ["director"],
+      "level_4": ["manager"]
+    },
+    "operational": {
+      "level_4": ["project-manager"],
+      "level_5": ["team-lead"],
+      "level_6": ["team-member"]
+    },
+    "specialist": {
+      "level_4": ["business-analyst", "technical-specialist"]
+    }
+  },
+  "department_specific_roles": {
+    "finance": {
+      "additional_permissions": [
+        "finance.sap.access",
+        "finance.reporting.advanced",
+        "finance.budget.management",
+        "finance.compliance.access"
+      ]
+    },
+    "operations": {
+      "additional_permissions": [
+        "operations.wms.access",
+        "operations.supply_chain.view",
+        "operations.logistics.management",
+        "operations.performance.monitoring"
+      ]
+    },
+    "technology": {
+      "additional_permissions": [
+        "technology.development.tools",
+        "technology.deployment.access",
+        "technology.architecture.view",
+        "technology.security.management"
+      ]
+    },
+    "hr": {
+      "additional_permissions": [
+        "hr.workday.access",
+        "hr.employee_data.view",
+        "hr.performance.management",
+        "hr.compliance.access"
+      ]
+    }
+  },
+  "audit_settings": {
+    "role_change_approval_required": true,
+    "permission_escalation_alerts": true,
+    "quarterly_review_required": true,
+    "compliance_reporting_enabled": true
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "created_date": "2025-11-06T10:00:00Z",
+    "last_modified": "2025-11-06T15:45:00Z",
+    "created_by": "kendall.rush@walmart.com",
+    "schema_version": "2025.1"
+  }
+}

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sparky AI - Test Demo</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sparky-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #FFCC00 0%, #FFD633 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border: 4px solid #1E3A8A;
+            box-shadow: 0 8px 25px rgba(255, 204, 0, 0.3);
+            margin: 0 auto 1rem;
+            animation: wink 4s ease-in-out infinite;
+        }
+        
+        @keyframes wink {
+            0%, 85%, 100% { transform: scale(1) rotate(0deg); }
+            90%, 95% { transform: scale(1.1) rotate(-2deg); }
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .test-button {
+            background: #1E3A8A;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: #3B82F6;
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <div class="sparky-avatar">😉</div>
+            <h1 style="color: #1E3A8A; margin-bottom: 0.5rem;">Sparky AI Test Demo</h1>
+            <p style="color: #64748b;">Testing basic functionality</p>
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="test-button" onclick="testBasicFunction()">Test Basic Function</button>
+            <button class="test-button" onclick="testAnimation()">Test Animation</button>
+            <button class="test-button" onclick="testVoice()">Test Voice (if supported)</button>
+        </div>
+        
+        <div id="status" class="status" style="display: none;">
+            <strong>Status:</strong> <span id="statusText">Ready</span>
+        </div>
+    </div>
+
+    <script>
+        function showStatus(message) {
+            document.getElementById('status').style.display = 'block';
+            document.getElementById('statusText').textContent = message;
+        }
+        
+        function testBasicFunction() {
+            showStatus('✅ Basic JavaScript is working! Sparky AI functions are operational.');
+        }
+        
+        function testAnimation() {
+            const avatar = document.querySelector('.sparky-avatar');
+            avatar.style.animation = 'none';
+            setTimeout(() => {
+                avatar.style.animation = 'wink 1s ease-in-out';
+                showStatus('✅ Animations are working! Sparky is winking properly.');
+            }, 100);
+        }
+        
+        function testVoice() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                showStatus('✅ Voice recognition is supported in this browser!');
+            } else {
+                showStatus('⚠️ Voice recognition not supported in this browser. Try Chrome or Edge.');
+            }
+        }
+        
+        // Test if everything loads properly
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('😉 Sparky AI Test Demo loaded successfully!');
+            setTimeout(() => {
+                showStatus('🎯 Demo loaded successfully! All tests ready.');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

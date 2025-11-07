@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sparky AI Assistant - Activity Hub Integration</title>
+    <link rel="stylesheet" href="../Design/walmart-brand-variables.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Everyday Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* Demo Interface Header */
+        .demo-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .walmart-spark {
+            width: 40px;
+            height: 40px;
+            background: #ffcc00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #1e3a8a;
+            font-size: 18px;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            min-height: calc(100vh - 100px);
+        }
+        
+        .dashboard-simulation {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dashboard-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .breadcrumb {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .data-table {
+            background: #f8fafc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: #e2e8f0;
+            padding: 1rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .table-row {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .status-on-track { background: #d1fae5; color: #065f46; }
+        .status-at-risk { background: #fef3c7; color: #92400e; }
+        .status-delayed { background: #fee2e2; color: #991b1b; }
+        
+        /* AI Assistant Sidebar */
+        .ai-assistant-sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .ai-header {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-dark) 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ai-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 204, 0, 0.1) 0%, transparent 70%);
+            animation: sparkle 4s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.3; }
+            50% { transform: rotate(180deg) scale(1.1); opacity: 0.1; }
+        }
+        
+        .ai-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--walmart-yellow) 0%, #FFD633 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 3rem;
+            backdrop-filter: blur(10px);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(255, 204, 0, 0.3);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+        
+        .ai-avatar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+            border-radius: 50%;
+        }
+        
+        .sparky-face {
+            position: relative;
+            z-index: 3;
+            animation: wink 4s ease-in-out infinite;
+        }
+        
+        @keyframes wink {
+            0%, 85%, 100% { transform: scale(1) rotate(0deg); }
+            90%, 95% { transform: scale(1.1) rotate(-2deg); }
+        }
+        
+        .ai-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--walmart-yellow);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .ai-tagline {
+            font-size: 1rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 2;
+            font-weight: 500;
+        }
+        
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8fafc;
+        }
+        
+        .chat-message {
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-user {
+            text-align: right;
+        }
+        
+        .message-ai {
+            text-align: left;
+        }
+        
+        .message-bubble {
+            display: inline-block;
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            max-width: 90%;
+            word-wrap: break-word;
+        }
+        
+        .message-user .message-bubble {
+            background: #3b82f6;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-ai .message-bubble {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-timestamp {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+        
+        .typing-indicator {
+            display: none;
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+        
+        .typing-bubble {
+            display: inline-block;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 0.75rem 1rem;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #64748b;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+        
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+        
+        .chat-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            resize: none;
+            min-height: 40px;
+            max-height: 100px;
+            font-family: inherit;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .send-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .send-button:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+        
+        .send-button:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .voice-button {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .voice-button:hover {
+            background: #6d28d9;
+            transform: scale(1.05);
+        }
+        
+        .voice-button.listening {
+            background: #ef4444;
+            animation: pulse 1s infinite;
+        }
+        
+        .suggestions-container {
+            padding: 0 1rem 1rem;
+            background: white;
+        }
+        
+        .suggestions-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .suggestion-chip {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .suggestion-chip:hover {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+        }
+        
+        .context-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .context-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+        
+        .context-details {
+            font-size: 0.8rem;
+            color: #1e40af;
+            opacity: 0.8;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .ai-assistant-sidebar {
+                position: relative;
+                top: 0;
+                order: -1;
+            }
+            
+            .chat-container {
+                height: 300px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+                text-align: left;
+            }
+        }
+        
+        /* Floating Chat Widget (Alternative View) */
+        .floating-chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .chat-toggle {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--walmart-yellow) 0%, #FFD633 100%);
+            border: 3px solid var(--walmart-blue);
+            border-radius: 50%;
+            color: var(--walmart-blue);
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 204, 0, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chat-toggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+            border-radius: 50%;
+        }
+        
+        .chat-toggle:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(255, 204, 0, 0.6);
+            animation: bounce 0.6s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1.1) rotate(5deg); }
+            50% { transform: scale(1.2) rotate(-5deg); }
+        }
+
+        /* QR Code Access */
+        .qr-button {
+            background: var(--walmart-yellow);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: var(--walmart-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .qr-button:hover {
+            background: #FFD633;
+            transform: scale(1.05);
+        }
+
+        .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background: white;
+            border: 8px solid var(--walmart-yellow);
+            border-radius: 12px;
+            margin: 1rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-family: monospace;
+            background-image: 
+                linear-gradient(90deg, #000 1px, transparent 1px),
+                linear-gradient(180deg, #000 1px, transparent 1px);
+            background-size: 8px 8px;
+            position: relative;
+        }
+
+        .qr-code::after {
+            content: '😉';
+            position: absolute;
+            font-size: 24px;
+            background: var(--walmart-yellow);
+            padding: 4px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .close-qr {
+            background: var(--walmart-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+        
+        .floating-chat-panel {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            display: none;
+        }
+        
+        .chat-panel-header {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-dark) 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .close-chat {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+        
+        .close-chat:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Header -->
+    <header class="demo-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="walmart-spark">*</div>
+                <div>
+                    <div class="header-title">Activity Hub - AI Assistant Demo</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">Intelligent Context-Aware Search & Support</div>
+                </div>
+            </div>
+            <div class="ai-status">
+                <div class="status-indicator"></div>
+                <span>Sparky AI Online</span>
+                <div class="qr-access" style="margin-left: 1rem;">
+                    <button class="qr-button" onclick="showQRCode()" title="Mobile Access QR Code">
+                        📱 QR
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <!-- Simulated Dashboard Content -->
+        <div class="dashboard-simulation">
+            <div class="dashboard-header">
+                <div class="dashboard-title">Operations Dashboard</div>
+                <div class="breadcrumb">Home > Dashboards > Operations > Team Performance</div>
+            </div>
+
+            <div class="context-info">
+                <div class="context-title">🎯 Current Context</div>
+                <div class="context-details">
+                    You're viewing the Operations Team Performance dashboard. The AI Assistant can help you understand the data, explain trends, guide you through actions, or search for related information.
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">23</div>
+                    <div class="metric-label">Active Projects</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">87%</div>
+                    <div class="metric-label">On Schedule</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">156</div>
+                    <div class="metric-label">Team Members</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">$2.4M</div>
+                    <div class="metric-label">Budget Utilized</div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">Recent Projects</div>
+                <div class="table-row">
+                    <strong>Project Alpha</strong>
+                    <span class="status-badge status-on-track">On Track</span>
+                    <span>85% Complete</span>
+                    <span>Due: Dec 15</span>
+                </div>
+                <div class="table-row">
+                    <strong>Supply Chain Optimization</strong>
+                    <span class="status-badge status-at-risk">At Risk</span>
+                    <span>62% Complete</span>
+                    <span>Due: Nov 28</span>
+                </div>
+                <div class="table-row">
+                    <strong>Warehouse Automation</strong>
+                    <span class="status-badge status-delayed">Delayed</span>
+                    <span>45% Complete</span>
+                    <span>Due: Dec 1</span>
+                </div>
+                <div class="table-row">
+                    <strong>Inventory Management</strong>
+                    <span class="status-badge status-on-track">On Track</span>
+                    <span>92% Complete</span>
+                    <span>Due: Nov 20</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Assistant Sidebar -->
+        <div class="ai-assistant-sidebar">
+            <div class="ai-header">
+                <div class="ai-avatar">
+                    <span class="sparky-face">😉</span>
+                </div>
+                <div class="ai-name">Sparky</div>
+                <div class="ai-tagline">Your AI Assistant</div>
+            </div>
+
+            <div class="chat-container" id="chatContainer">
+                <div class="chat-message message-ai">
+                    <div class="message-bubble">
+                        � Hi! I'm Sparky, your AI assistant. I can see you're looking at the Operations dashboard. I can help you understand the data, find specific information, or guide you through any processes. What would you like to know?
+                    </div>
+                    <div class="message-timestamp">Just now</div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-bubble">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="suggestions-container">
+                <div class="suggestions-title">💡 Try asking:</div>
+                <div class="suggestion-chips">
+                    <div class="suggestion-chip" onclick="sendSuggestion('Why is Warehouse Automation delayed?')">
+                        Why is Warehouse Automation delayed?
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('Show me team performance trends')">
+                        Show me team performance trends
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('How do I create a new project?')">
+                        How do I create a new project?
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('What projects need attention?')">
+                        What projects need attention?
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <button class="voice-button" id="voiceButton" onclick="toggleVoice()" title="Voice input">
+                        🎤
+                    </button>
+                    <textarea 
+                        class="chat-input" 
+                        id="chatInput" 
+                        placeholder="Ask me anything about this dashboard..."
+                        rows="1"
+                        onkeydown="handleKeyDown(event)"
+                    ></textarea>
+                    <button class="send-button" id="sendButton" onclick="sendMessage()" title="Send message">
+                        ➤
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Chat Widget (Alternative Implementation) -->
+    <div class="floating-chat-widget" id="floatingWidget">
+        <button class="chat-toggle" onclick="toggleFloatingChat()" title="Open AI Assistant">
+            😉
+        </button>
+        <div class="floating-chat-panel" id="floatingPanel">
+            <div class="chat-panel-header">
+                <div>
+                    <strong>Sparky AI Assistant</strong>
+                    <div style="font-size: 0.8rem; opacity: 0.9;">Context-aware help</div>
+                </div>
+                <button class="close-chat" onclick="toggleFloatingChat()">×</button>
+            </div>
+            <!-- Chat content would go here, similar to sidebar -->
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-content">
+            <h3 style="color: var(--walmart-blue); margin-bottom: 1rem;">📱 Mobile Access</h3>
+            <p style="margin-bottom: 1rem; color: #64748b;">Scan to access Sparky AI Assistant on your mobile device</p>
+            <div class="qr-code" id="qrCode">
+                <!-- QR Code pattern will be here -->
+            </div>
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1rem;">
+                <strong>localhost:8080/AI Assistant/ai-assistant-demo.html</strong>
+            </p>
+            <button class="close-qr" onclick="closeQRCode()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        let isListening = false;
+        let recognition = null;
+
+        // Initialize speech recognition if available
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('chatInput').value = transcript;
+                sendMessage();
+            };
+
+            recognition.onend = function() {
+                isListening = false;
+                document.getElementById('voiceButton').classList.remove('listening');
+                document.getElementById('voiceButton').innerHTML = '🎤';
+            };
+        }
+
+        // Sample AI responses for demo
+        const aiResponses = {
+            'why is warehouse automation delayed': {
+                text: `📊 **Warehouse Automation Project Analysis:**
+
+🔍 **Root Causes of Delay:**
+• **Vendor Issues**: Primary automation vendor had supply chain delays (3 weeks)
+• **Integration Complexity**: Unexpected compatibility issues with existing WMS
+• **Resource Constraints**: 2 key engineers reassigned to critical production issues
+
+📈 **Current Status:**
+• 45% complete (originally planned 65% by now)
+• 3 weeks behind schedule
+• Budget still on track at $1.2M utilized
+
+🎯 **Recommended Actions:**
+• Bring in specialized integration consultant
+• Fast-track vendor delivery with expedited shipping
+• Consider phased rollout to meet partial deadlines
+
+Would you like me to show you the detailed project timeline or help you draft a status update for stakeholders?`,
+                suggestions: ['Show project timeline', 'Draft status update', 'Find similar past projects']
+            },
+            'show me team performance trends': {
+                text: `📈 **Team Performance Trends (Last 6 Months):**
+
+🔥 **Key Highlights:**
+• **Productivity**: +15% improvement since July
+• **Project Delivery**: 87% on-time completion rate
+• **Quality Score**: 4.6/5.0 (up from 4.2)
+• **Employee Satisfaction**: 4.3/5.0
+
+📊 **Trend Analysis:**
+• **Best Month**: October (92% project success rate)
+• **Challenge Period**: August (72% due to summer vacations)
+• **Improvement Areas**: Communication efficiency, resource planning
+
+🎯 **Insights:**
+Your team is performing exceptionally well! The automation project delay is an outlier - your normal delivery rate is among the top 10% company-wide.
+
+Would you like me to generate a detailed performance report or compare with other departments?`,
+                suggestions: ['Generate performance report', 'Compare with other teams', 'Show individual contributors']
+            },
+            'how do i create a new project': {
+                text: `🎯 **Creating a New Project - Step by Step:**
+
+**Step 1:** Click the "New Project" button in the top right
+**Step 2:** Choose your project template:
+• Standard Business Project
+• IT/Technology Initiative  
+• Operations Improvement
+• Custom Project
+
+**Step 3:** Fill in the required information:
+• Project name and description
+• Start and end dates
+• Budget allocation
+• Team assignments
+
+**Step 4:** Define deliverables and milestones
+**Step 5:** Set up notifications and approval workflows
+
+😉 **I can guide you through this process!** Would you like me to:
+• Walk through each step with highlights on the interface
+• Show you a quick tutorial video
+• Help you fill out the project form`,
+                suggestions: ['Guide me through the process', 'Show tutorial video', 'Open project form']
+            },
+            'what projects need attention': {
+                text: `⚠️ **Projects Requiring Immediate Attention:**
+
+🔴 **Critical (2 projects):**
+• **Warehouse Automation** - 3 weeks delayed, vendor issues
+• **Supply Chain Optimization** - At risk, resource constraints
+
+🟡 **Attention Needed (1 project):**
+• **Project Alpha** - On track but approaching critical path milestone
+
+✅ **Performing Well (20 projects):**
+• All other projects are on schedule or ahead
+
+🎯 **Recommended Actions:**
+1. **Schedule emergency review** for Warehouse Automation
+2. **Reallocate resources** to Supply Chain Optimization  
+3. **Monitor** Project Alpha milestone (due Nov 25)
+
+Would you like me to help you schedule these reviews or create action items?`,
+                suggestions: ['Schedule project reviews', 'Create action items', 'Show detailed project status']
+            }
+        };
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Show typing indicator
+            showTyping();
+
+            // Simulate AI processing delay
+            setTimeout(() => {
+                hideTyping();
+                
+                // Find matching response or default
+                const responseKey = Object.keys(aiResponses).find(key => 
+                    message.toLowerCase().includes(key)
+                );
+                
+                const response = responseKey ? aiResponses[responseKey] : {
+                    text: `I understand you're asking about "${message}". Based on the current dashboard context, I can help you with:
+
+🔍 **Data Analysis**: I can explain the metrics and trends you're seeing
+📊 **Process Guidance**: I can walk you through any workflows or procedures  
+🔗 **Information Search**: I can find related documents or resources
+😉 **System Help**: I can guide you through using Activity Hub features
+
+Could you be more specific about what you'd like to know? I have access to all the data you can see plus additional context from connected systems.`,
+                    suggestions: ['Explain the current metrics', 'Help with workflows', 'Search for documents']
+                };
+                
+                addMessage(response.text, 'ai');
+                
+                if (response.suggestions) {
+                    updateSuggestions(response.suggestions);
+                }
+            }, 1500);
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message message-${sender}`;
+            
+            const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">${formatMessage(text)}</div>
+                <div class="message-timestamp">${timestamp}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function formatMessage(text) {
+            // Convert markdown-style formatting to HTML
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/•/g, '•')
+                .replace(/\n/g, '<br>');
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').style.display = 'block';
+            document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function updateSuggestions(suggestions) {
+            const container = document.querySelector('.suggestion-chips');
+            container.innerHTML = '';
+            
+            suggestions.forEach(suggestion => {
+                const chip = document.createElement('div');
+                chip.className = 'suggestion-chip';
+                chip.textContent = suggestion;
+                chip.onclick = () => sendSuggestion(suggestion);
+                container.appendChild(chip);
+            });
+        }
+
+        function sendSuggestion(text) {
+            document.getElementById('chatInput').value = text;
+            sendMessage();
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function toggleVoice() {
+            if (!recognition) {
+                alert('Speech recognition not supported in this browser');
+                return;
+            }
+
+            if (isListening) {
+                recognition.stop();
+            } else {
+                isListening = true;
+                document.getElementById('voiceButton').classList.add('listening');
+                document.getElementById('voiceButton').innerHTML = '⏹️';
+                recognition.start();
+            }
+        }
+
+        function toggleFloatingChat() {
+            const panel = document.getElementById('floatingPanel');
+            const isVisible = panel.style.display === 'block';
+            panel.style.display = isVisible ? 'none' : 'block';
+        }
+
+        // Auto-resize textarea
+        document.getElementById('chatInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // Demo mode toggle (for showing floating widget)
+        function toggleDemoMode() {
+            const sidebar = document.querySelector('.ai-assistant-sidebar');
+            const floating = document.getElementById('floatingWidget');
+            
+            if (sidebar.style.display === 'none') {
+                sidebar.style.display = 'block';
+                floating.style.display = 'none';
+            } else {
+                sidebar.style.display = 'none';
+                floating.style.display = 'block';
+            }
+        }
+
+        // Simulate context awareness
+        function updateContext() {
+            const contextInfo = document.querySelector('.context-details');
+            const contexts = [
+                "You're viewing the Operations Team Performance dashboard. I can help explain metrics, trends, and guide you through processes.",
+                "Looking at project data for November 2025. I have access to detailed project timelines, budgets, and team assignments.",
+                "Current user role: Operations Manager. I can provide management-level insights and recommendations.",
+                "Active filters: Team view, Q4 2025 data. I can help you adjust filters or explain the current data set."
+            ];
+            
+            setInterval(() => {
+                const randomContext = contexts[Math.floor(Math.random() * contexts.length)];
+                contextInfo.textContent = randomContext;
+            }, 10000);
+        }
+
+        // Initialize demo
+        updateContext();
+
+        // Add keyboard shortcut for AI assistant (Ctrl+/)
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === '/') {
+                event.preventDefault();
+                document.getElementById('chatInput').focus();
+            }
+        });
+
+        console.log('😉 Sparky AI Assistant initialized successfully!');
+        console.log('💡 Try the voice input feature or ask about the dashboard data.');
+        
+        // QR Code functionality
+        function showQRCode() {
+            const modal = document.getElementById('qrModal');
+            modal.style.display = 'flex';
+            
+            // Simulate QR code generation (in real implementation, use QR library)
+            const qrCode = document.getElementById('qrCode');
+            qrCode.innerHTML = '<div style="font-size: 10px; line-height: 1;">█ █▀▀▀█ █ ▀▀█ █▀▀▀█ █<br/>█ █   █ █▀▀▀█ █   █ █<br/>█ █▄▄▄█ █   █ █▄▄▄█ █<br/>█▄▄▄▄▄▄▄█▄█▄█▄▄▄▄▄▄▄█<br/>▀▀█▀▀▀▀▀█ █ █▀▀▀▀▀█▀▀<br/>█ █▀▀▀█ ▀▀█▀▀ █▀▀▀█ █<br/>█ █   █ █ ▀ █ █   █ █<br/>█ █▄▄▄█ █▄▄▄█ █▄▄▄█ █</div>';
+        }
+        
+        function closeQRCode() {
+            const modal = document.getElementById('qrModal');
+            modal.style.display = 'none';
+        }
+        
+        // Close QR modal when clicking outside
+        document.getElementById('qrModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeQRCode();
+            }
+        });
+    </script>
+</body>
+</html>
