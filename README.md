@@ -24,6 +24,11 @@ Activity-Hub/
 │   ├── access-groups.json # AD group mappings and access controls
 │   └── dynamic-links.json # Managed links and button configurations
 │
+├── Landing Page/           # Main landing page and user entry point
+│   ├── README.md          # Landing page documentation and update guide
+│   ├── index.html         # Primary landing page (production version)
+│   └── activity-hub-demo.html # Original Activity Hub demo and prototype
+│
 ├── Sparky AI/              # Intelligent AI assistant and platform integration
 │   ├── README.md          # Comprehensive Sparky AI system documentation
 │   ├── BACKEND_API.md     # Backend architecture and API documentation
@@ -36,7 +41,6 @@ Activity-Hub/
 │   ├── COMPLETE_BRAND_SPECS.md # Official Walmart brand guidelines
 │   ├── walmart-brand-variables.css # Production-ready CSS variables
 │   ├── color-tester.html  # Interactive color testing tool
-│   ├── activity-hub-demo.html # Live interface demo
 │   └── walmart-spark-logo.png # Official Walmart Spark logo
 │
 └── Strategy/               # Strategic planning and project documentation
