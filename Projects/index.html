@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IH Project Data Management Interface</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>IH Project Data Management</h1>
+            <p>Manage records from wmt-assetprotection-prod.Store_Support.IH_Project_Data</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="tab-button active" onclick="showTab('create')">Create New Record</button>
+            <button class="tab-button" onclick="showTab('search')">Search & Update Records</button>
+            <button class="tab-button" onclick="showTab('view')">View All Records</button>
+        </nav>
+
+        <!-- Create New Record Tab -->
+        <div id="create" class="tab-content active">
+            <div class="card">
+                <h2>Create New IH Project Record</h2>
+                <form id="createForm" class="form-grid">
+                    <div class="form-group">
+                        <label for="projectId">Project ID *</label>
+                        <input type="text" id="projectId" name="projectId" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="projectName">Project Name *</label>
+                        <input type="text" id="projectName" name="projectName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="storeNumber">Store Number</label>
+                        <input type="number" id="storeNumber" name="storeNumber">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="region">Region</label>
+                        <select id="region" name="region">
+                            <option value="">Select Region</option>
+                            <option value="North">North</option>
+                            <option value="South">South</option>
+                            <option value="East">East</option>
+                            <option value="West">West</option>
+                            <option value="Central">Central</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="district">District</label>
+                        <input type="text" id="district" name="district">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="market">Market</label>
+                        <input type="text" id="market" name="market">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="projectType">Project Type</label>
+                        <select id="projectType" name="projectType">
+                            <option value="">Select Type</option>
+                            <option value="Investigation">Investigation</option>
+                            <option value="Prevention">Prevention</option>
+                            <option value="Training">Training</option>
+                            <option value="Audit">Audit</option>
+                            <option value="Compliance">Compliance</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priority">Priority Level</label>
+                        <select id="priority" name="priority">
+                            <option value="">Select Priority</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="Planning">Planning</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="assignedTo">Assigned To</label>
+                        <input type="text" id="assignedTo" name="assignedTo">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" id="startDate" name="startDate">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="targetDate">Target Completion Date</label>
+                        <input type="date" id="targetDate" name="targetDate">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description">Project Description</label>
+                        <textarea id="description" name="description" rows="4" placeholder="Enter project description..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="notes">Additional Notes</label>
+                        <textarea id="notes" name="notes" rows="3" placeholder="Enter any additional notes..."></textarea>
+                    </div>
+
+                    <div class="form-actions full-width">
+                        <button type="submit" class="btn btn-primary">Create Record</button>
+                        <button type="reset" class="btn btn-secondary">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Search & Update Records Tab -->
+        <div id="search" class="tab-content">
+            <div class="card">
+                <h2>Search & Update Records</h2>
+                <div class="search-section">
+                    <div class="search-filters">
+                        <input type="text" id="searchProjectId" placeholder="Search by Project ID">
+                        <input type="text" id="searchProjectName" placeholder="Search by Project Name">
+                        <input type="number" id="searchStoreNumber" placeholder="Search by Store Number">
+                        <select id="searchStatus">
+                            <option value="">All Statuses</option>
+                            <option value="Planning">Planning</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="searchRecords()">Search</button>
+                        <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
+                    </div>
+                </div>
+
+                <div id="searchResults" class="search-results">
+                    <!-- Search results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Update Form Modal -->
+            <div id="updateModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Update Project Record</h3>
+                        <span class="close" onclick="closeUpdateModal()">&times;</span>
+                    </div>
+                    <form id="updateForm" class="form-grid">
+                        <!-- Form fields will be populated dynamically -->
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- View All Records Tab -->
+        <div id="view" class="tab-content">
+            <div class="card">
+                <h2>All IH Project Records</h2>
+                <div class="table-controls">
+                    <button class="btn btn-primary" onclick="loadAllRecords()">Refresh Data</button>
+                    <button class="btn btn-secondary" onclick="exportData()">Export to CSV</button>
+                </div>
+                <div class="table-container">
+                    <table id="recordsTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Project ID</th>
+                                <th>Project Name</th>
+                                <th>Store Number</th>
+                                <th>Region</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Assigned To</th>
+                                <th>Target Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTableBody">
+                            <!-- Table rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusMessage" class="status-message"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
