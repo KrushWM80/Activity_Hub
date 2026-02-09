@@ -148,9 +148,7 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: var(--space-6);
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: var(--space-6);
+            display: block;
         }
 
         /* Sidebar */
@@ -598,81 +596,31 @@
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
-                <a href="#" class="nav-item active">Dashboard</a>
+                <a href="#" class="nav-item active">For You</a>
                 <a href="#" class="nav-item">Projects</a>
+                <a href="#" class="nav-item">Reporting</a>
                 <a href="#" class="nav-item">Teams</a>
-                <a href="#" class="nav-item">Reports</a>
+                <a href="#" class="nav-item">My Work</a>
                 <a href="#" class="nav-item">Settings</a>
+                <a href="./../Admin/admin-dashboard.html" class="nav-item" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
             </nav>
             <div class="user-section">
                 <div class="notification-bell">
                     🔔
                     <div class="notification-badge">3</div>
                 </div>
-                <span>John Doe</span>
+                <span>Krush</span>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
     <div class="main-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <a href="#" class="sidebar-item active">
-                📊 Dashboard
-            </a>
-            <a href="#" class="sidebar-item">
-                📋 My Tasks
-            </a>
-            <a href="#" class="sidebar-item">
-                🔔 Notifications
-            </a>
-            <a href="#" class="sidebar-item">
-                📁 Projects
-            </a>
-            <a href="#" class="sidebar-item">
-                👥 Teams
-            </a>
-            <a href="#" class="sidebar-item">
-                📈 Analytics
-            </a>
-            <a href="#" class="sidebar-item">
-                ⚙️ Settings
-            </a>
-        </aside>
-
         <!-- Dashboard Grid -->
         <main class="dashboard">
-            <!-- Notifications Widget -->
-            <div class="widget notification-widget widget-medium">
-                <div class="widget-header">
-                    🔔 Notifications & Alerts
-                    <span class="notification-count">5</span>
-                </div>
-                <div class="widget-content">
-                    <div class="notification-item priority-high">
-                        <div>
-                            <strong>High Priority:</strong> Project Alpha deadline approaching
-                            <div style="font-size: 0.75rem; color: #718096; margin-top: 4px;">2 hours ago</div>
-                        </div>
-                    </div>
-                    <div class="notification-item priority-medium">
-                        <div>
-                            <strong>Team Update:</strong> New resources allocated to Project Beta
-                            <div style="font-size: 0.75rem; color: #718096; margin-top: 4px;">4 hours ago</div>
-                        </div>
-                    </div>
-                    <div class="notification-item">
-                        <div>
-                            <strong>System:</strong> Weekly report generated successfully
-                            <div style="font-size: 0.75rem; color: #718096; margin-top: 4px;">1 day ago</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <!-- Row 1: My Tasks + Performance Metrics -->
             <!-- My Tasks Widget -->
-            <div class="widget task-widget widget-medium">
+            <div class="widget task-widget widget-large">
                 <div class="widget-header">
                     📋 My Tasks
                     <button style="background: #3B82F6; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer;">+ Add</button>
@@ -711,8 +659,126 @@
                 </div>
             </div>
 
+            <!-- Performance Metrics -->
+            <div class="widget widget-large">
+                <div class="widget-header" style="background: linear-gradient(135deg, #38A169 0%, #2F855A 100%); color: white;">
+                    📈 Performance Metrics
+                </div>
+                <div class="widget-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span>Task Completion Rate</span>
+                        <span style="font-weight: bold; color: #38A169;">87%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 87%; background: linear-gradient(90deg, #38A169 0%, #68D391 100%);"></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0;">
+                        <span>Team Productivity</span>
+                        <span style="font-weight: bold; color: #3B82F6;">92%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 92%;"></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0;">
+                        <span>Goal Achievement</span>
+                        <span style="font-weight: bold; color: #D69E2E;">78%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%; background: linear-gradient(90deg, #D69E2E 0%, #F6E05E 100%);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Next Steps + Projects Feed -->
+            <!-- Next Steps Widget -->
+            <div class="widget action-widget widget-large">
+                <div class="widget-header">
+                    🎯 Next Steps & Action Items
+                    <span class="ai-badge">AI</span>
+                </div>
+                <div class="widget-content">
+                    <div class="action-item">
+                        <div class="action-icon">💡</div>
+                        <div class="action-content">
+                            <div class="action-title">Schedule team review meeting</div>
+                            <div class="action-description">Based on project timeline, recommend scheduling review by Friday</div>
+                            <span class="estimated-time">30 min</span>
+                        </div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-icon">📈</div>
+                        <div class="action-content">
+                            <div class="action-title">Update stakeholder report</div>
+                            <div class="action-description">Progress metrics need to be shared with executive team</div>
+                            <span class="estimated-time">15 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Feed -->
+            <div class="widget activity-widget widget-large">
+                <div class="widget-header">
+                    📁 Projects Feed
+                </div>
+                <div class="widget-content">
+                    <div class="activity-item">
+                        <div class="activity-avatar">JS</div>
+                        <div class="activity-content">
+                            <div class="activity-text"><strong>Jane Smith</strong> completed task "Design mockups"</div>
+                            <div class="activity-time">15 minutes ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-avatar">MJ</div>
+                        <div class="activity-content">
+                            <div class="activity-text"><strong>Mike Jones</strong> updated Project Alpha timeline</div>
+                            <div class="activity-time">1 hour ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-avatar">AL</div>
+                        <div class="activity-content">
+                            <div class="activity-text"><strong>Amy Lee</strong> added new team member to Project Beta</div>
+                            <div class="activity-time">3 hours ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Notifications + Project Dashboard -->
+            <!-- Notifications Widget -->
+            <div class="widget notification-widget widget-medium">
+                <div class="widget-header">
+                    🔔 Notifications & Alerts
+                    <span class="notification-count">5</span>
+                </div>
+                <div class="widget-content">
+                    <div class="notification-item priority-high">
+                        <div>
+                            <strong>High Priority:</strong> Project Alpha deadline approaching
+                            <div style="font-size: 0.75rem; color: #718096; margin-top: 4px;">2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="notification-item priority-medium">
+                        <div>
+                            <strong>Team Update:</strong> New resources allocated to Project Beta
+                            <div style="font-size: 0.75rem; color: #718096; margin-top: 4px;">4 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div>
+                            <strong>System:</strong> Weekly report generated successfully
+                            <div style="font-size: 0.75rem; color: #718096; margin-top: 4px;">1 day ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Project Dashboard Widget -->
-            <div class="widget project-widget widget-large">
+            <div class="widget project-widget widget-extra-large">
                 <div class="widget-header">
                     📊 Project Alpha Dashboard
                     <span style="font-size: 0.875rem; opacity: 0.9;">Updated <span class="loading"></span></span>
@@ -740,94 +806,6 @@
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: 73%"></div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Next Steps Widget -->
-            <div class="widget action-widget widget-medium">
-                <div class="widget-header">
-                    🎯 Next Steps & Action Items
-                    <span class="ai-badge">AI</span>
-                </div>
-                <div class="widget-content">
-                    <div class="action-item">
-                        <div class="action-icon">💡</div>
-                        <div class="action-content">
-                            <div class="action-title">Schedule team review meeting</div>
-                            <div class="action-description">Based on project timeline, recommend scheduling review by Friday</div>
-                            <span class="estimated-time">30 min</span>
-                        </div>
-                    </div>
-                    <div class="action-item">
-                        <div class="action-icon">📈</div>
-                        <div class="action-content">
-                            <div class="action-title">Update stakeholder report</div>
-                            <div class="action-description">Progress metrics need to be shared with executive team</div>
-                            <span class="estimated-time">15 min</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Team Activity Feed -->
-            <div class="widget activity-widget widget-medium">
-                <div class="widget-header">
-                    👥 Team Activity Feed
-                </div>
-                <div class="widget-content">
-                    <div class="activity-item">
-                        <div class="activity-avatar">JS</div>
-                        <div class="activity-content">
-                            <div class="activity-text"><strong>Jane Smith</strong> completed task "Design mockups"</div>
-                            <div class="activity-time">15 minutes ago</div>
-                        </div>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-avatar">MJ</div>
-                        <div class="activity-content">
-                            <div class="activity-text"><strong>Mike Jones</strong> updated Project Alpha timeline</div>
-                            <div class="activity-time">1 hour ago</div>
-                        </div>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-avatar">AL</div>
-                        <div class="activity-content">
-                            <div class="activity-text"><strong>Amy Lee</strong> added new team member to Project Beta</div>
-                            <div class="activity-time">3 hours ago</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Performance Metrics -->
-            <div class="widget widget-medium">
-                <div class="widget-header" style="background: linear-gradient(135deg, #38A169 0%, #2F855A 100%); color: white;">
-                    📈 Performance Metrics
-                </div>
-                <div class="widget-content">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <span>Task Completion Rate</span>
-                        <span style="font-weight: bold; color: #38A169;">87%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 87%; background: linear-gradient(90deg, #38A169 0%, #68D391 100%);"></div>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0;">
-                        <span>Team Productivity</span>
-                        <span style="font-weight: bold; color: #3B82F6;">92%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 92%;"></div>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0;">
-                        <span>Goal Achievement</span>
-                        <span style="font-weight: bold; color: #FFCC00; color: #D69E2E;">78%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 78%; background: linear-gradient(90deg, #D69E2E 0%, #F6E05E 100%);"></div>
                     </div>
                 </div>
             </div>
@@ -900,18 +878,12 @@
             // Navigation items
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-
-            // Sidebar items
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    document.querySelectorAll('.sidebar-item').forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
+                    // Only prevent default for placeholder links, allow real navigation
+                    if (this.getAttribute('href') === '#') {
+                        e.preventDefault();
+                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                    }
                 });
             });
         }

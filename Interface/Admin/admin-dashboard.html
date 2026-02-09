@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walmart Activity Hub - Admin</title>
+    <style>
+        /* Import Walmart Brand Variables - Same as Activity Hub */
+        :root {
+            /* Official Walmart Brand Colors */
+            --walmart-navy: #1E3A8A;
+            --walmart-blue-dark: #1D4ED8;
+            --walmart-blue: #3B82F6;
+            --walmart-blue-light: #60A5FA;
+            --walmart-blue-lightest: #DBEAFE;
+            --walmart-yellow: #FFCC00;
+            --walmart-yellow-dark: #E6B800;
+            --walmart-yellow-light: #FFD633;
+            
+            /* Typography */
+            --font-primary: 'Everyday Sans', 'Helvetica Neue', Arial, sans-serif;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            
+            /* Other Variables */
+            --gray-900: #1A202C;
+            --gray-700: #4A5568;
+            --gray-600: #718096;
+            --gray-300: #E2E8F0;
+            --gray-100: #F7FAFC;
+            --white: #FFFFFF;
+            --success: #38A169;
+            --warning: #D69E2E;
+            --error: #E53E3E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--gray-100);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        /* Header - Same as Activity Hub */
+        .header {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-dark) 100%);
+            color: var(--white);
+            padding: var(--space-4) var(--space-6);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .spark-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--walmart-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--gray-900);
+        }
+
+        .nav-items {
+            display: flex;
+            gap: var(--space-6);
+        }
+
+        .nav-item {
+            color: var(--white);
+            text-decoration: none;
+            padding: var(--space-2) var(--space-4);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: var(--walmart-yellow);
+            color: var(--gray-900);
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .notification-bell {
+            position: relative;
+            padding: var(--space-2);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--walmart-yellow);
+            color: var(--gray-900);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Main Container - Same as Activity Hub */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-6);
+        }
+
+        /* Admin Page Title */
+        .page-title {
+            margin-bottom: var(--space-6);
+        }
+
+        .page-title h2 {
+            font-size: 1.75rem;
+            color: var(--walmart-navy);
+            margin-bottom: var(--space-2);
+        }
+
+        .page-title p {
+            color: var(--gray-600);
+        }
+
+        /* Admin Navigation Tabs */
+        .admin-nav {
+            background: var(--white);
+            border-radius: 12px;
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: var(--space-4);
+            border-bottom: 2px solid var(--gray-300);
+            margin-bottom: var(--space-6);
+        }
+        
+        .nav-tab {
+            padding: var(--space-3) var(--space-6);
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            margin-bottom: -2px;
+        }
+        
+        .nav-tab.active {
+            color: var(--walmart-navy);
+            border-bottom-color: var(--walmart-navy);
+        }
+        
+        .nav-tab:hover {
+            color: var(--walmart-blue);
+        }
+
+        /* Sub Navigation */
+        .sub-nav {
+            display: flex;
+            gap: var(--space-2);
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        .sub-nav-tab {
+            padding: var(--space-2) var(--space-4);
+            background: var(--gray-100);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sub-nav-tab.active {
+            background: var(--walmart-navy);
+            color: var(--white);
+        }
+
+        .sub-nav-tab:hover:not(.active) {
+            background: var(--gray-300);
+        }
+
+        .sub-content {
+            display: none;
+        }
+
+        .sub-content.active {
+            display: block;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+        
+        .stat-card {
+            background: var(--white);
+            padding: var(--space-6);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--walmart-blue);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--walmart-blue);
+            margin-bottom: var(--space-2);
+        }
+        
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Management Grid */
+        .management-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+        
+        .management-section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: var(--space-6);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .management-section.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 2px solid var(--gray-100);
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: var(--walmart-blue);
+            color: var(--white);
+            border: none;
+            padding: var(--space-3) var(--space-6);
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: var(--walmart-blue-dark);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            padding: var(--space-2) var(--space-4);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+        
+        /* Item List */
+        .item-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--gray-100);
+            transition: background 0.2s ease;
+        }
+        
+        .list-item:hover {
+            background: var(--gray-100);
+        }
+        
+        .item-info h4 {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-1);
+        }
+        
+        .item-info p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+        
+        .action-btn {
+            padding: var(--space-1) var(--space-2);
+            font-size: 0.8rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .edit-btn {
+            background: var(--walmart-blue-light);
+            color: var(--white);
+        }
+        
+        .edit-btn:hover {
+            background: var(--walmart-blue);
+        }
+        
+        .delete-btn {
+            background: var(--error);
+            color: var(--white);
+        }
+        
+        .delete-btn:hover {
+            background: #c53030;
+        }
+
+        /* Form Elements */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+        
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-2);
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            margin-bottom: var(--space-4);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Activity Feed */
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--white);
+        }
+        
+        .activity-role { background: var(--walmart-navy); }
+        .activity-link { background: var(--walmart-blue-light); }
+        .activity-access { background: var(--success); }
+
+        .activity-content h4 {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-1);
+        }
+        
+        .activity-content p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+        
+        .activity-time {
+            margin-left: auto;
+            color: var(--gray-600);
+            font-size: 0.8rem;
+        }
+
+        /* Landing Cards */
+        .landing-page {
+            padding: var(--space-6) 0;
+        }
+
+        .landing-header {
+            text-align: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .landing-header h1 {
+            font-size: 2rem;
+            color: var(--walmart-navy);
+            margin-bottom: var(--space-2);
+        }
+
+        .landing-header p {
+            color: var(--gray-600);
+            font-size: 1.1rem;
+        }
+
+        .landing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .landing-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: var(--space-6);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+
+        .landing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            border-color: var(--walmart-blue);
+        }
+
+        .landing-card-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-4);
+            font-size: 2rem;
+        }
+
+        .landing-card-icon.access { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; }
+        .landing-card-icon.logic { background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); color: white; }
+        .landing-card-icon.links { background: linear-gradient(135deg, var(--walmart-blue-light) 0%, var(--walmart-blue) 100%); color: white; }
+        .landing-card-icon.workflows { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); color: white; }
+
+        .landing-card h3 {
+            font-size: 1.25rem;
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .landing-card p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: var(--space-4);
+        }
+
+        .landing-card .card-features {
+            text-align: left;
+            background: var(--gray-100);
+            border-radius: 8px;
+            padding: var(--space-4);
+        }
+
+        .landing-card .card-features li {
+            color: var(--gray-700);
+            font-size: 0.85rem;
+            padding: var(--space-2) 0;
+            padding-left: var(--space-6);
+            position: relative;
+            list-style: none;
+        }
+
+        .landing-card .card-features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .landing-card-arrow {
+            margin-top: var(--space-4);
+            color: var(--walmart-blue);
+            font-size: 1.25rem;
+        }
+
+        /* Workflow Builder */
+        .workflow-canvas {
+            background: var(--gray-100);
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            min-height: 350px;
+            padding: var(--space-6);
+        }
+
+        .workflow-node {
+            background: var(--white);
+            border: 2px solid var(--walmart-blue);
+            border-radius: 8px;
+            padding: var(--space-4);
+            width: 180px;
+            text-align: center;
+            margin: var(--space-4);
+            display: inline-block;
+        }
+
+        .workflow-node.trigger { border-color: var(--success); background: #f0fdf4; }
+        .workflow-node.action { border-color: var(--walmart-blue-light); background: #eff6ff; }
+        .workflow-node.condition { border-color: var(--warning); background: #fffbeb; }
+
+        /* Status Badges */
+        .status-badge {
+            padding: var(--space-1) var(--space-2);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Feedback Button */
+        .feedback-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue) 100%);
+            color: var(--white);
+            border: none;
+            padding: var(--space-4) var(--space-6);
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.4);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.5);
+        }
+
+        /* Feedback Modal */
+        .feedback-modal {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 380px;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .feedback-modal.active {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .feedback-header {
+            background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue) 100%);
+            color: var(--white);
+            padding: var(--space-4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .feedback-header h3 {
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .feedback-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: var(--white);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .feedback-body {
+            padding: var(--space-6);
+        }
+
+        .feedback-step {
+            display: none;
+        }
+
+        .feedback-step.active {
+            display: block;
+        }
+
+        .feedback-categories {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .feedback-category {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            background: var(--gray-100);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .feedback-category:hover { background: var(--gray-300); }
+        .feedback-category.selected { border-color: var(--walmart-blue); background: var(--walmart-blue-lightest); }
+        .feedback-category input { display: none; }
+        .feedback-category span { font-size: 1.2rem; }
+
+        .rating-scale {
+            display: flex;
+            justify-content: space-between;
+            margin: var(--space-6) 0;
+        }
+
+        .rating-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: var(--space-2);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .rating-option:hover { background: var(--gray-100); }
+        .rating-option.selected { background: var(--walmart-blue-lightest); }
+        .rating-option input { display: none; }
+        .rating-emoji { font-size: 1.75rem; margin-bottom: var(--space-1); }
+        .rating-label { font-size: 0.7rem; color: var(--gray-600); }
+
+        .feedback-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: var(--space-3);
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .feedback-textarea:focus {
+            outline: none;
+            border-color: var(--walmart-blue);
+        }
+
+        .feedback-actions {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+
+        .feedback-btn-next {
+            flex: 1;
+            background: var(--walmart-navy);
+            color: var(--white);
+            border: none;
+            padding: var(--space-3);
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .feedback-btn-next:hover { background: var(--walmart-blue); }
+
+        .feedback-btn-back {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: none;
+            padding: var(--space-3) var(--space-4);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .feedback-success {
+            text-align: center;
+            padding: var(--space-8) var(--space-4);
+        }
+
+        .feedback-success-icon {
+            font-size: 3.5rem;
+            margin-bottom: var(--space-4);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--white);
+            padding: var(--space-6);
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 2px solid var(--gray-100);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-600);
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: var(--space-4);
+            border-radius: 8px;
+            margin-bottom: var(--space-4);
+            display: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .management-grid { grid-template-columns: 1fr; }
+            .nav-tabs { overflow-x: auto; white-space: nowrap; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: var(--space-3);
+            }
+            .nav-items {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .feedback-modal { width: calc(100% - 48px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header - Same as Activity Hub -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="spark-logo">★</div>
+                <h1>Activity Hub</h1>
+            </div>
+            <nav class="nav-items">
+                <a href="../For You - Landing Page/activity-hub-demo.html" class="nav-item">For You</a>
+                <a href="#" class="nav-item">Projects</a>
+                <a href="#" class="nav-item">Reporting</a>
+                <a href="#" class="nav-item">Teams</a>
+                <a href="#" class="nav-item">My Work</a>
+                <a href="#" class="nav-item">Settings</a>
+                <a href="#" class="nav-item active" style="background: var(--walmart-yellow); color: var(--gray-900);">🔒 Admin</a>
+            </nav>
+            <div class="user-section">
+                <div class="notification-bell">
+                    🔔
+                    <div class="notification-badge">3</div>
+                </div>
+                <span>Krush</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Title -->
+        <div class="page-title">
+            <h2>🔒 Admin Dashboard</h2>
+            <p>Manage access, configure business logic, organize links, and design workflows</p>
+        </div>
+
+        <!-- Admin Navigation -->
+        <div class="admin-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab('admin-home')">Admin Home</button>
+                <button class="nav-tab" onclick="showTab('access-management')">Access Management</button>
+                <button class="nav-tab" onclick="showTab('logic')">Logic</button>
+                <button class="nav-tab" onclick="showTab('links')">Links</button>
+                <button class="nav-tab" onclick="showTab('workflows')">Workflows</button>
+                <button class="nav-tab" onclick="showTab('analytics')">Analytics</button>
+            </div>
+
+            <!-- Admin Home Tab -->
+            <div id="admin-home" class="tab-content active">
+                <div class="landing-page">
+                    <div class="landing-cards">
+                        <div class="landing-card" onclick="navigateToTab('access-management')">
+                            <div class="landing-card-icon access">🔐</div>
+                            <h3>Access Management</h3>
+                            <p>Control user permissions, manage AD groups, and configure role-based access controls.</p>
+                            <ul class="card-features">
+                                <li>User Role Assignment</li>
+                                <li>AD Group Management</li>
+                                <li>Permission Configuration</li>
+                            </ul>
+                            <div class="landing-card-arrow">→</div>
+                        </div>
+                        <div class="landing-card" onclick="navigateToTab('logic')">
+                            <div class="landing-card-icon logic">⚙️</div>
+                            <h3>Logic</h3>
+                            <p>Configure business rules, task automation, and notification alert settings.</p>
+                            <ul class="card-features">
+                                <li>Task Logic Configuration</li>
+                                <li>Notification Alerts</li>
+                                <li>Next Steps Rules</li>
+                            </ul>
+                            <div class="landing-card-arrow">→</div>
+                        </div>
+                        <div class="landing-card" onclick="navigateToTab('links')">
+                            <div class="landing-card-icon links">🔗</div>
+                            <h3>Links</h3>
+                            <p>Manage dynamic links, configure link visibility, and organize link categories.</p>
+                            <ul class="card-features">
+                                <li>Dynamic Link Management</li>
+                                <li>Link Categories</li>
+                                <li>Visibility Controls</li>
+                            </ul>
+                            <div class="landing-card-arrow">→</div>
+                        </div>
+                        <div class="landing-card" onclick="navigateToTab('workflows')">
+                            <div class="landing-card-icon workflows">📋</div>
+                            <h3>Workflows</h3>
+                            <p>Design process flows and automation rules for different teams and project types.</p>
+                            <ul class="card-features">
+                                <li>Process Flow Builder</li>
+                                <li>Team-Based Routing</li>
+                                <li>Automation Rules</li>
+                            </ul>
+                            <div class="landing-card-arrow">→</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Access Management Tab -->
+            <div id="access-management" class="tab-content">
+                <div class="sub-nav">
+                    <button class="sub-nav-tab active" onclick="showSubTab('access-management', 'access-overview')">Overview</button>
+                    <button class="sub-nav-tab" onclick="showSubTab('access-management', 'role-management')">Role Management</button>
+                    <button class="sub-nav-tab" onclick="showSubTab('access-management', 'access-control')">Access Control</button>
+                </div>
+                <div id="access-overview" class="sub-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-number">47,892</div><div class="stat-label">Active Users</div></div>
+                        <div class="stat-card"><div class="stat-number">23</div><div class="stat-label">AD Groups</div></div>
+                        <div class="stat-card"><div class="stat-number">12</div><div class="stat-label">User Roles</div></div>
+                        <div class="stat-card"><div class="stat-number">99.2%</div><div class="stat-label">Sync Success Rate</div></div>
+                    </div>
+                    <div class="management-grid">
+                        <div class="management-section">
+                            <div class="section-header"><h3 class="section-title">Quick Actions</h3></div>
+                            <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                                <button class="btn-primary" onclick="showModal('addUserModal')">Add New User</button>
+                                <button class="btn-secondary" onclick="showSubTab('access-management', 'role-management')">Manage Roles</button>
+                                <button class="btn-secondary" onclick="showSubTab('access-management', 'access-control')">Configure AD Groups</button>
+                            </div>
+                        </div>
+                        <div class="management-section">
+                            <div class="section-header"><h3 class="section-title">Recent Activity</h3></div>
+                            <div class="activity-item">
+                                <div class="activity-icon activity-role">R</div>
+                                <div class="activity-content"><h4>Role Assignment</h4><p>John Doe assigned to Finance Manager</p></div>
+                                <div class="activity-time">2 min ago</div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon activity-access">A</div>
+                                <div class="activity-content"><h4>Access Grant</h4><p>25 users added to Operations group</p></div>
+                                <div class="activity-time">1 hour ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="role-management" class="sub-content">
+                    <div class="management-grid">
+                        <div class="management-section">
+                            <div class="section-header"><h3 class="section-title">User Roles</h3><button class="btn-primary" onclick="showModal('addRoleModal')">Add Role</button></div>
+                            <div class="search-bar"><input type="text" class="search-input" placeholder="Search roles..."></div>
+                            <div class="item-list">
+                                <div class="list-item"><div class="item-info"><h4>C-Level Executive</h4><p>Enterprise-wide strategic access • 12 users</p></div><div class="item-actions"><button class="action-btn edit-btn">Edit</button><button class="action-btn delete-btn">Delete</button></div></div>
+                                <div class="list-item"><div class="item-info"><h4>Senior Director</h4><p>Multi-department oversight • 67 users</p></div><div class="item-actions"><button class="action-btn edit-btn">Edit</button><button class="action-btn delete-btn">Delete</button></div></div>
+                                <div class="list-item"><div class="item-info"><h4>Finance Manager</h4><p>Financial systems and reporting • 45 users</p></div><div class="item-actions"><button class="action-btn edit-btn">Edit</button><button class="action-btn delete-btn">Delete</button></div></div>
+                                <div class="list-item"><div class="item-info"><h4>Project Manager</h4><p>Project coordination and tracking • 234 users</p></div><div class="item-actions"><button class="action-btn edit-btn">Edit</button><button class="action-btn delete-btn">Delete</button></div></div>
+                            </div>
+                        </div>
+                        <div class="management-section">
+                            <div class="section-header"><h3 class="section-title">Permission Matrix</h3></div>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                                <thead><tr style="background: var(--gray-100);"><th style="padding: var(--space-3); text-align: left;">Role</th><th style="padding: var(--space-3); text-align: center;">Dashboard</th><th style="padding: var(--space-3); text-align: center;">Reports</th><th style="padding: var(--space-3); text-align: center;">Admin</th></tr></thead>
+                                <tbody>
+                                    <tr><td style="padding: var(--space-3);">C-Level</td><td style="padding: var(--space-3); text-align: center; color: var(--success);">✓</td><td style="padding: var(--space-3); text-align: center; color: var(--success);">✓</td><td style="padding: var(--space-3); text-align: center; color: var(--error);">✗</td></tr>
+                                    <tr><td style="padding: var(--space-3);">Manager</td><td style="padding: var(--space-3); text-align: center; color: var(--success);">✓</td><td style="padding: var(--space-3); text-align: center; color: var(--warning);">~</td><td style="padding: var(--space-3); text-align: center; color: var(--error);">✗</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="access-control" class="sub-content">
+                    <div class="management-grid">
+                        <div class="management-section">
+                            <div class="section-header"><h3 class="section-title">AD Groups</h3><button class="btn-primary">Map Group</button></div>
+                            <div class="item-list">
+                                <div class="list-item"><div class="item-info"><h4>WMT_ActivityHub_Executives</h4><p>Enterprise leadership • 15 members</p></div><div class="item-actions"><button class="action-btn edit-btn">Configure</button></div></div>
+                                <div class="list-item"><div class="item-info"><h4>WMT_ActivityHub_Finance_Users</h4><p>Finance department • 127 members</p></div><div class="item-actions"><button class="action-btn edit-btn">Configure</button></div></div>
+                                <div class="list-item"><div class="item-info"><h4>WMT_ActivityHub_Store_Fulfillment</h4><p>Store Fulfillment teams • 342 members</p></div><div class="item-actions"><button class="action-btn edit-btn">Configure</button></div></div>
+                            </div>
+                        </div>
+                        <div class="management-section">
+                            <div class="section-header"><h3 class="section-title">Access Analytics</h3></div>
+                            <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+                                <div class="stat-card"><div class="stat-number">99.2%</div><div class="stat-label">Sync Success</div></div>
+                                <div class="stat-card"><div class="stat-number">3</div><div class="stat-label">Pending Requests</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logic Tab -->
+            <div id="logic" class="tab-content">
+                <div class="sub-nav">
+                    <button class="sub-nav-tab active" onclick="showSubTab('logic', 'logic-overview')">Overview</button>
+                    <button class="sub-nav-tab" onclick="showSubTab('logic', 'task-logic')">Task Logic</button>
+                    <button class="sub-nav-tab" onclick="showSubTab('logic', 'notification-alerts')">Notification Alerts</button>
+                    <button class="sub-nav-tab" onclick="showSubTab('logic', 'next-steps')">Next Steps</button>
+                </div>
+                <div id="logic-overview" class="sub-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-number">24</div><div class="stat-label">Active Rules</div></div>
+                        <div class="stat-card"><div class="stat-number">156</div><div class="stat-label">Notifications Today</div></div>
+                        <div class="stat-card"><div class="stat-number">89%</div><div class="stat-label">Task Completion</div></div>
+                        <div class="stat-card"><div class="stat-number">12</div><div class="stat-label">Next Steps Templates</div></div>
+                    </div>
+                    <div class="management-section full-width">
+                        <div class="section-header"><h3 class="section-title">Logic Configuration Areas</h3></div>
+                        <div class="item-list">
+                            <div class="list-item" onclick="showSubTab('logic', 'task-logic')" style="cursor: pointer;"><div class="item-info"><h4>📋 Task Logic</h4><p>Configure task assignments, priorities, and automation rules</p></div><div style="color: var(--walmart-blue);">→</div></div>
+                            <div class="list-item" onclick="showSubTab('logic', 'notification-alerts')" style="cursor: pointer;"><div class="item-info"><h4>🔔 Notification Alerts</h4><p>Manage alert triggers, delivery channels, and escalations</p></div><div style="color: var(--walmart-blue);">→</div></div>
+                            <div class="list-item" onclick="showSubTab('logic', 'next-steps')" style="cursor: pointer;"><div class="item-info"><h4>🎯 Next Steps</h4><p>Define recommended actions and workflow guidance</p></div><div style="color: var(--walmart-blue);">→</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="task-logic" class="sub-content">
+                    <div class="management-section full-width">
+                        <div class="section-header"><h3 class="section-title">Task Logic Rules</h3><button class="btn-primary">+ Add Rule</button></div>
+                        <div class="item-list">
+                            <div class="list-item"><div class="item-info"><h4>High Priority Auto-Assignment</h4><p>Automatically assigns high-priority tasks to team leads</p></div><div class="item-actions"><span class="status-badge status-active">Active</span><button class="action-btn edit-btn">Edit</button></div></div>
+                            <div class="list-item"><div class="item-info"><h4>Overdue Task Escalation</h4><p>Escalate tasks overdue by more than 48 hours</p></div><div class="item-actions"><span class="status-badge status-active">Active</span><button class="action-btn edit-btn">Edit</button></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="notification-alerts" class="sub-content">
+                    <div class="management-section full-width">
+                        <div class="section-header"><h3 class="section-title">Notification Alert Rules</h3><button class="btn-primary">+ Add Alert</button></div>
+                        <div class="item-list">
+                            <div class="list-item"><div class="item-info"><h4>Project Deadline Reminder</h4><p>Send reminder 3 days before project deadline</p></div><div class="item-actions"><span style="color: var(--success);">Email, In-App</span><button class="action-btn edit-btn">Edit</button></div></div>
+                            <div class="list-item"><div class="item-info"><h4>New Task Assignment</h4><p>Notify user when a new task is assigned</p></div><div class="item-actions"><span style="color: var(--success);">In-App, Push</span><button class="action-btn edit-btn">Edit</button></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="next-steps" class="sub-content">
+                    <div class="management-section full-width">
+                        <div class="section-header"><h3 class="section-title">Next Steps Templates</h3><button class="btn-primary">+ Add Template</button></div>
+                        <div class="item-list">
+                            <div class="list-item"><div class="item-info"><h4>New Project Onboarding</h4><p>Guides users through project setup (5 steps)</p></div><div class="item-actions"><button class="action-btn edit-btn">Edit</button></div></div>
+                            <div class="list-item"><div class="item-info"><h4>Task Completion Follow-up</h4><p>Suggested actions after completing a task (3 steps)</p></div><div class="item-actions"><button class="action-btn edit-btn">Edit</button></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Links Tab -->
+            <div id="links" class="tab-content">
+                <div class="sub-nav"><button class="sub-nav-tab active" onclick="showSubTab('links', 'link-management')">Link Management</button></div>
+                <div id="link-management" class="sub-content active">
+                    <div class="management-grid">
+                        <div class="management-section">
+                            <div class="section-header"><h3 class="section-title">Managed Links</h3><button class="btn-primary" onclick="showModal('addLinkModal')">Add Link</button></div>
+                            <div class="item-list">
+                                <div class="list-item"><div class="item-info"><h4>SAP Financial Reports</h4><p>Finance • 1,247 clicks</p></div><div class="item-actions"><button class="action-btn edit-btn">Edit</button><button class="action-btn delete-btn">Remove</button></div></div>
+                                <div class="list-item"><div class="item-info"><h4>Workday Self-Service</h4><p>HR • 3,456 clicks</p></div><div class="item-actions"><button class="action-btn edit-btn">Edit</button><button class="action-btn delete-btn">Remove</button></div></div>
+                                <div class="list-item"><div class="item-info"><h4>Project Management Portal</h4><p>Operations • 892 clicks</p></div><div class="item-actions"><button class="action-btn edit-btn">Edit</button><button class="action-btn delete-btn">Remove</button></div></div>
+                            </div>
+                        </div>
+                        <div class="management-section">
+                            <div class="section-header"><h3 class="section-title">Link Performance</h3></div>
+                            <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+                                <div class="stat-card"><div class="stat-number">156</div><div class="stat-label">Active Links</div></div>
+                                <div class="stat-card"><div class="stat-number">98.7%</div><div class="stat-label">Uptime</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflows Tab -->
+            <div id="workflows" class="tab-content">
+                <div class="sub-nav">
+                    <button class="sub-nav-tab active" onclick="showSubTab('workflows', 'workflow-overview')">Overview</button>
+                    <button class="sub-nav-tab" onclick="showSubTab('workflows', 'workflow-builder')">Workflow Builder</button>
+                    <button class="sub-nav-tab" onclick="showSubTab('workflows', 'active-workflows')">Active Workflows</button>
+                </div>
+                <div id="workflow-overview" class="sub-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-number">8</div><div class="stat-label">Active Workflows</div></div>
+                        <div class="stat-card"><div class="stat-number">234</div><div class="stat-label">Processes This Week</div></div>
+                        <div class="stat-card"><div class="stat-number">94%</div><div class="stat-label">Completion Rate</div></div>
+                        <div class="stat-card"><div class="stat-number">2.3 hrs</div><div class="stat-label">Avg. Process Time</div></div>
+                    </div>
+                    <div class="management-section full-width">
+                        <div class="section-header"><h3 class="section-title">Workflow Templates</h3><button class="btn-primary" onclick="showSubTab('workflows', 'workflow-builder')">+ Create Workflow</button></div>
+                        <p style="color: var(--gray-600); margin-bottom: var(--space-6);">Design process flows for different teams. Example: When a new project is created by a Store Fulfillment team member in WM US Home Office, it follows a specific approval and routing process.</p>
+                        <div class="item-list">
+                            <div class="list-item"><div class="item-info"><h4>Store Fulfillment - New Project</h4><p>WM US Home Office → Store Fulfillment teams workflow</p></div><div class="item-actions"><span class="status-badge status-active">Active</span><button class="action-btn edit-btn">Edit</button></div></div>
+                            <div class="list-item"><div class="item-info"><h4>Finance - Budget Approval</h4><p>Multi-level approval for budget requests over $10K</p></div><div class="item-actions"><span class="status-badge status-active">Active</span><button class="action-btn edit-btn">Edit</button></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="workflow-builder" class="sub-content">
+                    <div class="management-section full-width">
+                        <div class="section-header"><h3 class="section-title">Workflow Builder</h3><div style="display: flex; gap: var(--space-2);"><button class="btn-secondary">Save Draft</button><button class="btn-primary">Publish Workflow</button></div></div>
+                        <div class="form-grid" style="margin-bottom: var(--space-6);">
+                            <div class="form-group"><label class="form-label">Workflow Name</label><input type="text" class="form-input" placeholder="e.g., Store Fulfillment - New Project"></div>
+                            <div class="form-group"><label class="form-label">Trigger Condition</label><select class="form-input"><option value="">Select trigger...</option><option value="new_project">New Project Created</option><option value="task_complete">Task Completed</option></select></div>
+                        </div>
+                        <div class="form-grid" style="margin-bottom: var(--space-6);">
+                            <div class="form-group"><label class="form-label">Team/Department Filter</label><select class="form-input"><option value="">All Teams</option><option value="store_fulfillment">Store Fulfillment</option><option value="finance">Finance</option></select></div>
+                            <div class="form-group"><label class="form-label">Location Filter</label><select class="form-input"><option value="">All Locations</option><option value="wm_us_ho">WM US Home Office</option><option value="wm_us_stores">WM US Stores</option></select></div>
+                        </div>
+                        <h4 style="margin-bottom: var(--space-4);">Workflow Steps</h4>
+                        <div class="workflow-canvas">
+                            <div class="workflow-node trigger"><strong>🚀 Trigger</strong><p style="font-size: 0.85rem; margin-top: var(--space-2);">New Project Created</p></div>
+                            <span style="font-size: 1.5rem; color: var(--gray-600);">→</span>
+                            <div class="workflow-node condition"><strong>❓ Condition</strong><p style="font-size: 0.85rem; margin-top: var(--space-2);">Check Team Type</p></div>
+                            <span style="font-size: 1.5rem; color: var(--gray-600);">→</span>
+                            <div class="workflow-node action"><strong>⚡ Action</strong><p style="font-size: 0.85rem; margin-top: var(--space-2);">Route to Manager</p></div>
+                            <div style="text-align: center; margin-top: var(--space-6);"><button class="btn-secondary" style="margin-right: var(--space-2);">+ Add Condition</button><button class="btn-secondary">+ Add Action</button></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="active-workflows" class="sub-content">
+                    <div class="management-section full-width">
+                        <div class="section-header"><h3 class="section-title">Active Workflow Instances</h3></div>
+                        <div class="item-list">
+                            <div class="list-item"><div class="item-info"><h4>Store Fulfillment Project #1247</h4><p>Created by: Sarah Johnson • Step 2 of 4: Manager Review</p></div><div class="item-actions"><span class="status-badge status-pending">In Progress</span><button class="action-btn edit-btn">View</button></div></div>
+                            <div class="list-item"><div class="item-info"><h4>Budget Approval Request #892</h4><p>Created by: Mike Wilson • Step 3 of 3: Final Approval</p></div><div class="item-actions"><span class="status-badge status-pending">Pending</span><button class="action-btn edit-btn">View</button></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics" class="tab-content">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-number">94.2%</div><div class="stat-label">User Adoption Rate</div></div>
+                    <div class="stat-card"><div class="stat-number">2.3M</div><div class="stat-label">Monthly Page Views</div></div>
+                    <div class="stat-card"><div class="stat-number">4.7</div><div class="stat-label">Avg Session (min)</div></div>
+                    <div class="stat-card"><div class="stat-number">15%</div><div class="stat-label">Productivity Increase</div></div>
+                </div>
+                <div class="management-grid">
+                    <div class="management-section">
+                        <div class="section-header"><h3 class="section-title">System Health</h3></div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4);">
+                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">●</div><div style="font-weight: 600;">Auth</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
+                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">●</div><div style="font-weight: 600;">Database</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
+                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">●</div><div style="font-weight: 600;">API</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
+                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">●</div><div style="font-weight: 600;">Load Balancer</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
+                        </div>
+                    </div>
+                    <div class="management-section">
+                        <div class="section-header"><h3 class="section-title">User Feedback</h3></div>
+                        <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div class="stat-card"><div class="stat-number">4.7/5</div><div class="stat-label">Satisfaction</div></div>
+                            <div class="stat-card"><div class="stat-number">47</div><div class="stat-label">Feedback This Month</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="addLinkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Add New Link</h3><button class="close-btn" onclick="hideModal('addLinkModal')">×</button></div>
+            <div class="success-message" id="linkSuccessMessage">Link created successfully!</div>
+            <form onsubmit="submitLink(event)">
+                <div class="form-grid"><div class="form-group"><label class="form-label">Link Name</label><input type="text" class="form-input" placeholder="Display name" required></div><div class="form-group"><label class="form-label">Category</label><select class="form-input" required><option value="">Select category</option><option value="finance">Finance</option><option value="operations">Operations</option></select></div></div>
+                <div class="form-group"><label class="form-label">Target URL</label><input type="url" class="form-input" placeholder="https://example.com" required></div>
+                <div style="display: flex; gap: var(--space-4); justify-content: flex-end; margin-top: var(--space-6);"><button type="button" class="btn-secondary" onclick="hideModal('addLinkModal')">Cancel</button><button type="submit" class="btn-primary">Create Link</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="addRoleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Add New Role</h3><button class="close-btn" onclick="hideModal('addRoleModal')">×</button></div>
+            <form onsubmit="submitRole(event)">
+                <div class="form-group"><label class="form-label">Role Name</label><input type="text" class="form-input" placeholder="Role name" required></div>
+                <div class="form-group"><label class="form-label">Access Level</label><select class="form-input" required><option value="">Select level</option><option value="executive">Executive</option><option value="management">Management</option></select></div>
+                <div style="display: flex; gap: var(--space-4); justify-content: flex-end; margin-top: var(--space-6);"><button type="button" class="btn-secondary" onclick="hideModal('addRoleModal')">Cancel</button><button type="submit" class="btn-primary">Create Role</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Feedback Button -->
+    <button class="feedback-btn" onclick="toggleFeedback()">💬 Send Feedback</button>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="feedback-modal">
+        <div class="feedback-header"><h3>💬 Send Feedback</h3><button class="feedback-close" onclick="toggleFeedback()">×</button></div>
+        <div class="feedback-body">
+            <div id="feedback-step1" class="feedback-step active">
+                <p style="margin-bottom: var(--space-4); color: var(--gray-600);">What area would you like to give feedback on?</p>
+                <div class="feedback-categories">
+                    <label class="feedback-category"><input type="radio" name="feedback-category" value="Dashboard UI"><span>🎨</span> Dashboard UI</label>
+                    <label class="feedback-category"><input type="radio" name="feedback-category" value="Admin Features"><span>⚙️</span> Admin Features</label>
+                    <label class="feedback-category"><input type="radio" name="feedback-category" value="Workflows"><span>📋</span> Workflows & Logic</label>
+                    <label class="feedback-category"><input type="radio" name="feedback-category" value="Performance"><span>⚡</span> Performance</label>
+                    <label class="feedback-category"><input type="radio" name="feedback-category" value="Other"><span>💡</span> Other</label>
+                </div>
+                <div class="feedback-actions"><button class="feedback-btn-next" onclick="nextFeedbackStep()">Next →</button></div>
+            </div>
+            <div id="feedback-step2" class="feedback-step">
+                <p style="margin-bottom: var(--space-2); color: var(--gray-600);">How would you rate this aspect?</p>
+                <div class="rating-scale">
+                    <label class="rating-option"><input type="radio" name="feedback-rating" value="1"><span class="rating-emoji">😞</span><span class="rating-label">Poor</span></label>
+                    <label class="rating-option"><input type="radio" name="feedback-rating" value="2"><span class="rating-emoji">😐</span><span class="rating-label">Fair</span></label>
+                    <label class="rating-option"><input type="radio" name="feedback-rating" value="3"><span class="rating-emoji">😊</span><span class="rating-label">Good</span></label>
+                    <label class="rating-option"><input type="radio" name="feedback-rating" value="4"><span class="rating-emoji">😄</span><span class="rating-label">Great</span></label>
+                    <label class="rating-option"><input type="radio" name="feedback-rating" value="5"><span class="rating-emoji">🤩</span><span class="rating-label">Excellent</span></label>
+                </div>
+                <div class="form-group"><label class="form-label">Comments (optional)</label><textarea class="feedback-textarea" placeholder="Tell us more..."></textarea></div>
+                <div class="feedback-actions"><button class="feedback-btn-back" onclick="prevFeedbackStep()">← Back</button><button class="feedback-btn-next" onclick="submitFeedback()">Submit</button></div>
+            </div>
+            <div id="feedback-step3" class="feedback-step">
+                <div class="feedback-success"><div class="feedback-success-icon">✅</div><h3 style="margin-bottom: var(--space-2);">Thank You!</h3><p style="color: var(--gray-600);">Your feedback has been submitted.</p><button class="feedback-btn-next" style="margin-top: var(--space-6);" onclick="resetFeedback()">Close</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            if (event && event.target) event.target.classList.add('active');
+        }
+
+        function navigateToTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+        }
+
+        function showSubTab(parentTab, subTabName) {
+            const parentEl = document.getElementById(parentTab);
+            parentEl.querySelectorAll('.sub-content').forEach(sub => sub.classList.remove('active'));
+            parentEl.querySelectorAll('.sub-nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(subTabName).classList.add('active');
+            if (event && event.target) event.target.classList.add('active');
+        }
+
+        function showModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
+        function hideModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+
+        function submitLink(event) {
+            event.preventDefault();
+            document.getElementById('linkSuccessMessage').style.display = 'block';
+            setTimeout(() => hideModal('addLinkModal'), 2000);
+        }
+
+        function submitRole(event) {
+            event.preventDefault();
+            alert('Role created successfully!');
+            hideModal('addRoleModal');
+        }
+
+        window.onclick = function(event) { if (event.target.classList.contains('modal')) event.target.style.display = 'none'; }
+
+        function toggleFeedback() { document.getElementById('feedbackModal').classList.toggle('active'); }
+
+        function nextFeedbackStep() {
+            const selected = document.querySelector('input[name="feedback-category"]:checked');
+            if (!selected) { alert('Please select a category'); return; }
+            document.getElementById('feedback-step1').classList.remove('active');
+            document.getElementById('feedback-step2').classList.add('active');
+        }
+
+        function prevFeedbackStep() {
+            document.getElementById('feedback-step2').classList.remove('active');
+            document.getElementById('feedback-step1').classList.add('active');
+        }
+
+        function submitFeedback() {
+            const rating = document.querySelector('input[name="feedback-rating"]:checked');
+            if (!rating) { alert('Please select a rating'); return; }
+            document.getElementById('feedback-step2').classList.remove('active');
+            document.getElementById('feedback-step3').classList.add('active');
+        }
+
+        function resetFeedback() {
+            document.querySelectorAll('.feedback-step').forEach(step => step.classList.remove('active'));
+            document.getElementById('feedback-step1').classList.add('active');
+            document.querySelectorAll('input[name="feedback-category"], input[name="feedback-rating"]').forEach(input => input.checked = false);
+            document.querySelector('.feedback-textarea').value = '';
+            document.querySelectorAll('.feedback-category, .rating-option').forEach(el => el.classList.remove('selected'));
+            toggleFeedback();
+        }
+
+        document.querySelectorAll('.feedback-category').forEach(cat => {
+            cat.addEventListener('click', function() {
+                document.querySelectorAll('.feedback-category').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        document.querySelectorAll('.rating-option').forEach(opt => {
+            opt.addEventListener('click', function() {
+                document.querySelectorAll('.rating-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        document.querySelectorAll('.search-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const items = this.closest('.management-section').querySelectorAll('.list-item');
+                items.forEach(item => { item.style.display = item.textContent.toLowerCase().includes(searchTerm) ? 'flex' : 'none'; });
+            });
+        });
+    </script>
+</body>
+</html>

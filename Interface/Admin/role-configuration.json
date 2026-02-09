@@ -44,14 +44,39 @@
         "restricted_removals": ["business_unit.view.all"]
       },
       "user_count": 28,
-      "created_date": "2025-11-06T10:00:00Z",
-      "last_modified": "2025-11-06T14:30:00Z"
+      "created_date": "2026-02-09T10:00:00Z",
+      "last_modified": "2026-02-09T14:30:00Z"
+    },
+    {
+      "id": "senior-director",
+      "name": "Senior Director",
+      "category": "management",
+      "level": 3,
+      "description": "Senior directors managing multiple departments with strategic input",
+      "permissions": [
+        "department.view.multiple",
+        "dashboard.management.access",
+        "metrics.department.advanced",
+        "reports.department.access",
+        "team.performance.management",
+        "resource.allocation.multi_department",
+        "strategic.planning.input"
+      ],
+      "inherits_from": null,
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["department.tools.access", "strategic.planning.tools"],
+        "restricted_removals": []
+      },
+      "user_count": 67,
+      "created_date": "2026-02-09T10:00:00Z",
+      "last_modified": "2026-02-09T14:30:00Z"
     },
     {
       "id": "director",
       "name": "Director",
       "category": "management",
-      "level": 3,
+      "level": 4,
       "description": "Directors managing specific departments or major functions",
       "permissions": [
         "department.view.all",
@@ -212,8 +237,60 @@
         "restricted_removals": []
       },
       "user_count": 89,
-      "created_date": "2025-11-06T10:00:00Z",
-      "last_modified": "2025-11-06T14:30:00Z"
+      "created_date": "2026-02-09T10:00:00Z",
+      "last_modified": "2026-02-09T14:30:00Z"
+    },
+    {
+      "id": "finance-manager",
+      "name": "Finance Manager",
+      "category": "department-specific",
+      "level": 4,
+      "description": "Finance department managers with specialized financial system access",
+      "permissions": [
+        "team.view.all",
+        "dashboard.management.access",
+        "metrics.team.view",
+        "reports.team.access",
+        "task.assignment.team",
+        "performance.review.team",
+        "finance.sap.access",
+        "finance.reporting.advanced",
+        "finance.budget.management"
+      ],
+      "inherits_from": "manager",
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["finance.tools.specialized"],
+        "restricted_removals": []
+      },
+      "user_count": 45,
+      "created_date": "2026-02-09T10:00:00Z",
+      "last_modified": "2026-02-09T14:30:00Z"
+    },
+    {
+      "id": "finance-analyst",
+      "name": "Finance Analyst",
+      "category": "department-specific",
+      "level": 5,
+      "description": "Financial analysts with specialized reporting and compliance access",
+      "permissions": [
+        "analytics.view.finance",
+        "dashboard.analytics.access",
+        "metrics.finance.view",
+        "reports.finance.access",
+        "finance.sap.read",
+        "finance.reporting.standard",
+        "finance.compliance.access"
+      ],
+      "inherits_from": "business-analyst",
+      "department_customizations": {
+        "enabled": true,
+        "allowed_additions": ["finance.analysis.tools"],
+        "restricted_removals": []
+      },
+      "user_count": 123,
+      "created_date": "2026-02-09T10:00:00Z",
+      "last_modified": "2026-02-09T14:30:00Z"
     }
   ],
   "permission_groups": {
@@ -268,7 +345,7 @@
       "level_2": ["vice-president"]
     },
     "management": {
-      "level_3": ["director"],
+      "level_3": ["senior-director", "director"],
       "level_4": ["manager"]
     },
     "operational": {
@@ -278,6 +355,10 @@
     },
     "specialist": {
       "level_4": ["business-analyst", "technical-specialist"]
+    },
+    "department-specific": {
+      "level_4": ["finance-manager"],
+      "level_5": ["finance-analyst"]
     }
   },
   "department_specific_roles": {
@@ -321,10 +402,10 @@
     "compliance_reporting_enabled": true
   },
   "metadata": {
-    "version": "1.0.0",
+    "version": "1.1.0",
     "created_date": "2025-11-06T10:00:00Z",
-    "last_modified": "2025-11-06T15:45:00Z",
+    "last_modified": "2026-02-09T15:45:00Z",
     "created_by": "kendall.rush@walmart.com",
-    "schema_version": "2025.1"
+    "schema_version": "2026.1"
   }
 }

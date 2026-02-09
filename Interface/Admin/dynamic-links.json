@@ -503,13 +503,13 @@
     ]
   },
   "metadata": {
-    "version": "1.0.0",
+    "version": "1.1.0",
     "created_date": "2025-11-06T10:00:00Z",
-    "last_modified": "2025-11-06T15:45:00Z",
+    "last_modified": "2026-02-09T15:45:00Z",
     "created_by": "kendall.rush@walmart.com",
     "total_links": 156,
     "active_links": 154,
     "inactive_links": 2,
-    "schema_version": "2025.1"
+    "schema_version": "2026.1"
   }
 }
