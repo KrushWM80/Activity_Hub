@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Projects - Activity Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- SheetJS for Excel/CSV parsing -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="spark-logo">★</div>
+                <h1>Activity Hub</h1>
+            </div>
+            <nav class="nav-items">
+                <a href="../../For%20You%20-%20Landing%20Page/activity-hub-demo.html" class="nav-item">For You</a>
+                <a href="../index.html" class="nav-item active">Projects</a>
+                <a href="../../Reporting/" class="nav-item">Reporting</a>
+                <a href="../../Teams/" class="nav-item">Teams</a>
+                <a href="../../My%20Work/" class="nav-item">My Work</a>
+                <a href="../../Settings/" class="nav-item">Settings</a>
+            </nav>
+            <div class="user-section">
+                <span>Krush</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <h2>📤 Upload Projects</h2>
+                <p>Import projects from files or connect to external data sources</p>
+            </div>
+            <button class="btn btn-secondary" onclick="window.location.href='../index.html'">
+                ← Back to Projects
+            </button>
+        </div>
+
+        <!-- Wizard Progress -->
+        <div class="wizard-container">
+            <div class="wizard-steps">
+                <div class="wizard-step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Connect Data</div>
+                </div>
+                <div class="wizard-step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Select Source</div>
+                </div>
+                <div class="wizard-step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Map Columns</div>
+                </div>
+                <div class="wizard-step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Validate</div>
+                </div>
+                <div class="wizard-step" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Management</div>
+                </div>
+                <div class="wizard-step" data-step="6">
+                    <div class="step-number">6</div>
+                    <div class="step-label">Import</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Connect Data -->
+            <div class="wizard-content" id="step-1" data-step="1">
+                <div class="step-header">
+                    <h3>How would you like to connect your data?</h3>
+                    <p>Choose a method to import your projects into Activity Hub</p>
+                </div>
+
+                <div class="connection-options">
+                    <div class="connection-card" data-connection="file">
+                        <div class="connection-icon">📁</div>
+                        <h4>Browse Files</h4>
+                        <p>Upload Excel (.xlsx) or CSV files from your computer</p>
+                        <ul class="connection-features">
+                            <li>✓ Quick one-time import</li>
+                            <li>✓ Excel & CSV support</li>
+                            <li>✓ Column auto-detection</li>
+                        </ul>
+                    </div>
+
+                    <div class="connection-card" data-connection="bigquery">
+                        <div class="connection-icon">🔷</div>
+                        <h4>BigQuery</h4>
+                        <p>Connect to Google BigQuery tables for live data</p>
+                        <ul class="connection-features">
+                            <li>✓ Live data connection</li>
+                            <li>✓ Scheduled sync</li>
+                            <li>✓ Large dataset support</li>
+                        </ul>
+                    </div>
+
+                    <div class="connection-card" data-connection="api">
+                        <div class="connection-icon">🔌</div>
+                        <h4>API Connection</h4>
+                        <p>Connect to REST APIs for bi-directional sync</p>
+                        <ul class="connection-features">
+                            <li>✓ Real-time updates</li>
+                            <li>✓ Bi-directional sync</li>
+                            <li>✓ Custom endpoints</li>
+                        </ul>
+                    </div>
+
+                    <div class="connection-card" data-connection="saved">
+                        <div class="connection-icon">💾</div>
+                        <h4>Saved Connections</h4>
+                        <p>Use a previously configured data connection</p>
+                        <ul class="connection-features">
+                            <li>✓ Reuse configurations</li>
+                            <li>✓ Quick refresh</li>
+                            <li>✓ Maintain mappings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Select Source -->
+            <div class="wizard-content hidden" id="step-2" data-step="2">
+                <!-- File Upload View -->
+                <div id="source-file" class="source-panel">
+                    <div class="step-header">
+                        <h3>Upload Your File</h3>
+                        <p>Drag and drop or browse to select your Excel or CSV file</p>
+                    </div>
+
+                    <div class="upload-zone" id="upload-zone">
+                        <div class="upload-icon">📤</div>
+                        <h4>Drop your file here</h4>
+                        <p>or</p>
+                        <label class="btn btn-primary upload-btn">
+                            Browse Files
+                            <input type="file" id="file-input" accept=".xlsx,.xls,.csv" hidden>
+                        </label>
+                        <p class="upload-hint">Supported formats: .xlsx, .xls, .csv</p>
+                    </div>
+
+                    <div class="file-preview hidden" id="file-preview">
+                        <div class="file-info">
+                            <div class="file-icon">📄</div>
+                            <div class="file-details">
+                                <h4 id="file-name">filename.xlsx</h4>
+                                <p id="file-meta">0 rows • 0 columns detected</p>
+                            </div>
+                            <button class="btn btn-secondary btn-small" id="remove-file">✕ Remove</button>
+                        </div>
+                        <div class="preview-table-container">
+                            <table class="preview-table" id="preview-table">
+                                <thead id="preview-header"></thead>
+                                <tbody id="preview-body"></tbody>
+                            </table>
+                        </div>
+                        <p class="preview-note">Showing first 5 rows for preview</p>
+                    </div>
+                </div>
+
+                <!-- BigQuery Connection View -->
+                <div id="source-bigquery" class="source-panel hidden">
+                    <div class="step-header">
+                        <h3>Connect to BigQuery</h3>
+                        <p>Enter your BigQuery connection details</p>
+                    </div>
+
+                    <div class="connection-form">
+                        <div class="form-group">
+                            <label for="bq-project">Project ID</label>
+                            <input type="text" id="bq-project" placeholder="e.g., wmt-assetprotection-prod">
+                        </div>
+                        <div class="form-group">
+                            <label for="bq-dataset">Dataset</label>
+                            <input type="text" id="bq-dataset" placeholder="e.g., Store_Support_Dev">
+                        </div>
+                        <div class="form-group">
+                            <label for="bq-table">Table</label>
+                            <input type="text" id="bq-table" placeholder="e.g., IH_Intake_Data">
+                        </div>
+                        <div class="form-group">
+                            <label for="bq-query">Custom Query (Optional)</label>
+                            <textarea id="bq-query" rows="4" placeholder="SELECT * FROM table WHERE status = 'Active'"></textarea>
+                        </div>
+                        <button class="btn btn-primary" id="test-bq-connection">
+                            🔗 Test Connection
+                        </button>
+                        <div class="connection-status hidden" id="bq-status"></div>
+                    </div>
+                </div>
+
+                <!-- API Connection View -->
+                <div id="source-api" class="source-panel hidden">
+                    <div class="step-header">
+                        <h3>Configure API Connection</h3>
+                        <p>Set up your REST API endpoint for data sync</p>
+                    </div>
+
+                    <div class="connection-form">
+                        <div class="form-group">
+                            <label for="api-name">Connection Name</label>
+                            <input type="text" id="api-name" placeholder="e.g., My Project System">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="api-method">Method</label>
+                                <select id="api-method">
+                                    <option value="GET">GET</option>
+                                    <option value="POST">POST</option>
+                                </select>
+                            </div>
+                            <div class="form-group flex-grow">
+                                <label for="api-endpoint">Endpoint URL</label>
+                                <input type="text" id="api-endpoint" placeholder="https://api.example.com/projects">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="api-auth">Authentication</label>
+                            <select id="api-auth">
+                                <option value="none">None</option>
+                                <option value="api-key">API Key</option>
+                                <option value="bearer">Bearer Token</option>
+                                <option value="basic">Basic Auth</option>
+                            </select>
+                        </div>
+                        <div class="form-group hidden" id="api-key-group">
+                            <label for="api-key">API Key / Token</label>
+                            <input type="password" id="api-key" placeholder="Enter your API key">
+                        </div>
+                        <div class="form-group">
+                            <label for="api-data-path">Data Path (for nested JSON)</label>
+                            <input type="text" id="api-data-path" placeholder="e.g., data.projects (leave empty for root array)">
+                        </div>
+                        <button class="btn btn-primary" id="test-api-connection">
+                            🔗 Test Connection
+                        </button>
+                        <div class="connection-status hidden" id="api-status"></div>
+                    </div>
+                </div>
+
+                <!-- Saved Connections View -->
+                <div id="source-saved" class="source-panel hidden">
+                    <div class="step-header">
+                        <h3>Saved Connections</h3>
+                        <p>Select a previously configured connection</p>
+                    </div>
+
+                    <div class="saved-connections-list" id="saved-connections-list">
+                        <!-- Populated dynamically -->
+                        <div class="empty-state">
+                            <p>No saved connections found</p>
+                            <p class="hint">Connections are saved after completing an import with API or BigQuery</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Map Columns -->
+            <div class="wizard-content hidden" id="step-3" data-step="3">
+                <div class="step-header">
+                    <h3>Map Your Columns</h3>
+                    <p>Match your source columns to Activity Hub's project schema</p>
+                </div>
+
+                <div class="mapping-container">
+                    <div class="mapping-header">
+                        <div class="mapping-stats">
+                            <span class="stat mapped"><span id="mapped-count">0</span> Mapped</span>
+                            <span class="stat unmapped"><span id="unmapped-count">0</span> Unmapped</span>
+                            <span class="stat required"><span id="required-count">0</span> Required</span>
+                        </div>
+                        <div class="mapping-actions">
+                            <button class="btn btn-secondary btn-small" id="auto-map-btn">
+                                ✨ Auto-Map
+                            </button>
+                            <button class="btn btn-secondary btn-small" id="clear-mapping-btn">
+                                🗑️ Clear All
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mapping-panels">
+                        <!-- Source Columns -->
+                        <div class="mapping-panel mapping-source">
+                            <h4>Source Columns</h4>
+                            <div class="column-list" id="source-columns">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Arrow -->
+                        <div class="mapping-arrow">→</div>
+
+                        <!-- Target Schema -->
+                        <div class="mapping-panel mapping-target">
+                            <h4>Activity Hub Schema</h4>
+                            <div class="schema-categories" id="target-schema">
+                                <!-- Populated dynamically from projects-schema.json -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Validate & Preview -->
+            <div class="wizard-content hidden" id="step-4" data-step="4">
+                <div class="step-header">
+                    <h3>Validate & Preview</h3>
+                    <p>Review your data before import</p>
+                </div>
+
+                <div class="validation-summary" id="validation-summary">
+                    <div class="validation-stat success">
+                        <span class="stat-number" id="valid-count">0</span>
+                        <span class="stat-label">Valid Records</span>
+                    </div>
+                    <div class="validation-stat warning">
+                        <span class="stat-number" id="warning-count">0</span>
+                        <span class="stat-label">Warnings</span>
+                    </div>
+                    <div class="validation-stat error">
+                        <span class="stat-number" id="error-count">0</span>
+                        <span class="stat-label">Errors</span>
+                    </div>
+                </div>
+
+                <div class="validation-details">
+                    <div class="validation-tabs">
+                        <button class="validation-tab active" data-tab="all">All Records</button>
+                        <button class="validation-tab" data-tab="errors">Errors Only</button>
+                        <button class="validation-tab" data-tab="warnings">Warnings Only</button>
+                    </div>
+
+                    <div class="validation-table-container">
+                        <table class="validation-table" id="validation-table">
+                            <thead id="validation-header"></thead>
+                            <tbody id="validation-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="validation-errors-panel hidden" id="errors-panel">
+                        <h4>⚠️ Issues Found</h4>
+                        <div class="error-list" id="error-list">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Data Management Decision -->
+            <div class="wizard-content hidden" id="step-5" data-step="5">
+                <div class="step-header">
+                    <h3>How would you like to manage these projects?</h3>
+                    <p>Choose how Activity Hub should handle your project data going forward</p>
+                </div>
+
+                <!-- Management Choice -->
+                <div class="management-options" id="management-choice">
+                    <div class="management-card" data-management="source">
+                        <div class="management-icon">🔗</div>
+                        <h4>Keep Source Connected</h4>
+                        <p>Continue updating from your original data source</p>
+                        <ul class="management-features">
+                            <li>• Pull updates from source automatically</li>
+                            <li>• Sync on a schedule you choose</li>
+                            <li>• Option to push changes back to source</li>
+                        </ul>
+                    </div>
+
+                    <div class="management-card" data-management="hub">
+                        <div class="management-icon">🏠</div>
+                        <h4>Activity Hub Manages</h4>
+                        <p>Activity Hub becomes the source of truth</p>
+                        <ul class="management-features">
+                            <li>• Disconnect from original source</li>
+                            <li>• Manage all projects within Activity Hub</li>
+                            <li>• Full control over data updates</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- API Setup Prompt (shown when "source" selected) -->
+                <div class="api-setup-prompt hidden" id="api-setup-prompt">
+                    <div class="prompt-header">
+                        <h4>🔄 Set Up Bi-Directional Sync?</h4>
+                        <p>For seamless updates between Activity Hub and your source, we recommend setting up an API connection.</p>
+                    </div>
+
+                    <div class="api-benefits">
+                        <div class="benefit">
+                            <span class="benefit-icon">⏱️</span>
+                            <span>Automatic sync on schedule (hourly, daily, weekly)</span>
+                        </div>
+                        <div class="benefit">
+                            <span class="benefit-icon">↔️</span>
+                            <span>Changes in Activity Hub push back to your source</span>
+                        </div>
+                        <div class="benefit">
+                            <span class="benefit-icon">🆕</span>
+                            <span>New projects from source automatically appear here</span>
+                        </div>
+                        <div class="benefit">
+                            <span class="benefit-icon">⚡</span>
+                            <span>Conflict detection and resolution</span>
+                        </div>
+                    </div>
+
+                    <div class="api-setup-actions">
+                        <button class="btn btn-primary" id="setup-api-btn">
+                            ✅ Set Up API Now
+                        </button>
+                        <button class="btn btn-secondary" id="skip-api-btn">
+                            ⏭️ Skip for Now
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sync Warning (shown when skipping API) -->
+                <div class="sync-warning hidden" id="sync-warning">
+                    <div class="warning-header">
+                        <span class="warning-icon">⚠️</span>
+                        <h4>Sync Warning</h4>
+                    </div>
+                    <div class="warning-content">
+                        <p>Without an API connection, your data may become out of sync:</p>
+                        <ul>
+                            <li>Changes made in your source won't appear in Activity Hub automatically</li>
+                            <li>Changes made here won't update your original system</li>
+                            <li>You'll need to manually re-upload to sync data</li>
+                        </ul>
+                        <p class="warning-note">You can set up an API connection later in Settings → Data Connections.</p>
+                    </div>
+                    <div class="warning-actions">
+                        <button class="btn btn-primary" id="back-to-api-btn">
+                            🔙 Go Back & Set Up API
+                        </button>
+                        <button class="btn btn-secondary" id="continue-without-api-btn">
+                            Continue Without API →
+                        </button>
+                    </div>
+                    <label class="dont-show-again">
+                        <input type="checkbox" id="dont-show-warning">
+                        Don't show this warning again
+                    </label>
+                </div>
+
+                <!-- API Configuration Form (shown when setting up API) -->
+                <div class="api-config-form hidden" id="api-config-form">
+                    <div class="form-header">
+                        <h4>Configure Bi-Directional API</h4>
+                        <p>Set up endpoints for reading and writing project data</p>
+                    </div>
+
+                    <div class="api-endpoints">
+                        <div class="endpoint-section">
+                            <h5>📥 Read Endpoint (Pull from source)</h5>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Method</label>
+                                    <select id="read-method">
+                                        <option value="GET">GET</option>
+                                        <option value="POST">POST</option>
+                                    </select>
+                                </div>
+                                <div class="form-group flex-grow">
+                                    <label>URL</label>
+                                    <input type="text" id="read-url" placeholder="https://api.example.com/projects">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endpoint-section">
+                            <h5>📤 Create Endpoint (New projects)</h5>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Method</label>
+                                    <select id="create-method">
+                                        <option value="POST">POST</option>
+                                        <option value="PUT">PUT</option>
+                                    </select>
+                                </div>
+                                <div class="form-group flex-grow">
+                                    <label>URL</label>
+                                    <input type="text" id="create-url" placeholder="https://api.example.com/projects">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endpoint-section">
+                            <h5>✏️ Update Endpoint (Modify projects)</h5>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Method</label>
+                                    <select id="update-method">
+                                        <option value="PUT">PUT</option>
+                                        <option value="PATCH">PATCH</option>
+                                        <option value="POST">POST</option>
+                                    </select>
+                                </div>
+                                <div class="form-group flex-grow">
+                                    <label>URL</label>
+                                    <input type="text" id="update-url" placeholder="https://api.example.com/projects/{id}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sync-schedule">
+                        <h5>⏰ Sync Schedule</h5>
+                        <div class="schedule-options">
+                            <label class="schedule-option">
+                                <input type="radio" name="sync-schedule" value="manual" checked>
+                                <span>Manual only</span>
+                            </label>
+                            <label class="schedule-option">
+                                <input type="radio" name="sync-schedule" value="hourly">
+                                <span>Hourly</span>
+                            </label>
+                            <label class="schedule-option">
+                                <input type="radio" name="sync-schedule" value="daily">
+                                <span>Daily</span>
+                            </label>
+                            <label class="schedule-option">
+                                <input type="radio" name="sync-schedule" value="weekly">
+                                <span>Weekly</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="sync-direction">
+                        <h5>↔️ Sync Direction</h5>
+                        <div class="direction-options">
+                            <label class="direction-option">
+                                <input type="radio" name="sync-direction" value="pull" checked>
+                                <span>Pull only (source → Activity Hub)</span>
+                            </label>
+                            <label class="direction-option">
+                                <input type="radio" name="sync-direction" value="push">
+                                <span>Push only (Activity Hub → source)</span>
+                            </label>
+                            <label class="direction-option">
+                                <input type="radio" name="sync-direction" value="bidirectional">
+                                <span>Bi-directional (both ways)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="save-api-config-btn">
+                        💾 Save API Configuration
+                    </button>
+                </div>
+
+                <!-- Hub Management Confirmation -->
+                <div class="hub-management-confirm hidden" id="hub-management-confirm">
+                    <div class="confirm-icon">🏠</div>
+                    <h4>Activity Hub Will Manage Your Projects</h4>
+                    <p>Your projects will be imported and managed entirely within Activity Hub. The connection to your original source will not be maintained.</p>
+                    <ul class="confirm-list">
+                        <li>✓ All future updates made in Activity Hub</li>
+                        <li>✓ No automatic sync with external systems</li>
+                        <li>✓ You can export data anytime</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Step 6: Import & Confirm -->
+            <div class="wizard-content hidden" id="step-6" data-step="6">
+                <div class="step-header">
+                    <h3>Import Summary</h3>
+                    <p>Review and confirm your import</p>
+                </div>
+
+                <div class="import-summary">
+                    <div class="summary-section">
+                        <h4>📊 Data Summary</h4>
+                        <div class="summary-stats">
+                            <div class="summary-stat">
+                                <span class="stat-value" id="total-records">0</span>
+                                <span class="stat-label">Total Records</span>
+                            </div>
+                            <div class="summary-stat">
+                                <span class="stat-value" id="mapped-fields">0</span>
+                                <span class="stat-label">Mapped Fields</span>
+                            </div>
+                            <div class="summary-stat">
+                                <span class="stat-value" id="import-errors">0</span>
+                                <span class="stat-label">Skipped (Errors)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>🔗 Connection Details</h4>
+                        <div class="connection-summary" id="connection-summary">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>📋 Management Mode</h4>
+                        <div class="management-summary" id="management-summary">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="import-actions">
+                    <button class="btn btn-primary btn-large" id="confirm-import-btn">
+                        ✅ Confirm & Import Projects
+                    </button>
+                </div>
+
+                <!-- Import Progress -->
+                <div class="import-progress hidden" id="import-progress">
+                    <div class="progress-header">
+                        <h4>Importing Projects...</h4>
+                        <span id="progress-text">0 of 0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Import Complete -->
+                <div class="import-complete hidden" id="import-complete">
+                    <div class="complete-icon">🎉</div>
+                    <h3>Import Complete!</h3>
+                    <p id="import-result-text">Successfully imported 0 projects</p>
+                    <div class="complete-actions">
+                        <button class="btn btn-primary" onclick="window.location.href='../index.html'">
+                            View Projects
+                        </button>
+                        <button class="btn btn-secondary" onclick="location.reload()">
+                            Import More
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wizard Navigation -->
+            <div class="wizard-nav">
+                <button class="btn btn-secondary" id="prev-btn" disabled>
+                    ← Previous
+                </button>
+                <button class="btn btn-primary" id="next-btn" disabled>
+                    Next →
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Status Toast -->
+    <div class="toast hidden" id="toast">
+        <span class="toast-icon"></span>
+        <span class="toast-message"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/local-storage.js"></script>
+    <script src="scripts/file-parser.js"></script>
+    <script src="scripts/column-mapper.js"></script>
+    <script src="scripts/validation.js"></script>
+    <script src="scripts/data-connections.js"></script>
+    <script src="scripts/upload-wizard.js"></script>
+</body>
+</html>

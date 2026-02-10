@@ -1,0 +1,74 @@
+{
+  "mappingVersion": "1.0.0",
+  "mappingId": "[source-name]-[data-type]",
+  "sourceName": "[Source Name]",
+  "sourceDescription": "[Description of the data source]",
+  "targetSchema": "[data-type]-schema.json",
+  "lastUpdated": "YYYY-MM-DD",
+  "updatedBy": "[email@walmart.com]",
+  "status": "draft",
+
+  "_instructions": {
+    "purpose": "Template for mapping external data sources to canonical schemas",
+    "howToUse": [
+      "1. Copy this file to the appropriate data type folder (e.g., Mappings/Projects/)",
+      "2. Rename to [source-name]-mapping.json",
+      "3. Fill in source information",
+      "4. Map each source column to a target canonical column",
+      "5. Specify transformations where data formats differ",
+      "6. Document any unmapped columns",
+      "7. Change status to 'active' when mapping is complete"
+    ],
+    "transformationTypes": {
+      "to_integer": "Convert to integer type",
+      "to_float": "Convert to float/decimal type",
+      "to_string": "Convert to string type",
+      "to_date": "Convert to YYYY-MM-DD date format",
+      "to_iso8601": "Convert to ISO8601 datetime format",
+      "uppercase": "Convert string to uppercase",
+      "lowercase": "Convert string to lowercase",
+      "trim": "Remove leading/trailing whitespace",
+      "normalize_market_3digit": "Pad market number to 3 digits with leading zeros",
+      "custom": "Define custom logic in transformationLogic field"
+    },
+    "statusOptions": ["draft", "review", "active", "deprecated"]
+  },
+
+  "sourceInfo": {
+    "type": "[excel|csv|api|database|bigquery]",
+    "connectionString": "[connection details or file pattern]",
+    "totalColumns": 0,
+    "recordCount": 0,
+    "notes": ""
+  },
+
+  "columnMappings": {
+    "[category_name]": [
+      {
+        "targetColumn": "[canonical_column_name]",
+        "sourceColumn": "[source_column_name]",
+        "alternateSource": "[optional_fallback_column]",
+        "transformation": "[transformation_function_or_null]",
+        "transformationLogic": "[description of custom transformation]",
+        "valueMapping": {
+          "[source_value]": "[target_value]"
+        },
+        "defaultValue": "[value_if_source_is_empty]",
+        "notes": "[additional notes]"
+      }
+    ]
+  },
+
+  "unmappedSourceColumns": [
+    "[List source columns that are not mapped to the canonical schema]"
+  ],
+
+  "changeLog": [
+    {
+      "date": "YYYY-MM-DD",
+      "user": "[email]",
+      "change": "[description of change]",
+      "version": "1.0.0"
+    }
+  ]
+}

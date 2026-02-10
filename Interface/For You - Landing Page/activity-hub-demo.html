@@ -580,6 +580,28 @@
             content: "🎯";
             margin-right: var(--space-2);
         }
+
+        /* Iframe Embedding Styles */
+        .iframe-wrapper {
+            position: fixed;
+            top: 100px; /* header height + demo banner + buffer */
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
+            background: var(--gray-100);
+            display: none;
+        }
+
+        .iframe-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .iframe-wrapper.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -596,8 +618,8 @@
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
-                <a href="#" class="nav-item active">For You</a>
-                <a href="#" class="nav-item">Projects</a>
+                <a href="#" class="nav-item active" data-view="dashboard">For You</a>
+                <a href="#" class="nav-item" data-embed="iframe" data-url="http://127.0.0.1:8001/">Projects</a>
                 <a href="#" class="nav-item">Reporting</a>
                 <a href="#" class="nav-item">Teams</a>
                 <a href="#" class="nav-item">My Work</a>
@@ -614,8 +636,13 @@
         </div>
     </header>
 
+    <!-- Embedded Content Iframe -->
+    <div id="iframe-content" class="iframe-wrapper">
+        <iframe id="embedded-frame" src="" title="Embedded Content"></iframe>
+    </div>
+
     <!-- Main Content -->
-    <div class="main-container">
+    <div id="dashboard-content" class="main-container">
         <!-- Dashboard Grid -->
         <main class="dashboard">
             <!-- Row 1: My Tasks + Performance Metrics -->
@@ -878,12 +905,34 @@
             // Navigation items
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', function(e) {
-                    // Only prevent default for placeholder links, allow real navigation
-                    if (this.getAttribute('href') === '#') {
+                    const href = this.getAttribute('href');
+                    const dataEmbed = this.getAttribute('data-embed');
+                    const dataView = this.getAttribute('data-view');
+                    const dataUrl = this.getAttribute('data-url');
+                    
+                    // Handle iframe embedding
+                    if (dataEmbed === 'iframe' && dataUrl) {
                         e.preventDefault();
                         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                         this.classList.add('active');
+                        
+                        // Hide dashboard, show iframe
+                        document.getElementById('dashboard-content').style.display = 'none';
+                        document.getElementById('iframe-content').classList.add('active');
+                        document.getElementById('embedded-frame').src = dataUrl;
                     }
+                    // Handle returning to dashboard view
+                    else if (dataView === 'dashboard' || href === '#') {
+                        e.preventDefault();
+                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Show dashboard, hide iframe
+                        document.getElementById('dashboard-content').style.display = 'block';
+                        document.getElementById('iframe-content').classList.remove('active');
+                        document.getElementById('embedded-frame').src = '';
+                    }
+                    // Allow real navigation for actual links
                 });
             });
         }

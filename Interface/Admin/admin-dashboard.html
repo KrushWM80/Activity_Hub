@@ -560,6 +560,181 @@
         .landing-card-icon.logic { background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); color: white; }
         .landing-card-icon.links { background: linear-gradient(135deg, var(--walmart-blue-light) 0%, var(--walmart-blue) 100%); color: white; }
         .landing-card-icon.workflows { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); color: white; }
+        .landing-card-icon.data-bridge { background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%); color: white; }
+
+        /* Data Bridge Styles */
+        .schema-categories-admin {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-4);
+        }
+        .schema-category-card {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: var(--space-4);
+        }
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin-bottom: var(--space-3);
+            padding-bottom: var(--space-2);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .category-icon { font-size: 1.25rem; }
+        .category-name { font-weight: 600; color: var(--gray-900); flex: 1; }
+        .category-count { font-size: 12px; color: var(--gray-500); }
+        .required-badge { background: #fef2f2; color: #dc2626; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+        .category-fields { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+        .schema-field-chip {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            background: white;
+            border: 1px solid var(--gray-200);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .schema-field-chip.required { border-color: #dc2626; background: #fef2f2; }
+        .schema-field-chip .field-info { cursor: help; opacity: 0.6; font-size: 12px; }
+        .schema-field-chip .field-info:hover { opacity: 1; }
+        
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--gray-300); transition: 0.3s; border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: 0.3s; border-radius: 50%;
+        }
+        .toggle-switch input:checked + .toggle-slider { background-color: var(--primary-blue); }
+        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
+        
+        .type-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; text-transform: uppercase; }
+        .type-badge.type-string { background: #dbeafe; color: #1e40af; }
+        .type-badge.type-number { background: #dcfce7; color: #166534; }
+        .type-badge.type-date { background: #fef3c7; color: #92400e; }
+        .type-badge.type-boolean { background: #f3e8ff; color: #7c3aed; }
+        .type-badge.type-enum { background: #fce7f3; color: #be185d; }
+
+        /* Shadow box for category cards */
+        .shadow-box {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.2s ease;
+        }
+        .shadow-box:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Field Config Table Styles */
+        .field-row { border-bottom: 1px solid var(--gray-200); transition: background 0.15s; }
+        .field-row:hover { background: var(--gray-50); }
+        .field-row:last-child { border-bottom: none; }
+        .field-row td { vertical-align: middle; }
+        
+        .btn-edit {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+        .btn-edit:hover { background: var(--walmart-blue); }
+        
+        .btn-delete {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: transparent;
+            color: var(--gray-500);
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .btn-delete:hover { background: #fee2e2; color: #dc2626; border-color: #dc2626; }
+        .btn-delete.disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-delete.disabled:hover { background: transparent; color: var(--gray-500); border-color: var(--gray-300); }
+        
+        .action-buttons { display: flex; gap: 6px; }
+        
+        /* Auto-populate badge */
+        .auto-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #fcd34d;
+        }
+        .auto-populate-row { background: #fffbeb; }
+        .auto-populate-row:hover { background: #fef3c7; }
+        
+        /* Audit Log Styles */
+        .area-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .action-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .action-badge.action-delete { background: #fee2e2; color: #dc2626; }
+        .action-badge.action-create { background: #dcfce7; color: #16a34a; }
+        .action-badge.action-update { background: #dbeafe; color: #2563eb; }
+        .action-badge.action-toggle { background: #fef3c7; color: #d97706; }
+        
+        /* Options dropdown */
+        .options-dropdown {
+            padding: 6px 10px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 12px;
+            background: white;
+            cursor: pointer;
+            min-width: 140px;
+        }
+        .options-dropdown:hover { border-color: var(--primary-blue); }
+        
+        /* Locked toggle for core required fields */
+        .toggle-switch.disabled { opacity: 0.7; cursor: not-allowed; }
+        .toggle-slider.locked { background-color: var(--primary-blue) !important; cursor: not-allowed; }
+        
+        /* Field info icon in schema overview */
+        .schema-field-chip { cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+        .schema-field-chip:hover { transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
+        .field-info-icon { font-size: 11px; opacity: 0.6; }
+        .schema-field-chip:hover .field-info-icon { opacity: 1; }
+        
+        /* Popup for field description */
+        .popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .popup-header button { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--gray-500); }
+        .popup-header button:hover { color: var(--gray-900); }
 
         .landing-card h3 {
             font-size: 1.25rem;
@@ -949,6 +1124,8 @@
                 <button class="nav-tab" onclick="showTab('logic')">Logic</button>
                 <button class="nav-tab" onclick="showTab('links')">Links</button>
                 <button class="nav-tab" onclick="showTab('workflows')">Workflows</button>
+                <button class="nav-tab" onclick="showTab('data-bridge')">Data Bridge</button>
+                <button class="nav-tab" onclick="showTab('activity-log')">Activity Log</button>
                 <button class="nav-tab" onclick="showTab('analytics')">Analytics</button>
             </div>
 
@@ -997,6 +1174,28 @@
                                 <li>Process Flow Builder</li>
                                 <li>Team-Based Routing</li>
                                 <li>Automation Rules</li>
+                            </ul>
+                            <div class="landing-card-arrow">→</div>
+                        </div>
+                        <div class="landing-card" onclick="navigateToTab('data-bridge')">
+                            <div class="landing-card-icon data-bridge">🔄</div>
+                            <h3>Data Bridge</h3>
+                            <p>Manage data schemas, configure required fields, and set up data source connections.</p>
+                            <ul class="card-features">
+                                <li>Schema Management</li>
+                                <li>Field Configuration</li>
+                                <li>Data Source Mapping</li>
+                            </ul>
+                            <div class="landing-card-arrow">→</div>
+                        </div>
+                        <div class="landing-card" onclick="navigateToTab('activity-log')">
+                            <div class="landing-card-icon" style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff);">📋</div>
+                            <h3>Activity Log</h3>
+                            <p>View audit trail of all admin actions, track changes, and monitor who did what.</p>
+                            <ul class="card-features">
+                                <li>Action History</li>
+                                <li>User Tracking</li>
+                                <li>Change Audit</li>
                             </ul>
                             <div class="landing-card-arrow">→</div>
                         </div>
@@ -1220,6 +1419,131 @@
                 </div>
             </div>
 
+            <!-- Data Bridge Tab -->
+            <div id="data-bridge" class="tab-content">
+                <div class="sub-nav">
+                    <button class="sub-nav-tab active" onclick="showSubTab('data-bridge', 'schema-overview')">Schema Overview</button>
+                    <button class="sub-nav-tab" onclick="showSubTab('data-bridge', 'field-config')">Field Configuration</button>
+                    <button class="sub-nav-tab" onclick="showSubTab('data-bridge', 'connections')">Data Connections</button>
+                </div>
+                <div id="schema-overview" class="sub-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-number">40</div><div class="stat-label">Total Fields</div></div>
+                        <div class="stat-card"><div class="stat-number">6</div><div class="stat-label">Required Fields</div></div>
+                        <div class="stat-card"><div class="stat-number">9</div><div class="stat-label">Categories</div></div>
+                        <div class="stat-card"><div class="stat-number">1</div><div class="stat-label">Active Connections</div></div>
+                    </div>
+                    <div class="management-grid">
+                        <div class="management-section full-width">
+                            <div class="section-header">
+                                <h3 class="section-title">Projects Schema</h3>
+                                <button class="btn-secondary" onclick="exportSchema()">📥 Export Schema</button>
+                            </div>
+                            <p style="color: var(--gray-600); margin-bottom: var(--space-4);">Define and manage the canonical column definitions for project data. This schema serves as the source of truth for all data bridging operations.</p>
+                            <div class="schema-categories-admin" id="schema-categories-list">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="field-config" class="sub-content">
+                    <div class="management-section full-width">
+                        <div class="section-header">
+                            <h3 class="section-title">Field Configuration <span style="font-size: 12px; color: var(--gray-500); font-weight: normal;">(40 fields)</span></h3>
+                            <div style="display: flex; gap: var(--space-2); align-items: center;">
+                                <input type="text" class="search-input" id="field-search" placeholder="Search fields..." style="width: 200px;" oninput="filterFields(this.value)">
+                                <select class="form-input" id="category-filter" style="width: 160px;" onchange="filterByCategory(this.value)">
+                                    <option value="all">All Categories</option>
+                                </select>
+                                <button class="btn-secondary" onclick="resetSchemaToDefault()" style="white-space: nowrap;">🔄 Reset</button>
+                                <button class="btn-primary" id="save-all-changes-btn" onclick="saveAllChanges()" style="white-space: nowrap;">💾 Save All</button>
+                            </div>
+                        </div>
+                        <p style="color: var(--gray-500); font-size: 13px; margin-bottom: var(--space-4);">Click "Edit" to modify any field. Changes are saved to your browser's local storage.</p>
+                        <div class="field-config-table" id="field-config-table" style="max-height: 600px; overflow-y: auto; border: 1px solid var(--gray-200); border-radius: 8px;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead style="position: sticky; top: 0; z-index: 10;">
+                                    <tr style="background: var(--gray-100); text-align: left;">
+                                        <th style="padding: var(--space-3); width: 180px;">Field Name</th>
+                                        <th style="padding: var(--space-3); width: 90px;">Type</th>
+                                        <th style="padding: var(--space-3); width: 100px;">Required</th>
+                                        <th style="padding: var(--space-3);">Description</th>
+                                        <th style="padding: var(--space-3); width: 180px;">Options</th>
+                                        <th style="padding: var(--space-3); width: 90px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="field-config-body">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="connections" class="sub-content">
+                    <div class="management-grid">
+                        <div class="management-section">
+                            <div class="section-header"><h3 class="section-title">Saved Connections</h3><button class="btn-primary" onclick="showModal('addConnectionModal')">+ Add Connection</button></div>
+                            <div class="item-list" id="saved-connections-admin">
+                                <div class="list-item">
+                                    <div class="item-info">
+                                        <h4>🔷 Intake Hub Data</h4>
+                                        <p>BigQuery • wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data</p>
+                                    </div>
+                                    <div class="item-actions">
+                                        <span class="status-badge status-active">Active</span>
+                                        <button class="action-btn edit-btn">Configure</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="management-section">
+                            <div class="section-header"><h3 class="section-title">Connection Stats</h3></div>
+                            <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+                                <div class="stat-card"><div class="stat-number">1</div><div class="stat-label">Active Sources</div></div>
+                                <div class="stat-card"><div class="stat-number">0</div><div class="stat-label">Last Sync Errors</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Log Tab -->
+            <div id="activity-log" class="tab-content">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-number" id="log-total-count">0</div><div class="stat-label">Total Actions</div></div>
+                    <div class="stat-card"><div class="stat-number" id="log-today-count">0</div><div class="stat-label">Today</div></div>
+                    <div class="stat-card"><div class="stat-number" id="log-week-count">0</div><div class="stat-label">This Week</div></div>
+                    <div class="stat-card"><div class="stat-number" id="log-users-count">0</div><div class="stat-label">Active Users</div></div>
+                </div>
+                <div class="management-section full-width">
+                    <div class="section-header">
+                        <h3 class="section-title">Admin Activity Log</h3>
+                        <div style="display: flex; gap: var(--space-2); align-items: center;">
+                            <select class="form-input" id="log-area-filter" style="width: 150px;" onchange="filterActivityLog()">
+                                <option value="all">All Areas</option>
+                                <option value="Data Bridge">Data Bridge</option>
+                                <option value="Access Management">Access Management</option>
+                                <option value="Links">Links</option>
+                                <option value="Workflows">Workflows</option>
+                                <option value="Logic">Logic</option>
+                            </select>
+                            <select class="form-input" id="log-action-filter" style="width: 150px;" onchange="filterActivityLog()">
+                                <option value="all">All Actions</option>
+                                <option value="delete">Delete</option>
+                                <option value="create">Create</option>
+                                <option value="update">Update</option>
+                                <option value="toggle">Toggle</option>
+                            </select>
+                            <button class="btn-secondary" onclick="exportActivityLog()">📥 Export</button>
+                            <button class="btn-secondary" onclick="clearActivityLog()" style="color: var(--error);">🗑️ Clear</button>
+                        </div>
+                    </div>
+                    <div id="activity-log-list" style="max-height: 500px; overflow-y: auto; border: 1px solid var(--gray-200); border-radius: 8px;">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Analytics Tab -->
             <div id="analytics" class="tab-content">
                 <div class="stats-grid">
@@ -1274,6 +1598,82 @@
         </div>
     </div>
 
+    <!-- Edit Field Modal -->
+    <div id="editFieldModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Edit Field Configuration</h3>
+                <button class="close-btn" onclick="hideModal('editFieldModal')">×</button>
+            </div>
+            <form onsubmit="saveFieldChanges(event)">
+                <input type="hidden" id="edit-field-key">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                    <div class="form-group">
+                        <label class="form-label">Display Name</label>
+                        <input type="text" class="form-input" id="edit-display-name" placeholder="Display name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Field Key (read-only)</label>
+                        <input type="text" class="form-input" id="edit-field-key-display" readonly style="background: var(--gray-100);">
+                    </div>
+                </div>
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                    <div class="form-group">
+                        <label class="form-label">Data Type</label>
+                        <select class="form-input" id="edit-field-type" required>
+                            <option value="string">String</option>
+                            <option value="number">Number</option>
+                            <option value="date">Date</option>
+                            <option value="boolean">Boolean</option>
+                            <option value="enum">Enum (Dropdown)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-input" id="edit-field-category" required>
+                            <option value="identifiers">Identifiers</option>
+                            <option value="status">Status</option>
+                            <option value="location">Location</option>
+                            <option value="time">Time</option>
+                            <option value="ownership">Ownership</option>
+                            <option value="categorization">Categorization</option>
+                            <option value="impact">Impact</option>
+                            <option value="description">Description</option>
+                            <option value="amp_meeting">AMP/Meeting</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input" id="edit-field-description" rows="2" placeholder="Describe what this field represents..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Example Value</label>
+                    <input type="text" class="form-input" id="edit-field-example" placeholder="e.g., PRJ-2024-001">
+                </div>
+                <div class="form-group" id="enum-values-group" style="display: none;">
+                    <label class="form-label">Enum Values (comma-separated)</label>
+                    <input type="text" class="form-input" id="edit-field-enum" placeholder="Option1, Option2, Option3">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Aliases (comma-separated)</label>
+                    <input type="text" class="form-input" id="edit-field-aliases" placeholder="proj_id, project_identifier">
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: var(--space-3);">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="edit-field-required">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="form-label" style="margin: 0;">Required Field</span>
+                </div>
+                <div style="display: flex; gap: var(--space-4); justify-content: flex-end; margin-top: var(--space-6); border-top: 1px solid var(--gray-200); padding-top: var(--space-4);">
+                    <button type="button" class="btn-secondary" onclick="hideModal('editFieldModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">💾 Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Feedback Button -->
     <button class="feedback-btn" onclick="toggleFeedback()">💬 Send Feedback</button>
 
@@ -1311,6 +1711,191 @@
     </div>
 
     <script>
+        // ==========================================
+        // AUDIT LOG SYSTEM
+        // ==========================================
+        const AuditLog = {
+            STORAGE_KEY: 'activityHub_auditLog',
+            
+            // Get current user (placeholder - integrate with actual auth)
+            getCurrentUser() {
+                return localStorage.getItem('activityHub_currentUser') || 'Admin User';
+            },
+            
+            // Log an audit event
+            log(area, action, details, metadata = {}) {
+                const logs = this.getAll();
+                const entry = {
+                    id: Date.now() + Math.random().toString(36).substr(2, 9),
+                    timestamp: new Date().toISOString(),
+                    user: this.getCurrentUser(),
+                    area: area,
+                    action: action,
+                    details: details,
+                    metadata: metadata
+                };
+                logs.unshift(entry); // Add to beginning
+                
+                // Keep only last 500 entries
+                if (logs.length > 500) logs.length = 500;
+                
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(logs));
+                this.updateStats();
+                this.renderLog();
+                return entry;
+            },
+            
+            // Get all logs
+            getAll() {
+                try {
+                    return JSON.parse(localStorage.getItem(this.STORAGE_KEY)) || [];
+                } catch {
+                    return [];
+                }
+            },
+            
+            // Clear all logs
+            clear() {
+                if (confirm('Are you sure you want to clear all activity logs? This cannot be undone.')) {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify([]));
+                    this.updateStats();
+                    this.renderLog();
+                    showNotification('Activity log cleared', 'success');
+                }
+            },
+            
+            // Export logs as JSON
+            export() {
+                const logs = this.getAll();
+                const dataStr = JSON.stringify(logs, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `activity-log-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            },
+            
+            // Update stats cards
+            updateStats() {
+                const logs = this.getAll();
+                const now = new Date();
+                const today = now.toDateString();
+                const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+                
+                const todayCount = logs.filter(l => new Date(l.timestamp).toDateString() === today).length;
+                const weekCount = logs.filter(l => new Date(l.timestamp) >= weekAgo).length;
+                const uniqueUsers = new Set(logs.map(l => l.user)).size;
+                
+                const totalEl = document.getElementById('log-total-count');
+                const todayEl = document.getElementById('log-today-count');
+                const weekEl = document.getElementById('log-week-count');
+                const usersEl = document.getElementById('log-users-count');
+                
+                if (totalEl) totalEl.textContent = logs.length;
+                if (todayEl) todayEl.textContent = todayCount;
+                if (weekEl) weekEl.textContent = weekCount;
+                if (usersEl) usersEl.textContent = uniqueUsers;
+            },
+            
+            // Render the activity log list
+            renderLog() {
+                const container = document.getElementById('activity-log-list');
+                if (!container) return;
+                
+                const areaFilter = document.getElementById('log-area-filter')?.value || 'all';
+                const actionFilter = document.getElementById('log-action-filter')?.value || 'all';
+                
+                let logs = this.getAll();
+                
+                // Apply filters
+                if (areaFilter !== 'all') {
+                    logs = logs.filter(l => l.area === areaFilter);
+                }
+                if (actionFilter !== 'all') {
+                    logs = logs.filter(l => l.action.toLowerCase().includes(actionFilter));
+                }
+                
+                if (logs.length === 0) {
+                    container.innerHTML = `
+                        <div style="padding: var(--space-8); text-align: center; color: var(--gray-500);">
+                            <div style="font-size: 3rem; margin-bottom: var(--space-4);">📋</div>
+                            <p>No activity logs found</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '<table style="width: 100%; border-collapse: collapse; font-size: 13px;">';
+                html += `
+                    <thead style="position: sticky; top: 0; background: var(--gray-100); z-index: 5;">
+                        <tr>
+                            <th style="padding: var(--space-3); text-align: left; width: 160px;">Timestamp</th>
+                            <th style="padding: var(--space-3); text-align: left; width: 120px;">User</th>
+                            <th style="padding: var(--space-3); text-align: left; width: 120px;">Area</th>
+                            <th style="padding: var(--space-3); text-align: left; width: 100px;">Action</th>
+                            <th style="padding: var(--space-3); text-align: left;">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                for (const log of logs) {
+                    const date = new Date(log.timestamp);
+                    const timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    const actionClass = this.getActionClass(log.action);
+                    
+                    html += `
+                        <tr style="border-bottom: 1px solid var(--gray-200);">
+                            <td style="padding: var(--space-3); color: var(--gray-500);">${timeStr}</td>
+                            <td style="padding: var(--space-3);">
+                                <span style="display: inline-flex; align-items: center; gap: 6px;">
+                                    <span style="width: 24px; height: 24px; background: var(--primary-blue); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">${log.user.charAt(0).toUpperCase()}</span>
+                                    ${log.user}
+                                </span>
+                            </td>
+                            <td style="padding: var(--space-3);"><span class="area-badge">${log.area}</span></td>
+                            <td style="padding: var(--space-3);"><span class="action-badge ${actionClass}">${log.action}</span></td>
+                            <td style="padding: var(--space-3);">${log.details}</td>
+                        </tr>
+                    `;
+                }
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            },
+            
+            getActionClass(action) {
+                const a = action.toLowerCase();
+                if (a.includes('delete')) return 'action-delete';
+                if (a.includes('create') || a.includes('add')) return 'action-create';
+                if (a.includes('update') || a.includes('edit') || a.includes('save')) return 'action-update';
+                if (a.includes('toggle')) return 'action-toggle';
+                return '';
+            }
+        };
+        
+        // Convenience functions for audit logging
+        function logAudit(area, action, details, metadata = {}) {
+            return AuditLog.log(area, action, details, metadata);
+        }
+        
+        function filterActivityLog() {
+            AuditLog.renderLog();
+        }
+        
+        function exportActivityLog() {
+            AuditLog.export();
+        }
+        
+        function clearActivityLog() {
+            AuditLog.clear();
+        }
+        
+        // ==========================================
+        // TAB NAVIGATION
+        // ==========================================
         function showTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
@@ -1400,6 +1985,805 @@
                 const items = this.closest('.management-section').querySelectorAll('.list-item');
                 items.forEach(item => { item.style.display = item.textContent.toLowerCase().includes(searchTerm) ? 'flex' : 'none'; });
             });
+        });
+
+        // ============================================
+        // DATA BRIDGE FUNCTIONALITY
+        // ============================================
+        let projectsSchema = null;
+        
+        // Embedded fallback schema (works without server)
+        // coreRequired = true means it cannot be toggled off in admin
+        const EMBEDDED_SCHEMA = {
+          "schemaVersion": "1.0.0",
+          "title": "Projects Data Schema",
+          "description": "Canonical column definitions for Projects data",
+          "lastUpdated": "2026-02-10",
+          "columns": {
+            "identifiers": {
+              "fields": [
+                { "name": "project_id", "type": "string", "required": true, "coreRequired": true, "description": "Unique project identifier", "aliases": ["PROJECT_ID", "ProjectId", "id"] },
+                { "name": "intake_card", "type": "string", "required": false, "description": "Intake card number (Operations/Intake Hub identifier)", "aliases": ["Intake_Card", "IntakeCard"] },
+                { "name": "title", "type": "string", "required": true, "coreRequired": true, "description": "Project name/title", "aliases": ["PROJECT_TITLE", "Title", "name"] }
+              ]
+            },
+            "status": {
+              "fields": [
+                { "name": "status", "type": "string", "required": true, "coreRequired": true, "description": "Current project status", "validation": { "enum": ["Active", "Archived", "Pending", "Cancelled", "Complete"] }, "aliases": ["Status", "PROJECT_STATUS"] },
+                { "name": "phase", "type": "string", "required": false, "description": "Current project phase", "validation": { "enum": ["POC/POT", "Test", "Mkt Scale", "Roll/Deploy", "Complete", "Pending", "Planning"] }, "aliases": ["Phase", "PROJECT_PHASE"] },
+                { "name": "health", "type": "string", "required": false, "description": "Project health status indicator", "validation": { "enum": ["On Track", "Off Track", "At Risk", "Continuous"] }, "aliases": ["Health", "PROJECT_HEALTH"] },
+                { "name": "project_source", "type": "string", "required": true, "coreRequired": true, "autoPopulate": true, "description": "Auto-populated from Data Connection (not user-selectable)", "validation": { "enum": ["Operations", "Realty", "Intake Hub", "Manual Upload", "API"] }, "aliases": ["Project_Source", "source"] }
+              ]
+            },
+            "location": {
+              "fields": [
+                { "name": "division", "type": "string", "required": false, "description": "Division identifier", "validation": { "enum": ["EAST", "WEST", "NORTH", "SOUTH", "SOUTHEAST", "SOUTHWEST", "NHM", "SAM"] }, "aliases": ["Division", "DIVISION"] },
+                { "name": "region", "type": "string", "required": false, "description": "Region identifier", "aliases": ["Region", "REGION"] },
+                { "name": "market", "type": "string", "required": false, "description": "Market number (3-digit format)", "aliases": ["Market", "MARKET", "mkt"] },
+                { "name": "facility", "type": "integer", "required": false, "description": "Store/facility number", "aliases": ["Facility", "store_number", "store"] },
+                { "name": "city", "type": "string", "required": false, "description": "City name", "aliases": ["City", "CITY"] },
+                { "name": "state", "type": "string", "required": false, "description": "State code (2-letter)", "aliases": ["State", "STATE"] },
+                { "name": "postal_code", "type": "string", "required": false, "description": "Postal/ZIP code", "aliases": ["Postal_Code", "zip", "ZIP"] },
+                { "name": "latitude", "type": "float", "required": false, "description": "Store latitude coordinate", "aliases": ["Latitude", "lat"] },
+                { "name": "longitude", "type": "float", "required": false, "description": "Store longitude coordinate", "aliases": ["Longitude", "lng"] },
+                { "name": "store_area", "type": "string", "required": false, "description": "Store area classification", "aliases": ["Store_Area", "area"] },
+                { "name": "business_area", "type": "string", "required": false, "description": "Business area within store", "aliases": ["Business_Area", "dept_area"] }
+              ]
+            },
+            "time": {
+              "fields": [
+                { "name": "created_date", "type": "datetime", "required": true, "coreRequired": true, "description": "Record creation timestamp", "aliases": ["CREATED_TS", "created_at", "created"] },
+                { "name": "last_updated", "type": "datetime", "required": true, "coreRequired": true, "description": "Last update timestamp", "aliases": ["Last_Updated", "updated_at", "modified_date"] },
+                { "name": "projected_completion", "type": "date", "required": false, "description": "Expected project completion date", "aliases": ["Projected_Completion_Date", "completion_date", "due_date"] },
+                { "name": "wm_week", "type": "integer", "required": false, "description": "Walmart week number", "aliases": ["WM_Week", "walmart_week", "week"] },
+                { "name": "fiscal_year", "type": "integer", "required": false, "description": "Walmart fiscal year", "aliases": ["FY", "fiscal_year", "year"] },
+                { "name": "implementation_week", "type": "string", "required": false, "description": "Implementation week identifier", "aliases": ["Implementation_WM_Week", "impl_week"] }
+              ]
+            },
+            "ownership": {
+              "fields": [
+                { "name": "owner", "type": "string", "required": false, "description": "Project owner name", "aliases": ["Owner", "PROJECT_OWNER", "lead", "pm"] },
+                { "name": "director", "type": "string", "required": false, "description": "Director overseeing the project", "aliases": ["Director", "DIRECTOR"] },
+                { "name": "sr_director", "type": "string", "required": false, "description": "Senior Director overseeing the project", "aliases": ["SR_Director", "senior_director"] }
+              ]
+            },
+            "categorization": {
+              "fields": [
+                { "name": "project_type", "type": "string", "required": false, "description": "Type of project", "aliases": ["Project_Type", "type"] },
+                { "name": "initiative_type", "type": "string", "required": false, "description": "Initiative type or classification", "aliases": ["Initiative_Type", "initiative"] },
+                { "name": "business_type", "type": "string", "required": false, "description": "Business type classification", "aliases": ["Business_Type", "biz_type"] },
+                { "name": "facility_type", "type": "string", "required": false, "description": "Facility type classification", "aliases": ["Facility_Type", "store_type", "format"] },
+                { "name": "partner", "type": "string", "required": false, "description": "Partner organization", "aliases": ["Partner", "vendor"] },
+                { "name": "business_organization", "type": "string", "required": false, "description": "Business organization or department", "aliases": ["Business_Organization", "business_org", "org"] }
+              ]
+            },
+            "impact": {
+              "fields": [
+                { "name": "associate_impact", "type": "string", "required": false, "description": "Impact description for associates", "aliases": ["ASSOCIATE_IMPACT", "employee_impact"] },
+                { "name": "customer_impact", "type": "string", "required": false, "description": "Impact description for customers", "aliases": ["CUSTOMER_IMPACT", "cx_impact"] }
+              ]
+            },
+            "amp_meeting": {
+              "fields": [
+                { "name": "amp_event_id", "type": "string", "required": false, "description": "Associated AMP Event ID for this project", "aliases": ["AMP_Event_ID", "amp_id", "event_id"] },
+                { "name": "amp_activity_title", "type": "string", "required": false, "description": "AMP Activity title linked to this project", "aliases": ["AMP_Activity_Title", "amp_title"] },
+                { "name": "meeting_type", "type": "string", "required": false, "description": "Type of meeting associated with project", "validation": { "enum": ["SIF", "AIM", "Store Meeting", "None"] }, "aliases": ["Meeting_Type", "mtg_type"] },
+                { "name": "sif_date", "type": "date", "required": false, "description": "Store Impact Forum (SIF) meeting date", "aliases": ["SIF_Date", "SIF_Meeting_Date"] },
+                { "name": "aim_date", "type": "date", "required": false, "description": "Area/Activity Impact Meeting (AIM) date", "aliases": ["AIM_Date", "AIM_Meeting_Date"] }
+              ]
+            },
+            "description": {
+              "fields": [
+                { "name": "summary", "type": "string", "required": false, "description": "Brief project summary", "aliases": ["PRESENTATION_SUMMARY", "summary", "brief"] },
+                { "name": "overview", "type": "string", "required": false, "description": "Detailed project overview", "aliases": ["OVERVIEW", "overview", "description", "details"] }
+              ]
+            }
+          }
+        };
+
+        async function loadProjectsSchema() {
+            try {
+                // First check if there's a saved version in localStorage
+                const savedSchema = localStorage.getItem('activityhub_projects_schema');
+                if (savedSchema) {
+                    const parsed = JSON.parse(savedSchema);
+                    // Validate that the schema has the correct flat structure
+                    if (parsed.columns && typeof parsed.columns === 'object' && Object.keys(parsed.columns).length > 0) {
+                        // Check if first column has displayName (indicates flat structure)
+                        const firstCol = Object.values(parsed.columns)[0];
+                        if (firstCol && firstCol.displayName !== undefined) {
+                            projectsSchema = parsed;
+                            console.log('Loaded valid schema from localStorage with', Object.keys(parsed.columns).length, 'fields');
+                        } else {
+                            console.log('localStorage schema has wrong format, clearing...');
+                            localStorage.removeItem('activityhub_projects_schema');
+                            projectsSchema = null;
+                        }
+                    } else {
+                        console.log('localStorage schema invalid, clearing...');
+                        localStorage.removeItem('activityhub_projects_schema');
+                        projectsSchema = null;
+                    }
+                }
+                
+                // If no valid schema from localStorage, load fresh
+                if (!projectsSchema) {
+                    // Try to load from file first
+                    let rawSchema = null;
+                    try {
+                        const response = await fetch('Data-Bridge/Schemas/projects-schema.json');
+                        if (response.ok) {
+                            rawSchema = await response.json();
+                            console.log('Loaded schema from file');
+                        }
+                    } catch (fetchError) {
+                        console.log('Fetch failed, using embedded schema');
+                    }
+                    
+                    // Use embedded schema as fallback
+                    if (!rawSchema) {
+                        rawSchema = EMBEDDED_SCHEMA;
+                        console.log('Using embedded schema');
+                    }
+                    
+                    // Convert nested schema to flat structure
+                    projectsSchema = convertNestedSchema(rawSchema);
+                    console.log('Converted schema with', Object.keys(projectsSchema.columns).length, 'fields');
+                }
+                
+                renderSchemaOverview();
+                renderFieldConfig();
+                populateCategoryFilter();
+                updateSchemaStats();
+            } catch (error) {
+                console.error('Schema load failed completely:', error);
+                // Last resort fallback - clear everything and use embedded
+                localStorage.removeItem('activityhub_projects_schema');
+                projectsSchema = convertNestedSchema(EMBEDDED_SCHEMA);
+                renderSchemaOverview();
+                renderFieldConfig();
+                populateCategoryFilter();
+                updateSchemaStats();
+            }
+        }
+        
+        function convertNestedSchema(rawSchema) {
+            // Convert nested category/fields structure to flat columns object
+            const flatColumns = {};
+            const categories = [];
+            let totalFields = 0;
+            
+            if (rawSchema.columns) {
+                for (const [categoryName, categoryData] of Object.entries(rawSchema.columns)) {
+                    categories.push(categoryName);
+                    
+                    // Handle both array of fields and fields property
+                    const fields = Array.isArray(categoryData) ? categoryData : (categoryData.fields || []);
+                    
+                    for (const field of fields) {
+                        const fieldKey = field.name || field.key;
+                        if (!fieldKey) continue;
+                        
+                        // Extract enum values from validation.enum
+                        const enumValues = field.values || field.enum || (field.validation?.enum) || [];
+                        const fieldType = enumValues.length > 0 ? 'enum' : (field.type || 'string');
+                        
+                        // Generate example from enum if not provided
+                        let example = field.example || '';
+                        if (!example && enumValues.length > 0) {
+                            example = enumValues[0];
+                        }
+                        
+                        flatColumns[fieldKey] = {
+                            displayName: field.displayName || fieldKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                            type: fieldType,
+                            required: field.required || false,
+                            coreRequired: field.coreRequired || false,
+                            description: field.description || '',
+                            example: example,
+                            category: categoryName,
+                            aliases: field.aliases || [],
+                            validation: field.validation || {},
+                            values: enumValues
+                        };
+                        totalFields++;
+                    }
+                }
+            }
+            
+            return {
+                metadata: {
+                    schemaVersion: rawSchema.schemaVersion || '1.0.0',
+                    title: rawSchema.title || 'Projects Schema',
+                    description: rawSchema.description || '',
+                    totalFields: totalFields,
+                    categories: categories,
+                    lastModified: rawSchema.lastUpdated || new Date().toISOString()
+                },
+                columns: flatColumns
+            };
+        }
+
+        function renderSchemaOverview() {
+            if (!projectsSchema || !projectsSchema.columns) return;
+            const container = document.getElementById('schema-categories-list');
+            if (!container) return;
+            
+            const categoryMap = {};
+            for (const [key, field] of Object.entries(projectsSchema.columns)) {
+                const cat = field.category || 'uncategorized';
+                if (!categoryMap[cat]) categoryMap[cat] = [];
+                categoryMap[cat].push({ key, ...field });
+            }
+
+            const categoryIcons = {
+                identifiers: '🔑', status: '📊', location: '📍', time: '📅', 
+                ownership: '👤', categorization: '🏷️', impact: '📈', 
+                description: '📝', amp_meeting: '📋'
+            };
+
+            let html = '';
+            for (const [category, fields] of Object.entries(categoryMap)) {
+                const requiredCount = fields.filter(f => f.required).length;
+                html += `
+                    <div class="schema-category-card shadow-box">
+                        <div class="category-header">
+                            <span class="category-icon">${categoryIcons[category] || '📁'}</span>
+                            <span class="category-name">${category.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+                            <span class="category-count">${fields.length} fields</span>
+                            ${requiredCount > 0 ? `<span class="required-badge">${requiredCount} required</span>` : ''}
+                        </div>
+                        <div class="category-fields">
+                            ${fields.map(f => `
+                                <div class="schema-field-chip ${f.required ? 'required' : ''}" onclick="showFieldDescription('${f.key}', '${(f.description || '').replace(/'/g, "\\'")}')">
+                                    <span class="field-name">${f.displayName || f.key}</span>
+                                    <span class="field-info-icon" title="Click for description">ℹ️</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+        
+        function showFieldDescription(fieldKey, description) {
+            const field = projectsSchema?.columns[fieldKey];
+            if (!field) return;
+            
+            const options = field.values && field.values.length > 0 
+                ? `<div style="margin-top: 8px;"><strong>Options:</strong> ${field.values.join(', ')}</div>` 
+                : '';
+            
+            const popup = document.createElement('div');
+            popup.className = 'field-description-popup';
+            popup.innerHTML = `
+                <div class="popup-header">
+                    <strong>${field.displayName || fieldKey}</strong>
+                    <button onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+                <p>${field.description || 'No description available'}</p>
+                ${options}
+            `;
+            popup.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: white; padding: 20px; border-radius: 12px; z-index: 1001;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 400px; min-width: 300px;
+            `;
+            
+            const backdrop = document.createElement('div');
+            backdrop.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 1000;';
+            backdrop.onclick = () => { backdrop.remove(); popup.remove(); };
+            
+            document.body.appendChild(backdrop);
+            document.body.appendChild(popup);
+        }
+
+        function renderFieldConfig() {
+            if (!projectsSchema || !projectsSchema.columns) {
+                console.log('renderFieldConfig: No schema or columns', projectsSchema);
+                return;
+            }
+            const tbody = document.getElementById('field-config-body');
+            if (!tbody) {
+                console.log('renderFieldConfig: tbody not found');
+                return;
+            }
+
+            const columns = Object.entries(projectsSchema.columns);
+            console.log('renderFieldConfig: Rendering', columns.length, 'fields');
+            
+            // Update field count in header
+            const fieldCountEl = document.querySelector('#field-config .section-title span');
+            if (fieldCountEl) fieldCountEl.textContent = `(${columns.length} fields)`;
+            
+            let html = '';
+            for (const [key, field] of columns) {
+                const hasOptions = field.values && field.values.length > 0;
+                const optionsHtml = hasOptions 
+                    ? `<select class="options-dropdown" onchange="showOptionsEditor('${key}')">
+                        <option value="">View Options (${field.values.length})</option>
+                        ${field.values.map(v => `<option value="${v}">${v}</option>`).join('')}
+                       </select>`
+                    : `<span style="color: var(--gray-400); font-style: italic;">Free text</span>`;
+                
+                const isCoreLocked = field.coreRequired === true;
+                const isAutoPopulate = field.autoPopulate === true;
+                
+                let toggleHtml = '';
+                if (isAutoPopulate) {
+                    toggleHtml = `<span class="auto-badge" title="Auto-populated from Data Connection">⚡ Auto</span>`;
+                } else if (isCoreLocked) {
+                    toggleHtml = `<label class="toggle-switch disabled" title="Core required field - cannot be changed">
+                        <input type="checkbox" checked disabled onclick="showCoreRequiredError()">
+                        <span class="toggle-slider locked"></span>
+                       </label>
+                       <span style="font-size: 10px; color: var(--gray-500);">🔒</span>`;
+                } else {
+                    toggleHtml = `<label class="toggle-switch">
+                        <input type="checkbox" ${field.required ? 'checked' : ''} onchange="toggleRequired('${key}', this.checked)">
+                        <span class="toggle-slider"></span>
+                       </label>`;
+                }
+                
+                html += `
+                    <tr class="field-row ${isAutoPopulate ? 'auto-populate-row' : ''}" data-category="${field.category || 'uncategorized'}" data-field="${key}">
+                        <td style="padding: var(--space-3);">
+                            <strong>${field.displayName || key}</strong>
+                            <div><small style="color: var(--gray-500);">${key}</small></div>
+                        </td>
+                        <td style="padding: var(--space-3);">
+                            <span class="type-badge type-${field.type}">${field.type}</span>
+                        </td>
+                        <td style="padding: var(--space-3);">
+                            ${toggleHtml}
+                        </td>
+                        <td style="padding: var(--space-3); max-width: 300px;">
+                            <span style="font-size: 13px; color: var(--gray-600);">${field.description || '-'}</span>
+                        </td>
+                        <td style="padding: var(--space-3);">
+                            ${optionsHtml}
+                        </td>
+                        <td style="padding: var(--space-3);">
+                            <div class="action-buttons">
+                                <button class="btn-edit" onclick="editField('${key}')">✏️</button>
+                                <button class="btn-delete ${(isCoreLocked || isAutoPopulate) ? 'disabled' : ''}" onclick="${isCoreLocked ? 'showDeleteCoreError()' : (isAutoPopulate ? 'showAutoPopulateError()' : `confirmDeleteField('${key}')`)}" title="${isCoreLocked ? 'Core field cannot be deleted' : (isAutoPopulate ? 'Auto-populated field cannot be deleted' : 'Delete field')}">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+        }
+        
+        function showCoreRequiredError() {
+            showNotification('This is a core required field and cannot be changed. It is essential for data integrity.', 'error');
+        }
+        
+        function showAutoPopulateError() {
+            showNotification('This field is auto-populated from the Data Connection and cannot be deleted.', 'error');
+        }
+        
+        function showDeleteCoreError() {
+            showNotification('Core required fields cannot be deleted. They are essential for data integrity.', 'error');
+        }
+        
+        function confirmDeleteField(fieldKey) {
+            const field = projectsSchema?.columns[fieldKey];
+            if (!field) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 450px;">
+                    <div class="modal-header" style="background: #fee2e2; border-bottom: 1px solid #fecaca;">
+                        <h3 style="color: #dc2626;">🗑️ Delete Field</h3>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    <div class="modal-body" style="padding: var(--space-6);">
+                        <p style="margin: 0 0 var(--space-4);">Are you sure you want to delete the field:</p>
+                        <div style="background: var(--gray-100); padding: var(--space-3); border-radius: 8px; margin-bottom: var(--space-4);">
+                            <strong>${field.displayName || fieldKey}</strong>
+                            <div style="font-size: 12px; color: var(--gray-500);">${fieldKey}</div>
+                            <div style="font-size: 13px; color: var(--gray-600); margin-top: var(--space-2);">${field.description || ''}</div>
+                        </div>
+                        <p style="margin: 0; color: #b91c1c; font-size: 13px;">⚠️ This action cannot be undone. Existing data for this field will no longer be mapped.</p>
+                    </div>
+                    <div class="modal-footer" style="padding: var(--space-4) var(--space-6); border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: var(--space-3);">
+                        <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                        <button class="btn-primary" style="background: #dc2626;" onclick="deleteField('${fieldKey}'); this.closest('.modal').remove();">Delete Field</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        }
+        
+        function deleteField(fieldKey) {
+            if (!projectsSchema?.columns[fieldKey]) return;
+            
+            const field = projectsSchema.columns[fieldKey];
+            if (field.coreRequired) {
+                showDeleteCoreError();
+                return;
+            }
+            
+            const displayName = field.displayName || fieldKey;
+            const fieldInfo = { ...field }; // Copy for logging
+            delete projectsSchema.columns[fieldKey];
+            
+            saveSchemaToStorage();
+            renderFieldConfig();
+            renderSchemaOverview();
+            populateCategoryFilter();
+            
+            // Log the deletion
+            logAudit('Data Bridge', 'Delete Field', `Deleted field "${displayName}" (${fieldKey})`, {
+                fieldKey: fieldKey,
+                fieldName: displayName,
+                fieldType: fieldInfo.type,
+                category: fieldInfo.category
+            });
+            
+            showNotification(`Field "${displayName}" has been deleted`, 'success');
+        }
+
+        function showOptionsEditor(fieldKey) {
+            const field = projectsSchema?.columns[fieldKey];
+            if (!field || !field.values) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h3>Edit Options: ${field.displayName || fieldKey}</h3>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    <div style="padding: var(--space-4);">
+                        <p style="color: var(--gray-600); margin-bottom: var(--space-4);">Add, edit, or remove allowed values for this field.</p>
+                        <div id="options-list-editor">
+                            ${field.values.map((v, i) => `
+                                <div class="option-item" style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
+                                    <input type="text" class="form-input" value="${v}" style="flex: 1;" data-index="${i}">
+                                    <button class="btn-secondary" onclick="this.parentElement.remove()" style="padding: 8px 12px;">🗑️</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="btn-secondary" onclick="addNewOption()" style="margin-top: var(--space-2);">+ Add Option</button>
+                    </div>
+                    <div style="display: flex; gap: var(--space-4); justify-content: flex-end; padding: var(--space-4); border-top: 1px solid var(--gray-200);">
+                        <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                        <button class="btn-primary" onclick="saveFieldOptions('${fieldKey}')">💾 Save Options</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        }
+        
+        function addNewOption() {
+            const container = document.getElementById('options-list-editor');
+            const div = document.createElement('div');
+            div.className = 'option-item';
+            div.style.cssText = 'display: flex; gap: 8px; margin-bottom: 8px; align-items: center;';
+            div.innerHTML = `
+                <input type="text" class="form-input" value="" style="flex: 1;" placeholder="New option...">
+                <button class="btn-secondary" onclick="this.parentElement.remove()" style="padding: 8px 12px;">🗑️</button>
+            `;
+            container.appendChild(div);
+            div.querySelector('input').focus();
+        }
+        
+        function saveFieldOptions(fieldKey) {
+            const field = projectsSchema?.columns[fieldKey];
+            if (!field) return;
+            
+            const inputs = document.querySelectorAll('#options-list-editor input');
+            const newValues = Array.from(inputs).map(i => i.value.trim()).filter(v => v);
+            const oldValues = field.values || [];
+            
+            field.values = newValues;
+            saveSchemaToStorage();
+            renderFieldConfig();
+            renderSchemaOverview();
+            
+            // Log the change
+            logAudit('Data Bridge', 'Update Options', `Updated options for "${field.displayName}" (${oldValues.length} → ${newValues.length} options)`, {
+                fieldKey: fieldKey,
+                fieldName: field.displayName,
+                oldCount: oldValues.length,
+                newCount: newValues.length
+            });
+            
+            document.querySelector('.modal')?.remove();
+            showNotification(`Options for "${field.displayName}" updated (${newValues.length} options)`, 'success');
+        }
+
+        function populateCategoryFilter() {
+            if (!projectsSchema || !projectsSchema.columns) return;
+            const select = document.getElementById('category-filter');
+            if (!select) return;
+
+            const categories = new Set();
+            for (const field of Object.values(projectsSchema.columns)) {
+                categories.add(field.category || 'uncategorized');
+            }
+
+            select.innerHTML = '<option value="all">All Categories</option>';
+            for (const cat of categories) {
+                const label = cat.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                select.innerHTML += `<option value="${cat}">${label}</option>`;
+            }
+        }
+
+        function filterFields(searchTerm) {
+            const rows = document.querySelectorAll('#field-config-body .field-row');
+            const term = searchTerm.toLowerCase();
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        }
+
+        function filterByCategory(category) {
+            const rows = document.querySelectorAll('#field-config-body .field-row');
+            rows.forEach(row => {
+                if (category === 'all' || row.dataset.category === category) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleRequired(fieldKey, isRequired) {
+            if (!projectsSchema || !projectsSchema.columns[fieldKey]) return;
+            
+            const field = projectsSchema.columns[fieldKey];
+            
+            // Check if this is a core required field that cannot be changed
+            if (field.coreRequired) {
+                showNotification('This is a core required field and cannot be changed. It is essential for data integrity.', 'error');
+                renderFieldConfig(); // Reset the checkbox
+                return;
+            }
+            
+            field.required = isRequired;
+            saveSchemaToStorage();
+            updateSchemaStats();
+            renderSchemaOverview();
+            const fieldName = field.displayName || fieldKey;
+            
+            // Log the change
+            logAudit('Data Bridge', 'Toggle Required', `Set "${fieldName}" to ${isRequired ? 'required' : 'optional'}`, {
+                fieldKey: fieldKey,
+                fieldName: fieldName,
+                newValue: isRequired
+            });
+            
+            showNotification(`"${fieldName}" ${isRequired ? 'marked as required' : 'set to optional'}`, 'success');
+        }
+
+        function editField(fieldKey) {
+            const field = projectsSchema?.columns[fieldKey];
+            if (!field) return;
+            
+            // Populate the edit modal
+            document.getElementById('edit-field-key').value = fieldKey;
+            document.getElementById('edit-field-key-display').value = fieldKey;
+            document.getElementById('edit-display-name').value = field.displayName || '';
+            document.getElementById('edit-field-type').value = field.type || 'string';
+            document.getElementById('edit-field-category').value = field.category || 'identifiers';
+            document.getElementById('edit-field-description').value = field.description || '';
+            document.getElementById('edit-field-example').value = field.example || '';
+            document.getElementById('edit-field-aliases').value = (field.aliases || []).join(', ');
+            document.getElementById('edit-field-required').checked = field.required || false;
+            
+            // Handle enum values
+            const enumGroup = document.getElementById('enum-values-group');
+            const enumInput = document.getElementById('edit-field-enum');
+            if (field.type === 'enum' && field.values) {
+                enumGroup.style.display = 'block';
+                enumInput.value = field.values.join(', ');
+            } else {
+                enumGroup.style.display = 'none';
+                enumInput.value = '';
+            }
+            
+            // Show/hide enum field based on type selection
+            document.getElementById('edit-field-type').onchange = function() {
+                enumGroup.style.display = this.value === 'enum' ? 'block' : 'none';
+            };
+            
+            showModal('editFieldModal');
+        }
+        
+        function saveFieldChanges(event) {
+            event.preventDefault();
+            
+            const fieldKey = document.getElementById('edit-field-key').value;
+            if (!fieldKey || !projectsSchema?.columns[fieldKey]) {
+                showNotification('Error: Field not found', 'error');
+                return;
+            }
+            
+            // Update the field in memory
+            const field = projectsSchema.columns[fieldKey];
+            const newDisplayName = document.getElementById('edit-display-name').value;
+            field.displayName = newDisplayName;
+            field.type = document.getElementById('edit-field-type').value;
+            field.category = document.getElementById('edit-field-category').value;
+            field.description = document.getElementById('edit-field-description').value;
+            field.example = document.getElementById('edit-field-example').value;
+            field.required = document.getElementById('edit-field-required').checked;
+            
+            // Parse aliases
+            const aliasesStr = document.getElementById('edit-field-aliases').value;
+            field.aliases = aliasesStr ? aliasesStr.split(',').map(a => a.trim()).filter(a => a) : [];
+            
+            // Handle enum values
+            if (field.type === 'enum') {
+                const enumStr = document.getElementById('edit-field-enum').value;
+                field.values = enumStr ? enumStr.split(',').map(v => v.trim()).filter(v => v) : [];
+            }
+            
+            // Save to localStorage
+            saveSchemaToStorage();
+            
+            // Re-render the table and overview
+            renderFieldConfig();
+            renderSchemaOverview();
+            updateSchemaStats();
+            
+            // Log the change
+            logAudit('Data Bridge', 'Edit Field', `Updated field "${newDisplayName}" (${fieldKey})`, {
+                fieldKey: fieldKey,
+                fieldName: newDisplayName,
+                fieldType: field.type,
+                category: field.category
+            });
+            
+            hideModal('editFieldModal');
+            showNotification(`Field "${field.displayName}" updated successfully!`, 'success');
+        }
+        
+        function saveSchemaToStorage() {
+            if (!projectsSchema) return;
+            projectsSchema.metadata.lastModified = new Date().toISOString();
+            localStorage.setItem('activityhub_projects_schema', JSON.stringify(projectsSchema));
+            markSchemaUnsaved(false);
+        }
+        
+        function markSchemaUnsaved(unsaved = true) {
+            const saveAllBtn = document.getElementById('save-all-changes-btn');
+            if (saveAllBtn) {
+                saveAllBtn.style.display = unsaved ? 'inline-flex' : 'none';
+            }
+        }
+        
+        function updateSchemaStats() {
+            if (!projectsSchema?.columns) return;
+            const columns = Object.values(projectsSchema.columns);
+            const totalFields = columns.length;
+            const requiredFields = columns.filter(f => f.required).length;
+            const categories = new Set(columns.map(f => f.category || 'uncategorized')).size;
+            
+            // Update stats in overview
+            const statsCards = document.querySelectorAll('#schema-overview .stat-number');
+            if (statsCards.length >= 3) {
+                statsCards[0].textContent = totalFields;
+                statsCards[1].textContent = requiredFields;
+                statsCards[2].textContent = categories;
+            }
+        }
+        
+        function saveAllChanges() {
+            saveSchemaToStorage();
+            showNotification('All schema changes saved!', 'success');
+        }
+        
+        function resetSchemaToDefault() {
+            if (!confirm('This will reset the schema to the original 40 fields. Any changes will be lost. Continue?')) return;
+            localStorage.removeItem('activityhub_projects_schema');
+            // Use embedded schema directly to avoid CORS issues
+            projectsSchema = convertNestedSchema(EMBEDDED_SCHEMA);
+            console.log('Reset to embedded schema with', Object.keys(projectsSchema.columns).length, 'fields');
+            renderSchemaOverview();
+            renderFieldConfig();
+            populateCategoryFilter();
+            updateSchemaStats();
+            
+            // Log the reset
+            logAudit('Data Bridge', 'Reset Schema', 'Reset schema to default (40 fields)', {
+                action: 'full_reset',
+                fieldCount: Object.keys(projectsSchema.columns).length
+            });
+            
+            showNotification('Schema reset to default (40 fields)', 'success');
+        }
+
+        function exportSchema() {
+            if (!projectsSchema) return;
+            const blob = new Blob([JSON.stringify(projectsSchema, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'projects-schema.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Schema exported successfully', 'success');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()">×</button>`;
+            notification.style.cssText = `
+                position: fixed; top: 80px; right: 20px; padding: 12px 20px; border-radius: 8px; z-index: 1000;
+                background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#3B82F6'}; color: white;
+                display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Load schema when Data Bridge tab is shown
+        const originalShowTab = showTab;
+        showTab = function(tabName) {
+            originalShowTab(tabName);
+            if (tabName === 'data-bridge') {
+                loadProjectsSchema();
+            }
+        };
+        
+        // Also hook into navigateToTab for landing card clicks
+        const originalNavigateToTab = navigateToTab;
+        navigateToTab = function(tabName) {
+            originalNavigateToTab(tabName);
+            if (tabName === 'data-bridge') {
+                loadProjectsSchema();
+            }
+        };
+        
+        // Also hook into showSubTab to load schema when clicking Field Configuration
+        const originalShowSubTab = showSubTab;
+        showSubTab = function(parentTab, subTabName) {
+            originalShowSubTab(parentTab, subTabName);
+            if (parentTab === 'data-bridge' && !projectsSchema) {
+                loadProjectsSchema();
+            }
+        };
+        
+        // Hook showTab to refresh Activity Log when shown
+        const baseShowTab = showTab;
+        showTab = function(tabName) {
+            baseShowTab(tabName);
+            if (tabName === 'activity-log') {
+                AuditLog.updateStats();
+                AuditLog.renderLog();
+            }
+        };
+        
+        // Hook navigateToTab too
+        const baseNavigateToTab = navigateToTab;
+        navigateToTab = function(tabName) {
+            baseNavigateToTab(tabName);
+            if (tabName === 'activity-log') {
+                AuditLog.updateStats();
+                AuditLog.renderLog();
+            }
+        };
+        
+        // Auto-load on page ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pre-load the schema so it's ready when user clicks Data Bridge
+            setTimeout(() => loadProjectsSchema(), 500);
+            
+            // Initialize audit log stats
+            AuditLog.updateStats();
         });
     </script>
 </body>

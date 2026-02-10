@@ -1,6 +1,71 @@
 {
   "links": [
     {
+      "id": "projects-in-stores",
+      "name": "Projects in Stores",
+      "description": "View and manage projects deployed to stores - embedded view within Activity Hub",
+      "category": "operations",
+      "type": "embedded",
+      "url": "http://127.0.0.1:8001/",
+      "display": {
+        "button_text": "Projects",
+        "icon": "folder",
+        "color": "#3B82F6",
+        "size": "medium",
+        "position": "header-navigation",
+        "tooltip": "View Projects in Stores"
+      },
+      "ownership": {
+        "primary_owner": "krush@walmart.com",
+        "primary_owner_name": "Krush",
+        "secondary_owner": "",
+        "secondary_owner_name": "",
+        "department": "Operations",
+        "review_frequency": "monthly",
+        "next_review_date": "2026-03-10"
+      },
+      "visibility": {
+        "roles": ["team-member", "team-lead", "manager", "director", "vice-president", "c-level-executive"],
+        "departments": ["All"],
+        "ad_groups": ["WMT_ActivityHub_All_Users"],
+        "conditions": {
+          "active_hours": "00:00-23:59",
+          "business_days_only": false,
+          "geo_restrictions": []
+        }
+      },
+      "tracking": {
+        "google_analytics": "",
+        "custom_events": ["projects_in_stores_access"],
+        "monthly_clicks": 0,
+        "unique_users": 0,
+        "avg_session_duration": ""
+      },
+      "health": {
+        "last_check": "2026-02-10T00:00:00Z",
+        "status": "healthy",
+        "response_time_ms": 0,
+        "uptime_percentage": 100,
+        "ssl_valid": false
+      },
+      "metadata": {
+        "created_date": "2026-02-10T00:00:00Z",
+        "created_by": "krush@walmart.com",
+        "last_modified": "2026-02-10T00:00:00Z",
+        "modified_by": "krush@walmart.com",
+        "version": "1.0",
+        "status": "active",
+        "change_log": [
+          {
+            "date": "2026-02-10T00:00:00Z",
+            "user": "krush@walmart.com",
+            "change": "Initial creation - Projects in Stores embedded link for header navigation",
+            "version": "1.0"
+          }
+        ]
+      }
+    },
+    {
       "id": "sap-financial-reports",
       "name": "SAP Financial Reports",
       "description": "Access monthly and quarterly financial reports, budget analysis, and financial planning tools",

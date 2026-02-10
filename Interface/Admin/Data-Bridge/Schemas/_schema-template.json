@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schemaVersion": "1.0.0",
+  "schemaType": "[DATA_TYPE]",
+  "title": "[Schema Title]",
+  "description": "[Description of what this schema defines]",
+  "lastUpdated": "YYYY-MM-DD",
+  "updatedBy": "[email@walmart.com]",
+  
+  "_instructions": {
+    "purpose": "This is a template for creating new canonical data schemas",
+    "howToUse": [
+      "1. Copy this file and rename to [data-type]-schema.json",
+      "2. Replace all [PLACEHOLDER] values with actual definitions",
+      "3. Define columns organized by logical categories",
+      "4. Include aliases for known alternate column names from sources",
+      "5. Add validation rules where applicable",
+      "6. Update metadata section with totals"
+    ],
+    "fieldProperties": {
+      "name": "Canonical column name (lowercase snake_case)",
+      "type": "string | integer | float | boolean | date | datetime | array | object",
+      "required": "true if this field must be present",
+      "description": "Human-readable description of the field",
+      "validation": "Optional validation rules (enum, pattern, min/max, etc.)",
+      "transformation": "Optional transformation function name to apply",
+      "aliases": "Array of known alternate names from various sources"
+    }
+  },
+
+  "columns": {
+    "[category_name]": {
+      "description": "[Category description]",
+      "fields": [
+        {
+          "name": "[field_name]",
+          "type": "[data_type]",
+          "required": false,
+          "description": "[Field description]",
+          "validation": {},
+          "aliases": ["[AliasName1]", "[alias_name_2]"]
+        }
+      ]
+    }
+  },
+
+  "metadata": {
+    "totalFields": 0,
+    "requiredFields": [],
+    "categories": []
+  }
+}

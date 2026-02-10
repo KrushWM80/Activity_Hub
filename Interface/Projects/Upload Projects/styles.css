@@ -1,0 +1,1725 @@
+/* ==========================================
+   Upload Projects - Styles
+   Activity Hub Data Import Wizard
+   ========================================== */
+
+/* CSS Variables - Walmart Brand */
+:root {
+    --walmart-navy: #1E3A8A;
+    --walmart-blue-dark: #1D4ED8;
+    --walmart-blue: #3B82F6;
+    --walmart-blue-light: #60A5FA;
+    --walmart-blue-lightest: #DBEAFE;
+    --walmart-yellow: #FFCC00;
+    --walmart-yellow-dark: #E6B800;
+    --walmart-yellow-light: #FFD633;
+    
+    --gray-900: #1A202C;
+    --gray-700: #4A5568;
+    --gray-600: #718096;
+    --gray-500: #A0AEC0;
+    --gray-400: #CBD5E0;
+    --gray-300: #E2E8F0;
+    --gray-200: #EDF2F7;
+    --gray-100: #F7FAFC;
+    --white: #FFFFFF;
+    
+    --success: #38A169;
+    --success-light: #C6F6D5;
+    --warning: #D69E2E;
+    --warning-light: #FEFCBF;
+    --error: #E53E3E;
+    --error-light: #FED7D7;
+    
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+    
+    --font-primary: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Reset & Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    background: var(--gray-100);
+    color: var(--gray-900);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ==========================================
+   Header
+   ========================================== */
+.header {
+    background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-dark) 100%);
+    color: var(--white);
+    padding: var(--space-4) var(--space-6);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.spark-logo {
+    width: 32px;
+    height: 32px;
+    background: var(--walmart-yellow);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--gray-900);
+}
+
+.logo-section h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.nav-items {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.nav-item {
+    color: var(--white);
+    text-decoration: none;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.nav-item.active {
+    background: var(--walmart-yellow);
+    color: var(--gray-900);
+}
+
+.user-section {
+    font-weight: 500;
+}
+
+/* ==========================================
+   Main Container
+   ========================================== */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6);
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-6);
+}
+
+.page-title h2 {
+    font-size: 1.75rem;
+    margin-bottom: var(--space-2);
+}
+
+.page-title p {
+    color: var(--gray-600);
+}
+
+/* ==========================================
+   Buttons
+   ========================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--walmart-blue);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background: var(--walmart-blue-dark);
+    transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+    background: var(--gray-400);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: var(--white);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-400);
+}
+
+.btn-small {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.85rem;
+}
+
+.btn-large {
+    padding: var(--space-4) var(--space-8);
+    font-size: 1.1rem;
+}
+
+/* ==========================================
+   Wizard Container
+   ========================================== */
+.wizard-container {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-8);
+}
+
+/* Wizard Steps */
+.wizard-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-8);
+    position: relative;
+}
+
+.wizard-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    right: 40px;
+    height: 2px;
+    background: var(--gray-300);
+    z-index: 0;
+}
+
+.wizard-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    z-index: 1;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--gray-300);
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.step-label {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.wizard-step.active .step-number {
+    background: var(--walmart-blue);
+    color: var(--white);
+}
+
+.wizard-step.active .step-label {
+    color: var(--walmart-blue);
+}
+
+.wizard-step.completed .step-number {
+    background: var(--success);
+    color: var(--white);
+}
+
+.wizard-step.completed .step-label {
+    color: var(--success);
+}
+
+/* Wizard Content */
+.wizard-content {
+    min-height: 400px;
+    padding: var(--space-4) 0;
+}
+
+.wizard-content.hidden {
+    display: none;
+}
+
+.step-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+}
+
+.step-header h3 {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-2);
+}
+
+.step-header p {
+    color: var(--gray-600);
+}
+
+/* Wizard Navigation */
+.wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--gray-200);
+    margin-top: var(--space-6);
+}
+
+/* ==========================================
+   Step 1: Connection Options
+   ========================================== */
+.connection-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-6);
+}
+
+.connection-card {
+    background: var(--white);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.connection-card:hover {
+    border-color: var(--walmart-blue-light);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.connection-card.selected {
+    border-color: var(--walmart-blue);
+    background: var(--walmart-blue-lightest);
+}
+
+.connection-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+}
+
+.connection-card h4 {
+    font-size: 1.1rem;
+    margin-bottom: var(--space-2);
+}
+
+.connection-card p {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-4);
+}
+
+.connection-features {
+    list-style: none;
+    text-align: left;
+    font-size: 0.85rem;
+    color: var(--gray-700);
+}
+
+.connection-features li {
+    padding: var(--space-1) 0;
+}
+
+/* Saved Connection Cards */
+.saved-connections-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.saved-connection-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.saved-connection-card:hover {
+    border-color: var(--walmart-blue);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.saved-connection-card .connection-icon {
+    font-size: 2rem;
+    width: 48px;
+    text-align: center;
+}
+
+.saved-connection-card .connection-info {
+    flex: 1;
+}
+
+.saved-connection-card .connection-info h4 {
+    margin: 0 0 var(--space-1) 0;
+    color: var(--gray-900);
+    font-size: 1rem;
+}
+
+.saved-connection-card .connection-info p {
+    margin: 0 0 var(--space-1) 0;
+    color: var(--gray-600);
+    font-size: 0.85rem;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.saved-connection-card .connection-info small {
+    color: var(--gray-500);
+    font-size: 0.8rem;
+}
+
+.saved-connections-list .empty-state {
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--gray-600);
+}
+
+.saved-connections-list .empty-state .hint {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin-top: var(--space-2);
+}
+
+/* ==========================================
+   Step 2: Source Panels
+   ========================================== */
+.source-panel.hidden {
+    display: none;
+}
+
+/* Upload Zone */
+.upload-zone {
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--radius-lg);
+    padding: var(--space-12);
+    text-align: center;
+    transition: all 0.3s ease;
+    background: var(--gray-100);
+}
+
+.upload-zone.drag-over {
+    border-color: var(--walmart-blue);
+    background: var(--walmart-blue-lightest);
+}
+
+.upload-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-4);
+}
+
+.upload-zone h4 {
+    margin-bottom: var(--space-2);
+}
+
+.upload-zone p {
+    color: var(--gray-600);
+    margin-bottom: var(--space-4);
+}
+
+.upload-btn {
+    cursor: pointer;
+}
+
+.upload-hint {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin-top: var(--space-4);
+}
+
+/* File Preview */
+.file-preview {
+    margin-top: var(--space-6);
+}
+
+.file-preview.hidden {
+    display: none;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--walmart-blue-lightest);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+}
+
+.file-icon {
+    font-size: 2rem;
+}
+
+.file-details {
+    flex-grow: 1;
+}
+
+.file-details h4 {
+    font-size: 1rem;
+    margin-bottom: var(--space-1);
+}
+
+.file-details p {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+}
+
+/* Preview Table */
+.preview-table-container {
+    overflow-x: auto;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+}
+
+.preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.preview-table th,
+.preview-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+}
+
+.preview-table th {
+    background: var(--gray-100);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+}
+
+.preview-table tr:hover {
+    background: var(--gray-50);
+}
+
+.preview-note {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    margin-top: var(--space-2);
+    text-align: center;
+}
+
+/* Connection Forms */
+.connection-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: var(--space-4);
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: var(--space-2);
+    color: var(--gray-700);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--walmart-blue);
+}
+
+.form-row {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-row .flex-grow {
+    flex: 3;
+}
+
+.connection-status {
+    margin-top: var(--space-4);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+}
+
+.connection-status.success {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.connection-status.error {
+    background: var(--error-light);
+    color: var(--error);
+}
+
+/* Saved Connections */
+.saved-connections-list {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.saved-connection-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.saved-connection-item:hover {
+    border-color: var(--walmart-blue);
+    background: var(--walmart-blue-lightest);
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--gray-500);
+}
+
+.empty-state .hint {
+    font-size: 0.85rem;
+    margin-top: var(--space-2);
+}
+
+/* ==========================================
+   Step 3: Column Mapping
+   ========================================== */
+.mapping-container {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.mapping-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4);
+    background: var(--gray-100);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.mapping-stats {
+    display: flex;
+    gap: var(--space-6);
+}
+
+.mapping-stats .stat {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.mapping-stats .mapped {
+    color: var(--success);
+}
+
+.mapping-stats .unmapped {
+    color: var(--warning);
+}
+
+.mapping-stats .required {
+    color: var(--error);
+}
+
+.mapping-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.mapping-panels {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    min-height: 400px;
+}
+
+.mapping-panel {
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    overflow-y: auto;
+    max-height: 500px;
+}
+
+.mapping-panel h4 {
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.mapping-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--gray-400);
+}
+
+/* Source Columns */
+.column-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-height: 100px;
+}
+
+.column-list:empty::before {
+    content: "No columns loaded";
+    color: var(--gray-500);
+    font-style: italic;
+    padding: var(--space-4);
+}
+
+.schema-categories {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-height: 100px;
+}
+
+.schema-categories:empty::before {
+    content: "Loading schema...";
+    color: var(--gray-500);
+    font-style: italic;
+    padding: var(--space-4);
+}
+
+.column-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.column-item:hover {
+    border-color: var(--walmart-blue);
+}
+
+.column-item.mapped {
+    background: var(--success-light);
+    border-color: var(--success);
+}
+
+.column-item.dragging {
+    opacity: 0.5;
+}
+
+.column-name {
+    font-weight: 500;
+}
+
+.column-sample {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.column-mapping-target {
+    font-size: 0.8rem;
+    color: var(--success);
+}
+
+/* Schema Categories */
+.schema-categories {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.schema-category {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.category-header {
+    padding: var(--space-3);
+    background: var(--walmart-blue-lightest);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.category-fields {
+    padding: var(--space-2);
+}
+
+.schema-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-3);
+    margin: var(--space-1) 0;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+}
+
+.schema-field:hover {
+    background: var(--gray-100);
+}
+
+.schema-field.required {
+    border-left: 3px solid var(--error);
+}
+
+.schema-field.mapped {
+    background: var(--success-light);
+}
+
+.field-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.field-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.field-type {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.field-mapping {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.field-mapping select {
+    padding: var(--space-1) var(--space-2);
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+}
+
+.required-badge {
+    font-size: 0.7rem;
+    background: var(--error);
+    color: var(--white);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+
+/* ==========================================
+   Step 4: Validation
+   ========================================== */
+.validation-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.validation-stat {
+    text-align: center;
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+}
+
+.validation-stat.success {
+    background: var(--success-light);
+}
+
+.validation-stat.warning {
+    background: var(--warning-light);
+}
+
+.validation-stat.error {
+    background: var(--error-light);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+}
+
+.validation-stat.success .stat-number {
+    color: var(--success);
+}
+
+.validation-stat.warning .stat-number {
+    color: var(--warning);
+}
+
+.validation-stat.error .stat-number {
+    color: var(--error);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+}
+
+.validation-tabs {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.validation-tab {
+    padding: var(--space-2) var(--space-4);
+    background: var(--gray-100);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.validation-tab.active {
+    background: var(--walmart-blue);
+    color: var(--white);
+}
+
+.validation-table-container {
+    overflow-x: auto;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    max-height: 400px;
+}
+
+.validation-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.validation-table th,
+.validation-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.validation-table th {
+    background: var(--gray-100);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+}
+
+.validation-table tr.has-error {
+    background: var(--error-light);
+}
+
+.validation-table tr.has-warning {
+    background: var(--warning-light);
+}
+
+.validation-errors-panel {
+    margin-top: var(--space-4);
+    padding: var(--space-4);
+    background: var(--error-light);
+    border-radius: var(--radius-md);
+}
+
+.validation-errors-panel h4 {
+    margin-bottom: var(--space-3);
+}
+
+.error-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.error-item {
+    padding: var(--space-2) var(--space-3);
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+}
+
+/* ==========================================
+   Step 5: Data Management
+   ========================================== */
+.management-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.management-card {
+    background: var(--white);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.management-card:hover {
+    border-color: var(--walmart-blue-light);
+    box-shadow: var(--shadow-md);
+}
+
+.management-card.selected {
+    border-color: var(--walmart-blue);
+    background: var(--walmart-blue-lightest);
+}
+
+.management-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+}
+
+.management-card h4 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-2);
+}
+
+.management-card p {
+    color: var(--gray-600);
+    margin-bottom: var(--space-4);
+}
+
+.management-features {
+    list-style: none;
+    text-align: left;
+    font-size: 0.9rem;
+    color: var(--gray-700);
+}
+
+.management-features li {
+    padding: var(--space-2) 0;
+}
+
+/* API Setup Prompt */
+.api-setup-prompt {
+    max-width: 600px;
+    margin: var(--space-8) auto 0;
+    padding: var(--space-6);
+    background: var(--walmart-blue-lightest);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.api-setup-prompt.hidden {
+    display: none;
+}
+
+.prompt-header h4 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-2);
+}
+
+.prompt-header p {
+    color: var(--gray-600);
+    margin-bottom: var(--space-4);
+}
+
+.api-benefits {
+    display: grid;
+    gap: var(--space-3);
+    text-align: left;
+    margin-bottom: var(--space-6);
+}
+
+.benefit {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2);
+    background: var(--white);
+    border-radius: var(--radius-md);
+}
+
+.benefit-icon {
+    font-size: 1.25rem;
+}
+
+.api-setup-actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+}
+
+/* Sync Warning */
+.sync-warning {
+    max-width: 600px;
+    margin: var(--space-8) auto 0;
+    padding: var(--space-6);
+    background: var(--warning-light);
+    border: 1px solid var(--warning);
+    border-radius: var(--radius-lg);
+}
+
+.sync-warning.hidden {
+    display: none;
+}
+
+.warning-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.warning-icon {
+    font-size: 1.5rem;
+}
+
+.warning-content ul {
+    margin: var(--space-4) 0;
+    padding-left: var(--space-6);
+}
+
+.warning-content li {
+    margin-bottom: var(--space-2);
+}
+
+.warning-note {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    font-style: italic;
+}
+
+.warning-actions {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+.dont-show-again {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    cursor: pointer;
+}
+
+/* API Config Form */
+.api-config-form {
+    max-width: 700px;
+    margin: var(--space-8) auto 0;
+    padding: var(--space-6);
+    background: var(--gray-100);
+    border-radius: var(--radius-lg);
+}
+
+.api-config-form.hidden {
+    display: none;
+}
+
+.form-header {
+    margin-bottom: var(--space-6);
+}
+
+.form-header h4 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-2);
+}
+
+.endpoint-section {
+    background: var(--white);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+}
+
+.endpoint-section h5 {
+    margin-bottom: var(--space-3);
+    color: var(--gray-700);
+}
+
+.sync-schedule,
+.sync-direction {
+    margin-top: var(--space-6);
+}
+
+.sync-schedule h5,
+.sync-direction h5 {
+    margin-bottom: var(--space-3);
+}
+
+.schedule-options,
+.direction-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.schedule-option,
+.direction-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.schedule-option:has(input:checked),
+.direction-option:has(input:checked) {
+    background: var(--walmart-blue-lightest);
+    border-color: var(--walmart-blue);
+}
+
+/* Hub Management Confirm */
+.hub-management-confirm {
+    max-width: 500px;
+    margin: var(--space-8) auto 0;
+    padding: var(--space-8);
+    background: var(--gray-100);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.hub-management-confirm.hidden {
+    display: none;
+}
+
+.confirm-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-4);
+}
+
+.hub-management-confirm h4 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-2);
+}
+
+.hub-management-confirm p {
+    color: var(--gray-600);
+    margin-bottom: var(--space-4);
+}
+
+.confirm-list {
+    list-style: none;
+    text-align: left;
+    display: inline-block;
+}
+
+.confirm-list li {
+    padding: var(--space-2) 0;
+    color: var(--success);
+}
+
+/* ==========================================
+   Step 6: Import Summary
+   ========================================== */
+.import-summary {
+    display: grid;
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.summary-section {
+    background: var(--gray-100);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+}
+
+.summary-section h4 {
+    margin-bottom: var(--space-4);
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+}
+
+.summary-stat {
+    text-align: center;
+    padding: var(--space-4);
+    background: var(--white);
+    border-radius: var(--radius-md);
+}
+
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--walmart-blue);
+}
+
+.connection-summary,
+.management-summary {
+    padding: var(--space-4);
+    background: var(--white);
+    border-radius: var(--radius-md);
+}
+
+.import-actions {
+    text-align: center;
+}
+
+/* Import Progress */
+.import-progress {
+    margin-top: var(--space-6);
+    padding: var(--space-6);
+    background: var(--gray-100);
+    border-radius: var(--radius-lg);
+}
+
+.import-progress.hidden {
+    display: none;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--gray-300);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--walmart-blue);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Import Complete */
+.import-complete {
+    text-align: center;
+    padding: var(--space-8);
+}
+
+.import-complete.hidden {
+    display: none;
+}
+
+.complete-icon {
+    font-size: 5rem;
+    margin-bottom: var(--space-4);
+}
+
+.import-complete h3 {
+    font-size: 1.75rem;
+    margin-bottom: var(--space-2);
+    color: var(--success);
+}
+
+.import-complete p {
+    color: var(--gray-600);
+    margin-bottom: var(--space-6);
+}
+
+.complete-actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+}
+
+/* ==========================================
+   Toast Notifications
+   ========================================== */
+.toast {
+    position: fixed;
+    bottom: var(--space-6);
+    right: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    background: var(--gray-900);
+    color: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+}
+
+.toast.hidden {
+    display: none;
+}
+
+.toast.success {
+    background: var(--success);
+}
+
+.toast.error {
+    background: var(--error);
+}
+
+.toast.warning {
+    background: var(--warning);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ==========================================
+   Responsive
+   ========================================== */
+@media (max-width: 768px) {
+    .wizard-steps {
+        flex-wrap: wrap;
+        gap: var(--space-4);
+    }
+    
+    .wizard-steps::before {
+        display: none;
+    }
+    
+    .connection-options,
+    .management-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .mapping-panels {
+        grid-template-columns: 1fr;
+    }
+    
+    .mapping-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .validation-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        flex-direction: column;
+    }
+}
+
+/* ==========================================
+   Value Mapping Modal
+   ========================================== */
+.value-mapping-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--space-4);
+}
+
+.value-mapping-content {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    max-width: 700px;
+    width: 100%;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
+}
+
+.value-mapping-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-6);
+    background: var(--walmart-blue-lightest);
+    border-bottom: 1px solid var(--gray-300);
+}
+
+.value-mapping-header h3 {
+    margin: 0;
+    color: var(--walmart-navy);
+    font-size: 1.25rem;
+}
+
+.value-mapping-header .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--gray-500);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.value-mapping-header .close-btn:hover {
+    color: var(--gray-700);
+}
+
+.value-mapping-body {
+    padding: var(--space-4) var(--space-6);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.mapping-explanation {
+    margin: 0 0 var(--space-4);
+    color: var(--gray-700);
+    background: var(--warning-light);
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--warning);
+}
+
+.value-mapping-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.values-section h4 {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    margin: 0 0 var(--space-2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.value-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.value-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.value-chip.mismatch {
+    background: var(--error-light);
+    color: var(--error);
+    border: 1px solid var(--error);
+}
+
+.value-chip.match {
+    background: var(--success-light);
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+.value-chip.allowed {
+    background: var(--walmart-blue-lightest);
+    color: var(--walmart-blue-dark);
+    border: 1px solid var(--walmart-blue);
+}
+
+/* Mapping Table Section */
+.value-mapping-table h4 {
+    font-size: 0.95rem;
+    color: var(--gray-700);
+    margin: 0 0 var(--space-3);
+}
+
+.value-mapping-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.value-mapping-table th {
+    text-align: left;
+    padding: var(--space-3);
+    background: var(--gray-100);
+    border-bottom: 2px solid var(--gray-300);
+    color: var(--gray-700);
+    font-weight: 600;
+}
+
+.value-mapping-table td {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: middle;
+}
+
+.value-mapping-table tr:hover {
+    background: var(--gray-100);
+}
+
+.value-mapping-table code {
+    font-family: 'Courier New', monospace;
+    background: var(--gray-200);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+}
+
+.value-mapping-table select {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    background: var(--white);
+    cursor: pointer;
+}
+
+.value-mapping-table select:focus {
+    outline: none;
+    border-color: var(--walmart-blue);
+    box-shadow: 0 0 0 3px var(--walmart-blue-lightest);
+}
+
+.value-mapping-table tr.needs-mapping {
+    background: var(--warning-light);
+}
+
+.value-mapping-table tr.needs-mapping:hover {
+    background: #fef3c7;
+}
+
+/* Modal Footer */
+.value-mapping-footer {
+    padding: var(--space-4) var(--space-6);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    border-top: 1px solid var(--gray-200);
+    background: var(--gray-100);
+}
+
+.value-mapping-footer .btn-secondary,
+.value-mapping-footer .btn-primary {
+    padding: var(--space-2) var(--space-6);
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.value-mapping-footer .btn-secondary {
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+}
+
+.value-mapping-footer .btn-secondary:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-400);
+}
+
+.value-mapping-footer .btn-primary {
+    background: var(--walmart-blue);
+    border: none;
+    color: var(--white);
+}
+
+.value-mapping-footer .btn-primary:hover {
+    background: var(--walmart-blue-dark);
+}

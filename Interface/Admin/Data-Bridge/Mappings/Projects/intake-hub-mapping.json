@@ -1,0 +1,272 @@
+{
+  "mappingVersion": "1.0.0",
+  "mappingId": "intake-hub-projects",
+  "sourceName": "Intake Hub",
+  "sourceDescription": "BigQuery table: wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data",
+  "targetSchema": "projects-schema.json",
+  "lastUpdated": "2026-02-10",
+  "updatedBy": "krush@walmart.com",
+  "status": "active",
+
+  "sourceInfo": {
+    "type": "bigquery",
+    "connectionString": "wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data",
+    "totalColumns": 122,
+    "recordCount": 1280356,
+    "notes": "Operations and Realty project data combined"
+  },
+
+  "columnMappings": {
+    "identifiers": [
+      {
+        "targetColumn": "project_id",
+        "sourceColumn": "PROJECT_ID",
+        "alternateSource": "Intake_Card",
+        "transformation": "resolve_project_id",
+        "transformationLogic": "Use PROJECT_ID if available, else Intake_Card, else 'R-' + Facility for Realty",
+        "notes": "Realty projects use concatenated facility ID"
+      },
+      {
+        "targetColumn": "intake_card",
+        "sourceColumn": "Intake_Card",
+        "transformation": null,
+        "notes": "Primary identifier for Operations projects"
+      },
+      {
+        "targetColumn": "title",
+        "sourceColumn": "PROJECT_TITLE",
+        "alternateSource": "Title",
+        "transformation": "resolve_title",
+        "transformationLogic": "PROJECT_TITLE → Title → Project_Type + Initiative_Type → 'Untitled'",
+        "notes": "Multiple fallback sources"
+      }
+    ],
+
+    "status": [
+      {
+        "targetColumn": "status",
+        "sourceColumn": "Status",
+        "transformation": "normalize_status",
+        "valueMapping": {
+          "Active": "Active",
+          "active": "Active",
+          "ACTIVE": "Active",
+          "Archived": "Archived",
+          "archived": "Archived",
+          "Pending": "Pending"
+        }
+      },
+      {
+        "targetColumn": "phase",
+        "sourceColumn": "Phase",
+        "alternateSource": "PROJECT_PHASE_2",
+        "transformation": null,
+        "notes": "Check both Phase and PROJECT_PHASE_2 columns"
+      },
+      {
+        "targetColumn": "health",
+        "sourceColumn": "PROJECT_HEALTH",
+        "alternateSource": "Health",
+        "transformation": null
+      },
+      {
+        "targetColumn": "project_source",
+        "sourceColumn": "Project_Source",
+        "transformation": null,
+        "defaultValue": "Intake Hub"
+      }
+    ],
+
+    "location": [
+      {
+        "targetColumn": "division",
+        "sourceColumn": "Division",
+        "transformation": "normalize_division",
+        "transformationLogic": "Uppercase, trim whitespace"
+      },
+      {
+        "targetColumn": "region",
+        "sourceColumn": "Region",
+        "transformation": null
+      },
+      {
+        "targetColumn": "market",
+        "sourceColumn": "Market",
+        "transformation": "normalize_market_3digit",
+        "transformationLogic": "Pad to 3 digits with leading zeros (e.g., 8 → '008', 101 → '101')"
+      },
+      {
+        "targetColumn": "facility",
+        "sourceColumn": "Facility",
+        "transformation": "to_integer",
+        "notes": "Joins to Store_Cur_Data.store_number for location data"
+      },
+      {
+        "targetColumn": "city",
+        "sourceColumn": "City",
+        "transformation": null,
+        "notes": "May come from Store_Cur_Data join"
+      },
+      {
+        "targetColumn": "state",
+        "sourceColumn": "State",
+        "transformation": "uppercase",
+        "notes": "2-letter state code"
+      },
+      {
+        "targetColumn": "postal_code",
+        "sourceColumn": "Postal_Code",
+        "transformation": null
+      },
+      {
+        "targetColumn": "latitude",
+        "sourceColumn": "Latitude",
+        "transformation": "to_float",
+        "notes": "From Store_Cur_Data join via Facility"
+      },
+      {
+        "targetColumn": "longitude",
+        "sourceColumn": "Longitude",
+        "transformation": "to_float",
+        "notes": "From Store_Cur_Data join via Facility"
+      },
+      {
+        "targetColumn": "store_area",
+        "sourceColumn": "Store_Area",
+        "transformation": null
+      },
+      {
+        "targetColumn": "business_area",
+        "sourceColumn": "Business_Area",
+        "transformation": null
+      }
+    ],
+
+    "time": [
+      {
+        "targetColumn": "created_date",
+        "sourceColumn": "CREATED_TS",
+        "transformation": "to_iso8601",
+        "transformationLogic": "Convert BigQuery TIMESTAMP to ISO8601 format"
+      },
+      {
+        "targetColumn": "last_updated",
+        "sourceColumn": "Last_Updated",
+        "transformation": "to_iso8601"
+      },
+      {
+        "targetColumn": "projected_completion",
+        "sourceColumn": "Projected_Completion_Date",
+        "transformation": "to_date",
+        "transformationLogic": "Convert to YYYY-MM-DD format"
+      },
+      {
+        "targetColumn": "wm_week",
+        "sourceColumn": "WM_Week",
+        "transformation": "to_integer"
+      },
+      {
+        "targetColumn": "fiscal_year",
+        "sourceColumn": "FY",
+        "transformation": "to_integer"
+      },
+      {
+        "targetColumn": "implementation_week",
+        "sourceColumn": "Implementation_WM_Week",
+        "transformation": null
+      }
+    ],
+
+    "ownership": [
+      {
+        "targetColumn": "owner",
+        "sourceColumn": "Owner",
+        "alternateSource": "PROJECT_OWNER",
+        "transformation": null
+      },
+      {
+        "targetColumn": "director",
+        "sourceColumn": "Director",
+        "transformation": null
+      },
+      {
+        "targetColumn": "sr_director",
+        "sourceColumn": "SR_Director",
+        "transformation": null
+      }
+    ],
+
+    "categorization": [
+      {
+        "targetColumn": "project_type",
+        "sourceColumn": "Project_Type",
+        "transformation": null
+      },
+      {
+        "targetColumn": "initiative_type",
+        "sourceColumn": "Initiative_Type",
+        "transformation": null
+      },
+      {
+        "targetColumn": "business_type",
+        "sourceColumn": "Business_Type",
+        "transformation": null
+      },
+      {
+        "targetColumn": "facility_type",
+        "sourceColumn": "Facility_Type",
+        "transformation": null
+      },
+      {
+        "targetColumn": "partner",
+        "sourceColumn": "Partner",
+        "transformation": null
+      },
+      {
+        "targetColumn": "business_organization",
+        "sourceColumn": "Business_Organization",
+        "transformation": null
+      }
+    ],
+
+    "impact": [
+      {
+        "targetColumn": "associate_impact",
+        "sourceColumn": "ASSOCIATE_IMPACT",
+        "transformation": null
+      },
+      {
+        "targetColumn": "customer_impact",
+        "sourceColumn": "CUSTOMER_IMPACT",
+        "transformation": null
+      }
+    ],
+
+    "description": [
+      {
+        "targetColumn": "summary",
+        "sourceColumn": "PRESENTATION_SUMMARY",
+        "transformation": null
+      },
+      {
+        "targetColumn": "overview",
+        "sourceColumn": "OVERVIEW",
+        "transformation": null
+      }
+    ]
+  },
+
+  "unmappedSourceColumns": [
+    "Additional columns from the 122-column source that are not mapped to canonical schema",
+    "These can be added to schema or mapping as needed"
+  ],
+
+  "changeLog": [
+    {
+      "date": "2026-02-10",
+      "user": "krush@walmart.com",
+      "change": "Initial mapping creation from Intake Hub BigQuery source",
+      "version": "1.0.0"
+    }
+  ]
+}
