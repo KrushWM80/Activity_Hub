@@ -1,0 +1,300 @@
+{
+  "figma_components": {
+    "frame_setup": {
+      "name": "AMP_Video_Frame",
+      "width": 1920,
+      "height": 1080,
+      "background": "#FFFFFF"
+    },
+    "color_styles": {
+      "walmart_blue": "#0071CE",
+      "walmart_yellow": "#FFC220",
+      "white": "#FFFFFF",
+      "text_dark": "#000000",
+      "text_light": "#666666"
+    },
+    "text_styles": {
+      "title": {
+        "fontFamily": "Arial",
+        "fontWeight": "Bold",
+        "fontSize": 72,
+        "lineHeight": 80,
+        "color": "#0071CE",
+        "textAlign": "center"
+      },
+      "subtitle": {
+        "fontFamily": "Arial",
+        "fontWeight": "Regular",
+        "fontSize": 36,
+        "lineHeight": 44,
+        "color": "#666666",
+        "textAlign": "center"
+      },
+      "body": {
+        "fontFamily": "Arial",
+        "fontWeight": "Regular",
+        "fontSize": 48,
+        "lineHeight": 56,
+        "color": "#000000",
+        "textAlign": "left"
+      },
+      "small": {
+        "fontFamily": "Arial",
+        "fontWeight": "Regular",
+        "fontSize": 32,
+        "lineHeight": 38,
+        "color": "#666666",
+        "textAlign": "left"
+      }
+    },
+    "slides": [
+      {
+        "name": "Title_Slide",
+        "duration": "0-3s",
+        "elements": {
+          "header": {
+            "type": "rectangle",
+            "width": 1920,
+            "height": 200,
+            "fill": "#0071CE",
+            "position": "top"
+          },
+          "logo": {
+            "type": "component",
+            "name": "walmart_spark",
+            "size": "120x120",
+            "fill": "#FFFFFF",
+            "position": "center_top"
+          },
+          "title": {
+            "type": "text",
+            "content": "Protecting Yourself from Illness\nDuring the Winter Months",
+            "style": "title",
+            "color": "#FFFFFF"
+          },
+          "week": {
+            "type": "text",
+            "content": "Week 41 • 2026",
+            "style": "subtitle",
+            "color": "#FFC220"
+          }
+        }
+      },
+      {
+        "name": "Key_Point_1",
+        "duration": "4-12s",
+        "elements": {
+          "container": {
+            "type": "auto_layout",
+            "direction": "vertical",
+            "padding": 120,
+            "spacing": 40
+          },
+          "main_text": {
+            "type": "text",
+            "content": "Overall associate well-being is a top priority as you continue to support your communities through the upcoming holiday season.",
+            "style": "body",
+            "color": "#000000"
+          },
+          "highlight_text": {
+            "type": "text",
+            "content": "It could be a busy flu and strep season, and we want you to stay healthy and well.",
+            "style": "body",
+            "fontWeight": "Bold",
+            "color": "#0071CE"
+          },
+          "health_icon": {
+            "type": "icon",
+            "name": "health_cross",
+            "size": "120x120",
+            "fill": "#FFC220",
+            "position": "top_right"
+          }
+        }
+      },
+      {
+        "name": "Key_Point_2",
+        "duration": "13-21s",
+        "elements": {
+          "layout": {
+            "type": "auto_layout",
+            "direction": "horizontal",
+            "padding": 80,
+            "spacing": 60
+          },
+          "left_column": {
+            "type": "auto_layout",
+            "direction": "vertical",
+            "width": "60%",
+            "spacing": 30
+          },
+          "headline": {
+            "type": "text",
+            "content": "All associates have easy and convenient access to a flu shot and other vaccines.",
+            "style": "body",
+            "fontWeight": "Bold",
+            "color": "#0071CE"
+          },
+          "bullet_list": {
+            "type": "text",
+            "content": "• Associates Medical Plan covers flu shots\n• Immunization events: Nov. 15 & Dec. 6\n• Walk-up appointments welcome\n• Use Walmart Scheduler for convenience",
+            "style": "small",
+            "color": "#000000"
+          },
+          "dates_box": {
+            "type": "frame",
+            "fill": "#0071CE",
+            "cornerRadius": 12,
+            "padding": 30,
+            "text": {
+              "content": "Immunization Events\nNov. 15 & Dec. 6",
+              "color": "#FFFFFF",
+              "style": "subtitle",
+              "fontWeight": "Bold"
+            }
+          },
+          "right_column": {
+            "type": "auto_layout",
+            "direction": "vertical",
+            "width": "40%",
+            "spacing": 40,
+            "alignItems": "center"
+          },
+          "calendar_icon": {
+            "type": "icon",
+            "name": "calendar",
+            "size": "120x120",
+            "fill": "#FFC220"
+          },
+          "vaccine_icon": {
+            "type": "icon",
+            "name": "syringe",
+            "size": "120x120",
+            "fill": "#FFC220"
+          }
+        }
+      },
+      {
+        "name": "Link_Reference",
+        "duration": "22-27s",
+        "elements": {
+          "layout": {
+            "type": "auto_layout",
+            "direction": "horizontal",
+            "padding": 100,
+            "spacing": 80,
+            "alignItems": "center"
+          },
+          "qr_container": {
+            "type": "frame",
+            "width": 300,
+            "height": 300,
+            "fill": "#FFFFFF",
+            "stroke": "#0071CE",
+            "strokeWidth": 4
+          },
+          "qr_code": {
+            "type": "qr_code",
+            "data": "https://amp2-cms.prod.walmart.com/preview/66aec44c-cff0-4b5a-9a6d-831272318d17/41/2026",
+            "size": "260x260"
+          },
+          "text_content": {
+            "type": "auto_layout",
+            "direction": "vertical",
+            "spacing": 20
+          },
+          "link_text": {
+            "type": "text",
+            "content": "Review more details here:",
+            "style": "body",
+            "color": "#000000"
+          },
+          "url_display": {
+            "type": "text",
+            "content": "amp2-cms.prod.walmart.com",
+            "style": "subtitle",
+            "fontWeight": "Bold",
+            "color": "#0071CE"
+          },
+          "cta_button": {
+            "type": "frame",
+            "width": 400,
+            "height": 80,
+            "fill": "#FFC220",
+            "cornerRadius": 40,
+            "text": {
+              "content": "Scan to Learn More",
+              "style": "small",
+              "fontWeight": "Bold",
+              "color": "#000000"
+            }
+          }
+        }
+      },
+      {
+        "name": "Call_to_Action",
+        "duration": "28-30s",
+        "elements": {
+          "background": "#0071CE",
+          "container": {
+            "type": "auto_layout",
+            "direction": "vertical",
+            "padding": 100,
+            "spacing": 40,
+            "alignItems": "center"
+          },
+          "main_cta": {
+            "type": "text",
+            "content": "Management, review the Associate Talking Points",
+            "style": "body",
+            "fontWeight": "Bold",
+            "color": "#FFFFFF",
+            "textAlign": "center"
+          },
+          "secondary_text": {
+            "type": "text",
+            "content": "to address associate questions as needed",
+            "style": "subtitle",
+            "color": "#FFC220",
+            "textAlign": "center"
+          },
+          "bottom_button": {
+            "type": "frame",
+            "width": 300,
+            "height": 80,
+            "fill": "#FFC220",
+            "cornerRadius": 40,
+            "text": {
+              "content": "Learn More",
+              "style": "subtitle",
+              "fontWeight": "Bold",
+              "color": "#000000"
+            }
+          }
+        }
+      }
+    ],
+    "animation_timeline": {
+      "total_duration": "30s",
+      "transitions": {
+        "type": "slide_left",
+        "duration": "0.3s",
+        "easing": "ease_out"
+      },
+      "frame_timing": [
+        {"frame": 1, "start": 0, "end": 3},
+        {"frame": 2, "start": 4, "end": 12},
+        {"frame": 3, "start": 13, "end": 21},
+        {"frame": 4, "start": 22, "end": 27},
+        {"frame": 5, "start": 28, "end": 30}
+      ]
+    },
+    "export_settings": {
+      "format": "MP4",
+      "quality": "High",
+      "frame_rate": 30,
+      "resolution": "1920x1080",
+      "duration": "30s"
+    }
+  }
+}

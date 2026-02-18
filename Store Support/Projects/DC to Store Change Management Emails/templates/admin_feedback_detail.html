@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Detail - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 100%);
+            color: white;
+            padding: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .breadcrumb {
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb a {
+            color: #3B82F6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .section h2 {
+            font-size: 20px;
+            color: #1E3A8A;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #DBEAFE;
+        }
+        
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .feedback-info {
+            flex: 1;
+        }
+        
+        .feedback-email {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1E3A8A;
+            margin-bottom: 5px;
+        }
+        
+        .feedback-meta {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .feedback-badges {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-category {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        
+        .badge-rating {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-status {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-dc {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .field {
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .field label {
+            font-weight: 600;
+            color: #1E3A8A;
+            margin-bottom: 5px;
+        }
+        
+        .field-value {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 4px;
+            color: #333;
+            border-left: 3px solid #3B82F6;
+        }
+        
+        .message-box {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #3B82F6;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .activity-log {
+            margin-top: 20px;
+        }
+        
+        .activity-item {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 3px solid #DBEAFE;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .activity-action {
+            margin-top: 5px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #1E3A8A;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #DBEAFE;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3B82F6;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #3B82F6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1D4ED8;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #3B82F6;
+            border: 2px solid #3B82F6;
+        }
+        
+        .btn-secondary:hover {
+            background: #DBEAFE;
+        }
+        
+        @media (max-width: 768px) {
+            .feedback-header {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💬 Feedback Detail Review</h1>
+    </div>
+    
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/admin/feedback">← Back to Feedback</a>
+        </div>
+        
+        <!-- Feedback Information -->
+        <div class="section">
+            <div class="feedback-header">
+                <div class="feedback-info">
+                    <div class="feedback-email">{{ feedback.user_email }}</div>
+                    <div class="feedback-meta">
+                        Submitted: {{ feedback.timestamp }}
+                        {% if feedback.user_dc %}
+                        | DC: {{ feedback.user_dc }}
+                        {% endif %}
+                    </div>
+                    <div class="feedback-badges">
+                        {% if feedback.category %}
+                        <span class="badge badge-category">📁 {{ feedback.category }}</span>
+                        {% endif %}
+                        {% if feedback.rating %}
+                        <span class="badge badge-rating">⭐ {{ feedback.rating }}/5</span>
+                        {% endif %}
+                        {% if feedback.user_dc %}
+                        <span class="badge badge-dc">📍 DC{{ feedback.user_dc }}</span>
+                        {% endif %}
+                        <span class="badge badge-status">Status: {{ feedback.status|upper }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Feedback Message</h2>
+            <div class="message-box">{{ feedback.message }}</div>
+        </div>
+        
+        <!-- Admin Review Section -->
+        <div class="section">
+            <h2>📝 Admin Review</h2>
+            
+            <form method="post" action="/admin/feedback/{{ feedback.id }}/update">
+                <div class="form-group">
+                    <label for="admin_user">Your Name</label>
+                    <input type="text" id="admin_user" name="admin_user" placeholder="Your name or ID" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" required>
+                        <option value="new" {% if feedback.status == 'new' %}selected{% endif %}>New - Not Reviewed</option>
+                        <option value="reviewed" {% if feedback.status == 'reviewed' %}selected{% endif %}>Reviewed - Acknowledged</option>
+                        <option value="resolved" {% if feedback.status == 'resolved' %}selected{% endif %}>Resolved - Action Taken</option>
+                        <option value="archived" {% if feedback.status == 'archived' %}selected{% endif %}>Archived</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Admin Notes</label>
+                    <textarea id="notes" name="notes" placeholder="Add your review notes, actions taken, or follow-up required...">{{ feedback.admin_notes or '' }}</textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Save Review</button>
+                    <a href="/admin/feedback" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Activity Log -->
+        {% if activity %}
+        <div class="section">
+            <h2>📋 Activity Timeline</h2>
+            
+            <div class="activity-log">
+                {% for item in activity %}
+                <div class="activity-item">
+                    <div class="activity-time">{{ item.timestamp }}</div>
+                    <div class="activity-action">
+                        <strong>{{ item.event_type }}</strong> - {{ item.action }}
+                        {% if item.admin_user %}<br><small>By: {{ item.admin_user }}</small>{% endif %}
+                        {% if item.details %}<br><small>{{ item.details }}</small>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

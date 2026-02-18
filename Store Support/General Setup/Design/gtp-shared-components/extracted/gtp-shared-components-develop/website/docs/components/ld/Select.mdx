@@ -1,0 +1,74 @@
+---
+title: Select
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Select gives users the ability to select from a
+number of predefined options. It is usually found in forms.
+
+
+<ScreenshotTabs screenshotData={{"inline-large":"screenshots/select-inline-large.gif","inline-small":"screenshots/select-inline-small.gif","inline-error":"screenshots/select-inline-error.gif","modal-single":"screenshots/select-modal-single.gif","modal-multi":"screenshots/select-modal-multi.gif","bottomsheet-single":"screenshots/select-bottomsheet-single.gif","bottomsheet-multi":"screenshots/select-bottomsheet-multi.gif","modal-extra-content":"screenshots/select-modal-extra-content.gif","modal-extra-content-middle":"screenshots/select-modal-extra-content-middle.gif","bottomsheet-extra-content":"screenshots/select-bottomsheet-extra-content.gif","bottomsheet-extra-content-middle":"screenshots/select-bottomsheet-extra-content-middle.gif","overlay-multi":"screenshots/select-overlay-multi.gif","overlay-single":"screenshots/select-overlay-single.gif","overlay-default":"screenshots/select-overlay-default.gif","overlay-extra-content":"screenshots/select-overlay-extra-content.gif"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Select} from '@walmart/gtp-shared-components`;
+
+const selectOptions = [
+  {text: 'Mug'},
+  {text: 'Shirt'},
+  {text: 'Sticker'},
+  {text: 'Hat - not available', disabled: true},
+  {text: 'Hoodie'},
+];
+
+const handleOnChange = (selected: Array<Selected>) => {
+  console.log('---- Picked:', selected);
+};
+
+<Select
+  selectOptions={selectOptions}
+  placeholder="Select your swag..."
+  label="Swag"
+  helperText="Helper text"
+  onChange={handleOnChange}
+/>
+```
+## Props
+
+ ### selectOptions
+<PropTable componentLink="Select" prop="selectOptions"/>
+ ### disabled
+<PropTable componentLink="Select" prop="disabled"/>
+ ### error
+<PropTable componentLink="Select" prop="error"/>
+ ### helperText
+<PropTable componentLink="Select" prop="helperText"/>
+ ### label
+<PropTable componentLink="Select" prop="label"/>
+ ### leading
+<PropTable componentLink="Select" prop="leading"/>
+ ### placeholder(required)
+<PropTable componentLink="Select" prop="placeholder"/>
+ ### onChange
+<PropTable componentLink="Select" prop="onChange"/>
+ ### size
+<PropTable componentLink="Select" prop="size"/>
+ ### UNSAFE_style
+<PropTable componentLink="Select" prop="UNSAFE_style"/>
+ ### componentType
+<PropTable componentLink="Select" prop="componentType"/>
+ ### selectionType
+<PropTable componentLink="Select" prop="selectionType"/>
+ ### title
+<PropTable componentLink="Select" prop="title"/>
+ ### isInsideModal
+<PropTable componentLink="Select" prop="isInsideModal"/>
+ ### doneButtonTitle
+<PropTable componentLink="Select" prop="doneButtonTitle"/>
+ ### cancelButtonTitle
+<PropTable componentLink="Select" prop="cancelButtonTitle"/>
+ ### modalProps
+<PropTable componentLink="Select" prop="modalProps"/>
+ ### bottomSheetProps
+<PropTable componentLink="Select" prop="bottomSheetProps"/>

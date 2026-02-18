@@ -1,0 +1,119 @@
+{
+  "common": {
+    "welcome": "Bienvenido",
+    "loading": "Cargando",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "store": "Tienda",
+    "of": "de"
+  },
+  "header": {
+    "title": "Guía de Actualización de Tour",
+    "subtitle": "El Lugar Favorito de Compras de América",
+    "notifications": "Notificaciones",
+    "profile": "Perfil",
+    "logout": "Cerrar sesión",
+    "settings": "Configuración"
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "items": "Artículos",
+    "survey": "Encuesta",
+    "reports": "Reportes",
+    "management": "Gestión",
+    "admin": "Administrador",
+    "backToDashboard": "Volver al Panel"
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "signIn": "Ingresar",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "storeNumber": "Número de tienda",
+    "role": "Rol",
+    "quickLogin": "Acceso rápido"
+  },
+  "dashboard": {
+    "title": "Panel del Propietario del Negocio",
+    "welcome": "¡Bienvenido de nuevo, {{name}}!",
+    "subtitle": "Monitorea y gestiona artículos de actualización en todas las tiendas.",
+    "overallProgress": "Progreso General",
+    "itemsCompleted": "artículos completados en todas las áreas",
+    "complete": "Completo",
+    "viewManageAll": "Ver y Gestionar Todos los Artículos",
+    "reportIt": "¡Reportar!",
+    "storeNumber": "Tienda #{{number}}",
+    "managerRole": "Rol de {{role}}"
+  },
+  "items": {
+    "title": "Todos los Artículos",
+    "viewAllItems": "Ver Todos los Artículos",
+    "reviewItems": "Revisar y continuar con los artículos de actualización",
+    "itemName": "Nombre del Artículo",
+    "owner": "Propietario",
+    "deadline": "Fecha límite",
+    "status": "Estado",
+    "resources": "Recursos",
+    "actions": "Acciones",
+    "viewItem": "Ver Artículo",
+    "updateItem": "Actualizar Artículo",
+    "saveChanges": "Guardar Cambios",
+    "noDeadline": "Sin fecha límite",
+    "unassigned": "Sin asignar",
+    "noResources": "Sin recursos",
+    "resource": "Recurso",
+    "resources_plural": "Recursos",
+    "createItem": "Crear Artículo"
+  },
+  "status": {
+    "pending": "Pendiente",
+    "completed": "Completado",
+    "na": "N/A",
+    "inProgress": "En Progreso",
+    "onHold": "En Espera"
+  },
+  "survey": {
+    "title": "Ver Artículo",
+    "area": "Área",
+    "topic": "Tema",
+    "item": "Artículo",
+    "owner": "Propietario",
+    "deadline": "Fecha límite",
+    "status": "Estado",
+    "notes": "Notas",
+    "addNotes": "Agregar Notas",
+    "notesPlaceholder": "¿Tienes alguna nota para este artículo?"
+  },
+  "roles": {
+    "manager": "Gerente",
+    "coach": "Entrenador",
+    "admin": "Administrador",
+    "business": "Propietario del Negocio",
+    "siteOwner": "Propietario del Sitio",
+    "associate": "Asociado"
+  },
+  "errors": {
+    "generic": "Ocurrió un error. Por favor, inténtalo de nuevo.",
+    "network": "Error de red. Por favor, verifica tu conexión.",
+    "unauthorized": "No tienes autorización para realizar esta acción.",
+    "notFound": "Recurso no encontrado.",
+    "validation": "Por favor, verifica tu entrada e inténtalo de nuevo."
+  },
+  "success": {
+    "saved": "Cambios guardados exitosamente",
+    "deleted": "Eliminado exitosamente",
+    "created": "Creado exitosamente",
+    "updated": "Actualizado exitosamente"
+  }
+}

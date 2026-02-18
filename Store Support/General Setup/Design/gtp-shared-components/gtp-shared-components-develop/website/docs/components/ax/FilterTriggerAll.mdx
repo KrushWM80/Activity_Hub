@@ -1,0 +1,36 @@
+---
+title: FilterTriggerAll
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Show/hide a full/large list of available filters.
+- Use when reducing large data sets with 3+ filtering methods into subsets of data.
+- Don't use when there's less than 3 filtering methods and can be quickly filtered
+  by a Filter Toggle or Filter Trigger Single.
+
+
+<ScreenshotTabs screenshotData={"screenshots/filter-trigger-all.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {FilterTriggerAll} from '@walmart/gtp-shared-components/ax`;
+
+<FilterTriggerAll>
+<FilterTriggerAll>Filters</FilterTriggerAll>
+<FilterTriggerAll appliedCount={0}/>
+<FilterTriggerAll appliedCount={1}/>
+<FilterTriggerAll appliedCount={1}>Filters</FilterTriggerAll>
+```
+## Props
+
+ ### children
+<PropTable componentLink="FilterTriggerAll" prop="children"/>
+ ### disabled
+<PropTable componentLink="FilterTriggerAll" prop="disabled"/>
+ ### onPress
+<PropTable componentLink="FilterTriggerAll" prop="onPress"/>
+ ### appliedCount
+<PropTable componentLink="FilterTriggerAll" prop="appliedCount"/>
+ ### UNSAFE_style
+<PropTable componentLink="FilterTriggerAll" prop="UNSAFE_style"/>

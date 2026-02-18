@@ -1,0 +1,48 @@
+---
+title: Popover
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Popovers are overlays that display contextual content on demand.
+
+
+<ScreenshotTabs screenshotData={"screenshots/popover.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Popover} from '@walmart/gtp-shared-components`;
+
+const [isOpen, setIsOpen] = useState(false);
+
+<Popover
+ content={'Example Popover content.'}
+ isOpen={isOpen}
+ onClose={() => setIsOpen(false)}
+ position="topLeft">
+  <Link
+    onPress={() => setIsOpen(!isOpen)}>
+    Top{'\n'}Left
+  </Link>
+</Popover>
+```
+## Props
+
+ ### content(required)
+<PropTable componentLink="Popover" prop="content"/>
+ ### children(required)
+<PropTable componentLink="Popover" prop="children"/>
+ ### isOpen
+<PropTable componentLink="Popover" prop="isOpen"/>
+ ### hasNubbin
+<PropTable componentLink="Popover" prop="hasNubbin"/>
+ ### hasSpotlight
+<PropTable componentLink="Popover" prop="hasSpotlight"/>
+ ### spotlightColor
+<PropTable componentLink="Popover" prop="spotlightColor"/>
+ ### onClose
+<PropTable componentLink="Popover" prop="onClose"/>
+ ### position
+<PropTable componentLink="Popover" prop="position"/>
+ ### UNSAFE_style
+<PropTable componentLink="Popover" prop="UNSAFE_style"/>

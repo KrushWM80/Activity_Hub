@@ -1,0 +1,1 @@
+### Deprecated: this component is not in the <strong>LD specs</strong> and will be removed in a future release.

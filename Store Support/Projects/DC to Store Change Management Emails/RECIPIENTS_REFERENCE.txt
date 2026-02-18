@@ -1,0 +1,179 @@
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                     EMAIL RECIPIENTS REFERENCE GUIDE                           ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+CURRENT TEST MODE (TEST_MODE = True)
+====================================
+
+All emails currently go to: kendall.rush@walmart.com
+
+The "Production Distribution List" box in each email shows WHO WOULD RECEIVE
+the email in production mode, so you can see the full recipient list without
+actually sending to them.
+
+
+PRODUCTION MODE (When TEST_MODE = False)
+=========================================
+
+Email Recipients are AUTOMATICALLY DETERMINED based on which DCs serve the
+stores with detected changes.
+
+EXAMPLE SCENARIO:
+─────────────────
+
+Suppose we detect manager changes at:
+  • Store 1234 (PLANO, TX) - Served by DC 6020
+  • Store 5678 (ARLINGTON, TX) - Served by DC 6020
+  • Store 9012 (HOUSTON, TX) - Served by DC 6080
+
+The system will:
+
+  1. Look up DC assignments:
+     ✓ Store 1234 → DC 6020 (Ambient) + DC 6040 (Perishable)
+     ✓ Store 5678 → DC 6020 (Ambient) + DC 6040 (Perishable)
+     ✓ Store 9012 → DC 6080 (Ambient) + DC 6090 (Perishable)
+
+  2. Create recipient lists for affected DCs:
+     ✓ DC 6020 Changes (4 changes total)
+     ✓ DC 6040 Changes (4 changes total)
+     ✓ DC 6080 Changes (1 change)
+     ✓ DC 6090 Changes (1 change)
+
+  3. For DC 6020, send email to:
+     • 6020GM@email.wal-mart.com (DC 6020 General Manager)
+     • 6020AGM@email.wal-mart.com (DC 6020 Assistant General Manager)
+
+  4. For DC 6040, send email to:
+     • 6040GM@email.wal-mart.com (DC 6040 General Manager)
+     • 6040AGM@email.wal-mart.com (DC 6040 Assistant General Manager)
+
+  5. For DC 6080, send email to:
+     • 6080GM@email.wal-mart.com (DC 6080 General Manager)
+     • 6080AGM@email.wal-mart.com (DC 6080 Assistant General Manager)
+
+  6. For DC 6090, send email to:
+     • 6090GM@email.wal-mart.com (DC 6090 General Manager)
+     • 6090AGM@email.wal-mart.com (DC 6090 Assistant General Manager)
+
+  ⚠️ NOTE: Each email is sent separately to each DC's team
+     (Uses BCC so recipients don't see each other)
+
+
+DC RECIPIENT PATTERN
+====================
+
+All DC recipients follow this pattern:
+
+  Format: <DC_NUMBER><ROLE>@email.wal-mart.com
+
+  Examples:
+    6020GM  = DC 6020 General Manager
+    6020AGM = DC 6020 Assistant General Manager
+    6080GM  = DC 6080 General Manager
+    6080AGM = DC 6080 Assistant General Manager
+
+  DC Numbers: 6020, 6040, 6080, 6090, 6120, 6140, etc.
+  Roles: GM (General Manager), AGM (Assistant General Manager)
+
+
+ADDITIONAL RECIPIENTS (GLOBAL CC)
+=================================
+
+The system can also add additional recipients who should always get emails:
+
+  • Set in: dc_leadership_config.py → GLOBAL_CC list
+  • Example: GLOBAL_CC = ['supply.ops@walmart.com', 'ops.manager@walmart.com']
+  • These will receive a BCC copy of EVERY email
+
+
+HOW TO MODIFY RECIPIENTS
+========================
+
+To customize which managers receive notifications:
+
+  1. Change DC Leadership Roles:
+     File: dc_leadership_config.py → DC_LEADERSHIP_ROLES
+     Default: ['GM', 'AGM']
+     Can add: ['AGM', 'Operations Director'] etc.
+
+  2. Change DC Email Domain:
+     File: dc_leadership_config.py → DC_EMAIL_DOMAIN
+     Default: 'email.wal-mart.com'
+     Can change if domain updates
+
+  3. Add Global Recipients:
+     File: dc_leadership_config.py → GLOBAL_CC
+     Add emails that should receive ALL notifications
+
+  4. Filter by Manager Type:
+     File: dc_leadership_config.py → DC_NOTIFICATION_ROLES
+     Currently: {'Store Manager', 'Market Manager'}
+     Add: 'Region Manager' if needed
+
+  5. Minimum Changes Threshold:
+     File: dc_leadership_config.py → MIN_CHANGES_FOR_DC_EMAIL
+     Currently: 1 (send email if ANY change detected)
+     Can change to: 5 (only send if 5+ changes)
+
+
+TESTING EMAIL RECIPIENTS
+========================
+
+To see what recipients WOULD receive in production:
+
+  1. Open any received email in test mode
+  2. Look for: "Production Distribution List" box (yellow)
+  3. This shows all the DCs and their GMs/AGMs that would get the email
+
+Example Production Distribution List:
+  • kendall.rush@walmart.com (TEST RECIPIENT - YOU)
+  • 6020GM@email.wal-mart.com
+  • 6020AGM@email.wal-mart.com
+  • 6080GM@email.wal-mart.com
+  • 6080AGM@email.wal-mart.com
+  • 6040GM@email.wal-mart.com
+  • 6040AGM@email.wal-mart.com
+
+
+SWITCHING TO PRODUCTION MODE
+============================
+
+When ready to switch from test mode to production:
+
+  1. Open: config.py
+  2. Set: TEST_MODE = False
+
+  3. Open: dc_email_config.py
+  4. Set: TEST_MODE = False
+
+  5. Verify: DC recipient emails look correct:
+     $ python -c "from dc_leadership_config import get_dc_emails; print(get_dc_emails(6020))"
+     Output: ['6020GM@email.wal-mart.com', '6020AGM@email.wal-mart.com']
+
+  6. Test with one DC first (modify daily_check_smart.py to skip others)
+  7. Monitor: Check Outlook to verify emails arrive
+  8. Once confirmed: Remove test skip logic and run normally
+
+
+TROUBLESHOOTING RECIPIENTS
+==========================
+
+Issue: "Email sent to wrong people"
+  → Check: dc_to_stores_lookup.json (DC assignments)
+  → Verify: Store is mapped to correct DC number
+
+Issue: "DC emails have typos (6020G instead of 6020GM)"
+  → Check: dc_leadership_config.py → DC_LEADERSHIP_ROLES format
+  → Ensure: Role names are correct (GM, AGM, etc.)
+
+Issue: "Some DCs not getting emails"
+  → Check: Are stores served by those DCs in the changed list?
+  → Verify: dc_to_stores_lookup.json includes those stores
+  → Confirm: MIN_CHANGES_FOR_DC_EMAIL threshold met
+
+Issue: "Same person getting multiple emails"
+  → This is normal if they serve multiple DCs
+  → Each DC gets a separate email with their territory's changes
+  → Solution: Add deduplication logic if needed (contact admin)
+

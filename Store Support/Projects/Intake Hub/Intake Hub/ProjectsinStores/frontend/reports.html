@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Reports - Intake Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+        }
+
+        .button-group {
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: #0071ce;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #005ba3;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #0071ce;
+            padding-bottom: 10px;
+        }
+
+        .report-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .report-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .report-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #0071ce;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .report-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .report-meta {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Dark Mode Support */
+        body.dark-mode {
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .card {
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .card h2 {
+            color: #e0e0e0;
+            border-bottom-color: #66c2ff;
+        }
+
+        body.dark-mode .report-item {
+            background: #333;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .report-item:hover {
+            border-color: #66c2ff;
+        }
+
+        body.dark-mode .report-title {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .report-meta {
+            color: #999;
+        }
+
+        body.dark-mode .form-group label {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .form-group input::placeholder,
+        body.dark-mode .form-group textarea::placeholder,
+        body.dark-mode .form-group select {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .report-item p,
+        body.dark-mode .modal-content p {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode input,
+        body.dark-mode textarea,
+        body.dark-mode select {
+            background: #333;
+            color: #e0e0e0;
+            border: 1px solid #444;
+        }
+
+        body.dark-mode input::placeholder,
+        body.dark-mode textarea::placeholder {
+            color: #999;
+        }
+
+        body.dark-mode .modal-content {
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .close {
+            color: #e0e0e0;
+        }
+
+        .dark-mode-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: inline-block;
+            margin-right: 10px;
+            font-weight: 600;
+        }
+
+        .dark-mode-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h3 {
+            color: #0071ce;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        body.dark-mode .form-group label {
+            color: #e0e0e0;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0071ce;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state img {
+            width: 150px;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0071ce;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #0071ce;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .info-box p {
+            color: #004080;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .section-divider {
+            border-top: 2px solid #e0e0e0;
+            margin: 25px 0;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+            line-height: 1.5;
+            padding: 10px;
+            background: rgba(0, 113, 206, 0.05);
+            border-left: 3px solid #0071ce;
+            border-radius: 4px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #333;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            display: none;
+            animation: slideIn 0.3s;
+        }
+
+        .toast.active {
+            display: block;
+        }
+
+        .toast.success {
+            background: #28a745;
+        }
+
+        .toast.error {
+            background: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .report-header {
+                flex-direction: column;
+            }
+
+            .report-actions {
+                margin-top: 10px;
+            }
+        }
+
+        /* Multi-select dropdown styles */
+        select[multiple] {
+            min-height: 150px;
+            padding: 8px;
+        }
+
+        select[multiple] option {
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-bottom: 2px;
+        }
+
+        select[multiple] option:checked {
+            background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        .multi-select-hint {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Report Details Card Styles */
+        .report-detail-card {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            border: 3px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+            color: white;
+            font-weight: 600;
+            user-select: none;
+            position: relative;
+        }
+
+        .report-detail-card input[type="checkbox"] {
+            display: none;
+        }
+
+        .report-detail-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .report-detail-card.selected {
+            border-color: white;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.5), 0 4px 20px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+        }
+
+        .report-detail-card.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: white;
+            color: #333;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Selected Items Badge */
+        .selected-item-badge {
+            background: white;
+            border: 1px solid #ddd;
+            color: #0071ce;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .selected-item-badge::before {
+            content: '•';
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Email Reports Manager</h1>
+            <p>Create, manage, and schedule automated email reports for your Intake Hub data</p>
+            <div class="button-group">
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌙</button>
+                <button class="btn btn-secondary" onclick="window.location.href='/'">
+                    ← Back to Dashboard
+                </button>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: #333; border: none; margin: 0;">Your Reports</h2>
+                    <button class="btn btn-primary" onclick="showCreateModal()">+ Create New Report</button>
+                </div>
+                <div id="reportsList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading reports...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Create New Report</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
+            <form id="reportForm">
+                <input type="hidden" id="configId">
+
+                <div class="info-box">
+                    <p><strong>💡 Tip:</strong> Configure your report to receive automated updates about your projects via email. You can select specific partners, customize columns, and choose when to receive reports.</p>
+                </div>
+
+                <!-- Basic Info -->
+                <div class="form-group">
+                    <label for="reportName">Report Name *</label>
+                    <input type="text" id="reportName" required placeholder="e.g., Weekly Partner Status Report">
+                    <div class="helper-text">Give your report a descriptive name</div>
+                </div>
+
+                <!-- User information auto-detected -->
+                <input type="hidden" id="userId" required>
+                <input type="hidden" id="primaryEmail" required>
+                
+                <div class="info-box">
+                    <p>📧 <strong>Your Information:</strong> Reports will be sent to <span id="userEmailDisplay"></span></p>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Report Details (formerly Columns) -->
+                <h3 style="margin-bottom: 10px;">Report Details</h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Select the information you want to see in your report</p>
+
+                <div id="reportDetailsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <!-- Populated dynamically with colored cards -->
+                </div>
+
+                <!-- Selected Items Preview -->
+                <div id="selectedPreview" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #0071ce; display: none;">
+                    <div style="font-size: 13px; font-weight: 600; color: #0071ce; margin-bottom: 8px;">✓ SELECTED:</div>
+                    <div id="selectedItems" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Filters -->
+                <h3 style="margin-bottom: 15px;">Filters</h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Add filters to narrow down the data in your report</p>
+
+                <div id="filtersContainer">
+                    <!-- Dynamic filters will be added here -->
+                </div>
+
+                <button type="button" class="btn btn-secondary" onclick="addFilter()" style="margin-top: 10px;">
+                    + Add Filter
+                </button>
+
+                <div class="section-divider"></div>
+
+                <!-- Schedule -->
+                <h3 style="margin-bottom: 15px;">Schedule</h3>
+
+                <div class="two-column">
+                    <div class="form-group">
+                        <label for="frequency">Frequency *</label>
+                        <select id="frequency" required onchange="toggleDayOfWeek()">
+                            <option value="">Select frequency</option>
+                            <option value="Daily">Daily</option>
+                            <option value="Weekly">Weekly</option>
+                            <option value="Monthly">Monthly</option>
+                            <option value="Quarterly">Quarterly</option>
+                        </select>
+                        <div class="helper-text">
+                            📋 <strong>When will you receive reports?</strong><br>
+                            • <strong>Daily:</strong> Every day at the specified time (starting tomorrow)<br>
+                            • <strong>Weekly:</strong> Every [selected day] at the specified time<br>
+                            • <strong>Monthly:</strong> 1st of every month at the specified time<br>
+                            • <strong>Quarterly:</strong> First day of each quarter (Jan 1, Apr 1, Jul 1, Oct 1)
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="dayOfWeekGroup" style="display: none;">
+                        <label for="deliveryDay">Day of Week *</label>
+                        <select id="deliveryDay">
+                            <option value="">Select day</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="two-column">
+                    <div class="form-group">
+                        <label for="deliveryTime">Delivery Time *</label>
+                        <input type="time" id="deliveryTime" value="09:00" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reportFormat">Report Format *</label>
+                        <select id="reportFormat" required>
+                            <option value="Email Body">Email Body</option>
+                            <option value="PDF">PDF Attachment</option>
+                            <option value="Both">Both</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- CC Emails (moved from top) -->
+                <div class="form-group">
+                    <label for="ccEmails">CC Emails (comma-separated)</label>
+                    <input type="text" id="ccEmails" placeholder="team1@walmart.com, team2@walmart.com">
+                    <div class="helper-text">Optional: Send copies to additional recipients</div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <h3 style="margin-bottom: 15px;">Timeframe</h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Select the date range(s) for data to include in your report. You can select multiple timeframes to compare different periods.</p>
+
+                <div class="checkbox-group" id="timeframes" style="margin-bottom: 20px;">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <input type="checkbox" id="isActive" checked style="width: 20px; height: 20px;">
+                    <label for="isActive" style="margin: 0; font-weight: 600; cursor: pointer;">Active</label>
+                    <div class="helper-text" style="margin: 0;">Send reports on schedule</div>
+                </div>
+
+                <div class="section-divider"></div>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Report Configuration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Determine API base URL - use backend port (8001) not frontend port (8002)
+        const API_BASE = window.location.origin + '/api/reports';
+        let currentUserId = '';
+        let currentUserEmail = '';
+
+        // Auto-detect user information from Windows environment
+        function detectUserInfo() {
+            // First, check URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            let user = urlParams.get('user_id');
+            
+            // Try to get user from sessionStorage (set by admin.html) if not in URL
+            if (!user) {
+                user = sessionStorage.getItem('adminUser');
+            }
+            
+            if (!user) {
+                // Try localStorage as backup
+                user = localStorage.getItem('reportUser');
+            }
+            
+            if (!user) {
+                // Fallback: try to get from environment or use default
+                const username = window.navigator.userAgent.match(/Windows NT.*?;.*?([A-Za-z]+)\\/)?.[1] || 'CurrentUser';
+                user = username.toLowerCase();
+            }
+            
+            // Extract just the username part if it's an email
+            if (user.includes('@')) {
+                user = user.split('@')[0];
+            }
+            
+            currentUserId = user.toLowerCase();
+            currentUserEmail = user.includes('@') ? user : `${user}@walmart.com`;
+            
+            // Set hidden fields
+            document.getElementById('userId').value = currentUserId;
+            document.getElementById('primaryEmail').value = currentUserEmail;
+            document.getElementById('userEmailDisplay').textContent = currentUserEmail;
+            
+            console.log('👤 Detected user:', currentUserId, '|', currentUserEmail);
+        }
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('reportsDarkMode', isDarkMode ? 'true' : 'false');
+            
+            // Update button icon
+            const btn = document.querySelector('.dark-mode-toggle');
+            btn.textContent = isDarkMode ? '☀️' : '🌙';
+        }
+
+        // Load dark mode preference on page load
+        function initDarkMode() {
+            const darkModePreference = localStorage.getItem('reportsDarkMode');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Use localStorage preference if set, otherwise use system preference
+            const shouldBeDark = darkModePreference !== null ? darkModePreference === 'true' : prefersDark;
+            
+            if (shouldBeDark) {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.dark-mode-toggle').textContent = '☀️';
+            } else {
+                document.querySelector('.dark-mode-toggle').textContent = '🌙';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            initDarkMode();
+            detectUserInfo();
+            await loadOptions();
+            await loadReports();
+        });
+
+        // Load available options from API
+        async function loadOptions() {
+            try {
+                // Try to load from API, but fall back to defaults if endpoint doesn't exist
+                try {
+                    const response = await fetch(`${API_BASE}/options`);
+                    if (!response.ok && response.status !== 404) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    if (response.ok) {
+                        const data = await response.json();
+                        await populateOptionsFromAPI(data);
+                        return;
+                    }
+                } catch (apiError) {
+                    console.log('API options endpoint not available, using defaults');
+                }
+                
+                // Use defaults
+                populateDefaultOptions();
+                await loadFilterOptions();
+
+            } catch (error) {
+                console.error('Error in loadOptions:', error);
+                populateDefaultOptions();
+            }
+        }
+
+        // Populate UI from API data
+        async function populateOptionsFromAPI(options) {
+            // Populate timeframes
+            const timeframesDiv = document.getElementById('timeframes');
+            const timeframes = options.timeframes || ['Current Day', 'Current Week', 'Current Month', 'Current Year', 'Last 7 Days', 'Last 30 Days'];
+            timeframes.forEach(tf => {
+                timeframesDiv.innerHTML += `
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tf_${tf.replace(/\s+/g, '_')}" value="${tf}">
+                        <label for="tf_${tf.replace(/\s+/g, '_')}">${tf}</label>
+                    </div>
+                `;
+            });
+
+            // Populate Report Details as colored cards
+            const reportDetailsContainer = document.getElementById('reportDetailsContainer');
+            const contentTypes = options.content_types || [
+                { name: 'Overview', color: '#3b82f6', icon: '📊' },
+                { name: 'My Actions', color: '#ef4444', icon: '✓' },
+                { name: 'Last Viewed', color: '#f97316', icon: '👁️' },
+                { name: 'Counts', color: '#f59e0b', icon: '#️⃣' },
+                { name: 'New', color: '#6b7280', icon: '✨' },
+                { name: 'Upcoming', color: '#a855f7', icon: '📅' },
+                { name: 'Notes', color: '#ec4899', icon: '📝' },
+                { name: 'Activity Feed', color: '#22c55e', icon: '📢' },
+                { name: 'Activity Feed - Details', color: '#10b981', icon: '📋' },
+                { name: 'Activity Feed - Files', color: '#14b8a6', icon: '📁' },
+                { name: 'Activity Feed - Links', color: '#06b6d4', icon: '🔗' },
+                { name: 'Activity Feed - Flow', color: '#8b5cf6', icon: '➡️' },
+                { name: 'Activity Feed - Actions', color: '#6366f1', icon: '⚙️' },
+                { name: 'Activity Feed - Facilities', color: '#0ea5e9', icon: '🏢' }
+            ];
+            
+            contentTypes.forEach(ct => {
+                const cardId = `detail_${ct.name.replace(/\s+/g, '_').toLowerCase()}`;
+                const card = document.createElement('div');
+                card.className = 'report-detail-card';
+                card.id = cardId;
+                card.style.backgroundColor = ct.color;
+                card.style.cursor = 'pointer';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'detail-checkbox';
+                checkbox.value = ct.name;
+                
+                const iconDiv = document.createElement('div');
+                iconDiv.style.fontSize = '32px';
+                iconDiv.style.marginBottom = '8px';
+                iconDiv.textContent = ct.icon;
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.style.fontSize = '14px';
+                nameDiv.textContent = ct.name;
+                
+                card.appendChild(checkbox);
+                card.appendChild(iconDiv);
+                card.appendChild(nameDiv);
+                
+                const toggleCard = function(e) {
+                    checkbox.checked = !checkbox.checked;
+                    card.classList.toggle('selected');
+                };
+                
+                card.addEventListener('click', toggleCard);
+                
+                reportDetailsContainer.appendChild(card);
+            });
+
+            // Load filter options for dynamic filters
+            await loadFilterOptions();
+        }
+
+        // Store filter options globally
+        let filterOptionsData = {};
+        let filterCounter = 0;
+
+        // Update preview of selected items
+        function updatePreview() {
+            const selectedCheckboxes = Array.from(document.querySelectorAll('.detail-checkbox:checked'));
+            const selectedItems = selectedCheckboxes.map(cb => cb.value);
+            
+            const previewDiv = document.getElementById('selectedPreview');
+            const selectedItemsDiv = document.getElementById('selectedItems');
+            
+            if (selectedItems.length === 0) {
+                previewDiv.style.display = 'none';
+                return;
+            }
+            
+            previewDiv.style.display = 'block';
+            selectedItemsDiv.innerHTML = selectedItems.map(item => 
+                `<div class="selected-item-badge">${item}</div>`
+            ).join('');
+        }
+
+        // Load all available filter options from API
+        async function loadFilterOptions() {
+            try {
+                const filtersUrl = window.location.origin + '/api/filters';
+                const response = await fetch(filtersUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                filterOptionsData = await response.json();
+                console.log('✅ Filter options loaded successfully!');
+                console.log('Available filter keys:', Object.keys(filterOptionsData).sort());
+                // Show sample counts
+                for (let key of Object.keys(filterOptionsData).slice(0, 3)) {
+                    const count = Array.isArray(filterOptionsData[key]) ? filterOptionsData[key].length : 0;
+                    console.log(`  - ${key}: ${count} items`);
+                }
+            } catch (error) {
+                console.error('❌ Error loading filter options:', error);
+                // API might not be available, but filters will still work with manual selection
+            }
+        }
+
+        // Add a new filter row
+        function addFilter() {
+            filterCounter++;
+            const filterId = `filter_${filterCounter}`;
+            
+            const filterDiv = document.createElement('div');
+            filterDiv.className = 'filter-row';
+            filterDiv.id = filterId;
+            filterDiv.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: start;';
+            
+            filterDiv.innerHTML = `
+                <div class="form-group" style="flex: 1; margin: 0;">
+                    <select class="filter-type" onchange="updateFilterValues('${filterId}')" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; width: 100%;">
+                        <option value="">Select Filter Type...</option>
+                        <option value="partners">Partner</option>
+                        <option value="store_areas">Store Area</option>
+                        <option value="business_areas">Business Area</option>
+                        <option value="divisions">Division</option>
+                        <option value="regions">Region</option>
+                        <option value="markets">Market</option>
+                        <option value="phases">Phase</option>
+                        <option value="health_statuses">Health Status</option>
+                        <option value="business_types">Business Type</option>
+                        <option value="fiscal_years">Fiscal Year</option>
+                        <option value="project_sources">Project Source</option>
+                        <option value="owners">Owner</option>
+                        <option value="stores">Store</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 2; margin: 0;">
+                    <select class="filter-values" multiple disabled style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; width: 100%; min-height: 100px; background: white;">
+                        <option value="">Select filter type first...</option>
+                    </select>
+                    <div class="multi-select-hint" style="font-size: 12px; color: #666; margin-top: 5px;">💡 Hold Ctrl/Cmd for multiple</div>
+                </div>
+                <button type="button" onclick="removeFilter('${filterId}')" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; height: fit-content; margin-top: 0; flex-shrink: 0;">
+                    ✕
+                </button>
+            `;
+            
+            document.getElementById('filtersContainer').appendChild(filterDiv);
+        }
+
+        // Update filter values based on selected filter type
+        function updateFilterValues(filterId) {
+            const filterRow = document.getElementById(filterId);
+            const typeSelect = filterRow.querySelector('.filter-type');
+            const valuesSelect = filterRow.querySelector('.filter-values');
+            
+            const filterType = typeSelect.value;
+            
+            if (!filterType) {
+                valuesSelect.disabled = true;
+                valuesSelect.innerHTML = '<option value="">Select filter type first...</option>';
+                return;
+            }
+            
+            valuesSelect.disabled = false;
+            valuesSelect.innerHTML = '';
+            
+            // The filterType is now directly the API key (e.g., 'tribes', 'divisions', etc.)
+            const values = filterOptionsData[filterType] || [];
+            console.log(`Filter type: ${filterType}, Values count: ${values.length}`);
+            
+            if (values.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No options available';
+                valuesSelect.appendChild(option);
+                return;
+            }
+            
+            values.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                valuesSelect.appendChild(option);
+            });
+        }
+
+        // Remove a filter row
+        function removeFilter(filterId) {
+            document.getElementById(filterId).remove();
+        }
+
+        // Provide default options if API fails
+        function populateDefaultOptions() {
+            // Populate Report Details as colored cards
+            const reportDetailsContainer = document.getElementById('reportDetailsContainer');
+            const contentTypes = [
+                { name: 'Overview', color: '#3b82f6', icon: '📊' },
+                { name: 'My Actions', color: '#ef4444', icon: '✓' },
+                { name: 'Last Viewed', color: '#f97316', icon: '👁️' },
+                { name: 'Counts', color: '#f59e0b', icon: '#️⃣' },
+                { name: 'New', color: '#6b7280', icon: '✨' },
+                { name: 'Upcoming', color: '#a855f7', icon: '📅' },
+                { name: 'Notes', color: '#ec4899', icon: '📝' },
+                { name: 'Activity Feed', color: '#22c55e', icon: '📢' }
+            ];
+            
+            contentTypes.forEach(ct => {
+                const cardId = `detail_${ct.name.replace(/\s+/g, '_').toLowerCase()}`;
+                const card = document.createElement('div');
+                card.className = 'report-detail-card';
+                card.id = cardId;
+                card.style.backgroundColor = ct.color;
+                card.style.cursor = 'pointer';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'detail-checkbox';
+                checkbox.value = ct.name;
+                
+                const iconDiv = document.createElement('div');
+                iconDiv.style.fontSize = '32px';
+                iconDiv.style.marginBottom = '8px';
+                iconDiv.textContent = ct.icon;
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.style.fontSize = '14px';
+                nameDiv.textContent = ct.name;
+                
+                card.appendChild(checkbox);
+                card.appendChild(iconDiv);
+                card.appendChild(nameDiv);
+                
+                const toggleCard = function(e) {
+                    checkbox.checked = !checkbox.checked;
+                    card.classList.toggle('selected');
+                    updatePreview();
+                };
+                
+                card.addEventListener('click', toggleCard);
+                
+                reportDetailsContainer.appendChild(card);
+            });
+        }
+
+        // Load reports
+        async function loadReports() {
+            const reportsList = document.getElementById('reportsList');
+            reportsList.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading reports...</p>
+                </div>
+            `;
+
+            try {
+                // Build API URL - include user_id if detected, otherwise get all
+                let apiUrl = `${API_BASE}/configs`;
+                if (currentUserId && currentUserId !== 'CurrentUser') {
+                    apiUrl += `?user_id=${currentUserId}`;
+                }
+                
+                console.log('📡 Loading reports:', apiUrl, '| currentUserId:', currentUserId);
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ Reports loaded:', data.configs?.length || 0, 'configs');
+
+                if (!data.configs || data.configs.length === 0) {
+                    reportsList.innerHTML = `
+                        <div class="empty-state">
+                            <p>📭 No report configurations yet</p>
+                            <p style="font-size: 14px; color: #999;">Create your first automated report to get started!</p>
+                            <button class="btn btn-primary" onclick="showCreateModal()">Create Report</button>
+                        </div>
+                    `;
+                } else {
+                    reportsList.innerHTML = data.configs.map(config => `
+                        <div class="report-item">
+                            <div class="report-header">
+                                <div>
+                                    <div class="report-title">${config.report_name}</div>
+                                    <div class="report-meta">
+                                        <span class="badge ${config.is_active ? 'badge-active' : 'badge-inactive'}">
+                                            ${config.is_active ? '✓ Active' : '✗ Inactive'}
+                                        </span>
+                                        <span class="badge badge-info">${config.frequency}</span>
+                                        ${config.delivery_day ? `<span class="badge badge-info">${config.delivery_day}s</span>` : ''}
+                                        <span class="badge badge-info">${config.delivery_time}</span>
+                                    </div>
+                                    <div class="report-meta">
+                                        📧 ${config.primary_email}
+                                        ${config.cc_emails.length > 0 ? `+ ${config.cc_emails.length} CC` : ''}
+                                    </div>
+                                    <div class="report-meta">
+                                        📊 ${config.content_types.length} content types | 
+                                        📅 ${config.timeframes.length} timeframes |
+                                        ${config.last_sent ? `Last sent: ${new Date(config.last_sent).toLocaleDateString()}` : 'Never sent'}
+                                    </div>
+                                </div>
+                                <div class="report-actions">
+                                    <button class="btn btn-sm btn-success" onclick="testReport('${config.config_id}')">
+                                        🧪 Test
+                                    </button>
+                                    <button class="btn btn-sm btn-primary" onclick="editReport('${config.config_id}')">
+                                        ✏️ Edit
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary" onclick="toggleReport('${config.config_id}', ${!config.is_active})">
+                                        ${config.is_active ? '⏸️ Pause' : '▶️ Resume'}
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteReport('${config.config_id}')">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading reports:', error);
+                reportsList.innerHTML = `
+                    <div class="empty-state">
+                        <p>❌ Failed to load reports</p>
+                        <p style="font-size: 14px; color: #999;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Show create modal
+        function showCreateModal() {
+            document.getElementById('modalTitle').textContent = 'Create New Report';
+            document.getElementById('reportForm').reset();
+            document.getElementById('configId').value = '';
+            document.getElementById('isActive').checked = true;
+            
+            // Clear all detail card selections
+            document.querySelectorAll('.report-detail-card').forEach(card => {
+                card.classList.remove('selected');
+                card.querySelector('.detail-checkbox').checked = false;
+            });
+            
+            // Clear filter rows
+            document.getElementById('filtersContainer').innerHTML = '';
+            
+            // Hide preview
+            updatePreview();
+            
+            document.getElementById('reportModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('reportModal').classList.remove('active');
+        }
+
+        // Toggle day of week field
+        function toggleDayOfWeek() {
+            const frequency = document.getElementById('frequency').value;
+            const dayGroup = document.getElementById('dayOfWeekGroup');
+            if (frequency === 'Weekly') {
+                dayGroup.style.display = 'block';
+            } else {
+                dayGroup.style.display = 'none';
+            }
+        }
+
+        // Submit form
+        document.getElementById('reportForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const configId = document.getElementById('configId').value;
+            const isEdit = configId !== '';
+
+            // Gather selected content types from cards
+            const contentTypes = Array.from(document.querySelectorAll('.detail-checkbox:checked'))
+                .map(cb => cb.value);
+
+            // Gather timeframes from checkboxes
+            const timeframes = Array.from(document.querySelectorAll('#timeframes input:checked'))
+                .map(cb => cb.value);
+
+            // Default columns structure
+            const columns = {
+                intake_card_number: true,
+                title_with_link: true,
+                facility_total_count: true
+            };
+
+            // Gather filters from dynamic filter rows
+            const filters = {};
+            const filterRows = document.querySelectorAll('.filter-row');
+            filterRows.forEach(row => {
+                const typeSelect = row.querySelector('.filter-type');
+                const valuesSelect = row.querySelector('.filter-values');
+                
+                const filterType = typeSelect.value;
+                const selectedValues = Array.from(valuesSelect.selectedOptions).map(opt => opt.value);
+                
+                if (filterType && selectedValues.length > 0) {
+                    filters[filterType] = selectedValues;
+                }
+            });
+
+            // Get CC emails
+            const ccEmailsInput = document.getElementById('ccEmails').value;
+            const ccEmails = ccEmailsInput ? ccEmailsInput.split(',').map(s => s.trim()) : [];
+
+            const data = {
+                user_id: document.getElementById('userId').value,
+                report_name: document.getElementById('reportName').value,
+                content_types: contentTypes.length > 0 ? contentTypes : ["Overview"],
+                columns: columns,
+                filters: filters,
+                frequency: document.getElementById('frequency').value,
+                delivery_day: document.getElementById('deliveryDay').value || null,
+                delivery_time: document.getElementById('deliveryTime').value,
+                timeframes: timeframes,
+                primary_email: document.getElementById('primaryEmail').value,
+                cc_emails: ccEmails,
+                report_format: document.getElementById('reportFormat').value,
+                is_active: document.getElementById('isActive').checked
+            };
+
+            try {
+                const url = isEdit ? `${API_BASE}/configs/${configId}` : `${API_BASE}/configs`;
+                const method = isEdit ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showToast(`Report ${isEdit ? 'updated' : 'created'} successfully!`, 'success');
+                    closeModal();
+                    await loadReports();
+                } else {
+                    const error = await response.json();
+                    showToast(`Failed to ${isEdit ? 'update' : 'create'} report: ${error.detail}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error saving report:', error);
+                showToast('Failed to save report configuration', 'error');
+            }
+        });
+
+        // Test report
+        async function testReport(configId) {
+            // Get current user email from localStorage/sessionStorage
+            let currentUserEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('adminUser') || sessionStorage.getItem('userEmail');
+            
+            const email = prompt(`Enter email address for test report (current user: ${currentUserEmail || 'unknown'}):`, currentUserEmail || '');
+            
+            if (email === null) return; // User cancelled
+            
+            try {
+                const response = await fetch(`${API_BASE}/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        config_id: configId,
+                        current_user_email: email || currentUserEmail || null,
+                        override_email: null
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Test report sent successfully!', 'success');
+                } else {
+                    showToast(`Failed to send test report: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error testing report:', error);
+                showToast('Failed to send test report', 'error');
+            }
+        }
+
+        // Edit report
+        async function editReport(configId) {
+            try {
+                const response = await fetch(`${API_BASE}/configs/${configId}`);
+                const config = await response.json();
+
+                document.getElementById('modalTitle').textContent = 'Edit Report';
+                document.getElementById('configId').value = config.config_id;
+                document.getElementById('userId').value = config.user_id;
+                document.getElementById('reportName').value = config.report_name;
+                document.getElementById('primaryEmail').value = config.primary_email;
+                document.getElementById('ccEmails').value = (config.cc_emails && config.cc_emails.length > 0) ? config.cc_emails.join(', ') : '';
+                document.getElementById('frequency').value = config.frequency;
+                document.getElementById('deliveryDay').value = config.delivery_day || '';
+                document.getElementById('deliveryTime').value = config.delivery_time;
+                document.getElementById('reportFormat').value = config.report_format;
+                document.getElementById('isActive').checked = config.is_active;
+
+                // Set timeframes
+                if (config.timeframes) {
+                    config.timeframes.forEach(tf => {
+                        const checkbox = document.getElementById(`tf_${tf.replace(/\s+/g, '_')}`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                }
+
+                // Set content types (detail cards)
+                if (config.content_types) {
+                    // First uncheck all cards
+                    document.querySelectorAll('.report-detail-card').forEach(card => {
+                        card.classList.remove('selected');
+                        card.querySelector('.detail-checkbox').checked = false;
+                    });
+                    
+                    // Then check selected ones
+                    config.content_types.forEach(contentType => {
+                        const cardId = `detail_${contentType.replace(/\s+/g, '_').toLowerCase()}`;
+                        const card = document.getElementById(cardId);
+                        if (card) {
+                            card.classList.add('selected');
+                            card.querySelector('.detail-checkbox').checked = true;
+                        }
+                    });
+                    
+                    // Update preview to show selected items
+                    updatePreview();
+                }
+
+                // Clear existing filter rows
+                document.getElementById('filtersContainer').innerHTML = '';
+                
+                // Recreate filter rows from saved config
+                if (config.filters) {
+                    Object.entries(config.filters).forEach(([filterType, values]) => {
+                        addFilter();
+                        const filterRows = document.querySelectorAll('.filter-row');
+                        const lastRow = filterRows[filterRows.length - 1];
+                        const typeSelect = lastRow.querySelector('.filter-type');
+                        typeSelect.value = filterType;
+                        updateFilterValues(lastRow.id);
+                        
+                        // Wait a moment for values to populate, then select them
+                        setTimeout(() => {
+                            const valuesSelect = lastRow.querySelector('.filter-values');
+                            const valuesArray = Array.isArray(values) ? values : [values];
+                            Array.from(valuesSelect.options).forEach(option => {
+                                if (valuesArray.includes(option.value)) {
+                                    option.selected = true;
+                                }
+                            });
+                        }, 100);
+                    });
+                }
+
+                toggleDayOfWeek();
+                document.getElementById('reportModal').classList.add('active');
+            } catch (error) {
+                console.error('Error loading report:', error);
+                showToast('Failed to load report configuration', 'error');
+            }
+        }
+
+        // Toggle report active status
+        async function toggleReport(configId, isActive) {
+            try {
+                const response = await fetch(`${API_BASE}/configs/${configId}/toggle?is_active=${isActive}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    showToast(`Report ${isActive ? 'activated' : 'paused'} successfully!`, 'success');
+                    await loadReports();
+                } else {
+                    showToast('Failed to update report status', 'error');
+                }
+            } catch (error) {
+                console.error('Error toggling report:', error);
+                showToast('Failed to update report status', 'error');
+            }
+        }
+
+        // Delete report
+        async function deleteReport(configId) {
+            if (!confirm('Are you sure you want to delete this report configuration? This cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/configs/${configId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showToast('Report deleted successfully!', 'success');
+                    await loadReports();
+                } else {
+                    showToast('Failed to delete report', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting report:', error);
+                showToast('Failed to delete report', 'error');
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} active`;
+
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

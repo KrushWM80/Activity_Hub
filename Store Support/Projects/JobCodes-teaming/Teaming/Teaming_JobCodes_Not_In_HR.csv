@@ -1,0 +1,139 @@
+composite_job_code,jobCodeTitle,teamName,workgroupName,jobCode,deptNumber,divNumber
+59-65-2104,Fuel DM,Fuel,Fuel,2104,65,59
+59-65-266,Fuel SA ON,Fuel,Fuel,266,65,59
+1-202-2002,Support Supv XPS,Fuel,Fuel,2002,202,1
+6-10-101,Auto Care Ctr DM,Auto Care Center,General Merchandise,101,10,6
+24-80-805,Cocina Cafe Assoc,Deli/Bakery,Food & Consumables,805,80,24
+24-80-804,Cocina Cafe Mgr,Deli/Bakery,Food & Consumables,804,80,24
+24-80-101,Deli DM,Deli/Bakery,Food & Consumables,101,80,24
+1-600-7310,Fresh AT Serv,Deli/Bakery,Food & Consumables,7310,600,1
+1-580-131,Fresh Prod Supervisor,Deli/Bakery,Food & Consumables,131,580,1
+1-930-1461,Delivery Associate,Digital,Digital,1461,930,1
+1-930-1471,Delivery Assoc-Last Mile,Digital,Digital,1471,930,1
+1-936-1401,Digital DM,Digital,Digital,1401,936,1
+1-630-7400,MFC Team Associate,Digital,Digital,7400,630,1
+1-930-1054,SFS Supervisor,Digital,Digital,1054,930,1
+1-995-711,System Operator,Digital,Digital,711,995,1
+1-5-101,Entertainment DM,Entertainment,General Merchandise,101,5,1
+1-815-2052,Entertainment Support Mgr,Entertainment,General Merchandise,2052,815,1
+1-202-2104,Adult Beverage DM,Food/Consumables,Food & Consumables,2104,202,1
+1-2-101,Consumables DM,Food/Consumables,Food & Consumables,101,2,1
+1-192-101,Dry Grocery DM,Food/Consumables,Food & Consumables,101,192,1
+1-190-101,Food DM,Food/Consumables,Food & Consumables,101,190,1
+1-640-101,OTC DM,Food/Consumables,Food & Consumables,101,640,1
+1-990-510,Customer Serv Mgr Day,Front End,Front End,510,990,1
+1-903-510,Customer Serv Mgr ON,Front End,Front End,510,903,1
+1-903-7410,Front End Checkout TA ON,Front End,Front End,7410,903,1
+1-990-505,Smokeshop Cashier Day,Front End,Front End,505,990,1
+1-903-505,Smokeshop Cashier Overnight,Front End,Front End,505,903,1
+1-995-101,Str Cleaning Sup Overnight,Front End,Front End,101,995,1
+1-993-1030,Visiting Cashier,Front End,Front End,1030,993,1
+1-11-101,Hardlines DM,Hardlines,General Merchandise,101,11,1
+1-16-101,Lawn & Garden DM,Hardlines,General Merchandise,101,16,1
+1-9-101,Sport Goods DM,Hardlines,General Merchandise,101,9,1
+1-620-7400,Home TA Avail,Home,General Merchandise,7400,620,1
+71-76-623,Academy Coach,Management,,623,76,71
+71-76-622,Academy Lead,Management,,622,76,71
+1-993-1079,AP Operations Coach,Management,,1079,993,1
+1-993-3027,Apparel Coach,Management,,3027,993,1
+6-10-811,Auto Care Center Coach,Management,,811,10,6
+1-993-1099,Digtial Coach,Management,,1099,993,1
+1-993-1072,Frontend Coach,Management,,1072,993,1
+1-993-1074,Overnight MFC Coach,Management,,1074,993,1
+1-993-1077,Stocking 1 Coach,Management,,1077,993,1
+1-993-3001,Store Lead,Management,,3001,993,1
+1-993-1001,Store Manager,Management,,1001,993,1
+1-584-2053,Fresh CAP Team 1 Supervisor,Meat/Produce,Food & Consumables,2053,584,1
+1-584-451,Fresh CAP Team 2 Supervisor,Meat/Produce,Food & Consumables,451,584,1
+1-594-101,Fresh Department Manager,Meat/Produce,Food & Consumables,101,594,1
+24-93-803,Meat Processor Supermerc,Meat/Produce,Food & Consumables,803,93,24
+10-38-826,Rx Tech Overnight,Pharmacy,Pharmacy,826,38,10
+10-38-853,State Certified Tech,Pharmacy,Pharmacy,853,38,10
+6-10-812,Auto Care Ctr Trainee,Auto Care Center,General Merchandise,812,10,6
+1-930-451,CAP Team Supv,Stocking Day 1,Stocking,451,930,1
+1-580-231,Flex Stocking TA,Stocking Day 1,Stocking,231,580,1
+1-921-2053,Food Support Mgr,Stocking Day 1,Stocking,2053,921,1
+1-3-2050,GM Support Mgr,Stocking Day 1,Stocking,2050,3,1
+1-910-600,Office Assoc,Stocking Day 1,Stocking,600,910,1
+1-635-7330,O/N AT Receiving,Stocking ON,Stocking,7330,635,1
+1-931-3404,Support Mgr ON,Stocking ON,Stocking,3404,931,1
+30-49-856,Licensed Optician,Vision Center,Vision,856,49,30
+30-49-874,OD Intern,Vision Center,Vision,874,49,30
+30-49-852,Optician,Vision Center,Vision,852,49,30
+30-49-880,Optician Apprentice,Vision Center,Vision,880,49,30
+30-49-881,Optician Apprentice,Vision Center,Vision,881,49,30
+30-49-882,Optician Apprentice,Vision Center,Vision,882,49,30
+30-49-859,Optician Dual Cert,Vision Center,Vision,859,49,30
+30-49-853,Optician Single Cert,Vision Center,Vision,853,49,30
+30-49-862,Optometric Asst,Vision Center,Vision,862,49,30
+1-995-410,Daystock Maint,Front End,Front End,410,995,1
+59-645-7310,Fuel AT,Fuel,Fuel,7310,645,59
+1-993-1026,Operations Manager,Management,,1026,993,1
+1-695-7520,Stocking 2 AT,Stocking Day 2,Stocking,7520,695,1
+1-202-2202,Overnight Supv XPS,Stocking ON,Stocking,2202,202,1
+1-993-1099,Digital Coach,Management,,1099,993,1
+1-993-1071,Emerging Store Manager,Management,,1071,993,1
+1-993-1085,Intern Coach,Management,,1085,993,1
+10-40-841,Staff Pharmacist,Pharmacy,Pharmacy,841,40,10
+30-49-855,Optician-WM,Vision Center,Vision,855,49,30
+1-990-3302,Find a Future Associate,Front End,Front End,3302,990,1
+1-993-1006,Outbound Coach,Management,,1006,993,1
+1-993-3003,MFC Store Lead,Management,,3003,993,1
+1-993-2101,MICRO SUPPORT SUPV,Stocking Day 1,Stocking,2101,993,1
+1-990-210,MICRO SALES ASC,Stocking Day 1,Stocking,210,990,1
+1-993-1001,"STORE MANAGER, MICRO STORE - WM STORES",Management,,1001,993,1
+10-40-840,Pharmacy Manager,Pharmacy,Pharmacy,840,40,10
+1-615-7410,Adult Beverage TA,Food/Consumables,Food & Consumables,7410,615,1
+30-49-3157,Optician Level 3,Vision Center,Vision,3157,49,30
+1-990-8410,DIH Front End TA,Front End,Front End,8410,990,1
+1-990-8210,DIH Front End TL,Front End,Front End,8210,990,1
+1-990-8320,DIH Front End AT,Front End,Front End,8320,990,1
+1-995-3470,System Operator O/N,Digital,Digital,3470,995,1
+1-930-3400,ON Digital TL,Digital,Digital,3400,930,1
+1-615-7410,Adult Beverage TA,Salesfloor,Food & Consumables,7410,615,1
+1-615-8400,DIH F&C TA,Food/Consumables,Food & Consumables,8400,615,1
+1-615-8200,DIH F&C TL,Food/Consumables,Food & Consumables,8200,615,1
+1-630-7410,Overnight MFC TA,Stocking ON,Stocking,7410,630,1
+1-630-7210,Overnight MFC Team Lead,Stocking ON,Stocking,7210,630,1
+1-635-8440,DIH Overnight TA,Stocking ON,Stocking,8440,635,1
+1-930-480,PUT DM,Stocking ON,Stocking,480,930,1
+1-990-501,Cashier Day,Front End,Front End,501,990,1
+1-903-501,Cashier Overnight,Front End,Front End,501,903,1
+1-993-3028,Backroom ASM,Management,,3028,993,1
+1-993-3020,Consumables ASM,Management,,3020,993,1
+1-993-1024,Day ASM,Management,,1024,993,1
+1-993-1048,Entertainment ASM,Management,,1048,993,1
+1-993-3023,Entertainment/Hardlines ASM,Management,,3023,993,1
+1-996-766,Specialty ASM,Management,,766,996,1
+1-993-1007,Fashion/Home ASM,Management,,1007,993,1
+1-993-1008,Overnight ASM,Management,,1008,993,1
+1-993-1012,Food ASM,Management,,1012,993,1
+1-993-3021,Fresh ASM,Management,,3021,993,1
+1-993-3025,Hardlines/Consumables ASM,Management,,3025,993,1
+1-993-1005,Hardlines ASM,Management,,1005,993,1
+1-993-3026,GM ASM,Management,,3026,993,1
+1-993-1009,Frontend ASM,Management,,1009,993,1
+1-993-1006,Entertainment/Fashion/Home ASM,Management,,1006,993,1
+1-993-1005,back,Management,,1005,993,1
+10-40-861,Pharmacy Manager CA,Pharmacy,Pharmacy,861,40,10
+10-40-867,Staff Pharmacist CA,Pharmacy,Pharmacy,867,40,10
+10-49-861,Optometrist WM,Vision Center,Vision,861,49,10
+71-76-624,Academy Coordinator,Support,Support,624,76,71
+1-996-766,MFC QA Lead O/N,Asset Protection,Asset Protection,766,996,1
+1-996-758,APC Trainee,Asset Protection,Asset Protection,758,996,1
+28-284-603,Grocery Reclamation Assoc,Asset Protection,Asset Protection,603,284,28
+1-930-465,DSD Receiving,Asset Protection,Asset Protection,465,930,1
+1-931-465,DSD Rec AK and HI Overnight,Asset Protection,Asset Protection,465,931,1
+1-976-783,Customer Host Overnight,Asset Protection,Asset Protection,783,976,1
+1-930-3451,Claims Supv,Asset Protection,Asset Protection,3451,930,1
+1-930-603,Claims Assoc,Asset Protection,Asset Protection,603,930,1
+1-993-1026,Operations Manager,Management,Management,1026,993,1
+1-625-8410,DIH GM TA,Fashion,General Merchandise,8410,625,1
+1-625-8210,DIH GM TL,Fashion,General Merchandise,8210,625,1
+1-994-469,ON Fresh Cleaner,Meat/Produce,Food & Consumables,469,994,1
+1-993-1001,Fuel Station Manager,Management,,1001,993,1
+10-40-801,Pharm Clinical Serv Mgr,Pharmacy,Pharmacy,801,40,10
+10-40-872,RX STAFF,Pharmacy,Pharmacy,872,40,10
+10-40-845,RX Relief,Pharmacy,Pharmacy,845,40,10
+10-38-820,Rx Ops Team Lead,Pharmacy,Pharmacy,820,38,10
+30-49-850,Vision Mgr,Vision Center,Vision,850,49,30

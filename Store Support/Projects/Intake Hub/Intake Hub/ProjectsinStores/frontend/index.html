@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects in Stores Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif; background: #f5f7fa; padding: 20px; }
+        .header { background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%); color: white; padding: 20px 30px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
+        .header h1 { font-size: 28px; margin-bottom: 5px; }
+        .header .subtitle { font-size: 14px; opacity: 0.9; margin-bottom: 3px; }
+        .header .last-updated { font-size: 11px; opacity: 0.7; font-style: italic; }
+        .header-top-right { position: absolute; top: 20px; right: 30px; text-align: right; }
+        .header-top-right .owner-name { font-size: 12px; color: rgba(255,255,255,0.7); }
+        .header-bottom-right { position: absolute; bottom: 12px; right: 20px; text-align: right; }
+        .header-bottom-right .email-reports-btn { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.3s; text-decoration: none; display: inline-block; }
+        .header-bottom-right .email-reports-btn:hover { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .stat-card .value { font-size: 32px; font-weight: bold; color: #333; }
+        .filters { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .filter-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .filter-group select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; }
+        .projects-table { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #dee2e6; }
+        td { padding: 12px; border-bottom: 1px solid #dee2e6; }
+        tr:hover { background: #f8f9fa; }
+        .loading { text-align: center; padding: 40px; color: #666; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .error { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; margin: 20px 0; }
+        button { background: #0071ce; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: 500; }
+        button:hover { background: #004f9a; }
+        #map { width: 100%; height: 500px; border-radius: 8px; border: 1px solid #dee2e6; }
+        .maplibregl-popup-content { padding: 10px; max-width: 250px; }
+        .maplibregl-popup-content h4 { margin-bottom: 5px; color: #333; }
+        .maplibregl-popup-content p { margin: 3px 0; font-size: 13px; color: #666; }
+        .rating-emoji { transition: all 0.2s ease; }
+        input[name="feedback-rating"]:checked + .rating-emoji { border-color: #0071ce !important; background: #e3f2fd; transform: scale(1.1); }
+        .rating-emoji:hover { border-color: #0071ce !important; transform: scale(1.05); }
+        .multi-select-wrapper { position: relative; }
+        .multi-select-wrapper input[readonly] { 
+            padding-right: 30px !important;
+            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="%23666" d="M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+        }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { padding: 15px; border-radius: 8px; }
+            .header h1 { font-size: 22px; }
+            .header .subtitle { font-size: 13px; }
+            .header .last-updated { font-size: 10px; }
+            .header-top-right { position: static; margin-top: 8px; text-align: left; }
+            .header-top-right .owner-name { display: inline-block; margin-right: 10px; }
+            .header-bottom-right { position: static; margin-top: 8px; text-align: left; }
+            .header-bottom-right .email-reports-btn { display: inline-block; font-size: 12px; padding: 5px 12px; }
+            .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .stat-card { padding: 15px; }
+            .stat-card h3 { font-size: 12px; }
+            .stat-card .value { font-size: 24px; }
+            .filters { padding: 15px; }
+            .filter-group { grid-template-columns: 1fr; gap: 10px; }
+            .projects-table { padding: 10px; }
+            table { font-size: 13px; }
+            th, td { padding: 8px 5px; }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 { font-size: 20px; }
+            .stats { grid-template-columns: 1fr; }
+            .stat-card .value { font-size: 28px; }
+            table { font-size: 12px; }
+            th, td { padding: 6px 3px; }
+        }
+        
+        /* Dark Mode Styles */
+        body.dark-mode { background: #1a1a1a; color: #e0e0e0; }
+        body.dark-mode .header { background: linear-gradient(135deg, #1a3a52 0%, #0d1f33 100%); color: #e0e0e0; }
+        body.dark-mode .header h1 { color: #e0e0e0; }
+        body.dark-mode .header .subtitle { color: rgba(255,255,255,0.7); }
+        body.dark-mode .header .last-updated { color: rgba(255,255,255,0.5); }
+        body.dark-mode .header-top-right .owner-name { color: rgba(255,255,255,0.7); }
+        body.dark-mode .stat-card { background: #2a2a2a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); color: #e0e0e0; }
+        body.dark-mode .stat-card h3 { color: #b0b0b0; }
+        body.dark-mode .stat-card .value { color: #e0e0e0; }
+        body.dark-mode .filters { background: #2a2a2a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        body.dark-mode .filter-group select { background: #333; color: #e0e0e0; border: 1px solid #444; }
+        body.dark-mode .filter-group select option { background: #333; color: #e0e0e0; }
+        body.dark-mode .filter-group input { background: #333; color: #e0e0e0; border-color: #444; }
+        body.dark-mode .projects-table { background: #2a2a2a; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        body.dark-mode table { background: #2a2a2a; }
+        body.dark-mode th { background: #1f1f1f; color: #e0e0e0; border-bottom: 2px solid #444; }
+        body.dark-mode td { color: #e0e0e0; border-bottom: 1px solid #333; }
+        body.dark-mode tr:hover { background: #333; }
+        body.dark-mode .error { background: #5a2c2c; color: #ff9999; }
+        body.dark-mode button { background: #0071ce; }
+        body.dark-mode button:hover { background: #0056a0; }
+        body.dark-mode a { color: #66c2ff; }
+        body.dark-mode .multi-select-wrapper input[readonly] { background-color: #333; color: #e0e0e0; border: 1px solid #444; }
+        body.dark-mode input { background: #333; color: #e0e0e0; border: 1px solid #444; }
+        body.dark-mode input::placeholder { color: #999; }
+        body.dark-mode label { color: #e0e0e0; }
+        body.dark-mode .loading { color: #b0b0b0; }
+        body.dark-mode .spinner { border-color: #333; border-top-color: #66c2ff; }
+        body.dark-mode input::placeholder { color: #999; }
+        
+        .dark-mode-toggle { 
+            background: rgba(255,255,255,0.2); 
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.3); 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            transition: all 0.3s; 
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .dark-mode-toggle:hover { 
+            background: rgba(255,255,255,0.3); 
+            border-color: rgba(255,255,255,0.5); 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1><img src="spark-logo.png" alt="Spark" style="height: 48px; width: 48px; margin-right: 12px; vertical-align: middle;"> Projects in Stores</h1>
+            <div class="subtitle">Data from Operations and Realty Data sources</div>
+            <div class="last-updated" id="last-updated">Last Updated: Fetching...</div>
+        </div>
+        <div class="header-top-right">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌙</button>
+            <div class="owner-name">Owner: Kendall Rush</div>
+        </div>
+        <div class="header-bottom-right">
+            <a href="reports.html" class="email-reports-btn">📧 Email Reports</a>
+            <button onclick="openFeedback()" class="email-reports-btn" style="margin-left: 10px; cursor: pointer;">? Feedback</button>
+        </div>
+    </div>
+
+    <div class="stats" id="stats">
+        <div class="stat-card">
+            <h3>Total Active Projects</h3>
+            <div class="value" id="total-projects">-</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Stores</h3>
+            <div class="value" id="total-stores">-</div>
+        </div>
+        <div class="stat-card">
+            <h3>Operational Projects</h3>
+            <div class="value" id="intake-projects">-</div>
+        </div>
+        <div class="stat-card">
+            <h3>Realty Projects/Initiatives</h3>
+            <div class="value" id="realty-projects-initiatives">-</div>
+        </div>
+    </div>
+
+    <div class="filters">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="margin: 0;">🔍 Filters</h2>
+            <button onclick="toggleExpandedFilters()" id="expand-filters-btn" style="padding: 6px 14px; background: white; color: #666; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">▼</button>
+        </div>
+        <!-- First row: Project Title search, Search button, Export, Refresh, WM Week, FY, and Phase -->
+        <div class="filter-row-1" style="display: grid; grid-template-columns: 1.5fr auto auto auto 130px 80px 120px; gap: 10px; margin-bottom: 10px; align-items: center;">
+            <input type="text" id="filter-title" placeholder="Search by Project Title... (press Enter)" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box;">
+            <button id="search-btn" onclick="performSearch()" title="Search" style="padding: 8px 12px; border: 2px solid white; border-radius: 4px; background: #0071ce; color: white; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px; height: 38px; box-shadow: 0 0 0 1px #0071ce;">🔎 Search</button>
+            <button onclick="exportToCSV()" title="Export to CSV" style="padding: 8px 12px; border: 1px solid #0071ce; border-radius: 4px; background: white; color: #0071ce; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px; height: 38px;">⬇️ Export</button>
+            <button onclick="resetFilters()" title="Reset all filters" style="padding: 10px 14px; border: 1px solid #0071ce; border-radius: 4px; background: #0071ce; color: white; cursor: pointer; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; min-width: 44px; height: 38px;">↻</button>
+            <div class="multi-select-wrapper" id="wmweek-wrapper" style="position: relative;">
+                <input type="text" id="wmweek-display" placeholder="All WM Weeks" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                <div id="wmweek-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <input type="text" id="wmweek-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                    <div id="wmweek-options" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            <div class="multi-select-wrapper" id="fy-wrapper" style="position: relative;">
+                <input type="text" id="fy-display" placeholder="All FY" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                <div id="fy-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <input type="text" id="fy-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                    <div id="fy-options" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            <div class="multi-select-wrapper" id="phase-wrapper" style="position: relative;">
+                <input type="text" id="phase-display" placeholder="All Phases" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                <div id="phase-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <input type="text" id="phase-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                    <div id="phase-options" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Second row: Division, Region, Market, Store, Source -->
+        <div class="filter-group" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 10px;">
+            <div class="multi-select-wrapper" id="division-wrapper" style="position: relative;">
+                <input type="text" id="division-display" placeholder="All Divisions" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                <div id="division-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <input type="text" id="division-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                    <div id="division-options" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            <div class="multi-select-wrapper" id="region-wrapper" style="position: relative;">
+                <input type="text" id="region-display" placeholder="All Regions" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                <div id="region-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <input type="text" id="region-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                    <div id="region-options" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            <div class="multi-select-wrapper" id="market-wrapper" style="position: relative;">
+                <input type="text" id="market-display" placeholder="All Markets" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                <div id="market-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <input type="text" id="market-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                    <div id="market-options" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            <div class="multi-select-wrapper" id="store-wrapper" style="position: relative;">
+                <input type="text" id="store-display" placeholder="All Stores" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                <div id="store-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <input type="text" id="store-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                    <div id="store-options" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            <select id="filter-source" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box;">
+                <option value="">All Sources</option>
+            </select>
+        </div>
+        <!-- Expandable filters row -->
+        <div id="expanded-filters" style="display: none; margin-top: 10px;">
+            <div class="filter-group" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 10px;">
+                <div class="multi-select-wrapper" id="owner-wrapper" style="position: relative;">
+                    <input type="text" id="owner-display" placeholder="All Owners" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                    <div id="owner-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <input type="text" id="owner-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                        <div id="owner-options" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+                <div class="multi-select-wrapper" id="partner-wrapper" style="position: relative;">
+                    <input type="text" id="partner-display" placeholder="All Partners" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; color: #333;">
+                    <div id="partner-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <input type="text" id="partner-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                        <div id="partner-options" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+                <div class="multi-select-wrapper" id="businessorg-wrapper" style="position: relative;">
+                    <input type="text" id="businessorg-display" placeholder="All Business Orgs" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                    <div id="businessorg-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <input type="text" id="businessorg-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                        <div id="businessorg-options" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+                <div class="multi-select-wrapper" id="storearea-wrapper" style="position: relative;">
+                    <input type="text" id="storearea-display" placeholder="All Store Areas" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                    <div id="storearea-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <input type="text" id="storearea-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                        <div id="storearea-options" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+                <div class="multi-select-wrapper" id="health-wrapper" style="position: relative;">
+                    <input type="text" id="health-display" placeholder="All Health" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                    <div id="health-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <input type="text" id="health-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                        <div id="health-options" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Second row of expanded filters: Business Type, Associate Impact, Customer Impact -->
+            <div class="filter-group" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 10px; margin-top: 10px;">
+                <div class="multi-select-wrapper" id="businesstype-wrapper" style="position: relative;">
+                    <input type="text" id="businesstype-display" placeholder="All Business Types" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                    <div id="businesstype-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <input type="text" id="businesstype-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                        <div id="businesstype-options" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+                <div class="multi-select-wrapper" id="associateimpact-wrapper" style="position: relative;">
+                    <input type="text" id="associateimpact-display" placeholder="All Associate Impacts" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                    <div id="associateimpact-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <input type="text" id="associateimpact-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                        <div id="associateimpact-options" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+                <div class="multi-select-wrapper" id="customerimpact-wrapper" style="position: relative;">
+                    <input type="text" id="customerimpact-display" placeholder="All Customer Impacts" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; background: white; cursor: pointer;">
+                    <div id="customerimpact-dropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <input type="text" id="customerimpact-search" placeholder="Type to search..." style="padding: 8px; border: none; border-bottom: 1px solid #ddd; width: 100%; box-sizing: border-box;">
+                        <div id="customerimpact-options" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="projects-table" style="box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <!-- Projects Section Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="margin: 0;">📋 Projects</h2>
+            <button onclick="toggleProjectsSection()" id="toggle-projects-btn" style="padding: 6px 14px; background: white; color: #666; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">▲</button>
+        </div>
+        
+        <!-- Projects Content (collapsible) -->
+        <div id="projects-content">
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading project data...</p>
+            </div>
+            <div id="error" class="error" style="display: none;"></div>
+            
+            <!-- Quick Review Section -->
+            <div id="preview-container" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <h3 style="margin: 0; color: #333;">Quick Review</h3>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 12px; color: #666;">Sort:</span>
+                            <select id="preview-sort" onchange="sortPreviewProjects()" style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; background: white; cursor: pointer;">
+                                <option value="az">A to Z</option>
+                                <option value="za">Z to A</option>
+                                <option value="high">High Volume</option>
+                                <option value="low">Low Volume</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="toggleQuickReview()" id="toggle-quickreview-btn" style="padding: 6px 14px; background: white; color: #666; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">▼</button>
+                </div>
+                <div id="quick-review-content">
+                    <div id="preview-list" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; overflow: visible;"></div>
+                    <div id="preview-all" style="display: none; max-height: 400px; overflow-y: auto;">
+                        <div id="preview-all-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Project List Section -->
+            <div id="project-list-section" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <h3 style="margin: 0; color: #333;">Project List</h3>
+                        <span id="nav-buttons"></span>
+                    </div>
+                    <button onclick="toggleProjectList()" id="toggle-project-list-btn" style="padding: 6px 14px; background: white; color: #666; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">▲</button>
+                </div>
+                <div id="hierarchy-breadcrumb" style="color: #999; font-size: 12px; margin-bottom: 10px;">Division</div>
+                <div id="project-list-content">
+                    <div id="filter-loading-indicator" style="display: none; text-align: center; padding: 30px 20px; color: #666;">
+                        <div style="display: inline-block; margin-bottom: 12px;">
+                            <div style="border: 4px solid #f3f3f3; border-top: 4px solid #0071ce; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                        </div>
+                        <div style="font-size: 14px; font-weight: 500; color: #0071ce;">Filtering projects...</div>
+                    </div>
+                    <div id="table-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+        <button onclick="toggleChat()" style="border-radius: 50%; width: 60px; height: 60px; font-size: 32px; background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%); color: white; border: none; box-shadow: 0 4px 12px rgba(0, 113, 206, 0.4); cursor: pointer; transition: transform 0.2s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">😊</button>
+    </div>
+
+    <div id="chat-box" style="display: none; position: fixed; bottom: 90px; right: 20px; width: 400px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 1000; flex-direction: column; border: 1px solid #e0e0e0;">
+        <div style="background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%); color: white; padding: 15px; border-radius: 12px 12px 0 0; font-weight: 600; display: flex; align-items: center; justify-content: space-between; font-family: 'Everyday Sans', sans-serif;">
+            <span style="display: flex; align-items: center; gap: 10px; font-size: 16px;">😊 Ask Sparky</span>
+            <div style="display: flex; gap: 8px;">
+                <button id="minimize-btn" onclick="minimizeChat()" style="background: transparent; color: white; border: 1px solid rgba(255,255,255,0.5); padding: 2px 8px; border-radius: 4px; cursor: pointer; font-weight: 600;">−</button>
+                <button onclick="toggleChat()" style="background: transparent; color: white; border: 1px solid rgba(255,255,255,0.5); padding: 2px 8px; border-radius: 4px; cursor: pointer; font-weight: 600;">✕</button>
+            </div>
+        </div>
+        <div id="chat-messages" style="flex: 1; overflow-y: auto; padding: 15px; background: #f8f9fa; font-family: 'Everyday Sans', sans-serif;"></div>
+        <div style="padding: 15px; border-top: 1px solid #dee2e6; background: white;">
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="text" id="chat-input" placeholder="Ask about projects..." style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Everyday Sans', sans-serif;">
+                <button onclick="openFeedback()" title="Send Feedback" style="padding: 10px; border: 1px solid #0071ce; border-radius: 4px; background: white; color: #0071ce; cursor: pointer; font-weight: bold; font-size: 16px;">?</button>
+            </div>
+            <button onclick="sendChatMessage()" style="width: 100%; font-family: 'Everyday Sans', sans-serif; font-weight: 600;">Send</button>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.2);">
+            <div style="background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%); color: white; padding: 20px; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0; font-family: 'Everyday Sans', sans-serif;">? Send Feedback</h2>
+                <button onclick="closeFeedback()" style="background: transparent; color: white; border: none; font-size: 24px; cursor: pointer; padding: 0; width: 30px; height: 30px;">×</button>
+            </div>
+            <form id="feedback-form" onsubmit="event.preventDefault(); submitFeedback();" style="padding: 30px;">
+                <div id="feedback-step1">
+                    <p style="margin-bottom: 20px; font-family: 'Everyday Sans', sans-serif;">What area would you like to give feedback on?</p>
+                    <label style="display: block; padding: 12px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; font-family: 'Everyday Sans', sans-serif;">
+                        <input type="radio" name="feedback-category" value="Dashboard UI" style="margin-right: 10px;">
+                        📊 Dashboard UI & Filters
+                    </label>
+                    <label style="display: block; padding: 12px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; font-family: 'Everyday Sans', sans-serif;">
+                        <input type="radio" name="feedback-category" value="Sparky AI" style="margin-right: 10px;">
+                        😊 Sparky AI Assistant
+                    </label>
+                    <label style="display: block; padding: 12px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; font-family: 'Everyday Sans', sans-serif;">
+                        <input type="radio" name="feedback-category" value="Data Quality" style="margin-right: 10px;">
+                        📋 Data Quality & Accuracy
+                    </label>
+                    <label style="display: block; padding: 12px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; font-family: 'Everyday Sans', sans-serif;">
+                        <input type="radio" name="feedback-category" value="Performance" style="margin-right: 10px;">
+                        ⚡ Performance & Speed
+                    </label>
+                    <label style="display: block; padding: 12px; margin-bottom: 20px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; font-family: 'Everyday Sans', sans-serif;">
+                        <input type="radio" name="feedback-category" value="Other" style="margin-right: 10px;">
+                        💡 Other / Feature Request
+                    </label>
+                    <button type="button" onclick="nextFeedbackStep()" style="width: 100%; padding: 12px; background: #0071ce; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Everyday Sans', sans-serif;">Next</button>
+                </div>
+
+                <div id="feedback-step2" style="display: none;">
+                    <p style="margin-bottom: 20px; font-family: 'Everyday Sans', sans-serif;">How would you rate your experience?</p>
+                    <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
+                        <label style="text-align: center; cursor: pointer;">
+                            <input type="radio" name="feedback-rating" value="1" style="display: none;">
+                            <div class="rating-emoji" style="font-size: 32px; padding: 10px; border-radius: 8px; border: 2px solid #ddd;">😞</div>
+                            <div style="font-size: 12px; margin-top: 5px;">Poor</div>
+                        </label>
+                        <label style="text-align: center; cursor: pointer;">
+                            <input type="radio" name="feedback-rating" value="2" style="display: none;">
+                            <div class="rating-emoji" style="font-size: 32px; padding: 10px; border-radius: 8px; border: 2px solid #ddd;">😐</div>
+                            <div style="font-size: 12px; margin-top: 5px;">Fair</div>
+                        </label>
+                        <label style="text-align: center; cursor: pointer;">
+                            <input type="radio" name="feedback-rating" value="3" style="display: none;">
+                            <div class="rating-emoji" style="font-size: 32px; padding: 10px; border-radius: 8px; border: 2px solid #ddd;">🙂</div>
+                            <div style="font-size: 12px; margin-top: 5px;">Good</div>
+                        </label>
+                        <label style="text-align: center; cursor: pointer;">
+                            <input type="radio" name="feedback-rating" value="4" style="display: none;">
+                            <div class="rating-emoji" style="font-size: 32px; padding: 10px; border-radius: 8px; border: 2px solid #ddd;">😄</div>
+                            <div style="font-size: 12px; margin-top: 5px;">Great</div>
+                        </label>
+                        <label style="text-align: center; cursor: pointer;">
+                            <input type="radio" name="feedback-rating" value="5" style="display: none;">
+                            <div class="rating-emoji" style="font-size: 32px; padding: 10px; border-radius: 8px; border: 2px solid #ddd;">🤩</div>
+                            <div style="font-size: 12px; margin-top: 5px;">Excellent</div>
+                        </label>
+                    </div>
+                    <p style="margin-bottom: 10px; font-family: 'Everyday Sans', sans-serif; font-weight: 600;">Tell us more:</p>
+                    <textarea id="feedback-comments" placeholder="Share your thoughts, suggestions, or report issues..." style="width: 100%; height: 120px; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-family: 'Everyday Sans', sans-serif; resize: vertical;" required></textarea>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button type="button" onclick="document.getElementById('feedback-step1').style.display='block'; document.getElementById('feedback-step2').style.display='none';" style="flex: 1; padding: 12px; background: #ddd; color: #333; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Everyday Sans', sans-serif;">Back</button>
+                        <button type="submit" style="flex: 2; padding: 12px; background: #0071ce; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Everyday Sans', sans-serif;">Submit Feedback</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Use the backend API server - dynamic port detection
+        const API_BASE = window.location.origin; // Use same origin as frontend
+        let allProjects = [];
+        let currentView = 'division'; // 'division', 'region', 'market', 'store'
+        let hierarchyLevel = 'division'; // Track current hierarchy level
+        let skipSummaryUpdate = false; // Flag to prevent overwriting backend summary
+        let backendSummary = null; // Store original backend summary
+        let searchDebounceTimer = null; // Timer for debouncing search input
+        const SEARCH_DEBOUNCE_DELAY = 500; // ms to wait after typing before searching
+
+        // Debounced search function - called when user types in search box
+        function debouncedSearch() {
+            // Clear previous timer
+            if (searchDebounceTimer) {
+                clearTimeout(searchDebounceTimer);
+            }
+            // Set new timer
+            searchDebounceTimer = setTimeout(() => {
+                filterProjects();
+            }, SEARCH_DEBOUNCE_DELAY);
+        }
+
+        // Immediate search function - called when user clicks search button or presses Enter
+        function performSearch() {
+            // Clear any pending debounced search
+            if (searchDebounceTimer) {
+                clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = null;
+            }
+            // Execute search immediately
+            filterProjects();
+        }
+
+        // Toggle expanded filters visibility
+        function toggleExpandedFilters() {
+            const expandedFilters = document.getElementById('expanded-filters');
+            const btn = document.getElementById('expand-filters-btn');
+            if (expandedFilters.style.display === 'none') {
+                expandedFilters.style.display = 'block';
+                btn.textContent = '▲';
+            } else {
+                expandedFilters.style.display = 'none';
+                btn.textContent = '▼';
+            }
+        }
+
+        // Toggle entire Projects section visibility
+        function toggleProjectsSection() {
+            const content = document.getElementById('projects-content');
+            const btn = document.getElementById('toggle-projects-btn');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                btn.textContent = '▲';
+            } else {
+                content.style.display = 'none';
+                btn.textContent = '▼';
+            }
+        }
+
+        // Toggle Quick Review - expand to show all projects or collapse to one row
+        function toggleQuickReview() {
+            const previewList = document.getElementById('preview-list');
+            const previewAll = document.getElementById('preview-all');
+            const allList = document.getElementById('preview-all-list');
+            const btn = document.getElementById('toggle-quickreview-btn');
+            
+            if (previewAll.style.display === 'none') {
+                // Expand - show all projects
+                allList.innerHTML = (window.allPreviewTitles || []).map(title => {
+                    const vol = window.previewProjectVolumes[title] || 0;
+                    const projectId = window.previewProjectIds?.[title] || '';
+                    const volText = vol > 0 ? `<span style="color: #666; font-size: 11px;">(${vol} stores)</span>` : '';
+                    const deepLinkIcon = projectId ? `<a href="https://hoops.wal-mart.com/intake-hub/projects/${projectId}" target="_blank" onclick="event.stopPropagation();" title="Open in Intake Hub" style="color: #0071ce; text-decoration: none; padding: 4px; margin-left: 8px; border-radius: 4px; display: inline-flex; align-items: center;" onmouseover="this.style.background='#e3f2fd';" onmouseout="this.style.background='transparent';">🔗</a>` : '';
+                    return `<div style="padding: 12px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; cursor: pointer; transition: all 0.2s;" 
+                         onmouseover="this.style.background='#e3f2fd'; this.style.borderColor='#0071ce';"
+                         onmouseout="this.style.background='#f8f9fa'; this.style.borderColor='#dee2e6';"
+                         onclick="document.getElementById('filter-title').value='${title.replace(/'/g, "\\'")}'; filterProjects();">
+                        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: 500; color: #333; word-break: break-word;">${title} ${volText}</span>${deepLinkIcon}</div>
+                    </div>`;
+                }).join('');
+                previewList.style.display = 'none';
+                previewAll.style.display = 'block';
+                btn.textContent = '▲';
+            } else {
+                // Collapse - show one row only
+                previewList.style.display = 'grid';
+                previewAll.style.display = 'none';
+                btn.textContent = '▼';
+            }
+        }
+
+        // Toggle project list visibility
+        function toggleProjectList() {
+            const content = document.getElementById('project-list-content');
+            const btn = document.getElementById('toggle-project-list-btn');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                btn.textContent = '▲';
+            } else {
+                content.style.display = 'none';
+                btn.textContent = '▼';
+            }
+        }
+
+        // Update hierarchy breadcrumb based on current level
+        function updateHierarchyBreadcrumb() {
+            const breadcrumb = document.getElementById('hierarchy-breadcrumb');
+            if (hierarchyLevel === 'division') {
+                breadcrumb.textContent = 'Division';
+            } else if (hierarchyLevel === 'region') {
+                breadcrumb.textContent = 'Division > Region';
+            } else if (hierarchyLevel === 'market') {
+                breadcrumb.textContent = 'Division > Region > Market';
+            } else if (hierarchyLevel === 'store') {
+                breadcrumb.textContent = 'Division > Region > Market > Store';
+            }
+        }
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'true' : 'false');
+            
+            // Update button icon
+            const btn = document.querySelector('.dark-mode-toggle');
+            btn.textContent = isDarkMode ? '☀️' : '🌙';
+        }
+
+        // Load dark mode preference on page load
+        function initDarkMode() {
+            const darkModePreference = localStorage.getItem('darkMode');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Use localStorage preference if set, otherwise use system preference
+            const shouldBeDark = darkModePreference !== null ? darkModePreference === 'true' : prefersDark;
+            
+            if (shouldBeDark) {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.dark-mode-toggle').textContent = '☀️';
+            } else {
+                document.querySelector('.dark-mode-toggle').textContent = '🌙';
+            }
+        }
+
+        // Update Last Updated timestamp from BigQuery data
+        function updateLastUpdatedTimestamp() {
+            // Use the backend summary's last_updated if available (from BigQuery)
+            if (window.backendSummary && window.backendSummary.last_updated) {
+                try {
+                    const date = new Date(window.backendSummary.last_updated);
+                    if (!isNaN(date.getTime())) {
+                        const formatted = date.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+                        document.getElementById('last-updated').textContent = `Last Updated: ${formatted}`;
+                        console.log('[Timestamp] Using BigQuery last_updated:', formatted);
+                        return;
+                    }
+                } catch (e) {
+                    console.error('[Timestamp] Error parsing BigQuery timestamp:', e);
+                }
+            }
+            
+            // Fallback: Try to get latest from projects data
+            if (window.allProjects && window.allProjects.length > 0) {
+                let latestTimestamp = null;
+                
+                // Try different possible field names for timestamp
+                window.allProjects.forEach(project => {
+                    const projectDate = project.last_updated || 
+                                       project.date_updated || 
+                                       project.updated_at ||
+                                       project.created_at;
+                    
+                    if (projectDate && typeof projectDate === 'string') {
+                        try {
+                            const date = new Date(projectDate);
+                            if (!isNaN(date.getTime())) {
+                                if (!latestTimestamp || date > latestTimestamp) {
+                                    latestTimestamp = date;
+                                }
+                            }
+                        } catch (e) {
+                            // Skip invalid dates
+                        }
+                    }
+                });
+                
+                if (latestTimestamp) {
+                    const formatted = latestTimestamp.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                    document.getElementById('last-updated').textContent = `Last Updated: ${formatted}`;
+                    console.log('[Timestamp] Using project data timestamp:', formatted);
+                    return;
+                }
+            }
+            
+            // Fallback: Show current time as API sync time
+            const now = new Date();
+            const formatted = now.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+            document.getElementById('last-updated').textContent = `Last Updated: ${formatted}`;
+            console.log('[Timestamp] Using current time:', formatted);
+        }
+
+        async function loadData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                console.log('Starting to load data...');
+                
+                // Load summary first for accurate totals
+                console.log('Fetching summary...');
+                const summaryRes = await fetch(`${API_BASE}/api/summary`);
+                const summary = await summaryRes.json();
+                console.log('Summary:', summary);
+                
+                // Store backend summary for reuse
+                backendSummary = summary;
+                
+                // Update summary cards with accurate data from backend
+                document.getElementById('total-projects').textContent = summary.total_active_projects || 0;
+                document.getElementById('total-stores').textContent = summary.total_stores || 0;
+                document.getElementById('intake-projects').textContent = summary.intake_hub_projects || 0;
+                document.getElementById('realty-projects-initiatives').textContent = summary.realty_projects || 0;
+                
+                // Load projects (request high limit to get all unique titles for preview)
+                console.log('Fetching projects...');
+                const projectsRes = await fetch(`${API_BASE}/api/projects?limit=50000`);
+                const projectsData = await projectsRes.json();
+                console.log('Projects response:', projectsData);
+                
+                // Check if projects is an array or nested
+                if (Array.isArray(projectsData)) {
+                    allProjects = projectsData;
+                } else if (projectsData.projects && Array.isArray(projectsData.projects)) {
+                    allProjects = projectsData.projects;
+                } else {
+                    console.error('Unexpected projects format:', projectsData);
+                    allProjects = [];
+                }
+                
+                console.log('Total projects loaded:', allProjects.length);
+                
+                // Debug: Log project_source breakdown
+                const sourceBreakdown = {};
+                allProjects.forEach(p => {
+                    sourceBreakdown[p.project_source] = (sourceBreakdown[p.project_source] || 0) + 1;
+                });
+                console.log('Projects by source:', sourceBreakdown);
+                
+                // Load filter options
+                console.log('Fetching filters...');
+                const filtersRes = await fetch(`${API_BASE}/api/filters`);
+                const filters = await filtersRes.json();
+                console.log('Filters:', filters);
+                console.log('Available project_sources from API:', filters.project_sources);
+                
+                populateFilters(filters);
+                updateNavigationButtons(); // Initialize navigation buttons
+                updateHierarchyBreadcrumb(); // Initialize breadcrumb
+                displayDivisions(allProjects);
+                updateProjectPreview(); // Show preview on initial load
+                updateLastUpdatedTimestamp(); // Update the "Last Updated" timestamp from BQ data
+                
+                document.getElementById('loading').style.display = 'none';
+                console.log('Data loading complete!');
+                
+            } catch (error) {
+                console.error('Error in loadData:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Error loading data: ' + error.message + ' - Check browser console (F12) for details';
+            }
+        }
+
+        function populateFilters(filters) {
+            const sourceSelect = document.getElementById('filter-source');
+            const phaseSelect = document.getElementById('filter-phase');
+            
+            // Populate source filter if available
+            if (filters.project_sources && Array.isArray(filters.project_sources)) {
+                // Clear existing options except "All Sources"
+                while (sourceSelect.options.length > 1) {
+                    sourceSelect.remove(1);
+                }
+                filters.project_sources.forEach(s => {
+                    if (s) {
+                        const opt = document.createElement('option');
+                        opt.value = s;
+                        opt.textContent = s;
+                        sourceSelect.appendChild(opt);
+                    }
+                });
+            }
+            
+            // Populate phase filter with custom order
+            if (filters.phases && Array.isArray(filters.phases)) {
+                const phaseOrder = ['Pending', 'POC/POT', 'Test', 'Mkt Scale', 'Roll/Deploy', 'Complete', 'Realty'];
+                const sortedPhases = phaseOrder.filter(p => filters.phases.includes(p));
+                // Add any phases not in the custom order at the end
+                const otherPhases = filters.phases.filter(p => !phaseOrder.includes(p));
+                const allPhases = [...sortedPhases, ...otherPhases];
+                setupMultiSelect('phase', allPhases, 'Phases');
+            }
+            
+            // Setup multi-select dropdowns
+            if (filters.divisions && Array.isArray(filters.divisions)) {
+                setupMultiSelect('division', filters.divisions, 'Divisions');
+            }
+            
+            if (filters.regions && Array.isArray(filters.regions)) {
+                setupMultiSelect('region', filters.regions, 'Regions');
+            }
+            
+            if (filters.markets && Array.isArray(filters.markets)) {
+                setupMultiSelect('market', filters.markets, 'Markets');
+            }
+            
+            if (filters.stores && Array.isArray(filters.stores)) {
+                setupMultiSelect('store', filters.stores, 'Stores');
+            }
+            
+            if (filters.wm_weeks && Array.isArray(filters.wm_weeks)) {
+                setupMultiSelect('wmweek', filters.wm_weeks, 'WM Weeks');
+            }
+            
+            if (filters.fiscal_years && Array.isArray(filters.fiscal_years)) {
+                setupMultiSelect('fy', filters.fiscal_years, 'FY');
+            }
+            
+            // Setup expanded filter dropdowns (new row 1)
+            if (filters.owners && Array.isArray(filters.owners)) {
+                setupMultiSelect('owner', filters.owners, 'Owners');
+            }
+            
+            // Partners filter - use data from BigQuery
+            if (filters.partners && Array.isArray(filters.partners) && filters.partners.length > 0) {
+                setupMultiSelect('partner', filters.partners, 'Partners');
+            } else {
+                // Fallback if API doesn't return partners
+                const partnerOptions = ['Activity Team', 'Intake & Test', 'Validation', 'Implement', 'Transformation Strategy', 'Strategy & Support', 'Asset Protection'];
+                setupMultiSelect('partner', partnerOptions, 'Partners');
+            }
+            
+            if (filters.business_areas && Array.isArray(filters.business_areas)) {
+                setupMultiSelect('businessorg', filters.business_areas, 'Business Orgs');
+            }
+            
+            if (filters.store_areas && Array.isArray(filters.store_areas)) {
+                setupMultiSelect('storearea', filters.store_areas, 'Store Areas');
+            }
+            
+            if (filters.health_statuses && Array.isArray(filters.health_statuses)) {
+                setupMultiSelect('health', filters.health_statuses, 'Health');
+            }
+            
+            // Setup expanded filter dropdowns (new row 2)
+            if (filters.business_types && Array.isArray(filters.business_types)) {
+                setupMultiSelect('businesstype', filters.business_types, 'Business Types');
+            }
+            
+            if (filters.associate_impacts && Array.isArray(filters.associate_impacts)) {
+                setupMultiSelect('associateimpact', filters.associate_impacts, 'Associate Impacts');
+            }
+            
+            if (filters.customer_impacts && Array.isArray(filters.customer_impacts)) {
+                setupMultiSelect('customerimpact', filters.customer_impacts, 'Customer Impacts');
+            }
+            
+            // Add change listeners
+            const titleInput = document.getElementById('filter-title');
+            sourceSelect.addEventListener('change', filterProjects);
+            // Use debounced search for typing, immediate search for Enter key
+            titleInput.addEventListener('input', debouncedSearch);
+            titleInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch();
+                }
+            });
+            // Note: Phase filter is now a multi-select handled by setupMultiSelect
+        }
+        
+        async function updateProjectPreview(filteredProjects = null) {
+            try {
+                // Use filtered projects if provided, otherwise use all projects
+                const projectsToShow = filteredProjects || allProjects;
+                
+                // Get unique titles and calculate volumes (store counts per project)
+                const titleVolumes = {};
+                const titleToProjectId = {};
+                projectsToShow.forEach(p => {
+                    if (p.title) {
+                        titleVolumes[p.title] = (titleVolumes[p.title] || 0) + 1;
+                        // Store the first project_id found for this title
+                        if (!titleToProjectId[p.title] && p.project_id) {
+                            titleToProjectId[p.title] = p.project_id;
+                        }
+                    }
+                });
+                
+                // Store volumes and project IDs globally for sorting and linking
+                window.previewProjectVolumes = titleVolumes;
+                window.previewProjectIds = titleToProjectId;
+                
+                // Get unique titles and apply current sort option
+                let titles = Object.keys(titleVolumes);
+                const sortOption = document.getElementById('preview-sort')?.value || 'az';
+                switch(sortOption) {
+                    case 'az':
+                        titles.sort((a, b) => a.localeCompare(b));
+                        break;
+                    case 'za':
+                        titles.sort((a, b) => b.localeCompare(a));
+                        break;
+                    case 'high':
+                        titles.sort((a, b) => (titleVolumes[b] || 0) - (titleVolumes[a] || 0));
+                        break;
+                    case 'low':
+                        titles.sort((a, b) => (titleVolumes[a] || 0) - (titleVolumes[b] || 0));
+                        break;
+                    default:
+                        titles.sort((a, b) => a.localeCompare(b));
+                }
+                
+                console.log('[Preview] Updating with', titles.length, 'unique project titles from', filteredProjects ? 'filtered' : 'all', 'projects');
+                
+                if (titles && titles.length > 0) {
+                    // Show preview container
+                    const previewContainer = document.getElementById('preview-container');
+                    if (previewContainer) {
+                        previewContainer.style.display = 'block';
+                        
+                        // Populate top 5 in the main preview
+                        const previewList = document.getElementById('preview-list');
+                        if (previewList) {
+                            previewList.innerHTML = titles.slice(0, 5).map(title => {
+                                const vol = titleVolumes[title] || 0;
+                                const projectId = titleToProjectId[title] || '';
+                                const volText = vol > 0 ? `<span style="color: #666; font-size: 11px;">(${vol} stores)</span>` : '';
+                                const deepLinkIcon = projectId ? `<a href="https://hoops.wal-mart.com/intake-hub/projects/${projectId}" target="_blank" onclick="event.stopPropagation();" title="Open in Intake Hub" style="color: #0071ce; text-decoration: none; padding: 4px; margin-left: 8px; border-radius: 4px; display: inline-flex; align-items: center;" onmouseover="this.style.background='#e3f2fd';" onmouseout="this.style.background='transparent';">🔗</a>` : '';
+                                return `<div style="padding: 12px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; cursor: pointer; transition: all 0.2s;" 
+                                     onmouseover="this.style.background='#e3f2fd'; this.style.borderColor='#0071ce';"
+                                     onmouseout="this.style.background='#f8f9fa'; this.style.borderColor='#dee2e6';"
+                                     onclick="document.getElementById('filter-title').value='${title.replace(/'/g, "\\'")}'; filterProjects();">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: 500; color: #333; word-break: break-word; font-size: 13px;">${title} ${volText}</span>${deepLinkIcon}</div>
+                                </div>`;
+                            }).join('');
+                        }
+                        
+                        // Store all titles for the dropdown
+                        window.allPreviewTitles = titles;
+                        
+                        // Also refresh the expanded list if it's currently visible
+                        const previewAll = document.getElementById('preview-all');
+                        if (previewAll && previewAll.style.display !== 'none') {
+                            const allList = document.getElementById('preview-all-list');
+                            if (allList) {
+                                allList.innerHTML = titles.map(title => {
+                                    const vol = titleVolumes[title] || 0;
+                                    const projectId = titleToProjectId[title] || '';
+                                    const volText = vol > 0 ? `<span style="color: #666; font-size: 11px;">(${vol} stores)</span>` : '';
+                                    const deepLinkIcon = projectId ? `<a href="https://hoops.wal-mart.com/intake-hub/projects/${projectId}" target="_blank" onclick="event.stopPropagation();" title="Open in Intake Hub" style="color: #0071ce; text-decoration: none; padding: 4px; margin-left: 8px; border-radius: 4px; display: inline-flex; align-items: center;" onmouseover="this.style.background='#e3f2fd';" onmouseout="this.style.background='transparent';">🔗</a>` : '';
+                                    return `<div style="padding: 12px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; cursor: pointer; transition: all 0.2s;" 
+                                         onmouseover="this.style.background='#e3f2fd'; this.style.borderColor='#0071ce';"
+                                         onmouseout="this.style.background='#f8f9fa'; this.style.borderColor='#dee2e6';"
+                                         onclick="document.getElementById('filter-title').value='${title.replace(/'/g, "\\'")}'; filterProjects();">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: 500; color: #333; word-break: break-word;">${title} ${volText}</span>${deepLinkIcon}</div>
+                                    </div>`;
+                                }).join('');
+                            }
+                        }
+                        
+                        console.log('[Preview] Successfully populated', titles.length, 'unique projects');
+                    }
+                } else {
+                    const previewContainer = document.getElementById('preview-container');
+                    if (previewContainer) {
+                        previewContainer.style.display = 'none';
+                    }
+                    console.log('[Preview] No projects to display');
+                }
+            } catch (error) {
+                console.error('[Preview] Error updating preview:', error);
+                const previewContainer = document.getElementById('preview-container');
+                if (previewContainer) {
+                    previewContainer.style.display = 'none';
+                }
+            }
+        }
+        
+        // Store project volume data for sorting
+        window.previewProjectVolumes = {};
+        
+        function sortPreviewProjects() {
+            const sortOption = document.getElementById('preview-sort').value;
+            let sortedTitles = [...(window.allPreviewTitles || [])];
+            
+            switch(sortOption) {
+                case 'az':
+                    sortedTitles.sort((a, b) => a.localeCompare(b));
+                    break;
+                case 'za':
+                    sortedTitles.sort((a, b) => b.localeCompare(a));
+                    break;
+                case 'high':
+                    // Sort by volume (number of store assignments) - high to low
+                    sortedTitles.sort((a, b) => {
+                        const volA = window.previewProjectVolumes[a] || 0;
+                        const volB = window.previewProjectVolumes[b] || 0;
+                        return volB - volA;
+                    });
+                    break;
+                case 'low':
+                    // Sort by volume - low to high
+                    sortedTitles.sort((a, b) => {
+                        const volA = window.previewProjectVolumes[a] || 0;
+                        const volB = window.previewProjectVolumes[b] || 0;
+                        return volA - volB;
+                    });
+                    break;
+            }
+            
+            // Update the preview list display
+            const previewList = document.getElementById('preview-list');
+            const allList = document.getElementById('preview-all-list');
+            
+            const createProjectCard = (title) => {
+                const vol = window.previewProjectVolumes[title] || 0;
+                const projectId = window.previewProjectIds?.[title] || '';
+                const volText = vol > 0 ? `<span style="color: #666; font-size: 11px;">(${vol} stores)</span>` : '';
+                const deepLinkIcon = projectId ? `<a href="https://hoops.wal-mart.com/intake-hub/projects/${projectId}" target="_blank" onclick="event.stopPropagation();" title="Open in Intake Hub" style="color: #0071ce; text-decoration: none; padding: 4px; margin-left: 8px; border-radius: 4px; display: inline-flex; align-items: center;" onmouseover="this.style.background='#e3f2fd';" onmouseout="this.style.background='transparent';">🔗</a>` : '';
+                return `<div style="padding: 8px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; cursor: pointer; transition: all 0.2s; min-height: 60px; display: flex; flex-direction: column; justify-content: center;" 
+                     onmouseover="this.style.background='#e3f2fd'; this.style.borderColor='#0071ce';"
+                     onmouseout="this.style.background='#f8f9fa'; this.style.borderColor='#dee2e6';"
+                     onclick="document.getElementById('filter-title').value='${title.replace(/'/g, "\\'")}'; filterProjects();">
+                    <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: 500; color: #333; word-break: break-word; font-size: 12px;">${title} ${volText}</span>${deepLinkIcon}</div>
+                </div>`;
+            };
+            
+            previewList.innerHTML = sortedTitles.slice(0, 5).map(createProjectCard).join('');
+            allList.innerHTML = sortedTitles.map(createProjectCard).join('');
+            
+            // Update stored titles
+            window.allPreviewTitles = sortedTitles;
+        }
+        
+        function togglePreview() {
+            const previewList = document.getElementById('preview-list');
+            const previewAll = document.getElementById('preview-all');
+            const allList = document.getElementById('preview-all-list');
+            
+            if (previewAll.style.display === 'none') {
+                // Show all projects
+                allList.innerHTML = (window.allPreviewTitles || []).map(title => {
+                    const vol = window.previewProjectVolumes[title] || 0;
+                    const projectId = window.previewProjectIds?.[title] || '';
+                    const volText = vol > 0 ? `<span style="color: #666; font-size: 11px;">(${vol} stores)</span>` : '';
+                    const deepLinkIcon = projectId ? `<a href="https://hoops.wal-mart.com/intake-hub/projects/${projectId}" target="_blank" onclick="event.stopPropagation();" title="Open in Intake Hub" style="color: #0071ce; text-decoration: none; padding: 4px; margin-left: 8px; border-radius: 4px; display: inline-flex; align-items: center;" onmouseover="this.style.background='#e3f2fd';" onmouseout="this.style.background='transparent';">🔗</a>` : '';
+                    return `<div style="padding: 12px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; cursor: pointer; transition: all 0.2s;" 
+                         onmouseover="this.style.background='#e3f2fd'; this.style.borderColor='#0071ce';"
+                         onmouseout="this.style.background='#f8f9fa'; this.style.borderColor='#dee2e6';"
+                         onclick="document.getElementById('filter-title').value='${title.replace(/'/g, "\\'")}'; filterProjects();">
+                        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: 500; color: #333; word-break: break-word;">${title} ${volText}</span>${deepLinkIcon}</div>
+                    </div>`;
+                }).join('');
+                previewList.style.display = 'none';
+                previewAll.style.display = 'block';
+                event.target.textContent = 'Hide';
+            } else {
+                previewList.style.display = 'grid';
+                previewAll.style.display = 'none';
+                event.target.textContent = 'Show All';
+            }
+        }
+            
+        const selectedFilters = {
+            division: [],
+            region: [],
+            market: [],
+            store: [],
+            wmweek: [],
+            fy: [],
+            phase: [],
+            owner: [],
+            partner: [],
+            businessorg: [],
+            storearea: [],
+            health: [],
+            businesstype: [],
+            associateimpact: [],
+            customerimpact: []
+        };
+        
+        function setupMultiSelect(name, options, label) {
+            const displayInput = document.getElementById(`${name}-display`);
+            const dropdown = document.getElementById(`${name}-dropdown`);
+            const searchInput = document.getElementById(`${name}-search`);
+            const optionsContainer = document.getElementById(`${name}-options`);
+            
+            // Store all options sorted
+            const allOptions = options.filter(o => o).sort((a, b) => {
+                // For numeric values, sort numerically
+                const aNum = parseInt(a);
+                const bNum = parseInt(b);
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return aNum - bNum;
+                }
+                // For strings, sort alphabetically (case-insensitive)
+                return a.toString().localeCompare(b.toString(), undefined, { numeric: true, sensitivity: 'base' });
+            });
+            
+            // Populate options with checkboxes
+            function renderOptions(filterText = '') {
+                optionsContainer.innerHTML = '';
+                const filtered = filterText ? 
+                    allOptions.filter(o => o.toLowerCase().includes(filterText.toLowerCase())) : 
+                    allOptions;
+                
+                filtered.forEach(option => {
+                    const label = document.createElement('label');
+                    label.style.cssText = 'display: block; padding: 8px; cursor: pointer; user-select: none;';
+                    label.onmouseover = () => label.style.background = '#f0f0f0';
+                    label.onmouseout = () => label.style.background = 'white';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = option;
+                    checkbox.checked = selectedFilters[name].includes(option);
+                    checkbox.style.marginRight = '8px';
+                    
+                    checkbox.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            if (!selectedFilters[name].includes(option)) {
+                                selectedFilters[name].push(option);
+                            }
+                        } else {
+                            selectedFilters[name] = selectedFilters[name].filter(v => v !== option);
+                        }
+                        updateDisplay();
+                        filterProjects();
+                    });
+                    
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(option));
+                    optionsContainer.appendChild(label);
+                });
+            }
+            
+            // Update display text
+            function updateDisplay() {
+                const count = selectedFilters[name].length;
+                if (count === 0) {
+                    displayInput.value = `All ${label}`;
+                } else if (count === 1) {
+                    displayInput.value = selectedFilters[name][0];
+                } else {
+                    displayInput.value = `${count} ${label}`;
+                }
+            }
+            
+            // Show dropdown when display is clicked
+            displayInput.addEventListener('click', () => {
+                // Close other dropdowns
+                document.querySelectorAll('.dropdown-content').forEach(d => {
+                    if (d.id !== `${name}-dropdown`) {
+                        d.style.display = 'none';
+                    }
+                });
+                
+                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+                if (dropdown.style.display === 'block') {
+                    searchInput.focus();
+                    renderOptions();
+                }
+            });
+            
+            // Filter options as user types
+            searchInput.addEventListener('input', (e) => {
+                renderOptions(e.target.value);
+            });
+            
+            // Prevent dropdown from closing when clicking inside
+            dropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Initial render
+            renderOptions();
+            updateDisplay();
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.multi-select-wrapper')) {
+                document.querySelectorAll('.dropdown-content').forEach(d => {
+                    d.style.display = 'none';
+                });
+            }
+        });
+        
+        function resetFilters() {
+            // Clear title and source
+            document.getElementById('filter-title').value = '';
+            document.getElementById('filter-source').value = '';
+            
+            // Clear all multi-select filters
+            selectedFilters.division = [];
+            selectedFilters.region = [];
+            selectedFilters.market = [];
+            selectedFilters.store = [];
+            selectedFilters.wmweek = [];
+            selectedFilters.fy = [];
+            selectedFilters.phase = [];
+            selectedFilters.owner = [];
+            selectedFilters.partner = [];
+            selectedFilters.businessorg = [];
+            selectedFilters.storearea = [];
+            selectedFilters.health = [];
+            selectedFilters.businesstype = [];
+            selectedFilters.associateimpact = [];
+            selectedFilters.customerimpact = [];
+            
+            // Update displays
+            document.getElementById('division-display').value = 'All Divisions';
+            document.getElementById('region-display').value = 'All Regions';
+            document.getElementById('market-display').value = 'All Markets';
+            document.getElementById('store-display').value = 'All Stores';
+            document.getElementById('wmweek-display').value = 'All WM Weeks';
+            document.getElementById('fy-display').value = 'All FY';
+            document.getElementById('phase-display').value = 'All Phases';
+            document.getElementById('owner-display').value = 'All Owners';
+            document.getElementById('partner-display').value = 'All Partners';
+            document.getElementById('businessorg-display').value = 'All Business Orgs';
+            document.getElementById('storearea-display').value = 'All Store Areas';
+            document.getElementById('health-display').value = 'All Health';
+            document.getElementById('businesstype-display').value = 'All Business Types';
+            document.getElementById('associateimpact-display').value = 'All Associate Impacts';
+            document.getElementById('customerimpact-display').value = 'All Customer Impacts';
+            
+            // Uncheck all checkboxes
+            document.querySelectorAll('.dropdown-content input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            
+            // Restore original backend summary
+            if (backendSummary) {
+                document.getElementById('total-projects').textContent = backendSummary.total_active_projects || 0;
+                document.getElementById('total-stores').textContent = backendSummary.total_stores || 0;
+                document.getElementById('intake-projects').textContent = backendSummary.intake_hub_projects || 0;
+                document.getElementById('realty-projects-initiatives').textContent = backendSummary.realty_projects || 0;
+            }
+            
+            // Display all projects without recalculating summary
+            displayDivisions(allProjects);
+        }
+
+        async function filterProjects() {
+            // Show loading indicator
+            document.getElementById('filter-loading-indicator').style.display = 'block';
+            
+            const title = document.getElementById('filter-title').value.toLowerCase();
+            const source = document.getElementById('filter-source').value;
+            
+            // Build query parameters for backend filtering (use first selected value for each filter to reduce dataset)
+            const params = new URLSearchParams();
+            
+            // Add single-value filters
+            if (title) params.append('title', title);
+            if (source) params.append('project_source', source);
+            
+            // Add multi-select filters (take first selected value for backend to reduce dataset)
+            if (selectedFilters.division.length > 0) params.append('division', selectedFilters.division[0]);
+            if (selectedFilters.region.length > 0) params.append('region', selectedFilters.region[0]);
+            if (selectedFilters.market.length > 0) params.append('market', selectedFilters.market[0]);
+            if (selectedFilters.store.length > 0) params.append('store', selectedFilters.store[0]);
+            if (selectedFilters.phase.length > 0) params.append('phase', selectedFilters.phase[0]);
+            if (selectedFilters.wmweek.length > 0) params.append('wm_week', selectedFilters.wmweek[0]);
+            if (selectedFilters.fy.length > 0) params.append('fy', selectedFilters.fy[0]);
+            if (selectedFilters.owner.length > 0) params.append('owner', selectedFilters.owner[0]);
+            if (selectedFilters.partner.length > 0) params.append('partner', selectedFilters.partner[0]);
+            if (selectedFilters.businessorg.length > 0) params.append('business_area', selectedFilters.businessorg[0]);
+            if (selectedFilters.storearea.length > 0) params.append('store_area', selectedFilters.storearea[0]);
+            
+            // Add extended filters (take first selected value for backend)
+            if (selectedFilters.businesstype.length > 0) params.append('business_type', selectedFilters.businesstype[0]);
+            if (selectedFilters.health.length > 0) params.append('health', selectedFilters.health[0]);
+            if (selectedFilters.associateimpact.length > 0) params.append('associate_impact', selectedFilters.associateimpact[0]);
+            if (selectedFilters.customerimpact.length > 0) params.append('customer_impact', selectedFilters.customerimpact[0]);
+            
+            // Check if any filters are applied
+            const hasFilters = title || source || 
+                selectedFilters.division.length > 0 || 
+                selectedFilters.region.length > 0 || 
+                selectedFilters.market.length > 0 || 
+                selectedFilters.store.length > 0 ||
+                selectedFilters.wmweek.length > 0 ||
+                selectedFilters.fy.length > 0 ||
+                selectedFilters.phase.length > 0 ||
+                selectedFilters.owner.length > 0 ||
+                selectedFilters.partner.length > 0 ||
+                selectedFilters.businessorg.length > 0 ||
+                selectedFilters.storearea.length > 0 ||
+                selectedFilters.health.length > 0 ||
+                selectedFilters.businesstype.length > 0 ||
+                selectedFilters.associateimpact.length > 0 ||
+                selectedFilters.customerimpact.length > 0;
+            
+            let filtered;
+            
+            if (hasFilters) {
+                // Call backend API with filters for server-side filtering, then apply client-side filtering
+                try {
+                    params.append('limit', '50000'); // Higher limit for filtered results (captures all unique projects)
+                    const response = await fetch(`${API_BASE}/api/projects?${params.toString()}`);
+                    const backendFiltered = await response.json();
+                    console.log(`Backend filtered: ${backendFiltered.length} projects`);
+                    
+                    // Now apply ALL filters client-side (for multi-select and extended filters)
+                    filtered = backendFiltered.filter(p => {
+                        // Title search (already done by backend, but reapply for safety)
+                        if (title && !p.title.toLowerCase().includes(title)) return false;
+                        
+                        // Source filter (already done by backend)
+                        if (source && p.project_source !== source) return false;
+                        
+                        // Multi-select filters - check ALL selected values
+                        if (selectedFilters.phase.length > 0 && !selectedFilters.phase.includes(p.phase)) return false;
+                        if (selectedFilters.division.length > 0 && !selectedFilters.division.includes(p.division)) return false;
+                        if (selectedFilters.region.length > 0 && !selectedFilters.region.includes(p.region)) return false;
+                        if (selectedFilters.market.length > 0 && !selectedFilters.market.includes(p.market)) return false;
+                        if (selectedFilters.store.length > 0 && !selectedFilters.store.includes(p.store)) return false;
+                        if (selectedFilters.wmweek.length > 0 && !selectedFilters.wmweek.includes(p.wm_week)) return false;
+                        if (selectedFilters.fy.length > 0 && !selectedFilters.fy.includes(p.fy)) return false;
+                        if (selectedFilters.owner.length > 0 && !selectedFilters.owner.includes(p.owner)) return false;
+                        if (selectedFilters.partner.length > 0 && !selectedFilters.partner.includes(p.partner)) return false;
+                        if (selectedFilters.businessorg.length > 0 && !selectedFilters.businessorg.includes(p.business_area)) return false;
+                        if (selectedFilters.storearea.length > 0 && !selectedFilters.storearea.includes(p.store_area)) return false;
+                        
+                        // Extended filters (health, businesstype, etc) - client-side only
+                        if (selectedFilters.health.length > 0 && !selectedFilters.health.includes(p.health)) return false;
+                        if (selectedFilters.businesstype.length > 0 && !selectedFilters.businesstype.includes(p.business_type)) return false;
+                        if (selectedFilters.associateimpact.length > 0 && !selectedFilters.associateimpact.includes(p.associate_impact)) return false;
+                        if (selectedFilters.customerimpact.length > 0 && !selectedFilters.customerimpact.includes(p.customer_impact)) return false;
+                        
+                        return true;
+                    });
+                    
+                    console.log(`After client-side filtering: ${filtered.length} projects`);
+                    
+                } catch (error) {
+                    console.error('Error fetching filtered projects:', error);
+                    // Fallback to client-side filtering
+                    filtered = allProjects.filter(p => {
+                        if (title && !p.title.toLowerCase().includes(title)) return false;
+                        if (source && p.project_source !== source) return false;
+                        if (selectedFilters.phase.length > 0 && !selectedFilters.phase.includes(p.phase)) return false;
+                        if (selectedFilters.division.length > 0 && !selectedFilters.division.includes(p.division)) return false;
+                        if (selectedFilters.region.length > 0 && !selectedFilters.region.includes(p.region)) return false;
+                        if (selectedFilters.market.length > 0 && !selectedFilters.market.includes(p.market)) return false;
+                        if (selectedFilters.store.length > 0 && !selectedFilters.store.includes(p.store)) return false;
+                        if (selectedFilters.wmweek.length > 0 && !selectedFilters.wmweek.includes(p.wm_week)) return false;
+                        if (selectedFilters.fy.length > 0 && !selectedFilters.fy.includes(p.fy)) return false;
+                        if (selectedFilters.owner.length > 0 && !selectedFilters.owner.includes(p.owner)) return false;
+                        if (selectedFilters.partner.length > 0 && !selectedFilters.partner.includes(p.partner)) return false;
+                        if (selectedFilters.businessorg.length > 0 && !selectedFilters.businessorg.includes(p.business_area)) return false;
+                        if (selectedFilters.storearea.length > 0 && !selectedFilters.storearea.includes(p.store_area)) return false;
+                        if (selectedFilters.health.length > 0 && !selectedFilters.health.includes(p.health)) return false;
+                        if (selectedFilters.businesstype.length > 0 && !selectedFilters.businesstype.includes(p.business_type)) return false;
+                        if (selectedFilters.associateimpact.length > 0 && !selectedFilters.associateimpact.includes(p.associate_impact)) return false;
+                        if (selectedFilters.customerimpact.length > 0 && !selectedFilters.customerimpact.includes(p.customer_impact)) return false;
+                        return true;
+                    });
+                }
+            } else {
+                // No filters - use cached allProjects
+                filtered = allProjects;
+            }
+            
+            // Debug: Log source filter values
+            if (source) {
+                const sourceCounts = {};
+                filtered.forEach(p => {
+                    sourceCounts[p.project_source] = (sourceCounts[p.project_source] || 0) + 1;
+                });
+                console.log('Source filter selected:', source);
+                console.log('Projects after filter:', filtered.length);
+            }
+            
+            // Sort by Title, then WM Week
+            filtered.sort((a, b) => {
+                const titleCompare = (a.title || '').localeCompare(b.title || '');
+                if (titleCompare !== 0) return titleCompare;
+                return (a.wm_week || '').localeCompare(b.wm_week || '');
+            });
+            
+            // Only recalculate summary if filters are applied, otherwise use backend summary
+            if (hasFilters) {
+                updateSummaryStats(filtered);
+            } else if (backendSummary) {
+                // Use stored backend summary when no filters applied
+                document.getElementById('total-projects').textContent = backendSummary.total_active_projects || 0;
+                document.getElementById('total-stores').textContent = backendSummary.total_stores || 0;
+                document.getElementById('intake-projects').textContent = backendSummary.intake_hub_projects || 0;
+                document.getElementById('realty-projects-initiatives').textContent = backendSummary.realty_projects || 0;
+            }
+            
+            // Display based on current hierarchy level
+            if (hierarchyLevel === 'division') {
+                displayDivisions(filtered);
+            } else if (hierarchyLevel === 'region') {
+                displayRegions(filtered);
+            } else if (hierarchyLevel === 'market') {
+                displayMarkets(filtered);
+            } else if (hierarchyLevel === 'store') {
+                displayStores(filtered);
+            }
+            
+            // Update the project preview list with filtered data
+            updateProjectPreview(filtered);
+            
+            // Hide loading indicator
+            document.getElementById('filter-loading-indicator').style.display = 'none';
+        }
+
+        function updateSummaryStats(projects) {
+            // Count distinct projects by TITLE (each title = one initiative/project)
+            const uniqueTitles = new Set(projects.map(p => p.title).filter(t => t));
+            const totalProjects = uniqueTitles.size;
+            
+            // Count unique stores (excluding null/undefined)
+            const uniqueStores = new Set(projects.map(p => p.store).filter(s => s && s.trim() !== ''));
+            const totalStores = uniqueStores.size;
+            
+            // Count distinct operations and realty projects by title
+            const operationsTitles = new Set(projects.filter(p => p.project_source === 'Operations').map(p => p.title).filter(t => t));
+            const realtyTitles = new Set(projects.filter(p => p.project_source === 'Realty').map(p => p.title).filter(t => t));
+            
+            const intakeProjects = operationsTitles.size;
+            const realtyProjects = realtyTitles.size;
+            const realtyInitiatives = realtyTitles.size; // Each title = one initiative
+            
+            console.log('[Stats] Input rows:', projects.length, '| Unique Titles (Projects):', totalProjects, '| Realty Titles:', realtyProjects, '| Unique Stores:', totalStores);
+            console.log('[Stats] Unique Titles sample:', Array.from(uniqueTitles).slice(0, 5));
+            
+            document.getElementById('total-projects').textContent = totalProjects;
+            document.getElementById('total-stores').textContent = totalStores;
+            document.getElementById('intake-projects').textContent = intakeProjects;
+            document.getElementById('realty-projects-initiatives').textContent = `${realtyProjects} / ${realtyInitiatives}`;
+        }
+
+        function displayProjects(projects) {
+            const container = document.getElementById('table-container');
+            
+            if (projects.length === 0) {
+                container.innerHTML = '<p>No projects found matching filters.</p>';
+                return;
+            }
+            
+            const html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Project ID</th>
+                            <th>Title</th>
+                            <th>Source</th>
+                            <th>Division</th>
+                            <th>Region</th>
+                            <th>Market</th>
+                            <th>Phase</th>
+                            <th>WM Week</th>
+                            <th>Store Count</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${projects.slice(0, 100).map(p => `
+                            <tr>
+                                <td>${p.project_id}</td>
+                                <td><a href="https://hoops.wal-mart.com/intake-hub/projects/${p.project_id}" target="_blank" style="color: #0071ce; text-decoration: none; font-weight: 500;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">${p.title}</a></td>
+                                <td>${p.project_source}</td>
+                                <td>${p.division || '-'}</td>
+                                <td>${p.region || '-'}</td>
+                                <td>${p.market || '-'}</td>
+                                <td>${p.phase || '-'}</td>
+                                <td>${p.wm_week || '-'}</td>
+                                <td style="text-align: center;">${p.store_count || 1}</td>
+                                <td>${p.status}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; color: #666;">Showing ${Math.min(100, projects.length)} of ${projects.length} projects</p>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function displayDivisions(projects) {
+            const container = document.getElementById('table-container');
+            const divisions = {};
+            projects.forEach(p => {
+                const div = p.division || 'Unknown';
+                if (!divisions[div]) {
+                    divisions[div] = { projects: [], storeCount: 0, projectIds: new Set() };
+                }
+                divisions[div].projects.push(p);
+                divisions[div].storeCount++; // Each row is one store
+                divisions[div].projectIds.add(p.project_id); // Track unique projects
+            });
+            
+            let html = '<div class="hierarchical-view">';
+            Object.keys(divisions).sort().forEach(div => {
+                const data = divisions[div];
+                
+                // Group by region within this division
+                const regions = {};
+                data.projects.forEach(p => {
+                    const reg = p.region || 'Unknown';
+                    if (!regions[reg]) {
+                        regions[reg] = { count: 0, projectIds: new Set() };
+                    }
+                    regions[reg].count++;
+                    regions[reg].projectIds.add(p.project_id);
+                });
+                
+                html += `
+                    <div class="division-group" style="margin-bottom: 15px; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden;">
+                        <div onclick="toggleGroup('div-${div}')" style="background: #f8f9fa; padding: 15px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between;">
+                            <span>📁 ${div}</span>
+                            <span>${data.projectIds.size} projects • ${data.storeCount} stores</span>
+                        </div>
+                        <div id="div-${div}" style="display: none; padding: 15px; background: #fafbfc;">
+                            <table style="width: 100%; font-size: 14px;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid #dee2e6;">
+                                        <th style="text-align: left; padding: 8px;">Region</th>
+                                        <th style="text-align: right; padding: 8px;">Projects</th>
+                                        <th style="text-align: right; padding: 8px;">Stores</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${Object.keys(regions).sort().map(reg => `
+                                        <tr style="border-bottom: 1px solid #eee;">
+                                            <td style="padding: 8px;">${reg}</td>
+                                            <td style="text-align: right; padding: 8px;">${regions[reg].projectIds.size}</td>
+                                            <td style="text-align: right; padding: 8px;">${regions[reg].count}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function displayRegions(projects) {
+            const container = document.getElementById('table-container');
+            const regions = {};
+            projects.forEach(p => {
+                const key = `${p.division || 'Unknown'} > ${p.region || 'Unknown'}`;
+                if (!regions[key]) {
+                    regions[key] = { projects: [], storeCount: 0, projectIds: new Set() };
+                }
+                regions[key].projects.push(p);
+                regions[key].storeCount++; // Each row is one store
+                regions[key].projectIds.add(p.project_id);
+            });
+            
+            let html = '<div class="hierarchical-view">';
+            Object.keys(regions).sort().forEach(reg => {
+                const data = regions[reg];
+                
+                // Group by market within this region
+                const markets = {};
+                data.projects.forEach(p => {
+                    const mkt = p.market || 'Unknown';
+                    if (!markets[mkt]) {
+                        markets[mkt] = { count: 0, projectIds: new Set() };
+                    }
+                    markets[mkt].count++;
+                    markets[mkt].projectIds.add(p.project_id);
+                });
+                
+                html += `
+                    <div class="region-group" style="margin-bottom: 15px; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden;">
+                        <div onclick="toggleGroup('reg-${reg}')" style="background: #f1f3f5; padding: 15px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between;">
+                            <span>📂 ${reg}</span>
+                            <span>${data.projectIds.size} projects • ${data.storeCount} stores</span>
+                        </div>
+                        <div id="reg-${reg}" style="display: none; padding: 15px; background: #fafbfc;">
+                            <table style="width: 100%; font-size: 14px;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid #dee2e6;">
+                                        <th style="text-align: left; padding: 8px;">Market</th>
+                                        <th style="text-align: right; padding: 8px;">Projects</th>
+                                        <th style="text-align: right; padding: 8px;">Stores</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${Object.keys(markets).sort().map(mkt => `
+                                        <tr style="border-bottom: 1px solid #eee;">
+                                            <td style="padding: 8px;">${mkt}</td>
+                                            <td style="text-align: right; padding: 8px;">${markets[mkt].projectIds.size}</td>
+                                            <td style="text-align: right; padding: 8px;">${markets[mkt].count}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function displayMarkets(projects) {
+            const container = document.getElementById('table-container');
+            const markets = {};
+            projects.forEach(p => {
+                const key = `${p.division || 'Unknown'} > ${p.region || 'Unknown'} > ${p.market || 'Unknown'}`;
+                if (!markets[key]) {
+                    markets[key] = { projects: [], storeCount: 0, projectIds: new Set() };
+                }
+                markets[key].projects.push(p);
+                markets[key].storeCount++; // Each row is one store
+                markets[key].projectIds.add(p.project_id);
+            });
+            
+            let html = '<div class="hierarchical-view">';
+            Object.keys(markets).sort().forEach(mkt => {
+                const data = markets[mkt];
+                
+                // Group by store within this market
+                const stores = {};
+                data.projects.forEach(p => {
+                    const store = p.store || 'Unknown';
+                    if (!stores[store]) {
+                        stores[store] = { count: 0, projectIds: new Set(), titles: new Set() };
+                    }
+                    stores[store].count++;
+                    stores[store].projectIds.add(p.project_id);
+                    stores[store].titles.add(p.title);
+                });
+                
+                html += `
+                    <div class="market-group" style="margin-bottom: 15px; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden;">
+                        <div onclick="toggleGroup('mkt-${mkt}')" style="background: #e9ecef; padding: 15px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between;">
+                            <span>📋 ${mkt}</span>
+                            <span>${data.projectIds.size} projects • ${data.storeCount} stores</span>
+                        </div>
+                        <div id="mkt-${mkt}" style="display: none; padding: 15px; background: #fafbfc;">
+                            <table style="width: 100%; font-size: 14px;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid #dee2e6;">
+                                        <th style="text-align: left; padding: 8px;">Store</th>
+                                        <th style="text-align: left; padding: 8px;">Projects</th>
+                                        <th style="text-align: right; padding: 8px;">Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${Object.keys(stores).sort().map(store => `
+                                        <tr style="border-bottom: 1px solid #eee;">
+                                            <td style="padding: 8px;">${store}</td>
+                                            <td style="padding: 8px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${Array.from(stores[store].titles).join(', ')}">${stores[store].projectIds.size} project(s)</td>
+                                            <td style="text-align: right; padding: 8px;">${stores[store].count}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function displayStores(projects) {
+            const container = document.getElementById('table-container');
+            
+            // Sort projects by title, then by store
+            const sortedProjects = [...projects].sort((a, b) => {
+                const titleCompare = a.title.localeCompare(b.title);
+                if (titleCompare !== 0) return titleCompare;
+                return (a.store || 0) - (b.store || 0);
+            });
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Project ID</th>
+                            <th>Title</th>
+                            <th>Source</th>
+                            <th>Division</th>
+                            <th>Region</th>
+                            <th>Market</th>
+                            <th>Store/Facility</th>
+                            <th>Phase</th>
+                            <th>WM Week</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sortedProjects.slice(0, 200).map(p => `
+                            <tr>
+                                <td>${p.project_id}</td>
+                                <td><a href="https://hoops.wal-mart.com/intake-hub/projects/${p.project_id}" target="_blank" style="color: #0071ce; text-decoration: none; font-weight: 500;" onmouseover="this.style.textDecoration='underline';" onmouseout="this.style.textDecoration='none';">${p.title}</a></td>
+                                <td>${p.project_source}</td>
+                                <td>${p.division || '-'}</td>
+                                <td>${p.region || '-'}</td>
+                                <td>${p.market || '-'}</td>
+                                <td>${p.store || '-'}</td>
+                                <td>${p.phase || '-'}</td>
+                                <td>${p.wm_week || '-'}</td>
+                                <td>${p.status}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; color: #666;">Showing ${Math.min(200, sortedProjects.length)} of ${sortedProjects.length} rows</p>
+            `;
+            container.innerHTML = html;
+        }
+
+        function toggleGroup(groupId) {
+            const element = document.getElementById(groupId);
+            if (element) {
+                element.style.display = element.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        function updateNavigationButtons() {
+            const navContainer = document.getElementById('nav-buttons');
+            let buttons = '';
+            
+            if (hierarchyLevel === 'division') {
+                buttons = '<button onclick="setHierarchyLevel(\'region\')" style="margin-right: 10px;">🔍 Show Regions</button>';
+            } else if (hierarchyLevel === 'region') {
+                buttons = `
+                    <button onclick="setHierarchyLevel('market')" style="margin-right: 10px;">🔍 Show Markets</button>
+                    <button onclick="setHierarchyLevel('division')" style="margin-right: 10px;">⬅️ Back to Division</button>
+                `;
+            } else if (hierarchyLevel === 'market') {
+                buttons = `
+                    <button onclick="setHierarchyLevel('store')" style="margin-right: 10px;">🔍 Show Stores</button>
+                    <button onclick="setHierarchyLevel('region')" style="margin-right: 10px;">⬅️ Back to Regions</button>
+                    <button onclick="setHierarchyLevel('division')" style="margin-right: 10px;">⬅️ Back to Division</button>
+                `;
+            } else if (hierarchyLevel === 'store') {
+                buttons = `
+                    <button onclick="setHierarchyLevel('market')" style="margin-right: 10px;">⬅️ Back to Markets</button>
+                    <button onclick="setHierarchyLevel('region')" style="margin-right: 10px;">⬅️ Back to Regions</button>
+                    <button onclick="setHierarchyLevel('division')" style="margin-right: 10px;">⬅️ Back to Division</button>
+                `;
+            }
+            
+            navContainer.innerHTML = buttons;
+        }
+        
+        function setHierarchyLevel(level) {
+            hierarchyLevel = level;
+            updateNavigationButtons();
+            updateHierarchyBreadcrumb();
+            filterProjects();
+        }
+
+        function exportToCSV() {
+            const source = document.getElementById('filter-source').value;
+            
+            const filtered = allProjects.filter(p => {
+                if (source && p.project_source !== source) return false;
+                if (selectedFilters.division.length > 0 && !selectedFilters.division.includes(p.division)) return false;
+                if (selectedFilters.region.length > 0 && !selectedFilters.region.includes(p.region)) return false;
+                if (selectedFilters.market.length > 0 && !selectedFilters.market.includes(p.market)) return false;
+                if (selectedFilters.store.length > 0 && !selectedFilters.store.includes(p.store)) return false;
+                return true;
+            });
+            
+            let csv = 'Project ID,Title,Source,Division,Region,Market,Store Number,Phase,WM Week,Store Count,Status,Last Updated\n';
+            filtered.forEach(p => {
+                csv += `"${p.project_id}","${p.title}","${p.project_source}","${p.division || ''}","${p.region || ''}","${p.market || ''}","${p.store || ''}","${p.phase || ''}","${p.wm_week || ''}","${p.store_count || 1}","${p.status}","${p.last_updated || ''}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `projects_export_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        let chatMinimized = false;
+        
+        function toggleChat() {
+            const chatBox = document.getElementById('chat-box');
+            const minimizeBtn = document.getElementById('minimize-btn');
+            if (chatBox.style.display === 'none' || chatBox.style.display === '') {
+                chatBox.style.display = 'flex';
+                if (chatMinimized) {
+                    // Restore from minimized state
+                    chatBox.style.height = '500px';
+                    document.getElementById('chat-messages').style.display = 'block';
+                    document.querySelector('#chat-box > div:last-child').style.display = 'block';
+                    minimizeBtn.textContent = '−';
+                    chatMinimized = false;
+                }
+            } else {
+                chatBox.style.display = 'none';
+                minimizeBtn.textContent = '−';
+                chatMinimized = false;
+            }
+        }
+        
+        function minimizeChat() {
+            const chatBox = document.getElementById('chat-box');
+            const messagesDiv = document.getElementById('chat-messages');
+            const inputDiv = document.querySelector('#chat-box > div:last-child');
+            const minimizeBtn = document.getElementById('minimize-btn');
+            
+            if (!chatMinimized) {
+                // Minimize: hide messages and input, show only header
+                messagesDiv.style.display = 'none';
+                inputDiv.style.display = 'none';
+                chatBox.style.height = 'auto';
+                minimizeBtn.textContent = '+';
+                chatMinimized = true;
+            } else {
+                // Maximize: show everything
+                messagesDiv.style.display = 'block';
+                inputDiv.style.display = 'block';
+                chatBox.style.height = '500px';
+                minimizeBtn.textContent = '−';
+                chatMinimized = false;
+            }
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const messagesDiv = document.getElementById('chat-messages');
+            messagesDiv.innerHTML += `<div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 8px;"><strong>You:</strong> ${message}</div>`;
+            input.value = '';
+            
+            try {
+                // Prepare project list for AI context - include owner for owner searches
+                const projectList = allProjects.map(p => ({
+                    project_id: p.project_id,
+                    title: p.title,
+                    project_source: p.project_source,
+                    division: p.division,
+                    phase: p.phase,
+                    wm_week: p.wm_week,
+                    region: p.region,
+                    market: p.market,
+                    Owner: p.owner || '',  // Include Owner field for AI searches
+                    owner: p.owner || ''   // Include both formats for compatibility
+                }));
+                
+                const response = await fetch(`${API_BASE}/api/ai/query`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: message,
+                        context: {
+                            total_projects: allProjects.length,
+                            all_projects: projectList,
+                            filters: {
+                                source: document.getElementById('filter-source').value,
+                                division: selectedFilters.division,
+                                region: selectedFilters.region,
+                                market: selectedFilters.market,
+                                store: selectedFilters.store
+                            }
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                messagesDiv.innerHTML += `<div style="margin-bottom: 10px; padding: 10px; background: #e3f2fd; border-radius: 8px;"><strong>😊 Sparky:</strong> ${data.answer}</div>`;
+                
+                // Helper function to update multi-select filter
+                const updateMultiSelectFilter = (filterKey, value, dropdownId) => {
+                    selectedFilters[filterKey] = [];
+                    const checkboxes = document.querySelectorAll(`#${dropdownId} input[type="checkbox"]`);
+                    checkboxes.forEach(cb => cb.checked = false);
+                    const targetCheckbox = Array.from(checkboxes).find(cb => cb.value === value);
+                    if (targetCheckbox) {
+                        targetCheckbox.checked = true;
+                        selectedFilters[filterKey].push(value);
+                    }
+                    const display = document.getElementById(`${filterKey}-display`);
+                    display.value = value;
+                };
+                
+                // Check if any dropdown filters are being applied (not just search)
+                const hasDropdownFilter = data.data && (
+                    data.data.division_filter || 
+                    data.data.region_filter || 
+                    data.data.market_filter || 
+                    data.data.phase_filter || 
+                    data.data.source_filter ||
+                    data.data.wm_week_filter
+                );
+                
+                // If applying dropdown filters and NO new search term, clear the search box first
+                // This prevents old search terms from conflicting with new dropdown filters
+                if (hasDropdownFilter && !(data.data && data.data.suggested_filter)) {
+                    document.getElementById('filter-title').value = '';
+                }
+                
+                // Apply suggested project search filter
+                if (data.data && data.data.suggested_filter) {
+                    document.getElementById('filter-title').value = data.data.suggested_filter;
+                }
+                
+                // Apply phase filter if suggested
+                if (data.data && data.data.phase_filter) {
+                    updateMultiSelectFilter('phase', data.data.phase_filter, 'phase-dropdown');
+                }
+                
+                // Apply region filter if suggested
+                if (data.data && data.data.region_filter) {
+                    updateMultiSelectFilter('region', data.data.region_filter, 'region-dropdown');
+                }
+                
+                // Apply market filter if suggested
+                if (data.data && data.data.market_filter) {
+                    updateMultiSelectFilter('market', data.data.market_filter, 'market-dropdown');
+                }
+                
+                // Apply WM Week filter if suggested
+                if (data.data && data.data.wm_week_filter) {
+                    updateMultiSelectFilter('wmweek', data.data.wm_week_filter, 'wmweek-dropdown');
+                }
+                
+                // Apply division filter if suggested
+                if (data.data && data.data.division_filter) {
+                    updateMultiSelectFilter('division', data.data.division_filter, 'division-dropdown');
+                }
+                
+                // Apply source filter if suggested (Realty, Operations, etc.)
+                if (data.data && data.data.source_filter) {
+                    document.getElementById('filter-source').value = data.data.source_filter;
+                }
+                
+                // Re-filter projects with all applied filters
+                filterProjects();
+                
+                // Show confirmation of applied filters
+                const appliedFilters = [];
+                if (data.data && data.data.suggested_filter) appliedFilters.push(`Search: ${data.data.suggested_filter}`);
+                if (data.data && data.data.region_filter) appliedFilters.push(`Region: ${data.data.region_filter}`);
+                if (data.data && data.data.market_filter) appliedFilters.push(`Market: ${data.data.market_filter}`);
+                if (data.data && data.data.phase_filter) appliedFilters.push(`Phase: ${data.data.phase_filter}`);
+                if (data.data && data.data.source_filter) appliedFilters.push(`Source: ${data.data.source_filter}`);
+                if (data.data && data.data.wm_week_filter) appliedFilters.push(`Week: ${data.data.wm_week_filter}`);
+                if (data.data && data.data.division_filter) appliedFilters.push(`Division: ${data.data.division_filter}`);
+                
+                if (appliedFilters.length > 0) {
+                    messagesDiv.innerHTML += `<div style="margin-bottom: 10px; padding: 10px; background: #c8e6c9; border-radius: 8px;"><strong>✓ Filters Applied:</strong><br/>${appliedFilters.join('<br/>')}</div>`;
+                }
+                
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            } catch (error) {
+                messagesDiv.innerHTML += `<div style="margin-bottom: 10px; padding: 10px; background: #ffebee; border-radius: 8px;"><strong>Error:</strong> ${error.message}</div>`;
+            }
+        }
+
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendChatMessage();
+        });
+
+        // Feedback functionality
+        function openFeedback() {
+            document.getElementById('feedback-modal').style.display = 'flex';
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedback-modal').style.display = 'none';
+            document.getElementById('feedback-form').reset();
+            document.getElementById('feedback-step1').style.display = 'block';
+            document.getElementById('feedback-step2').style.display = 'none';
+        }
+
+        function nextFeedbackStep() {
+            const category = document.querySelector('input[name="feedback-category"]:checked');
+            if (!category) {
+                alert('Please select a category');
+                return;
+            }
+            document.getElementById('feedback-step1').style.display = 'none';
+            document.getElementById('feedback-step2').style.display = 'block';
+        }
+
+        async function submitFeedback() {
+            const category = document.querySelector('input[name="feedback-category"]:checked')?.value;
+            const rating = document.querySelector('input[name="feedback-rating"]:checked')?.value;
+            const comments = document.getElementById('feedback-comments').value;
+            
+            if (!rating || !comments.trim()) {
+                alert('Please provide a rating and comments');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        category: category,
+                        rating: parseInt(rating),
+                        comments: comments,
+                        timestamp: new Date().toISOString(),
+                        user_context: {
+                            current_filters: selectedFilters,
+                            projects_displayed: allProjects.length
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Thank you for your feedback! 🎉');
+                    closeFeedback();
+                } else {
+                    throw new Error('Failed to submit feedback');
+                }
+            } catch (error) {
+                alert('Sorry, there was an error submitting your feedback. Please try again.');
+                console.error('Feedback error:', error);
+            }
+        }
+
+// Load data on page load
+        initDarkMode();
+        loadData();
+    </script>
+</body>
+</html>

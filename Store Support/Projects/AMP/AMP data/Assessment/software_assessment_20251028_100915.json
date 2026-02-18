@@ -1,0 +1,142 @@
+{
+  "timestamp": "2025-10-28T10:09:15.159953",
+  "system_info": {
+    "platform": "win32",
+    "python_version": "3.14.0 (tags/v3.14.0:ebf955d, Oct  7 2025, 10:15:03) [MSC v.1944 64 bit (AMD64)]",
+    "python_executable": "C:\\Users\\krush\\Documents\\VSCode\\Spark-Playground\\.venv-1\\Scripts\\python.exe"
+  },
+  "software_status": {
+    "essential": {
+      "Google Cloud CLI (gcloud)": {
+        "installed": false,
+        "version": "Command not found or timed out",
+        "install_url": "https://cloud.google.com/sdk/docs/install",
+        "description": "Essential for BigQuery operations and Cloud Function deployment"
+      },
+      "Git": {
+        "installed": false,
+        "version": "Command not found or timed out",
+        "install_url": "https://git-scm.com/download/windows",
+        "description": "Version control and includes Git Bash terminal"
+      },
+      "Python 3.8+": {
+        "installed": true,
+        "version": "\u2705 Already Available",
+        "install_url": "https://www.python.org/downloads/",
+        "description": "Already available in your environment"
+      }
+    },
+    "recommended": {
+      "BigQuery CLI (bq)": {
+        "installed": false,
+        "version": "Command not found or timed out",
+        "install_url": "Included with Google Cloud CLI",
+        "description": "Command-line tool for BigQuery operations"
+      },
+      "Terraform": {
+        "installed": false,
+        "version": "Command not found or timed out",
+        "install_url": "https://www.terraform.io/downloads.html",
+        "description": "Infrastructure as Code for advanced deployments"
+      },
+      "curl": {
+        "installed": true,
+        "version": "curl 8.14.1 (Windows) libcurl/8.14.1 Schannel zlib/1.3.1 WinIDN\nRelease-Date: 2025-06-09\nProtocols: dict file ftp ftps http https imap imaps ipfs ipns mqtt pop3 pop3s smb smbs smtp smtps telnet tftp ws wss\nFeatures: alt-svc AsynchDNS HSTS HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM SPNEGO SSL SSPI threadsafe Unicode UnixSockets",
+        "install_url": "Usually pre-installed on Windows 10+",
+        "description": "For testing HTTP endpoints and API calls"
+      }
+    },
+    "optional": {
+      "Visual Studio Code": {
+        "installed": true,
+        "version": "\u2705 Already Available (in use)",
+        "install_url": "https://code.visualstudio.com/download",
+        "description": "Code editor with Google Cloud extensions"
+      },
+      "Docker": {
+        "installed": false,
+        "version": "Command not found or timed out",
+        "install_url": "https://www.docker.com/products/docker-desktop",
+        "description": "For containerized deployments (optional)"
+      }
+    }
+  },
+  "python_packages": {
+    "google-cloud-bigquery": false,
+    "google-cloud-functions-framework": false,
+    "google-auth": false,
+    "pandas": false,
+    "requests": false
+  },
+  "environment_variables": {
+    "GOOGLE_APPLICATION_CREDENTIALS": {
+      "value": null,
+      "description": "Google Cloud service account key",
+      "set": false
+    },
+    "GOOGLE_CLOUD_PROJECT": {
+      "value": null,
+      "description": "Default Google Cloud project",
+      "set": false
+    },
+    "PATH": {
+      "value": "C:\\Program Files (x86)\\RSA SecurID Token Common;C:\\Program Files\\RSA SecurID Token Common;C:\\WINDOWS\\CCM\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\WINDOWS\\system32\\config\\systemprofile\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Program Files (x86)\\Adaptiva\\AdaptivaClient\\bin\\x32;C:\\Program Files (x86)\\Adaptiva\\AdaptivaClient\\bin\\x64;C:\\Program Files\\Support Tools;C:\\Program Files\\1E\\Client\\Extensibility\\NomadBranch;%SystemRoot%\\system32;%SystemRoot%;%SystemRoot%\\System32\\Wbem;%SYSTEMROOT%\\System32\\WindowsPowerShell\\v1.0\\;%SYSTEMROOT%\\System32\\OpenSSH\\;C:\\Users\\krush\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\krush\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;c:\\Users\\krush\\.vscode\\extensions\\ms-python.debugpy-2025.14.1-win32-x64\\bundled\\scripts\\noConfigScripts;c:\\Users\\krush\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand",
+      "description": "System PATH (should include gcloud)",
+      "set": true
+    },
+    "USERPROFILE": {
+      "value": "C:\\Users\\krush",
+      "description": "User profile directory",
+      "set": true
+    },
+    "COMPUTERNAME": {
+      "value": "LEUS62315243171",
+      "description": "Computer name",
+      "set": true
+    }
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "software": "Google Cloud CLI (gcloud)",
+      "action": "Install Google Cloud CLI (gcloud)",
+      "url": "https://cloud.google.com/sdk/docs/install"
+    },
+    {
+      "priority": "HIGH",
+      "software": "Git",
+      "action": "Install Git",
+      "url": "https://git-scm.com/download/windows"
+    },
+    {
+      "priority": "MEDIUM",
+      "software": "google-cloud-bigquery",
+      "action": "pip install google-cloud-bigquery",
+      "command": "pip install google-cloud-bigquery"
+    },
+    {
+      "priority": "MEDIUM",
+      "software": "google-cloud-functions-framework",
+      "action": "pip install google-cloud-functions-framework",
+      "command": "pip install google-cloud-functions-framework"
+    },
+    {
+      "priority": "MEDIUM",
+      "software": "google-auth",
+      "action": "pip install google-auth",
+      "command": "pip install google-auth"
+    },
+    {
+      "priority": "MEDIUM",
+      "software": "pandas",
+      "action": "pip install pandas",
+      "command": "pip install pandas"
+    },
+    {
+      "priority": "MEDIUM",
+      "software": "requests",
+      "action": "pip install requests",
+      "command": "pip install requests"
+    }
+  ]
+}

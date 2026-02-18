@@ -1,0 +1,37 @@
+---
+title: ButtonGroup
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Button group displays multiple related actions in a horizontal row
+to help with arrangement and spacing.
+
+
+<ScreenshotTabs screenshotData={"screenshots/button-group.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {ButtonGroup} from '@walmart/gtp-shared-components`;
+
+<ButtonGroup>
+  <Button
+    variant="secondary"
+    onPress={() => {}}>
+    Secondary
+  </Button>
+  <Button
+    variant="primary"
+    onPress={() => {}}>
+    Primary
+  </Button>
+</ButtonGroup>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="ButtonGroup" prop="children"/>
+ ### isFullWidth
+<PropTable componentLink="ButtonGroup" prop="isFullWidth"/>
+ ### UNSAFE_style
+<PropTable componentLink="ButtonGroup" prop="UNSAFE_style"/>

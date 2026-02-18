@@ -1,0 +1,49 @@
+---
+title: Button
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+A button allows users to take actions and make choices, with a single
+press or a tap. Buttons are used as calls-to-action (CTA) across the experience.
+They are organized in the order or their importance:
+<strong>variant: primary, secondary, tertiary</strong>
+
+
+<ScreenshotTabs screenshotData={{"primary":"screenshots/button-primary.png","secondary":"screenshots/button-secondary.png","tertiary":"screenshots/button-tertiary.png","destructive":"screenshots/button-destructive.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Button} from '@walmart/gtp-shared-components';
+
+<Button
+  variant="primary"
+  onPress={() => console.log('Pressed')}
+  size="small"
+  isLoading={false}
+/>
+```
+## Props
+
+ ### variant
+<PropTable componentLink="button" prop="variant"/>
+ ### children
+<PropTable componentLink="button" prop="children"/>
+ ### onPress(required)
+<PropTable componentLink="button" prop="onPress"/>
+ ### size
+<PropTable componentLink="button" prop="size"/>
+ ### leading
+<PropTable componentLink="button" prop="leading"/>
+ ### trailing
+<PropTable componentLink="button" prop="trailing"/>
+ ### disabled
+<PropTable componentLink="button" prop="disabled"/>
+ ### isLoading
+<PropTable componentLink="button" prop="isLoading"/>
+ ### isFullWidth
+<PropTable componentLink="button" prop="isFullWidth"/>
+ ### UNSAFE_style
+<PropTable componentLink="button" prop="UNSAFE_style"/>
+ ### hitSlop
+<PropTable componentLink="button" prop="hitSlop"/>

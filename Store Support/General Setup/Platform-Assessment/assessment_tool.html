@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Support Platform Assessment Tool</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #0071ce;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #ffc220;
+            padding-bottom: 10px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 15px 20px;
+            border: 2px solid #0071ce;
+            background: white;
+            color: #0071ce;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: #0071ce;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 113, 206, 0.3);
+        }
+
+        .btn.selected {
+            background: #0071ce;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #0071ce;
+            color: white;
+            border-color: #0071ce;
+            grid-column: 1 / -1;
+            font-size: 16px;
+            padding: 18px;
+        }
+
+        .btn-primary:hover {
+            background: #004f9a;
+            border-color: #004f9a;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .step {
+            margin: 30px 0;
+        }
+
+        .step-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .step-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin: 20px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0071ce;
+            box-shadow: 0 0 0 3px rgba(0, 113, 206, 0.1);
+        }
+
+        .results {
+            background: #f0f4f8;
+            padding: 30px;
+            border-radius: 8px;
+            border-left: 5px solid #0071ce;
+            margin: 30px 0;
+        }
+
+        .results-title {
+            font-size: 22px;
+            color: #0071ce;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #ffc220;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .complexity-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .complexity-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .complexity-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .complexity-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .breadcrumb {
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .breadcrumb-item {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .breadcrumb-item.active {
+            color: #0071ce;
+            font-weight: 600;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: space-between;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border-color: #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            border-color: #aaa;
+        }
+
+        .summary-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .summary-section h3 {
+            color: #0071ce;
+            margin-bottom: 15px;
+        }
+
+        .summary-item {
+            padding: 10px 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .cost-estimate {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid #ffc220;
+        }
+
+        .cost-estimate h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .cost-total {
+            font-weight: 600;
+            color: #333;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            margin-top: 10px;
+        }
+
+        .recommendation {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+            color: #155724;
+        }
+
+        @media (max-width: 600px) {
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Store Support Platform Assessment</h1>
+            <p>Quick and Easy Tool to Determine Your Platform's Development Needs</p>
+        </div>
+
+        <div class="content">
+            <!-- START SCREEN -->
+            <div id="startScreen" class="section">
+                <div class="section-title">Welcome to Platform Assessment</div>
+                
+                <p style="color: #666; margin-bottom: 30px; line-height: 1.6;">
+                    This tool helps you understand the full scope of work needed for each Store Support Platform. 
+                    Simply answer a few simple questions, and we'll provide a comprehensive assessment of requirements, 
+                    complexity, and estimated costs.
+                </p>
+
+                <div class="button-group">
+                    <button class="btn" onclick="startAssessment('existing')">
+                        📊 Assess Existing Platform
+                    </button>
+                    <button class="btn" onclick="startAssessment('new')">
+                        ✨ Design New Platform
+                    </button>
+                </div>
+
+                <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #eee;">
+                    <h3 style="color: #0071ce; margin-bottom: 20px;">How It Works:</h3>
+                    <ol style="color: #666; margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Select</strong> - Choose whether you're assessing an existing platform or designing new one</li>
+                        <li><strong>Answer</strong> - Simple questions about your platform's needs (no technical knowledge required)</li>
+                        <li><strong>Review</strong> - Get a detailed assessment with complexity levels and cost estimates</li>
+                        <li><strong>Export</strong> - Save results for team discussion and planning</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- BASIC INFO SCREEN -->
+            <div id="basicInfoScreen" class="section hidden">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Assessment</span>
+                    <span class="breadcrumb-item">→</span>
+                    <span class="breadcrumb-item active">Basic Information</span>
+                </div>
+
+                <div class="step-title">Tell us about your platform</div>
+                <div class="step-description">Don't worry if you're not sure about all the details - we'll help you figure it out!</div>
+
+                <div class="form-group">
+                    <label for="platformName" id="platformNameLabel">Platform Name *</label>
+                    <input type="text" id="platformName" placeholder="e.g., Store Activity Dashboard, Tour Guides">
+                </div>
+
+                <div class="form-group">
+                    <label>What does this platform do? *</label>
+                    <textarea id="platformDescription" placeholder="In simple terms, what will this platform help your team do?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Primary Users (who will use it?) *</label>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('users', 'store-associates')">🏢 Store Associates</button>
+                        <button class="btn" onclick="selectOption('users', 'managers')">👔 Store Managers</button>
+                        <button class="btn" onclick="selectOption('users', 'corporate')">🏢 Corporate Staff</button>
+                        <button class="btn" onclick="selectOption('users', 'mixed')">🔄 Mixed Users</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Estimated number of users *</label>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('userCount', 'small')">< 100 users</button>
+                        <button class="btn" onclick="selectOption('userCount', 'medium')">100 - 1,000 users</button>
+                        <button class="btn" onclick="selectOption('userCount', 'large')">1,000 - 10,000 users</button>
+                        <button class="btn" onclick="selectOption('userCount', 'xl')">10,000+ users</button>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="resetAssessment()">← Start Over</button>
+                    <button class="btn btn-primary" onclick="nextStep('basicInfoScreen', 'platformTypeScreen')">Continue →</button>
+                </div>
+            </div>
+
+            <!-- PLATFORM TYPE SCREEN -->
+            <div id="platformTypeScreen" class="section hidden">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Assessment</span>
+                    <span class="breadcrumb-item">→</span>
+                    <span class="breadcrumb-item active">Platform Type</span>
+                </div>
+
+                <div class="step-title">What type of platform is this?</div>
+                <div class="step-description">Select all types that apply (you can choose multiple)</div>
+
+                <div class="button-group" id="platformTypeGroup">
+                    <button class="btn" onclick="selectOption('platformType', 'dashboard', true)">
+                        📊 Dashboard/Reporting<br><span style="font-size: 12px; opacity: 0.7;">View data and reports</span>
+                    </button>
+                    <button class="btn" onclick="selectOption('platformType', 'crud', true)">
+                        📝 Data Entry/CRUD<br><span style="font-size: 12px; opacity: 0.7;">Create/Read/Update/Delete</span>
+                    </button>
+                    <button class="btn" onclick="selectOption('platformType', 'workflow', true)">
+                        ⚙️ Workflow/Process<br><span style="font-size: 12px; opacity: 0.7;">Multi-step processes</span>
+                    </button>
+                    <button class="btn" onclick="selectOption('platformType', 'communication', true)">
+                        💬 Communication<br><span style="font-size: 12px; opacity: 0.7;">Messages, notifications</span>
+                    </button>
+                    <button class="btn" onclick="selectOption('platformType', 'integration', true)">
+                        🔗 Integration Hub<br><span style="font-size: 12px; opacity: 0.7;">Connect other systems</span>
+                    </button>
+                    <button class="btn" onclick="selectOption('platformType', 'other', true)">
+                        ❓ Other<br><span style="font-size: 12px; opacity: 0.7;">Something else</span>
+                    </button>
+                </div>
+                
+                <div id="selectedTypes" style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 6px; display: none;">
+                    <strong>Selected types:</strong>
+                    <div id="selectedTypesList" style="margin-top: 10px; color: #0071ce; font-weight: 600;"></div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="previousStep('platformTypeScreen', 'basicInfoScreen')">← Back</button>
+                    <button class="btn btn-primary" onclick="nextStep('platformTypeScreen', 'dataScreen')">Continue →</button>
+                </div>
+            </div>
+
+            <!-- DATA REQUIREMENTS SCREEN -->
+            <div id="dataScreen" class="section hidden">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Assessment</span>
+                    <span class="breadcrumb-item">→</span>
+                    <span class="breadcrumb-item active">Data & Storage</span>
+                </div>
+
+                <div class="step-title">Data & Storage Needs</div>
+                <div class="step-description">Tell us about your data requirements</div>
+
+                <div class="form-group">
+                    <label>How much data will you store and manage? *</label>
+                    <div class="step-description" style="margin: 10px 0 15px 0; padding: 10px; background: #f0f4f8; border-radius: 4px; font-size: 13px;">
+                        💡 <strong>Not sure?</strong> Think about: How many records/transactions per year? How long to keep data? How many concurrent users accessing it?
+                    </div>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('dataSize', 'small')">📦 Small (< 50 GB)<br><span style="font-size: 11px; opacity: 0.7;">Few years of data, <500k records</span></button>
+                        <button class="btn" onclick="selectOption('dataSize', 'medium')">📦📦 Medium (50-500 GB)<br><span style="font-size: 11px; opacity: 0.7;">Multi-year data, millions of records</span></button>
+                        <button class="btn" onclick="selectOption('dataSize', 'large')">📦📦📦 Large (500GB - 5TB)<br><span style="font-size: 11px; opacity: 0.7;">5+ years of data, 100M+ records</span></button>
+                        <button class="btn" onclick="selectOption('dataSize', 'xl')">📦📦📦📦 Very Large (5TB+)<br><span style="font-size: 11px; opacity: 0.7;">Massive datasets, archive everything</span></button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>How often will data be accessed? *</label>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('dataFrequency', 'daily')">📅 Daily or Less</button>
+                        <button class="btn" onclick="selectOption('dataFrequency', 'hourly')">⏰ Hourly</button>
+                        <button class="btn" onclick="selectOption('dataFrequency', 'realtime')">⚡ Real-time</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Where does the data come from? (Select all that apply)</label>
+                    <div style="display: grid; gap: 10px; margin-left: 0; width: 100%;">
+                        <label style="display: flex; align-items: center; cursor: pointer; margin: 0; width: 100%; overflow: visible; white-space: normal;">
+                            <input type="checkbox" id="dataSource_manual" style="margin-right: 10px; cursor: pointer; flex-shrink: 0; width: auto; height: auto;"> Manual entry by users
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer; margin: 0; width: 100%; overflow: visible; white-space: normal;">
+                            <input type="checkbox" id="dataSource_system" style="margin-right: 10px; cursor: pointer; flex-shrink: 0; width: auto; height: auto;"> Other systems/APIs
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer; margin: 0; width: 100%; overflow: visible; white-space: normal;">
+                            <input type="checkbox" id="dataSource_file" style="margin-right: 10px; cursor: pointer; flex-shrink: 0; width: auto; height: auto;"> File uploads (CSV, Excel)
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer; margin: 0; width: 100%; overflow: visible; white-space: normal;">
+                            <input type="checkbox" id="dataSource_bigquery" style="margin-right: 10px; cursor: pointer; flex-shrink: 0; width: auto; height: auto;"> BigQuery
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Do you need real-time dashboards or live data? *</label>
+                    <div class="step-description" style="margin: 10px 0 15px 0; padding: 10px; background: #f9f5e1; border-radius: 4px; font-size: 13px;">
+                        💡 <strong>Static:</strong> Data updates when page is refreshed (dashboards refresh daily/weekly) | <strong>Live:</strong> Data updates automatically without refresh (real-time updates every second/minute)
+                    </div>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('realtime', 'no')" title="Data updates when page is refreshed. Dashboard shows snapshots at specific times (daily, weekly, etc). Good for historical reporting.">No - Static is fine</button>
+                        <button class="btn" onclick="selectOption('realtime', 'yes')" title="Data updates automatically without page refresh. Dashboard shows current information at all times. Requires real-time data connection.">Yes - Need live updates</button>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="previousStep('dataScreen', 'platformTypeScreen')">← Back</button>
+                    <button class="btn btn-primary" onclick="nextStep('dataScreen', 'technologyScreen')">Continue →</button>
+                </div>
+            </div>
+
+            <!-- TECHNOLOGY SCREEN -->
+            <div id="technologyScreen" class="section hidden">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Assessment</span>
+                    <span class="breadcrumb-item">→</span>
+                    <span class="breadcrumb-item active">Technology & Interface</span>
+                </div>
+
+                <div class="step-title">Technology & Interface</div>
+                <div class="step-description">What kind of interface does your platform need?</div>
+
+                <div class="form-group">
+                    <label>What interfaces does your platform need? (Select all that apply) *</label>
+                    <div class="step-description" style="margin: 10px 0 15px 0; padding: 10px; background: #f0f4f8; border-radius: 4px; font-size: 13px;">
+                        💡 <strong>Tip:</strong> Many platforms need multiple interfaces. For example: a web dashboard for reporting AND a mobile app for field teams.
+                    </div>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('interface', 'static', true)">
+                            📄 Static HTML<br><span style="font-size: 12px; opacity: 0.7;">Simple, fast</span>
+                        </button>
+                        <button class="btn" onclick="selectOption('interface', 'react', true)">
+                            ⚛️ React App<br><span style="font-size: 12px; opacity: 0.7;">Interactive, modern</span>
+                        </button>
+                        <button class="btn" onclick="selectOption('interface', 'mobile', true)">
+                            📱 Mobile App<br><span style="font-size: 12px; opacity: 0.7;">Phone/tablet</span>
+                        </button>
+                        <button class="btn" onclick="selectOption('interface', 'desktop', true)">
+                            🖥️ Desktop App<br><span style="font-size: 12px; opacity: 0.7;">Windows/Mac software</span>
+                        </button>
+                    </div>
+                    <div id="selectedInterfaces" style="display: none; margin-top: 10px; padding: 8px; background: #e8f4f8; border-left: 4px solid #0078d4; border-radius: 3px; font-size: 13px;">
+                        <strong>Selected:</strong> <span id="selectedInterfacesList"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Does this need a backend server? *</label>
+                    <div class="step-description" style="margin: 10px 0 15px 0; padding: 10px; background: #f9f5e1; border-radius: 4px; font-size: 13px;">
+                        🤔 <strong>Need help deciding?</strong> Ask yourself:
+                        <ul style="margin: 8px 0 0 0; padding-left: 20px; line-height: 1.5;">
+                            <li><strong>No backend:</strong> Just displaying static info? Single HTML file?</li>
+                            <li><strong>Lightweight:</strong> Need to read/write data? Simple login? Store user preferences?</li>
+                            <li><strong>Complex:</strong> Business rules/calculations? Workflows? Multiple user roles? Multi-step approvals?</li>
+                        </ul>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('backend', 'no')">
+                            ❌ No - Frontend only<br><span style="font-size: 11px; opacity: 0.7;">Static display only</span>
+                        </button>
+                        <button class="btn" onclick="selectOption('backend', 'lightweight')">
+                            ⚡ Lightweight<br><span style="font-size: 11px; opacity: 0.7;">Simple API, basic data</span>
+                        </button>
+                        <button class="btn" onclick="selectOption('backend', 'complex')">
+                            🔧 Complex<br><span style="font-size: 11px; opacity: 0.7;">Business logic, workflows</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>What authentication & security do you need? (Select all that apply) *</label>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('auth', 'basic', true)" title="Users log in with Walmart credentials. Same access for all users.">
+                            🔓 Basic<br><span style="font-size: 11px; opacity: 0.7;">Walmart login, same access</span>
+                        </button>
+                        <button class="btn" onclick="selectOption('auth', 'standard', true)" title="Users log in + assigned to roles (Admin, Manager, Viewer). Different access levels.">
+                            🔐 Standard<br><span style="font-size: 11px; opacity: 0.7;">Role-based access control</span>
+                        </button>
+                        <button class="btn" onclick="selectOption('auth', 'advanced', true)" title="Custom permission rules. Fine-grained access (e.g., only see own data, specific by location/department).">
+                            🔒 Advanced<br><span style="font-size: 11px; opacity: 0.7;">Custom rules & permissions</span>
+                        </button>
+                        <button class="btn" onclick="selectOption('auth', 'sso', true)" title="Single Sign-On - users already logged in elsewhere stay logged in here.">
+                            🔑 SSO<br><span style="font-size: 11px; opacity: 0.7;">Single Sign-On integration</span>
+                        </button>
+                    </div>
+                    <div id="selectedAuth" style="display: none; margin-top: 10px; padding: 8px; background: #f0e8f5; border-left: 4px solid #7c3aed; border-radius: 3px; font-size: 13px;">
+                        <strong>Selected:</strong> <span id="selectedAuthList"></span>
+                    </div>
+                    <div style="margin-top: 12px; padding: 10px; background: #e8f5e9; border-radius: 4px; font-size: 12px; line-height: 1.5;">
+                        <strong>📚 Quick Reference:</strong>
+                        <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                            <li><strong>Basic:</strong> Everyone has identical access (e.g., dashboard view only)</li>
+                            <li><strong>Standard:</strong> Different permission levels by role (Admin creates, Manager approves, Viewer reads)</li>
+                            <li><strong>Advanced:</strong> Custom logic like "Sales staff only see their region" or "Managers see their team"</li>
+                            <li><strong>SSO:</strong> Users stay logged in across multiple apps (uses Azure/Okta/Google)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="previousStep('technologyScreen', 'dataScreen')">← Back</button>
+                    <button class="btn btn-primary" onclick="nextStep('technologyScreen', 'featuresScreen')">Continue →</button>
+                </div>
+            </div>
+
+            <!-- FEATURES SCREEN -->
+            <div id="featuresScreen" class="section hidden">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Assessment</span>
+                    <span class="breadcrumb-item">→</span>
+                    <span class="breadcrumb-item active">Features & Functionality</span>
+                </div>
+
+                <div class="step-title">Features & Functionality</div>
+                <div class="step-description">What features does your platform need? (Select all that apply)</div>
+
+                <div style="display: grid; gap: 10px;">
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_search" style="margin-right: 10px; cursor: pointer;"> 🔍 Search functionality
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_filter" style="margin-right: 10px; cursor: pointer;"> 🔽 Advanced filtering
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_export" style="margin-right: 10px; cursor: pointer;"> 📥 Export data (Excel, PDF)
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_import" style="margin-right: 10px; cursor: pointer;"> 📤 Import data (files)
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_reports" style="margin-right: 10px; cursor: pointer;"> 📊 Reports & charts
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_notifications" style="margin-right: 10px; cursor: pointer;"> 🔔 Notifications/Alerts
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_approval" style="margin-right: 10px; cursor: pointer;"> ✅ Approval workflows
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_comments" style="margin-right: 10px; cursor: pointer;"> 💬 Comments/Discussion
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_versioning" style="margin-right: 10px; cursor: pointer;"> 📝 Version history
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_scheduling" style="margin-right: 10px; cursor: pointer;"> 📅 Scheduling/Booking
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_analytics" style="margin-right: 10px; cursor: pointer;"> 📈 Usage analytics
+                    </label>
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="feature_sync" style="margin-right: 10px; cursor: pointer;"> 🔄 Sync with other systems
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-top: 30px;">
+                    <label>Any other important features?</label>
+                    <textarea id="otherFeatures" placeholder="List any other features or functionality needed..."></textarea>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="previousStep('featuresScreen', 'technologyScreen')">← Back</button>
+                    <button class="btn btn-primary" onclick="nextStep('featuresScreen', 'constraintsScreen')">Continue →</button>
+                </div>
+            </div>
+
+            <!-- CONSTRAINTS & TIMELINE SCREEN -->
+            <div id="constraintsScreen" class="section hidden">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Assessment</span>
+                    <span class="breadcrumb-item">→</span>
+                    <span class="breadcrumb-item active">Timeline & Constraints</span>
+                </div>
+
+                <div class="step-title">Timeline & Constraints</div>
+                <div class="step-description">Help us understand your timeline and any constraints</div>
+
+                <div class="form-group">
+                    <label>Target launch timeline *</label>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('timeline', 'immediate')">⚡ ASAP (1-2 months)</button>
+                        <button class="btn" onclick="selectOption('timeline', 'short')">📅 Short term (3-6 months)</button>
+                        <button class="btn" onclick="selectOption('timeline', 'medium')">📅 Medium term (6-12 months)</button>
+                        <button class="btn" onclick="selectOption('timeline', 'long')">📅 Long term (12+ months)</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Budget constraints or limits? *</label>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('budget', 'minimal')">💰 Minimal (keep it cheap)</button>
+                        <button class="btn" onclick="selectOption('budget', 'flexible')">💵 Flexible (within reason)</button>
+                        <button class="btn" onclick="selectOption('budget', 'unlimited')">💴 Not a constraint</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>What's most important to your team? (Pick one)</label>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectOption('priority', 'speed')">⚡ Speed (launch quickly)</button>
+                        <button class="btn" onclick="selectOption('priority', 'quality')">✨ Quality (do it right)</button>
+                        <button class="btn" onclick="selectOption('priority', 'cost')">💰 Cost (minimize expense)</button>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="previousStep('constraintsScreen', 'featuresScreen')">← Back</button>
+                    <button class="btn btn-primary" onclick="generateResults()">Generate Assessment →</button>
+                </div>
+            </div>
+
+            <!-- RESULTS SCREEN -->
+            <div id="resultsScreen" class="section hidden">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Assessment</span>
+                    <span class="breadcrumb-item">→</span>
+                    <span class="breadcrumb-item active">Results</span>
+                </div>
+
+                <div id="resultsContent"></div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="resetAssessment()">← Start Over</button>
+                    <button class="btn btn-primary" onclick="exportResults()">📥 Export Results</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Assessment data object
+        const assessment = {
+            assessmentType: '',
+            platformName: '',
+            platformDescription: '',
+            users: '',
+            userCount: '',
+            platformType: [],
+            dataSize: '',
+            dataFrequency: '',
+            dataSources: [],
+            realtime: '',
+            interface: [],
+            backend: '',
+            auth: [],
+            features: [],
+            otherFeatures: '',
+            timeline: '',
+            budget: '',
+            priority: ''
+        };
+
+        function startAssessment(type) {
+            assessment.assessmentType = type;
+            
+            const infoScreen = document.getElementById('basicInfoScreen');
+            const titleElement = infoScreen.querySelector('.step-title');
+            const descElement = infoScreen.querySelector('.step-description');
+            const platNameLabel = document.getElementById('platformNameLabel');
+            
+            if (type === 'existing') {
+                titleElement.textContent = 'Basic Platform Information';
+                descElement.textContent = 'Tell us about your existing platform that we\'re assessing';
+                platNameLabel.textContent = 'What\'s the name of your existing platform? *';
+                document.getElementById('platformDescription').placeholder = 'e.g., Current dashboard application, legacy CRUD system, etc.';
+            } else {
+                titleElement.textContent = 'New Platform Design';
+                descElement.textContent = 'Let\'s design your new platform. Start with the basics';
+                platNameLabel.textContent = 'What would you like to name this new platform? *';
+                document.getElementById('platformDescription').placeholder = 'e.g., Modern dashboard for real-time analytics, mobile field app, etc.';
+            }
+            
+            showScreen('basicInfoScreen');
+        }
+
+        function selectOption(field, value, isMultiSelect = false) {
+            const btn = event.target.closest('.btn');
+            
+            if (isMultiSelect) {
+                // Multi-select: toggle the button and update array
+                btn.classList.toggle('selected');
+                
+                if (!Array.isArray(assessment[field])) {
+                    assessment[field] = [];
+                }
+                
+                if (btn.classList.contains('selected')) {
+                    // Add to array if not already present
+                    if (!assessment[field].includes(value)) {
+                        assessment[field].push(value);
+                    }
+                } else {
+                    // Remove from array
+                    assessment[field] = assessment[field].filter(item => item !== value);
+                }
+                
+                // Update the selected types display
+                updateSelectedDisplay(field);
+            } else {
+                // Single-select: deselect others
+                assessment[field] = value;
+                btn.closest('.button-group')?.querySelectorAll('.btn').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                btn.classList.add('selected');
+            }
+        }
+        
+        function updateSelectedDisplay(field) {
+            if (field === 'platformType') {
+                const selectedContainer = document.getElementById('selectedTypes');
+                const selectedList = document.getElementById('selectedTypesList');
+                const selected = assessment[field] || [];
+                
+                if (selected.length > 0) {
+                    const typeLabels = {
+                        'dashboard': 'Dashboard/Reporting',
+                        'crud': 'Data Entry/CRUD',
+                        'workflow': 'Workflow/Process',
+                        'communication': 'Communication',
+                        'integration': 'Integration Hub',
+                        'other': 'Other'
+                    };
+                    
+                    selectedList.textContent = selected.map(type => typeLabels[type] || type).join(', ');
+                    selectedContainer.style.display = 'block';
+                } else {
+                    selectedContainer.style.display = 'none';
+                }
+            }
+            
+            if (field === 'interface') {
+                const selectedContainer = document.getElementById('selectedInterfaces');
+                const selectedList = document.getElementById('selectedInterfacesList');
+                const selected = assessment[field] || [];
+                
+                if (selected.length > 0) {
+                    const interfaceLabels = {
+                        'static': 'Static HTML',
+                        'react': 'React App',
+                        'mobile': 'Mobile App',
+                        'desktop': 'Desktop App'
+                    };
+                    
+                    selectedList.textContent = selected.map(type => interfaceLabels[type] || type).join(', ');
+                    selectedContainer.style.display = 'block';
+                } else {
+                    selectedContainer.style.display = 'none';
+                }
+            }
+            
+            if (field === 'auth') {
+                const selectedContainer = document.getElementById('selectedAuth');
+                const selectedList = document.getElementById('selectedAuthList');
+                const selected = assessment[field] || [];
+                
+                if (selected.length > 0) {
+                    const authLabels = {
+                        'basic': 'Basic (Walmart login)',
+                        'standard': 'Standard (Role-based)',
+                        'advanced': 'Advanced (Custom rules)',
+                        'sso': 'SSO'
+                    };
+                    
+                    selectedList.textContent = selected.map(type => authLabels[type] || type).join(', ');
+                    selectedContainer.style.display = 'block';
+                } else {
+                    selectedContainer.style.display = 'none';
+                }
+            }
+        }
+
+        function nextStep(fromScreen, toScreen) {
+            if (fromScreen === 'basicInfoScreen') {
+                // First, collect the values from the form
+                const platformName = document.getElementById('platformName').value.trim();
+                const platformDescription = document.getElementById('platformDescription').value.trim();
+                const users = assessment.users;
+                const userCount = assessment.userCount;
+                
+                // Then validate
+                if (!platformName || !platformDescription || !users || !userCount) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // Update the assessment object with the collected values
+                assessment.platformName = platformName;
+                assessment.platformDescription = platformDescription;
+            }
+            
+            if (fromScreen === 'platformTypeScreen') {
+                // Validate that at least one platform type is selected
+                if (!assessment.platformType || assessment.platformType.length === 0) {
+                    alert('Please select at least one platform type');
+                    return;
+                }
+            }
+            
+            if (fromScreen === 'technologyScreen') {
+                // Validate interfaces, backend, and auth selections
+                const errors = [];
+                
+                if (!assessment.interface || assessment.interface.length === 0) {
+                    errors.push('Select at least one interface type');
+                }
+                if (!assessment.backend) {
+                    errors.push('Select a backend server option');
+                }
+                if (!assessment.auth || assessment.auth.length === 0) {
+                    errors.push('Select at least one authentication method');
+                }
+                
+                if (errors.length > 0) {
+                    alert('Please fill in all required fields:\n• ' + errors.join('\n• '));
+                    return;
+                }
+            }
+
+            showScreen(toScreen);
+        }
+
+        function previousStep(fromScreen, toScreen) {
+            showScreen(toScreen);
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('[id$="Screen"]').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function resetAssessment() {
+            Object.keys(assessment).forEach(key => {
+                assessment[key] = '';
+            });
+            document.querySelectorAll('input[type="text"], textarea').forEach(input => {
+                input.value = '';
+            });
+            document.querySelectorAll('input[type="checkbox"]').forEach(input => {
+                input.checked = false;
+            });
+            document.querySelectorAll('.btn.selected').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            showScreen('startScreen');
+        }
+
+        function generateResults() {
+            assessment.otherFeatures = document.getElementById('otherFeatures').value;
+
+            // Collect features
+            assessment.features = [];
+            document.querySelectorAll('input[id^="feature_"]:checked').forEach(checkbox => {
+                assessment.features.push(checkbox.id.replace('feature_', ''));
+            });
+
+            // Collect data sources
+            assessment.dataSources = [];
+            document.querySelectorAll('input[id^="dataSource_"]:checked').forEach(checkbox => {
+                assessment.dataSources.push(checkbox.id.replace('dataSource_', ''));
+            });
+
+            generateResultsHTML();
+            showScreen('resultsScreen');
+        }
+
+        function formatLabel(str) {
+            if (!str) return '';
+            return str
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function formatFeatureLabel(feature) {
+            const labels = {
+                search: '🔍 Search',
+                filter: '🔽 Advanced Filtering',
+                export: '📥 Export Data',
+                import: '📤 Import Data',
+                reports: '📊 Reports & Charts',
+                notifications: '🔔 Notifications',
+                approval: '✅ Approval Workflows',
+                comments: '💬 Comments',
+                versioning: '📝 Version History',
+                scheduling: '📅 Scheduling',
+                analytics: '📈 Analytics',
+                sync: '🔄 System Sync'
+            };
+            return labels[feature] || formatLabel(feature);
+        }
+
+        function calculateComplexity() {
+            let score = 0;
+
+            const dataSizeScore = { small: 1, medium: 2, large: 3, xl: 4 };
+            score += dataSizeScore[assessment.dataSize] || 0;
+
+            const frequencyScore = { daily: 1, hourly: 2, realtime: 3 };
+            score += frequencyScore[assessment.dataFrequency] || 0;
+
+            const interfaceScore = { static: 1, react: 2, mobile: 3, desktop: 3 };
+            score += interfaceScore[assessment.interface] || 0;
+
+            const backendScore = { no: 0, lightweight: 2, complex: 3 };
+            score += backendScore[assessment.backend] || 0;
+
+            if (assessment.realtime === 'yes') score += 2;
+
+            score += Math.min(assessment.features.length, 5);
+
+            const authScore = { basic: 1, standard: 2, advanced: 3 };
+            score += authScore[assessment.auth] || 0;
+
+            score += Math.min(assessment.dataSources.length, 2);
+
+            if (score <= 8) {
+                return { level: 'low', label: '✅ Low Complexity' };
+            } else if (score <= 15) {
+                return { level: 'medium', label: '⚠️ Medium Complexity' };
+            } else {
+                return { level: 'high', label: '🔴 High Complexity' };
+            }
+        }
+
+        function calculateCosts() {
+            let dev = 0;
+            let infra = 0;
+
+            const interfaceCosts = {
+                static: 15000,
+                react: 35000,
+                mobile: 50000,
+                desktop: 45000
+            };
+            
+            // Handle interface as array
+            if (Array.isArray(assessment.interface)) {
+                assessment.interface.forEach(iface => {
+                    dev += interfaceCosts[iface] || 0;
+                });
+            } else {
+                dev += interfaceCosts[assessment.interface] || 0;
+            }
+
+            const backendCosts = {
+                no: 0,
+                lightweight: 20000,
+                complex: 50000
+            };
+            dev += backendCosts[assessment.backend] || 0;
+
+            dev += assessment.features.length * 3000;
+
+            const infraCosts = {
+                small: { daily: 2000, hourly: 5000, realtime: 8000 },
+                medium: { daily: 5000, hourly: 12000, realtime: 18000 },
+                large: { daily: 12000, hourly: 25000, realtime: 40000 },
+                xl: { daily: 25000, hourly: 50000, realtime: 80000 }
+            };
+
+            const infraBySize = infraCosts[assessment.dataSize] || infraCosts.small;
+            infra += infraBySize[assessment.dataFrequency] || infraBySize.daily;
+
+            const authCosts = { basic: 2000, standard: 5000, advanced: 10000, sso: 8000 };
+            
+            // Handle auth as array
+            if (Array.isArray(assessment.auth)) {
+                assessment.auth.forEach(auth => {
+                    infra += authCosts[auth] || 0;
+                });
+            } else {
+                infra += authCosts[assessment.auth] || 0;
+            }
+
+            return {
+                development: dev,
+                infrastructure: infra,
+                total: dev + infra
+            };
+        }
+
+        function generateResultsHTML() {
+            const complexity = calculateComplexity();
+            const costs = calculateCosts();
+
+            let html = `
+                <div class="results">
+                    <div class="results-title">📋 Platform Assessment Results</div>
+                    
+                    <div class="result-item">
+                        <div class="result-label">Assessment Type</div>
+                        <div class="result-value">${assessment.assessmentType === 'existing' ? '📊 Assessing Existing Platform' : '✨ Designing New Platform'}</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <div class="result-label">Platform Name</div>
+                        <div class="result-value">${assessment.platformName}</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Purpose</div>
+                        <div class="result-value">${assessment.platformDescription}</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">User Base</div>
+                        <div class="result-value">${formatLabel(assessment.userCount)} ${formatLabel(assessment.users)}</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Platform Type</div>
+                        <div class="result-value">${Array.isArray(assessment.platformType) ? assessment.platformType.map(type => formatLabel(type)).join(', ') : formatLabel(assessment.platformType)}</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Overall Complexity</div>
+                        <div class="result-value">
+                            <span class="complexity-badge complexity-${complexity.level}">${complexity.label}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h3>🎯 Technical Architecture</h3>
+                    
+                    <div class="summary-item"><strong>Frontend:</strong> ${Array.isArray(assessment.interface) ? assessment.interface.map(type => formatLabel(type)).join(', ') : formatLabel(assessment.interface)}</div>
+                    <div class="summary-item"><strong>Backend:</strong> ${formatLabel(assessment.backend)}</div>
+                    <div class="summary-item"><strong>Data Storage:</strong> ${formatLabel(assessment.dataSize)}</div>
+                    <div class="summary-item"><strong>Access Pattern:</strong> ${formatLabel(assessment.dataFrequency)}</div>
+                    <div class="summary-item"><strong>Real-time Updates:</strong> ${assessment.realtime === 'yes' ? '✅ Required' : '❌ Not Required'}</div>
+                    <div class="summary-item"><strong>Security Level:</strong> ${Array.isArray(assessment.auth) ? assessment.auth.map(type => formatLabel(type)).join(', ') : formatLabel(assessment.auth)}</div>
+                </div>
+
+                <div class="summary-section">
+                    <h3>✨ Features & Capabilities</h3>
+                    ${assessment.features.length > 0 ? `
+                        <ul style="margin-left: 20px; color: #333;">
+                            ${assessment.features.map(f => `<li>${formatFeatureLabel(f)}</li>`).join('')}
+                        </ul>
+                    ` : '<div class="summary-item">No standard features selected</div>'}
+                    ${assessment.otherFeatures ? `<div class="summary-item" style="margin-top: 10px;"><strong>Additional Requirements:</strong> ${assessment.otherFeatures}</div>` : ''}
+                </div>
+
+                <div class="cost-estimate">
+                    <h4>💰 Estimated Development Investment</h4>
+                    <div class="cost-item">
+                        <span><strong>Frontend & Features Development:</strong></span>
+                        <span><strong>$${costs.development.toLocaleString()}</strong></span>
+                    </div>
+                    <div class="cost-item">
+                        <span><strong>Infrastructure & Backend (Year 1):</strong></span>
+                        <span><strong>$${costs.infrastructure.toLocaleString()}</strong></span>
+                    </div>
+                    <div class="cost-item">
+                        <span><strong>Integration & Testing:</strong></span>
+                        <span><strong>$${(costs.total * 0.15).toLocaleString()}</strong></span>
+                    </div>
+                    <div class="cost-total">
+                        Total Year 1 Investment: $${(costs.total + (costs.total * 0.15)).toLocaleString()}
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h3>📊 Data & Integration Profile</h3>
+                    <div class="summary-item"><strong>Data Sources:</strong> ${assessment.dataSources.length > 0 ? assessment.dataSources.map(d => formatLabel(d)).join(', ') : 'Not specified'}</div>
+                    <div class="summary-item"><strong>Data Volume:</strong> ${formatLabel(assessment.dataSize)}</div>
+                    <div class="summary-item"><strong>Access Frequency:</strong> ${formatLabel(assessment.dataFrequency)}</div>
+                </div>
+
+                <div class="recommendation">
+                    <strong>Key Recommendation:</strong><br>
+                    ${getRecommendation(complexity, assessment)}
+                </div>
+
+                <div class="summary-section">
+                    <h3>⏱️ Timeline & Execution</h3>
+                    <div class="summary-item"><strong>Target Launch:</strong> ${formatLabel(assessment.timeline)}</div>
+                    <div class="summary-item"><strong>Budget Priority:</strong> ${formatLabel(assessment.budget)}</div>
+                    <div class="summary-item"><strong>Success Factor:</strong> ${formatLabel(assessment.priority)}</div>
+                    <div class="summary-item" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ccc;">
+                        <strong>Estimated Timeline:</strong> ${getTimelineEstimate(complexity.level, assessment.timeline)}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultsContent').innerHTML = html;
+        }
+
+        function getRecommendation(complexity, data) {
+            if (complexity.level === 'low') {
+                return 'This is a relatively straightforward platform. Focus on rapid iteration and user feedback. Consider an agile 2-week sprint approach.';
+            } else if (complexity.level === 'medium') {
+                return 'Moderate complexity requires careful architecture planning. Recommend 4-week development phases with regular stakeholder reviews.';
+            } else {
+                return 'This is a complex platform requiring detailed technical specification before development begins. Plan for comprehensive testing and gradual rollout to production.';
+            }
+        }
+
+        function getTimelineEstimate(level, priority) {
+            const baseEstimates = {
+                low: '2-3 months',
+                medium: '4-6 months',
+                high: '6-12 months'
+            };
+
+            const adjustments = {
+                immediate: ' (aggressive timeline may require additional resources)',
+                short: ' (standard timeline)',
+                medium: ' (comfortable timeline)',
+                long: ' (allows for thorough planning)'
+            };
+
+            return baseEstimates[level] + (adjustments[priority] || '');
+        }
+
+        function exportResults() {
+            console.log('Export function called');
+            
+            // Open a new window with print-friendly version
+            const printWindow = window.open('', '_blank');
+            
+            // Get the actual HTML from the results content on the page
+            const resultsContent = document.getElementById('resultsContent');
+            const resultsHTML = resultsContent.innerHTML;
+            
+            // Create a complete HTML document optimized for printing
+            const printHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Store Support Platform Assessment - ${assessment.platformName}</title>
+                    <style>
+                        @media print {
+                            @page {
+                                size: letter;
+                                margin: 0.5in;
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                        }
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+                        body {
+                            font-family: 'Segoe UI', Arial, sans-serif;
+                            background: white;
+                            font-size: 11pt;
+                            line-height: 1.4;
+                            color: #333;
+                        }
+                        h1 {
+                            font-size: 20pt;
+                            text-align: center;
+                            border-bottom: 3px solid #ffc220;
+                            padding-bottom: 10px;
+                            margin-bottom: 15px;
+                            color: #0071ce;
+                        }
+                        h2 {
+                            font-size: 15pt;
+                            color: #0071ce;
+                            margin: 15px 0 8px 0;
+                        }
+                        h3 {
+                            font-size: 13pt;
+                            color: #0071ce;
+                            margin: 12px 0 6px 0;
+                        }
+                        h4 {
+                            font-size: 12pt;
+                            color: #0071ce;
+                            margin: 10px 0 5px 0;
+                        }
+                        .header-info {
+                            text-align: center;
+                            color: #666;
+                            font-size: 9pt;
+                            margin-bottom: 20px;
+                            padding-bottom: 10px;
+                            border-bottom: 1px solid #ddd;
+                        }
+                        .results {
+                            background: #f0f4f8;
+                            padding: 12px;
+                            border-radius: 4px;
+                            border-left: 5px solid #0071ce;
+                            margin: 15px 0;
+                            page-break-inside: avoid;
+                        }
+                        .result-item {
+                            background: white;
+                            padding: 8px;
+                            margin: 6px 0;
+                            border-radius: 3px;
+                            border-left: 3px solid #ffc220;
+                        }
+                        .summary-section {
+                            margin: 15px 0;
+                            padding: 12px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            background: white;
+                            page-break-inside: avoid;
+                        }
+                        .cost-estimate {
+                            background: #f0f4f8;
+                            padding: 12px;
+                            border-radius: 4px;
+                            margin: 15px 0;
+                            page-break-inside: avoid;
+                        }
+                        .recommendation {
+                            background: #fff8e1;
+                            padding: 12px;
+                            border-left: 4px solid #ffc220;
+                            margin: 15px 0;
+                            page-break-inside: avoid;
+                        }
+                        .cost-item {
+                            display: flex;
+                            justify-content: space-between;
+                            padding: 6px 0;
+                            border-bottom: 1px solid #ddd;
+                            font-size: 10pt;
+                        }
+                        .cost-total {
+                            background: #ffc220;
+                            padding: 8px;
+                            margin-top: 8px;
+                            font-weight: bold;
+                            border-radius: 3px;
+                            font-size: 11pt;
+                        }
+                        ul {
+                            margin-left: 25px;
+                            font-size: 10pt;
+                        }
+                        li {
+                            margin: 5px 0;
+                        }
+                        .summary-item {
+                            margin: 6px 0;
+                            font-size: 10pt;
+                        }
+                        .complexity-badge {
+                            display: inline-block;
+                            padding: 3px 8px;
+                            border-radius: 3px;
+                            font-size: 9pt;
+                            font-weight: bold;
+                        }
+                        .complexity-low {
+                            background: #d4edda;
+                            color: #155724;
+                        }
+                        .complexity-medium {
+                            background: #fff3cd;
+                            color: #856404;
+                        }
+                        .complexity-high {
+                            background: #f8d7da;
+                            color: #721c24;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>STORE SUPPORT PLATFORM ASSESSMENT REPORT</h1>
+                    <div class="header-info">
+                        <p><strong>Platform:</strong> ${assessment.platformName}</p>
+                        <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                        <p><strong>Assessment Type:</strong> ${assessment.assessmentType === 'existing' ? 'Existing Platform' : 'New Platform Design'}</p>
+                    </div>
+                    ${resultsHTML}
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                            }, 500);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(printHTML);
+            printWindow.document.close();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribution List Selector - Walmart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0071ce 0%, #004c91 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #0071ce;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .stats-bar {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            display: flex;
+            gap: 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .stat {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0071ce;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #0071ce;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        select {
+            padding: 8px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #0071ce;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #004c91;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 113, 206, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .selection-bar {
+            background: #fff3cd;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ffc107;
+        }
+
+        .selection-info {
+            font-weight: 600;
+            color: #856404;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .dl-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dl-table thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+        }
+
+        .dl-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .dl-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .dl-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .dl-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .dl-name {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .dl-email {
+            color: #0071ce;
+            font-size: 14px;
+        }
+
+        .dl-category {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .cat-operations { background: #d1ecf1; color: #0c5460; }
+        .cat-market { background: #d4edda; color: #155724; }
+        .cat-region { background: #fff3cd; color: #856404; }
+        .cat-support { background: #f8d7da; color: #721c24; }
+        .cat-management { background: #e2e3e5; color: #383d41; }
+        .cat-team { background: #d6d8db; color: #1b1e21; }
+        .cat-general { background: #e7e8ea; color: #383d41; }
+
+        .member-count {
+            text-align: center;
+            font-weight: 600;
+            color: #6c757d;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state svg {
+            width: 120px;
+            height: 120px;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0071ce;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 30px;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .page-btn.active {
+            background: #0071ce;
+            color: white;
+            border-color: #0071ce;
+        }
+
+        .page-btn:hover:not(.active) {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📧 Distribution List Selector</h1>
+            <p>Search, select, and compose emails to multiple distribution lists</p>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-label">Total Lists</div>
+                <div class="stat-value" id="totalLists">134,900</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Filtered Results</div>
+                <div class="stat-value" id="filteredCount">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Selected</div>
+                <div class="stat-value" id="selectedCount">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Last Updated</div>
+                <div class="stat-value" id="lastUpdated">Today 5:00 AM</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput" 
+                    placeholder="Search by name, email, or description..."
+                    onkeyup="filterDLs()"
+                >
+                <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <span class="filter-label">Category:</span>
+                    <select id="categoryFilter" onchange="filterDLs()">
+                        <option value="">All Categories</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Market">Market</option>
+                        <option value="Region">Region</option>
+                        <option value="Support">Support</option>
+                        <option value="Management">Management</option>
+                        <option value="Team">Team</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Size:</span>
+                    <select id="sizeFilter" onchange="filterDLs()">
+                        <option value="">All Sizes</option>
+                        <option value="small">Small (&lt;50)</option>
+                        <option value="medium">Medium (50-499)</option>
+                        <option value="large">Large (500+)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-label">Show:</span>
+                    <select id="perPage" onchange="changePerPage()">
+                        <option value="50">50 per page</option>
+                        <option value="100" selected>100 per page</option>
+                        <option value="250">250 per page</option>
+                        <option value="500">500 per page</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selection Bar -->
+        <div class="selection-bar" id="selectionBar" style="display: none;">
+            <div class="selection-info">
+                <span id="selectionText">0 lists selected</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="composeEmail()" id="composeBtn">
+                    ✉️ Compose Email
+                </button>
+                <button class="btn btn-secondary" onclick="clearSelection()">
+                    Clear Selection
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 20px; color: #6c757d;">Loading distribution lists...</p>
+            </div>
+
+            <div id="tableContainer" style="display: none;">
+                <table class="dl-table">
+                    <thead>
+                        <tr>
+                            <th width="50">
+                                <input type="checkbox" class="dl-checkbox" id="selectAll" onchange="toggleSelectAll()">
+                            </th>
+                            <th>Distribution List</th>
+                            <th>Category</th>
+                            <th width="120">Members</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dlTableBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                <h3>No distribution lists found</h3>
+                <p>Try adjusting your search or filters</p>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <script>
+        // This would be loaded from the CSV file via backend API
+        // For now, demo data structure
+        let allDLs = [];
+        let filteredDLs = [];
+        let selectedDLs = new Set();
+        let currentPage = 1;
+        let perPage = 100;
+
+        // Simulate loading data
+        window.onload = function() {
+            setTimeout(() => {
+                loadDLData();
+            }, 1000);
+        };
+
+        function loadDLData() {
+            // In production, this would fetch from: /api/distribution-lists
+            // For now, simulating with sample data
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('tableContainer').style.display = 'block';
+            
+            // Demo: Load actual data via fetch
+            // fetch('/api/distribution-lists')
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         allDLs = data;
+            //         filterDLs();
+            //     });
+            
+            // For demo, show message
+            document.getElementById('dlTableBody').innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 40px; color: #6c757d;">
+                        <p style="font-size: 18px; margin-bottom: 10px;">🚀 Backend Integration Required</p>
+                        <p>Connect to backend API serving the CSV data</p>
+                        <p style="font-size: 14px; margin-top: 20px;">Expected endpoint: <code>GET /api/distribution-lists</code></p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function filterDLs() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const size = document.getElementById('sizeFilter').value;
+
+            filteredDLs = allDLs.filter(dl => {
+                const matchesSearch = !searchTerm || 
+                    dl.name.toLowerCase().includes(searchTerm) ||
+                    dl.email.toLowerCase().includes(searchTerm) ||
+                    (dl.description && dl.description.toLowerCase().includes(searchTerm));
+
+                const matchesCategory = !category || dl.category === category;
+
+                let matchesSize = true;
+                if (size === 'small') matchesSize = dl.memberCount < 50;
+                else if (size === 'medium') matchesSize = dl.memberCount >= 50 && dl.memberCount < 500;
+                else if (size === 'large') matchesSize = dl.memberCount >= 500;
+
+                return matchesSearch && matchesCategory && matchesSize;
+            });
+
+            document.getElementById('filteredCount').textContent = filteredDLs.length.toLocaleString();
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const start = (currentPage - 1) * perPage;
+            const end = start + perPage;
+            const pageData = filteredDLs.slice(start, end);
+
+            if (pageData.length === 0) {
+                document.getElementById('tableContainer').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('tableContainer').style.display = 'block';
+
+            const tbody = document.getElementById('dlTableBody');
+            tbody.innerHTML = pageData.map(dl => `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="dl-checkbox" 
+                            ${selectedDLs.has(dl.email) ? 'checked' : ''}
+                            onchange="toggleDL('${dl.email}')">
+                    </td>
+                    <td>
+                        <div class="dl-name">${dl.name}</div>
+                        <div class="dl-email">${dl.email}</div>
+                        ${dl.description ? `<div style="font-size: 13px; color: #6c757d; margin-top: 4px;">${dl.description}</div>` : ''}
+                    </td>
+                    <td>
+                        <span class="dl-category cat-${dl.category.toLowerCase()}">${dl.category}</span>
+                    </td>
+                    <td class="member-count">${dl.memberCount.toLocaleString()}</td>
+                </tr>
+            `).join('');
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredDLs.length / perPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            
+            // Previous button
+            html += `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">‹ Prev</button>`;
+            
+            // Page numbers
+            for (let i = 1; i <= Math.min(totalPages, 10); i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            
+            if (totalPages > 10) {
+                html += `<span>...</span>`;
+                html += `<button class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+            }
+            
+            // Next button
+            html += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">Next ›</button>`;
+            
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderTable();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function changePerPage() {
+            perPage = parseInt(document.getElementById('perPage').value);
+            currentPage = 1;
+            renderTable();
+        }
+
+        function toggleDL(email) {
+            if (selectedDLs.has(email)) {
+                selectedDLs.delete(email);
+            } else {
+                selectedDLs.add(email);
+            }
+            updateSelection();
+        }
+
+        function toggleSelectAll() {
+            const checked = document.getElementById('selectAll').checked;
+            const start = (currentPage - 1) * perPage;
+            const end = start + perPage;
+            const pageData = filteredDLs.slice(start, end);
+
+            pageData.forEach(dl => {
+                if (checked) {
+                    selectedDLs.add(dl.email);
+                } else {
+                    selectedDLs.delete(dl.email);
+                }
+            });
+
+            updateSelection();
+            renderTable();
+        }
+
+        function updateSelection() {
+            const count = selectedDLs.size;
+            document.getElementById('selectedCount').textContent = count.toLocaleString();
+            
+            if (count > 0) {
+                document.getElementById('selectionBar').style.display = 'flex';
+                document.getElementById('selectionText').textContent = `${count} ${count === 1 ? 'list' : 'lists'} selected`;
+            } else {
+                document.getElementById('selectionBar').style.display = 'none';
+            }
+        }
+
+        function clearSelection() {
+            selectedDLs.clear();
+            updateSelection();
+            renderTable();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('sizeFilter').value = '';
+            filterDLs();
+        }
+
+        function composeEmail() {
+            if (selectedDLs.size === 0) return;
+
+            const emails = Array.from(selectedDLs).join(';');
+            
+            // Option 1: mailto link (works but has length limits)
+            // window.location.href = `mailto:${emails}`;
+            
+            // Option 2: Open Outlook Web (better for large lists)
+            const outlookUrl = `https://outlook.office365.com/mail/deeplink/compose?to=${encodeURIComponent(emails)}`;
+            window.open(outlookUrl, '_blank');
+            
+            // Option 3: Copy to clipboard
+            navigator.clipboard.writeText(emails).then(() => {
+                alert(`${selectedDLs.size} email addresses copied to clipboard!\n\nYou can now paste them into your email client.`);
+            });
+        }
+    </script>
+</body>
+</html>

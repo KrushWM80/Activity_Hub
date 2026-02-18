@@ -1,0 +1,47 @@
+---
+title: MetricGroup
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+MetricGroup is a group of metrics displayed together.
+
+
+<ScreenshotTabs screenshotData={{"group-recipe-1":"screenshots/metric-group-recipe1.png","group-recipe-2":"screenshots/metric-group-recipe2.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {MetricGroup} from '@walmart/gtp-shared-components`;
+
+const threeMetricData = [
+  {
+    title: 'Store safety',
+    timescope: 'YTD.9h ago',
+    textLabel: 'Accident free days',
+    value: '21',
+  },
+  {
+    textLabel: 'Customer accidents',
+    value: '7',
+  },
+  {
+    textLabel: 'Associate accidents',
+    value: '4',
+  },
+];
+<MetricGroup data={threeMetricData} />
+```
+## Props
+
+ ### data(required)
+<PropTable componentLink="MetricGroup" prop="data"/>
+ ### allowIndividualTitles
+<PropTable componentLink="MetricGroup" prop="allowIndividualTitles"/>
+ ### UNSAFE_style
+<PropTable componentLink="MetricGroup" prop="UNSAFE_style"/>
+ ### onPress
+<PropTable componentLink="MetricGroup" prop="onPress"/>
+ ### showOnPressIndicator
+<PropTable componentLink="MetricGroup" prop="showOnPressIndicator"/>
+ ### pressedColor
+<PropTable componentLink="MetricGroup" prop="pressedColor"/>

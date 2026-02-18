@@ -1,0 +1,11 @@
+/* https://www.typescriptlang.org/tsconfig */
+{
+  "extends": "@tsconfig/react-native/tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
+      "@walmart/gtp-shared-icons": ["../"],
+      "@walmart/gtp-shared-icons/*": ["../*"]
+    }
+  }
+}

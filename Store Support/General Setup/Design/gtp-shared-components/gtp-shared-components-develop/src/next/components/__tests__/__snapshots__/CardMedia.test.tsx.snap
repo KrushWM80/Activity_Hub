@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing CardMedia should display correctly 1`] = `
+<View
+  accessibilityRole="image"
+  style={
+    [
+      {
+        "alignItems": "center",
+        "justifyContent": "center",
+        "overflow": "hidden",
+        "width": "100%",
+      },
+      undefined,
+    ]
+  }
+  testID="CardMedia"
+>
+  <Image
+    source={
+      {
+        "testUri": "../../../assets/images/media-image.png",
+      }
+    }
+    style={
+      {
+        "height": 200,
+        "resizeMode": "stretch",
+      }
+    }
+  />
+</View>
+`;

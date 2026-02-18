@@ -1,0 +1,58 @@
+---
+title: TextArea
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Text fields allow users to enter and edit text.
+
+
+<ScreenshotTabs screenshotData={"screenshots/text-area.gif"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {TextArea} from '@walmart/gtp-shared-components`;
+
+<TextArea
+  label="Label text"
+  helperText="Helper text"
+  placeholder="Placeholder text"
+  onSubmitEditing={event =>
+    console.log('TextArea value captured:', event.nativeEvent.text)
+  }
+/>
+```
+## Props
+
+ ### defaultValue
+<PropTable componentLink="TextArea" prop="defaultValue"/>
+ ### maxLength
+<PropTable componentLink="TextArea" prop="maxLength"/>
+ ### onBlur
+<PropTable componentLink="TextArea" prop="onBlur"/>
+ ### onChangeText
+<PropTable componentLink="TextArea" prop="onChangeText"/>
+ ### onFocus
+<PropTable componentLink="TextArea" prop="onFocus"/>
+ ### placeholder
+<PropTable componentLink="TextArea" prop="placeholder"/>
+ ### readOnly
+<PropTable componentLink="TextArea" prop="readOnly"/>
+ ### value
+<PropTable componentLink="TextArea" prop="value"/>
+ ### size
+<PropTable componentLink="TextArea" prop="size"/>
+ ### disabled
+<PropTable componentLink="TextArea" prop="disabled"/>
+ ### error
+<PropTable componentLink="TextArea" prop="error"/>
+ ### helperText
+<PropTable componentLink="TextArea" prop="helperText"/>
+ ### label(required)
+<PropTable componentLink="TextArea" prop="label"/>
+ ### textAreaProps
+<PropTable componentLink="TextArea" prop="textAreaProps"/>
+ ### UNSAFE_style
+<PropTable componentLink="TextArea" prop="UNSAFE_style"/>
+ ### ref_
+<PropTable componentLink="TextArea" prop="ref_"/>

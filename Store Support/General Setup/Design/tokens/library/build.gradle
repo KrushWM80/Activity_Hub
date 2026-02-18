@@ -1,0 +1,37 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.walmartlabs.multimodule'
+
+walmart {
+    artifactGroup = 'com.walmart.android.ld'
+    artifactName = 'living-design-tokens'
+    artifactVersion = project.versionName
+}
+
+println "Artifact version: $walmart.artifactGroup:$walmart.artifactName:$walmart.artifactVersion ($project.versionCode)"
+
+android {
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 23
+        targetSdk 33
+        versionCode project.versionCode
+        versionName project.versionName
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation 'com.walmart.android.ld:living-design-icons:0.4.38'
+    implementation 'com.walmart.android.ld:living-design-bogle:0.1.12'
+}

@@ -1,0 +1,28 @@
+---
+title: Segment
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Segments are used as children of Segmented.
+
+
+
+## Usage
+```js
+import {Segment} from '@walmart/gtp-shared-components';
+
+<Segment selected={true}>First</Segment>
+<Segment selected={false}>Second</Segment>
+```
+## Props
+
+ ### size
+<PropTable componentLink="Segment" prop="size"/>
+ ### selected
+<PropTable componentLink="Segment" prop="selected"/>
+ ### UNSAFE_style
+<PropTable componentLink="Segment" prop="UNSAFE_style"/>
+ ### small<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Use <strong>size</strong> instead</span></span>
+<PropTable componentLink="Segment" prop="small"/>

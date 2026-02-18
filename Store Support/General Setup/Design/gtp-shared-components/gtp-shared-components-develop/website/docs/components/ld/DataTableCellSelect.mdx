@@ -1,0 +1,101 @@
+---
+title: DataTableCellSelect
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Column selection is implemented with the DataTableHeaderSelect and DataTableCellSelect components.
+
+
+
+## Usage
+```js
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableHead,
+  DataTableHeader,
+  DataTableHeaderSelect,
+  DataTableCellSelect,
+  DataTableRow,
+} from '@walmart/gtp-shared-components';
+
+const selectHeader = ['ID', 'Name'];
+const selectData = [
+  {id: 1, name: 'Banana'},
+  {id: 2, name: 'Peach'},
+  {id: 3, name: 'Strawberry'},
+];
+const [simpleCellChecked, setSimpleCellChecked] = React.useState([]);
+const onHeaderChecked = () => {
+  if (simpleCellChecked.length < 3) {
+    setSimpleCellChecked([1, 2, 3]);
+  } else {
+    setSimpleCellChecked([]);
+  }
+};
+<DataTable>
+  <DataTableHead>
+    <DataTableRow>
+      {selectHeader.map((header, index) => (
+        <DataTableHeader>{header}</DataTableHeader>
+      ))}
+      <DataTableHeaderSelect
+        alignment={'right'}
+        onChange={onHeaderChecked}
+        indeterminate={
+          simpleCellChecked.length !== 0 && simpleCellChecked.length < 3
+        }
+        checked={simpleCellChecked.length === 3}
+      />
+    </DataTableRow>
+  </DataTableHead>
+  <DataTableBody hor>
+    {selectData.map((item) => {
+      const {id, name} = item;
+      return (
+        <DataTableRow>
+          <DataTableCell>{id}</DataTableCell>
+          <DataTableCell>{name}</DataTableCell>
+          <DataTableCellSelect
+            variant="numeric"
+            checked={simpleCellChecked.includes(id)}
+            onChange={() => {
+              if (simpleCellChecked.includes(id)) {
+                const removed = simpleCellChecked.filter((item) => item !== id);
+                setSimpleCellChecked(removed);
+              } else {
+                setSimpleCellChecked([...simpleCellChecked, id]);
+              }
+            }}
+          />
+        </DataTableRow>
+      );
+    })}
+  </DataTableBody>
+</DataTable>;
+```
+## Props
+
+ ### checkboxProps
+<PropTable componentLink="DataTableCellSelect" prop="checkboxProps"/>
+ ### checked
+<PropTable componentLink="DataTableCellSelect" prop="checked"/>
+ ### disabled
+<PropTable componentLink="DataTableCellSelect" prop="disabled"/>
+ ### indeterminate
+<PropTable componentLink="DataTableCellSelect" prop="indeterminate"/>
+ ### name
+<PropTable componentLink="DataTableCellSelect" prop="name"/>
+ ### onChange(required)
+<PropTable componentLink="DataTableCellSelect" prop="onChange"/>
+ ### variant
+<PropTable componentLink="DataTableCellSelect" prop="variant"/>
+ ### width
+<PropTable componentLink="DataTableCellSelect" prop="width"/>
+ ### numberOfColumns(required)
+<PropTable componentLink="DataTableCellSelect" prop="numberOfColumns"/>
+ ### UNSAFE_style
+<PropTable componentLink="DataTableCellSelect" prop="UNSAFE_style"/>

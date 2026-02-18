@@ -1,0 +1,32 @@
+---
+title: DataTableCell
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Data Table Cells represent one piece of information with a specific type. We provide several Cell types to help represent different kinds of information consistently.
+
+
+
+## Usage
+```js
+import {DataTableCell} from '@walmart/gtp-shared-components';
+
+<DataTableCell
+ numberOfColumns ={1} variant="alphanumeric">
+  {"Data Table Cell"}
+</DataTableCell>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="DataTableCell" prop="children"/>
+ ### variant
+<PropTable componentLink="DataTableCell" prop="variant"/>
+ ### width
+<PropTable componentLink="DataTableCell" prop="width"/>
+ ### numberOfColumns
+<PropTable componentLink="DataTableCell" prop="numberOfColumns"/>
+ ### UNSAFE_style
+<PropTable componentLink="DataTableCell" prop="UNSAFE_style"/>

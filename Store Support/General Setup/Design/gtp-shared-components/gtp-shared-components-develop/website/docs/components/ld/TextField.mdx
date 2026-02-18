@@ -1,0 +1,85 @@
+---
+title: TextField
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Text fields allow users to enter and edit text.
+
+
+<ScreenshotTabs screenshotData={"screenshots/text-field.gif"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {TextField, Icons} from '@walmart/gtp-shared-components`;
+
+<TextField
+  label="Label text"
+  helperText="Helper text"
+  placeholder="Placeholder text"
+  leading={[<Icons.EmailIcon />, true]}
+  onSubmitEditing={event =>
+    console.log('TextField value captured:', event.nativeEvent.text)
+  }
+/>
+```
+## Props
+
+ ### defaultValue
+<PropTable componentLink="TextField" prop="defaultValue"/>
+ ### onBlur
+<PropTable componentLink="TextField" prop="onBlur"/>
+ ### onChangeText
+<PropTable componentLink="TextField" prop="onChangeText"/>
+ ### onFocus
+<PropTable componentLink="TextField" prop="onFocus"/>
+ ### placeholder
+<PropTable componentLink="TextField" prop="placeholder"/>
+ ### readOnly
+<PropTable componentLink="TextField" prop="readOnly"/>
+ ### value
+<PropTable componentLink="TextField" prop="value"/>
+ ### size
+<PropTable componentLink="TextField" prop="size"/>
+ ### disabled
+<PropTable componentLink="TextField" prop="disabled"/>
+ ### error
+<PropTable componentLink="TextField" prop="error"/>
+ ### helperText
+<PropTable componentLink="TextField" prop="helperText"/>
+ ### label(required)
+<PropTable componentLink="TextField" prop="label"/>
+ ### leading
+<PropTable componentLink="TextField" prop="leading"/>
+ ### trailing
+<PropTable componentLink="TextField" prop="trailing"/>
+ ### textInputProps
+<PropTable componentLink="TextField" prop="textInputProps"/>
+ ### type
+<PropTable componentLink="TextField" prop="type"/>
+ ### UNSAFE_style
+<PropTable componentLink="TextField" prop="UNSAFE_style"/>
+ ### ref_
+<PropTable componentLink="TextField" prop="ref_"/>
+ ### leadingIcon<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>leading</strong> instead</span></span>
+<PropTable componentLink="TextField" prop="leadingIcon"/>
+ ### trailingIcon<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>trailing</strong> instead</span></span>
+<PropTable componentLink="TextField" prop="trailingIcon"/>
+ ### trailingLink<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>trailing</strong> instead</span></span>
+<PropTable componentLink="TextField" prop="trailingLink"/>
+ ### onTrailingIconPress<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>trailing</strong> instead</span></span>
+<PropTable componentLink="TextField" prop="onTrailingIconPress"/>
+ ### onLinkPress<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>trailing</strong> instead</span></span>
+<PropTable componentLink="TextField" prop="onLinkPress"/>
+ ### state<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="TextField" prop="state"/>
+ ### successMessage<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="TextField" prop="successMessage"/>
+ ### stateIcon<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="TextField" prop="stateIcon"/>
+ ### counter<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="TextField" prop="counter"/>
+ ### helperTextImportantForA11y<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="TextField" prop="helperTextImportantForA11y"/>
+ ### onTextChange<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>onChangeText</strong> instead</span></span>
+<PropTable componentLink="TextField" prop="onTextChange"/>

@@ -1,0 +1,82 @@
+{
+  "date": "2026-01-22",
+  "source": "SDL Export",
+  "locations": [
+    {
+      "location_id": "1234",
+      "location_name": "PLANO, TX",
+      "location_type": "Walmart Supercenter",
+      "store_manager": "Sarah Johnson",
+      "store_manager_email": "sarah.johnson@walmart.com",
+      "market": "Dallas/Fort Worth",
+      "region": "Texas",
+      "division": "WAL-MART STORES INC.",
+      "banner": "WM Supercenter",
+      "operating_status": 1
+    },
+    {
+      "location_id": "5678",
+      "location_name": "ARLINGTON, TX",
+      "location_type": "Walmart Supercenter",
+      "store_manager": "David Martinez",
+      "store_manager_email": "david.martinez@walmart.com",
+      "market": "Dallas/Fort Worth",
+      "region": "Texas",
+      "division": "WAL-MART STORES INC.",
+      "banner": "WM Supercenter",
+      "operating_status": 1
+    },
+    {
+      "location_id": "9012",
+      "location_name": "HOUSTON, TX",
+      "location_type": "Walmart Supercenter",
+      "store_manager": "Robert Williams",
+      "store_manager_email": "robert.williams@walmart.com",
+      "market": "Houston",
+      "region": "Texas",
+      "division": "WAL-MART STORES INC.",
+      "banner": "WM Supercenter",
+      "operating_status": 1
+    },
+    {
+      "location_id": "3456",
+      "location_name": "AUSTIN, TX",
+      "location_type": "Walmart Supercenter",
+      "store_manager": "Christopher Brown",
+      "store_manager_email": "christopher.brown@walmart.com",
+      "market": "Austin",
+      "region": "Texas",
+      "division": "WAL-MART STORES INC.",
+      "banner": "WM Supercenter",
+      "operating_status": 1
+    },
+    {
+      "location_id": "DFW_MARKET",
+      "location_name": "Dallas/Fort Worth Market",
+      "location_type": "Market",
+      "market_manager": "Amanda Foster",
+      "market_manager_email": "amanda.foster@walmart.com",
+      "region": "Texas",
+      "market_type": "Distribution Market"
+    },
+    {
+      "location_id": "HOU_MARKET",
+      "location_name": "Houston Market",
+      "location_type": "Market",
+      "market_manager": "Patricia Rivera",
+      "market_manager_email": "patricia.rivera@walmart.com",
+      "region": "Texas",
+      "market_type": "Distribution Market"
+    }
+  ],
+  "total_locations": 6,
+  "summary": {
+    "store_managers": 4,
+    "market_managers": 2,
+    "by_market": {
+      "Dallas/Fort Worth": 2,
+      "Houston": 2,
+      "Austin": 1
+    }
+  }
+}

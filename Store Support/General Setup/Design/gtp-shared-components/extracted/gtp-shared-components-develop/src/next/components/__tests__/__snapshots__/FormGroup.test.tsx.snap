@@ -1,0 +1,1297 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test FormGroup FormGroup with CheckBox 1`] = `
+<View
+  style={
+    [
+      {
+        "flex": 1,
+        "flexDirection": "column",
+      },
+      {},
+    ]
+  }
+  testID="FormGroup"
+>
+  <View
+    accessibilityRole="text"
+    style={
+      {
+        "marginBottom": 12,
+      }
+    }
+  />
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. checkbox"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Checkbox"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 2,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 18,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 18,
+          }
+        }
+      />
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Apple checkbox"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Checkbox"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 2,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 18,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 18,
+          }
+        }
+      />
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Apple
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Cookie checkbox"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Checkbox"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 2,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 18,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 18,
+          }
+        }
+      />
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Cookie
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Test FormGroup FormGroup with Radio 1`] = `
+<View
+  style={
+    [
+      {
+        "flex": 1,
+        "flexDirection": "column",
+      },
+      {},
+    ]
+  }
+  testID="FormGroup"
+>
+  <View
+    accessibilityRole="text"
+    style={
+      {
+        "marginBottom": 12,
+      }
+    }
+  />
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      accessibilityRole="radio"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Radio"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 10,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 20,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 20,
+          }
+        }
+        testID="Radio-buttonOuter"
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderRadius": 6,
+              "height": 12,
+              "width": 12,
+            }
+          }
+          testID="Radio-buttonInner"
+        />
+      </View>
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Apple"
+      accessibilityRole="radio"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Radio"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 10,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 20,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 20,
+          }
+        }
+        testID="Radio-buttonOuter"
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderRadius": 6,
+              "height": 12,
+              "width": 12,
+            }
+          }
+          testID="Radio-buttonInner"
+        />
+      </View>
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Apple
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Cookie"
+      accessibilityRole="radio"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Radio"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 10,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 20,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 20,
+          }
+        }
+        testID="Radio-buttonOuter"
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderRadius": 6,
+              "height": 12,
+              "width": 12,
+            }
+          }
+          testID="Radio-buttonInner"
+        />
+      </View>
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Cookie
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Test FormGroup FormGroup with Radio Error Text 1`] = `
+<View
+  style={
+    [
+      {
+        "flex": 1,
+        "flexDirection": "column",
+      },
+      {},
+    ]
+  }
+  testID="FormGroup"
+>
+  <View
+    accessibilityRole="text"
+    style={
+      {
+        "marginBottom": 12,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "flexDirection": "row",
+        }
+      }
+    >
+      <Image
+        accessibilityRole="image"
+        source={
+          {
+            "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/ExclamationCircleFill-16.png",
+          }
+        }
+        style={
+          [
+            {
+              "height": 16,
+              "tintColor": "#de1c24",
+              "width": 16,
+            },
+            {
+              "marginTop": 6,
+            },
+          ]
+        }
+        testID="ExclamationCircleFillIcon"
+      />
+      <Text
+        accessibilityRole="text"
+        style={
+          [
+            {
+              "color": "#2e2f32",
+              "fontFamily": "Bogle",
+              "fontSize": 16,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 24,
+            },
+            {
+              "color": "#de1c24",
+              "marginHorizontal": 4,
+            },
+          ]
+        }
+        testID="Body"
+      >
+        Error Text ?
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      accessibilityRole="radio"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Radio"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 10,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 20,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 20,
+          }
+        }
+        testID="Radio-buttonOuter"
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderRadius": 6,
+              "height": 12,
+              "width": 12,
+            }
+          }
+          testID="Radio-buttonInner"
+        />
+      </View>
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Apple"
+      accessibilityRole="radio"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Radio"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 10,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 20,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 20,
+          }
+        }
+        testID="Radio-buttonOuter"
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderRadius": 6,
+              "height": 12,
+              "width": 12,
+            }
+          }
+          testID="Radio-buttonInner"
+        />
+      </View>
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Apple
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Cookie"
+      accessibilityRole="radio"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Radio"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 10,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 20,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 20,
+          }
+        }
+        testID="Radio-buttonOuter"
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderRadius": 6,
+              "height": 12,
+              "width": 12,
+            }
+          }
+          testID="Radio-buttonInner"
+        />
+      </View>
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Cookie
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Test FormGroup FormGroup with Radio helper Text 1`] = `
+<View
+  style={
+    [
+      {
+        "flex": 1,
+        "flexDirection": "column",
+      },
+      {},
+    ]
+  }
+  testID="FormGroup"
+>
+  <View
+    accessibilityRole="text"
+    style={
+      {
+        "marginBottom": 12,
+      }
+    }
+  >
+    <Text
+      accessibilityRole="text"
+      style={
+        [
+          {
+            "color": "#2e2f32",
+            "fontFamily": "Bogle",
+            "fontSize": 16,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 24,
+          },
+          {
+            "color": "#74767c",
+            "fontFamily": "Bogle",
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "paddingTop": 12,
+          },
+        ]
+      }
+      testID="Body"
+    >
+      Helper Text
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      accessibilityRole="radio"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Radio"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 10,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 20,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 20,
+          }
+        }
+        testID="Radio-buttonOuter"
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderRadius": 6,
+              "height": 12,
+              "width": 12,
+            }
+          }
+          testID="Radio-buttonInner"
+        />
+      </View>
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Apple"
+      accessibilityRole="radio"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Radio"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 10,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 20,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 20,
+          }
+        }
+        testID="Radio-buttonOuter"
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderRadius": 6,
+              "height": 12,
+              "width": 12,
+            }
+          }
+          testID="Radio-buttonInner"
+        />
+      </View>
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Apple
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "marginVertical": 12,
+      }
+    }
+  >
+    <View
+      accessibilityLabel="Cookie"
+      accessibilityRole="radio"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": false,
+          "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        [
+          {
+            "alignItems": "flex-start",
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
+      }
+      testID="Radio"
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#fff",
+            "borderColor": "#000",
+            "borderRadius": 10,
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "height": 20,
+            "justifyContent": "center",
+            "margin": 1,
+            "width": 20,
+          }
+        }
+        testID="Radio-buttonOuter"
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "borderRadius": 6,
+              "height": 12,
+              "width": 12,
+            }
+          }
+          testID="Radio-buttonInner"
+        />
+      </View>
+      <Text
+        style={
+          {
+            "color": "#2e2f32",
+            "flexShrink": 1,
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginLeft": 12,
+          }
+        }
+      >
+        Cookie
+      </Text>
+    </View>
+  </View>
+</View>
+`;

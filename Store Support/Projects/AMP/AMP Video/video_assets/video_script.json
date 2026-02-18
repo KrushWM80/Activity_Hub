@@ -1,0 +1,35 @@
+{
+  "title": "[EXTRACT FROM AMP URL]",
+  "segments": [
+    {
+      "time": "0-3s",
+      "type": "title_slide",
+      "text": "[EXTRACT FROM AMP URL]",
+      "subtitle": "Week 41 \u2022 2026"
+    },
+    {
+      "time": "4-12s",
+      "type": "key_point",
+      "text": "[FIRST KEY POINT FROM CONTENT]",
+      "icon": "info"
+    },
+    {
+      "time": "13-21s",
+      "type": "key_point",
+      "text": "[SECOND KEY POINT FROM CONTENT]",
+      "icon": "action"
+    },
+    {
+      "time": "22-27s",
+      "type": "key_point",
+      "text": "[THIRD KEY POINT FROM CONTENT]",
+      "icon": "calendar"
+    },
+    {
+      "time": "28-30s",
+      "type": "call_to_action",
+      "text": "[CALL TO ACTION FROM CONTENT]",
+      "action": "Learn More"
+    }
+  ]
+}

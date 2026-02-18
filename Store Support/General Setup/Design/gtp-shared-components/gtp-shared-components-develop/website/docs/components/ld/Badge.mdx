@@ -1,0 +1,32 @@
+---
+title: Badge
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Badges are visual indicators of status or count.
+
+
+<ScreenshotTabs screenshotData={"screenshots/badge.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Badge} from '@walmart/gtp-shared-components`;
+
+<Badge color="blue">1</Badge>
+<Badge color="gray">2</Badge>
+<Badge color="green">3</Badge>
+<Badge color="purple">4</Badge>
+<Badge color="red">5</Badge>
+<Badge color="spark">6</Badge>
+<Badge color="white">7</Badge>
+
+```
+## Props
+
+ ### color
+<PropTable componentLink="Badge" prop="color"/>
+ ### children
+<PropTable componentLink="Badge" prop="children"/>
+ ### UNSAFE_style
+<PropTable componentLink="Badge" prop="UNSAFE_style"/>

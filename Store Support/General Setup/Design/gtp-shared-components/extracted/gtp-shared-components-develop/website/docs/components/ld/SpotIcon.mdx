@@ -1,0 +1,39 @@
+---
+title: SpotIcon
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Spot Icons are decorative elements that add visual interest to messaging or other screen elements such
+as list items.
+
+
+<ScreenshotTabs screenshotData={"screenshots/spot-icon.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Icons, SpotIcon} from '@walmart/gtp-shared-components`;
+
+<SpotIcon>
+  <Icons.CheckIcon />
+</SpotIcon>
+<SpotIcon color="white">
+  <Icons.CheckIcon />
+</SpotIcon>
+<SpotIcon size="large">
+  <Icons.CheckIcon />
+</SpotIcon>
+<SpotIcon color="white" size="large">
+  <Icons.CheckIcon />
+</SpotIcon>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="SpotIcon" prop="children"/>
+ ### color
+<PropTable componentLink="SpotIcon" prop="color"/>
+ ### size
+<PropTable componentLink="SpotIcon" prop="size"/>
+ ### UNSAFE_style
+<PropTable componentLink="SpotIcon" prop="UNSAFE_style"/>

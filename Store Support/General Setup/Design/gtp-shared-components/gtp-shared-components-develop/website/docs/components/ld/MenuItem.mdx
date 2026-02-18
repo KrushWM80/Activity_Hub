@@ -1,0 +1,27 @@
+---
+title: MenuItem
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+MenuItem is a single item in a Menu.
+
+
+<ScreenshotTabs screenshotData={"screenshots/menu.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {MenuItem} from '@walmart/gtp-shared-components`;
+
+<MenuItem onPress={() => console.log('Item 1 clicked')}>Item 1</MenuItem>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="MenuItem" prop="children"/>
+ ### leading
+<PropTable componentLink="MenuItem" prop="leading"/>
+ ### onPress(required)
+<PropTable componentLink="MenuItem" prop="onPress"/>
+ ### UNSAFE_style
+<PropTable componentLink="MenuItem" prop="UNSAFE_style"/>

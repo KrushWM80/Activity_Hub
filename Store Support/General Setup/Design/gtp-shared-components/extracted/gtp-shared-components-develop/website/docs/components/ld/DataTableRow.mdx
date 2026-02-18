@@ -1,0 +1,32 @@
+---
+title: DataTableRow
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Each Data Table row represents one object, showing details about that object in each cell.
+
+
+
+## Usage
+```js
+import {DataTableRow,DataTableHeader} from '@walmart/gtp-shared-components';
+
+<DataTableRow>
+  <DataTableHeader alignment={'left'}>
+      {"header Left"}
+  </DataTableHeader>
+  <DataTableHeader alignment={'right'}>
+      {"header Right"}
+  </DataTableHeader>
+</DataTableRow>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="DataTableRow" prop="children"/>
+ ### selected
+<PropTable componentLink="DataTableRow" prop="selected"/>
+ ### UNSAFE_style
+<PropTable componentLink="DataTableRow" prop="UNSAFE_style"/>

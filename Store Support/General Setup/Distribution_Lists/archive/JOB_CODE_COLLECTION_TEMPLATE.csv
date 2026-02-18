@@ -1,0 +1,4 @@
+Email,JobCode,JobTitle,Department,ManagementLevel,Function,Division,Status
+example@walmart.com,US-100019949,Group Director Supply Chain Management,Supply Chain,C,Supply Chain,Global Tech,SAMPLE
+example2@walmart.com,US-100020696,Group Director Operations,Operations,C,Operations,Global Tech,SAMPLE
+example3@walmart.com,VP-100001234,Vice President Supply Chain,Supply Chain,VP,Supply Chain,Global Tech,SAMPLE

@@ -1,0 +1,35 @@
+---
+title: ChipGroup
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+ChipGroup displays multiple related Chip's in a horizontal row
+to help with arrangement and spacing.
+
+
+<ScreenshotTabs screenshotData={"screenshots/chip-group.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {ChipGroup} from '@walmart/gtp-shared-components`;
+
+<ChipGroup
+ onPress={selectedIds =>
+   console.log('--- selected Chips: ', selectedIds)
+ }>
+   <Chip id={0}>All</Chip>
+   <Chip id={1}>Last 7 Days</Chip>
+   <Chip id={2}>Last Month</Chip>
+   <Chip id={3}>Last 6 Months</Chip>
+   <Chip id={4}>2022</Chip>
+ </ChipGroup>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="ChipGroup" prop="children"/>
+ ### onPress(required)
+<PropTable componentLink="ChipGroup" prop="onPress"/>
+ ### multiple
+<PropTable componentLink="ChipGroup" prop="multiple"/>

@@ -1,0 +1,200 @@
+{
+  "majorVersion" : 1,
+  "minorVersion" : 0,
+  "flowEntryName" : "flow",
+  "displaySettingsEntryName" : "displaySettings",
+  "isPackagedMaestroDocument" : true,
+  "documentFeaturesUsedInDocument" : [ {
+    "id" : "node.v2020_3_3.Group",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2020,
+      "quarterOfYear" : 3,
+      "versionString" : "2020.3.3",
+      "indexOfRelease" : 3
+    },
+    "notSupportedMessages" : [ "it_IT::Raggruppa fasi (supportato nelle versioni 2020.3.3 e successive)", "fr_CA::Regrouper les étapes (pris en charge dans la version 2020.3.3 et versions ultérieures)", "sv_SE::Gruppera steg (stöds i version 2020.3.3 och senare)", "pt_BR::Agrupar etapas (suportado na versão 2020.3.3 e posteriores)", "th_TH::ขั้นตอนการจัดกลุ่ม (รองรับในเวอร์ชัน 2020.3.3 และใหม่กว่า)", "fr_FR::Regrouper les étapes (pris en charge dans la version 2020.3.3 et versions ultérieures)", "ja_JP::ステップをグループ化 (バージョン 2020.3.3 以降でサポートされています)", "de_DE::Schritte gruppieren (unterstützt in Version 2020.3.3 und höher)", "en_GB::Group Steps (supported in version 2020.3.3 and later)", "zh_TW::分組步驟 (版本 2020.3.3 及更高版本中支援)", "ko_KR::단계 그룹화(버전 2020.3.3 이상에서 지원됨)", "en_US::Group Steps (supported in version 2020.3.3 and later)", "ga_IE::33c5-表:9b73-表:Group Steps|桜 (supported in version 2020.3.3 and later)|桜", "es_ES::Agrupar pasos (admitido en la versión 2020.3.3 y posteriores)", "zh_CN::将步骤分组 (版本 2020.3.3 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2020,
+      "quarterOfYear" : 3,
+      "versionString" : "2020.3.3",
+      "indexOfRelease" : 3
+    }
+  }, {
+    "id" : "node.v2019_2_3.DuplicateColumn",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2019,
+      "quarterOfYear" : 2,
+      "versionString" : "2019.2.3",
+      "indexOfRelease" : 3
+    },
+    "notSupportedMessages" : [ "it_IT::Campi duplicati (supportato nelle versioni 2019.2.3 e successive)", "fr_CA::Champs en double (pris en charge dans la version 2019.2.3 et versions ultérieures)", "sv_SE::Duplicera fält (stöds i version 2019.2.3 och senare)", "pt_BR::Campos duplicados (suportado na versão 2019.2.3 e posteriores)", "th_TH::ฟิลด์ที่ทำซ้ำ (รองรับในเวอร์ชัน 2019.2.3 และใหม่กว่า)", "fr_FR::Champs en double (pris en charge dans la version 2019.2.3 et versions ultérieures)", "ja_JP::フィールドの複製 (バージョン 2019.2.3 以降でサポートされています)", "de_DE::Felder duplizieren (unterstützt in Version 2019.2.3 und höher)", "en_GB::Duplicate Fields (supported in version 2019.2.3 and later)", "zh_TW::重複欄位 (版本 2019.2.3 及更高版本中支援)", "ko_KR::필드 복제(버전 2019.2.3 이상에서 지원됨)", "en_US::Duplicate Fields (supported in version 2019.2.3 and later)", "ga_IE::33c5-表:6e3b-表:Duplicate Fields|桜 (supported in version 2019.2.3 and later)|桜", "es_ES::Duplicar campos (admitido en la versión 2019.2.3 y posteriores)", "zh_CN::重复字段 (版本 2019.2.3 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2019,
+      "quarterOfYear" : 2,
+      "versionString" : "2019.2.3",
+      "indexOfRelease" : 3
+    }
+  }, {
+    "id" : "node.v2020_1_3.MultiRowCalc",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2020,
+      "quarterOfYear" : 1,
+      "versionString" : "2020.1.3",
+      "indexOfRelease" : 3
+    },
+    "notSupportedMessages" : [ "it_IT::Calcoli Level of Detail Fixed e Classificazione (supportato nelle versioni 2020.1.3 e successive)", "fr_CA::Calculs de niveau de détail FIXED et calculs de classements (pris en charge dans la version 2020.1.3 et versions ultérieures)", "sv_SE::Fasta beräkningar av detaljnivå och rankning (stöds i version 2020.1.3 och senare)", "pt_BR::Cálculos fixos de nível de detalhe e classificação (suportado na versão 2020.1.3 e posteriores)", "th_TH::ระดับของรายละเอียดและการคำนวณอันดับที่แก้ไขแล้ว (รองรับในเวอร์ชัน 2020.1.3 และใหม่กว่า)", "fr_FR::Calculs de niveau de détail FIXED et calculs de classements (pris en charge dans la version 2020.1.3 et versions ultérieures)", "ja_JP::FIXED 詳細レベルとランク計算 (バージョン 2020.1.3 以降でサポートされています)", "de_DE::Fixed Detailsgenauigkeits- und Rangberechnungen (unterstützt in Version 2020.1.3 und höher)", "en_GB::Fixed Level of Detail and Rank Calculations (supported in version 2020.1.3 and later)", "zh_TW::修正詳細資料層級和排名計算 (版本 2020.1.3 及更高版本中支援)", "ko_KR::고정된 세부 수준 및 순위 계산(버전 2020.1.3 이상에서 지원됨)", "en_US::Fixed Level of Detail and Rank Calculations (supported in version 2020.1.3 and later)", "ga_IE::33c5-表:4935-表:Fixed Level of Detail and Rank Calculations|桜 (supported in version 2020.1.3 and later)|桜", "es_ES::Nivel de detalle fijo y cálculos de clasificación (admitido en la versión 2020.1.3 y posteriores)", "zh_CN::固定详细级别和排名计算 (版本 2020.1.3 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2020,
+      "quarterOfYear" : 1,
+      "versionString" : "2020.1.3",
+      "indexOfRelease" : 3
+    }
+  }, {
+    "id" : "node.v2019_1_4.Remap",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2019,
+      "quarterOfYear" : 1,
+      "versionString" : "2019.1.4",
+      "indexOfRelease" : 4
+    },
+    "notSupportedMessages" : [ "it_IT::Raggruppa valori tramite corrispondenze ruolo dati (supportato nelle versioni 2019.1.4 e successive)", "fr_CA::Regrouper des valeurs en utilisant des correspondances de rôles de données (pris en charge dans la version 2019.1.4 et versions ultérieures)", "sv_SE::Gruppera värden med datarollmatchningar (stöds i version 2019.1.4 och senare)", "pt_BR::Agrupar valores usando correspondências de funções de dados (suportado na versão 2019.1.4 e posteriores)", "th_TH::จัดกลุ่มค่าโดยใช้การจับคู่บทบาทข้อมูล (รองรับในเวอร์ชัน 2019.1.4 และใหม่กว่า)", "fr_FR::Regrouper les valeurs en utilisant des correspondances de rôles des données (pris en charge dans la version 2019.1.4 et versions ultérieures)", "ja_JP::データの役割の一致を使用した値のグループ (バージョン 2019.1.4 以降でサポートされています)", "de_DE::Werte per Datenrollenübereinstimmungen gruppieren (unterstützt in Version 2019.1.4 und höher)", "en_GB::Group Values using Data Role Matches (supported in version 2019.1.4 and later)", "zh_TW::使用資料角色符合將值分組 (版本 2019.1.4 及更高版本中支援)", "ko_KR::데이터 역할 일치를 통해 값 그룹화(버전 2019.1.4 이상에서 지원됨)", "en_US::Group Values using Data Role Matches (supported in version 2019.1.4 and later)", "ga_IE::33c5-表:3709-表:Group Values using Data Role Matches|桜 (supported in version 2019.1.4 and later)|桜", "es_ES::Agrupar valores que utilicen coincidencias de funciones de datos (admitido en la versión 2019.1.4 y posteriores)", "zh_CN::使用数据角色匹配将值分组 (版本 2019.1.4 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2018,
+      "quarterOfYear" : 1,
+      "versionString" : "2018.1.1",
+      "indexOfRelease" : 1
+    }
+  }, {
+    "id" : "node.v2019_3_1.LoadSqlProxy",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2019,
+      "quarterOfYear" : 3,
+      "versionString" : "2019.3.1",
+      "indexOfRelease" : 1
+    },
+    "notSupportedMessages" : [ "it_IT::Connetti a Tableau Server (supportato nelle versioni 2019.3.1 e successive)", "fr_CA::Connexion à Tableau Server (pris en charge dans la version 2019.3.1 et versions ultérieures)", "sv_SE::Anslut till Tableau Server (stöds i version 2019.3.1 och senare)", "pt_BR::Conectar ao Tableau Server (suportado na versão 2019.3.1 e posteriores)", "th_TH::เชื่อมต่อกับ Tableau Server (รองรับในเวอร์ชัน 2019.3.1 และใหม่กว่า)", "fr_FR::Connexion à Tableau Server (pris en charge dans la version 2019.3.1 et versions ultérieures)", "ja_JP::Tableau Server に接続 (バージョン 2019.3.1 以降でサポートされています)", "de_DE::Zu Tableau Server verbinden (unterstützt in Version 2019.3.1 und höher)", "en_GB::Connect to Tableau Server (supported in version 2019.3.1 and later)", "zh_TW::連線至 Tableau Server (版本 2019.3.1 及更高版本中支援)", "ko_KR::Tableau Server에 연결(버전 2019.3.1 이상에서 지원됨)", "en_US::Connect to Tableau Server (supported in version 2019.3.1 and later)", "ga_IE::33c5-表:7789-表:Connect to Tableau Server|桜 (supported in version 2019.3.1 and later)|桜", "es_ES::Conectar a Tableau Server (admitido en la versión 2019.3.1 y posteriores)", "zh_CN::连接到 Tableau Server (版本 2019.3.1 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2019,
+      "quarterOfYear" : 3,
+      "versionString" : "2019.3.1",
+      "indexOfRelease" : 1
+    }
+  }, {
+    "id" : "node.v2018_2_1.RichWildcardFilter",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2018,
+      "quarterOfYear" : 2,
+      "versionString" : "2018.2.1",
+      "indexOfRelease" : 1
+    },
+    "notSupportedMessages" : [ "it_IT::Filtro caratteri jolly (supportato nelle versioni 2018.2.1 e successive)", "fr_CA::Filtre de caractères génériques (pris en charge dans la version 2018.2.1 et versions ultérieures)", "sv_SE::Jokertecken-filter (stöds i version 2018.2.1 och senare)", "pt_BR::Filtro curinga (suportado na versão 2018.2.1 e posteriores)", "th_TH::ตัวกรองไวลด์การ์ด (รองรับในเวอร์ชัน 2018.2.1 และใหม่กว่า)", "fr_FR::Filtre de caractères génériques (pris en charge dans la version 2018.2.1 et versions ultérieures)", "ja_JP::ワイルドカード フィルター (バージョン 2018.2.1 以降でサポートされています)", "de_DE::Platzhalter-Filter (unterstützt in Version 2018.2.1 und höher)", "en_GB::Wildcard Filter (supported in version 2018.2.1 and later)", "zh_TW::萬用字元篩選器 (版本 2018.2.1 及更高版本中支援)", "ko_KR::와일드카드 필터(버전 2018.2.1 이상에서 지원됨)", "en_US::Wildcard Filter (supported in version 2018.2.1 and later)", "ga_IE::33c5-表:a3e1-表:Wildcard Filter|桜 (supported in version 2018.2.1 and later)|桜", "es_ES::Filtro de comodín (admitido en la versión 2018.2.1 y posteriores)", "zh_CN::通配符筛选器 (版本 2018.2.1 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2018,
+      "quarterOfYear" : 2,
+      "versionString" : "2018.2.1",
+      "indexOfRelease" : 1
+    }
+  }, {
+    "id" : "document.v2018_3_1.Flow",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2018,
+      "quarterOfYear" : 3,
+      "versionString" : "2018.3.1",
+      "indexOfRelease" : 1
+    },
+    "notSupportedMessages" : [ "it_IT::Operazioni di pulizia su join, unificazione, pivot o aggregazione (supportato nelle versioni 2018.3.1 e successive)", "fr_CA::Actions de nettoyage sur jointure, union, tableau croisé dynamique ou agrégation (pris en charge dans la version 2018.3.1 et versions ultérieures)", "sv_SE::Rensningsåtgärder i Koppla, Förena, Pivotera eller Aggregera (stöds i version 2018.3.1 och senare)", "pt_BR::Limpeza de ações em União de colunas, União de linhas, Dinamizar ou Agregar (suportado na versão 2018.3.1 e posteriores)", "th_TH::การดำเนินการล้างในการรวม ผนวก ทำการ Pivot หรือรวบรวม (รองรับในเวอร์ชัน 2018.3.1 และใหม่กว่า)", "fr_FR::Actions de nettoyage sur jointure, union, permutation ou agrégation (pris en charge dans la version 2018.3.1 et versions ultérieures)", "ja_JP::結合、ユニオン、ピボット、または集計でのアクションを作成する (バージョン 2018.3.1 以降でサポートされています)", "de_DE::Aufbereitungsaktionen für Verknüpfen, Vereinigen, Pivotieren oder Aggregieren (unterstützt in Version 2018.3.1 und höher)", "en_GB::Cleaning Actions on Join, Union, Pivot or Aggregate (supported in version 2018.3.1 and later)", "zh_TW::針對聯結、聯集、樞紐或彙總的清除操作 (版本 2018.3.1 及更高版本中支援)", "ko_KR::조인, 유니온, 피벗 또는 집계 관련 작업을 정리하는 중(버전 2018.3.1 이상에서 지원됨)", "en_US::Cleaning Actions on Join, Union, Pivot or Aggregate (supported in version 2018.3.1 and later)", "ga_IE::33c5-表:1f53-表:Cleaning Actions on Join, Union, Pivot or Aggregate|桜 (supported in version 2018.3.1 and later)|桜", "es_ES::Acciones de limpieza en Unión de columnas, Unión de filas, Tabla dinámica o Agregado (admitido en la versión 2018.3.1 y posteriores)", "zh_CN::针对联接、合并、转置或聚合的清理操作 (版本 2018.3.1 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2018,
+      "quarterOfYear" : 3,
+      "versionString" : "2018.3.1",
+      "indexOfRelease" : 1
+    }
+  }, {
+    "id" : "node.v2018_2_3.SuperAggregate",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2018,
+      "quarterOfYear" : 2,
+      "versionString" : "2018.2.3",
+      "indexOfRelease" : 3
+    },
+    "notSupportedMessages" : [ "it_IT::Azioni in aggregato (supportato nelle versioni 2018.2.3 e successive)", "fr_CA::Actions dans l’agrégation (pris en charge dans la version 2018.2.3 et versions ultérieures)", "sv_SE::Åtgärder i Aggregera (stöds i version 2018.2.3 och senare)", "pt_BR::Ações ao agregar (suportado na versão 2018.2.3 e posteriores)", "th_TH::การดำเนินการในผลรวม (รองรับในเวอร์ชัน 2018.2.3 และใหม่กว่า)", "fr_FR::Actions dans l’agrégation (pris en charge dans la version 2018.2.3 et versions ultérieures)", "ja_JP::集計内のアクション (バージョン 2018.2.3 以降でサポートされています)", "de_DE::Aktionen in Aggregieren (unterstützt in Version 2018.2.3 und höher)", "en_GB::Actions in Aggregate (supported in version 2018.2.3 and later)", "zh_TW::彙總中的操作 (版本 2018.2.3 及更高版本中支援)", "ko_KR::총 작업 수(버전 2018.2.3 이상에서 지원됨)", "en_US::Actions in Aggregate (supported in version 2018.2.3 and later)", "ga_IE::33c5-表:7299-表:Actions in Aggregate|桜 (supported in version 2018.2.3 and later)|桜", "es_ES::Acciones en agregado (admitido en la versión 2018.2.3 y posteriores)", "zh_CN::聚合中的操作 (版本 2018.2.3 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2018,
+      "quarterOfYear" : 2,
+      "versionString" : "2018.2.3",
+      "indexOfRelease" : 3
+    }
+  }, {
+    "id" : "node.v2018_2_3.SuperJoin",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2018,
+      "quarterOfYear" : 2,
+      "versionString" : "2018.2.3",
+      "indexOfRelease" : 3
+    },
+    "notSupportedMessages" : [ "it_IT::Azioni in join (supportato nelle versioni 2018.2.3 e successive)", "fr_CA::Actions dans la jointure (pris en charge dans la version 2018.2.3 et versions ultérieures)", "sv_SE::Åtgärder i Koppla (stöds i version 2018.2.3 och senare)", "pt_BR::Ações ao unir colunas (suportado na versão 2018.2.3 e posteriores)", "th_TH::การดำเนินการในการรวม (รองรับในเวอร์ชัน 2018.2.3 และใหม่กว่า)", "fr_FR::Actions dans la jointure (pris en charge dans la version 2018.2.3 et versions ultérieures)", "ja_JP::結合内のアクション (バージョン 2018.2.3 以降でサポートされています)", "de_DE::Aktionen in Verknüpfen (unterstützt in Version 2018.2.3 und höher)", "en_GB::Actions in Join (supported in version 2018.2.3 and later)", "zh_TW::聯結中的操作 (版本 2018.2.3 及更高版本中支援)", "ko_KR::조인 작업 수(버전 2018.2.3 이상에서 지원됨)", "en_US::Actions in Join (supported in version 2018.2.3 and later)", "ga_IE::33c5-表:501f-表:Actions in Join|桜 (supported in version 2018.2.3 and later)|桜", "es_ES::Acciones en unión de columnas (admitido en la versión 2018.2.3 y posteriores)", "zh_CN::联接中的操作 (版本 2018.2.3 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2018,
+      "quarterOfYear" : 2,
+      "versionString" : "2018.2.3",
+      "indexOfRelease" : 3
+    }
+  }, {
+    "id" : "node.v2018_2_3.SuperUnion",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2018,
+      "quarterOfYear" : 2,
+      "versionString" : "2018.2.3",
+      "indexOfRelease" : 3
+    },
+    "notSupportedMessages" : [ "it_IT::Azioni in unificazione (supportato nelle versioni 2018.2.3 e successive)", "fr_CA::Actions dans l’union (pris en charge dans la version 2018.2.3 et versions ultérieures)", "sv_SE::Åtgärder i Förena (stöds i version 2018.2.3 och senare)", "pt_BR::Ações ao unir linhas (suportado na versão 2018.2.3 e posteriores)", "th_TH::การดำเนินการในการผนวก (รองรับในเวอร์ชัน 2018.2.3 และใหม่กว่า)", "fr_FR::Actions dans l’union (pris en charge dans la version 2018.2.3 et versions ultérieures)", "ja_JP::ユニオン内のアクション (バージョン 2018.2.3 以降でサポートされています)", "de_DE::Aktionen in Vereinigung (unterstützt in Version 2018.2.3 und höher)", "en_GB::Actions in Union (supported in version 2018.2.3 and later)", "zh_TW::聯集中的操作 (版本 2018.2.3 及更高版本中支援)", "ko_KR::유니온 작업 수(버전 2018.2.3 이상에서 지원됨)", "en_US::Actions in Union (supported in version 2018.2.3 and later)", "ga_IE::33c5-表:346e-表:Actions in Union|桜 (supported in version 2018.2.3 and later)|桜", "es_ES::Acciones en unión de filas (admitido en la versión 2018.2.3 y posteriores)", "zh_CN::并集中的操作 (版本 2018.2.3 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2018,
+      "quarterOfYear" : 2,
+      "versionString" : "2018.2.3",
+      "indexOfRelease" : 3
+    }
+  }, {
+    "id" : "node.v2018_3_3.QuickCalcColumn",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2018,
+      "quarterOfYear" : 3,
+      "versionString" : "2018.3.3",
+      "indexOfRelease" : 3
+    },
+    "notSupportedMessages" : [ "it_IT::Operazione di pulizia rapida (supportato nelle versioni 2018.3.3 e successive)", "fr_CA::Opération de nettoyage rapide (pris en charge dans la version 2018.3.3 et versions ultérieures)", "sv_SE::Snabbrensningsåtgärd (stöds i version 2018.3.3 och senare)", "pt_BR::Operação rápida de limpeza (suportado na versão 2018.3.3 e posteriores)", "th_TH::การทำความสะอาดด่วน (รองรับในเวอร์ชัน 2018.3.3 และใหม่กว่า)", "fr_FR::Opération de nettoyage rapide (pris en charge dans la version 2018.3.3 et versions ultérieures)", "ja_JP::クイック クリーニング操作 (バージョン 2018.3.3 以降でサポートされています)", "de_DE::Schneller Bereinigungsvorgang (unterstützt in Version 2018.3.3 und höher)", "en_GB::Quick Cleaning Operation (supported in version 2018.3.3 and later)", "zh_TW::快速清除操作 (版本 2018.3.3 及更高版本中支援)", "ko_KR::빠른 정리 작업(버전 2018.3.3 이상에서 지원됨)", "en_US::Quick Cleaning Operation (supported in version 2018.3.3 and later)", "ga_IE::33c5-表:2d9b-表:Quick Cleaning Operation|桜 (supported in version 2018.3.3 and later)|桜", "es_ES::Operación de limpieza rápida (admitido en la versión 2018.3.3 y posteriores)", "zh_CN::快速清理操作 (版本 2018.3.3 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2018,
+      "quarterOfYear" : 3,
+      "versionString" : "2018.3.3",
+      "indexOfRelease" : 3
+    }
+  }, {
+    "id" : "node.v2018_3_3.SuperPivot",
+    "featureName" : "",
+    "firstSoftwareVersionSupportedIn" : {
+      "year" : 2018,
+      "quarterOfYear" : 3,
+      "versionString" : "2018.3.3",
+      "indexOfRelease" : 3
+    },
+    "notSupportedMessages" : [ "it_IT::Trasforma righe in colonne (supportato nelle versioni 2018.3.3 e successive)", "fr_CA::Permuter les lignes en colonnes (pris en charge dans la version 2018.3.3 et versions ultérieures)", "sv_SE::Pivotera rader till kolumner (stöds i version 2018.3.3 och senare)", "pt_BR::Dinamizar linhas para colunas (suportado na versão 2018.3.3 e posteriores)", "th_TH::ทำ Pivot แถวเป็นคอลัมน์ (รองรับในเวอร์ชัน 2018.3.3 และใหม่กว่า)", "fr_FR::Permuter les lignes en colonnes (pris en charge dans la version 2018.3.3 et versions ultérieures)", "ja_JP::行を列にピボットする (バージョン 2018.3.3 以降でサポートされています)", "de_DE::Zeilen in Spalten pivotieren (unterstützt in Version 2018.3.3 und höher)", "en_GB::Pivot Rows to Columns (supported in version 2018.3.3 and later)", "zh_TW::將列樞紐為欄 (版本 2018.3.3 及更高版本中支援)", "ko_KR::행을 열로 피벗(버전 2018.3.3 이상에서 지원됨)", "en_US::Pivot Rows to Columns (supported in version 2018.3.3 and later)", "ga_IE::33c5-表:2879-表:Pivot Rows to Columns|桜 (supported in version 2018.3.3 and later)|桜", "es_ES::Crear tabla dinámica de filas a columnas (admitido en la versión 2018.3.3 y posteriores)", "zh_CN::将行转置为列 (版本 2018.3.3 及更高版本中支持)" ],
+    "minimumCompatibleSoftwareVersion" : {
+      "year" : 2018,
+      "quarterOfYear" : 3,
+      "versionString" : "2018.3.3",
+      "indexOfRelease" : 3
+    }
+  } ]
+}

@@ -1,0 +1,2065 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test gray  and large Spinner It should render SparkLeaf with 0 rotation, 1200ms. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 48,
+      "width": 48,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "304.61538461538464deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "313.84615384615387deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "323.0769230769231deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "332.3076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "341.53846153846155deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "350.7692307692308deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test gray  and large Spinner It should render SparkLeaf with 0 rotation, 2400ms. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 48,
+      "width": 48,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test gray  and large Spinner It should render SparkLeaf with correct rotation. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 48,
+      "width": 48,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "138.46153846153845deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "175.38461538461536deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "212.3076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "249.23076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "286.15384615384613deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "323.0769230769231deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test gray  and large Spinner It should render SparkLeaf with half rotation. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 48,
+      "width": 48,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "0deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "55.38461538461539deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "110.76923076923077deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "166.15384615384616deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "221.53846153846155deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "276.92307692307696deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test gray  and small Spinner It should render SparkLeaf with 0 rotation, 1200ms. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 24,
+      "width": 24,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "304.61538461538464deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "313.84615384615387deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "323.0769230769231deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "332.3076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "341.53846153846155deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "350.7692307692308deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test gray  and small Spinner It should render SparkLeaf with 0 rotation, 2400ms. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 24,
+      "width": 24,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test gray  and small Spinner It should render SparkLeaf with correct rotation. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 24,
+      "width": 24,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "138.46153846153845deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "175.38461538461536deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "212.3076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "249.23076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "286.15384615384613deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "323.0769230769231deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test gray  and small Spinner It should render SparkLeaf with half rotation. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 24,
+      "width": 24,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "0deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "55.38461538461539deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "110.76923076923077deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "166.15384615384616deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "221.53846153846155deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "gray",
+        "transform": [
+          {
+            "rotate": "276.92307692307696deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test white  and large Spinner It should render SparkLeaf with 0 rotation, 1200ms. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 48,
+      "width": 48,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "304.61538461538464deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "313.84615384615387deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "323.0769230769231deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "332.3076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "341.53846153846155deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "350.7692307692308deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test white  and large Spinner It should render SparkLeaf with 0 rotation, 2400ms. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 48,
+      "width": 48,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test white  and large Spinner It should render SparkLeaf with correct rotation. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 48,
+      "width": 48,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "138.46153846153845deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "175.38461538461536deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "212.3076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "249.23076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "286.15384615384613deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "323.0769230769231deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test white  and large Spinner It should render SparkLeaf with half rotation. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 48,
+      "width": 48,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "0deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "55.38461538461539deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "110.76923076923077deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "166.15384615384616deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "221.53846153846155deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafLarge.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "276.92307692307696deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test white  and small Spinner It should render SparkLeaf with 0 rotation, 1200ms. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 24,
+      "width": 24,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "304.61538461538464deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "313.84615384615387deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "323.0769230769231deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "332.3076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "341.53846153846155deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "350.7692307692308deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test white  and small Spinner It should render SparkLeaf with 0 rotation, 2400ms. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 24,
+      "width": 24,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "360deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test white  and small Spinner It should render SparkLeaf with correct rotation. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 24,
+      "width": 24,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "138.46153846153845deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "175.38461538461536deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "212.3076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "249.23076923076923deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "286.15384615384613deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "323.0769230769231deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;
+
+exports[`Test white  and small Spinner It should render SparkLeaf with half rotation. 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "alignSelf": "center",
+      "height": 24,
+      "width": 24,
+    }
+  }
+  testID="Spinner"
+>
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "0deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "55.38461538461539deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "110.76923076923077deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "166.15384615384616deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "221.53846153846155deg",
+          },
+        ],
+      }
+    }
+  />
+  <Image
+    collapsable={false}
+    source={
+      {
+        "testUri": "../../../assets/images/SparkLeafSmall.png",
+      }
+    }
+    style={
+      {
+        "position": "absolute",
+        "tintColor": "white",
+        "transform": [
+          {
+            "rotate": "276.92307692307696deg",
+          },
+        ],
+      }
+    }
+  />
+</View>
+`;

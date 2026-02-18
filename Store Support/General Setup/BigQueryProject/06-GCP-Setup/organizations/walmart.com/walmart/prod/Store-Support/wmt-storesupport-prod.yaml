@@ -1,0 +1,282 @@
+projects:
+  # Store Support GCP Project Configuration
+  # Project ID: wmt-storesupport-prod
+  # Team: Walmart Home Office Store Support
+  # Purpose: Enable software and product development for Walmart store support teams
+  # SSP & APM: Shared with Path to Production infrastructure
+  
+  - 'wmt-storesupport-prod':
+      #################################################################
+      # Project Name
+      # Friendly name for the Store Support project
+      project_name: 'Store Support - Production'
+      #################################################################
+
+      #################################################################
+      # *REQUIRED* - Billing Account
+      # To be filled with actual Walmart billing account ID
+      # Format: XXXXXX-XXXXXX-XXXXXX
+      billing_account: '[STORE-SUPPORT-BILLING-ACCOUNT-ID]'
+      #################################################################
+
+      #################################################################
+      # Project Labels for Governance and Cost Tracking
+      labels:
+        costcenter: 'US07858'                                # Store Support cost center
+        notificationdistlist: 'group:gcp-storesupport-prod-admin@walmart.com'
+        teamname: 'store-support'                            # Store Support team
+        applicationname: 'store-support-platform'            # Application name
+        environment: 'prod'                                   # Production
+        owner: 'group:gcp-storesupport-prod-admin@walmart.com'
+        businessunit: 'store-operations'                     # Business unit
+        purpose: 'software-product-development'              # Purpose
+      #################################################################
+
+      #################################################################
+      # Enabled APIs for Store Support Operations
+      # Includes APIs for data processing, analytics, and application deployment
+      apis:
+        - 'bigquery'                  # Data analytics and warehousing
+        - 'bigqueryconnection'        # BigQuery connections
+        - 'bigquerydatatransfer'      # BigQuery data transfers
+        - 'storage'                   # Cloud Storage
+        - 'storage-api'               # Storage API
+        - 'storage-component'         # Storage component
+        - 'compute'                   # Compute Engine
+        - 'container'                 # GKE (Kubernetes Engine)
+        - 'containerregistry'         # Container Registry
+        - 'cloudsql'                  # Cloud SQL managed databases
+        - 'dataproc'                  # Dataproc for Hadoop/Spark
+        - 'dataflow'                  # Dataflow for data pipelines
+        - 'composer'                  # Cloud Composer (Apache Airflow)
+        - 'cloudfunctions'            # Cloud Functions serverless
+        - 'run'                       # Cloud Run container runtime
+        - 'monitoring'                # Cloud Monitoring
+        - 'logging'                   # Cloud Logging
+        - 'cloudtrace'                # Cloud Trace
+        - 'clouderrorreporting'       # Error Reporting
+        - 'cloudresourcemanager'      # Resource Manager
+        - 'iam'                       # Identity and Access Management
+        - 'iamcredentials'            # IAM Credentials API
+        - 'iap'                       # Identity-Aware Proxy
+        - 'secretmanager'             # Secret Manager
+        - 'cloudkms'                  # Cloud Key Management Service
+        - 'pubsub'                    # Cloud Pub/Sub messaging
+        - 'cloudscheduler'            # Cloud Scheduler
+        - 'cloudtasks'                # Cloud Tasks
+        - 'artifactregistry'          # Artifact Registry
+        - 'cloudbuild'                # Cloud Build CI/CD
+        - 'cloudshell'                # Cloud Shell
+        - 'deploymentmanager'         # Deployment Manager
+        - 'stackdriver'               # Stackdriver (monitoring)
+        - 'servicenetworking'         # Service Networking
+        - 'serviceusage'              # Service Usage
+        - 'servicehealth'             # Service Health
+        - 'aiplatform'                # Vertex AI platform
+        - 'automl'                    # AutoML
+        - 'language'                  # Cloud Natural Language
+        - 'translate'                 # Cloud Translation
+        - 'vision'                    # Cloud Vision
+        - 'notebooks'                 # Vertex AI Notebooks
+        - 'dataplex'                  # Dataplex data management
+      #################################################################
+
+      #################################################################
+      # Storage Bucket Configuration
+      # Will create and configure a Cloud Storage bucket for exports
+      bucket_export_settings:
+        create-bucket: true
+      #################################################################
+
+      #################################################################
+      # Service Accounts for Store Support Operations
+      # Each service account has specific roles and purposes
+      service_accounts:
+        - 'storesupport-etl-sa'              # ETL and data processing
+        - 'storesupport-app-sa'              # Application services
+        - 'storesupport-analytics-sa'        # Analytics and reporting
+        - 'storesupport-deploy-sa'           # Deployment and CI/CD
+      #################################################################
+
+      #################################################################
+      # IAM Role Bindings for Store Support
+      # AD Groups and Service Accounts mapped to GCP roles
+      roles:
+        # Base Project Roles
+        roles/owner:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        roles/editor:
+          members:
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+            - 'serviceAccount:storesupport-deploy-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        # BigQuery Roles - Data Access
+        roles/bigquery.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+            - 'serviceAccount:storesupport-etl-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        roles/bigquery.dataEditor:
+          members:
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+            - 'serviceAccount:storesupport-etl-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+            - 'serviceAccount:storesupport-app-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        roles/bigquery.dataViewer:
+          members:
+            - 'group:gcp-storesupport-prod-analyst@walmart.com'
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+            - 'serviceAccount:storesupport-analytics-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+            - 'serviceAccount:storesupport-app-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        roles/bigquery.user:
+          members:
+            - 'group:gcp-storesupport-prod-analyst@walmart.com'
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+            - 'serviceAccount:storesupport-etl-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+            - 'serviceAccount:storesupport-analytics-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        roles/bigquery.jobUser:
+          members:
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+            - 'group:gcp-storesupport-prod-analyst@walmart.com'
+            - 'serviceAccount:storesupport-etl-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        # Storage Roles
+        roles/storage.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+            - 'serviceAccount:storesupport-etl-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        roles/storage.objectAdmin:
+          members:
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+            - 'serviceAccount:storesupport-etl-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        roles/storage.objectViewer:
+          members:
+            - 'group:gcp-storesupport-prod-analyst@walmart.com'
+            - 'serviceAccount:storesupport-analytics-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        # Compute Roles
+        roles/compute.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        roles/compute.instanceAdmin.v1:
+          members:
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+
+        # Container/Kubernetes Roles
+        roles/container.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+            - 'serviceAccount:storesupport-deploy-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        # Cloud SQL Roles
+        roles/cloudsql.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        roles/cloudsql.client:
+          members:
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+            - 'serviceAccount:storesupport-app-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        # Dataproc Roles
+        roles/dataproc.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        # Cloud Composer (Airflow) Roles
+        roles/composer.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        roles/composer.worker:
+          members:
+            - 'serviceAccount:storesupport-etl-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        # Cloud Build CI/CD Roles
+        roles/cloudbuild.builds.editor:
+          members:
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+            - 'serviceAccount:storesupport-deploy-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        # Service Account Roles
+        roles/iam.serviceAccountUser:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+            - 'serviceAccount:storesupport-deploy-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        roles/iam.serviceAccountTokenCreator:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        # Secret Manager Roles
+        roles/secretmanager.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        roles/secretmanager.secretAccessor:
+          members:
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+            - 'serviceAccount:storesupport-app-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+            - 'serviceAccount:storesupport-etl-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        # Logging and Monitoring Roles
+        roles/logging.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        roles/logging.logWriter:
+          members:
+            - 'serviceAccount:storesupport-etl-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+            - 'serviceAccount:storesupport-app-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        roles/monitoring.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        roles/monitoring.metricWriter:
+          members:
+            - 'serviceAccount:storesupport-app-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+            - 'serviceAccount:storesupport-etl-sa@wmt-storesupport-prod.iam.gserviceaccount.com'
+
+        # Vertex AI Roles
+        roles/aiplatform.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        roles/aiplatform.user:
+          members:
+            - 'group:gcp-storesupport-dev-admin@walmart.com'
+
+        # Cloud Functions Roles
+        roles/cloudfunctions.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        # Cloud Run Roles
+        roles/run.admin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        # Service Usage Roles
+        roles/serviceusage.serviceUsageAdmin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+
+        # Resource Manager Roles
+        roles/resourcemanager.projectIamAdmin:
+          members:
+            - 'group:gcp-storesupport-prod-admin@walmart.com'
+      #################################################################
+
+      #################################################################
+      # VPC Service Controls Configuration
+      # Add project to VPC Service Controls security perimeter
+      enable_vpc_svc_ctrls: True
+      #################################################################

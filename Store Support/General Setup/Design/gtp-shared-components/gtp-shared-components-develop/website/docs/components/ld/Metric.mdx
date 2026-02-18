@@ -1,0 +1,62 @@
+---
+title: Metric
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+The Metric displays the value of a significant data point.
+
+Metric emphasizes a single, specific value that informs users of a critical data point. It allows users to identify meaningful changes and act on them.
+
+Leverage Metric to show point-in-time data, trends over time, key performance indicators, or progress against a goal.
+
+
+<ScreenshotTabs screenshotData={{"metric-neutral":"screenshots/metric-neutral.png","metric-positive":"screenshots/metric-positive.png","metric-negative":"screenshots/metric-negative.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Metric} from '@walmart/gtp-shared-components`;
+
+<Metric
+  title="Real-Time WOSH and overtime"
+  textLabel="3 hours more then last month"
+  timescope="MTD"
+  value="24"
+  unit="hours"
+  variant="neutral"
+ />
+
+<Metric
+  title="Real-Time WOSH and overtime"
+  textLabel="3 hours more then last month"
+  timescope="MTD"
+  value="24"
+  unit="hours"
+  variant="neutral"
+  withCardLayout={true}
+ />
+```
+## Props
+
+ ### textLabel
+<PropTable componentLink="Metric" prop="textLabel"/>
+ ### timescope
+<PropTable componentLink="Metric" prop="timescope"/>
+ ### title(required)
+<PropTable componentLink="Metric" prop="title"/>
+ ### unit
+<PropTable componentLink="Metric" prop="unit"/>
+ ### value(required)
+<PropTable componentLink="Metric" prop="value"/>
+ ### UNSAFE_style
+<PropTable componentLink="Metric" prop="UNSAFE_style"/>
+ ### variant
+<PropTable componentLink="Metric" prop="variant"/>
+ ### withCardLayout
+<PropTable componentLink="Metric" prop="withCardLayout"/>
+ ### onPress
+<PropTable componentLink="Metric" prop="onPress"/>
+ ### showOnPressIndicator
+<PropTable componentLink="Metric" prop="showOnPressIndicator"/>
+ ### pressedColor
+<PropTable componentLink="Metric" prop="pressedColor"/>

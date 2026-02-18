@@ -1,0 +1,89 @@
+{
+  "name": "@walmart/gtp-shared-icons",
+  "version": "1.0.12",
+  "description": "Shared icons for Living Design themed React Native apps at Walmart",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.js",
+  "files": [
+    "assets/",
+    "dist/",
+    "src/",
+    "declarations.d.ts"
+  ],
+  "scripts": {
+    "build": "npx tsc -p tsconfig.build.json",
+    "build:noEmit": "npx tsc -p tsconfig.build.json --noEmit",
+    "build:watch": "npx tsc -p tsconfig.build.json --watch",
+    "check:env": "./scripts/checkEnvironment.sh",
+    "check:spaces": "./scripts/checkSpaces.sh",
+    "docs": "npx styleguidist build",
+    "docs:dev": "npx styleguidist server",
+    "format": "npx prettier --write .",
+    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:watch": "npx esw . --clear --quiet --watch --ext .js,.jsx,.ts,.tsx",
+    "lint:icons": "npx eslint src/icons --fix --ext .js,.jsx,.ts,.tsx",
+    "prepublishOnly": "npm run build",
+    "refreshIcons": "./scripts/refreshIcons.sh",
+    "test": "npx jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gecgithub01.walmart.com/electrode-mobile-platform/gtp-shared-icons.git"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://gecgithub01.walmart.com/pages/electrode-mobile-platform/gtp-shared-icons/",
+  "dependencies": {
+    "@livingdesign/tokens": "0.74.0",
+    "lodash": "^4.17.15",
+    "moment": "^2.27.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "@livingdesign/bogle": "^0.1.13",
+    "@react-native/eslint-config": "^0.72.2",
+    "@react-native/metro-config": "^0.72.11",
+    "@testing-library/react-native": "^12.4.1",
+    "@tsconfig/react-native": "^3.0.0",
+    "@types/imagemin": "^8.0.5",
+    "@types/imagemin-optipng": "^5.2.4",
+    "@types/jest": "^29.5.11",
+    "@types/lodash": "^4.14.155",
+    "@types/node": "^18.11.18",
+    "@types/react-test-renderer": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/parser": "^5.7.0",
+    "babel-jest": "^29.3.1",
+    "babel-loader": "^9.1.2",
+    "babel-plugin-react-native-web": "^0.18.12",
+    "eslint": "^8.19.0",
+    "eslint-watch": "^8.0.0",
+    "imagemin": "^9.0.0",
+    "imagemin-optipng": "^8.0.0",
+    "jest": "^29.2.1",
+    "metro-react-native-babel-preset": "0.76.8",
+    "prettier": "^2.5.1",
+    "react": "18.2.0",
+    "react-docgen-typescript": "^2.2.2",
+    "react-dom": "18.2.0",
+    "react-native": "0.72.9",
+    "react-native-web": "^0.18.10",
+    "react-styleguidist": "13.0.0",
+    "react-test-renderer": "18.2.0",
+    "typescript": "4.8.4",
+    "url-loader": "^4.1.0",
+    "webpack": "^5.75.0"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "resolutions": {
+    "@types/react": "^18.2.0"
+  },
+  "packageManager": "yarn@4.1.1"
+}

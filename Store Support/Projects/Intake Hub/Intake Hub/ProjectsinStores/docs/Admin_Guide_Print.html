@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects in Stores Dashboard - Admin Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            color: #0071ce;
+            border-bottom: 3px solid #0071ce;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #0071ce;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #0071ce;
+            padding-left: 10px;
+        }
+        h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #0071ce;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .card {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .action-box {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .approve { background: #28a745; color: white; }
+        .deny { background: #dc3545; color: white; }
+        .hold { background: #ffc107; color: #333; }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .checklist li:before {
+            content: "☐ ";
+            font-size: 1.2em;
+        }
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+        .workflow {
+            background: #e8f4fd;
+            border: 2px solid #0071ce;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .workflow-step {
+            display: inline-block;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 5px;
+            border: 1px solid #0071ce;
+        }
+        .arrow {
+            display: inline-block;
+            margin: 0 5px;
+            color: #0071ce;
+            font-size: 1.5em;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .quick-ref {
+            background: #0071ce;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .quick-ref h3 {
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+        .quick-ref code {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        @media print {
+            body { padding: 20px; }
+            .page-break { page-break-before: always; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Projects in Stores Dashboard - Admin Guide</h1>
+    
+    <h2>Getting Started</h2>
+    
+    <h3>Accessing the Admin Dashboard</h3>
+    <table>
+        <tr>
+            <th>Setting</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Dashboard URL</td>
+            <td><code>http://localhost:8001/admin</code></td>
+        </tr>
+        <tr>
+            <td>Primary Login</td>
+            <td>Username: <code>kendall.rush</code> &nbsp;|&nbsp; Password: <code>admin2026</code></td>
+        </tr>
+        <tr>
+            <td>Backup Login</td>
+            <td>Username: <code>admin</code> &nbsp;|&nbsp; Password: <code>copilot123</code></td>
+        </tr>
+    </table>
+
+    <h2>Understanding Fix Cards</h2>
+    <p>Each pending fix displays detailed information about the reported issue:</p>
+    
+    <table>
+        <tr>
+            <th>Field</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><strong>Fix ID</strong></td>
+            <td>Unique identifier (e.g., FIX-001)</td>
+        </tr>
+        <tr>
+            <td><strong>Category</strong></td>
+            <td>Type of issue (filter_issue, display_bug, etc.)</td>
+        </tr>
+        <tr>
+            <td><strong>Priority</strong></td>
+            <td>HIGH, MEDIUM, or LOW</td>
+        </tr>
+        <tr>
+            <td><strong>Description</strong></td>
+            <td>Summary of the reported issue</td>
+        </tr>
+        <tr>
+            <td><strong>Root Cause</strong></td>
+            <td>AI's analysis of what caused the problem</td>
+        </tr>
+        <tr>
+            <td><strong>Investigation Notes</strong></td>
+            <td>Step-by-step analysis the AI performed</td>
+        </tr>
+        <tr>
+            <td><strong>Files Analyzed</strong></td>
+            <td>List of code files the AI examined</td>
+        </tr>
+        <tr>
+            <td><strong>Current Code</strong></td>
+            <td>Existing code that will be replaced</td>
+        </tr>
+        <tr>
+            <td><strong>New Code</strong></td>
+            <td>Proposed replacement code</td>
+        </tr>
+    </table>
+
+    <div class="warning">
+        <strong>⚠️ NEEDS REVIEW Badge:</strong> When you see this badge, the AI flagged the issue as complex and requires extra careful review before approval.
+    </div>
+
+    <h2>Taking Action</h2>
+    
+    <div class="card">
+        <span class="action-box approve">✅ Approve</span>
+        <p><strong>When to use:</strong> The analysis correctly identifies the root cause and the proposed fix is appropriate.</p>
+        <p><strong>Result:</strong> Code change is automatically applied to the specified file.</p>
+    </div>
+    
+    <div class="card">
+        <span class="action-box deny">❌ Deny</span>
+        <p><strong>When to use:</strong> The analysis is incorrect, fix wouldn't solve the problem, or change could cause other issues.</p>
+        <p><strong>Result:</strong> Fix is marked as denied and moved to history. No code changes are made.</p>
+    </div>
+    
+    <div class="card">
+        <span class="action-box hold">⏸️ Hold</span>
+        <p><strong>When to use:</strong> Need more time to review, want to consult with someone, or requires additional investigation.</p>
+        <p><strong>Result:</strong> Fix remains in the pending queue with "On Hold" status.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>Workflow Overview</h2>
+    <div class="workflow">
+        <div class="workflow-step">User Reports Feedback</div>
+        <span class="arrow">→</span>
+        <div class="workflow-step">AI Analyzes & Investigates</div>
+        <span class="arrow">→</span>
+        <div class="workflow-step">Email Sent to Admin</div>
+        <span class="arrow">→</span>
+        <div class="workflow-step">Admin Reviews</div>
+        <span class="arrow">→</span>
+        <div class="workflow-step">Approve / Deny / Hold</div>
+    </div>
+
+    <h2>Priority Levels</h2>
+    <table>
+        <tr>
+            <th>Priority</th>
+            <th>Response Time</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td class="priority-high">🔴 HIGH</td>
+            <td>Same day</td>
+            <td>Critical issues affecting core functionality</td>
+        </tr>
+        <tr>
+            <td class="priority-medium">🟡 MEDIUM</td>
+            <td>1-2 days</td>
+            <td>Notable issues but workarounds exist</td>
+        </tr>
+        <tr>
+            <td class="priority-low">🟢 LOW</td>
+            <td>1 week</td>
+            <td>Minor issues or enhancements</td>
+        </tr>
+    </table>
+
+    <h2>Review Checklist</h2>
+    <p>Before approving any fix, verify the following:</p>
+    <ul class="checklist">
+        <li>Read the <strong>Investigation Notes</strong> - understand how AI reached its conclusion</li>
+        <li>Compare <strong>Current Code</strong> vs <strong>New Code</strong> - ensure change is appropriate</li>
+        <li>Check the <strong>File Path</strong> - confirm the correct file is being modified</li>
+        <li>Look for <strong>⚠️ NEEDS REVIEW</strong> badge - extra caution required</li>
+        <li>Consider <strong>side effects</strong> - could this change affect other features?</li>
+    </ul>
+
+    <h2>When to Escalate</h2>
+    <p>Contact the development team if:</p>
+    <ul>
+        <li>Changes involve authentication or security code</li>
+        <li>Multiple files need modification</li>
+        <li>Code change is more than 15 lines</li>
+        <li>You're unsure about the potential impact</li>
+        <li>Fix marked with ⚠️ NEEDS REVIEW and you're not confident</li>
+    </ul>
+
+    <h2>Troubleshooting</h2>
+    <table>
+        <tr>
+            <th>Problem</th>
+            <th>Solution</th>
+        </tr>
+        <tr>
+            <td>"Fix application failed"</td>
+            <td>The code may have changed since analysis. Contact dev team to manually apply.</td>
+        </tr>
+        <tr>
+            <td>"File not found"</td>
+            <td>Target file may have been moved or renamed. Deny and request new analysis.</td>
+        </tr>
+        <tr>
+            <td>Dashboard not loading</td>
+            <td>Verify server is running at <code>localhost:8001/api/health</code></td>
+        </tr>
+        <tr>
+            <td>Can't login</td>
+            <td>Clear browser cookies and try backup credentials</td>
+        </tr>
+    </table>
+
+    <div class="quick-ref">
+        <h3>Quick Reference</h3>
+        <p><strong>Dashboard:</strong> <code>localhost:8001/admin</code></p>
+        <p><strong>Actions:</strong> ✅ Approve (apply) | ❌ Deny (reject) | ⏸️ Hold (later)</p>
+        <p><strong>Always check:</strong> Investigation Notes → Code Changes → File Path → Side Effects</p>
+        <p><strong>Support Email:</strong> ATCteamsupport@walmart.com</p>
+    </div>
+
+    <p style="text-align: center; margin-top: 40px; color: #666; font-size: 0.9em;">
+        <em>Last Updated: January 19, 2026</em>
+    </p>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# The following GitHub team is the owner of this repo
+
+# See https://gecgithub01.walmart.com/orgs/electrode-mobile-platform/teams/gtp-mobile-engineers for team details.
+
+# This team will be automatically added as a reviewer to a pull request (PR) upon PR creation.
+
+# NOTE: for this to work, gtp-mobile-engineers has to be added as an admin on this repo
+
+- @electrode-mobile-platform/gtp-mobile-engineers

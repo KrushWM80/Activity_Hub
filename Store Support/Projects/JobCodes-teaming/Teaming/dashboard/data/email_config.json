@@ -1,0 +1,24 @@
+{
+    "_instructions": "Configure email settings below. Options for 'method': 'graph', 'smtp', 'outlook', 'log'",
+    "_method_descriptions": {
+        "graph": "Microsoft Graph API (recommended for O365) - requires Azure AD app registration",
+        "smtp": "Direct SMTP with authentication - works with O365 or Exchange",
+        "outlook": "Opens local Outlook client to compose email",
+        "log": "Just logs emails to email_queue.json for manual processing"
+    },
+    
+    "method": "log",
+    
+    "_graph_instructions": "Register app at https://portal.azure.com > Azure AD > App registrations. Grant Mail.Send permission.",
+    "tenant_id": "",
+    "client_id": "",
+    "client_secret": "",
+    "sender_email": "ATCTEAMSUPPORT@walmart.com",
+    
+    "_smtp_instructions": "For O365: smtp.office365.com:587. For Walmart internal: try smtp.wal-mart.com:25",
+    "smtp_server": "smtp.office365.com",
+    "smtp_port": 587,
+    "smtp_username": "",
+    "smtp_password": "",
+    "from_email": "ATCTEAMSUPPORT@walmart.com"
+}

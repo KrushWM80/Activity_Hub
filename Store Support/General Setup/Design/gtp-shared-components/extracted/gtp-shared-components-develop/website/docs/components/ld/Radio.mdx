@@ -1,0 +1,39 @@
+---
+title: Radio
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Radio buttons represent a group of mutually exclusive choices, compared to
+checkboxes that allow users to make one or more selections from a group.
+In use cases where only one selection of a group is allowed, use the radio
+button component instead of the checkbox.
+
+
+<ScreenshotTabs screenshotData={"screenshots/radio.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Radio} from '@walmart/gtp-shared-components`;
+
+<Radio label="Unselected" />
+<Radio label="Selected" checked />
+<Radio label="Unselected (disabled)" disabled />
+<Radio label="Selected (disabled)" checked disabled />
+<Radio />
+<Radio checked />
+<Radio disabled />
+<Radio checked disabled />
+```
+## Props
+
+ ### checked
+<PropTable componentLink="Radio" prop="checked"/>
+ ### label
+<PropTable componentLink="Radio" prop="label"/>
+ ### UNSAFE_style
+<PropTable componentLink="Radio" prop="UNSAFE_style"/>
+ ### value<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. use <strong>checked</strong> instead..</span></span>
+<PropTable componentLink="Radio" prop="value"/>
+ ### onChange<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. use <strong>onPress</strong> instead..</span></span>
+<PropTable componentLink="Radio" prop="onChange"/>

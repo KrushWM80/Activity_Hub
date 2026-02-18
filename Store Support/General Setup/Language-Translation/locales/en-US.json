@@ -1,0 +1,119 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "loading": "Loading",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "store": "Store",
+    "of": "of"
+  },
+  "header": {
+    "title": "Refresh Touring Guide",
+    "subtitle": "America's Favorite Place to Shop",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "logout": "Logout",
+    "settings": "Settings"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "items": "Items",
+    "survey": "Survey",
+    "reports": "Reports",
+    "management": "Management",
+    "admin": "Admin",
+    "backToDashboard": "Back to Dashboard"
+  },
+  "login": {
+    "title": "Sign In",
+    "email": "Email Address",
+    "password": "Password",
+    "signIn": "Sign In",
+    "forgotPassword": "Forgot Password?",
+    "storeNumber": "Store Number",
+    "role": "Role",
+    "quickLogin": "Quick Login"
+  },
+  "dashboard": {
+    "title": "Business Owner Dashboard",
+    "welcome": "Welcome back, {{name}}!",
+    "subtitle": "Monitor and manage refresh items across all stores.",
+    "overallProgress": "Overall Progress",
+    "itemsCompleted": "items completed across all areas",
+    "complete": "Complete",
+    "viewManageAll": "View & Manage All Items",
+    "reportIt": "Report IT!",
+    "storeNumber": "Store #{{number}}",
+    "managerRole": "{{role}} Role"
+  },
+  "items": {
+    "title": "All Items",
+    "viewAllItems": "View All Items",
+    "reviewItems": "Review and continue refresh items",
+    "itemName": "Item Name",
+    "owner": "Owner",
+    "deadline": "Deadline",
+    "status": "Status",
+    "resources": "Resources",
+    "actions": "Actions",
+    "viewItem": "View Item",
+    "updateItem": "Update Item",
+    "saveChanges": "Save Changes",
+    "noDeadline": "No deadline",
+    "unassigned": "Unassigned",
+    "noResources": "No Resources",
+    "resource": "Resource",
+    "resources_plural": "Resources",
+    "createItem": "Create Item"
+  },
+  "status": {
+    "pending": "Pending",
+    "completed": "Completed",
+    "na": "N/A",
+    "inProgress": "In Progress",
+    "onHold": "On Hold"
+  },
+  "survey": {
+    "title": "View Item",
+    "area": "Area",
+    "topic": "Topic",
+    "item": "Item",
+    "owner": "Owner",
+    "deadline": "Deadline",
+    "status": "Status",
+    "notes": "Notes",
+    "addNotes": "Add Notes",
+    "notesPlaceholder": "Do you have any Notes for this Item?"
+  },
+  "roles": {
+    "manager": "Manager",
+    "coach": "Coach",
+    "admin": "Admin",
+    "business": "Business Owner",
+    "siteOwner": "Site Owner",
+    "associate": "Associate"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "notFound": "Resource not found.",
+    "validation": "Please check your input and try again."
+  },
+  "success": {
+    "saved": "Changes saved successfully",
+    "deleted": "Deleted successfully",
+    "created": "Created successfully",
+    "updated": "Updated successfully"
+  }
+}

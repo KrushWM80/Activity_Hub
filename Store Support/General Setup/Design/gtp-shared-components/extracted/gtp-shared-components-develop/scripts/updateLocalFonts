@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2086
+# shellcheck disable=SC1091
+
+# NOOP if running on Looper
+test "$(id -u -n )" = "jenkinspan" && exit 0
+
+
+HEADER=$(cat<<'EOH'
+#=====================================================================
+# updateLocalFonts.sh
+#=====================================================================
+# DESCRIPTION
+#    This script copies the Bogle fonts from @livingdesign/bogle
+#    into ./assets/fonts
+#    It is run during postinstall (only when running yarn locally)
+#
+#- OPTIONS
+#-    -h, --help                Print detail help (this HEADER)
+#-
+#=====================================================================
+EOH
+:)
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPTS_DIR="$PROJECT_DIR/scripts"
+SOURCE_DIR="$PROJECT_DIR/node_modules/@livingdesign/bogle/fonts"
+
+#=====================================================================
+# Functions
+#=====================================================================
+# shellcheck source=$SCRIPTS_DIR/common.sh
+source $SCRIPTS_DIR/common.sh
+
+SELF=$(basename "$0")
+usage()         { echo "$HEADER"|grep -e "^#[%+-]" | sed -e "s/^#[%+-]//g" -e "s/\$0/$SELF/g"; }
+showHelp()      { echo; echo "$HEADER"|grep -e "^#" | sed -e "s/^#[%+-]*//g" -e "s/\$0/$SELF/g"; echo; exit 0; }
+mkTempFile()    { echo "/tmp/${SELF}.${RANDOM}.txt"; }
+
+#=====================================================================
+# Get input parameters
+#=====================================================================
+(( $# != 0 && $# != 1)) && \
+  bailWithUsage "garbled command options"
+while [ $# -gt 0 ]; do
+  # echo "$#, $*"
+  case $1 in
+  (-h|--help)     showHelp; break;;
+  (-*)  bailWithUsage "$1: unknown option"; break;;
+  (*) break;;
+  esac
+done
+
+# Chek if node_modules exists
+test -d node_modules
+(( $? )) &&  "You need to run 'yarn' first"
+
+# Extract fonts version
+version=$(grep "\"version\":" ./node_modules/@livingdesign/bogle/package.json 2>/dev/null|sed -e 's/^..*: "\(..*\)",/\1/g')
+
+# Compare with previous version
+prevVersion=$(head -1 ./assets/fonts/version.txt 2>/dev/null)
+
+if  [[ "$version" == "$prevVersion" ]]; then
+  echo "Fonts are up to date. Version: $version"
+else
+
+  step="Updating local fonts ..."
+  echo "$step"
+  cp $SOURCE_DIR/Bogle/OTF/* ./assets/fonts && \
+  cp $SOURCE_DIR/BogleMono/OTF/* ./assets/fonts
+  ret=$?
+  if (( ! ret )); then
+    step="    Saving new fonts version ... "
+    echo $version > ./assets/fonts/version.txt
+    echo "Fonts have been updated. Version: $version"
+  else
+    errorHandler $ret "something went wrong during step: $step."
+  fi
+fi

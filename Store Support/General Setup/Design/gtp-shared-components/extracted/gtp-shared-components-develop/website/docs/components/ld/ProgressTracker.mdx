@@ -1,0 +1,47 @@
+---
+title: ProgressTracker
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Progress tracker is a visual representation of a users progress through a set of steps.
+They inform the user of the number of steps required to complete a specified process.
+
+
+<ScreenshotTabs screenshotData={"screenshots/progress-tracker.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {ProgressTracker, ProgressTrackerItem} from '@walmart/gtp-shared-components`;
+
+<ProgressTracker activeIndex={2} variant="info" >
+   <ProgressTrackerItem>Label1</ProgressTrackerItem>
+   <ProgressTrackerItem>Label2</ProgressTrackerItem>
+   <ProgressTrackerItem>Label3</ProgressTrackerItem>
+   <ProgressTrackerItem>Label4</ProgressTrackerItem>
+</ProgressTracker>
+```
+## Props
+
+ ### activeIndex
+<PropTable componentLink="ProgressTracker" prop="activeIndex"/>
+ ### UNSAFE_style
+<PropTable componentLink="ProgressTracker" prop="UNSAFE_style"/>
+ ### variant
+<PropTable componentLink="ProgressTracker" prop="variant"/>
+ ### stepCount<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ProgressTracker" prop="stepCount"/>
+ ### completeCount<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ProgressTracker" prop="completeCount"/>
+ ### labels<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ProgressTracker" prop="labels"/>
+ ### title<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ProgressTracker" prop="title"/>
+ ### subtitle<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ProgressTracker" prop="subtitle"/>
+ ### button<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ProgressTracker" prop="button"/>
+ ### link<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ProgressTracker" prop="link"/>
+ ### type<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Use <strong>variant</strong> instead.</span></span>
+<PropTable componentLink="ProgressTracker" prop="type"/>

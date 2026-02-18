@@ -1,0 +1,37 @@
+---
+title: Checkbox
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Checkboxes are used for a list of options where the user may select multiple options, including all or none.
+
+
+<ScreenshotTabs screenshotData={"screenshots/checkbox.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Checkbox} from '@walmart/gtp-shared-components`;
+
+<Checkbox label="Unchecked" />
+<Checkbox label="Checked" checked />
+<Checkbox label="Indeterminate" indeterminate />
+<Checkbox label="Unchecked (disabled)" disabled />
+<Checkbox label="Checked (disabled)" checked disabled />
+<Checkbox label="Indeterminate (disabled)" indeterminate disabled />
+
+```
+## Props
+
+ ### checked
+<PropTable componentLink="Checkbox" prop="checked"/>
+ ### indeterminate
+<PropTable componentLink="Checkbox" prop="indeterminate"/>
+ ### label
+<PropTable componentLink="Checkbox" prop="label"/>
+ ### UNSAFE_style
+<PropTable componentLink="Checkbox" prop="UNSAFE_style"/>
+ ### value<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. use <strong>checked</strong> instead..</span></span>
+<PropTable componentLink="Checkbox" prop="value"/>
+ ### onChange<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. use <strong>onPress</strong> instead..</span></span>
+<PropTable componentLink="Checkbox" prop="onChange"/>

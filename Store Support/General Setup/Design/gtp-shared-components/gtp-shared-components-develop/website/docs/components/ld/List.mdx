@@ -1,0 +1,30 @@
+---
+title: List
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Lists are a continuous, vertical group of related information.
+
+
+<ScreenshotTabs screenshotData={"screenshots/list.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {List, ListItem} from '@walmart/gtp-shared-components`;
+
+<List>
+  <ListItem>Item 1</ListItem>
+  <ListItem>Item 2</ListItem>
+</List>
+```
+## Props
+
+ ### children
+<PropTable componentLink="List" prop="children"/>
+ ### UNSAFE_style
+<PropTable componentLink="List" prop="UNSAFE_style"/>
+ ### separator
+<PropTable componentLink="List" prop="separator"/>
+ ### items<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="List" prop="items"/>

@@ -1,0 +1,39 @@
+---
+title: Link
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Links can be inserted within a line of text,
+used on their own, or at the end of content.
+
+
+<ScreenshotTabs screenshotData={"screenshots/link.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Link} from '@walmart/gtp-shared-components';
+
+<Link onPress={() => {}}>Link</Link>
+<Link disabled={true} onPress={() => {}}>Disabled Link</link>
+<Link color="white" onPress={() => {}}>White Link</link>
+<Link disabled={true} color="white" onPress={() => {}}>Disabled White Link</link>
+
+<Text>
+  {'This '}
+  <Link onPress={() => {}}>link</Link>
+  {' is embedded'}
+</Text>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="Link" prop="children"/>
+ ### onPress(required)
+<PropTable componentLink="Link" prop="onPress"/>
+ ### color
+<PropTable componentLink="Link" prop="color"/>
+ ### disabled
+<PropTable componentLink="Link" prop="disabled"/>
+ ### UNSAFE_style
+<PropTable componentLink="Link" prop="UNSAFE_style"/>

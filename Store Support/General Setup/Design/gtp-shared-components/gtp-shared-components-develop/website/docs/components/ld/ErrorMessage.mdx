@@ -1,0 +1,32 @@
+---
+title: ErrorMessage
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Error Messages communicate system errors in a consistent and expected way.
+
+
+<ScreenshotTabs screenshotData={"screenshots/error-message.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {ErrorMessage} from '@walmart/gtp-shared-components`;
+
+<ErrorMessage
+  title={'No internet connection'}>
+  Make sure you’re connected to WiFi or data and try again.
+</ErrorMessage>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="ErrorMessage" prop="children"/>
+ ### media
+<PropTable componentLink="ErrorMessage" prop="media"/>
+ ### title(required)
+<PropTable componentLink="ErrorMessage" prop="title"/>
+ ### actions
+<PropTable componentLink="ErrorMessage" prop="actions"/>
+ ### UNSAFE_style
+<PropTable componentLink="ErrorMessage" prop="UNSAFE_style"/>

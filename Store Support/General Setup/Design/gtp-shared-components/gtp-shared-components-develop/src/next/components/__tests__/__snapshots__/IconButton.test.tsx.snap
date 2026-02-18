@@ -1,0 +1,147 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Icon Button It should render correctly. 1`] = `
+<View
+  accessibilityRole="imagebutton"
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": false,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    [
+      {
+        "alignItems": "center",
+        "borderRadius": 1000,
+        "height": 32,
+        "justifyContent": "center",
+        "width": 32,
+      },
+      {
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "borderWidth": 0,
+      },
+      undefined,
+    ]
+  }
+  testID="IconButton"
+>
+  <Image
+    accessibilityRole="image"
+    source={
+      {
+        "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/Home-16.png",
+      }
+    }
+    style={
+      [
+        {
+          "height": 16,
+          "tintColor": "#000",
+          "width": 16,
+        },
+        {},
+      ]
+    }
+    testID="HomeIcon"
+  />
+</View>
+`;
+
+exports[`Test Icon Button Should match snapshot correctly. 1`] = `
+<View
+  accessibilityRole="imagebutton"
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": false,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    [
+      {
+        "alignItems": "center",
+        "borderRadius": 1000,
+        "height": 32,
+        "justifyContent": "center",
+        "width": 32,
+      },
+      {
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "borderWidth": 0,
+      },
+      undefined,
+    ]
+  }
+  testID="IconButton"
+>
+  <Image
+    accessibilityRole="image"
+    source={
+      {
+        "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/Home-16.png",
+      }
+    }
+    style={
+      [
+        {
+          "height": 16,
+          "tintColor": "#000",
+          "width": 16,
+        },
+        {},
+      ]
+    }
+    testID="HomeIcon"
+  />
+</View>
+`;

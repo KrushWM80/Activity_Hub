@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELM Manager Change Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #008a00;
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header p {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .control-group select,
+        .control-group button {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .control-group select {
+            background: white;
+            color: #333;
+        }
+
+        .control-group select:hover {
+            border-color: #008a00;
+        }
+
+        .control-group button {
+            background: #008a00;
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        .control-group button:hover {
+            background: #006600;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #008a00;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .kpi-card.alt {
+            border-left-color: #0071ce;
+        }
+
+        .kpi-card.warning {
+            border-left-color: #ffc107;
+        }
+
+        .kpi-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #008a00;
+        }
+
+        .kpi-card.alt .kpi-value {
+            color: #0071ce;
+        }
+
+        .kpi-card.warning .kpi-value {
+            color: #ffc107;
+        }
+
+        .kpi-trend {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-canvas-wrapper {
+            position: relative;
+            height: 320px;
+        }
+
+        /* Full-width charts */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-container.full-width {
+            height: 350px;
+        }
+
+        .chart-container.full-width .chart-canvas-wrapper {
+            height: 280px;
+        }
+
+        /* Data Table */
+        .data-table-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .data-table-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table thead {
+            background: #f5f5f5;
+            border-bottom: 2px solid #008a00;
+        }
+
+        table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #008a00;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .control-group {
+                width: 100%;
+            }
+
+            .control-group select,
+            .control-group button {
+                width: 100%;
+            }
+
+            .kpi-value {
+                font-size: 28px;
+            }
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #e3f2fd;
+            border: 2px solid #0071ce;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #0c3080;
+            font-size: 14px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .info-box i {
+            font-size: 18px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <i class="fas fa-chart-line"></i>
+                ELM Manager Change Dashboard
+            </h1>
+            <p>Real-time tracking of manager changes and email delivery metrics</p>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="daysFilter">Time Period:</label>
+                <select id="daysFilter">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <button onclick="refreshData()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+            <div style="margin-left: auto; color: #999; font-size: 12px;">
+                Last updated: <span id="lastUpdated">--:--:-- </span>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid" id="kpiCards">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Changes Detected</div>
+                <div class="kpi-value" id="totalChanges">0</div>
+                <div class="kpi-trend">Across all DCs and role types</div>
+            </div>
+
+            <div class="kpi-card alt">
+                <div class="kpi-label">Total Emails Sent</div>
+                <div class="kpi-value" id="totalEmails">0</div>
+                <div class="kpi-trend">In selected time period</div>
+            </div>
+
+            <div class="kpi-card warning">
+                <div class="kpi-label">Unique DCs Affected</div>
+                <div class="kpi-value" id="uniqueDCs">0</div>
+                <div class="kpi-trend">Distribution centers with changes</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-title">
+                    <i class="fas fa-pie-chart"></i> Changes by Role Type
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="roleChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">
+                    <i class="fas fa-envelope"></i> Email Delivery Status
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="deliveryChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container full-width">
+                <div class="chart-title">
+                    <i class="fas fa-line-chart"></i> Daily Trend
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- DC Territory Data Table -->
+        <div class="data-table-container">
+            <div class="data-table-title">
+                <i class="fas fa-building"></i> Changes by DC Territory
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>DC Number</th>
+                        <th>Type</th>
+                        <th>Total Changes</th>
+                        <th>Days with Changes</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="dcTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #999;">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            <p><strong>ELM Manager Change Detection System</strong></p>
+            <p>Automated monitoring and notification of manager changes across retail locations</p>
+            <p style="margin-top: 10px;">Questions? Contact: ATCTEAMSUPPORT@walmart.com</p>
+        </footer>
+    </div>
+
+    <script>
+        // Chart instances
+        let charts = {};
+        
+        // Get days filter value
+        function getDays() {
+            return document.getElementById('daysFilter').value;
+        }
+
+        // Format numbers
+        function formatNumber(num) {
+            return num.toLocaleString();
+        }
+
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = now.toLocaleTimeString();
+        }
+
+        // Fetch metrics
+        async function fetchMetrics() {
+            try {
+                const days = getDays();
+                const response = await fetch(`/api/metrics/summary?days=${days}`);
+                const data = await response.json();
+                updateKPICards(data);
+            } catch (error) {
+                console.error('Error fetching metrics:', error);
+            }
+        }
+
+        // Update KPI cards
+        function updateKPICards(data) {
+            document.getElementById('totalChanges').textContent = formatNumber(data.total_changes);
+            document.getElementById('totalEmails').textContent = formatNumber(data.total_emails);
+            document.getElementById('uniqueDCs').textContent = formatNumber(data.unique_dcs);
+        }
+
+        // Fetch and render role chart
+        async function renderRoleChart() {
+            try {
+                const days = getDays();
+                const response = await fetch(`/api/metrics/role-type?days=${days}`);
+                const data = await response.json();
+
+                const ctx = document.getElementById('roleChart').getContext('2d');
+                
+                if (charts.roleChart) {
+                    charts.roleChart.destroy();
+                }
+
+                charts.roleChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.map(d => d.role),
+                        datasets: [{
+                            data: data.map(d => d.count),
+                            backgroundColor: ['#008a00', '#0071ce', '#ffc107', '#d32f2f'],
+                            borderColor: 'white',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error rendering role chart:', error);
+            }
+        }
+
+        // Fetch and render delivery chart
+        async function renderDeliveryChart() {
+            try {
+                const days = getDays();
+                const response = await fetch(`/api/metrics/delivery-status?days=${days}`);
+                const data = await response.json();
+
+                const ctx = document.getElementById('deliveryChart').getContext('2d');
+                
+                if (charts.deliveryChart) {
+                    charts.deliveryChart.destroy();
+                }
+
+                charts.deliveryChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(d => d.status),
+                        datasets: [{
+                            label: 'Count',
+                            data: data.map(d => d.count),
+                            backgroundColor: ['#008a00', '#ffc107', '#d32f2f', '#999'],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error rendering delivery chart:', error);
+            }
+        }
+
+        // Fetch and render trend chart
+        async function renderTrendChart() {
+            try {
+                const days = getDays();
+                const response = await fetch(`/api/metrics/trend?days=${days}`);
+                const data = await response.json();
+
+                const ctx = document.getElementById('trendChart').getContext('2d');
+                
+                if (charts.trendChart) {
+                    charts.trendChart.destroy();
+                }
+
+                charts.trendChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.date),
+                        datasets: [
+                            {
+                                label: 'Total Changes',
+                                data: data.map(d => d.total_changes),
+                                borderColor: '#008a00',
+                                backgroundColor: 'rgba(0, 138, 0, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Emails Sent',
+                                data: data.map(d => d.emails_sent),
+                                borderColor: '#0071ce',
+                                backgroundColor: 'rgba(0, 113, 206, 0.1)',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error rendering trend chart:', error);
+            }
+        }
+
+        // Fetch and render DC table
+        async function renderDCTable() {
+            try {
+                const days = getDays();
+                const response = await fetch(`/api/metrics/dc-territory?days=${days}`);
+                const data = await response.json();
+
+                const tbody = document.getElementById('dcTableBody');
+                tbody.innerHTML = '';
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No data available</td></tr>';
+                    return;
+                }
+
+                data.forEach(dc => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>DC ${dc.dc_number}</strong></td>
+                        <td>${dc.dc_type}</td>
+                        <td>${formatNumber(dc.total_changes)}</td>
+                        <td>${dc.days_with_changes}</td>
+                        <td><span class="badge success">Active</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error rendering DC table:', error);
+            }
+        }
+
+        // Refresh all data
+        async function refreshData() {
+            console.log('Refreshing data...');
+            updateTimestamp();
+            await fetchMetrics();
+            await renderRoleChart();
+            await renderDeliveryChart();
+            await renderTrendChart();
+            await renderDCTable();
+        }
+
+        // Handle days filter change
+        document.getElementById('daysFilter').addEventListener('change', refreshData);
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Dashboard loaded');
+            refreshData();
+            
+            // Refresh every 5 minutes
+            setInterval(refreshData, 5 * 60 * 1000);
+        });
+    </script>
+</body>
+</html>

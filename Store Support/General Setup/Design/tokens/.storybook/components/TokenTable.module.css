@@ -1,0 +1,176 @@
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 56rem;
+}
+
+.toolbar {
+  align-items: center;
+  display: flex;
+  gap: var(--ld-primitive-scale-space-300);
+  justify-content: space-between;
+  margin-bottom: var(--ld-primitive-scale-space-200);
+}
+
+.field {
+  align-items: center;
+  display: flex;
+  gap: var(--ld-primitive-scale-space-100);
+
+  label {
+    font-weight: var(--ld-primitive-font-weight-bold);
+  }
+}
+
+.filterContainer {
+  position: relative;
+
+  input {
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--ld-semantic-color-field-fill);
+    border-radius: var(--ld-primitive-scale-border-radius-field);
+    border: none;
+    color: var(--ld-semantic-color-field-text-on-fill);
+    font-family: inherit;
+    font-size: 100%;
+    line-height: inherit;
+    padding: var(--ld-primitive-scale-space-50) var(--ld-primitive-scale-space-100)
+      var(--ld-primitive-scale-space-50)
+      calc(var(--ld-primitive-scale-space-300) + var(--ld-primitive-scale-space-100));
+    width: 100%;
+
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+
+  &::before {
+    border-radius: var(--ld-primitive-scale-border-radius-field);
+    border: var(--ld-primitive-scale-border-width-interactive) solid
+      var(--ld-semantic-color-field-border);
+    content: "";
+    display: block;
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+  }
+  &::after {
+    content: "🔍";
+    display: inline-block;
+    left: 0.333rem;
+    line-height: 1;
+    position: absolute;
+    text-align: center;
+    top: 0.5rem;
+    width: var(--ld-primitive-scale-space-200);
+  }
+
+  &:hover::before {
+    border-color: var(--ld-semantic-color-field-border-hovered);
+    border-width: var(--ld-primitive-scale-border-width-interactive-hovered);
+  }
+  &:focus-within::before {
+    border-color: var(--ld-semantic-color-field-border-focused);
+    border-width: var(--ld-primitive-scale-border-width-interactive-focused);
+  }
+}
+
+.platformPickerContainer {
+  position: relative;
+
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--ld-semantic-color-field-fill);
+    border-radius: var(--ld-primitive-scale-border-radius-field);
+    border: none;
+    color: var(--ld-semantic-color-field-text-on-fill);
+    font-family: inherit;
+    font-size: 100%;
+    line-height: inherit;
+    padding: var(--ld-primitive-scale-space-50)
+      calc(var(--ld-primitive-scale-space-300) + var(--ld-primitive-scale-space-100))
+      var(--ld-primitive-scale-space-50) var(--ld-primitive-scale-space-100);
+  }
+
+  &::before {
+    border-radius: var(--ld-primitive-scale-border-radius-field);
+    border: var(--ld-primitive-scale-border-width-interactive) solid
+      var(--ld-semantic-color-field-border);
+    content: "";
+    display: block;
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+  }
+  &::after {
+    color: var(--ld-semantic-color-field-text-subtle-on-fill);
+    content: "▾";
+    display: inline-block;
+    line-height: 1;
+    pointer-events: none;
+    position: absolute;
+    right: 0.375rem;
+    text-align: center;
+    top: 0.4rem;
+    width: var(--ld-primitive-scale-space-200);
+  }
+
+  &:hover::before {
+    border-color: var(--ld-semantic-color-field-border-hovered);
+    border-width: var(--ld-primitive-scale-border-width-interactive-hovered);
+  }
+  &:focus-within::before {
+    border-color: var(--ld-semantic-color-field-border-focused);
+    border-width: var(--ld-primitive-scale-border-width-interactive-focused);
+  }
+}
+
+.table {
+  border-collapse: collapse;
+  margin: 0;
+  width: 100%;
+
+  tr {
+    border-bottom: var(--ld-primitive-scale-border-width-100) solid
+      var(--ld-semantic-color-separator);
+  }
+
+  td,
+  th {
+    padding: var(--ld-primitive-scale-space-150) var(--ld-primitive-scale-space-100);
+    vertical-align: top;
+
+    &:first-child {
+      padding-left: 0;
+      text-align: left;
+      width: 45%;
+    }
+
+    &:last-child {
+      padding-right: 0;
+      text-align: center;
+      width: 5%;
+    }
+  }
+}
+
+.name {
+  font-family: var(--ld-primitive-font-family-code);
+}
+
+.comment {
+  color: var(--ld-semantic-color-text-subtlest);
+  font-size: var(--ld-primitive-font-size-50);
+  line-height: var(--ld-primitive-scale-space-250);
+  margin: var(--ld-primitive-scale-space-50) 0 0;
+}
+
+.themeable {
+  color: var(--ld-semantic-color-text-negative);
+
+  &.true {
+    color: var(--ld-semantic-color-text-positive);
+  }
+}

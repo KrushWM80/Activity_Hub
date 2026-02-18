@@ -1,0 +1,33 @@
+---
+title: DataTableHead
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+All Header of the Data Table will be added in DataTableHead
+
+
+
+## Usage
+```js
+import {
+  DataTableHead,
+  DataTableHeader,
+  DataTableRow,
+} from '@walmart/gtp-shared-components';
+
+<DataTableHead>
+    <DataTableRow>
+      <DataTableHeader>{'ID'}</DataTableHeader>
+      <DataTableHeader>{'Name'}</DataTableHeader>
+      <DataTableHeader alignment={'right'}>{'Count'}</DataTableHeader>
+    </DataTableRow>
+</DataTableHead>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="DataTableHead" prop="children"/>
+ ### UNSAFE_style
+<PropTable componentLink="DataTableHead" prop="UNSAFE_style"/>

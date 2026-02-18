@@ -1,0 +1,41 @@
+---
+title: FilterToggle
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Apply/clear a single filter for a list of data.
+- Use when needing to quickly apply a simple boolean filter to a data set or results list.
+- Don't use when what you really need is a tab that changes your data/results to a different view
+without actually filtering down the list.
+
+
+<ScreenshotTabs screenshotData={"screenshots/filter-toggle.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {FilterToggle, Icons} from '@walmart/gtp-shared-components/ax`;
+
+<FilterToggle>Filter</FilterToggle>
+<FilterToggle isApplied>Applied</FilterToggle>
+<FilterToggle leading={<Icons.ClockIcon />}>With Icon</FilterToggle>
+<FilterToggle leading={<Icons.ClockIcon />} isApplied>
+  With Icon Applied
+</FilterToggle>
+<FilterToggle disabled>Filter</FilterToggle>
+
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="FilterToggle" prop="children"/>
+ ### disabled
+<PropTable componentLink="FilterToggle" prop="disabled"/>
+ ### onPress
+<PropTable componentLink="FilterToggle" prop="onPress"/>
+ ### isApplied
+<PropTable componentLink="FilterToggle" prop="isApplied"/>
+ ### leading
+<PropTable componentLink="FilterToggle" prop="leading"/>
+ ### UNSAFE_style
+<PropTable componentLink="FilterToggle" prop="UNSAFE_style"/>

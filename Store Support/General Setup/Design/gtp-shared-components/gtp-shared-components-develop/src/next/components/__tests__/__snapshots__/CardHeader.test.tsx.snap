@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing CardMedia should display correctly 1`] = `
+<View
+  accessibilityRole="header"
+  style={
+    [
+      {
+        "alignItems": "center",
+        "backgroundColor": "#fff",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "marginVertical": 16,
+        "paddingHorizontal": 16,
+        "width": "100%",
+      },
+      undefined,
+    ]
+  }
+  testID="CardHeader"
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "row",
+      }
+    }
+  >
+    <Text
+      accessibilityRole="header"
+      style={
+        [
+          {
+            "color": "#2e2f32",
+            "fontFamily": "Bogle",
+            "fontSize": 20,
+            "fontStyle": "normal",
+            "fontWeight": "700",
+            "lineHeight": 28,
+          },
+          {},
+        ]
+      }
+      testID="Heading"
+    >
+      This is the header
+    </Text>
+  </View>
+</View>
+`;

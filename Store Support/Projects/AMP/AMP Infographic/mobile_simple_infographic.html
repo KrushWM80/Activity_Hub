@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winter Health - Quick Reference</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.4;
+            background: #0071CE;
+            color: #333;
+            padding: 10px;
+        }
+
+        .card {
+            max-width: 350px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0071CE, #FFC220);
+            color: white;
+            text-align: center;
+            padding: 24px 20px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header .week {
+            background: rgba(255,255,255,0.25);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            display: inline-block;
+        }
+
+        .section {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            color: #0071CE;
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section h2 .emoji {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #FFC220, #ffed4a);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 12px 0;
+            text-align: center;
+        }
+
+        .highlight-box .big-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .highlight-box .small-text {
+            font-size: 13px;
+            color: #4a4a4a;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        .info-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+
+        .info-item .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .info-item .title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #0071CE;
+            margin-bottom: 2px;
+        }
+
+        .info-item .desc {
+            font-size: 10px;
+            color: #64748b;
+            line-height: 1.3;
+        }
+
+        .date-banner {
+            background: #0071CE;
+            color: white;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 12px 0;
+            font-weight: 600;
+        }
+
+        .date-banner .dates {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+        }
+
+        .date-banner .date {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .tip-list {
+            list-style: none;
+        }
+
+        .tip-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        .tip-list li .emoji {
+            margin-right: 10px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .tip-list li .text {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .qr-section {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .qr-placeholder {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 8px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .qr-text {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .qr-url {
+            font-size: 10px;
+            opacity: 0.9;
+            word-break: break-all;
+        }
+
+        .cta-section {
+            background: #ef4444;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .cta-section h2 {
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .cta-section p {
+            font-size: 13px;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: white;
+            color: #ef4444;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:active {
+            transform: scale(0.95);
+        }
+
+        .footer {
+            background: #f8fafc;
+            text-align: center;
+            padding: 16px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .footer .logo {
+            color: #0071CE;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .card {
+                background: #1f2937;
+                color: #f9fafb;
+            }
+            
+            .section {
+                border-bottom-color: #374151;
+            }
+            
+            .info-item {
+                background: #374151;
+                border-color: #4b5563;
+                color: #f9fafb;
+            }
+            
+            .tip-list li {
+                background: #374151;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Header -->
+        <div class="header">
+            <h1>🛡️ Winter Health Protection</h1>
+            <div class="week">Week 41 • 2026</div>
+        </div>
+
+        <!-- Priority Section -->
+        <div class="section">
+            <div class="highlight-box">
+                <div class="big-text">Your Well-being is Our Priority! ⭐</div>
+                <div class="small-text">Stay healthy during flu and strep season</div>
+            </div>
+        </div>
+
+        <!-- Vaccine Access -->
+        <div class="section">
+            <h2><span class="emoji">💉</span>Easy Vaccine Access</h2>
+            <p style="font-size: 14px; margin-bottom: 16px;">All associates have convenient access to flu shots and vaccines!</p>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="icon">🏥</div>
+                    <div class="title">Medical Plan</div>
+                    <div class="desc">No cost with network providers</div>
+                </div>
+                <div class="info-item">
+                    <div class="icon">🚶</div>
+                    <div class="title">Walk-ups</div>
+                    <div class="desc">Welcome when off the clock</div>
+                </div>
+                <div class="info-item">
+                    <div class="icon">📱</div>
+                    <div class="title">Scheduler</div>
+                    <div class="desc">Use Walmart Scheduler</div>
+                </div>
+                <div class="info-item">
+                    <div class="icon">🏘️</div>
+                    <div class="title">Community</div>
+                    <div class="desc">Local health resources</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Important Dates -->
+        <div class="section">
+            <h2><span class="emoji">📅</span>Immunization Events</h2>
+            <div class="date-banner">
+                Mark Your Calendar!
+                <div class="dates">
+                    <div class="date">Nov 15</div>
+                    <div class="date">Dec 6</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="section">
+            <h2><span class="emoji">💡</span>Quick Tips</h2>
+            <ul class="tip-list">
+                <li>
+                    <span class="emoji">🩺</span>
+                    <span class="text">Check with healthcare provider for personalized advice</span>
+                </li>
+                <li>
+                    <span class="emoji">🌐</span>
+                    <span class="text">Visit CDC Flu Prevention Site for more info</span>
+                </li>
+                <li>
+                    <span class="emoji">💊</span>
+                    <span class="text">Consult pharmacist about individual risk factors</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- QR Section -->
+        <div class="qr-section">
+            <div class="qr-placeholder">📱</div>
+            <div class="qr-text">Learn More Details</div>
+            <div class="qr-url">amp2-cms.prod.walmart.com/preview/66aec44c-cff0-4b5a-9a6d-831272318d17/41/2026</div>
+        </div>
+
+        <!-- Management CTA -->
+        <div class="cta-section">
+            <h2><span class="emoji">👔</span>For Management</h2>
+            <p>Review Associate Talking Points to address questions</p>
+            <button class="cta-button" onclick="window.open('https://amp2-cms.prod.walmart.com/preview/66aec44c-cff0-4b5a-9a6d-831272318d17/41/2026', '_blank')">Access Resources</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="logo">⭐</div>
+            <div>Walmart Associate Health & Safety</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,159 @@
+inherit:
+  - job:///emp/looper-templates:slack
+  - job:///emp/looper-templates:strict
+
+node: linux
+
+tools:
+  jdk:
+    version: 11
+    flavor: azul
+  nodejs: 23.4.0
+  sonarscanner: 4.7.0.2747
+
+envs:
+  global:
+    variables:
+      LOOPER_NODES: '(ubuntu)'
+      SLACK_CHANNEL: emp-ci-alerts
+      LD_CURRENT_REL_VERSION: 'x.xx.xx'
+      LD_NEW_REL_VERSION: 'x.xx.xx'
+      REL_BRANCH: 'release/x.xx.xx'
+      REL_TYPE: 'major | minor | patch | prepatch | premajor | preminor | prerelease'
+      GITHUB_ACCESS_TOKEN: "%{credentials.secret('gtp-mobile-git-token')}"
+      PUBLISH_KEY: "%{credentials.secret('git-mobile-publish-key')}"
+
+rules:
+  before:
+    - exposeVars(package.json)
+    - var(npm=$package)
+    - var(LD_CURRENT_REL_VERSION="v${npm.version}")
+
+triggers:
+  - manual:
+      name: Publish LD-Shared-Components
+      call: release
+      parameters:
+        - version(Valid options - patch, minor, major, prepatch, premajor, preminor, prerelease):
+            {type: string}
+        - teamCode(Please contact GTP-mobile team): {type: string}
+  - pr:
+      call: pr
+  - push:
+      ignoreAuthor: jenkinspan
+      ignoreCommitter: jenkinspan
+      call: default
+
+branches:
+  - spec: main
+  - spec: main-legacy
+  - spec: develop
+  - spec: next
+  - spec: release/*
+    call: default
+
+flows:
+  default:
+    - echo "Running ${LOOPER_FLOW} triggered by ${LOOPER_TRIGGER}"
+    # Compare .nvmrc node version with allspark node version
+    - ./scripts/checkNodeSyncAllspark.sh -t ${GITHUB_ACCESS_TOKEN}
+    - (name Yarn Install) corepack enable
+    - (name Yarn Version) yarn --version
+    - yarn --frozen-lockfile
+    - yarn lint
+    - yarn jest:coverage
+    - call: run-sonar
+    - yarn build
+    - dir(example):
+        - yarn --frozen-lockfile
+        - yarn lint
+        - yarn typecheck
+
+  pr:
+    - call: default
+    - call: sonar-fetch-remote-fix-ref
+    - call: run-sonar-pr
+    - call: pr-title-check
+
+  pr-title-check:
+    - yarn check:prData -t $GITHUB_ACCESS_TOKEN -i "${GITHUB_PR_TITLE}" -p $GITHUB_PR_NUMBER
+
+  run-sonar:
+    - sonar("Sonar"):
+        - exposeVars(package.json)
+        - (name Sonar Analysis) sonar-scanner
+          -Dproject.settings=sonar-project.properties
+          -Dsonar.projectVersion="${package.version}"
+
+  run-sonar-pr:
+    - sonar("Sonar"):
+        - exposeVars(package.json)
+        - (name Sonar PR Analysis) sonar-scanner -X -Dproject.settings=sonar-project.properties
+          -Dsonar.projectVersion="${package.version}"
+          -Dsonar.pullrequest.github.repository=electrode-mobile-platform/gtp-shared-components
+          -Dsonar.pullrequest.key=${GITHUB_PR_NUMBER}
+          -Dsonar.pullrequest.branch=${GITHUB_PR_SOURCE_BRANCH}
+          -Dsonar.pullrequest.base=${GITHUB_PR_TARGET_BRANCH}
+          -Dsonar.scm.revision=${GITHUB_PR_HEAD_SHA}
+
+  ### Sonar fetch ref ###
+  # The clone of the git repository on the build system sometimes has
+  # invalid references. Because of this, Sonar picks the latest commit
+  # of the PR branch as the ref commit instead of the latest commit of
+  # the target branch and hence is unable to detect new code changes.
+  # The following flow will fetch all refs and reset the local ref to
+  # the target branch.
+  # https://dx.walmart.com/documents/product/SonarQube/eg4foueque
+  sonar-fetch-remote-fix-ref:
+    shell: |
+      #!/bin/bash
+      - echo "Running build for= ${GITHUB_PR_NUMBER} = ${GITHUB_PR_SOURCE_BRANCH}"
+      git fetch --no-tags --all
+      if [[ ! -z "${GITHUB_PR_TARGET_BRANCH}" ]]
+      then
+        git fetch --no-tags origin ${GITHUB_PR_TARGET_BRANCH}:refs/remotes/origin/${GITHUB_PR_TARGET_BRANCH}
+      fi
+
+  release:
+    - try:
+        - call: prepare_release
+        - yarn release:run --currentVersion $LD_CURRENT_REL_VERSION --releaseType $REL_TYPE --gitToken ${GITHUB_ACCESS_TOKEN} --new_version $LD_NEW_REL_VERSION --rel_branch $REL_BRANCH
+        - call: post_slack_message
+        - call: slack-npme-success
+      catch:
+        - call: slack-failure
+        - fail($flowErrorMessage)
+
+  prepare_release:
+    - group(Prepare Release):
+        - var(REL_TYPE=${version(Valid options - patch, minor, major, prepatch, premajor, preminor, prerelease)})
+        - var(teamCode=${teamCode(Please contact GTP-mobile team)})
+        - if: |
+            %{teamCode != PUBLISH_KEY}
+          then:
+            - echo "Invalid Publish Key - Please Contact GTP Team for release password"
+            - exit 1
+        - call: default
+        - yarn release:validate $LD_CURRENT_REL_VERSION $REL_TYPE
+        - if: |
+            %{REL_TYPE == "premajor" || REL_TYPE == "preminor" || REL_TYPE == "prepatch" || REL_TYPE == "prerelease"}
+          then:
+            - var(LD_NEW_REL_VERSION): npx semver -i $REL_TYPE $LD_CURRENT_REL_VERSION --preid rc
+          else:
+            - var(LD_NEW_REL_VERSION): npx semver -i $REL_TYPE $LD_CURRENT_REL_VERSION
+            - yarn release:getAll $GITHUB_ACCESS_TOKEN $LD_NEW_REL_VERSION
+            - var(LD_CURRENT_REL_VERSION): awk 'NR==1 {print; exit}' latestRelease.txt
+        - yarn release:createReleaseBranch -v $LD_NEW_REL_VERSION -r $REL_TYPE
+        - var(REL_BRANCH): awk 'NR==1 {print; exit}' latestRelease.txt
+
+  post_slack_message:
+    - if: |
+        %{REL_TYPE == "premajor" || REL_TYPE == "preminor" || REL_TYPE == "prepatch" || REL_TYPE == "prerelease"}
+      then:
+        - slack.postMessage:
+            message: ":ld2-livingdesign-01: :react-transparent: Version `$LD_NEW_REL_VERSION` of the `Living Design React Native library` has been released \n <https://gecgithub01.walmart.com/electrode-mobile-platform/gtp-shared-components/releases/tag/v$LD_NEW_REL_VERSION|Release notes and changelog> \n cc:  <!here>"
+            channelId: '$SLACK_CHANNEL'
+      else:
+        - slack.postMessage:
+            message: ":ld2-livingdesign-01: :react-transparent: Version `$LD_NEW_REL_VERSION` of the `Living Design React Native library` has been released \n <https://gecgithub01.walmart.com/electrode-mobile-platform/gtp-shared-components/releases/tag/v$LD_NEW_REL_VERSION|Release notes and changelog> \n cc:  <!here>"
+            channelId: '$SLACK_CHANNEL'

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0; url=http://LEUS62315243171.homeoffice.Wal-Mart.com:8080">
+    <title>Job Code Teaming Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0071ce, #004c91);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: #ffc220;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        a {
+            color: #ffc220;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Job Code Teaming Dashboard</h1>
+        <div class="spinner"></div>
+        <p>Redirecting to dashboard...</p>
+        <p style="font-size: 0.9em; margin-top: 20px;">
+            If you are not redirected automatically, 
+            <a href="http://LEUS62315243171.homeoffice.Wal-Mart.com:8080">click here</a>
+        </p>
+    </div>
+    <script>
+        // Fallback redirect in case meta refresh doesn't work
+        setTimeout(function() {
+            window.location.href = "http://LEUS62315243171.homeoffice.Wal-Mart.com:8080";
+        }, 100);
+    </script>
+</body>
+</html>

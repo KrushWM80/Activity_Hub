@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Activity Hub Platform Assessment Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #0071ce;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #ffc220;
+            padding-bottom: 10px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 15px 20px;
+            border: 2px solid #0071ce;
+            background: white;
+            color: #0071ce;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: #0071ce;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 113, 206, 0.3);
+        }
+
+        .btn.selected {
+            background: #0071ce;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #0071ce;
+            color: white;
+            border-color: #0071ce;
+            grid-column: 1 / -1;
+            font-size: 16px;
+            padding: 18px;
+        }
+
+        .btn-primary:hover {
+            background: #004f9a;
+            border-color: #004f9a;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .form-group {
+            margin: 20px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0071ce;
+            box-shadow: 0 0 0 3px rgba(0, 113, 206, 0.1);
+        }
+
+        .file-upload-area {
+            border: 3px dashed #0071ce;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+            margin: 20px 0;
+        }
+
+        .file-upload-area:hover {
+            background: #f0f4f8;
+            border-color: #004f9a;
+        }
+
+        .file-upload-area input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-area p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-area .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .results {
+            background: #f0f4f8;
+            padding: 30px;
+            border-radius: 8px;
+            border-left: 5px solid #0071ce;
+            margin: 30px 0;
+        }
+
+        .results-title {
+            font-size: 22px;
+            color: #0071ce;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #ffc220;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .complexity-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .complexity-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .complexity-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .complexity-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .breadcrumb {
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .breadcrumb-item {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .breadcrumb-item.active {
+            color: #0071ce;
+            font-weight: 600;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border-color: #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            border-color: #aaa;
+        }
+
+        .summary-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .summary-section h3 {
+            color: #0071ce;
+            margin-bottom: 15px;
+        }
+
+        .summary-item {
+            padding: 10px 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .cost-estimate {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid #ffc220;
+        }
+
+        .cost-estimate h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .cost-total {
+            font-weight: 600;
+            color: #333;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            margin-top: 10px;
+        }
+
+        .recommendation {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+            color: #155724;
+        }
+
+        .warning {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc220;
+            margin: 15px 0;
+            color: #856404;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #0071ce;
+            margin: 15px 0;
+            color: #004f9a;
+            font-size: 14px;
+        }
+
+        .decision-tree {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #0071ce;
+        }
+
+        .tree-level {
+            margin-left: 20px;
+            padding: 10px 0;
+            border-left: 2px solid #ddd;
+            padding-left: 15px;
+        }
+
+        .tree-item {
+            color: #333;
+            font-size: 14px;
+            margin: 8px 0;
+        }
+
+        .tree-decision {
+            font-weight: 600;
+            color: #0071ce;
+        }
+
+        .tree-result {
+            color: #28a745;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+
+            .btn-primary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Advanced Activity Hub Platform Assessment</h1>
+            <p>Comprehensive Decision Tree & Project Analysis Tool</p>
+        </div>
+
+        <div class="content">
+            <!-- START SCREEN -->
+            <div id="startScreen" class="section">
+                <div class="section-title">Welcome to Advanced Assessment</div>
+                
+                <p style="color: #666; margin-bottom: 30px; line-height: 1.6;">
+                    This advanced tool helps you evaluate platforms using Walmart's decision tree approach. 
+                    Choose your assessment method below.
+                </p>
+
+                <div class="button-group">
+                    <button class="btn" onclick="startMode('simple')">
+                        📊 Simple Assessment<br><span style="font-size: 12px; opacity: 0.7;">Quick questionnaire</span>
+                    </button>
+                    <button class="btn" onclick="startMode('decision-tree')">
+                        🌳 Decision Tree<br><span style="font-size: 12px; opacity: 0.7;">Walmart approach</span>
+                    </button>
+                    <button class="btn" onclick="startMode('project-analysis')">
+                        📁 Analyze Project<br><span style="font-size: 12px; opacity: 0.7;">Scan existing code</span>
+                    </button>
+                </div>
+
+                <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #eee;">
+                    <h3 style="color: #0071ce; margin-bottom: 20px;">Choose Your Approach:</h3>
+                    <ul style="color: #666; margin-left: 20px; line-height: 1.8; font-size: 14px;">
+                        <li><strong>Simple Assessment</strong> - Traditional questionnaire for quick evaluation</li>
+                        <li><strong>Decision Tree</strong> - Walmart's structured approach for detailed planning</li>
+                        <li><strong>Analyze Project</strong> - Import existing project folder for automatic analysis</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- DECISION TREE SCREEN -->
+            <div id="decisionTreeScreen" class="section hidden">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Assessment</span>
+                    <span class="breadcrumb-item">→</span>
+                    <span class="breadcrumb-item active">Decision Tree Analysis</span>
+                </div>
+
+                <div class="section-title">Walmart Decision Tree Process</div>
+
+                <div class="info-box">
+                    This tool guides you through Walmart's proven decision tree approach to evaluate platform requirements, 
+                    select appropriate technologies, and estimate costs.
+                </div>
+
+                <div class="form-group">
+                    <label>Step 1: What is the primary product type? *</label>
+                    <div class="button-group">
+                        <button class="btn" onclick="selectDecisionPath('web-app')">
+                            🌐 Web Application<br><span style="font-size: 12px; opacity: 0.7;">HTML/React/Node</span>
+                        </button>
+                        <button class="btn" onclick="selectDecisionPath('data-analytics')">
+                            📊 Data/Analytics<br><span style="font-size: 12px; opacity: 0.7;">BigQuery, analytics</span>
+                        </button>
+                        <button class="btn" onclick="selectDecisionPath('devops-ml')">
+                            🔧 DevOps/ML<br><span style="font-size: 12px; opacity: 0.7;">Tools, infrastructure</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Web App Branch -->
+                <div id="webAppBranch" class="hidden">
+                    <div class="decision-tree">
+                        <div class="tree-item"><strong>📍 Web Application Branch</strong></div>
+                        
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label>Is it public-facing or internal? *</label>
+                            <div class="button-group">
+                                <button class="btn" onclick="selectWebAppOption('public')">🌍 Public-Facing</button>
+                                <button class="btn" onclick="selectWebAppOption('internal')">🏢 Internal Only</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Does it require containerization? *</label>
+                            <div class="button-group">
+                                <button class="btn" onclick="selectWebAppOption('container-yes')">✅ Yes - Docker/K8s</button>
+                                <button class="btn" onclick="selectWebAppOption('container-no')">❌ No - Standard VMs</button>
+                            </div>
+                        </div>
+
+                        <div id="webAppResult" class="hidden" style="margin-top: 20px;">
+                            <div class="recommendation">
+                                <strong>Recommended Platform:</strong><br>
+                                <div id="webAppRecommendation"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data/Analytics Branch -->
+                <div id="dataAnalyticsBranch" class="hidden">
+                    <div class="decision-tree">
+                        <div class="tree-item"><strong>📍 Data & Analytics Branch</strong></div>
+                        
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label>Data type? *</label>
+                            <div class="button-group">
+                                <button class="btn" onclick="selectDataOption('structured')">📋 Structured</button>
+                                <button class="btn" onclick="selectDataOption('unstructured')">📁 Unstructured</button>
+                                <button class="btn" onclick="selectDataOption('mixed')">🔀 Mixed</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Does it require analytics/ML? *</label>
+                            <div class="button-group">
+                                <button class="btn" onclick="selectDataOption('analytics-yes')">✅ Yes</button>
+                                <button class="btn" onclick="selectDataOption('analytics-no')">❌ No</button>
+                            </div>
+                        </div>
+
+                        <div id="dataResult" class="hidden" style="margin-top: 20px;">
+                            <div class="recommendation">
+                                <strong>Recommended Solution:</strong><br>
+                                <div id="dataRecommendation"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DevOps/ML Branch -->
+                <div id="devopsBranch" class="hidden">
+                    <div class="decision-tree">
+                        <div class="tree-item"><strong>📍 DevOps & Infrastructure Branch</strong></div>
+                        
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label>What tools do you need? (Select all)</label>
+                            <div style="display: grid; gap: 10px;">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="tool_cicd" style="margin-right: 10px; cursor: pointer;"> CI/CD Pipeline
+                                </label>
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="tool_monitoring" style="margin-right: 10px; cursor: pointer;"> Monitoring/Logging
+                                </label>
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="tool_ml" style="margin-right: 10px; cursor: pointer;"> ML/AI Compute
+                                </label>
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="tool_kubernetes" style="margin-right: 10px; cursor: pointer;"> Kubernetes
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="devopsResult" class="hidden" style="margin-top: 20px;">
+                            <div class="recommendation">
+                                <strong>Recommended Stack:</strong><br>
+                                <div id="devopsRecommendation"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 30px;">
+                    <label>Additional Platform Details</label>
+                    <textarea id="platformDetails" placeholder="Any other details about your platform or requirements..."></textarea>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="resetAssessment()">← Start Over</button>
+                    <button class="btn btn-primary" onclick="generateDecisionTreeResults()">Generate Architecture Plan →</button>
+                </div>
+            </div>
+
+            <!-- PROJECT ANALYSIS SCREEN -->
+            <div id="projectAnalysisScreen" class="section hidden">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Assessment</span>
+                    <span class="breadcrumb-item">→</span>
+                    <span class="breadcrumb-item active">Project Analysis</span>
+                </div>
+
+                <div class="section-title">Analyze Existing Project</div>
+
+                <div class="info-box">
+                    Upload your project folder to automatically detect technology stack, features, and suggest improvements.
+                </div>
+
+                <div class="form-group">
+                    <label>Project Folder Upload</label>
+                    <div class="file-upload-area" onclick="document.getElementById('folderInput').click()">
+                        <div class="upload-icon">📁</div>
+                        <p>Click to select project folder</p>
+                        <p style="font-size: 12px; color: #999;">or drag and drop</p>
+                        <input type="file" id="folderInput" webkitdirectory directory multiple onchange="analyzeProjectFolder(event)">
+                    </div>
+                </div>
+
+                <div id="projectAnalysisResult" class="hidden" style="margin-top: 20px;"></div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="resetAssessment()">← Start Over</button>
+                </div>
+            </div>
+
+            <!-- RESULTS SCREEN -->
+            <div id="resultsScreen" class="section hidden">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item">Assessment</span>
+                    <span class="breadcrumb-item">→</span>
+                    <span class="breadcrumb-item active">Results</span>
+                </div>
+
+                <div id="resultsContent"></div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="resetAssessment()">← Start Over</button>
+                    <button class="btn btn-primary" onclick="exportAdvancedResults()">📥 Export Assessment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const assessment = {
+            mode: '',
+            productType: '',
+            webAppPublic: '',
+            webAppContainer: '',
+            dataType: '',
+            dataAnalytics: '',
+            devopsTools: [],
+            platformDetails: '',
+            projectFiles: [],
+            projectAnalysis: {}
+        };
+
+        function startMode(mode) {
+            assessment.mode = mode;
+            if (mode === 'simple') {
+                // Redirect to simple assessment
+                window.location.href = 'assessment_tool.html';
+            } else if (mode === 'decision-tree') {
+                showScreen('decisionTreeScreen');
+            } else if (mode === 'project-analysis') {
+                showScreen('projectAnalysisScreen');
+            }
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('[id$="Screen"]').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function selectDecisionPath(path) {
+            assessment.productType = path;
+            
+            // Hide all branches
+            document.getElementById('webAppBranch').classList.add('hidden');
+            document.getElementById('dataAnalyticsBranch').classList.add('hidden');
+            document.getElementById('devopsBranch').classList.add('hidden');
+            
+            // Show selected branch
+            if (path === 'web-app') {
+                document.getElementById('webAppBranch').classList.remove('hidden');
+            } else if (path === 'data-analytics') {
+                document.getElementById('dataAnalyticsBranch').classList.remove('hidden');
+            } else if (path === 'devops-ml') {
+                document.getElementById('devopsBranch').classList.remove('hidden');
+            }
+        }
+
+        function selectWebAppOption(option) {
+            if (option === 'public' || option === 'internal') {
+                assessment.webAppPublic = option;
+            } else if (option === 'container-yes' || option === 'container-no') {
+                assessment.webAppContainer = option;
+            }
+            
+            if (assessment.webAppPublic && assessment.webAppContainer) {
+                generateWebAppRecommendation();
+            }
+        }
+
+        function selectDataOption(option) {
+            if (option === 'structured' || option === 'unstructured' || option === 'mixed') {
+                assessment.dataType = option;
+            } else if (option === 'analytics-yes' || option === 'analytics-no') {
+                assessment.dataAnalytics = option;
+            }
+            
+            if (assessment.dataType && assessment.dataAnalytics) {
+                generateDataRecommendation();
+            }
+        }
+
+        function generateWebAppRecommendation() {
+            let recommendation = '';
+            let platform = '';
+
+            if (assessment.webAppPublic === 'public') {
+                platform = 'Managed Azure App Service Environment (ASE) or WCNP';
+                recommendation = `<strong>${platform}</strong><br>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Secure public-facing endpoints</li>
+                        <li>Auto-scaling and load balancing</li>
+                        <li>DDoS protection and WAF</li>
+                        <li>SSL/TLS certificates</li>
+                    </ul>`;
+            } else {
+                if (assessment.webAppContainer === 'container-yes') {
+                    platform = 'WCNP (Walmart Cloud Native Platform)';
+                    recommendation = `<strong>${platform}</strong><br>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Kubernetes orchestration</li>
+                            <li>Container registry (Harbor)</li>
+                            <li>Auto-scaling based on metrics</li>
+                            <li>Service mesh (Istio)</li>
+                        </ul>`;
+                } else {
+                    platform = 'Managed ASE or OneOps';
+                    recommendation = `<strong>${platform}</strong><br>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Managed VM instances</li>
+                            <li>Database integration</li>
+                            <li>Storage solutions</li>
+                            <li>Monitoring and logging</li>
+                        </ul>`;
+                }
+            }
+
+            document.getElementById('webAppRecommendation').innerHTML = recommendation;
+            document.getElementById('webAppResult').classList.remove('hidden');
+        }
+
+        function generateDataRecommendation() {
+            let recommendation = '';
+            let platform = '';
+
+            if (assessment.dataType === 'structured') {
+                platform = 'BigQuery or Google Cloud SQL';
+                recommendation = `<strong>${platform}</strong><br>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Structured data storage</li>
+                        ${assessment.dataAnalytics === 'analytics-yes' ? '<li>Advanced analytics and BI</li>' : ''}
+                        <li>ACID compliance</li>
+                        <li>Query optimization</li>
+                    </ul>`;
+            } else if (assessment.dataType === 'unstructured') {
+                platform = 'Google Cloud Storage or Azure Blob Storage';
+                recommendation = `<strong>${platform}</strong><br>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Unlimited object storage</li>
+                        <li>Archive tier for cost optimization</li>
+                        <li>Encryption and versioning</li>
+                        <li>CDN integration</li>
+                    </ul>`;
+            } else {
+                platform = 'Hybrid: BigQuery + Cloud Storage';
+                recommendation = `<strong>${platform}</strong><br>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Structured data in BigQuery</li>
+                        <li>Unstructured in Cloud Storage</li>
+                        ${assessment.dataAnalytics === 'analytics-yes' ? '<li>Dataproc for ETL and ML</li>' : '<li>BigQuery for queries</li>'}
+                        <li>Unified data lake architecture</li>
+                    </ul>`;
+            }
+
+            document.getElementById('dataRecommendation').innerHTML = recommendation;
+            document.getElementById('dataResult').classList.remove('hidden');
+        }
+
+        function analyzeProjectFolder(event) {
+            const files = Array.from(event.target.files);
+            assessment.projectFiles = files;
+
+            // Analyze files
+            const analysis = {
+                technologies: [],
+                frameworks: [],
+                languages: [],
+                hasDocker: false,
+                hasPipeline: false,
+                hasTests: false,
+                hasLogs: false,
+                estimatedComplexity: 'medium',
+                fileCount: files.length,
+                suggestions: []
+            };
+
+            files.forEach(file => {
+                const name = file.name.toLowerCase();
+                
+                // Detect frameworks and tools
+                if (name.includes('package.json') || name.includes('yarn.lock')) analysis.frameworks.push('Node.js');
+                if (name.includes('requirements.txt') || name.includes('pyproject.toml')) analysis.frameworks.push('Python');
+                if (name.includes('pom.xml') || name.includes('build.gradle')) analysis.frameworks.push('Java');
+                if (name.includes('.csproj') || name.includes('.sln')) analysis.frameworks.push('.NET');
+                
+                if (name.includes('dockerfile')) analysis.hasDocker = true;
+                if (name.includes('pipeline') || name.includes('github') || name.includes('.gitlab-ci')) analysis.hasPipeline = true;
+                if (name.includes('test') || name.includes('spec')) analysis.hasTests = true;
+                if (name.includes('log') || name.includes('splunk') || name.includes('datadog')) analysis.hasLogs = true;
+                
+                if (name.endsWith('.js') || name.endsWith('.jsx')) analysis.languages.push('JavaScript');
+                if (name.endsWith('.ts') || name.endsWith('.tsx')) analysis.languages.push('TypeScript');
+                if (name.endsWith('.py')) analysis.languages.push('Python');
+                if (name.endsWith('.java')) analysis.languages.push('Java');
+                if (name.endsWith('.cs')) analysis.languages.push('C#');
+            });
+
+            // Generate suggestions
+            if (!analysis.hasDocker) analysis.suggestions.push('Consider adding Docker support for containerization');
+            if (!analysis.hasPipeline) analysis.suggestions.push('Implement CI/CD pipeline (Tekton, GitHub Actions)');
+            if (!analysis.hasTests) analysis.suggestions.push('Add unit and integration tests');
+            if (!analysis.hasLogs) analysis.suggestions.push('Integrate logging solution (Splunk, DataDog)');
+            
+            assessment.projectAnalysis = analysis;
+            displayProjectAnalysis(analysis);
+        }
+
+        function displayProjectAnalysis(analysis) {
+            let html = `
+                <div class="results">
+                    <div class="results-title">📊 Project Analysis Results</div>
+                    
+                    <div class="result-item">
+                        <div class="result-label">Total Files Analyzed</div>
+                        <div class="result-value">${analysis.fileCount} files</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Programming Languages</div>
+                        <div class="result-value">${analysis.languages.length > 0 ? analysis.languages.join(', ') : 'Not detected'}</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Frameworks & Runtime</div>
+                        <div class="result-value">${analysis.frameworks.length > 0 ? analysis.frameworks.join(', ') : 'Not detected'}</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Docker Support</div>
+                        <div class="result-value">${analysis.hasDocker ? '✅ Yes' : '❌ No'}</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">CI/CD Pipeline</div>
+                        <div class="result-value">${analysis.hasPipeline ? '✅ Yes' : '❌ No'}</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Test Coverage</div>
+                        <div class="result-value">${analysis.hasTests ? '✅ Yes' : '❌ No'}</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Logging/Monitoring</div>
+                        <div class="result-value">${analysis.hasLogs ? '✅ Yes' : '❌ No'}</div>
+                    </div>
+                </div>
+
+                ${analysis.suggestions.length > 0 ? `
+                <div class="warning">
+                    <strong>📋 Recommended Improvements:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        ${analysis.suggestions.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+
+                <div class="summary-section">
+                    <h3>🔧 Recommended Technology Stack</h3>
+                    <div class="summary-item">
+                        <strong>Frontend:</strong> ${analysis.languages.includes('TypeScript') || analysis.languages.includes('JavaScript') ? 'React/Next.js' : 'TBD'}
+                    </div>
+                    <div class="summary-item">
+                        <strong>Backend:</strong> ${analysis.frameworks.join(' + ') || 'TBD'}
+                    </div>
+                    <div class="summary-item">
+                        <strong>Containerization:</strong> ${analysis.hasDocker ? 'Docker configured' : 'Recommend Docker setup'}
+                    </div>
+                    <div class="summary-item">
+                        <strong>CI/CD:</strong> ${analysis.hasPipeline ? 'Pipeline exists' : 'Recommend Tekton or GitHub Actions'}
+                    </div>
+                    <div class="summary-item">
+                        <strong>Monitoring:</strong> ${analysis.hasLogs ? 'Logging configured' : 'Recommend Splunk or DataDog'}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('projectAnalysisResult').innerHTML = html;
+            document.getElementById('projectAnalysisResult').classList.remove('hidden');
+        }
+
+        function generateDecisionTreeResults() {
+            assessment.platformDetails = document.getElementById('platformDetails').value;
+
+            let html = `
+                <div class="results">
+                    <div class="results-title">🌳 Architecture Planning Results</div>
+                    
+                    <div class="result-item">
+                        <div class="result-label">Product Type</div>
+                        <div class="result-value">${formatLabel(assessment.productType)}</div>
+                    </div>
+                </div>
+
+                <div class="decision-tree">
+                    <div class="tree-item"><strong>Architecture Recommendations</strong></div>
+                    <div class="tree-level" id="recommendationDetail"></div>
+                </div>
+
+                <div class="cost-estimate">
+                    <h4>💰 Cost Estimation Framework</h4>
+                    <div class="cost-item">
+                        <span><strong>Development Hours:</strong></span>
+                        <span>Engineering hours × hourly rate</span>
+                    </div>
+                    <div class="cost-item">
+                        <span><strong>Infrastructure:</strong></span>
+                        <span>Cloud resources (compute, storage, bandwidth)</span>
+                    </div>
+                    <div class="cost-item">
+                        <span><strong>Licensing:</strong></span>
+                        <span>Paid tools/APIs/frameworks</span>
+                    </div>
+                    <div class="cost-item">
+                        <span><strong>Support & Maintenance:</strong></span>
+                        <span>Ongoing operational costs</span>
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h3>📋 Next Steps</h3>
+                    <div class="summary-item">
+                        1. <strong>Detailed Technical Specification</strong> - Design architecture documents
+                    </div>
+                    <div class="summary-item">
+                        2. <strong>Cost Calculator</strong> - Work with Cloud FinOps team
+                    </div>
+                    <div class="summary-item">
+                        3. <strong>Resource Planning</strong> - Determine team composition
+                    </div>
+                    <div class="summary-item">
+                        4. <strong>Timeline</strong> - Create project schedule
+                    </div>
+                    <div class="summary-item">
+                        5. <strong>Risk Assessment</strong> - Identify potential blockers
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Walmart Resources:</strong><br>
+                    • Platform Decision Tree Guide (see Confluence)<br>
+                    • Cloud FinOps team for cost calculations<br>
+                    • #helpplatforms Slack channel for support
+                </div>
+            `;
+
+            // Add specific recommendations
+            let recommendations = '';
+            if (assessment.productType === 'web-app') {
+                recommendations = `
+                    <div class="tree-item"><strong>Web Application Architecture</strong></div>
+                    <div class="tree-level">
+                        <div class="tree-decision">Platform:</div>
+                        <div class="tree-result">${assessment.webAppPublic === 'public' ? 'Azure ASE' : assessment.webAppContainer === 'container-yes' ? 'WCNP' : 'Managed ASE/OneOps'}</div>
+                        <div class="tree-decision" style="margin-top: 15px;">Key Components:</div>
+                        <div class="tree-result" style="margin-top: 5px;">
+                            • Compute: ${assessment.webAppContainer === 'container-yes' ? 'Kubernetes with auto-scaling' : 'VMs'}<br>
+                            • Storage: Azure Blobs, SQL Database<br>
+                            • Networking: Load Balancers, CDN<br>
+                            • ${assessment.webAppPublic === 'public' ? 'Security: WAF, SSL, DDoS protection' : 'Security: VNET, IAM, encryption'}
+                        </div>
+                    </div>
+                `;
+            } else if (assessment.productType === 'data-analytics') {
+                recommendations = `
+                    <div class="tree-item"><strong>Data & Analytics Architecture</strong></div>
+                    <div class="tree-level">
+                        <div class="tree-decision">Platform:</div>
+                        <div class="tree-result">${assessment.dataType === 'structured' ? 'BigQuery' : assessment.dataType === 'unstructured' ? 'Cloud Storage' : 'Data Lake (BigQuery + Storage)'}</div>
+                        <div class="tree-decision" style="margin-top: 15px;">Key Components:</div>
+                        <div class="tree-result" style="margin-top: 5px;">
+                            • Storage: ${assessment.dataType === 'structured' ? 'SQL databases with schemas' : 'Object storage with versioning'}<br>
+                            • Processing: ${assessment.dataAnalytics === 'analytics-yes' ? 'Dataproc, Databricks' : 'BigQuery queries'}<br>
+                            • Analytics: BI tools, dashboards<br>
+                            • ${assessment.dataAnalytics === 'analytics-yes' ? 'ML: Vertex AI, custom models' : 'Reporting: Data Studio'}
+                        </div>
+                    </div>
+                `;
+            } else if (assessment.productType === 'devops-ml') {
+                const tools = [];
+                if (document.getElementById('tool_cicd').checked) tools.push('Tekton (CI/CD)');
+                if (document.getElementById('tool_monitoring').checked) tools.push('Splunk (Logs), Prometheus (Metrics)');
+                if (document.getElementById('tool_ml').checked) tools.push('Vertex AI, Databricks');
+                if (document.getElementById('tool_kubernetes').checked) tools.push('Kubernetes, WCNP');
+                
+                recommendations = `
+                    <div class="tree-item"><strong>DevOps & Infrastructure Stack</strong></div>
+                    <div class="tree-level">
+                        <div class="tree-decision">Selected Tools:</div>
+                        <div class="tree-result" style="margin-top: 5px;">
+                            ${tools.length > 0 ? tools.map(t => `• ${t}`).join('<br>') : 'No tools selected'}
+                        </div>
+                        <div class="tree-decision" style="margin-top: 15px;">Implementation:</div>
+                        <div class="tree-result" style="margin-top: 5px;">
+                            • Version Control: Git (GitHub Enterprise)<br>
+                            • Build: Docker, container registry<br>
+                            • Deploy: Kubernetes/WCNP<br>
+                            • Monitor: Observability stack<br>
+                            • Security: RBAC, secrets management
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('recommendationDetail').innerHTML = recommendations;
+            html = html.replace('id="recommendationDetail"', 'id="recommendationDetail"') + recommendations;
+            
+            document.getElementById('resultsContent').innerHTML = html;
+            showScreen('resultsScreen');
+        }
+
+        function formatLabel(str) {
+            if (!str) return '';
+            return str
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function resetAssessment() {
+            assessment.mode = '';
+            assessment.productType = '';
+            document.getElementById('platformDetails').value = '';
+            document.getElementById('folderInput').value = '';
+            showScreen('startScreen');
+        }
+
+        function exportAdvancedResults() {
+            const timestamp = new Date().toLocaleString();
+            let content = `ADVANCED ACTIVITY HUB PLATFORM ASSESSMENT
+Generated: ${timestamp}
+
+ASSESSMENT MODE: ${assessment.mode}
+==================`;
+
+            if (assessment.mode === 'decision-tree') {
+                content += `
+
+PRODUCT TYPE
+============
+${formatLabel(assessment.productType)}
+
+ARCHITECTURAL DECISIONS
+=======================
+${assessment.productType === 'web-app' ? `
+Deployment: ${assessment.webAppPublic === 'public' ? 'Public-facing' : 'Internal'}
+Containerization: ${assessment.webAppContainer === 'container-yes' ? 'Yes (Docker/Kubernetes)' : 'No (VMs)'}
+Recommended Platform: ${assessment.webAppPublic === 'public' ? 'Azure ASE' : assessment.webAppContainer === 'container-yes' ? 'WCNP' : 'Managed ASE/OneOps'}
+` : ''}
+${assessment.productType === 'data-analytics' ? `
+Data Type: ${formatLabel(assessment.dataType)}
+Analytics Required: ${assessment.dataAnalytics === 'analytics-yes' ? 'Yes' : 'No'}
+Recommended Solution: ${assessment.dataType === 'structured' ? 'BigQuery/Cloud SQL' : assessment.dataType === 'unstructured' ? 'Cloud Storage' : 'Data Lake'}
+` : ''}
+
+PLATFORM DETAILS
+================
+${assessment.platformDetails || 'None provided'}
+`;
+            } else if (assessment.mode === 'project-analysis') {
+                content += `
+
+PROJECT ANALYSIS RESULTS
+========================
+Files Analyzed: ${assessment.projectAnalysis.fileCount}
+Languages: ${assessment.projectAnalysis.languages.join(', ') || 'None detected'}
+Frameworks: ${assessment.projectAnalysis.frameworks.join(', ') || 'None detected'}
+Docker: ${assessment.projectAnalysis.hasDocker ? 'Yes' : 'No'}
+CI/CD: ${assessment.projectAnalysis.hasPipeline ? 'Yes' : 'No'}
+Tests: ${assessment.projectAnalysis.hasTests ? 'Yes' : 'No'}
+Monitoring: ${assessment.projectAnalysis.hasLogs ? 'Yes' : 'No'}
+
+RECOMMENDATIONS
+===============
+${assessment.projectAnalysis.suggestions.join('\n') || 'None'}
+`;
+            }
+
+            content += `
+
+COST ESTIMATION FRAMEWORK
+=========================
+Development: Engineering hours × hourly rate
+Infrastructure: Cloud resources (compute, storage, bandwidth)
+Licensing: Paid tools and APIs
+Support & Maintenance: Ongoing operational costs
+
+NEXT STEPS
+==========
+1. Create detailed technical specifications
+2. Work with Cloud FinOps for cost calculations
+3. Plan resource requirements
+4. Build project timeline
+5. Assess risks and dependencies
+
+WALMART RESOURCES
+=================
+• Platform Decision Tree Guide
+• Cloud FinOps team
+• #helpplatforms Slack channel`;
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Advanced_Assessment_${new Date().getTime()}.txt`;
+            a.click();
+        }
+    </script>
+</body>
+</html>

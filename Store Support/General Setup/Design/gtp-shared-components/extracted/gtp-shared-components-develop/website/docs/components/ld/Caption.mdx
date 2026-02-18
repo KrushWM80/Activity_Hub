@@ -1,0 +1,29 @@
+---
+title: Caption
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Captions annotate imagery, introduces a headline as an "eyebrow", or provide legal information.
+
+
+<ScreenshotTabs screenshotData={"screenshots/caption.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Caption} from '@walmart/gtp-shared-components`;
+
+<Caption weight="400">Lorem ipsum</Caption>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="Caption" prop="children"/>
+ ### weight
+<PropTable componentLink="Caption" prop="weight"/>
+ ### UNSAFE_style
+<PropTable componentLink="Caption" prop="UNSAFE_style"/>
+ ### color
+<PropTable componentLink="Caption" prop="color"/>
+ ### inheritColor<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - has no effect. If you need to apply a color to the text, use e.g. UNSAFE_style=`{color: 'green'}`</span></span>
+<PropTable componentLink="Caption" prop="inheritColor"/>

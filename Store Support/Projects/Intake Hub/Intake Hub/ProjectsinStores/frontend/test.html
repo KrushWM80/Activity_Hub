@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Testing API Connection</h1>
+    <div id="status">Loading...</div>
+    <pre id="data"></pre>
+    
+    <script>
+        async function test() {
+            const statusDiv = document.getElementById('status');
+            const dataDiv = document.getElementById('data');
+            
+            try {
+                statusDiv.innerHTML = 'Connecting to http://127.0.0.1:8000/api/health...';
+                const response = await fetch('http://127.0.0.1:8000/api/health');
+                const data = await response.json();
+                
+                statusDiv.innerHTML = '✅ Connected! Status: ' + data.status;
+                dataDiv.innerHTML = JSON.stringify(data, null, 2);
+                
+                // Now test summary
+                const summaryResponse = await fetch('http://127.0.0.1:8000/api/summary?status=Active');
+                const summaryData = await summaryResponse.json();
+                dataDiv.innerHTML += '\n\nSummary:\n' + JSON.stringify(summaryData, null, 2);
+                
+            } catch (error) {
+                statusDiv.innerHTML = '❌ Error: ' + error.message;
+                dataDiv.innerHTML = error.stack;
+            }
+        }
+        
+        test();
+    </script>
+</body>
+</html>

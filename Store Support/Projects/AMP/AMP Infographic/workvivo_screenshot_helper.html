@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkVivo Post - Ready to Screenshot</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #screenshot-instructions {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0071CE;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            z-index: 10000;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        #screenshot-instructions button {
+            background: #FFC220;
+            color: #0071CE;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 15px;
+            font-size: 14px;
+        }
+
+        #screenshot-instructions button:hover {
+            background: #ffdd66;
+        }
+    </style>
+</head>
+<body>
+    <div id="screenshot-instructions">
+        📸 Press Ctrl+P to Print → Save as PDF → Convert to PNG<br>
+        OR Right-click below and "Save image as..."
+        <button onclick="window.print()">Print Now</button>
+        <button onclick="document.getElementById('screenshot-instructions').style.display='none'">Hide Instructions</button>
+    </div>
+
+    <iframe src="workvivo_social_post.html" 
+            width="1080" 
+            height="1920" 
+            frameborder="0" 
+            style="display: block; background: white; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+    </iframe>
+
+    <script>
+        // Auto-hide instructions after 10 seconds
+        setTimeout(() => {
+            const instructions = document.getElementById('screenshot-instructions');
+            if (instructions) {
+                instructions.style.opacity = '0';
+                instructions.style.transition = 'opacity 1s';
+                setTimeout(() => instructions.style.display = 'none', 1000);
+            }
+        }, 10000);
+    </script>
+</body>
+</html>

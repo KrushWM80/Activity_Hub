@@ -1,0 +1,68 @@
+{
+  "activities": [
+    {
+      "id": "842abc09",
+      "timestamp": "2026-02-05 09:41:01",
+      "action": "Fix Approved",
+      "user": "kendall.rush",
+      "details": "Approved fix 176b8708",
+      "category": "admin"
+    },
+    {
+      "id": "ed26c350",
+      "timestamp": "2026-02-05 11:09:00",
+      "action": "Admin Login",
+      "user": "kendall.rush",
+      "details": "Logged into admin dashboard",
+      "category": "admin"
+    },
+    {
+      "id": "fb18b5c3",
+      "timestamp": "2026-02-06 07:43:08",
+      "action": "Admin Login",
+      "user": "kendall.rush",
+      "details": "Logged into admin dashboard",
+      "category": "admin"
+    },
+    {
+      "id": "c872f90a",
+      "timestamp": "2026-02-06 07:43:35",
+      "action": "Fix Denied",
+      "user": "kendall.rush",
+      "details": "Denied fix cae9cb04",
+      "category": "admin"
+    },
+    {
+      "id": "7b4f737d",
+      "timestamp": "2026-02-12 08:17:50",
+      "action": "Admin Login",
+      "user": "kendall.rush",
+      "details": "Logged into admin dashboard",
+      "category": "admin"
+    },
+    {
+      "id": "d708b9d3",
+      "timestamp": "2026-02-13 12:07:18",
+      "action": "Admin Login",
+      "user": "kendall.rush",
+      "details": "Logged into admin dashboard",
+      "category": "admin"
+    },
+    {
+      "id": "aa733dca",
+      "timestamp": "2026-02-17 12:48:37",
+      "action": "Admin Login",
+      "user": "kendall.rush",
+      "details": "Logged into admin dashboard",
+      "category": "admin"
+    },
+    {
+      "id": "e6fede48",
+      "timestamp": "2026-02-17 12:54:41",
+      "action": "Admin Login",
+      "user": "kendall.rush",
+      "details": "Logged into admin dashboard",
+      "category": "admin"
+    }
+  ]
+}

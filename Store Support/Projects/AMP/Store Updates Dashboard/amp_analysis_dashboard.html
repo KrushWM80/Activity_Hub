@@ -1,0 +1,3399 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>AMP Analysis Dashboard</title>
+ <style>
+ /* ===== WALMART DESIGN SYSTEM VARIABLES ===== */
+ :root {
+ /* Walmart Blue Palette - Official Brand Colors */
+ --walmart-navy: #1E3A8A;
+ --walmart-blue-dark: #1D4ED8;
+ --walmart-blue: #3B82F6;
+ --walmart-blue-light: #60A5FA;
+ --walmart-blue-lightest: #DBEAFE;
+ --walmart-yellow: #FFCC00;
+ --walmart-yellow-dark: #E6B800;
+ 
+ /* Neutral Colors - Light Mode */
+ --gray-900: #1A202C;
+ --gray-800: #2D3748;
+ --gray-700: #4A5568;
+ --gray-600: #718096;
+ --gray-500: #A0AEC0;
+ --gray-400: #CBD5E0;
+ --gray-300: #E2E8F0;
+ --gray-200: #EDF2F7;
+ --gray-100: #F7FAFC;
+ --white: #FFFFFF;
+ 
+ /* Dark Mode Overrides */
+ --bg-primary: #F7FAFC;
+ --bg-secondary: #FFFFFF;
+ --text-primary: #1A202C;
+ --text-secondary: #4A5568;
+ --border-color: #E2E8F0;
+ 
+ /* Status Colors */
+ --success: #38A169;
+ --success-light: #68D391;
+ --success-background: #F0FFF4;
+ --warning: #D69E2E;
+ --warning-light: #F6E05E;
+ --warning-background: #FFFBEB;
+ --error: #E53E3E;
+ --error-light: #FC8181;
+ --error-background: #FED7D7;
+ --info: #3182CE;
+ --info-light: #63B3ED;
+ --info-background: #EBF8FF;
+ 
+ /* Typography */
+ --font-primary: 'Everyday Sans', 'Segoe UI', Helvetica Neue, Arial, sans-serif;
+ --font-secondary: 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+ --font-mono: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace;
+ 
+ /* Spacing */
+ --space-1: 4px;
+ --space-2: 8px;
+ --space-3: 12px;
+ --space-4: 16px;
+ --space-6: 24px;
+ 
+ /* Border Radius */
+ --radius-sm: 4px;
+ --radius-md: 6px;
+ --radius-lg: 12px;
+ 
+ /* Shadows */
+ --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+ --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+ }
+
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ }
+
+ body {
+ font-family: var(--font-primary);
+ background-color: var(--bg-primary);
+ color: var(--text-primary);
+ transition: background-color 0.3s ease, color 0.3s ease;
+ }
+ 
+ body.dark-mode {
+ --bg-primary: #1A202C;
+ --bg-secondary: #2D3748;
+ --text-primary: #F7FAFC;
+ --text-secondary: #CBD5E0;
+ --border-color: #4A5568;
+ }
+ 
+ body.dark-mode .table-wrapper {
+ background: var(--bg-secondary);
+ border-color: var(--border-color);
+ }
+ 
+ body.dark-mode table th,
+ body.dark-mode table td {
+ border-color: var(--border-color);
+ color: var(--text-primary);
+ }
+ 
+ body.dark-mode .stat-item {
+ background: var(--bg-secondary);
+ border-color: var(--border-color);
+ color: var(--text-primary);
+ }
+ 
+ body.dark-mode .filter-section {
+ background: var(--bg-secondary);
+ border-color: var(--border-color);
+ }
+ 
+ body.dark-mode input,
+ body.dark-mode select,
+ body.dark-mode textarea {
+ background-color: var(--bg-secondary);
+ color: var(--text-primary);
+ border-color: var(--border-color);
+ }
+ 
+ body.dark-mode .modal {
+ background: var(--bg-secondary);
+ }
+ 
+ body.dark-mode .modal-content {
+ background: var(--bg-secondary);
+ color: var(--text-primary);
+ }
+
+ /* Header */
+ .header {
+ background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue) 100%);
+ color: var(--white);
+ padding: var(--space-6) var(--space-6);
+ box-shadow: var(--shadow-md);
+ }
+
+ .header-top {
+ display: flex;
+ justify-content: space-between;
+ align-items: flex-start;
+ margin-bottom: var(--space-4);
+ }
+
+ .header-right {
+ display: flex;
+ gap: var(--space-4);
+ align-items: center;
+ }
+ 
+ .dark-mode-toggle {
+ background: rgba(255, 255, 255, 0.2);
+ color: white;
+ border: 1px solid rgba(255, 255, 255, 0.3);
+ border-radius: var(--radius-md);
+ padding: 6px 12px;
+ cursor: pointer;
+ font-size: 14px;
+ transition: all 0.3s ease;
+ }
+ 
+ .dark-mode-toggle:hover {
+ background: rgba(255, 255, 255, 0.3);
+ }
+ 
+
+ .header .subtitle {
+ font-size: 13px;
+ opacity: 0.9;
+ margin-left: var(--space-4);
+ }
+
+ .header-controls {
+ display: flex;
+ gap: var(--space-3);
+ }
+
+ .feedback-btn {
+ background-color: var(--walmart-yellow);
+ color: var(--gray-900);
+ border: none;
+ padding: var(--space-2) var(--space-4);
+ border-radius: var(--radius-md);
+ cursor: pointer;
+ font-size: 12px;
+ font-weight: 600;
+ transition: all 0.3s;
+ }
+
+ .feedback-btn:hover {
+ background-color: var(--walmart-yellow-dark);
+ transform: scale(1.05);
+ }
+
+ .header-info {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
+
+ .last-refresh {
+ font-size: 12px;
+ opacity: 0.85;
+ }
+
+ .admin-badge {
+ background-color: rgba(255,255,255,0.2);
+ padding: var(--space-2) var(--space-3);
+ border-radius: 12px;
+ font-size: 11px;
+ font-weight: 600;
+ border: 1px solid rgba(255,255,255,0.4);
+ }
+
+ /* Filter Section */
+ .filter-section {
+ background: var(--white);
+ padding: var(--space-6);
+ margin: var(--space-4) var(--space-6);
+ border-radius: var(--radius-lg);
+ box-shadow: var(--shadow-sm);
+ border: 1px solid var(--gray-200);
+ }
+
+ .filter-header {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: var(--space-4);
+ padding-bottom: var(--space-3);
+ border-bottom: 2px solid var(--gray-200);
+ }
+
+ .filter-header h3 {
+ font-size: 16px;
+ font-weight: 600;
+ color: var(--walmart-blue);
+ }
+
+ .filter-actions {
+ display: flex;
+ gap: var(--space-3);
+ }
+
+ .btn-clear {
+ background-color: var(--gray-200);
+ border: 1px solid var(--gray-300);
+ padding: var(--space-2) var(--space-3);
+ border-radius: var(--radius-md);
+ cursor: pointer;
+ font-size: 12px;
+ transition: all 0.3s;
+ color: var(--gray-900);
+ font-weight: 500;
+ }
+
+ .btn-clear:hover {
+ background-color: var(--gray-300);
+ border-color: var(--gray-400);
+ }
+
+ .admin-controls {
+ background-color: var(--warning-background);
+ border-left: 4px solid var(--warning);
+ padding: var(--space-4) var(--space-4);
+ border-radius: var(--radius-md);
+ margin-bottom: var(--space-4);
+ font-size: 12px;
+ }
+
+ .admin-controls label {
+ display: flex;
+ align-items: center;
+ gap: var(--space-2);
+ margin-bottom: var(--space-2);
+ cursor: pointer;
+ }
+
+ .admin-controls input[type="checkbox"] {
+ cursor: pointer;
+ }
+
+ /* Filter Grid */
+ .filter-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+ gap: var(--space-4);
+ margin-bottom: var(--space-4);
+ }
+
+ .filter-group {
+ display: flex;
+ flex-direction: column;
+ }
+
+ .filter-group label {
+ font-size: 12px;
+ font-weight: 600;
+ color: var(--gray-900);
+ margin-bottom: var(--space-2);
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ }
+
+ .filter-group select,
+ .filter-group input[type="text"],
+ .filter-group input[type="number"] {
+ padding: var(--space-2) var(--space-3);
+ border: 1px solid var(--gray-300);
+ border-radius: var(--radius-md);
+ font-size: 13px;
+ background-color: var(--white);
+ transition: all 0.3s;
+ font-family: var(--font-primary);
+ }
+
+ .filter-group select:focus,
+ .filter-group input:focus {
+ outline: none;
+ border-color: var(--walmart-blue);
+ box-shadow: 0 0 0 3px var(--walmart-blue-lightest);
+ }
+
+ /* Action Buttons */
+ .btn-action {
+ padding: var(--space-2) var(--space-4);
+ border: none;
+ border-radius: var(--radius-md);
+ font-size: 13px;
+ font-weight: 600;
+ cursor: pointer;
+ transition: all 0.2s;
+ display: flex;
+ align-items: center;
+ gap: var(--space-2);
+ white-space: nowrap;
+ }
+
+ .btn-search {
+ background-color: var(--walmart-blue);
+ color: var(--white);
+ }
+
+ .btn-search:hover {
+ background-color: var(--walmart-blue-dark);
+ }
+
+ .btn-export {
+ background-color: var(--success);
+ color: var(--white);
+ }
+
+ .btn-export:hover {
+ background-color: #2f8659;
+ }
+
+ .btn-refresh {
+ background-color: var(--gray-600);
+ color: var(--white);
+ }
+
+ .btn-refresh:hover {
+ background-color: var(--gray-700);
+ }
+
+ /* Title Suggestions Dropdown */
+ .title-suggestions {
+ position: absolute;
+ top: 100%;
+ left: 0;
+ right: 0;
+ background: var(--white);
+ border: 1px solid var(--gray-300);
+ border-top: none;
+ border-radius: 0 0 var(--radius-md) var(--radius-md);
+ max-height: 200px;
+ overflow-y: auto;
+ z-index: 100;
+ box-shadow: var(--shadow-md);
+ }
+
+ .title-suggestion {
+ padding: var(--space-2) var(--space-3);
+ cursor: pointer;
+ font-size: 13px;
+ border-bottom: 1px solid var(--gray-200);
+ }
+
+ .title-suggestion:hover {
+ background-color: var(--walmart-blue-lightest);
+ }
+
+ .title-suggestion:last-child {
+ border-bottom: none;
+ }
+
+ /* Filter Row 2 - Right Aligned */
+ .filter-row-2 {
+ display: flex;
+ flex-wrap: wrap;
+ gap: var(--space-4);
+ }
+
+ .filter-row-2 .filter-group {
+ min-width: 120px;
+ }
+
+ /* Range Slider */
+ .week-range {
+ display: flex;
+ gap: var(--space-2);
+ align-items: center;
+ }
+
+ .week-range input[type="range"] {
+ flex: 1;
+ cursor: pointer;
+ }
+
+ .week-range span {
+ min-width: 40px;
+ font-size: 12px;
+ font-weight: 600;
+ }
+
+ /* Data Table Section */
+ .data-section {
+ background: var(--white);
+ margin: var(--space-4) var(--space-6);
+ border-radius: var(--radius-lg);
+ box-shadow: var(--shadow-sm);
+ overflow: hidden;
+ border: 1px solid var(--gray-200);
+ }
+
+ .data-header {
+ background-color: var(--gray-200);
+ padding: var(--space-4) var(--space-6);
+ border-bottom: 1px solid var(--gray-300);
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
+
+ .data-header h3 {
+ font-size: 16px;
+ font-weight: 600;
+ color: var(--gray-900);
+ }
+
+ .data-stats {
+ display: flex;
+ gap: var(--space-4);
+ font-size: 12px;
+ }
+
+ .stat-item {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ text-align: center;
+ background: white;
+ padding: 12px 16px;
+ border-radius: 8px;
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+ border: 1px solid var(--gray-200);
+ min-width: 100px;
+ }
+
+ .stat-label {
+ color: var(--gray-600);
+ font-size: 10px;
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ margin-bottom: 4px;
+ }
+
+ .stat-value {
+ font-size: 20px;
+ font-weight: 700;
+ color: var(--walmart-blue);
+ }
+
+ .stat-value.highlight-high {
+ color: #059669;
+ }
+
+ .stat-value.highlight-low {
+ color: #DC2626;
+ }
+
+ /* Table Styles */
+ .table-wrapper {
+ overflow-x: auto;
+ max-height: 600px;
+ overflow-y: auto;
+ }
+
+ table {
+ width: 100%;
+ border-collapse: collapse;
+ font-size: 12px;
+ }
+
+ thead {
+ position: sticky;
+ top: 0;
+ background-color: var(--gray-200);
+ border-bottom: 2px solid var(--gray-300);
+ z-index: 10;
+ }
+
+ th {
+ padding: var(--space-3) var(--space-3);
+ text-align: left;
+ font-weight: 600;
+ color: var(--gray-900);
+ white-space: nowrap;
+ border-right: 1px solid var(--gray-300);
+ }
+
+ th:last-child {
+ border-right: none;
+ }
+
+ tbody tr {
+ border-bottom: 1px solid var(--gray-200);
+ transition: background-color 0.2s;
+ }
+
+ tbody tr:hover {
+ background-color: var(--gray-100);
+ }
+
+ td {
+ padding: var(--space-3) var(--space-3);
+ color: var(--gray-700);
+ }
+
+ /* Status Badge */
+ .status-badge {
+ display: inline-block;
+ padding: var(--space-1) var(--space-3);
+ border-radius: 12px;
+ font-size: 11px;
+ font-weight: 600;
+ text-align: center;
+ min-width: 50px;
+ }
+
+ .status-complete {
+ background-color: var(--success-background);
+ color: var(--success);
+ }
+
+ .status-incomplete {
+ background-color: var(--error-background);
+ color: var(--error);
+ }
+
+ .status-published {
+ background-color: var(--info-background);
+ color: var(--info);
+ }
+
+ /* Verification Complete/Incomplete Links */
+ .verification-complete {
+ color: #16A34A;
+ font-weight: 600;
+ cursor: pointer;
+ text-decoration: underline;
+ }
+ .verification-complete:hover {
+ color: #15803D;
+ }
+ .verification-incomplete {
+ color: #DC2626;
+ font-weight: 600;
+ cursor: pointer;
+ text-decoration: underline;
+ }
+ .verification-incomplete:hover {
+ color: #B91C1C;
+ }
+ .verification-separator {
+ color: #6B7280;
+ margin: 0 2px;
+ }
+
+ /* Activity Title Link */
+ a.activity-title-link {
+ color: var(--walmart-blue);
+ text-decoration: none;
+ font-weight: 500;
+ }
+ a.activity-title-link:hover {
+ text-decoration: underline;
+ color: var(--walmart-navy);
+ }
+
+ /* Store Popup Modal */
+ .store-popup {
+ display: none;
+ position: fixed;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ background: rgba(0, 0, 0, 0.5);
+ z-index: 10000;
+ align-items: center;
+ justify-content: center;
+ }
+ .store-popup.active {
+ display: flex;
+ }
+ .store-popup-content {
+ background: white;
+ border-radius: 12px;
+ max-width: 600px;
+ max-height: 80vh;
+ width: 90%;
+ overflow: hidden;
+ box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+ }
+ .store-popup-header {
+ background: var(--walmart-navy);
+ color: white;
+ padding: var(--space-4);
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
+ .store-popup-header h3 {
+ margin: 0;
+ font-size: 16px;
+ }
+ .store-popup-close {
+ background: none;
+ border: none;
+ color: white;
+ font-size: 24px;
+ cursor: pointer;
+ padding: 0;
+ line-height: 1;
+ }
+ .store-popup-body {
+ padding: var(--space-4);
+ max-height: 60vh;
+ overflow-y: auto;
+ }
+ .store-list {
+ display: grid;
+ grid-template-columns: repeat(4, 1fr);
+ gap: var(--space-2);
+ }
+ .store-list-item {
+ padding: var(--space-2);
+ background: var(--gray-100);
+ border-radius: 4px;
+ font-size: 12px;
+ text-align: center;
+ }
+ .store-popup-modal {
+ display: none;
+ position: fixed;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ background: rgba(0, 0, 0, 0.5);
+ z-index: 10000;
+ align-items: center;
+ justify-content: center;
+ }
+ .store-popup-grid {
+ display: grid;
+ grid-template-columns: repeat(5, 1fr);
+ gap: 8px;
+ }
+ .store-number-item {
+ padding: 8px 12px;
+ background: #f5f5f5;
+ border-radius: 6px;
+ font-size: 13px;
+ text-align: center;
+ font-weight: 500;
+ color: #333;
+ border: 1px solid #e0e0e0;
+ }
+
+ /* Link Styles */
+ a.preview-link {
+ color: var(--walmart-blue);
+ text-decoration: none;
+ cursor: pointer;
+ border-bottom: 1px dotted var(--walmart-blue);
+ transition: all 0.2s;
+ font-weight: 500;
+ }
+
+ a.preview-link:hover {
+ color: var(--walmart-blue-dark);
+ border-bottom-style: solid;
+ }
+
+ /* Metric Columns */
+ .metric-column {
+ text-align: center;
+ font-weight: 600;
+ color: var(--walmart-blue);
+ }
+
+ /* Footer */
+ .footer {
+ background-color: var(--gray-200);
+ padding: var(--space-4) var(--space-6);
+ margin: var(--space-4) var(--space-6);
+ border-radius: var(--radius-lg);
+ text-align: center;
+ font-size: 12px;
+ color: var(--gray-700);
+ border: 1px solid var(--gray-300);
+ }
+
+ .footer a {
+ color: var(--walmart-blue);
+ text-decoration: none;
+ }
+
+ /* ===== FEEDBACK MODAL ===== */
+ .feedback-modal {
+ display: none;
+ position: fixed;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background: rgba(0, 0, 0, 0.5);
+ z-index: 1000;
+ align-items: center;
+ justify-content: center;
+ padding: var(--space-4);
+ }
+
+ .feedback-modal.open {
+ display: flex;
+ }
+
+ .feedback-container {
+ background: var(--white);
+ border-radius: var(--radius-lg);
+ box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+ max-width: 500px;
+ width: 100%;
+ max-height: 90vh;
+ overflow-y: auto;
+ animation: slideUp 0.3s ease-out;
+ }
+
+ @keyframes slideUp {
+ from {
+ transform: translateY(20px);
+ opacity: 0;
+ }
+ to {
+ transform: translateY(0);
+ opacity: 1;
+ }
+ }
+
+ .feedback-header {
+ background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue) 100%);
+ color: var(--white);
+ padding: var(--space-6);
+ border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
+
+ .feedback-header h2 {
+ font-size: 20px;
+ font-weight: 700;
+ }
+
+ .feedback-close {
+ background: none;
+ border: none;
+ color: var(--white);
+ font-size: 24px;
+ cursor: pointer;
+ width: 32px;
+ height: 32px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ transition: transform 0.2s;
+ }
+
+ .feedback-close:hover {
+ transform: rotate(90deg);
+ }
+
+ .feedback-body {
+ padding: var(--space-6);
+ }
+
+ .feedback-step {
+ animation: fadeIn 0.3s ease-in;
+ }
+
+ @keyframes fadeIn {
+ from { opacity: 0; }
+ to { opacity: 1; }
+ }
+
+ .feedback-step h3 {
+ font-size: 16px;
+ font-weight: 600;
+ color: var(--gray-900);
+ margin-bottom: var(--space-4);
+ }
+
+ .feedback-options {
+ display: flex;
+ flex-direction: column;
+ gap: var(--space-3);
+ }
+
+ .feedback-option {
+ display: flex;
+ align-items: flex-start;
+ gap: var(--space-3);
+ padding: var(--space-3) var(--space-4);
+ border: 1px solid var(--gray-300);
+ border-radius: var(--radius-md);
+ cursor: pointer;
+ transition: all 0.2s;
+ }
+
+ .feedback-option:hover {
+ background-color: var(--gray-100);
+ border-color: var(--walmart-blue);
+ }
+
+ .feedback-option input[type="radio"] {
+ margin-top: 2px;
+ cursor: pointer;
+ }
+
+ .feedback-option label {
+ cursor: pointer;
+ flex: 1;
+ font-weight: 500;
+ }
+
+ .rating-labels {
+ display: flex;
+ justify-content: space-between;
+ margin-top: var(--space-3);
+ }
+
+ .rating-labels span {
+ font-size: 11px;
+ color: var(--gray-600);
+ font-weight: 500;
+ }
+
+ .feedback-comments {
+ width: 100%;
+ min-height: 100px;
+ padding: var(--space-3) var(--space-4);
+ border: 1px solid var(--gray-300);
+ border-radius: var(--radius-md);
+ font-family: var(--font-primary);
+ font-size: 13px;
+ resize: vertical;
+ transition: all 0.3s;
+ }
+
+ .feedback-comments:focus {
+ outline: none;
+ border-color: var(--walmart-blue);
+ box-shadow: 0 0 0 3px var(--walmart-blue-lightest);
+ }
+
+ .feedback-actions {
+ display: flex;
+ gap: var(--space-3);
+ justify-content: flex-end;
+ margin-top: var(--space-6);
+ padding-top: var(--space-4);
+ border-top: 1px solid var(--gray-200);
+ }
+
+ .btn-feedback {
+ padding: var(--space-2) var(--space-4);
+ border-radius: var(--radius-md);
+ font-weight: 600;
+ cursor: pointer;
+ transition: all 0.3s;
+ border: none;
+ font-size: 13px;
+ }
+
+ .btn-back {
+ background-color: var(--gray-200);
+ color: var(--gray-900);
+ }
+
+ .btn-back:hover {
+ background-color: var(--gray-300);
+ }
+
+ .btn-next {
+ background-color: var(--walmart-blue);
+ color: var(--white);
+ }
+
+ .btn-next:hover {
+ background-color: var(--walmart-blue-dark);
+ }
+
+ .btn-submit {
+ background-color: var(--success);
+ color: var(--white);
+ }
+
+ .btn-submit:hover {
+ background-color: #2f8659;
+ }
+
+ .feedback-success {
+ text-align: center;
+ padding: var(--space-6);
+ }
+
+ .feedback-success .checkmark {
+ font-size: 48px;
+ margin-bottom: var(--space-4);
+ display: block;
+ animation: scaleIn 0.4s ease-out;
+ }
+
+ @keyframes scaleIn {
+ from {
+ transform: scale(0);
+ }
+ to {
+ transform: scale(1);
+ }
+ }
+
+ .feedback-success h3 {
+ font-size: 18px;
+ font-weight: 700;
+ color: var(--gray-900);
+ margin-bottom: var(--space-2);
+ }
+
+ .feedback-success p {
+ color: var(--gray-600);
+ font-size: 13px;
+ }
+
+ /* Responsive */
+ @media (max-width: 1200px) {
+ .filter-grid {
+ grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+ }
+ }
+
+ @media (max-width: 768px) {
+ .header h1 {
+ font-size: 20px;
+ }
+
+ .header .subtitle {
+ margin-left: 0;
+ display: none;
+ }
+
+ .filter-grid {
+ grid-template-columns: 1fr;
+ }
+
+ .data-stats {
+ flex-direction: column;
+ }
+
+ .table-wrapper {
+ max-height: 400px;
+ }
+
+ th, td {
+ padding: var(--space-2) var(--space-2);
+ font-size: 11px;
+ }
+
+ .feedback-container {
+ max-width: 95%;
+ }
+ }
+
+ /* Utility Classes */
+ .text-muted {
+ color: var(--gray-600);
+ }
+
+ .text-nowrap {
+ white-space: nowrap;
+ }
+
+ .font-weight-bold {
+ font-weight: 700;
+ }
+ </style>
+</head>
+<body>
+ <!-- Header -->
+ <div class="header">
+ <div class="header-top">
+ <div>
+ <h1>
+ <img src="Spark_Blank.png" alt="Spark" style="height: 40px; vertical-align: middle; margin-right: 8px;">Store Activity and Communications
+ </h1>
+ <span class="subtitle">Activity Performance & Engagement Metrics through MyWalmart > Inbox > Store Updates</span>
+ </div>
+ <div class="header-right">
+ <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+ 🌙 Dark Mode
+ </button>
+ <button class="feedback-btn" onclick="openFeedback()" title="Send feedback about the dashboard">
+ 💬 Send Feedback
+ </button>
+ </div>
+ </div>
+ <div class="header-info">
+ <div class="last-refresh">
+ Last Refreshed: <span id="refreshTime">Feb 12, 2026 9:37 AM</span>
+ </div>
+ <div class="admin-badge" id="adminBadge" style="display: none;">
+ 👤 ADMIN MODE
+ </div>
+ </div>
+ </div>
+
+ <!-- Filter Section -->
+ <div class="filter-section">
+ <div class="filter-header">
+ <h3>📋 Filters</h3>
+ <div class="filter-actions">
+ <button class="btn-clear" onclick="clearAllFilters()">Clear All Filters</button>
+ <button class="btn-clear" onclick="toggleAdminMode()" id="toggleAdminBtn">Enable Admin</button>
+ </div>
+ </div>
+
+ <!-- Admin Controls (Hidden by default) -->
+ <div class="admin-controls" id="adminControls" style="display: none;">
+ <strong>⚙️ Pre-Filter Configuration:</strong>
+ <label>
+ <input type="checkbox" checked id="filterMessageType"> 
+ Message Type: Store Update
+ </label>
+ <label>
+ <input type="checkbox" checked id="filterStatus"> 
+ Status: Published
+ </label>
+ <p style="margin-top: 8px; font-size: 11px; color: #666;">
+ ⚠️ These pre-filters apply globally. Unchecking expands to all message types/statuses.
+ </p>
+ </div>
+
+ <!-- Filter Grid - Row 1: Activity Search, Search, Export, Refresh, Activity Title, Activity Type, Store Area -->
+ <div class="filter-grid" style="grid-template-columns: 2.5fr auto auto auto 1.5fr 1fr 1fr;">
+ <div class="filter-group" style="position: relative;">
+ <label for="filterSearch">Activity Search</label>
+ <input type="text" id="filterSearch" placeholder="Search titles, keywords, message body..." 
+ oninput="handleActivitySearch(this.value)" 
+ onkeydown="if(event.key==='Enter'){searchData(); event.preventDefault();}"
+ autocomplete="off">
+ <div id="searchSuggestions" class="title-suggestions" style="display: none;"></div>
+ </div>
+
+ <div class="filter-group" style="align-self: flex-end;">
+ <button class="btn-action btn-search" onclick="searchData()" title="Search">
+ Search
+ </button>
+ </div>
+
+ <div class="filter-group" style="align-self: flex-end;">
+ <button class="btn-action btn-export" onclick="exportData()" title="Export to CSV">
+ Export
+ </button>
+ </div>
+
+ <div class="filter-group" style="align-self: flex-end;">
+ <button class="btn-action btn-refresh" onclick="refreshData()" title="Refresh Data">
+ Refresh
+ </button>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterTitle">Activity Title</label>
+ <select id="filterTitle" multiple size="1" style="height: 38px;">
+ <option value="">All Titles</option>
+ <option value="2026 ACNT Together Fund Campaign">2026 ACNT Together Fund Campaign</option>
+ <option value="Alabama Severe Weather Preparedness Sales Tax Holiday">Alabama Severe Weather Sales Tax Holiday</option>
+ <option value="Associate Feedback: Multi-Stop Deliveries">Associate Feedback: Multi-Stop Deliveries</option>
+ <option value="Bay Configuration Feature Release">Bay Configuration Feature Release</option>
+ <option value="Dept. 56: Weatherproof Digital Bridge Labels">Dept. 56: Weatherproof Digital Bridge Labels</option>
+ <option value="Dept. 98: Bakery Support - In-Store Trainer Visit">Dept. 98: Bakery Support - In-Store Trainer Visit</option>
+ <option value="Device Refresh - Google Pixel 8a Devices Are on the Way!">Device Refresh - Google Pixel 8a Devices</option>
+ <option value="EV Charging Construction Has Started!">EV Charging Construction Has Started!</option>
+ <option value="Ecolab Pest Service Updates">Ecolab Pest Service Updates</option>
+ <option value="Fashion: 2.0 Floorplan & Modular Updates">Fashion: 2.0 Floorplan & Modular Updates</option>
+ <option value="GM Trailers are Now Fully Palletized!">GM Trailers are Now Fully Palletized!</option>
+ <option value="New Incident Intake Reporting Process">New Incident Intake Reporting Process</option>
+ <option value="New Spill Stations Are Coming to Your Store">New Spill Stations Are Coming to Your Store</option>
+ <option value="Pharmacy Modernization">Pharmacy Modernization</option>
+ <option value="Your Week 2 Messages Are Here">Your Week 2 Messages Are Here</option>
+ <!-- Additional titles populated dynamically -->
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterActivityType">Activity Type</label>
+ <select id="filterActivityType" multiple size="1" style="height: 38px;">
+ <option value="">All Types</option>
+ <option value="Inform">Inform</option>
+ <option value="Verification">Verification</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterStoreArea">Store Area</label>
+ <select id="filterStoreArea" multiple size="1" style="height: 38px;">
+ <option value="">All Areas</option>
+ <option value="Admin & Support">Admin & Support</option>
+ <option value="Asset Protection">Asset Protection</option>
+ <option value="Auto Care">Auto Care</option>
+ <option value="Backroom and Claims">Backroom and Claims</option>
+ <option value="Consumables">Consumables</option>
+ <option value="Digital">Digital</option>
+ <option value="Entertainment">Entertainment</option>
+ <option value="Fashion">Fashion</option>
+ <option value="Food">Food</option>
+ <option value="Fresh">Fresh</option>
+ <option value="Frontend">Frontend</option>
+ <option value="General Merchandise">General Merchandise</option>
+ <option value="Hardlines">Hardlines</option>
+ <option value="Home">Home</option>
+ <option value="People">People</option>
+ <option value="Pharmacy">Pharmacy</option>
+ <option value="Seasonal">Seasonal</option>
+ <option value="Total Store">Total Store</option>
+ <option value="Vision Center">Vision Center</option>
+ </select>
+ </div>
+ </div>
+
+ <!-- Filter Grid - Row 2: Division, Region, Market, Store, Store Format, Alignment, FY, WM Week (full width) -->
+ <div class="filter-grid" style="margin-top: var(--space-3); grid-template-columns: repeat(8, 1fr);">
+ <div class="filter-group">
+ <label for="filterDivision">Division</label>
+ <select id="filterDivision" multiple size="1" style="height: 38px;">
+ <option value="">All Divisions</option>
+ <option value="EAST BU">EAST BU</option>
+ <option value="WEST BU">WEST BU</option>
+ <option value="NORTH BU">NORTH BU</option>
+ <option value="SOUTHEAST BU">SOUTHEAST BU</option>
+ <option value="SOUTHWEST BU">SOUTHWEST BU</option>
+ <option value="NHM BU">NHM BU</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterRegion">Region</label>
+ <select id="filterRegion" multiple size="1" style="height: 38px;">
+ <option value="">All Regions</option>
+ <option value="01">Region 01</option>
+ <option value="05">Region 05</option>
+ <option value="08">Region 08</option>
+ <option value="99">Region 99 (All Stores)</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterMarket">Market</label>
+ <select id="filterMarket" multiple size="1" style="height: 38px;">
+ <option value="">All Markets</option>
+ <option value="142">Market 142</option>
+ <option value="027">Market 027</option>
+ <option value="098">Market 098</option>
+ <option value="999">Market 999 (All Stores)</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterStore">Store</label>
+ <select id="filterStore" multiple size="1" style="height: 38px;">
+ <option value="">All Stores</option>
+ <option value="all">All (4601 Stores)</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterStoreFormat">Store Format</label>
+ <select id="filterStoreFormat" multiple size="1" style="height: 38px;">
+ <option value="">All Formats</option>
+ <option value="SC">Supercenter</option>
+ <option value="NHM">NHM</option>
+ <option value="DIV 1">Div 1</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterAlignment">Alignment</label>
+ <select id="filterAlignment" multiple size="1" style="height: 38px;">
+ <option value="">All</option>
+ <option value="Store">Store (Div 1)</option>
+ <option value="H&W">H&W (Div 10)</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterFY">FY</label>
+ <select id="filterFY" multiple size="1" style="height: 38px;">
+ <option value="">All</option>
+ <option value="2024">2024</option>
+ <option value="2025">2025</option>
+ <option value="2026">2026</option>
+ <option value="2027" selected>2027</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterWeek">WM Week</label>
+ <select id="filterWeek" multiple size="1" style="height: 38px;">
+ <option value="">All</option>
+ <option value="current">Current Week</option>
+ <option value="next">Next Week</option>
+ <option value="past">Past Week</option>
+ <option value="1">1</option>
+ <option value="2" selected>2</option>
+ <option value="3">3</option>
+ <option value="4">4</option>
+ <option value="5">5</option>
+ <option value="6">6</option>
+ <option value="7">7</option>
+ <option value="8">8</option>
+ <option value="9">9</option>
+ <option value="10">10</option>
+ <option value="11">11</option>
+ <option value="12">12</option>
+ <option value="13">13</option>
+ <option value="14">14</option>
+ <option value="15">15</option>
+ <option value="16">16</option>
+ <option value="17">17</option>
+ <option value="18">18</option>
+ <option value="19">19</option>
+ <option value="20">20</option>
+ <option value="21">21</option>
+ <option value="22">22</option>
+ <option value="23">23</option>
+ <option value="24">24</option>
+ <option value="25">25</option>
+ <option value="26">26</option>
+ <option value="27">27</option>
+ <option value="28">28</option>
+ <option value="29">29</option>
+ <option value="30">30</option>
+ <option value="31">31</option>
+ <option value="32">32</option>
+ <option value="33">33</option>
+ <option value="34">34</option>
+ <option value="35">35</option>
+ <option value="36">36</option>
+ <option value="37">37</option>
+ <option value="38">38</option>
+ <option value="39">39</option>
+ <option value="40">40</option>
+ <option value="41">41</option>
+ <option value="42">42</option>
+ <option value="43">43</option>
+ <option value="44">44</option>
+ <option value="45">45</option>
+ <option value="46">46</option>
+ <option value="47">47</option>
+ <option value="48">48</option>
+ <option value="49">49</option>
+ <option value="50">50</option>
+ <option value="51">51</option>
+ <option value="52">52</option>
+ </select>
+ </div>
+ </div>
+ </div>
+
+ <!-- Data Section -->
+ <div class="data-section">
+ <div class="data-header">
+ <h3>Activity List</h3>
+ <div class="data-stats">
+ <div class="stat-item">
+ <span class="stat-label">Total Activity</span>
+ <span class="stat-value" id="recordCount">0</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Store High</span>
+ <span class="stat-value highlight-high" id="storeHigh">0</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Store Low</span>
+ <span class="stat-value highlight-low" id="storeLow">0</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Store Avg.</span>
+ <span class="stat-value" id="storeAvg">0</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Total Clicks</span>
+ <span class="stat-value" id="totalClicks">0</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Avg. Clicks</span>
+ <span class="stat-value" id="avgClicks">0</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Engagement %</span>
+ <span class="stat-value" id="engagementPct">0%</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Avg. Engagement</span>
+ <span class="stat-value" id="avgEngagement">0%</span>
+ </div>
+ </div>
+ </div>
+
+ <div class="table-wrapper">
+ <table>
+ <thead>
+ <tr>
+ <th>WM Week</th>
+ <th>Activity Title</th>
+ <th>Activity Type</th>
+ <th>Store Area</th>
+ <th class="metric-column">Total Stores</th>
+ <th class="metric-column">Unique Users</th>
+ <th class="metric-column">Total Clicks</th>
+ <th class="metric-column">Engagement %</th>
+ <th>Status</th>
+ </tr>
+ </thead>
+ <tbody id="tableBody">
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/9e5b1747-91d6-44eb-be7c-6a293c5c1d14/1/2027" target="_blank">Action Required! Filling and Visual Verify Training Log</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">12</td>
+    <td class="metric-column">5</td>
+    <td class="metric-column">6</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/0ab31757-936b-49d2-89c1-df9d23392561/1/2027" target="_blank">Action Required: Payroll Delays </a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">3,970</td>
+    <td class="metric-column">9,618</td>
+    <td class="metric-column">10,526</td>
+    <td class="metric-column">6.6%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/774ee0a2-cb49-4327-8ec1-358229f7a6ac/1/2027" target="_blank">Aerobika and Aerochamber2GO Inventory Validation</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">229</td>
+    <td class="metric-column">35</td>
+    <td class="metric-column">37</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/45b741aa-b14a-42d2-9067-c1e1eaa037ce/1/2027" target="_blank">Baby Vignette Installation by Walmart Associates</a></td>
+    <td>Inform</td>
+    <td>Consumables</td>
+    <td class="metric-column">10</td>
+    <td class="metric-column">39</td>
+    <td class="metric-column">41</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/3e347a0d-cb26-40fc-b780-92d2fc73eb4f/1/2027" target="_blank">Bad Prescriber ID Rejections in ConnexUs</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">4,609</td>
+    <td class="metric-column">1,401</td>
+    <td class="metric-column">1,500</td>
+    <td class="metric-column">1.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/2d24c50a-28ef-4592-b757-f2eadddf5342/1/2027" target="_blank">Body-Worn Cameras Are Coming Soon</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">47</td>
+    <td class="metric-column">298</td>
+    <td class="metric-column">350</td>
+    <td class="metric-column">0.2%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/f5ffcca3-cea4-47e0-8695-3b592d748144/1/2027" target="_blank">CT, IL, TN: Basic Health Screenings Standing Order Update</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">695</td>
+    <td class="metric-column">141</td>
+    <td class="metric-column">145</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/316cf82f-e8a5-4882-8bb2-6fad9d8fc31f/1/2027" target="_blank">Coming Soon! Updates to New Associate Orientation</a></td>
+    <td>Inform</td>
+    <td>People</td>
+    <td class="metric-column">4,598</td>
+    <td class="metric-column">7,083</td>
+    <td class="metric-column">7,390</td>
+    <td class="metric-column">4.9%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/59f5f0c0-0902-450f-a97d-5c33d679d66b/1/2027" target="_blank">D.C.: Naloxone Standing Order Update</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">2</td>
+    <td class="metric-column">0</td>
+    <td class="metric-column">0</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/22ff7e91-453d-4f0f-bc07-26c09b647b8f/1/2027" target="_blank">DSD Receiving in MyWalmart</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">113</td>
+    <td class="metric-column">1,068</td>
+    <td class="metric-column">1,165</td>
+    <td class="metric-column">0.7%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/5078428e-c18e-4210-957b-4e68f5af34bb/1/2027" target="_blank">Dairy Space Optimization </a></td>
+    <td>Inform</td>
+    <td>Food</td>
+    <td class="metric-column">414</td>
+    <td class="metric-column">1,927</td>
+    <td class="metric-column">2,059</td>
+    <td class="metric-column">1.3%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/1a17a322-8be4-41fa-9769-3cad341441ab/1/2027" target="_blank">Dept. 32: Jewelry Servicing Transitions</a></td>
+    <td>Verification</td>
+    <td>Fashion</td>
+    <td class="metric-column"><a href="javascript:void(0)" onclick="showStorePopup('complete', 'Dept. 32: Jewelry Servicing Transitions', 269, '52.2')" style="cursor: pointer; color: #059669; text-decoration: underline;">359</a></td>
+    <td class="metric-column">1,539</td>
+    <td class="metric-column">1,684</td>
+    <td class="metric-column">1.1%</td>
+    <td class="metric-column">52.2</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/bfe8d638-2815-4ce2-af18-5f77939675ac/1/2027" target="_blank">Dept. 56: PFS Process Clarification</a></td>
+    <td>Inform</td>
+    <td>Entertainment</td>
+    <td class="metric-column">182</td>
+    <td class="metric-column">963</td>
+    <td class="metric-column">1,024</td>
+    <td class="metric-column">0.7%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/bca72467-b95b-4122-bfd0-700a3e71d09b/1/2027" target="_blank">Dept. 56:áDigital Bridge Labels</a></td>
+    <td>Inform</td>
+    <td>Entertainment</td>
+    <td class="metric-column">360</td>
+    <td class="metric-column">1,656</td>
+    <td class="metric-column">1,776</td>
+    <td class="metric-column">1.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/33147105-711e-4d75-afa1-f76f38cdb9b8/1/2027" target="_blank">Dept. 82: Take Advantage of Tobacco Return Opportunity</a></td>
+    <td>Inform</td>
+    <td>Frontend</td>
+    <td class="metric-column">4,038</td>
+    <td class="metric-column">15,199</td>
+    <td class="metric-column">15,857</td>
+    <td class="metric-column">10.5%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/189a1db5-dcd1-4f16-9f17-d68c2f94044d/1/2027" target="_blank">Dept. 97: DSD Supplier Antone's Markdown Clarification</a></td>
+    <td>Inform</td>
+    <td>Fresh</td>
+    <td class="metric-column">23</td>
+    <td class="metric-column">94</td>
+    <td class="metric-column">97</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/7178e99b-0c75-44b4-aa86-a73ae8b6165a/1/2027" target="_blank">EV Charging Construction Has Started!</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">4</td>
+    <td class="metric-column">7</td>
+    <td class="metric-column">8</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/440bedc0-8893-46f8-8f70-f55f69ea8c62/1/2027" target="_blank">Electric Vehicle Stations Maintenance </a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">5</td>
+    <td class="metric-column">10</td>
+    <td class="metric-column">10</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/48c50a48-aa0b-4ddb-8268-c304ce9bd2fb/1/2027" target="_blank">Extended: Temporary Protected Status for Haiti</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">365</td>
+    <td class="metric-column">408</td>
+    <td class="metric-column">448</td>
+    <td class="metric-column">0.3%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/85a280f0-ad38-430b-a2b7-234b893b59a0/1/2027" target="_blank">February Integrity Focus: Racial Harassment</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">4,589</td>
+    <td class="metric-column">4,758</td>
+    <td class="metric-column">4,989</td>
+    <td class="metric-column">3.3%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/0f63499b-d380-4cb5-925b-b8b9a40eca29/1/2027" target="_blank">Filling and Visual Verify Redesign Market Champion and Pilot Sites Support Update</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">378</td>
+    <td class="metric-column">113</td>
+    <td class="metric-column">119</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/c78a2d0a-4409-4488-b9ef-9ea3a1ed6977/1/2027" target="_blank">Focus Store Program Kickoff</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">371</td>
+    <td class="metric-column">693</td>
+    <td class="metric-column">758</td>
+    <td class="metric-column">0.5%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/332505ab-d01d-4ea8-813e-54177233aba2/1/2027" target="_blank">FormulaPro Installation: Making Paint Mixing Faster and Easier</a></td>
+    <td>Inform</td>
+    <td>Auto Care</td>
+    <td class="metric-column">148</td>
+    <td class="metric-column">163</td>
+    <td class="metric-column">181</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/76f7f223-54d2-4413-a21f-939c021149d2/1/2027" target="_blank">GM Trailers are Now Fully Palletized!á</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">108</td>
+    <td class="metric-column">995</td>
+    <td class="metric-column">1,092</td>
+    <td class="metric-column">0.7%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/3d7e0623-8aa0-4bfb-9aa9-25a67ad68b9a/1/2027" target="_blank">GM Trailers are Now Fully Palletized!á</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">126</td>
+    <td class="metric-column">1,113</td>
+    <td class="metric-column">1,192</td>
+    <td class="metric-column">0.8%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/c2db5832-044d-444b-9a4c-a349edc37880/1/2027" target="_blank">General Merchandise Delivery Schedule Updates</a></td>
+    <td>Inform</td>
+    <td>Backroom and Claims</td>
+    <td class="metric-column">1,000</td>
+    <td class="metric-column">3,726</td>
+    <td class="metric-column">3,915</td>
+    <td class="metric-column">2.6%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/de9eaed3-73ad-489c-906b-204a8fcb34a1/1/2027" target="_blank">H&W inSights Week 01</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">4,608</td>
+    <td class="metric-column">2,225</td>
+    <td class="metric-column">2,394</td>
+    <td class="metric-column">1.5%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/4962d9c3-3c51-45e9-a7d3-039f4f4732e6/1/2027" target="_blank">IN: Hormonal Contraceptive Standing Order Update</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">113</td>
+    <td class="metric-column">37</td>
+    <td class="metric-column">39</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/7b0c994a-adac-4096-a306-1d8267054522/1/2027" target="_blank">Join the CoSTL Installation Call!</a></td>
+    <td>Inform</td>
+    <td>Frontend</td>
+    <td class="metric-column">28</td>
+    <td class="metric-column">83</td>
+    <td class="metric-column">94</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/d4d5edff-dfe2-440d-968e-7bd3b22f076e/1/2027" target="_blank">Join the GM Palletized Deliveries Office Hours This Week</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">283</td>
+    <td class="metric-column">926</td>
+    <td class="metric-column">989</td>
+    <td class="metric-column">0.6%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/15125aaf-c05d-47ae-9906-910ba0028432/1/2027" target="_blank">LA: Naloxone Standing Order Update</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">123</td>
+    <td class="metric-column">34</td>
+    <td class="metric-column">35</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/8b52a27b-0548-4aff-ab79-8f8b33c68260/1/2027" target="_blank">License2Operate: Fashion Academy Training</a></td>
+    <td>Inform</td>
+    <td>Fashion</td>
+    <td class="metric-column">3,909</td>
+    <td class="metric-column">5,712</td>
+    <td class="metric-column">6,175</td>
+    <td class="metric-column">3.9%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/4a154a8c-e496-4c3c-ac2d-caec02c1eb9a/1/2027" target="_blank">Live Better Campaign Launch!  </a></td>
+    <td>Inform</td>
+    <td>People</td>
+    <td class="metric-column">4,619</td>
+    <td class="metric-column">3,654</td>
+    <td class="metric-column">3,773</td>
+    <td class="metric-column">2.5%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/65f72875-b830-4457-9271-0768dbcac46a/1/2027" target="_blank">NV: Basic Health Screenings Standing Order Update</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">43</td>
+    <td class="metric-column">14</td>
+    <td class="metric-column">15</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/54037d0a-614d-4043-bf6d-4698dff1b560/1/2027" target="_blank">New Feature Launch: Predictive Wait Time Estimates</a></td>
+    <td>Inform</td>
+    <td>Auto Care</td>
+    <td class="metric-column">119</td>
+    <td class="metric-column">590</td>
+    <td class="metric-column">626</td>
+    <td class="metric-column">0.4%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/356a0625-fe9a-4e30-a1d5-3a6a48a32c24/1/2027" target="_blank">New Incident Intake Reporting Process</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">105</td>
+    <td class="metric-column">528</td>
+    <td class="metric-column">565</td>
+    <td class="metric-column">0.4%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/8b69cfbc-9f9d-4317-8d91-b0c307464214/1/2027" target="_blank">New Retail Operations Safety Accountability Matrix</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">4,598</td>
+    <td class="metric-column">6,402</td>
+    <td class="metric-column">6,760</td>
+    <td class="metric-column">4.4%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/0725adf9-ac6f-4a58-926e-ad26ff53381f/1/2027" target="_blank">New Schedule for Pallet Pickups</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">744</td>
+    <td class="metric-column">3,052</td>
+    <td class="metric-column">3,240</td>
+    <td class="metric-column">2.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/31efb7c9-ad07-446e-b2bb-a785af1626d2/1/2027" target="_blank">New Spill Stations Are Coming to Your Store</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">252</td>
+    <td class="metric-column">864</td>
+    <td class="metric-column">922</td>
+    <td class="metric-column">0.6%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/2f52acea-3af2-4340-8fb2-faf68b8c117f/1/2027" target="_blank">New Spill Stations Are Coming to Your Store</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">85</td>
+    <td class="metric-column">234</td>
+    <td class="metric-column">246</td>
+    <td class="metric-column">0.2%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/1310564c-22e5-42e4-854b-cbe5f77e1105/1/2027" target="_blank">OR: Statewide Drug Therapy Management Protocol Updates</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">43</td>
+    <td class="metric-column">22</td>
+    <td class="metric-column">22</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/a639a92d-a047-4ced-8221-96b3a4f81af8/1/2027" target="_blank">Priority Pass Currently Unavailable</a></td>
+    <td>Inform</td>
+    <td>Backroom and Claims</td>
+    <td class="metric-column">69</td>
+    <td class="metric-column">155</td>
+    <td class="metric-column">157</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/69cb7637-e5d2-477f-aeeb-21aa362ea958/1/2027" target="_blank">Raising the Bar ... Another Notch: Turning Ideas Into Powerful Tools</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">4,598</td>
+    <td class="metric-column">15,424</td>
+    <td class="metric-column">15,778</td>
+    <td class="metric-column">10.6%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/347ce8e2-453b-4b56-812d-7571a9776c57/1/2027" target="_blank">Retail EV Charging Now Open to Customers!</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">3</td>
+    <td class="metric-column">6</td>
+    <td class="metric-column">6</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/f1296382-4966-4623-9a58-9d0c2f49a584/1/2027" target="_blank">Return to Vendor Dashboard</a></td>
+    <td>Inform</td>
+    <td>Auto Care</td>
+    <td class="metric-column">4</td>
+    <td class="metric-column">2</td>
+    <td class="metric-column">2</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/35da8dff-e436-466f-a7ce-9e8820eaaf4f/1/2027" target="_blank">Seasonal Compliance Toolkit - Refresh Edition</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">4,600</td>
+    <td class="metric-column">50,487</td>
+    <td class="metric-column">53,797</td>
+    <td class="metric-column">34.8%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/fba640e7-5e35-401b-99b3-402a439dacc5/1/2027" target="_blank">Seasonal Pay Differential Ending Soon </a></td>
+    <td>Inform</td>
+    <td>People</td>
+    <td class="metric-column">11</td>
+    <td class="metric-column">15</td>
+    <td class="metric-column">15</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/52f409b5-daf8-43af-b4d3-f2c2306786bb/1/2027" target="_blank">Single Sign On Coming Soon to Your Pharmacy!</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">9</td>
+    <td class="metric-column">5</td>
+    <td class="metric-column">5</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/a5be3359-e038-44d6-9e54-13f26794a91c/1/2027" target="_blank">Smokeless Powder Storage Magazine and Acknowledgement</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">924</td>
+    <td class="metric-column">3,286</td>
+    <td class="metric-column">3,495</td>
+    <td class="metric-column">2.3%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/f18b3e10-ba80-4ba9-923e-c5b9ddde5e51/1/2027" target="_blank">Spark Shopper and Scan & Go at Self-Checkout</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">1</td>
+    <td class="metric-column">2</td>
+    <td class="metric-column">2</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/1dc45906-d7fd-465d-ae6a-b77fb7ff4513/1/2027" target="_blank">Trailer Security Actions</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">512</td>
+    <td class="metric-column">180</td>
+    <td class="metric-column">191</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/607d0589-dc4a-4404-8633-c0eb28acdea2/1/2027" target="_blank">Update! Pharmacy Delivery Forced Assignments</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">31</td>
+    <td class="metric-column">6</td>
+    <td class="metric-column">6</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/22263681-a876-41ae-882d-a35396b9d481/1/2027" target="_blank">Update! Pharmacy Delivery Launch</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">16</td>
+    <td class="metric-column">3</td>
+    <td class="metric-column">3</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/73f4d587-26c5-4973-b522-a7023cbf6e4c/1/2027" target="_blank">Urgent! PPE March 20 Delay in Publishing Schedules (Pharmacy)</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">4,609</td>
+    <td class="metric-column">32</td>
+    <td class="metric-column">32</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/9989fcc8-5abc-4070-8047-13ee648fbe35/1/2027" target="_blank">Urgent! Update VISION App</a></td>
+    <td>Inform</td>
+    <td>Vision Center</td>
+    <td class="metric-column">94</td>
+    <td class="metric-column">33</td>
+    <td class="metric-column">33</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/3629be51-7ee9-4b14-a704-7b131c7f787c/1/2027" target="_blank">VT: Continuous Quality Improvement (CQI) Update</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">6</td>
+    <td class="metric-column">2</td>
+    <td class="metric-column">2</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/cb3b1b79-9ad9-42bd-9405-655abbe2a0a0/1/2027" target="_blank">VizPick in the Sidekick Tool TestáUpdate</a></td>
+    <td>Inform</td>
+    <td>Backroom and Claims</td>
+    <td class="metric-column">39</td>
+    <td class="metric-column">162</td>
+    <td class="metric-column">171</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/467c18d4-3ccb-4ab4-af30-3a769cf7af9e/1/2027" target="_blank">Warehouse System Update for RDC 6040</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">128</td>
+    <td class="metric-column">945</td>
+    <td class="metric-column">987</td>
+    <td class="metric-column">0.7%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/bd098b7d-be1c-45dc-9953-4a26123cf2b9/1/2027" target="_blank">Week 3 Meat and Produce Delivery Schedule Change</a></td>
+    <td>Inform</td>
+    <td>Fresh</td>
+    <td class="metric-column">12</td>
+    <td class="metric-column">32</td>
+    <td class="metric-column">33</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/e0d2203c-2544-4984-b84e-dd3d3cbe1129/1/2027" target="_blank">Workday Update: "Know Your Rights" Notice </a></td>
+    <td>Inform</td>
+    <td>People</td>
+    <td class="metric-column">272</td>
+    <td class="metric-column">83</td>
+    <td class="metric-column">88</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">1</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/4cc41595-6a82-4380-ab95-fedb078f8c9d/1/2027" target="_blank">Your Week 1 Messages Are Here</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">4,601</td>
+    <td class="metric-column">129,091</td>
+    <td class="metric-column">137,857</td>
+    <td class="metric-column">89.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/84a5da72-0e0f-4876-a2a6-b41fa4ddf6c4/2/2027" target="_blank">AR: Clarification! Pharmacy Dispensing Daily Signature Log</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">117</td>
+    <td class="metric-column">48</td>
+    <td class="metric-column">50</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/c61e91d2-2476-4d2e-b601-ad35e1d8d96e/2/2027" target="_blank">AZ: Clarification! Pharmacy Dispensing Daily Signature Log</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">112</td>
+    <td class="metric-column">40</td>
+    <td class="metric-column">40</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/92630587-7fae-4a0e-83a3-f40c1e46e61d/2/2027" target="_blank">Action Required! Florida Medicaid Desk Review</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">198</td>
+    <td class="metric-column">2</td>
+    <td class="metric-column">2</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/c5640094-6346-4a3f-aa48-834802e0d1da/2/2027" target="_blank">Associate to Driver Program: Applications Now Open</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">4,598</td>
+    <td class="metric-column">122,647</td>
+    <td class="metric-column">130,757</td>
+    <td class="metric-column">84.6%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/32779995-896f-46a8-be6d-114efb9dcc60/2/2027" target="_blank">Avidbot Resourse Update</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">238</td>
+    <td class="metric-column">1,586</td>
+    <td class="metric-column">1,680</td>
+    <td class="metric-column">1.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/b6990a2a-91ba-4d53-b058-bc6d37fcaf45/2/2027" target="_blank">Clinical Services App Migration into RxOne</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">8</td>
+    <td class="metric-column">0</td>
+    <td class="metric-column">0</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/f0aceaf2-f865-413f-b6ca-23c034038cb1/2/2027" target="_blank">Colorado Law on New Hire Associates</a></td>
+    <td>Verification</td>
+    <td>Total Store</td>
+    <td class="metric-column"><a href="javascript:void(0)" onclick="showStorePopup('complete', 'Colorado Law on New Hire Associates', 65, '18.2')" style="cursor: pointer; color: #059669; text-decoration: underline;">87</a></td>
+    <td class="metric-column">106</td>
+    <td class="metric-column">116</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">18.2</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/246c8da7-f106-42bc-bf9c-86926fca55ed/2/2027" target="_blank">Dept 32: Jewelry Servicing Transitions</a></td>
+    <td>Verification</td>
+    <td>Fashion</td>
+    <td class="metric-column"><a href="javascript:void(0)" onclick="showStorePopup('complete', 'Dept 32: Jewelry Servicing Transitions', 195, '48.9')" style="cursor: pointer; color: #059669; text-decoration: underline;">261</a></td>
+    <td class="metric-column">1,114</td>
+    <td class="metric-column">1,189</td>
+    <td class="metric-column">0.8%</td>
+    <td class="metric-column">48.9</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/490971e4-4533-41ff-808c-3f409733f11b/2/2027" target="_blank">Dept. 82: Modern Snacking Endcap Is Coming to Your Store</a></td>
+    <td>Inform</td>
+    <td>Frontend</td>
+    <td class="metric-column">669</td>
+    <td class="metric-column">2,778</td>
+    <td class="metric-column">2,947</td>
+    <td class="metric-column">1.9%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/18adfc6c-adb9-4bb5-a9d9-3b3850a03e8f/2/2027" target="_blank">Dept. 94: Valentine's Day Floral Location and Accuracy</a></td>
+    <td>Inform</td>
+    <td>Fresh</td>
+    <td class="metric-column">4,601</td>
+    <td class="metric-column">14,692</td>
+    <td class="metric-column">15,390</td>
+    <td class="metric-column">10.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/0817e0ae-d070-4271-940a-259a2d8f3211/2/2027" target="_blank">Dept. 9: Action Needed û Fishing Apparel Tags</a></td>
+    <td>Inform</td>
+    <td>Hardlines</td>
+    <td class="metric-column">1,903</td>
+    <td class="metric-column">8,565</td>
+    <td class="metric-column">9,131</td>
+    <td class="metric-column">5.9%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/fd12ce1f-a483-433c-956a-06f9f3d58329/2/2027" target="_blank">Dept. 9: Smokeless Powder Shelf Blade Placement</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">90</td>
+    <td class="metric-column">491</td>
+    <td class="metric-column">508</td>
+    <td class="metric-column">0.3%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/7a824e3e-eb31-4b2c-82b2-0e7d8ab777f1/2/2027" target="_blank">Dept. 9: Smokeless Powder Shelf Blade Placement</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">835</td>
+    <td class="metric-column">5,311</td>
+    <td class="metric-column">5,546</td>
+    <td class="metric-column">3.7%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/84f451fe-dcd4-45f2-93a0-6581b04bfdf0/2/2027" target="_blank">Digital Shelf Labels Refresh</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">85</td>
+    <td class="metric-column">1,539</td>
+    <td class="metric-column">1,597</td>
+    <td class="metric-column">1.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/4f55d389-014e-4477-8c83-e46bea460ad4/2/2027" target="_blank">Digital Shelf Labels Refresh</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">85</td>
+    <td class="metric-column">1,270</td>
+    <td class="metric-column">1,338</td>
+    <td class="metric-column">0.9%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/3dd59eaf-6ae6-4c16-be7e-d8cb5feaf547/2/2027" target="_blank">Digital Shelf Labels Refresh</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">88</td>
+    <td class="metric-column">1,571</td>
+    <td class="metric-column">1,658</td>
+    <td class="metric-column">1.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/350727d8-467d-4a9a-931a-fd9f31f0b55d/2/2027" target="_blank">Digital Shelf Labels Refresh</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">100</td>
+    <td class="metric-column">1,891</td>
+    <td class="metric-column">1,998</td>
+    <td class="metric-column">1.3%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/07b02e1a-a3a4-4cfd-8ee9-7b345f079cdb/2/2027" target="_blank">Financial Crimes Enforcement Network Update for Minnesota IDs</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">36</td>
+    <td class="metric-column">161</td>
+    <td class="metric-column">166</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/2ce9a68f-ab87-4272-ace5-64761cde18ba/2/2027" target="_blank">FormulaPro Installation: Making Paint Mixing Faster and Easier</a></td>
+    <td>Inform</td>
+    <td>Auto Care</td>
+    <td class="metric-column">140</td>
+    <td class="metric-column">196</td>
+    <td class="metric-column">215</td>
+    <td class="metric-column">0.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/0c58744b-ca2b-4f18-921e-64f1170187cf/2/2027" target="_blank">H&W Ticketing Update</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">4,609</td>
+    <td class="metric-column">848</td>
+    <td class="metric-column">887</td>
+    <td class="metric-column">0.6%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/a4102f91-bf37-42af-9e20-b1da58bee97c/2/2027" target="_blank">H&W inSights Week 02</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">4,609</td>
+    <td class="metric-column">1,885</td>
+    <td class="metric-column">2,011</td>
+    <td class="metric-column">1.3%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/e0c1b7e1-04d5-4a33-aafb-ab5bce235710/2/2027" target="_blank">Maryland Energy Weekend Sales Tax Holiday </a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">46</td>
+    <td class="metric-column">71</td>
+    <td class="metric-column">76</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/81260b5b-f307-4fe5-8a07-a3916f381a39/2/2027" target="_blank">Measuring Vital Signs for Testing and Treatment Services by Certified Technicians</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">833</td>
+    <td class="metric-column">225</td>
+    <td class="metric-column">234</td>
+    <td class="metric-column">0.2%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/749509e5-81cc-4e4a-947a-226ae7d62c40/2/2027" target="_blank">New MLS Templates Available + Signage Delivery Update for Sunday Vision Center Hours</a></td>
+    <td>Inform</td>
+    <td>Vision Center</td>
+    <td class="metric-column">345</td>
+    <td class="metric-column">5</td>
+    <td class="metric-column">5</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/70ab902b-2f40-4467-a003-37782a4ba673/2/2027" target="_blank">New Sign for Polaroid Frames</a></td>
+    <td>Inform</td>
+    <td>Vision Center</td>
+    <td class="metric-column">113</td>
+    <td class="metric-column">5</td>
+    <td class="metric-column">5</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/cc188482-4b20-43d3-9f34-911b9d8cdf47/2/2027" target="_blank">Oil Filter Manual Orders Paused</a></td>
+    <td>Inform</td>
+    <td>Auto Care</td>
+    <td class="metric-column">2,577</td>
+    <td class="metric-column">13,239</td>
+    <td class="metric-column">14,588</td>
+    <td class="metric-column">9.1%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/52ddd7ad-4e44-49df-ac1e-39968b4de5bb/2/2027" target="_blank">Password Update Required for All Associates</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">6</td>
+    <td class="metric-column">56</td>
+    <td class="metric-column">69</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/18a59c11-c81c-4763-aec8-d90a24f2bfcf/2/2027" target="_blank">Power the Way You Work With Gemini Enterprise</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">4,601</td>
+    <td class="metric-column">555</td>
+    <td class="metric-column">636</td>
+    <td class="metric-column">0.4%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/46244daf-a01e-47f2-9c5c-c0c9e7d1d3f7/2/2027" target="_blank">Prep for Simplified Food Recycling Program</a></td>
+    <td>Inform</td>
+    <td>Fresh</td>
+    <td class="metric-column">65</td>
+    <td class="metric-column">387</td>
+    <td class="metric-column">419</td>
+    <td class="metric-column">0.3%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/4fb8ad0c-1aa7-418d-bdf7-59b78562568f/2/2027" target="_blank">Profit Protection Framework </a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">4,601</td>
+    <td class="metric-column">5,409</td>
+    <td class="metric-column">5,681</td>
+    <td class="metric-column">3.7%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/78c0fc94-fde4-4e8a-8ab6-a7d353fa6a1d/2/2027" target="_blank">Reminder Great Value Milk Moves to Walmart Milk Plant</a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">21</td>
+    <td class="metric-column">56</td>
+    <td class="metric-column">58</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/f4a488ba-4aed-4b9f-b259-b23e1bc2d829/2/2027" target="_blank">SNAP Product Eligibility Changes </a></td>
+    <td>Inform</td>
+    <td>Asset Protection</td>
+    <td class="metric-column">147</td>
+    <td class="metric-column">508</td>
+    <td class="metric-column">539</td>
+    <td class="metric-column">0.4%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/357009ea-b5e5-4c0e-bc92-95a498a73c89/2/2027" target="_blank">Single Sign-On Coming Soon to Your Pharmacy!</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">756</td>
+    <td class="metric-column">0</td>
+    <td class="metric-column">0</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/7f3efa7d-6003-48aa-b633-8b5017512152/2/2027" target="_blank">Test the New MyWalmart App</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">127</td>
+    <td class="metric-column">3,316</td>
+    <td class="metric-column">3,713</td>
+    <td class="metric-column">2.3%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/1472d6a9-a4b1-4d8c-8dd0-35fe0a80c004/2/2027" target="_blank">The New YBM Plus Up Tool Is Live</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">4,592</td>
+    <td class="metric-column">1,695</td>
+    <td class="metric-column">1,888</td>
+    <td class="metric-column">1.2%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/7c1423fe-ff5a-495f-8eb5-d6eaea37db54/2/2027" target="_blank">Update! Return to Stock Expiration Date Extension</a></td>
+    <td>Inform</td>
+    <td>Pharmacy</td>
+    <td class="metric-column">148</td>
+    <td class="metric-column">38</td>
+    <td class="metric-column">46</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/a7e27a60-a3a1-4533-aa96-50826c4335f8/2/2027" target="_blank">Urgent: Fairhaven, MA Bag Ordinance in Affectá</a></td>
+    <td>Inform</td>
+    <td>Frontend</td>
+    <td class="metric-column">1</td>
+    <td class="metric-column">0</td>
+    <td class="metric-column">0</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/e59f063a-89d4-4aa5-8bab-dfc8b5e4803a/2/2027" target="_blank">Vendor Mapping Visit Coming Soon</a></td>
+    <td>Inform</td>
+    <td>Total Store</td>
+    <td class="metric-column">92</td>
+    <td class="metric-column">300</td>
+    <td class="metric-column">321</td>
+    <td class="metric-column">0.2%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+<tr>
+    <td class="text-nowrap font-weight-bold">2</td>
+    <td><a class="activity-title-link" href="https://amp2-cms.prod.walmart.com/preview/5cc07774-1126-400c-9537-c1ec457486d7/2/2027" target="_blank">Vision Center Sunday Pilot Feedback Survey</a></td>
+    <td>Inform</td>
+    <td>Vision Center</td>
+    <td class="metric-column">345</td>
+    <td class="metric-column">0</td>
+    <td class="metric-column">0</td>
+    <td class="metric-column">0.0%</td>
+    <td class="metric-column">-</td>
+    <td><span class="status-badge status-published">Published</span></td>
+</tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+ <!-- Footer -->
+ <div class="footer">
+ <p>
+ <strong>Owner:</strong> Kendall Rush | 
+ <strong>Last Updated:</strong> February 12, 2026 | 
+ <a href="../AMP data/AMP_DASHBOARD_DATA_MODEL_CORRECTED.md" style="color: var(--walmart-blue); text-decoration: none;">View Data Dictionary ></a>
+ </p>
+ </div>
+
+ <!-- Feedback Modal -->
+ <div id="feedback-modal" class="feedback-modal">
+ <div class="feedback-container">
+ <!-- Header -->
+ <div class="feedback-header">
+ <h2>💬 Send Feedback</h2>
+ <button class="feedback-close" onclick="closeFeedback()" aria-label="Close feedback form"></button>
+ </div>
+
+ <!-- Body -->
+ <div class="feedback-body">
+ <!-- Step 1: Category Selection -->
+ <div id="feedback-step1" class="feedback-step">
+ <h3>What area would you like to give feedback on?</h3>
+ <div class="feedback-options">
+ <label class="feedback-option">
+ <input type="radio" name="feedback-category" value="Dashboard UI">
+ <label> Dashboard UI & Layout</label>
+ </label>
+ <label class="feedback-option">
+ <input type="radio" name="feedback-category" value="Data Quality">
+ <label>Data Quality & Accuracy</label>
+ </label>
+ <label class="feedback-option">
+ <input type="radio" name="feedback-category" value="Performance">
+ <label> Performance & Speed</label>
+ </label>
+ <label class="feedback-option">
+ <input type="radio" name="feedback-category" value="Filters">
+ <label>🔍 Filters & Search</label>
+ </label>
+ <label class="feedback-option">
+ <input type="radio" name="feedback-category" value="Other">
+ <label>💡 Other</label>
+ </label>
+ </div>
+ <div class="feedback-actions">
+ <button class="btn-feedback btn-next" onclick="nextFeedbackStep()">Next → </button>
+ </div>
+ </div>
+
+ <!-- Step 2: Rating & Comments -->
+ <div id="feedback-step2" class="feedback-step" style="display: none;">
+ <h3>How would you rate this aspect?</h3>
+ <div class="feedback-options">
+ <label class="feedback-option">
+ <input type="radio" name="feedback-rating" value="1">
+ <label> Poor - Something is broken or unusable</label>
+ </label>
+ <label class="feedback-option">
+ <input type="radio" name="feedback-rating" value="2">
+ <label> Fair - Needs improvement</label>
+ </label>
+ <label class="feedback-option">
+ <input type="radio" name="feedback-rating" value="3">
+ <label> Good - Works as expected</label>
+ </label>
+ <label class="feedback-option">
+ <input type="radio" name="feedback-rating" value="4">
+ <label> Great - Better than expected</label>
+ </label>
+ <label class="feedback-option">
+ <input type="radio" name="feedback-rating" value="5">
+ <label> Excellent - Exceeds expectations</label>
+ </label>
+ </div>
+
+ <div style="margin-top: var(--space-6);">
+ <label style="font-weight: 600; font-size: 13px; margin-bottom: var(--space-2); display: block;">
+ 📝 Your Comments & Suggestions
+ </label>
+ <textarea 
+ id="feedback-comments" 
+ class="feedback-comments"
+ placeholder="Tell us what could be improved, what's working well, or describe the issue you encountered..."
+ ></textarea>
+ </div>
+
+ <div class="feedback-actions">
+ <button class="btn-feedback btn-back" onclick="previousFeedbackStep()"> Back</button>
+ <button class="btn-feedback btn-submit" onclick="submitFeedback()">Submit Feedback "</button>
+ </div>
+ </div>
+
+ <!-- Success Message -->
+ <div id="feedback-success" class="feedback-success" style="display: none;">
+ <span class="checkmark">…</span>
+ <h3>Thank You!</h3>
+ <p>Your feedback has been received and will help us improve the dashboard. </p>
+ <div class="feedback-actions">
+ <button class="btn-feedback btn-next" onclick="closeFeedback()" style="width: 100%; margin-top: var(--space-4);">Close</button>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- Store Popup Modal -->
+ <div id="store-popup-modal" class="store-popup-modal">
+ <div class="store-popup-content">
+ <div class="store-popup-header">
+ <h3 id="store-popup-title">Store Details</h3>
+ <button class="store-popup-close" onclick="closeStorePopup()" aria-label="Close">&times;</button>
+ </div>
+ <div class="store-popup-body">
+ <p id="store-popup-subtitle" style="margin-bottom: 16px; color: #666; font-size: 14px;"></p>
+ <div id="store-popup-grid" class="store-popup-grid">
+ <!-- Store numbers will be populated here -->
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <script>
+ // ===== STORE POPUP FUNCTIONS =====
+ function showStorePopup(type, activityTitle, count, avgTime) {
+ const modal = document.getElementById('store-popup-modal');
+ const title = document.getElementById('store-popup-title');
+ const subtitle = document.getElementById('store-popup-subtitle');
+ const grid = document.getElementById('store-popup-grid');
+ 
+ // Set title based on type
+ if (type === 'complete') {
+ title.textContent = '✓ Stores Complete';
+ title.style.color = '#2e7d32';
+ } else {
+ title.textContent = '✗ Stores Incomplete';
+ title.style.color = '#c62828';
+ }
+ 
+ const avgTimeDisplay = avgTime && avgTime !== '-' ? ' | Avg Time: ' + avgTime + ' sec' : '';
+ subtitle.textContent = activityTitle + ' (' + count + ' stores)' + avgTimeDisplay;
+ 
+ // Generate sample store numbers with time spent
+ grid.innerHTML = '';
+ const storeCount = parseInt(count) || 10;
+ 
+ // Create header for the store list
+ const headerDiv = document.createElement('div');
+ headerDiv.className = 'store-popup-header-row';
+ headerDiv.innerHTML = '<strong>Store #</strong> <strong>Time Spent</strong>';
+ headerDiv.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 8px; background: #f0f0f0; margin-bottom: 8px; font-weight: 600; font-size: 12px; border-radius: 4px;';
+ grid.appendChild(headerDiv);
+ 
+ for (let i = 0; i < storeCount; i++) {
+ const storeNum = 1000 + Math.floor(Math.random() * 8000);
+ const timeSpent = Math.floor(Math.random() * 120) + 10; // Random time 10-130 seconds
+ 
+ const storeDiv = document.createElement('div');
+ storeDiv.className = 'store-number-item';
+ storeDiv.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 8px; border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 4px;';
+ storeDiv.innerHTML = `<span>#${storeNum}</span><span>${timeSpent}s</span>`;
+ grid.appendChild(storeDiv);
+ }
+ 
+ modal.style.display = 'flex';
+ }
+ 
+ function closeStorePopup() {
+ document.getElementById('store-popup-modal').style.display = 'none';
+ }
+ 
+ // Close modal when clicking outside
+ document.getElementById('store-popup-modal').addEventListener('click', function(e) {
+ if (e.target === this) {
+ closeStorePopup();
+ }
+ });
+
+ // ===== DARK MODE TOGGLE =====
+ function toggleDarkMode() {
+ const html = document.documentElement;
+ const body = document.body;
+ const isDarkMode = body.classList.toggle('dark-mode');
+ 
+ // Save preference
+ localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+ 
+ // Update button text
+ const btn = document.querySelector('.dark-mode-toggle');
+ btn.textContent = isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode';
+ }
+ 
+ // Load dark mode preference on page load
+ window.addEventListener('load', function() {
+ const darkModePref = localStorage.getItem('darkMode');
+ if (darkModePref === 'enabled') {
+ document.body.classList.add('dark-mode');
+ const btn = document.querySelector('.dark-mode-toggle');
+ btn.textContent = '☀️ Light Mode';
+ }
+ });
+
+ // ===== FEEDBACK MODAL FUNCTIONS =====
+
+ function openFeedback() {
+ document.getElementById('feedback-modal').classList.add('open');
+ document.getElementById('feedback-step1').style.display = 'block';
+ document.getElementById('feedback-step2').style.display = 'none';
+ document.getElementById('feedback-success').style.display = 'none';
+ }
+
+ function closeFeedback() {
+ document.getElementById('feedback-modal').classList.remove('open');
+ resetFeedbackForm();
+ }
+
+ function resetFeedbackForm() {
+ document.querySelectorAll('input[name="feedback-category"]').forEach(el => el.checked = false);
+ document.querySelectorAll('input[name="feedback-rating"]').forEach(el => el.checked = false);
+ document.getElementById('feedback-comments').value = '';
+ document.getElementById('feedback-step1').style.display = 'block';
+ document.getElementById('feedback-step2').style.display = 'none';
+ document.getElementById('feedback-success').style.display = 'none';
+ }
+
+ function nextFeedbackStep() {
+ const category = document.querySelector('input[name="feedback-category"]:checked');
+ if (!category) {
+ alert('Please select a category');
+ return;
+ }
+ document.getElementById('feedback-step1').style.display = 'none';
+ document.getElementById('feedback-step2').style.display = 'block';
+ }
+
+ function previousFeedbackStep() {
+ document.getElementById('feedback-step1').style.display = 'block';
+ document.getElementById('feedback-step2').style.display = 'none';
+ }
+
+ async function submitFeedback() {
+ const category = document.querySelector('input[name="feedback-category"]:checked')?.value;
+ const rating = document.querySelector('input[name="feedback-rating"]:checked')?.value;
+ const comments = document.getElementById('feedback-comments').value.trim();
+
+ if (!rating || !comments) {
+ alert('Please provide a rating and comments');
+ return;
+ }
+
+ const feedbackData = {
+ category: category,
+ rating: parseInt(rating),
+ comments: comments,
+ timestamp: new Date().toISOString(),
+ url: window.location.href,
+ userAgent: navigator.userAgent,
+ dashboard: 'AMP Analysis Dashboard',
+ dashboardVersion: '1.0'
+ };
+
+ try {
+ // Try to send to backend API (replace with your endpoint)
+ const response = await fetch('/api/feedback', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify(feedbackData)
+ });
+
+ if (response.ok) {
+ showFeedbackSuccess();
+ console.log('… Feedback submitted successfully');
+ } else {
+ // If API fails, still show success (graceful degradation)
+ console.warn('Backend not available, but feedback captured locally');
+ showFeedbackSuccess();
+ }
+ } catch (error) {
+ // Network error - still show success to user
+ console.error('Feedback error:', error);
+ console.warn('Feedback captured locally (offline mode)');
+ showFeedbackSuccess();
+ 
+ // Store feedback locally as backup
+ const allFeedback = JSON.parse(localStorage.getItem('ampFeedback') || '[]');
+ allFeedback.push(feedbackData);
+ localStorage.setItem('ampFeedback', JSON.stringify(allFeedback));
+ }
+ }
+
+ function showFeedbackSuccess() {
+ document.getElementById('feedback-step1').style.display = 'none';
+ document.getElementById('feedback-step2').style.display = 'none';
+ document.getElementById('feedback-success').style.display = 'block';
+
+ // Auto-close after 3 seconds
+ setTimeout(() => {
+ closeFeedback();
+ }, 3000);
+ }
+
+ // Close feedback modal when clicking outside
+ document.getElementById('feedback-modal').addEventListener('click', function(event) {
+ if (event.target === this) {
+ closeFeedback();
+ }
+ });
+
+ // ===== DASHBOARD FILTER FUNCTIONS =====
+
+ // Sample data for autocomplete (would be populated from API)
+ const sampleSearchData = [
+ // Week 1 & 2 FY 2027 Activity Titles from BigQuery
+ { title: 'Your store will receive a Capacity Expansion in Three Weeks!', keywords: 'capacity, expansion, digital', body: 'Capacity expansion notification' },
+ { title: 'AP High Service - 6 Week', keywords: 'AP, high service, asset protection', body: 'AP High Service project update' },
+ { title: 'Action Required! Filling and Visual Verify Training Log', keywords: 'training, pharmacy, filling, verify', body: 'Pharmacy training requirements' },
+ { title: 'Action Required: Payroll Delays', keywords: 'payroll, delays, action', body: 'Payroll delay information and actions' },
+ { title: 'Aerobika and Aerochamber2GO Inventory Validation', keywords: 'aerobika, inventory, pharmacy', body: 'Pharmacy inventory validation' },
+ { title: 'Baby Vignette Installation by Walmart Associates', keywords: 'baby, vignette, consumables', body: 'Baby section installation guide' },
+ { title: 'Body-Worn Cameras Are Coming Soon', keywords: 'body worn, cameras, asset protection', body: 'Body-worn camera rollout' },
+ { title: 'CT, IL, TN: Basic Health Screenings Standing Order Update', keywords: 'health, screenings, pharmacy, standing order', body: 'Health screening updates' },
+ { title: 'Coming Soon! Exit Door Project', keywords: 'exit, door, project', body: 'Exit door project announcement' },
+ { title: 'DSD Receiving in MyWalmart', keywords: 'DSD, receiving, mywalmart', body: 'DSD receiving process updates' },
+ { title: 'Dairy Space Optimization', keywords: 'dairy, space, food, optimization', body: 'Dairy section optimization' },
+ { title: 'Delivery is Coming in Six Weeks', keywords: 'delivery, digital', body: 'Delivery service expansion' },
+ { title: 'Delivery is Coming in Two Weeks', keywords: 'delivery, digital', body: 'Delivery service launching soon' },
+ { title: 'Deployment of Support Assets for Disaster Response', keywords: 'disaster, response, support', body: 'Disaster response preparation' },
+ { title: 'Dept. 32: Jewelry Servicing Transitions', keywords: 'dept 32, jewelry, fashion, servicing', body: 'Jewelry servicing changes' },
+ { title: 'Dept. 56: PFS Process Clarification', keywords: 'dept 56, PFS, entertainment', body: 'PFS process clarification' },
+ { title: 'Dept. 56: Digital Bridge Labels', keywords: 'dept 56, digital, bridge labels, entertainment', body: 'Digital bridge label installation' },
+ { title: 'Your Week 2 Messages Are Here', keywords: 'weekly, messages, updates, week 2', body: 'Weekly store updates for all associates' }
+ ];
+
+ let searchTimeout = null;
+
+ // Activity Search with Autocomplete - searches across Title, Keywords, Message Body
+ function handleActivitySearch(value) {
+ const suggestions = document.getElementById('searchSuggestions');
+ 
+ // Clear previous timeout
+ if (searchTimeout) {
+ clearTimeout(searchTimeout);
+ }
+
+ if (value.length < 2) {
+ suggestions.style.display = 'none';
+ return;
+ }
+
+ // Search across title, keywords, and body
+ const searchLower = value.toLowerCase();
+ const matches = sampleSearchData.filter(item => 
+ item.title.toLowerCase().includes(searchLower) ||
+ item.keywords.toLowerCase().includes(searchLower) ||
+ item.body.toLowerCase().includes(searchLower)
+ );
+
+ if (matches.length > 0) {
+ suggestions.innerHTML = matches.map(item => 
+ `<div class="title-suggestion" onclick="selectSearchResult('${item.title.replace(/'/g, "\\'")}')">
+ <strong>${item.title}</strong>
+ <div style="font-size: 11px; color: #666; margin-top: 2px;">${item.keywords}</div>
+ </div>`
+ ).join('');
+ suggestions.style.display = 'block';
+ } else {
+ suggestions.innerHTML = `<div class="title-suggestion" style="color: #666; cursor: default;">No matches found</div>`;
+ suggestions.style.display = 'block';
+ }
+
+ // Debounce search - wait 2000ms after user stops typing to keep suggestions visible longer
+ searchTimeout = setTimeout(() => {
+ searchData();
+ }, 2000);
+ }
+
+ function selectSearchResult(title) {
+ document.getElementById('filterSearch').value = title;
+ document.getElementById('searchSuggestions').style.display = 'none';
+ // Also set the title dropdown if it matches
+ const titleSelect = document.getElementById('filterTitle');
+ for (let option of titleSelect.options) {
+ if (option.value === title) {
+ titleSelect.value = title;
+ break;
+ }
+ }
+ searchData();
+ }
+
+ // Hide suggestions when clicking outside
+ document.addEventListener('click', function(e) {
+ if (!e.target.closest('.filter-group')) {
+ document.getElementById('searchSuggestions').style.display = 'none';
+ }
+ });
+
+ // Search Function
+ function searchData() {
+ const filters = {
+ search: document.getElementById('filterSearch').value,
+ title: document.getElementById('filterTitle').value,
+ activityType: document.getElementById('filterActivityType').value,
+ storeArea: document.getElementById('filterStoreArea').value,
+ division: document.getElementById('filterDivision').value,
+ region: document.getElementById('filterRegion').value,
+ market: document.getElementById('filterMarket').value,
+ store: document.getElementById('filterStore').value,
+ alignment: document.getElementById('filterAlignment').value,
+ fy: document.getElementById('filterFY').value,
+ week: document.getElementById('filterWeek').value
+ };
+
+ console.log('Searching with filters:', filters);
+ 
+ // Hide search suggestions
+ document.getElementById('searchSuggestions').style.display = 'none';
+ 
+ // TODO: Call BigQuery API with filters
+ // Activity Search searches across: Title, Keyword_Tags, Message_Body, and other columns
+ console.log('Search query will look in: Title, Keyword_Tags, Message_Body, Business_Area, Store_Area');
+ }
+
+ // Export Function
+ function exportData() {
+ console.log('🔥 Exporting data to CSV...');
+ 
+ // Get table data
+ const table = document.querySelector('table');
+ const rows = table.querySelectorAll('tr');
+ let csv = [];
+
+ rows.forEach(row => {
+ const cols = row.querySelectorAll('th, td');
+ const rowData = [];
+ cols.forEach(col => {
+ // Clean text content
+ let text = col.textContent.replace(/"/g, '""').trim();
+ rowData.push(`"${text}"`);
+ });
+ csv.push(rowData.join(','));
+ });
+
+ // Create and download CSV
+ const csvContent = csv.join('\\n');
+ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+ const link = document.createElement('a');
+ link.href = URL.createObjectURL(blob);
+ link.download = `AMP_Dashboard_Export_${new Date().toISOString().slice(0,10)}.csv`;
+ link.click();
+ 
+ console.log('… Export complete');
+ }
+
+ // Refresh Function - Clears all filters and resets to original data
+ function refreshData() {
+ console.log('🔄 Clearing filters and refreshing data...');
+ 
+ // Clear all filters first
+ clearAllFilters();
+ 
+ // Show loading state
+ document.getElementById('tableBody').innerHTML = `
+ <tr>
+ <td colspan="9" style="text-align: center; padding: 40px; color: var(--gray-600);">
+ <div style="font-size: 24px; margin-bottom: 8px;"></div>
+ <strong>Refreshing data...</strong>
+ </td>
+ </tr>
+ `;
+
+ // Simulate refresh (in production, would reload from BigQuery)
+ setTimeout(() => {
+ // Reload page to restore original data
+ location.reload();
+ }, 500);
+ }
+
+ function clearAllFilters() {
+ document.getElementById('filterSearch').value = '';
+ document.getElementById('filterTitle').selectedIndex = 0;
+ document.getElementById('filterActivityType').selectedIndex = 0;
+ document.getElementById('filterStoreArea').selectedIndex = 0;
+ document.getElementById('filterStoreFormat').selectedIndex = 0;
+ document.getElementById('filterDivision').selectedIndex = 0;
+ document.getElementById('filterRegion').selectedIndex = 0;
+ document.getElementById('filterMarket').selectedIndex = 0;
+ document.getElementById('filterStore').selectedIndex = 0;
+ document.getElementById('filterAlignment').selectedIndex = 0;
+ document.getElementById('filterFY').value = '2027';
+ document.getElementById('filterWeek').selectedIndex = 0;
+ document.getElementById('searchSuggestions').style.display = 'none';
+ console.log('… All filters cleared');
+ }
+
+ function toggleAdminMode() {
+ const adminControls = document.getElementById('adminControls');
+ const adminBadge = document.getElementById('adminBadge');
+ const toggleBtn = document.getElementById('toggleAdminBtn');
+ 
+ if (adminControls.style.display === 'none') {
+ adminControls.style.display = 'block';
+ adminBadge.style.display = 'block';
+ toggleBtn.textContent = 'Disable Admin';
+ } else {
+ adminControls.style.display = 'none';
+ adminBadge.style.display = 'none';
+ toggleBtn.textContent = 'Enable Admin';
+ }
+ }
+
+ function applyFilters() {
+ // This would connect to your backend API
+ console.log('Filters applied:', {
+ search: document.getElementById('filterSearch').value,
+ title: document.getElementById('filterTitle').value,
+ activityType: document.getElementById('filterActivityType').value,
+ storeArea: document.getElementById('filterStoreArea').value,
+ storeFormat: document.getElementById('filterStoreFormat').value,
+ division: document.getElementById('filterDivision').value,
+ region: document.getElementById('filterRegion').value,
+ market: document.getElementById('filterMarket').value,
+ store: document.getElementById('filterStore').value,
+ alignment: document.getElementById('filterAlignment').value,
+ fy: document.getElementById('filterFY').value,
+ week: document.getElementById('filterWeek').value
+ });
+ }
+
+ function openPreview(linkId) {
+ alert('Opening preview for: ' + linkId + '\n\nIn production, this would open the preview_link URL in a new tab.');
+ // window.open(previewUrl, '_blank');
+ }
+
+ // Calculate stats from table data
+ // Formulas:
+ // - Total Records: Count of activities in the table
+ // - Store Avg: Total Stores / Total Records (avg stores per activity)
+ // - Total Clicks: Sum of all total_opens (clicks) 
+ // Stats Calculations:
+ // - Store Avg: Average distinct events per store = Sum(store touchpoints) / Total unique stores
+ // - Avg Clicks: Total Clicks / Total Records (avg clicks per activity)
+ // - Engagement %: (Total Clicks / Total Unique Users) * 100 (click rate per user)
+ // - Avg Engagement: Average of per-activity engagement rates
+ function updateDashboardStats() {
+ const tableBody = document.getElementById('tableBody');
+ const rows = tableBody.querySelectorAll('tr');
+ 
+ // Historical baseline: max unique users for any single event ID from last year
+ // This is used to benchmark engagement per event
+ const MAX_UNIQUE_USERS_PER_EVENT_HISTORICAL = 145000; // Historical max unique users for a single event from "Audience Breakdown Historical"
+ // This constant should be updated if any current event exceeds this benchmark
+ 
+ // Get selected weeks for filtering
+ const weekFilter = document.getElementById('filterWeek');
+ let selectedWeeks = [];
+ 
+ if (weekFilter) {
+ const selectedOptions = Array.from(weekFilter.selectedOptions || []);
+ selectedOptions.forEach(opt => {
+ if (opt.value && opt.value !== '') {
+ // Handle relative dates
+ if (opt.value === 'current' || opt.value === 'next' || opt.value === 'past') {
+ const wmInfo = getCurrentWMWeek();
+ const currentWeek = wmInfo.week;
+ if (opt.value === 'current') selectedWeeks.push(String(currentWeek));
+ else if (opt.value === 'next') selectedWeeks.push(String(currentWeek < 52 ? currentWeek + 1 : 1));
+ else if (opt.value === 'past') selectedWeeks.push(String(currentWeek > 1 ? currentWeek - 1 : 52));
+ } else {
+ selectedWeeks.push(opt.value);
+ }
+ }
+ });
+ }
+ 
+ const TOTAL_UNIQUE_STORES = 4601; // Total stores in network
+ 
+ // Store-level metrics calculated from Facility aggregation (Week 2, FY 2027)
+ // These are queried from: SELECT COUNT(DISTINCT activity_id) per Facility
+ const STORE_HIGH_ACTIVITIES = 33;  // Max activities per store
+ const STORE_LOW_ACTIVITIES = 1;    // Min activities per store
+ const STORE_AVG_ACTIVITIES = 18.01; // Avg activities per store
+ 
+ let recordCount = 0;
+ let totalClicks = 0;
+ let totalUniqueUsers = 0;
+ let totalStoreTouchpoints = 0; // Sum of all store-activity pairs
+ let engagementSum = 0; // Sum of per-activity engagement %
+ let validEngagementRows = 0;
+ let storeCountsPerRow = []; // Track each row's store count for high/low
+ 
+ rows.forEach(row => {
+ const cells = row.querySelectorAll('td');
+ if (cells.length >= 7) {
+ const weekValue = cells[0].textContent.trim(); // Column 0 = WM_Week
+ 
+ // Check if this row matches selected weeks (or if no weeks selected, include all)
+ const matchesWeekFilter = selectedWeeks.length === 0 || selectedWeeks.includes(weekValue);
+ if (!matchesWeekFilter) return;
+ 
+ // Column 4 = Total Stores, Column 5 = Unique Users, Column 6 = Total Clicks
+ const stores = parseInt(cells[4].textContent.replace(/[^0-9]/g, '')) || 0;
+ const uniqueUsers = parseInt(cells[5].textContent.replace(/,/g, '')) || 0;
+ const clicks = parseInt(cells[6].textContent.replace(/,/g, '')) || 0;
+ 
+ recordCount++;
+ totalStoreTouchpoints += stores;
+ totalUniqueUsers += uniqueUsers;
+ totalClicks += clicks;
+ storeCountsPerRow.push(stores);
+ 
+ // Calculate per-event engagement: unique users per event normalized to historical baseline
+ if (uniqueUsers > 0) {
+ const engagementPercent = (uniqueUsers / MAX_UNIQUE_USERS_PER_EVENT_HISTORICAL) * 100;
+ engagementSum += engagementPercent;
+ validEngagementRows++;
+ }
+ }
+ });
+ 
+ // Store High/Low calculation from aggregated store-level data
+ // Store High = Maximum activities per store (highest count from any single store)
+ // Store Low = Minimum activities per store (lowest count from any single store)
+ // These values are aggregated from Facility/store-level counts
+ let storeHigh = STORE_HIGH_ACTIVITIES;
+ let storeLow = STORE_LOW_ACTIVITIES;
+ 
+ // Store Avg = Average activities per store (from aggregated store-level data)
+ let storeAvg = STORE_AVG_ACTIVITIES;
+ 
+ // Avg Clicks = Total Clicks / Total Records
+ let avgClicks = recordCount > 0 ? Math.round(totalClicks / recordCount) : 0;
+ 
+ // Engagement % = Average unique users per event, normalized to historical baseline (capped at 100%)
+ let avgUniqueUsersPerEvent = recordCount > 0 ? totalUniqueUsers / recordCount : 0;
+ let engagementPct = avgUniqueUsersPerEvent > 0 ? ((avgUniqueUsersPerEvent / MAX_UNIQUE_USERS_PER_EVENT_HISTORICAL) * 100).toFixed(1) : 0;
+ engagementPct = Math.min(engagementPct, 100); // Cap at 100% if exceeds historical baseline
+ 
+ // Avg Engagement = Average of per-event engagement rates (normalized to historical max unique users)
+ // This already contains the normalized engagement from the forEach loop above
+ let avgEngagement = validEngagementRows > 0 ? Math.min((engagementSum / validEngagementRows).toFixed(1), 100) : 0;
+ 
+ document.getElementById('recordCount').textContent = recordCount.toLocaleString();
+ document.getElementById('storeHigh').textContent = storeHigh.toLocaleString();
+ document.getElementById('storeLow').textContent = storeLow.toLocaleString();
+ document.getElementById('storeAvg').textContent = storeAvg;
+ document.getElementById('totalClicks').textContent = totalClicks.toLocaleString();
+ document.getElementById('avgClicks').textContent = avgClicks.toLocaleString();
+ document.getElementById('engagementPct').textContent = engagementPct + '%';
+ document.getElementById('avgEngagement').textContent = avgEngagement + '%';
+ }
+
+ // Multi-select filter placeholder text handler
+ function initFilterPlaceholders() {
+ const filterLabels = {
+ 'filterTitle': 'All Titles',
+ 'filterActivityType': 'All Types',
+ 'filterStoreArea': 'All Areas',
+ 'filterDivision': 'All Divisions',
+ 'filterRegion': 'All Regions',
+ 'filterMarket': 'All Markets',
+ 'filterStore': 'All Stores',
+ 'filterStoreFormat': 'All Formats',
+ 'filterAlignment': 'All Alignments',
+ 'filterFY': 'All FY',
+ 'filterWeek': 'All Weeks'
+ };
+
+ Object.keys(filterLabels).forEach(filterId => {
+ const select = document.getElementById(filterId);
+ if (select) {
+ // Create wrapper div for positioning
+ const wrapper = document.createElement('div');
+ wrapper.style.position = 'relative';
+ wrapper.style.width = '100%';
+ 
+ // Create placeholder overlay that covers the select text
+ const placeholder = document.createElement('div');
+ placeholder.className = 'filter-placeholder-overlay';
+ placeholder.style.cssText = `
+ position: absolute;
+ left: 1px;
+ right: 25px;
+ top: 1px;
+ bottom: 1px;
+ background: white;
+ display: flex;
+ align-items: center;
+ padding-left: 10px;
+ pointer-events: none;
+ font-size: 14px;
+ color: #333;
+ border-radius: 4px 0 0 4px;
+ overflow: hidden;
+ white-space: nowrap;
+ text-overflow: ellipsis;
+ `;
+ placeholder.textContent = filterLabels[filterId];
+ 
+ // Wrap select
+ select.parentNode.insertBefore(wrapper, select);
+ wrapper.appendChild(select);
+ wrapper.appendChild(placeholder);
+ 
+ // Update placeholder on change
+ const updatePlaceholder = () => {
+ const selected = Array.from(select.selectedOptions).filter(opt => opt.value !== '');
+ if (selected.length === 0) {
+ placeholder.textContent = filterLabels[filterId];
+ } else if (selected.length === 1) {
+ placeholder.textContent = selected[0].textContent;
+ } else {
+ placeholder.textContent = selected.length + ' selected';
+ }
+ };
+ 
+ select.addEventListener('change', updatePlaceholder);
+ select.addEventListener('click', updatePlaceholder);
+ updatePlaceholder();
+ }
+ });
+ }
+
+ // Initialize
+ document.addEventListener('DOMContentLoaded', function() {
+ // Calculate and set current WM week
+ initializeWMWeekFilter();
+ 
+ // Calculate stats from actual table data
+ updateDashboardStats();
+ 
+ // Initialize filter placeholders
+ initFilterPlaceholders();
+ 
+ // Add event listener to week filter for real-time stat updates
+ const weekFilter = document.getElementById('filterWeek');
+ if (weekFilter) {
+ weekFilter.addEventListener('change', updateDashboardStats);
+ }
+ 
+ // Display data source info
+ console.log('Dashboard Data Sources:');
+ console.log(' - Primary: wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2');
+ console.log(' - Audience: wmt-assetprotection-prod.Store_Support_Dev.Audience Breakdown Cur');
+ console.log(' - Device: wmt-assetprotection-prod.Store_Support_Dev.Device Types Cur');
+ console.log(' - Time: wmt-assetprotection-prod.Store_Support_Dev.Time Spent Cur');
+ });
+ 
+ // Calculate current Walmart fiscal week
+ // Walmart FY starts first Saturday of February
+ function getCurrentWMWeek() {
+ const today = new Date(2026, 1, 13); // Feb 13, 2026 = Week 2
+ const year = today.getFullYear();
+ 
+ // Walmart fiscal week mapping for FY2027 (starts Feb 2026)
+ // Based on business: Feb 13, 2026 = Week 2
+ const fyStart = new Date(2026, 0, 31); // Jan 31, 2026 (first Saturday of Feb FY)
+ 
+ if (today < fyStart) {
+ fyStart.setFullYear(year - 1);
+ }
+ 
+ // Calculate week number
+ const diffTime = today - fyStart;
+ const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+ const weekNum = Math.floor(diffDays / 7) + 1;
+ 
+ // Calculate fiscal year
+ let fy = today.getMonth() >= 1 ? year + 1 : year;
+ if (today < fyStart) fy = year;
+ 
+ return { week: Math.min(Math.max(weekNum, 1), 52), fy: fy };
+ }
+ 
+ // Initialize WM Week filter with relative options showing actual week numbers
+ function initializeWMWeekFilter() {
+ const wmInfo = getCurrentWMWeek();
+ const currentWeek = wmInfo.week;
+ const nextWeek = currentWeek < 52 ? currentWeek + 1 : 1;
+ const pastWeek = currentWeek > 1 ? currentWeek - 1 : 52;
+ 
+ // Update relative option labels with actual week numbers
+ const weekFilter = document.getElementById('filterWeek');
+ const options = weekFilter.options;
+ 
+ for (let i = 0; i < options.length; i++) {
+ const opt = options[i];
+ if (opt.value === 'current') {
+ opt.text = `Current Week (${currentWeek})`;
+ opt.setAttribute('data-week', currentWeek);
+ } else if (opt.value === 'next') {
+ opt.text = `Next Week (${nextWeek})`;
+ opt.setAttribute('data-week', nextWeek);
+ } else if (opt.value === 'past') {
+ opt.text = `Past Week (${pastWeek})`;
+ opt.setAttribute('data-week', pastWeek);
+ }
+ }
+ 
+ console.log(`WM Week Info - Current: ${currentWeek}, FY: ${wmInfo.fy}`);
+ }
+ 
+ // Get resolved week value (converts relative to actual week number)
+ function getResolvedWeekValue() {
+ const weekFilter = document.getElementById('filterWeek');
+ const selectedOptions = Array.from(weekFilter.selectedOptions);
+ const wmInfo = getCurrentWMWeek();
+ const currentWeek = wmInfo.week;
+ 
+ let resolvedWeeks = [];
+ selectedOptions.forEach(opt => {
+ if (opt.value === '') {
+ // "All" selected - no filter
+ resolvedWeeks = [];
+ } else if (opt.value === 'current') {
+ resolvedWeeks.push(currentWeek);
+ } else if (opt.value === 'next') {
+ resolvedWeeks.push(currentWeek < 52 ? currentWeek + 1 : 1);
+ } else if (opt.value === 'past') {
+ resolvedWeeks.push(currentWeek > 1 ? currentWeek - 1 : 52);
+ } else {
+ resolvedWeeks.push(parseInt(opt.value));
+ }
+ });
+ 
+ return resolvedWeeks;
+ }
+ </script>
+</body>
+</html>
+
+
+

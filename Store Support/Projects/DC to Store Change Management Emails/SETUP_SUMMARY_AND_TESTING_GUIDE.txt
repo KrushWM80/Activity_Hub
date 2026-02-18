@@ -1,0 +1,368 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║              DC TO STORE CHANGE MANAGEMENT - EMAIL SYSTEM OVERVIEW              ║
+║                       Setup Summary & Testing Guide                             ║
+║                            January 22, 2026                                     ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. CURRENT CONFIGURATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ TEST MODE: ENABLED
+  └─ All emails send to: kendall.rush@walmart.com
+
+✓ TEST EMAIL: kendall.rush@walmart.com
+  └─ Updated from: jhendr6@homeoffice.wal-mart.com
+
+✓ SEND FROM EMAIL: supplychainops@email.wal-mart.com
+  └─ Display Name: "ELM Manager Change Tracking System"
+
+✓ EMAIL METHOD: Microsoft Graph / Outlook COM
+
+✓ SCHEDULE: Every Hour (via Windows Task Scheduler)
+  └─ Idempotent: Only processes each day once
+  └─ Future: Will switch to bi-weekly (per pay cycle)
+
+✓ VPN RETRY: Enabled (7-day automatic retry if VPN unavailable)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. EMAIL TEMPLATE STYLING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📧 Template Location: MOCK_EMAIL_TEMPLATE.html
+
+📋 Email Sections:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│  [RED TEST BANNER]                                                           │
+│  "THIS IS A TEST EMAIL"                                                     │
+│                                                                              │
+│  [WALMART GREEN HEADER]                                                      │
+│  "Recent Field Leadership Updates"                                          │
+│  Date: January 22, 2026                                                    │
+│                                                                              │
+│  [RECIPIENTS BOX - Yellow]                                                  │
+│  Production Distribution List:                                              │
+│  • kendall.rush@walmart.com (TEST RECIPIENT - YOU)                         │
+│  • 6020GM@email.wal-mart.com                                               │
+│  • 6020AGM@email.wal-mart.com                                              │
+│  • 6080GM@email.wal-mart.com                                               │
+│  • 6080AGM@email.wal-mart.com                                              │
+│                                                                              │
+│  [INTRO TEXT]                                                               │
+│  "The following manager changes were detected..."                           │
+│                                                                              │
+│  [STORE MANAGER SECTION]                                                    │
+│  Store Manager (4 changes)                                                  │
+│  • Store 1234 - PLANO, TX                                                  │
+│    John Smith → Sarah Johnson                                              │
+│    Market: Dallas/Fort Worth                                               │
+│    Email: sarah.johnson@walmart.com                                        │
+│                                                                              │
+│  [MARKET MANAGER SECTION]                                                   │
+│  Market Manager (2 changes)                                                 │
+│  • Dallas/Fort Worth Market                                                │
+│    Robert Thompson → Amanda Foster                                         │
+│    Email: amanda.foster@walmart.com                                        │
+│                                                                              │
+│  [SUMMARY STATISTICS]                                                       │
+│  6 Total Changes  |  4 DC Recipients                                       │
+│                                                                              │
+│  [DISCLAIMER - Yellow Box]                                                 │
+│  "Automated Email - Do Not Reply"                                          │
+│  "This mailbox is not monitored..."                                        │
+│                                                                              │
+│  [FOOTER]                                                                   │
+│  "ELM Manager Change Tracking System"                                      │
+│  "Automated daily monitoring of SDL manager assignments"                   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+🎨 Color Scheme:
+  • Header: Walmart Green (#008a00)
+  • Accents: Walmart Blue (#0071ce)
+  • Success: Green (#2e7d32)
+  • Removed: Red (#d32f2f)
+  • Warnings: Yellow (#ffc107)
+
+✏️ To Customize Look & Feel:
+  1. Edit: MOCK_EMAIL_TEMPLATE.html
+  2. Modify: <style> section with your CSS changes
+  3. Test: View in web browser to preview
+  4. Apply: Transfer changes to dc_email_generator_html.py
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. HOW EMAILS ARE DISTRIBUTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP-BY-STEP PROCESS:
+
+Step 1: Detect Changes (Hourly)
+  └─ Compare today's SDL export vs yesterday's
+  └─ Identify: Store Managers, Market Managers, Region Managers
+
+Step 2: Map to DCs
+  └─ Use dc_to_stores_lookup.json
+  └─ Example: Store 1234 → DC 6020 (Ambient) + DC 6040 (Perishable)
+
+Step 3: Group by DC
+  └─ Collect all changes affecting each DC territory
+  └─ Create one email per DC with their specific changes
+
+Step 4: Generate Email
+  └─ Create beautiful HTML with manager changes
+  └─ Show old → new manager with styling
+  └─ Include SDL links for store lookups
+
+Step 5: Determine Recipients
+  └─ FOR EACH DC: Get their GM and AGM emails
+  └─ Example DC 6020: [6020GM@email.wal-mart.com, 6020AGM@email.wal-mart.com]
+
+Step 6: Send Email
+  ✓ In TEST MODE: 
+    └─ SENDS TO: kendall.rush@walmart.com
+    └─ SHOWS: Production recipients list (for visibility)
+  
+  ✓ In PRODUCTION MODE (when TEST_MODE=False):
+    └─ SENDS TO: Each DC's GM and AGM (via BCC)
+    └─ Example recipients per email:
+        • 6020GM@email.wal-mart.com
+        • 6020AGM@email.wal-mart.com
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. EMAIL RECIPIENT PATTERNS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👥 RECIPIENT FORMAT: <DC_NUMBER><ROLE>@email.wal-mart.com
+
+Examples:
+  • 6020GM@email.wal-mart.com   = DC 6020 General Manager
+  • 6020AGM@email.wal-mart.com  = DC 6020 Assistant General Manager
+  • 6040GM@email.wal-mart.com   = DC 6040 General Manager
+  • 6040AGM@email.wal-mart.com  = DC 6040 Assistant General Manager
+  • 6080GM@email.wal-mart.com   = DC 6080 General Manager
+  • 6080AGM@email.wal-mart.com  = DC 6080 Assistant General Manager
+
+📍 DC Numbers in System: 6020, 6040, 6080, 6090, 6120, 6140, etc.
+
+🔐 EMAIL DELIVERY METHOD: BCC (Blind Carbon Copy)
+  └─ Recipients can't see each other's addresses
+  └─ Prevents accidental reply-all floods
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. TESTING YOUR SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧪 QUICK TEST STEPS:
+
+1. Verify Configuration
+   └─ Check config.py: TEST_EMAIL = "kendall.rush@walmart.com" ✓
+   └─ Check dc_email_config.py: TEST_RECIPIENT = "kendall.rush@walmart.com" ✓
+
+2. Review Mock Email
+   └─ Open: MOCK_EMAIL_TEMPLATE.html
+   └─ View in: Web browser
+   └─ Note: Look & feel, spacing, colors
+
+3. Check Email Templates
+   └─ File: dc_email_generator_html.py
+   └─ Review: HTML generation logic
+   └─ Location: generate_dc_email_html() function
+
+4. Review Recipient Logic
+   └─ File: dc_leadership_config.py
+   └─ Function: get_dc_emails(dc_number)
+   └─ Output: List of GM and AGM emails for a DC
+
+5. Check DC Lookup
+   └─ File: dc_to_stores_lookup.json
+   └─ Structure: {DC_number: {'stores': [1234, 5678], 'type': 'Ambient'}}
+
+6. Send Test Email (When VPN Available)
+   └─ Command: python daily_check_smart.py
+   └─ Watch: Output logs and check kendall.rush@walmart.com inbox
+   └─ Look for: "Recent Field Leadership Updates" email
+
+
+📝 EMAIL LOGS:
+  • File: daily_run_log_YYYYMMDD.txt
+  • Location: Project root folder
+  • Shows: What ran, what was sent, any errors
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. FUTURE DASHBOARD REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 PLANNED FEATURES:
+
+Web Dashboard (Flask/FastAPI on localhost:5000):
+  ├─ Email Activity Log
+  │   ├─ What was sent (date, DC, count of changes)
+  │   ├─ Who it was sent to (recipient list)
+  │   └─ Delivery status (success/failed)
+  │
+  ├─ Change Metrics
+  │   ├─ Total changes detected per cycle
+  │   ├─ Changes by DC territory
+  │   ├─ Changes by role type (Store/Market/Region Manager)
+  │   ├─ Trending (daily/weekly/monthly)
+  │   └─ Impact analysis
+  │
+  ├─ Delivery Confirmations
+  │   ├─ Email send timestamps
+  │   ├─ Recipient count per DC
+  │   └─ Status indicators (sent/pending/failed)
+  │
+  ├─ Business Overview (For leadership)
+  │   ├─ KPI cards showing top metrics
+  │   ├─ Charts: Changes over time, by DC, by role
+  │   └─ Export functionality (CSV, PDF reports)
+  │
+  └─ Data Persistence
+      ├─ SQLite database for email history
+      ├─ Snapshot archive
+      └─ Historical analytics
+
+
+📁 DATA STORAGE:
+  • Snapshots: snapshots_local/ (JSON files, daily)
+  • Emails Pending: emails_pending/ (queue)
+  • Reports: reports/ (generated analytics)
+  • Database: email_history.db (new, SQLite)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. SCHEDULE CHANGE: HOURLY → BI-WEEKLY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CURRENT SCHEDULE: Hourly (for testing)
+  └─ Task Scheduler runs daily_check_smart.py every hour
+  └─ Idempotent: Only processes once per calendar day
+  └─ Frequency: ~24 runs/day (but email sent max 1x/day)
+
+FUTURE SCHEDULE: Bi-Weekly (every 2 weeks on pay cycle)
+  └─ When switching: Update Windows Task Scheduler
+  └─ Option 1: Specific dates (every 2nd Friday)
+  └─ Option 2: Custom schedule aligned with HR pay cycles
+  └─ Reduces email noise while maintaining visibility
+  └─ Better for leadership review cycles
+
+🔧 TO IMPLEMENT BI-WEEKLY SCHEDULE:
+  1. Identify exact pay cycle dates
+  2. Update: setup_hourly_task_auto.bat
+  3. Change: /SC HOURLY → /SC WEEKLY + /D FRI + manual date logic
+  4. Test: Run on first pay cycle date
+  5. Monitor: Confirm emails sent on correct schedule
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. FILES TO REVIEW & CUSTOMIZE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Configuration Files (READ & MODIFY):
+  1. config.py
+     └─ Main settings: test email, roles to track, filters
+     └─ What changed: TEST_EMAIL = "kendall.rush@walmart.com"
+
+  2. dc_email_config.py
+     └─ Email settings: sender, recipients, test mode
+     └─ What changed: TEST_RECIPIENT = "kendall.rush@walmart.com"
+
+  3. dc_leadership_config.py
+     └─ DC recipient patterns and roles
+     └─ Review: get_dc_emails() function
+
+  4. dc_email_generator_html.py
+     └─ Email HTML generation and styling
+     └─ Review: generate_dc_email_html() function
+
+Data Files (OBSERVE):
+  1. snapshots_local/manager_snapshot_YYYY-MM-DD.json
+     └─ Daily SDL exports
+     └─ Sample: manager_snapshot_2026-01-22_SAMPLE.json
+
+  2. dc_to_stores_lookup.json
+     └─ DC-to-store mapping
+     └─ Critical for recipient determination
+
+Documentation (READ):
+  1. EMAIL_FLOW_DOCUMENTATION.txt ← NEW
+     └─ Complete step-by-step process breakdown
+  2. RECIPIENTS_REFERENCE.txt ← NEW
+     └─ Detailed guide on recipient logic
+  3. MOCK_EMAIL_TEMPLATE.html ← NEW
+     └─ Visual example for styling review
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. NEXT STEPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ COMPLETED:
+  ✓ Updated test email to kendall.rush@walmart.com
+  ✓ Created mock email template (MOCK_EMAIL_TEMPLATE.html)
+  ✓ Created comprehensive flow documentation
+  ✓ Created recipient reference guide
+  ✓ Added sample data for demonstration
+
+📋 READY FOR:
+  □ Review mock email styling and provide feedback
+  □ Test with actual system when VPN available
+  □ Review recipient determination logic
+  □ Plan dashboard development
+
+🚀 FUTURE TASKS:
+  1. Create Flask/FastAPI dashboard
+  2. Implement email history persistence (SQLite)
+  3. Build metrics and analytics views
+  4. Implement business overview dashboard
+  5. Switch from hourly to bi-weekly schedule
+  6. Deploy to production when ready
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. QUESTIONS & FEEDBACK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Please review and let me know:
+
+1. EMAIL TEMPLATE:
+   □ Does the styling look good?
+   □ Should we change any colors?
+   □ Need different sections or layout?
+   □ Any content to add/remove?
+
+2. RECIPIENTS:
+   □ Does the recipient logic make sense?
+   □ Should we add additional recipients (e.g., regional managers)?
+   □ Any distribution list changes needed?
+
+3. DASHBOARD:
+   □ Which metrics are most important?
+   □ Any specific charts or visualizations?
+   □ Layout preferences?
+
+4. SCHEDULE:
+   □ When should we switch to bi-weekly?
+   □ Specific pay cycle dates to target?
+   □ Any other frequency preferences?
+
+5. DATA PERSISTENCE:
+   □ Want email history in database?
+   □ How long to retain history?
+   □ Need archival process?
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+For more details, see:
+  • EMAIL_FLOW_DOCUMENTATION.txt - Complete step-by-step process
+  • RECIPIENTS_REFERENCE.txt - Recipient logic and configuration
+  • MOCK_EMAIL_TEMPLATE.html - Visual email template
+
+═══════════════════════════════════════════════════════════════════════════════════

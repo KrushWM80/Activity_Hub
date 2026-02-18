@@ -1,0 +1,64 @@
+---
+title: IconButton
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+This button is an action that allows adding content into another flow or screen.
+
+
+<ScreenshotTabs screenshotData={"screenshots/icon-button.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Icons, IconButton} from '@walmart/gtp-shared-components';
+
+<IconButton
+  size="small"
+  icon={<Icons.HomeIcon />}
+  onPress={() => {}}
+/>
+<IconButton
+  size="medium"
+  icon={<Icons.HomeIcon />}
+  onPress={() => {}}
+/>
+<IconButton
+  size="large"
+  icon={<Icons.HomeIcon />}
+  onPress={() => {}}
+/>
+<IconButton
+  size="large"
+  icon={<Icons.HomeIcon />}
+  onPress={() => {}}
+  UNSAFE_style={{
+    backgroundColor: 'yellow',
+    height: 42,
+    width: 42,
+    borderRadius: 21,
+  }}
+/>
+```
+## Props
+
+ ### onPress(required)
+<PropTable componentLink="IconButton" prop="onPress"/>
+ ### a11yLabel
+<PropTable componentLink="IconButton" prop="a11yLabel"/>
+ ### children
+<PropTable componentLink="IconButton" prop="children"/>
+ ### disabled
+<PropTable componentLink="IconButton" prop="disabled"/>
+ ### size
+<PropTable componentLink="IconButton" prop="size"/>
+ ### UNSAFE_style
+<PropTable componentLink="IconButton" prop="UNSAFE_style"/>
+ ### color
+<PropTable componentLink="IconButton" prop="color"/>
+ ### disabledColor
+<PropTable componentLink="IconButton" prop="disabledColor"/>
+ ### type<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect</span></span>
+<PropTable componentLink="IconButton" prop="type"/>
+ ### icon<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>children</strong> prop instead</span></span>
+<PropTable componentLink="IconButton" prop="icon"/>

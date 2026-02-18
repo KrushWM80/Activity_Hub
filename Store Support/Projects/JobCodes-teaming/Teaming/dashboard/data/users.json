@@ -1,0 +1,58 @@
+{
+  "admin": {
+    "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "role": "admin",
+    "name": "Administrator",
+    "email": "admin@walmart.com",
+    "approved": true
+  },
+  "krush": {
+    "password_hash": "1ff275f4655a4137b257002b5abedbd8e4fbb1697e167ff170c44a54c5bb7a26",
+    "role": "admin",
+    "name": "Kendall Rush",
+    "email": "kendall.rush@walmart.com",
+    "approved": true,
+    "registered": "2026-01-21T11:41:26.658749",
+    "default_tab": "admin"
+  },
+  "micah.roth": {
+    "password_hash": "",
+    "role": "admin",
+    "name": "Micah Roth",
+    "email": "micah.roth@walmart.com",
+    "approved": true,
+    "registered": "2026-01-21T16:34:22.263310"
+  },
+  "steven.reid": {
+    "password_hash": "",
+    "role": "admin",
+    "name": "Steven Reid",
+    "email": "steven.reid@walmart.com",
+    "approved": true,
+    "registered": "2026-01-28T10:30:43.381835"
+  },
+  "robert.isaacs": {
+    "password_hash": "",
+    "role": "user",
+    "name": "Robert Isaacs",
+    "email": "robert.isaacs@walmart.com",
+    "approved": true,
+    "registered": "2026-01-29T09:55:04.340422"
+  },
+  "rachel.doctorello": {
+    "password_hash": "",
+    "role": "user",
+    "name": "Rachel Doctorello",
+    "email": "rachel.doctorello@walmart.com",
+    "approved": true,
+    "registered": "2026-02-03T11:04:26.988181"
+  },
+  "andrea.hanson": {
+    "password_hash": "",
+    "role": "user",
+    "name": "Andrea Hanson",
+    "email": "andrea.hanson@walmart.com",
+    "approved": true,
+    "registered": "2026-02-09T10:51:42.293884"
+  }
+}

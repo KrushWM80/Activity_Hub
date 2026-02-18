@@ -1,0 +1,126 @@
+---
+title: DataTableCellActionsMenu
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Use DataTableCellActionsMenu and DataTableCellActionsMenuItem for overflow actions
+
+
+
+## Usage
+```js
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableHead,
+  DataTableHeader,
+  DataTableHeaderSelect,
+  DataTableCellSelect,
+  DataTableCellActions,
+  DataTableCellActionsMenu,
+  DataTableCellActionsMenuItem,
+  IconButton,
+  Icons,
+  DataTableRow,
+} from '@walmart/gtp-shared-components';
+
+const menuHeader = ['ID', 'Name', 'Actions'];
+const menuData = [
+  {id: 1, name: 'Banana', isEdit: false},
+  {id: 2, name: 'Peach', isEdit: false},
+  {id: 3, name: 'Strawberry', isEdit: false},
+];
+const [rowId, setRowId] = React.useState(0);
+<DataTable>
+  <DataTableHead>
+    <DataTableRow>
+      {menuHeader.map((header, index) => (
+        <DataTableHeader alignment={index === 2 ? 'right' : 'left'}>
+          {header}
+        </DataTableHeader>
+      ))}
+    </DataTableRow>
+  </DataTableHead>
+  <DataTableBody hor>
+    {menuData.map((item) => {
+      const {id, name, isEdit} = item;
+      return (
+        <DataTableRow>
+          <DataTableCell>{id}</DataTableCell>
+          {isEdit ? (
+            <TextField
+              value={name}
+              label={''}
+              onChangeText={(value) => updateData('Edit', id, value)}
+              onSubmitEditing={() => {
+                updateData('EditDone', id);
+              }}
+            />
+          ) : (
+            <DataTableCell key={'name'}>{name}</DataTableCell>
+          )}
+          <DataTableCellActions alignment="right">
+            <IconButton
+              children={<Icons.PencilIcon />}
+              size="small"
+              onPress={() =>
+                displayPopupAlert('Action', `Edit button pressed for ${name}`)
+              }
+            />
+            <IconButton
+              children={<Icons.TrashCanIcon />}
+              size="small"
+              onPress={() =>
+                displayPopupAlert('Action', `Delete button pressed for ${name}`)
+              }
+            />
+            <DataTableCellActionsMenu
+              isOpen={rowId === id}
+              onClose={() => setRowId(0)}
+              trigger={
+                <IconButton
+                  children={<Icons.MoreIcon />}
+                  onPress={() => setRowId(id)}
+                />
+              }>
+              <DataTableCellActionsMenuItem
+                onPress={() => {
+                  setRowId(0);
+                }}>
+                Email
+              </DataTableCellActionsMenuItem>
+              <DataTableCellActionsMenuItem
+                onPress={() => {
+                  setRowId(0);
+                }}>
+                Print
+              </DataTableCellActionsMenuItem>
+              <DataTableCellActionsMenuItem
+                onPress={() => {
+                  setRowId(0);
+                }}>
+                Disable
+              </DataTableCellActionsMenuItem>
+            </DataTableCellActionsMenu>
+          </DataTableCellActions>
+        </DataTableRow>
+      );
+    })}
+  </DataTableBody>
+</DataTable>;
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="DataTableCellActionsMenu" prop="children"/>
+ ### isOpen
+<PropTable componentLink="DataTableCellActionsMenu" prop="isOpen"/>
+ ### onClose
+<PropTable componentLink="DataTableCellActionsMenu" prop="onClose"/>
+ ### trigger(required)
+<PropTable componentLink="DataTableCellActionsMenu" prop="trigger"/>
+ ### UNSAFE_style
+<PropTable componentLink="DataTableCellActionsMenu" prop="UNSAFE_style"/>

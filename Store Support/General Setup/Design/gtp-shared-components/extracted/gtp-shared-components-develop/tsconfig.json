@@ -1,0 +1,24 @@
+/* https://www.typescriptlang.org/tsconfig */
+{
+  "extends": "@tsconfig/react-native/tsconfig.json",
+  "compilerOptions": {
+    "checkJs": true,
+    "noEmit": false,
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "forceConsistentCasingInFileNames": true,
+    "types": ["react-native", "jest", "node"]
+  },
+  "exclude": [
+    /* from @tsconfig/react-native/tsconfig.json */
+    "node_modules",
+
+    /* user defined exclusions */
+    "**/*.js",
+    "docs/**/*",
+    "example/",
+    "styleguidist/**/*.js",
+    "transforms/__testfixtures__/**"
+  ]
+}

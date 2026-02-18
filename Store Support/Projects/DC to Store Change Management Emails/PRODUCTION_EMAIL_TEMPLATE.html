@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0f172a;
+                color: #e2e8f0;
+            }
+            
+            .header {
+                background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%) !important;
+            }
+            
+            .content {
+                background: #1e293b;
+                border-color: #334155;
+            }
+            
+            .intro {
+                background: #1e3a8a;
+                border-left-color: #3b82f6;
+            }
+            
+            .intro p {
+                color: #e2e8f0;
+            }
+            
+            .role-header {
+                background: #1e3a8a;
+                color: #60a5fa;
+                border-left-color: #3b82f6;
+            }
+            
+            .change-card {
+                background: #334155;
+                border-color: #475569;
+                color: #e2e8f0;
+            }
+            
+            .change-card:hover {
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+            
+            .location-link {
+                color: #60a5fa;
+            }
+            
+            .label {
+                color: #93c5fd;
+            }
+            
+            .value {
+                color: #e2e8f0;
+            }
+            
+            .manager-change {
+                background: #1e293b;
+            }
+            
+            .new-manager {
+                color: #6ee7b7;
+            }
+            
+            .old-manager {
+                color: #fca5a5;
+            }
+            
+            .summary {
+                background: #1e3a8a;
+                border-left-color: #3b82f6;
+            }
+            
+            .summary-number {
+                color: #60a5fa;
+            }
+            
+            .summary-label {
+                color: #cbd5e1;
+            }
+            
+            .btn-primary {
+                background: #3b82f6;
+            }
+            
+            .btn-primary:hover {
+                background: #1d4ed8;
+            }
+            
+            .btn-secondary {
+                background: #334155;
+                color: #60a5fa;
+                border-color: #3b82f6;
+            }
+            
+            .btn-secondary:hover {
+                background: #475569;
+            }
+            
+            .footer-info {
+                border-top-color: #334155;
+                color: #cbd5e1;
+            }
+            
+            .footer-info p {
+                color: #cbd5e1;
+            }
+            
+            .elm-link {
+                background: #3b82f6;
+            }
+            
+            .elm-link:hover {
+                background: #1d4ed8;
+            }
+        }
+        .header {
+            background: linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header-logo {
+            max-width: 100px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .content {
+            background: white;
+            padding: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .intro {
+            background: #DBEAFE;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border-left: 4px solid #1D4ED8;
+        }
+        .role-section {
+            margin: 30px 0;
+        }
+        .role-header {
+            background: #DBEAFE;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #1E3A8A;
+            font-size: 18px;
+            border-left: 4px solid #1D4ED8;
+        }
+        .change-card {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s;
+        }
+        .change-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .location-link {
+            color: #1D4ED8;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .location-link:hover {
+            text-decoration: underline;
+        }
+        .field {
+            margin: 8px 0;
+            display: flex;
+            align-items: baseline;
+        }
+        .label {
+            font-weight: 600;
+            color: #666;
+            min-width: 140px;
+            flex-shrink: 0;
+        }
+        .value {
+            color: #333;
+        }
+        .manager-change {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .old-manager {
+            color: #d32f2f;
+            text-decoration: line-through;
+            opacity: 0.8;
+        }
+        .arrow {
+            color: #666;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        .new-manager {
+            color: #2e7d32;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .summary {
+            background: #DBEAFE;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .summary-stat {
+            display: inline-block;
+            margin: 0 20px;
+        }
+        .summary-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1E3A8A;
+        }
+        .summary-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #3B82F6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1D4ED8;
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+        }
+        .btn-secondary {
+            background: white;
+            color: #3B82F6;
+            border: 2px solid #3B82F6;
+        }
+        .btn-secondary:hover {
+            background: #DBEAFE;
+        }
+        .footer-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+        .footer-info p {
+            margin: 5px 0;
+        }
+        .elm-link {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 2px 8px;
+            background: #3B82F6;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .elm-link:hover {
+            background: #1D4ED8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="C:\Users\krush\Documents\VSCode\Spark-Playground\General Setup\Design\Spark Blank.png" alt="Spark Logo" class="header-logo">
+        <h1>Recent Field Leadership Updates</h1>
+        <p>February 16, 2026</p>
+    </div>
+    
+    <div class="content">
+        <div class="intro">
+            <p><strong>The following manager changes were detected in stores/markets served by your DC.</strong></p>
+            <p>These changes may impact your supply chain coordination and store relationships.</p>
+        </div>
+
+        <div class="role-section">
+            <div class="role-header">
+                STORE MANAGER (4 changes)
+            </div>
+            
+            <div class='change-card'>
+                <div class="field">
+                    <span class="label">Store:</span>
+                    <a href="https://sdl.prod.walmart.com/detail/US/2841" class="location-link" target="_blank">Store 2841 - BOWLING GREEN, KY</a>
+                    <a href="https://sdl.prod.walmart.com/detail/US/2841" class="elm-link" target="_blank">ELM</a>
+                </div>
+                <div class="manager-change">
+                    <span class="old-manager">John Smith</span>
+                    <span class="arrow">→</span>
+                    <span class="new-manager">Sarah Johnson</span>
+                </div>
+                <div class="field">
+                    <span class="label">Market:</span>
+                    <span class="value">Central Kentucky</span>
+                </div>
+                <div class="field">
+                    <span class="label">Email:</span>
+                    <span class="value"><a href="mailto:sarah.johnson@walmart.com">sarah.johnson@walmart.com</a></span>
+                </div>
+            </div>
+
+            <div class='change-card'>
+                <div class="field">
+                    <span class="label">Store:</span>
+                    <a href="https://sdl.prod.walmart.com/detail/US/2973" class="location-link" target="_blank">Store 2973 - COVINGTON, KY</a>
+                    <a href="https://sdl.prod.walmart.com/detail/US/2973" class="elm-link" target="_blank">ELM</a>
+                </div>
+                <div class="manager-change">
+                    <span class="old-manager">Michael Chen</span>
+                    <span class="arrow">→</span>
+                    <span class="new-manager">David Martinez</span>
+                </div>
+                <div class="field">
+                    <span class="label">Market:</span>
+                    <span class="value">Northern Kentucky</span>
+                </div>
+                <div class="field">
+                    <span class="label">Email:</span>
+                    <span class="value"><a href="mailto:david.martinez@walmart.com">david.martinez@walmart.com</a></span>
+                </div>
+            </div>
+
+            <div class='change-card'>
+                <div class="field">
+                    <span class="label">Store:</span>
+                    <a href="https://sdl.prod.walmart.com/detail/US/2925" class="location-link" target="_blank">Store 2925 - LEXINGTON, KY</a>
+                    <a href="https://sdl.prod.walmart.com/detail/US/2925" class="elm-link" target="_blank">ELM</a>
+                </div>
+                <div class="manager-change">
+                    <span class="old-manager">Jennifer Davis</span>
+                    <span class="arrow">→</span>
+                    <span class="new-manager">Robert Williams</span>
+                </div>
+                <div class="field">
+                    <span class="label">Market:</span>
+                    <span class="value">Lexington Market</span>
+                </div>
+                <div class="field">
+                    <span class="label">Email:</span>
+                    <span class="value"><a href="mailto:robert.williams@walmart.com">robert.williams@walmart.com</a></span>
+                </div>
+            </div>
+
+            <div class='change-card'>
+                <div class="field">
+                    <span class="label">Store:</span>
+                    <a href="https://sdl.prod.walmart.com/detail/US/2840" class="location-link" target="_blank">Store 2840 - LOUISVILLE, KY</a>
+                    <a href="https://sdl.prod.walmart.com/detail/US/2840" class="elm-link" target="_blank">ELM</a>
+                </div>
+                <div class="manager-change">
+                    <span class="old-manager">Lisa Anderson</span>
+                    <span class="arrow">→</span>
+                    <span class="new-manager">Christopher Brown</span>
+                </div>
+                <div class="field">
+                    <span class="label">Market:</span>
+                    <span class="value">Louisville Market</span>
+                </div>
+                <div class="field">
+                    <span class="label">Email:</span>
+                    <span class="value"><a href="mailto:christopher.brown@walmart.com">christopher.brown@walmart.com</a></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="role-section">
+            <div class="role-header">
+                MARKET MANAGER (2 changes)
+            </div>
+            
+            <div class='change-card'>
+                <div class="field">
+                    <span class="label">Market:</span>
+                    <span class="value"><strong>Northern Kentucky Market</strong> - Covington Region</span>
+                </div>
+                <div class="manager-change">
+                    <span class="old-manager">Robert Thompson</span>
+                    <span class="arrow">→</span>
+                    <span class="new-manager">Amanda Foster</span>
+                </div>
+                <div class="field">
+                    <span class="label">Email:</span>
+                    <span class="value"><a href="mailto:amanda.foster@walmart.com">amanda.foster@walmart.com</a></span>
+                </div>
+            </div>
+
+            <div class='change-card'>
+                <div class="field">
+                    <span class="label">Market:</span>
+                    <span class="value"><strong>Central Kentucky Market</strong> - Lexington Region</span>
+                </div>
+                <div class="manager-change">
+                    <span class="old-manager">Kevin Wilson</span>
+                    <span class="arrow">→</span>
+                    <span class="new-manager">Patricia Rivera</span>
+                </div>
+                <div class="field">
+                    <span class="label">Email:</span>
+                    <span class="value"><a href="mailto:patricia.rivera@walmart.com">patricia.rivera@walmart.com</a></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <div class="summary-stat">
+                <div class="summary-number">6</div>
+                <div class="summary-label">Total Changes</div>
+            </div>
+            <div class="summary-stat">
+                <div class="summary-number">4</div>
+                <div class="summary-label">DC Recipients</div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="mailto:feedback@walmart.com?subject=Manager%20Change%20Tracking%20Feedback" class="btn btn-primary" title="Help us improve the Manager Change Tracking System! Share your thoughts, report issues, or suggest features.">
+                💬 Send Feedback
+            </a>
+            <a href="https://localhost:5000/store-manager-directory" class="btn btn-secondary">
+                📊 View Store Managers
+            </a>
+        </div>
+        
+        <div class="footer-info">
+            <p><strong>ELM Manager Change Tracking System</strong></p>
+            <p>Automated monitoring of SDL manager assignments, aligned to Pay Cycle</p>
+            <p style="font-size: 11px; color: #999; margin-top: 10px;">
+                This email was sent to you because manager changes were detected in your DC's service territory. 
+                Updates are generated on each Pay Cycle on SDL export data.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

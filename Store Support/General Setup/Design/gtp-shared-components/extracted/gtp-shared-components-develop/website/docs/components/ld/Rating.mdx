@@ -1,0 +1,29 @@
+---
+title: Rating
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Ratings provide insight into how well a product or service has been received by those who have bought or used it previously.
+
+
+<ScreenshotTabs screenshotData={"screenshots/rating.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Rating} from '@walmart/gtp-shared-components`;
+
+<Rating value={3.5} size={'large'} />
+```
+## Props
+
+ ### size
+<PropTable componentLink="Rating" prop="size"/>
+ ### value
+<PropTable componentLink="Rating" prop="value"/>
+ ### UNSAFE_style
+<PropTable componentLink="Rating" prop="UNSAFE_style"/>
+ ### count
+<PropTable componentLink="Rating" prop="count"/>
+ ### onPress<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="Rating" prop="onPress"/>

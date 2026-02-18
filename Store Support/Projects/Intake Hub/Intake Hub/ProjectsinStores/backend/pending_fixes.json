@@ -1,0 +1,147 @@
+{
+  "fixes": [],
+  "history": [
+    {
+      "id": "a89640f6",
+      "title": "User Feedback: Sparky AI",
+      "feedback_category": "Sparky AI",
+      "feedback_rating": 1,
+      "feedback_comments": "I asked for something in East Division, and it searched for Division. Then I reworded my question and it worked it filtered for East, but it didn't remove the Search word Division, so it showed 0. I guess when someone used chat it needs to clear the filters before it moves to the next chat. \n\nHere is the context of the chat. You: I'm looking for projects in East division \ud83d\ude0a Sparky: \ud83d\udd0d **Found 1 projects matching 'DIVISION':** \u2022 Cost Inventory \\| Division 1 Test - Hawaii \ud83d\udcca **Total:** 9 stores across these projects \ud83d\udca1 **Tip:** Type a specific project name for more details. \u2713 Filters Applied: Search: division You: I'm looking for projects in the East \ud83d\ude0a Sparky: \ud83d\udccd **Filtering to EAST Division** \u2705 Found 82 projects impacting 18765 stores \ud83c\udfaf Dashboard filtered! \ud83d\udca1 Would you like to narrow this down by WM WK? \u2713 Filters Applied: Division: EAST",
+      "timestamp": "2026-01-19T16:21:46.751Z",
+      "priority": "high",
+      "root_cause": "User reported issue in category 'Sparky AI'. Manual analysis required to determine specific root cause.",
+      "resolution": "Review feedback comments and any attached context. Reach out to user if clarification needed.",
+      "code_changes": null,
+      "user_context": {
+        "current_filters": {
+          "division": [],
+          "region": [],
+          "market": [],
+          "store": [],
+          "wmweek": [],
+          "phase": []
+        },
+        "projects_displayed": 100000
+      },
+      "status": "approved",
+      "actioned_by": "kendall.rush",
+      "actioned_at": "2026-01-19 10:22:34",
+      "implementation_result": {
+        "success": true,
+        "message": ""
+      }
+    },
+    {
+      "id": "fdf69b54",
+      "title": "UI/Visual Issue",
+      "feedback_category": "Sparky AI",
+      "feedback_rating": 1,
+      "feedback_comments": "I asked a question you should know. \n\nAsk Sparky\n\u2212\n\u2715\nYou: Realty projects in East\n\ud83d\ude0a Sparky: \u274c **No projects found** matching phase 'Realty'. Try adjusting your search or filters.\n\u2713 Filters Applied:\nPhase: Realty\n\n----\n\nYou should be able to select Realty, which you did, but it showed nothing. ",
+      "timestamp": "2026-01-21T14:37:19.396Z",
+      "priority": "high",
+      "root_cause": "User interface element not behaving as expected. Need to identify specific element and expected vs actual behavior.",
+      "resolution": "Identify specific UI element from feedback. Review CSS styling and JavaScript event handlers. Test across browsers.",
+      "code_changes": null,
+      "user_context": {
+        "current_filters": {
+          "division": [],
+          "region": [],
+          "market": [],
+          "store": [],
+          "wmweek": [],
+          "phase": [
+            "Realty"
+          ]
+        },
+        "projects_displayed": 100000
+      },
+      "investigation_notes": [
+        "Active filters at time of feedback: {'phase': ['Realty']}",
+        "Projects displayed: 100000"
+      ],
+      "files_analyzed": [
+        "frontend/simple.html"
+      ],
+      "requires_ai_review": true,
+      "status": "approved",
+      "actioned_by": "kendall.rush",
+      "actioned_at": "2026-01-21 08:38:06",
+      "implementation_result": {
+        "success": true,
+        "message": ""
+      }
+    },
+    {
+      "id": "176b8708",
+      "title": "UI/Visual Issue",
+      "feedback_category": "Sparky AI",
+      "feedback_rating": 1,
+      "feedback_comments": "I asked for a remodel at 5147, but Sparky wasn't able to show anything. \n\nMaybe it could show any Realty Remodels or Initiatives with Remodel in them for 5147. If it had none then maybe just say this is what we are showing for 5147.\n\nYou: remodel 5147\n\ud83d\ude0a Sparky: \ud83d\udc4b **Hi! I'm Sparky!** \ud83d\udcca I have access to **100000 active projects** across thousands of stores in BigQuery. \ud83c\udfaf **Quick actions:** \u2022 **Search projects:** Just type a project name (e.g., `GMD`, `Sidekick`) \u2022 **Search by owner:** `projects owned by Mike` or `owner: John` \u2022 **Get stats:** Type `summary` or `statistics` \u2022 **Get help:** Type `help` for full command list \ud83d\udca1 **Example queries:** \u2022 `Show me Sidekick projects` \u2022 `POC projects in EAST` \u2022 `Projects owned by Mike` \u2022 `Give me a summary` What would you like to explore?",
+      "timestamp": "2026-01-27T20:41:02.122Z",
+      "priority": "high",
+      "root_cause": "User interface element not behaving as expected. Need to identify specific element and expected vs actual behavior.",
+      "resolution": "Identify specific UI element from feedback. Review CSS styling and JavaScript event handlers. Test across browsers.",
+      "code_changes": null,
+      "user_context": {
+        "current_filters": {
+          "division": [],
+          "region": [],
+          "market": [],
+          "store": [],
+          "wmweek": [],
+          "phase": []
+        },
+        "projects_displayed": 100000
+      },
+      "investigation_notes": [
+        "Active filters at time of feedback: {}",
+        "Projects displayed: 100000"
+      ],
+      "files_analyzed": [
+        "frontend/simple.html"
+      ],
+      "requires_ai_review": true,
+      "status": "approved",
+      "actioned_by": "kendall.rush",
+      "actioned_at": "2026-02-05 09:41:01",
+      "implementation_result": {
+        "success": true,
+        "message": ""
+      }
+    },
+    {
+      "id": "cae9cb04",
+      "title": "UI/Visual Issue",
+      "feedback_category": "Sparky AI",
+      "feedback_rating": 1,
+      "feedback_comments": "I gave Sparky information that he did not translate well. \nHe should have been able to look for Projects or Realty Initiative for Remodel and for store 5147. If it could not find anything at lease offer what they can find for 5147. \n\n\nYou: remodel 5147\n\ud83d\ude0a Sparky: \ud83d\udc4b **Hi! I'm Sparky!** \ud83d\udcca I have access to **0 active projects** across thousands of stores in BigQuery. \ud83c\udfaf **Quick actions:** \u2022 **Search projects:** Just type a project name (e.g., `GMD`, `Sidekick`) \u2022 **Search by owner:** `projects owned by Mike` or `owner: John` \u2022 **Get stats:** Type `summary` or `statistics` \u2022 **Get help:** Type `help` for full command list \ud83d\udca1 **Example queries:** \u2022 `Show me Sidekick projects` \u2022 `POC projects in EAST` \u2022 `Projects owned by Mike` \u2022 `Give me a summary` What would you like to explore?",
+      "timestamp": "2026-01-27T21:07:44.620Z",
+      "priority": "high",
+      "root_cause": "User interface element not behaving as expected. Need to identify specific element and expected vs actual behavior.",
+      "resolution": "Identify specific UI element from feedback. Review CSS styling and JavaScript event handlers. Test across browsers.",
+      "code_changes": null,
+      "user_context": {
+        "current_filters": {
+          "division": [],
+          "region": [],
+          "market": [],
+          "store": [],
+          "wmweek": [],
+          "phase": []
+        },
+        "projects_displayed": 100000
+      },
+      "investigation_notes": [
+        "Active filters at time of feedback: {}",
+        "Projects displayed: 100000"
+      ],
+      "files_analyzed": [
+        "frontend/simple.html"
+      ],
+      "requires_ai_review": true,
+      "status": "denied",
+      "actioned_by": "kendall.rush",
+      "actioned_at": "2026-02-06 07:43:35"
+    }
+  ]
+}

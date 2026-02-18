@@ -1,0 +1,43 @@
+---
+title: ListItem
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+ListItem's are composed of items containing text, icons, spot icons or images, and
+they should contain at least one action.
+
+
+<ScreenshotTabs screenshotData={"screenshots/list-item.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {ListItem} from '@walmart/gtp-shared-components`;
+
+<ListItem>List Item</ListItem>
+<ListItem leading={<Icon name="icon-name" />}>List Item with Icon</ListItem>
+<ListItem title="Title">List Item with Title</ListItem>
+<ListItem title="Title" leading={<Icon name="icon-name" />}>
+ List Item with Title and Icon
+</ListItem>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="ListItem" prop="children"/>
+ ### leading
+<PropTable componentLink="ListItem" prop="leading"/>
+ ### title
+<PropTable componentLink="ListItem" prop="title"/>
+ ### trailing
+<PropTable componentLink="ListItem" prop="trailing"/>
+ ### UNSAFE_style
+<PropTable componentLink="ListItem" prop="UNSAFE_style"/>
+ ### content<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ListItem" prop="content"/>
+ ### leadingAlign<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ListItem" prop="leadingAlign"/>
+ ### trailingAlign<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ListItem" prop="trailingAlign"/>
+ ### onPress<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="ListItem" prop="onPress"/>

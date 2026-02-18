@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>AMP Dashboard Debug Test</h1>
+    <div class="debug" id="debug-info">Loading...</div>
+    
+    <table id="test-table">
+        <thead>
+            <tr>
+                <th>Week</th>
+                <th>Title</th>
+                <th>Total Count</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="test-body">
+            <!-- Data will be loaded here -->
+        </tbody>
+    </table>
+
+    <script src="amp-data-connector.js"></script>
+    <script>
+        async function testDashboard() {
+            const debugDiv = document.getElementById('debug-info');
+            const testBody = document.getElementById('test-body');
+            
+            try {
+                debugDiv.innerHTML = 'Initializing data connector...';
+                
+                const connector = new AMPDataConnector();
+                await connector.initialize();
+                
+                debugDiv.innerHTML = 'Loading data...';
+                const data = await connector.getData();
+                
+                debugDiv.innerHTML = `Loaded ${data.length} records successfully!`;
+                
+                // Display data in table
+                testBody.innerHTML = '';
+                data.slice(0, 10).forEach(item => { // Show first 10 records
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.week_number || 'N/A'}</td>
+                        <td>${item.activity_title || 'No Title'}</td>
+                        <td>${(item.total_count || 0).toLocaleString()}</td>
+                        <td>${item.status || 'Unknown'}</td>
+                    `;
+                    testBody.appendChild(row);
+                });
+                
+            } catch (error) {
+                debugDiv.innerHTML = `Error: ${error.message}`;
+                console.error('Test failed:', error);
+                
+                // Show sample data as fallback
+                const sampleData = [
+                    { week_number: 43, activity_title: 'Test Activity 1', total_count: 100, status: 'complete' },
+                    { week_number: 43, activity_title: 'Test Activity 2', total_count: 200, status: 'incomplete' },
+                    { week_number: 42, activity_title: 'Test Activity 3', total_count: 150, status: 'inform' }
+                ];
+                
+                testBody.innerHTML = '';
+                sampleData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.week_number}</td>
+                        <td>${item.activity_title}</td>
+                        <td>${item.total_count.toLocaleString()}</td>
+                        <td>${item.status}</td>
+                    `;
+                    testBody.appendChild(row);
+                });
+                
+                debugDiv.innerHTML += '<br>Showing sample data instead.';
+            }
+        }
+        
+        // Run test when page loads
+        document.addEventListener('DOMContentLoaded', testDashboard);
+    </script>
+</body>
+</html>

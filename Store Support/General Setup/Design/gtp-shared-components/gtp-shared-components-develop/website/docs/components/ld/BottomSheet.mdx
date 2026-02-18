@@ -1,0 +1,153 @@
+---
+title: BottomSheet
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Bottom Sheets are surfaces anchored to the bottom of the screen that contain supplementary content.
+
+
+<ScreenshotTabs screenshotData={{"small":"screenshots/bottom-sheet-small.png","large":"screenshots/bottom-sheet-large.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {BottomSheet} from '@walmart/gtp-shared-components`;
+
+const [modalIsOpen, setModalIsOpen] = React.useState(false);
+
+<BottomSheet
+  isOpen={modalIsOpen}
+  onOpen={() => setModalIsOpen(true)}
+  onClose={() => setModalIsOpen(false)}
+  title="Confirmation"
+  actions={
+    <ButtonGroup>
+      <Button variant="tertiary" onPress={() => setModalIsOpen(false)}>
+        Cancel
+      </Button>
+      <Button variant="primary" onPress={() => setModalIsOpen(false)}>
+        Continue
+      </Button>
+    </ButtonGroup>
+  }>
+  Lorem ipsum dolor sit amet
+</BottomSheet>
+```
+## Props
+
+ ### animationInTiming
+<PropTable componentLink="BottomSheet" prop="animationInTiming"/>
+ ### animationOutTiming
+<PropTable componentLink="BottomSheet" prop="animationOutTiming"/>
+ ### avoidKeyboard<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect.This feature is now baked in.</span></span>
+<PropTable componentLink="BottomSheet" prop="avoidKeyboard"/>
+ ### coverScreen
+<PropTable componentLink="BottomSheet" prop="coverScreen"/>
+ ### hasBackdrop
+<PropTable componentLink="BottomSheet" prop="hasBackdrop"/>
+ ### backdropColor
+<PropTable componentLink="BottomSheet" prop="backdropColor"/>
+ ### backdropOpacity
+<PropTable componentLink="BottomSheet" prop="backdropOpacity"/>
+ ### backdropTransitionInTiming
+<PropTable componentLink="BottomSheet" prop="backdropTransitionInTiming"/>
+ ### backdropTransitionOutTiming
+<PropTable componentLink="BottomSheet" prop="backdropTransitionOutTiming"/>
+ ### customBackdrop
+<PropTable componentLink="BottomSheet" prop="customBackdrop"/>
+ ### useNativeDriver
+<PropTable componentLink="BottomSheet" prop="useNativeDriver"/>
+ ### deviceHeight
+<PropTable componentLink="BottomSheet" prop="deviceHeight"/>
+ ### deviceWidth
+<PropTable componentLink="BottomSheet" prop="deviceWidth"/>
+ ### hideModalContentWhileAnimating
+<PropTable componentLink="BottomSheet" prop="hideModalContentWhileAnimating"/>
+ ### propagateSwipe
+<PropTable componentLink="BottomSheet" prop="propagateSwipe"/>
+ ### isVisible
+<PropTable componentLink="BottomSheet" prop="isVisible"/>
+ ### panResponderThreshold
+<PropTable componentLink="BottomSheet" prop="panResponderThreshold"/>
+ ### swipeThreshold
+<PropTable componentLink="BottomSheet" prop="swipeThreshold"/>
+ ### onModalShow
+<PropTable componentLink="BottomSheet" prop="onModalShow"/>
+ ### onModalWillShow
+<PropTable componentLink="BottomSheet" prop="onModalWillShow"/>
+ ### onModalHide
+<PropTable componentLink="BottomSheet" prop="onModalHide"/>
+ ### onModalWillHide
+<PropTable componentLink="BottomSheet" prop="onModalWillHide"/>
+ ### onBackdropPress
+<PropTable componentLink="BottomSheet" prop="onBackdropPress"/>
+ ### onBackButtonPress<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="BottomSheet" prop="onBackButtonPress"/>
+ ### scrollTo
+<PropTable componentLink="BottomSheet" prop="scrollTo"/>
+ ### scrollOffset
+<PropTable componentLink="BottomSheet" prop="scrollOffset"/>
+ ### scrollOffsetMax
+<PropTable componentLink="BottomSheet" prop="scrollOffsetMax"/>
+ ### scrollHorizontal
+<PropTable componentLink="BottomSheet" prop="scrollHorizontal"/>
+ ### statusBarTranslucent
+<PropTable componentLink="BottomSheet" prop="statusBarTranslucent"/>
+ ### supportedOrientations
+<PropTable componentLink="BottomSheet" prop="supportedOrientations"/>
+ ### actions
+<PropTable componentLink="BottomSheet" prop="actions"/>
+ ### children(required)
+<PropTable componentLink="BottomSheet" prop="children"/>
+ ### closeButtonProps
+<PropTable componentLink="BottomSheet" prop="closeButtonProps"/>
+ ### isOpen
+<PropTable componentLink="BottomSheet" prop="isOpen"/>
+ ### onOpen
+<PropTable componentLink="BottomSheet" prop="onOpen"/>
+ ### onOpened
+<PropTable componentLink="BottomSheet" prop="onOpened"/>
+ ### onClose
+<PropTable componentLink="BottomSheet" prop="onClose"/>
+ ### onClosed
+<PropTable componentLink="BottomSheet" prop="onClosed"/>
+ ### title
+<PropTable componentLink="BottomSheet" prop="title"/>
+ ### UNSAFE_style
+<PropTable componentLink="BottomSheet" prop="UNSAFE_style"/>
+ ### onResize
+<PropTable componentLink="BottomSheet" prop="onResize"/>
+ ### showCloseHandle
+<PropTable componentLink="BottomSheet" prop="showCloseHandle"/>
+ ### keyboardShouldPersistTaps
+<PropTable componentLink="BottomSheet" prop="keyboardShouldPersistTaps"/>
+ ### onDismiss<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>onClose</strong> instead.</span></span>
+<PropTable componentLink="BottomSheet" prop="onDismiss"/>
+ ### onBackPress<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="BottomSheet" prop="onBackPress"/>
+ ### minimumContentHeight<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="BottomSheet" prop="minimumContentHeight"/>
+ ### dismissAreaHeight<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="BottomSheet" prop="dismissAreaHeight"/>
+ ### dismissable<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="BottomSheet" prop="dismissable"/>
+ ### resizable<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="BottomSheet" prop="resizable"/>
+ ### size<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="BottomSheet" prop="size"/>
+ ### dismissingChangesOpacity<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="BottomSheet" prop="dismissingChangesOpacity"/>
+ ### visible<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>isOpen</strong> instead.</span></span>
+<PropTable componentLink="BottomSheet" prop="visible"/>
+ ### keyboardVerticalOffset<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="BottomSheet" prop="keyboardVerticalOffset"/>
+ ### hideCloseIcon
+<PropTable componentLink="BottomSheet" prop="hideCloseIcon"/>
+ ### hideHeader
+<PropTable componentLink="BottomSheet" prop="hideHeader"/>
+ ### childrenContainScrollableComponent
+<PropTable componentLink="BottomSheet" prop="childrenContainScrollableComponent"/>
+ ### innerScrollViewRef
+<PropTable componentLink="BottomSheet" prop="innerScrollViewRef"/>
+ ### withRNModal
+<PropTable componentLink="BottomSheet" prop="withRNModal"/>

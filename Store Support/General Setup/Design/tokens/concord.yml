@@ -1,0 +1,64 @@
+configuration:
+  runtime: "concord-v2"
+  processTimeout: "PT5H"
+  dependencies:
+  - mvn://com.walmartlabs.concord.plugins:looper-task:latest
+
+flows:
+  onPush:
+  - checkpoint: " CI build for Push Trigger "
+  - log: " branch :::   ${event.branch}"
+  - task: looper
+    in:
+      username: SVCLDUser # AD service account/User account
+      baseUrl: https://looperpro-cigateway.prod.walmart.com
+      apiToken: ${crypto.decryptString("u//veVWUTaHs2aBz0lu2lRMQBieFtGiTlZlETe5wBTp15pxeNAhnYbP9MNth3m+K")} # PAT for SVCLDUser. Encrypted on https://concord.prod.walmart.com/#/org/LivingDesign/project/living-design-web
+      jobName: LivingDesign/tokens
+      processId: ${txId}
+      processType: "concord"
+      call: default
+      suspend: true
+      branch: ${event.branch} # Event branch name
+    out: looperJob
+  - log: "looperJob Details :: ${looperJob.status}, url: ${looperJob.url} log: ${looperJob.log} ${looperJob.message} ${looperJob.scmEventsLog}"
+
+  onPr:
+  - checkpoint: " CI build for PR Trigger "
+  - set:
+      prBranch: ${event.payload.pull_request.head.ref}
+      sha: ${event.payload.pull_request.head.sha}
+      baseBranch: ${event.payload.pull_request.base.ref}
+      prNumber: ${event.payload.pull_request.number}
+  - log: "Pr branch: ${prBranch}, base branch: ${baseBranch}, Concord process: ${txId}"
+  - task: looper
+    in:
+      username: SVCLDUser  # AD service account 
+      baseUrl: https://looperpro-cigateway.prod.walmart.com # Do not change this
+      apiToken: ${crypto.decryptString("u//veVWUTaHs2aBz0lu2lRMQBieFtGiTlZlETe5wBTp15pxeNAhnYbP9MNth3m+K")}  # PAT for SVCLDUser. Encrypted on https://concord.prod.walmart.com/#/org/LivingDesign/project/living-design-web
+      jobName: LivingDesign/tokens # DX onboarding details page will give you your job name [Note : ACL is mandatory on dx ui for the user to trigger jobs]
+      commitHash: ${sha}
+      processId: ${txId}
+      processType: "concord"
+      prNumber: ${prNumber}
+      suspend: true
+      call: pr
+    out: looperJob
+  - log: "looperJob Details :: ${looperJob.status}, url: ${looperJob.url} log: ${looperJob.log} ${looperJob.message} ${looperJob.scmEventsLog}"
+
+triggers:
+  - github:
+      version: 2
+      entryPoint: "onPr"
+      conditions:
+        type: "pull_request"
+        status: "(opened|synchronize)"
+  - github:
+      version: 2
+      useInitiator: true
+      entryPoint: onPush
+      conditions:
+        type: push
+        branch: "main|next"
+        payload:
+          head_commit:
+            message: "(?s)^(?!.*(\\[skip-ci\\]|\\[skip ci\\])).*$"    #ignore commits with '[skip-ci]' or '[skip ci]' in the commit message

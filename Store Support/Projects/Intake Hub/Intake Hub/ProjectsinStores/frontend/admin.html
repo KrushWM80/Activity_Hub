@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Copilot Admin - Pending Fixes</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .auth-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .auth-box {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .auth-box h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .auth-box input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .auth-box input::placeholder { color: rgba(255,255,255,0.5); }
+        .auth-box button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #0071ce, #004c91);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .auth-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,113,206,0.4);
+        }
+        .auth-error {
+            background: rgba(220,53,69,0.2);
+            border: 1px solid #dc3545;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        /* Main Dashboard */
+        .dashboard { display: none; }
+        .dashboard.active { display: block; }
+        .auth-screen.hidden { display: none; }
+        
+        header {
+            background: rgba(0,0,0,0.3);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        header h1 { font-size: 22px; }
+        header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        header .logout-btn {
+            padding: 8px 16px;
+            background: rgba(220,53,69,0.3);
+            border: 1px solid #dc3545;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        header .logout-btn:hover { background: rgba(220,53,69,0.5); }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-card .label { font-size: 14px; color: rgba(255,255,255,0.7); }
+        .stat-card .value { font-size: 32px; font-weight: 700; margin-top: 5px; }
+        .stat-card.pending .value { color: #ffc107; }
+        .stat-card.approved .value { color: #28a745; }
+        .stat-card.denied .value { color: #dc3545; }
+        
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .fixes-list { display: flex; flex-direction: column; gap: 20px; }
+        
+        .fix-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+        .fix-header {
+            background: rgba(0,0,0,0.2);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .fix-header .fix-id { font-family: monospace; color: rgba(255,255,255,0.6); }
+        .fix-header .fix-priority {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .fix-priority.high { background: #dc3545; }
+        .fix-priority.medium { background: #ffc107; color: #000; }
+        .fix-priority.low { background: #28a745; }
+        
+        .fix-body { padding: 20px; }
+        .fix-body h3 { margin-bottom: 15px; font-size: 18px; }
+        
+        .fix-section {
+            margin-bottom: 20px;
+        }
+        .fix-section-title {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .fix-section-content {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .code-diff {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .code-diff .added { color: #4ec9b0; background: rgba(78,201,176,0.1); }
+        .code-diff .removed { color: #f14c4c; background: rgba(241,76,76,0.1); }
+        .code-diff .file-path { color: #569cd6; margin-bottom: 10px; display: block; }
+        
+        .fix-actions {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .fix-actions button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .fix-actions button:hover { transform: translateY(-1px); }
+        .fix-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-approve { background: linear-gradient(135deg, #28a745, #1e7e34); color: #fff; }
+        .btn-deny { background: linear-gradient(135deg, #dc3545, #a71d2a); color: #fff; }
+        .btn-hold { background: linear-gradient(135deg, #6c757d, #495057); color: #fff; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255,255,255,0.5);
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 15px; }
+        
+        /* History Section */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .history-table th, .history-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .history-table th {
+            background: rgba(0,0,0,0.2);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.7);
+        }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.approved { background: rgba(40,167,69,0.3); color: #28a745; }
+        .status-badge.denied { background: rgba(220,53,69,0.3); color: #dc3545; }
+        .status-badge.hold { background: rgba(108,117,125,0.3); color: #adb5bd; }
+        
+        /* Fix type badges */
+        .fix-type-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .fix-type-badge.auto {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: #fff;
+        }
+        .fix-type-badge.manual {
+            background: linear-gradient(135deg, #ffc107, #d39e00);
+            color: #000;
+        }
+        .manual-warning {
+            background: rgba(255,193,7,0.15);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .manual-warning h4 {
+            color: #ffc107;
+            margin: 0 0 8px 0;
+            font-size: 14px;
+        }
+        .manual-warning p {
+            color: rgba(255,255,255,0.8);
+            margin: 0;
+            font-size: 13px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 500;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #28a745; }
+        .toast.error { background: #dc3545; }
+        .toast.info { background: #0071ce; }
+        
+        .implementing-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .implementing-overlay.show { display: flex; }
+        .implementing-box {
+            background: #1a1a2e;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .implementing-box .spinner {
+            width: 50px; height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #0071ce;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Activity Log Styles */
+        .activity-section {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        .activity-log-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+        .activity-log-header {
+            background: rgba(0,0,0,0.2);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .activity-log-header h3 {
+            font-size: 16px;
+            margin: 0;
+        }
+        .activity-log-controls {
+            display: flex;
+            gap: 10px;
+        }
+        .activity-log-controls select,
+        .activity-log-controls button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            cursor: pointer;
+        }
+        .activity-log-controls button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .activity-log-body {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .activity-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .activity-item:hover {
+            background: rgba(255,255,255,0.03);
+        }
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .activity-icon.admin { background: rgba(0,113,206,0.3); }
+        .activity-icon.user { background: rgba(40,167,69,0.3); }
+        .activity-icon.api { background: rgba(255,193,7,0.3); }
+        .activity-icon.system { background: rgba(108,117,125,0.3); }
+        .activity-content {
+            flex: 1;
+        }
+        .activity-content .action {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .activity-content .details {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 3px;
+        }
+        .activity-content .user {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
+        }
+        .activity-time {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            white-space: nowrap;
+        }
+        
+        /* Active Users Sidebar */
+        .active-users-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+        .active-users-header {
+            background: rgba(0,0,0,0.2);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .active-users-header h3 {
+            font-size: 16px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .live-indicator {
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .active-users-body {
+            padding: 15px;
+        }
+        .user-count {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0,113,206,0.2);
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .user-count .number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #0071ce;
+        }
+        .user-count .label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #0071ce, #004c91);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .user-info {
+            flex: 1;
+        }
+        .user-info .name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .user-info .page {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+        .user-status {
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+        }
+        .no-users {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.2);
+            padding: 5px;
+            border-radius: 8px;
+            width: fit-content;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .tab-btn.active {
+            background: #0071ce;
+            color: #fff;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Email Reports Styles */
+        .reports-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .reports-stat-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #0071ce;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .reports-stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0071ce;
+        }
+
+        .reports-stat-label {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .reports-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .reports-card h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .reports-filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .reports-filter-group {
+            flex: 1;
+        }
+
+        .reports-filter-group label {
+            display: block;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .reports-filter-group input,
+        .reports-filter-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        .reports-filter-group input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .reports-filter-group input:focus,
+        .reports-filter-group select:focus {
+            outline: none;
+            border-color: #0071ce;
+            background: rgba(0,113,206,0.1);
+        }
+
+        .reports-table-container {
+            overflow-x: auto;
+        }
+
+        .reports-table-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reports-table-container th {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
+        }
+
+        .reports-table-container td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+        }
+
+        .reports-table-container tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .reports-status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .reports-status-active {
+            background: rgba(40,167,69,0.3);
+            color: #28a745;
+        }
+
+        .reports-status-paused {
+            background: rgba(255,193,7,0.3);
+            color: #ffc107;
+        }
+
+        .reports-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .reports-action-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reports-action-btn-view {
+            background: rgba(0,113,206,0.3);
+            color: #0071ce;
+        }
+
+        .reports-action-btn-edit {
+            background: rgba(255,193,7,0.3);
+            color: #ffc107;
+        }
+
+        .reports-action-btn-delete {
+            background: rgba(220,53,69,0.3);
+            color: #dc3545;
+        }
+
+        .reports-action-btn:hover {
+            opacity: 0.8;
+        }
+
+        .reports-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .reports-btn-primary {
+            background: linear-gradient(135deg, #0071ce, #004c91);
+            color: white;
+        }
+
+        .reports-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,113,206,0.4);
+        }
+
+        .reports-log-entry {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 4px solid rgba(255,255,255,0.2);
+        }
+
+        .reports-log-entry.success {
+            border-left-color: #28a745;
+            background: rgba(40,167,69,0.1);
+        }
+
+        .reports-log-entry.failed {
+            border-left-color: #dc3545;
+            background: rgba(220,53,69,0.1);
+        }
+
+        .reports-log-timestamp {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+        }
+
+        .reports-log-message {
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .reports-filter-section {
+                flex-direction: column;
+            }
+
+            .reports-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Modal Styles */
+        .reports-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reports-modal-overlay.active {
+            display: flex;
+        }
+
+        .reports-modal {
+            background: linear-gradient(135deg, #1a1d2e 0%, #2d3142 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .reports-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+
+        .reports-modal-title {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .reports-modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: rgba(255,255,255,0.6);
+            transition: all 0.2s ease;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reports-modal-close:hover {
+            color: #fff;
+        }
+
+        .reports-modal-section {
+            margin-bottom: 25px;
+        }
+
+        .reports-modal-section-title {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(0,113,206,0.8);
+        }
+
+        .reports-modal-field {
+            margin-bottom: 15px;
+        }
+
+        .reports-modal-label {
+            display: block;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .reports-modal-value {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            word-break: break-word;
+        }
+
+        .reports-modal-input,
+        .reports-modal-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .reports-modal-input:focus,
+        .reports-modal-textarea:focus {
+            outline: none;
+            border-color: #0071ce;
+            background: rgba(0,113,206,0.1);
+        }
+
+        .reports-modal-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .reports-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .reports-modal-action-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .reports-modal-action-save {
+            background: linear-gradient(135deg, #0071ce, #004c91);
+            color: white;
+        }
+
+        .reports-modal-action-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,113,206,0.4);
+        }
+
+        .reports-modal-action-cancel {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .reports-modal-action-cancel:hover {
+            background: rgba(255,255,255,0.15);
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Screen -->
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-box">
+            <h1>🔧 Copilot Admin</h1>
+            <div class="auth-error" id="authError">Invalid credentials</div>
+            <input type="text" id="adminUser" placeholder="Username" autocomplete="off">
+            <input type="password" id="adminPass" placeholder="Password">
+            <button onclick="login()">Sign In</button>
+            <p style="margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.5); text-align: center;">
+                Authorized administrators only
+            </p>
+        </div>
+    </div>
+    
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <header>
+            <h1>🔧 Copilot Admin - Fix Management</h1>
+            <div class="user-info">
+                <span id="currentUser">Admin</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </header>
+        
+        <div class="container">
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card pending">
+                    <div class="label">Pending Fixes</div>
+                    <div class="value" id="statPending">0</div>
+                </div>
+                <div class="stat-card approved">
+                    <div class="label">Approved (Implemented)</div>
+                    <div class="value" id="statApproved">0</div>
+                </div>
+                <div class="stat-card denied">
+                    <div class="label">Denied</div>
+                    <div class="value" id="statDenied">0</div>
+                </div>
+                <div class="stat-card" style="background: rgba(0,113,206,0.2);">
+                    <div class="label">Active Users</div>
+                    <div class="value" id="statActiveUsers" style="color: #0071ce;">0</div>
+                </div>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('fixes')">🔧 Fix Management</button>
+                <button class="tab-btn" onclick="switchTab('activity')">📋 Activity Log</button>
+                <button class="tab-btn" onclick="switchTab('reports')">📊 Email Reports</button>
+            </div>
+            
+            <!-- Fix Management Tab -->
+            <div class="tab-content active" id="tab-fixes">
+                <!-- Pending Fixes -->
+                <h2 class="section-title">⏳ Pending Fixes Awaiting Approval</h2>
+                <div class="fixes-list" id="pendingFixes">
+                    <div class="empty-state">
+                        <div class="icon">✅</div>
+                        <p>No pending fixes - all caught up!</p>
+                    </div>
+                </div>
+                
+                <!-- History -->
+                <h2 class="section-title" style="margin-top: 40px;">📜 Action History</h2>
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Issue</th>
+                            <th>Status</th>
+                            <th>Actioned By</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Activity Log Tab -->
+            <div class="tab-content" id="tab-activity">
+                <div class="activity-section">
+                    <!-- Activity Log -->
+                    <div class="activity-log-container">
+                        <div class="activity-log-header">
+                            <h3>📋 Activity Log</h3>
+                            <div class="activity-log-controls">
+                                <select id="activityFilter" onchange="filterActivity()">
+                                    <option value="all">All Activities</option>
+                                    <option value="admin">Admin Actions</option>
+                                    <option value="user">User Activity</option>
+                                    <option value="api">API Calls</option>
+                                    <option value="system">System Events</option>
+                                </select>
+                                <button onclick="refreshActivityLog()">🔄 Refresh</button>
+                                <button onclick="clearActivityLog()" style="background: rgba(220,53,69,0.3); border-color: #dc3545;">🗑️ Clear</button>
+                            </div>
+                        </div>
+                        <div class="activity-log-body" id="activityLogBody">
+                            <div class="empty-state">
+                                <div class="icon">📋</div>
+                                <p>No activities recorded yet</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Active Users Sidebar -->
+                    <div class="active-users-container">
+                        <div class="active-users-header">
+                            <h3><span class="live-indicator"></span> Active Users</h3>
+                        </div>
+                        <div class="active-users-body">
+                            <div class="user-count">
+                                <div class="number" id="activeUserCount">0</div>
+                                <div class="label">Users Online (Last 30 min)</div>
+                            </div>
+                            <div class="user-list" id="activeUsersList">
+                                <div class="no-users">No active users</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Reports Tab -->
+            <div class="tab-content" id="tab-reports">
+                <div class="reports-stats-grid">
+                    <div class="reports-stat-card">
+                        <div class="reports-stat-number" id="reportsTotal">-</div>
+                        <div class="reports-stat-label">Total Reports</div>
+                    </div>
+                    <div class="reports-stat-card">
+                        <div class="reports-stat-number" id="reportsActive">-</div>
+                        <div class="reports-stat-label">Active Reports</div>
+                    </div>
+                    <div class="reports-stat-card">
+                        <div class="reports-stat-number" id="reportsSent">-</div>
+                        <div class="reports-stat-label">Sent (24h)</div>
+                    </div>
+                    <div class="reports-stat-card">
+                        <div class="reports-stat-number" id="reportsFailed">-</div>
+                        <div class="reports-stat-label">Failed (24h)</div>
+                    </div>
+                </div>
+
+                <!-- Reports List -->
+                <div class="reports-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>📋 All Email Reports</h3>
+                        <button class="reports-btn reports-btn-primary" onclick="createNewReport()">+ New Report</button>
+                    </div>
+
+                    <div class="reports-filter-section">
+                        <div class="reports-filter-group" style="flex: 2;">
+                            <label>Search by name</label>
+                            <input type="text" id="searchReportsInput" placeholder="Type report name..." onkeyup="filterReportsTable()">
+                        </div>
+                        <div class="reports-filter-group">
+                            <label>Filter by status</label>
+                            <select id="statusFilterReports" onchange="filterReportsTable()">
+                                <option value="">All</option>
+                                <option value="active">Active</option>
+                                <option value="paused">Paused</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="reports-table-container">
+                        <table id="reportsTableAdmin">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Owner</th>
+                                    <th>Frequency</th>
+                                    <th>Status</th>
+                                    <th>Last Sent</th>
+                                    <th>Recipients</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsTableBodyAdmin">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 40px;">
+                                        <div class="spinner"></div>
+                                        Loading reports...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Execution Logs -->
+                <div class="reports-card" style="margin-top: 30px;">
+                    <h3>📝 Execution Logs</h3>
+
+                    <div class="reports-filter-section">
+                        <div class="reports-filter-group" style="flex: 2;">
+                            <label>Filter by report</label>
+                            <select id="logReportFilterAdmin" onchange="filterReportsLogs()">
+                                <option value="">All Reports</option>
+                            </select>
+                        </div>
+                        <div class="reports-filter-group">
+                            <label>Filter by status</label>
+                            <select id="logStatusFilterAdmin" onchange="filterReportsLogs()">
+                                <option value="">All</option>
+                                <option value="success">Success</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="logsContainerAdmin" style="max-height: 600px; overflow-y: auto;">
+                        <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">Loading logs...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Edit Modal -->
+    <div class="reports-modal-overlay" id="reportEditModal">
+        <div class="reports-modal">
+            <div class="reports-modal-header">
+                <h2 class="reports-modal-title" id="modalTitle">View Report</h2>
+                <button class="reports-modal-close" onclick="closeReportModal()">×</button>
+            </div>
+
+            <div class="reports-modal-section">
+                <div class="reports-modal-section-title">Configuration</div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">Report Name</label>
+                    <input type="text" class="reports-modal-input" id="modalReportName" placeholder="Enter report name">
+                </div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">Owner Email</label>
+                    <div class="reports-modal-value" id="modalOwnerEmail">-</div>
+                </div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">Status</label>
+                    <select class="reports-modal-input" id="modalReportStatus">
+                        <option value="active">Active</option>
+                        <option value="paused">Paused</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="reports-modal-section">
+                <div class="reports-modal-section-title">Schedule</div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">Frequency</label>
+                    <div class="reports-modal-value" id="modalFrequency">-</div>
+                </div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">Delivery Time</label>
+                    <div class="reports-modal-value" id="modalDeliveryTime">-</div>
+                </div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">Last Sent</label>
+                    <div class="reports-modal-value" id="modalLastSent">-</div>
+                </div>
+            </div>
+
+            <div class="reports-modal-section">
+                <div class="reports-modal-section-title">Recipients</div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">Primary Email</label>
+                    <div class="reports-modal-value" id="modalPrimaryEmail">-</div>
+                </div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">CC Emails (comma-separated)</label>
+                    <input type="text" class="reports-modal-input" id="modalCCEmails" placeholder="email1@example.com, email2@example.com">
+                </div>
+            </div>
+
+            <div class="reports-modal-section">
+                <div class="reports-modal-section-title">Content Details</div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">Report Format</label>
+                    <div class="reports-modal-value" id="modalReportFormat">-</div>
+                </div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">Selected Content Types</label>
+                    <div class="reports-modal-value" id="modalContentTypes">-</div>
+                </div>
+                <div class="reports-modal-field">
+                    <label class="reports-modal-label">Selected Timeframes</label>
+                    <div class="reports-modal-value" id="modalTimeframes">-</div>
+                </div>
+            </div>
+
+            <div class="reports-modal-actions">
+                <button class="reports-modal-action-btn reports-modal-action-save" onclick="saveReportChanges()">Save Changes</button>
+                <button class="reports-modal-action-btn reports-modal-action-cancel" onclick="closeReportModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Implementing Overlay -->
+    <div class="implementing-overlay" id="implementingOverlay">
+        <div class="implementing-box">
+            <div class="spinner"></div>
+            <h3>Implementing Fix...</h3>
+            <p style="margin-top: 10px; color: rgba(255,255,255,0.7);">Applying code changes and restarting server</p>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        const API_BASE = window.location.origin;
+        
+        // Authorized admins (in production, this would be server-side)
+        const AUTHORIZED_ADMINS = {
+            'kendall.rush': 'admin2026',
+            'admin': 'copilot123'
+        };
+        
+        let currentUser = null;
+        let activityData = [];
+        let activeUsersInterval = null;
+        
+        function login() {
+            const user = document.getElementById('adminUser').value.trim();
+            const pass = document.getElementById('adminPass').value;
+            
+            if (AUTHORIZED_ADMINS[user] && AUTHORIZED_ADMINS[user] === pass) {
+                currentUser = user;
+                sessionStorage.setItem('adminUser', user);
+                localStorage.setItem('reportUser', user);
+                document.getElementById('authScreen').classList.add('hidden');
+                document.getElementById('dashboard').classList.add('active');
+                document.getElementById('currentUser').textContent = user.includes('@') ? user : user + '@walmart.com';
+                loadDashboard();
+                // Log login activity
+                logActivity('Admin Login', currentUser, 'Logged into admin dashboard', 'admin');
+                // Start tracking active users
+                trackAdminUser();
+                activeUsersInterval = setInterval(trackAdminUser, 60000); // Every minute
+            } else {
+                document.getElementById('authError').style.display = 'block';
+            }
+        }
+        
+        function logout() {
+            if (activeUsersInterval) clearInterval(activeUsersInterval);
+            sessionStorage.removeItem('adminUser');
+            currentUser = null;
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('adminUser').value = '';
+            document.getElementById('adminPass').value = '';
+        }
+        
+        function checkAuth() {
+            const user = sessionStorage.getItem('adminUser');
+            if (user && AUTHORIZED_ADMINS[user]) {
+                currentUser = user;
+                sessionStorage.setItem('adminUser', user);
+                localStorage.setItem('reportUser', user);
+                document.getElementById('authScreen').classList.add('hidden');
+                document.getElementById('dashboard').classList.add('active');
+                document.getElementById('currentUser').textContent = user.includes('@') ? user : user + '@walmart.com';
+                loadDashboard();
+                trackAdminUser();
+                activeUsersInterval = setInterval(trackAdminUser, 60000);
+            }
+        }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            if (tabName === 'activity') {
+                loadActivityLog();
+                loadActiveUsers();
+            } else if (tabName === 'reports') {
+                loadReportsData();
+                loadReportsLogs();
+            }
+        }
+        
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/fixes`);
+                const data = await response.json();
+                
+                // Update stats
+                document.getElementById('statPending').textContent = data.fixes?.length || 0;
+                document.getElementById('statApproved').textContent = 
+                    data.history?.filter(h => h.status === 'approved').length || 0;
+                document.getElementById('statDenied').textContent = 
+                    data.history?.filter(h => h.status === 'denied').length || 0;
+                
+                // Render pending fixes
+                renderPendingFixes(data.fixes || []);
+                
+                // Render history
+                renderHistory(data.history || []);
+                
+                // Load active users count
+                loadActiveUsers();
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showToast('Error loading fixes', 'error');
+            }
+        }
+        
+        // Activity Log Functions
+        async function loadActivityLog() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/activity-log?limit=100`);
+                const data = await response.json();
+                activityData = data.activities || [];
+                renderActivityLog(activityData);
+            } catch (error) {
+                console.error('Error loading activity log:', error);
+            }
+        }
+        
+        async function logActivity(action, user, details, category) {
+            try {
+                await fetch(`${API_BASE}/api/admin/activity-log`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, user, details, category })
+                });
+            } catch (error) {
+                console.error('Error logging activity:', error);
+            }
+        }
+        
+        function filterActivity() {
+            const filter = document.getElementById('activityFilter').value;
+            const filtered = filter === 'all' 
+                ? activityData 
+                : activityData.filter(a => a.category === filter);
+            renderActivityLog(filtered);
+        }
+        
+        function renderActivityLog(activities) {
+            const container = document.getElementById('activityLogBody');
+            
+            if (!activities || activities.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📋</div>
+                        <p>No activities recorded yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = activities.map(activity => {
+                const icon = getActivityIcon(activity.category);
+                const timeAgo = getTimeAgo(activity.timestamp);
+                
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon ${activity.category}">${icon}</div>
+                        <div class="activity-content">
+                            <div class="action">${escapeHtml(activity.action)}</div>
+                            ${activity.details ? `<div class="details">${escapeHtml(activity.details)}</div>` : ''}
+                            <div class="user">👤 ${escapeHtml(activity.user)}</div>
+                        </div>
+                        <div class="activity-time">${timeAgo}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getActivityIcon(category) {
+            const icons = {
+                'admin': '🔧',
+                'user': '👤',
+                'api': '🔌',
+                'system': '⚙️',
+                'general': '📌'
+            };
+            return icons[category] || '📌';
+        }
+        
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const time = new Date(timestamp);
+            const diff = Math.floor((now - time) / 1000);
+            
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+            return time.toLocaleDateString();
+        }
+        
+        async function refreshActivityLog() {
+            await loadActivityLog();
+            showToast('Activity log refreshed', 'info');
+        }
+        
+        async function clearActivityLog() {
+            if (!confirm('Clear all activity log entries?')) return;
+            
+            try {
+                await fetch(`${API_BASE}/api/admin/activity-log`, { method: 'DELETE' });
+                activityData = [];
+                renderActivityLog([]);
+                showToast('Activity log cleared', 'success');
+            } catch (error) {
+                showToast('Error clearing log', 'error');
+            }
+        }
+        
+        // Active Users Functions
+        async function loadActiveUsers() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/active-users`);
+                const data = await response.json();
+                
+                const count = data.count || 0;
+                document.getElementById('statActiveUsers').textContent = count;
+                document.getElementById('activeUserCount').textContent = count;
+                
+                renderActiveUsers(data.users || {});
+            } catch (error) {
+                console.error('Error loading active users:', error);
+            }
+        }
+        
+        function renderActiveUsers(users) {
+            const container = document.getElementById('activeUsersList');
+            const userList = Object.entries(users);
+            
+            if (userList.length === 0) {
+                container.innerHTML = '<div class="no-users">No active users</div>';
+                return;
+            }
+            
+            container.innerHTML = userList.map(([userId, info]) => {
+                const initials = userId.split('.').map(n => n[0]?.toUpperCase() || '').join('').slice(0, 2);
+                return `
+                    <div class="user-item">
+                        <div class="user-avatar">${initials || '?'}</div>
+                        <div class="user-info">
+                            <div class="name">${escapeHtml(userId)}</div>
+                            <div class="page">📄 ${escapeHtml(info.page || 'Unknown')}</div>
+                        </div>
+                        <div class="user-status"></div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        async function trackAdminUser() {
+            if (!currentUser) return;
+            try {
+                await fetch(`${API_BASE}/api/admin/track-user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUser, page: 'Admin Dashboard' })
+                });
+            } catch (error) {
+                console.error('Error tracking user:', error);
+            }
+        }
+        
+        function renderPendingFixes(fixes) {
+            const container = document.getElementById('pendingFixes');
+            
+            if (!fixes || fixes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">✅</div>
+                        <p>No pending fixes - all caught up!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = fixes.map(fix => {
+                const hasCodeFix = fix.code_changes && fix.code_changes.old_code && fix.code_changes.new_code;
+                const fixType = hasCodeFix ? 'auto' : 'manual';
+                const fixTypeLabel = hasCodeFix ? '🚀 AUTO-FIX READY' : '🛠️ MANUAL IMPLEMENTATION';
+                
+                return `
+                <div class="fix-card" id="fix-${fix.id}">
+                    <div class="fix-header">
+                        <span class="fix-id">FIX-${fix.id}
+                            <span class="fix-type-badge ${fixType}">${fixTypeLabel}</span>
+                            ${fix.requires_ai_review ? ' <span style="color: #ffc107; font-size: 11px;">⚠️ NEEDS AI REVIEW</span>' : ''}
+                        </span>
+                        <span class="fix-priority ${fix.priority || 'medium'}">${(fix.priority || 'medium').toUpperCase()}</span>
+                    </div>
+                    <div class="fix-body">
+                        <h3>${escapeHtml(fix.title)}</h3>
+                        
+                        <div class="fix-section">
+                            <div class="fix-section-title">📝 User Feedback</div>
+                            <div class="fix-section-content">${escapeHtml(fix.feedback_comments)}</div>
+                        </div>
+                        
+                        ${fix.investigation_notes && fix.investigation_notes.length > 0 ? `
+                        <div class="fix-section">
+                            <div class="fix-section-title">🔬 Investigation Notes</div>
+                            <div class="fix-section-content">
+                                <ul style="margin: 0; padding-left: 20px;">
+                                    ${fix.investigation_notes.map(note => `<li>${escapeHtml(note)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${fix.files_analyzed && fix.files_analyzed.length > 0 ? `
+                        <div class="fix-section">
+                            <div class="fix-section-title">📁 Files Analyzed</div>
+                            <div class="fix-section-content" style="font-family: monospace; font-size: 13px;">
+                                ${fix.files_analyzed.map(f => `<span style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px; margin-right: 8px;">${escapeHtml(f)}</span>`).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="fix-section">
+                            <div class="fix-section-title">🔍 Root Cause Analysis</div>
+                            <div class="fix-section-content" style="white-space: pre-wrap;">${escapeHtml(fix.root_cause)}</div>
+                        </div>
+                        
+                        <div class="fix-section">
+                            <div class="fix-section-title">💡 Proposed Resolution</div>
+                            <div class="fix-section-content" style="white-space: pre-wrap;">${escapeHtml(fix.resolution)}</div>
+                        </div>
+                        
+                        ${fix.code_changes && fix.code_changes.old_code && fix.code_changes.new_code ? `
+                        <div class="fix-section">
+                            <div class="fix-section-title">📄 Code Changes (AUTO-APPLY) ${fix.code_changes.description ? `<span style="font-weight: normal; color: rgba(255,255,255,0.6);">- ${escapeHtml(fix.code_changes.description)}</span>` : ''}</div>
+                            <div class="code-diff">
+                                <span class="file-path">${escapeHtml(fix.code_changes.file)}</span>
+${formatCodeDiff(fix.code_changes)}
+                            </div>
+                        </div>
+                        ` : `
+                        <div class="fix-section">
+                            <div class="manual-warning">
+                                <h4>⚠️ Manual Implementation Required</h4>
+                                <p>This issue requires manual code changes. The analysis above describes the problem and suggested resolution.</p>
+                                <p style="margin-top: 10px;"><strong>To implement:</strong> Ask Sparky/Copilot to implement this fix using the root cause analysis and resolution above, or forward to development team.</p>
+                            </div>
+                        </div>
+                        `}
+                        
+                        <div class="fix-section">
+                            <div class="fix-section-title">📅 Submitted</div>
+                            <div class="fix-section-content">${fix.timestamp}</div>
+                        </div>
+                    </div>
+                    <div class="fix-actions">
+                        ${hasCodeFix ? `
+                        <button class="btn-approve" onclick="approveFix('${fix.id}')">✅ Approve & Auto-Implement</button>
+                        ` : `
+                        <button class="btn-approve" onclick="approveFix('${fix.id}')" title="Mark as acknowledged - requires manual implementation">✅ Acknowledge Issue</button>
+                        `}
+                        <button class="btn-deny" onclick="denyFix('${fix.id}')">❌ Deny</button>
+                        <button class="btn-hold" onclick="holdFix('${fix.id}')">🔄 Hold for Later</button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+        
+        function formatCodeDiff(changes) {
+            if (!changes) return '';
+            let html = '';
+            if (changes.old_code) {
+                html += `<span class="removed">- ${escapeHtml(changes.old_code)}</span>\n`;
+            }
+            if (changes.new_code) {
+                html += `<span class="added">+ ${escapeHtml(changes.new_code)}</span>`;
+            }
+            return html;
+        }
+        
+        function renderHistory(history) {
+            const tbody = document.getElementById('historyBody');
+            
+            if (!history || history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: rgba(255,255,255,0.5);">No history yet</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = history.slice().reverse().map(item => `
+                <tr>
+                    <td>${item.actioned_at || item.timestamp}</td>
+                    <td>${escapeHtml(item.title)}</td>
+                    <td><span class="status-badge ${item.status}">${item.status.toUpperCase()}</span></td>
+                    <td>${escapeHtml(item.actioned_by || 'System')}</td>
+                </tr>
+            `).join('');
+        }
+        
+        async function approveFix(fixId) {
+            // Check if this fix has auto-apply code changes
+            const fixCard = document.getElementById(`fix-${fixId}`);
+            const isAutoFix = fixCard && fixCard.querySelector('.fix-type-badge.auto');
+            
+            const confirmMsg = isAutoFix 
+                ? 'Approve and AUTO-IMPLEMENT this fix?\n\nThe code will be modified automatically.'
+                : 'Acknowledge this issue?\n\nThis issue requires MANUAL implementation. Approving will move it to history as "acknowledged" but no code changes will be made.\n\nUse the analysis above to implement the fix manually or forward to the development team.';
+            
+            if (!confirm(confirmMsg)) return;
+            
+            document.getElementById('implementingOverlay').classList.add('show');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/fixes/${fixId}/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ admin_user: currentUser })
+                });
+                
+                const result = await response.json();
+                
+                document.getElementById('implementingOverlay').classList.remove('show');
+                
+                if (result.success) {
+                    showToast('Fix approved and implemented!', 'success');
+                    loadDashboard();
+                } else {
+                    showToast(result.error || 'Failed to implement fix', 'error');
+                }
+            } catch (error) {
+                document.getElementById('implementingOverlay').classList.remove('show');
+                showToast('Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function denyFix(fixId) {
+            if (!confirm('Deny this fix? It will be moved to history.')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/fixes/${fixId}/deny`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ admin_user: currentUser })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('Fix denied', 'info');
+                    loadDashboard();
+                } else {
+                    showToast(result.error || 'Failed to deny fix', 'error');
+                }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function holdFix(fixId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/fixes/${fixId}/hold`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ admin_user: currentUser })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('Fix placed on hold', 'info');
+                    loadDashboard();
+                } else {
+                    showToast(result.error || 'Failed to hold fix', 'error');
+                }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ==================== EMAIL REPORTS FUNCTIONS ====================
+        let allReportsData = [];
+        let allReportsLogs = [];
+        const REPORTS_API_BASE = window.location.origin + '/api/reports';
+
+        async function loadReportsData() {
+            try {
+                // Admin view - load ALL reports (no user_id filter)
+                const resp = await fetch(`${REPORTS_API_BASE}/configs`, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await resp.json();
+                allReportsData = data.configs || data || [];
+
+                // Update stats
+                const activeCount = allReportsData.filter(r => r.is_active).length;
+                document.getElementById('reportsTotal').textContent = allReportsData.length;
+                document.getElementById('reportsActive').textContent = activeCount;
+
+                renderReportsTable(allReportsData);
+            } catch (error) {
+                console.error('Error loading reports:', error);
+                document.getElementById('reportsTableBodyAdmin').innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #999; padding: 40px;">
+                            Error loading reports
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function renderReportsTable(reports) {
+            if (reports.length === 0) {
+                document.getElementById('reportsTableBodyAdmin').innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">
+                            No reports found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const html = reports.map(report => `
+                <tr>
+                    <td><strong>${escapeHtml(report.report_name)}</strong></td>
+                    <td>${escapeHtml(report.primary_email)}</td>
+                    <td>${report.frequency}</td>
+                    <td>
+                        <span class="reports-status-badge ${report.is_active ? 'reports-status-active' : 'reports-status-paused'}">
+                            ${report.is_active ? 'Active' : 'Paused'}
+                        </span>
+                    </td>
+                    <td>${report.last_sent ? new Date(report.last_sent).toLocaleDateString() : 'Never'}</td>
+                    <td>${escapeHtml(report.primary_email)}${report.cc_emails && report.cc_emails.length > 0 ? ' +' + report.cc_emails.length : ''}</td>
+                    <td>
+                        <div class="reports-actions">
+                            <button class="reports-action-btn reports-action-btn-view" onclick="openReportModal('${report.config_id}', 'view')">View</button>
+                            <button class="reports-action-btn reports-action-btn-edit" onclick="openReportModal('${report.config_id}', 'edit')">Edit</button>
+                            <button class="reports-action-btn reports-action-btn-delete" onclick="deleteReportAdmin('${report.config_id}')">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.getElementById('reportsTableBodyAdmin').innerHTML = html;
+        }
+
+        function filterReportsTable() {
+            const searchTerm = document.getElementById('searchReportsInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilterReports').value;
+
+            const filtered = allReportsData.filter(report => {
+                const matchesSearch = report.report_name.toLowerCase().includes(searchTerm);
+                const matchesStatus = !statusFilter || (statusFilter === 'active' ? report.is_active : !report.is_active);
+                return matchesSearch && matchesStatus;
+            });
+
+            renderReportsTable(filtered);
+        }
+
+        async function loadReportsLogs() {
+            try {
+                const resp = await fetch(`${REPORTS_API_BASE}/logs`);
+                allReportsLogs = await resp.json();
+
+                const now = new Date();
+                const day24hAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                const successCount = allReportsLogs.filter(l => l.status === 'success' && new Date(l.timestamp) > day24hAgo).length;
+                const failedCount = allReportsLogs.filter(l => l.status === 'failed' && new Date(l.timestamp) > day24hAgo).length;
+
+                document.getElementById('reportsSent').textContent = successCount;
+                document.getElementById('reportsFailed').textContent = failedCount;
+
+                // Populate report filter
+                const reportNames = [...new Set(allReportsLogs.map(l => l.report_name))];
+                const filterHtml = reportNames.map(name => `<option value="${name}">${escapeHtml(name)}</option>`).join('');
+                document.getElementById('logReportFilterAdmin').innerHTML = '<option value="">All Reports</option>' + filterHtml;
+
+                renderReportsLogs(allReportsLogs);
+            } catch (error) {
+                console.error('Error loading logs:', error);
+                document.getElementById('logsContainerAdmin').innerHTML = `
+                    <div style="text-align: center; color: #999; padding: 40px;">
+                        Error loading logs
+                    </div>
+                `;
+            }
+        }
+
+        function renderReportsLogs(logs) {
+            if (logs.length === 0) {
+                document.getElementById('logsContainerAdmin').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5);">
+                        📭 No execution logs found
+                    </div>
+                `;
+                return;
+            }
+
+            const html = logs.map(log => `
+                <div class="reports-log-entry ${log.status}">
+                    <div class="reports-log-timestamp">${new Date(log.timestamp).toLocaleString()}</div>
+                    <div class="reports-log-message">
+                        <strong>${escapeHtml(log.report_name)}</strong> - ${log.status === 'success' ? '✓ Sent successfully' : '✗ Failed'}
+                    </div>
+                    ${log.recipients ? `<div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 5px;">📧 Recipients: ${escapeHtml(log.recipients)}</div>` : ''}
+                    ${log.error_message ? `<div style="font-size: 12px; color: #ff6b6b; margin-top: 5px;">⚠️ Error: ${escapeHtml(log.error_message)}</div>` : ''}
+                </div>
+            `).join('');
+
+            document.getElementById('logsContainerAdmin').innerHTML = html;
+        }
+
+        function filterReportsLogs() {
+            const reportFilter = document.getElementById('logReportFilterAdmin').value;
+            const statusFilter = document.getElementById('logStatusFilterAdmin').value;
+
+            const filtered = allReportsLogs.filter(log => {
+                const matchesReport = !reportFilter || log.report_name === reportFilter;
+                const matchesStatus = !statusFilter || log.status === statusFilter;
+                return matchesReport && matchesStatus;
+            });
+
+            renderReportsLogs(filtered);
+        }
+
+        async function deleteReportAdmin(configId) {
+            if (!confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const resp = await fetch(`${REPORTS_API_BASE}/configs/${configId}`, {
+                    method: 'DELETE'
+                });
+
+                if (resp.ok) {
+                    showToast('Report deleted successfully', 'success');
+                    loadReportsData();
+                    loadReportsLogs();
+                } else {
+                    showToast('Error deleting report', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting report:', error);
+                showToast('Error deleting report', 'error');
+            }
+        }
+
+        function viewReportDetailAdmin(configId) {
+            const report = allReportsData.find(r => r.config_id === configId);
+            if (!report) return;
+
+            const detailsHtml = `
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #fff; margin-bottom: 10px;">📋 Configuration</h4>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 13px;"><strong>Name:</strong> ${escapeHtml(report.report_name)}</p>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 13px;"><strong>Owner:</strong> ${escapeHtml(report.primary_email)}</p>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 13px;"><strong>Frequency:</strong> ${report.frequency}</p>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 13px;"><strong>Time:</strong> ${report.delivery_time}</p>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 13px;"><strong>Status:</strong> <span class="reports-status-badge ${report.is_active ? 'reports-status-active' : 'reports-status-paused'}">${report.is_active ? 'Active' : 'Paused'}</span></p>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #fff; margin-bottom: 10px;">📧 Recipients</h4>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 13px;"><strong>Primary:</strong> ${escapeHtml(report.primary_email)}</p>
+                    ${report.cc_emails && report.cc_emails.length > 0 ? `
+                        <p style="color: rgba(255,255,255,0.8); font-size: 13px;"><strong>CC:</strong> ${escapeHtml(report.cc_emails.join(', '))}</p>
+                    ` : ''}
+                </div>
+
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #fff; margin-bottom: 10px;">📊 Content</h4>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 13px;"><strong>Report Details:</strong> ${report.content_types ? report.content_types.length + ' items' : 'Not configured'}</p>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 13px;"><strong>Format:</strong> ${report.report_format}</p>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 13px;"><strong>Last Sent:</strong> ${report.last_sent ? new Date(report.last_sent).toLocaleString() : 'Never'}</p>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button class="reports-btn reports-btn-primary" onclick="editReport('${report.config_id}')">Edit Report</button>
+                    <button class="reports-btn reports-btn-primary" onclick="testReportAdmin('${report.config_id}')">Send Test</button>
+                    <button style="background: rgba(220,53,69,0.3); color: #dc3545; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px;" onclick="deleteReportAdmin('${report.config_id}')">Delete</button>
+                </div>
+            `;
+
+            alert(
+                report.report_name + '\n\n' +
+                'Owner: ' + report.primary_email + '\n' +
+                'Frequency: ' + report.frequency + '\n' +
+                'Status: ' + (report.is_active ? 'Active' : 'Paused') + '\n' +
+                'Last Sent: ' + (report.last_sent ? new Date(report.last_sent).toLocaleString() : 'Never') + '\n\n' +
+                'Use Edit button to make changes or Delete to remove this report.'
+            );
+        }
+
+        async function testReportAdmin(configId) {
+            try {
+                // Get current admin user email from sessionStorage
+                const currentUserEmail = sessionStorage.getItem('adminUser') || localStorage.getItem('userEmail');
+                
+                const resp = await fetch(`${REPORTS_API_BASE}/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        config_id: configId,
+                        current_user_email: currentUserEmail
+                    })
+                });
+
+                if (resp.ok) {
+                    showToast('Test report sent successfully', 'success');
+                    loadReportsLogs();
+                } else {
+                    showToast('Error sending test report', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending test report:', error);
+                showToast('Error sending test report', 'error');
+            }
+        }
+
+        function createNewReport() {
+            const user = currentUser || 'admin';
+            location.href = `reports.html?user_id=${user}`;
+        }
+
+        function editReport(configId) {
+            const user = currentUser || 'admin';
+            location.href = `reports.html?edit=${configId}&user_id=${user}`;
+        }
+
+        // Modal functions
+        let currentEditingReport = null;
+
+        function openReportModal(configId, mode) {
+            const report = allReportsData.find(r => r.config_id === configId);
+            if (!report) return;
+
+            currentEditingReport = report;
+            const isEditMode = mode === 'edit';
+
+            // Set title
+            document.getElementById('modalTitle').textContent = isEditMode ? 'Edit Report' : 'View Report';
+
+            // Populate fields
+            document.getElementById('modalReportName').value = report.report_name;
+            document.getElementById('modalOwnerEmail').textContent = report.primary_email;
+            document.getElementById('modalReportStatus').value = report.is_active ? 'active' : 'paused';
+            document.getElementById('modalFrequency').textContent = report.frequency || '-';
+            document.getElementById('modalDeliveryTime').textContent = report.delivery_time || '-';
+            document.getElementById('modalLastSent').textContent = report.last_sent ? new Date(report.last_sent).toLocaleString() : 'Never';
+            document.getElementById('modalPrimaryEmail').textContent = report.primary_email;
+            document.getElementById('modalCCEmails').value = report.cc_emails ? report.cc_emails.join(', ') : '';
+            document.getElementById('modalReportFormat').textContent = report.report_format || '-';
+            document.getElementById('modalContentTypes').textContent = report.content_types ? report.content_types.join(', ') : '-';
+            document.getElementById('modalTimeframes').textContent = report.timeframes ? report.timeframes.join(', ') : '-';
+
+            // Disable/enable fields based on mode
+            const editableFields = ['modalReportName', 'modalReportStatus', 'modalCCEmails'];
+            editableFields.forEach(fieldId => {
+                document.getElementById(fieldId).disabled = !isEditMode;
+            });
+
+            // Show/hide save button
+            document.querySelector('.reports-modal-action-save').style.display = isEditMode ? 'block' : 'none';
+
+            // Show modal
+            document.getElementById('reportEditModal').classList.add('active');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportEditModal').classList.remove('active');
+            currentEditingReport = null;
+        }
+
+        async function saveReportChanges() {
+            if (!currentEditingReport) return;
+
+            try {
+                const ccEmailsText = document.getElementById('modalCCEmails').value.trim();
+                const ccEmails = ccEmailsText ? ccEmailsText.split(',').map(e => e.trim()) : [];
+
+                const updatedConfig = {
+                    ...currentEditingReport,
+                    report_name: document.getElementById('modalReportName').value,
+                    is_active: document.getElementById('modalReportStatus').value === 'active',
+                    cc_emails: ccEmails,
+                    updated_at: new Date().toISOString()
+                };
+
+                const resp = await fetch(`${REPORTS_API_BASE}/configs/${currentEditingReport.config_id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedConfig)
+                });
+
+                if (resp.ok) {
+                    showToast('Report updated successfully', 'success');
+                    closeReportModal();
+                    loadReportsData();
+                    loadReportsLogs();
+                } else {
+                    const errData = await resp.json().catch(() => ({}));
+                    showToast(errData.detail || 'Error updating report', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving report:', error);
+                showToast('Error saving report', 'error');
+            }
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeReportModal();
+            }
+        });
+
+        // Close modal on overlay click
+        document.getElementById('reportEditModal').addEventListener('click', (e) => {
+            if (e.target.id === 'reportEditModal') {
+                closeReportModal();
+            }
+        });
+        // ==================== END EMAIL REPORTS FUNCTIONS ====================
+        
+        // Check auth on load
+        document.addEventListener('DOMContentLoaded', checkAuth);
+        
+        // Enter key to login
+        document.getElementById('adminPass').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+    </script>
+</body>
+</html>

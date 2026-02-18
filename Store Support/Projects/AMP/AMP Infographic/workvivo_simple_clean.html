@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winter Health - WorkVivo Infographic</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Arial Black', Arial, sans-serif;
+        }
+
+        .infographic {
+            width: 1080px;
+            background: linear-gradient(180deg, #a8d8f0 0%, #b8e0f5 100%);
+            border-radius: 40px;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        /* Holiday lights decoration */
+        .lights {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background-image: 
+                radial-gradient(circle at 10% 50%, #FFC220 15px, transparent 15px),
+                radial-gradient(circle at 20% 60%, #0071CE 18px, transparent 18px),
+                radial-gradient(circle at 30% 45%, #FF6B6B 16px, transparent 16px),
+                radial-gradient(circle at 40% 55%, #FFC220 17px, transparent 17px),
+                radial-gradient(circle at 50% 50%, #4ECDC4 15px, transparent 15px),
+                radial-gradient(circle at 60% 58%, #0071CE 18px, transparent 18px),
+                radial-gradient(circle at 70% 47%, #FF6B6B 16px, transparent 16px),
+                radial-gradient(circle at 80% 55%, #FFC220 17px, transparent 17px),
+                radial-gradient(circle at 90% 50%, #0071CE 15px, transparent 15px);
+        }
+
+        .lights::before {
+            content: '';
+            position: absolute;
+            top: 35px;
+            left: 50px;
+            right: 50px;
+            height: 3px;
+            background: #2d5016;
+            z-index: 1;
+        }
+
+        /* Section headers */
+        .section-labels {
+            display: flex;
+            justify-content: space-between;
+            margin: 120px 0 40px 0;
+            padding: 0 20px;
+        }
+
+        .section-label {
+            font-size: 42px;
+            font-weight: 900;
+            color: #003d82;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .section-label::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 4px;
+            background: #003d82;
+            margin-top: 10px;
+        }
+
+        /* Three boxes container */
+        .boxes-container {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        /* Individual box */
+        .info-box {
+            flex: 1;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .box-header {
+            background: #0071CE;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .box-header .walmart-text {
+            color: white;
+            font-size: 48px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .box-content {
+            background: #003d82;
+            padding: 40px 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .box-title {
+            color: white;
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .box-subtitle {
+            color: white;
+            font-size: 44px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .box-date {
+            background: #0071CE;
+            color: white;
+            padding: 20px 30px;
+            font-size: 42px;
+            font-weight: 900;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .box-date.highlight {
+            background: #FFC220;
+            color: #003d82;
+        }
+
+        /* Icon styling */
+        .box-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        /* Bottom text */
+        .bottom-text {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .walmart-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 52px;
+            color: #0071CE;
+            font-weight: 900;
+        }
+
+        .walmart-logo .spark {
+            color: #FFC220;
+            font-size: 60px;
+        }
+
+        .bottom-message {
+            font-size: 44px;
+            color: #003d82;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* Print optimization */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .infographic {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="infographic">
+        <!-- Holiday lights decoration -->
+        <div class="lights"></div>
+
+        <!-- Section labels -->
+        <div class="section-labels">
+            <div class="section-label">VACCINE<br>ACCESS</div>
+            <div class="section-label">IMMUNIZATION<br>EVENTS</div>
+            <div class="section-label">STAY<br>HEALTHY</div>
+        </div>
+
+        <!-- Three info boxes -->
+        <div class="boxes-container">
+            <!-- Box 1 -->
+            <div class="info-box">
+                <div class="box-header">
+                    <div class="walmart-text">Walmart</div>
+                </div>
+                <div class="box-content">
+                    <div class="box-icon">💉</div>
+                    <div class="box-title">FREE FLU SHOTS</div>
+                    <div class="box-subtitle">WITH MEDICAL PLAN</div>
+                </div>
+                <div class="box-date">NO COST!</div>
+            </div>
+
+            <!-- Box 2 -->
+            <div class="info-box">
+                <div class="box-header">
+                    <div class="walmart-text">Walmart</div>
+                </div>
+                <div class="box-content">
+                    <div class="box-icon">📅</div>
+                    <div class="box-title">WALK-UP EVENTS</div>
+                    <div class="box-subtitle">IN YOUR STORE</div>
+                </div>
+                <div class="box-date">NOV. 15 & DEC. 6</div>
+            </div>
+
+            <!-- Box 3 -->
+            <div class="info-box">
+                <div class="box-header">
+                    <div class="walmart-text">Walmart</div>
+                </div>
+                <div class="box-content">
+                    <div class="box-icon">🛡️</div>
+                    <div class="box-title">YOUR HEALTH</div>
+                    <div class="box-subtitle">IS OUR PRIORITY</div>
+                </div>
+                <div class="box-date highlight">WEEK 41 • 2026</div>
+            </div>
+        </div>
+
+        <!-- Bottom branding -->
+        <div class="bottom-text">
+            <div class="walmart-logo">
+                <span class="spark">⭐</span>
+                <span>Walmart</span>
+            </div>
+            <div class="bottom-message">associates stay healthy & strong</div>
+        </div>
+    </div>
+</body>
+</html>

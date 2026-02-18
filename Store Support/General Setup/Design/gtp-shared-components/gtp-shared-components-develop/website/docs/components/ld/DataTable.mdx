@@ -1,0 +1,35 @@
+---
+title: DataTable
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Data Table displays a set of related information in rows and columns.
+
+
+<ScreenshotTabs screenshotData={"screenshots/data-table.gif"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Body, DataTable} from '@walmart/gtp-shared-components`;
+
+<DataTable>
+  <DataTableHead>
+    <DataTableRow>
+      <DataTableHeader>ID</DataTableHeader>
+      <DataTableHeader>Name</DataTableHeader>
+    </DataTableRow>
+  </DataTableHead>
+  <DataTableBody>
+    <Body>Lorem ipsum</Body>
+  </DataTableBody>
+</DataTable>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="DataTable" prop="children"/>
+ ### horizontalScroll
+<PropTable componentLink="DataTable" prop="horizontalScroll"/>
+ ### UNSAFE_style
+<PropTable componentLink="DataTable" prop="UNSAFE_style"/>

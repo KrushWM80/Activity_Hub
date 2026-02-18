@@ -1,0 +1,41 @@
+---
+title: Banner
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Banners provide brief information about a significant incident affecting
+large numbers (or all) of the population.
+
+
+<ScreenshotTabs screenshotData={{"short-text":"screenshots/banner.png","long-text":"screenshots/banner-long-text.png","with-leading":"screenshots/banner-with-leading.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Banner} from '@walmart/gtp-shared-components
+
+<Banner
+  variant="info"
+  children="This is an info banner"
+  actionButtonProps={{
+    children: 'Action',
+    onPress: () => Alert.alert('Action', 'Action pressed'),
+  }}
+/>
+```
+## Props
+
+ ### variant
+<PropTable componentLink="Banner" prop="variant"/>
+ ### children(required)
+<PropTable componentLink="Banner" prop="children"/>
+ ### closeButtonProps
+<PropTable componentLink="Banner" prop="closeButtonProps"/>
+ ### onClose(required)
+<PropTable componentLink="Banner" prop="onClose"/>
+ ### UNSAFE_style
+<PropTable componentLink="Banner" prop="UNSAFE_style"/>
+ ### closeIconColor
+<PropTable componentLink="Banner" prop="closeIconColor"/>
+ ### leading
+<PropTable componentLink="Banner" prop="leading"/>

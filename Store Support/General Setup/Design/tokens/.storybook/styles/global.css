@@ -1,0 +1,12 @@
+*,
+*:after,
+*:before {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--ld-semantic-color-background);
+  color: var(--ld-semantic-color-text);
+  font-family: var(--ld-semantic-font-family-default);
+  line-height: 1.5;
+}

@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMP Title Selector & Figma Video Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0071CE 0%, #004d8f 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            color: #0071CE;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .header-logo .spark {
+            font-size: 40px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Left Panel - Title List */
+        .titles-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            background: #0071CE;
+            color: white;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .search-box {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #0071CE;
+        }
+
+        .titles-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .title-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .title-item:hover {
+            background: #f5f5f5;
+            transform: translateX(5px);
+        }
+
+        .title-item.selected {
+            background: #e8f4fd;
+            border-left: 4px solid #0071CE;
+            padding-left: 16px;
+        }
+
+        .title-item .title-text {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .title-item .title-week {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Right Panel - Preview & Actions */
+        .preview-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            background: #FFC220;
+            color: #003d82;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .preview-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .preview-content.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .amp-details {
+            margin-bottom: 20px;
+        }
+
+        .detail-row {
+            margin-bottom: 15px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #333;
+            padding: 10px 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            word-break: break-all;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-preview {
+            background: #0071CE;
+            color: white;
+        }
+
+        .btn-preview:hover {
+            background: #0052a3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,113,206,0.4);
+        }
+
+        .btn-preview:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-figma {
+            background: #6366f1;
+            color: white;
+        }
+
+        .btn-figma:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99,102,241,0.4);
+        }
+
+        .btn-figma:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Bottom Panel - Figma Code Output */
+        .figma-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .figma-panel.hidden {
+            display: none;
+        }
+
+        .figma-header {
+            background: #6366f1;
+            color: white;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .figma-header button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            font-size: 12px;
+        }
+
+        .figma-header button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .figma-content {
+            padding: 30px;
+        }
+
+        .figma-code-block {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-btn {
+            background: #0071CE;
+            color: white;
+            padding: 10px 20px;
+            font-size: 13px;
+            width: auto;
+        }
+
+        .copy-btn:hover {
+            background: #0052a3;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0071CE;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-logo">
+                <span class="spark">⭐</span>
+                <h1>AMP Video Creator Suite</h1>
+            </div>
+            <p>Select an AMP title, preview the content, and generate Figma specifications for video creation</p>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTitles">0</div>
+                <div class="stat-label">Total AMP Titles</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="selectedTitle">—</div>
+                <div class="stat-label">Selected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="videosCreated">0</div>
+                <div class="stat-label">Videos Generated</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel -->
+            <div class="titles-panel">
+                <div class="panel-header">📋 AMP Titles</div>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search titles...">
+                </div>
+                <div class="titles-list" id="titlesList"></div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="preview-panel">
+                <div class="preview-header">👁️ Preview & Actions</div>
+                <div class="preview-content empty" id="previewContent">
+                    Select a title to preview content
+                </div>
+            </div>
+        </div>
+
+        <!-- Figma Code Panel -->
+        <div class="figma-panel hidden" id="figmaPanel">
+            <div class="figma-header">
+                🎨 Figma Specifications
+                <button onclick="closeFigmaPanel()">Close</button>
+            </div>
+            <div class="figma-content">
+                <div class="success-message" id="successMessage">
+                    ✅ Figma code copied to clipboard!
+                </div>
+                <div class="figma-code-block" id="figmaCode"></div>
+                <button class="copy-btn" onclick="copyFigmaCode()">📋 Copy All Code</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for AMP Preview -->
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // Real AMP Data from CSV - fetched from actual published data
+        let ampTitles = [];
+        let selectedAmp = null;
+        let videosCreated = 0;
+
+        // Load CSV data
+        async function loadAmpData() {
+            try {
+                const response = await fetch('../Store Updates Dashboard/real-amp-data.csv');
+                const csvText = await response.text();
+                parseCSV(csvText);
+                init();
+            } catch (error) {
+                console.error('Error loading CSV:', error);
+                // Fallback to embedded data if CSV fails to load
+                loadFallbackData();
+            }
+        }
+
+        // Parse CSV and extract unique titles with preview links
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            
+            const titleIndexMap = {};
+            const ampData = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+                
+                const amp = {
+                    id: i,
+                    week: `Week ${values[0]} • 2026`,
+                    title: values[1],
+                    contentArea: values[14],
+                    status: values[9],
+                    location: values[2],
+                    previewLink: values[22],
+                    activityType: values[13],
+                    division: values[8]
+                };
+
+                // Only add published items with valid preview links
+                if (amp.status === 'published' && amp.previewLink && amp.previewLink.includes('preview')) {
+                    ampData.push(amp);
+                }
+            }
+
+            // Remove duplicates by title
+            const uniqueTitles = {};
+            ampData.forEach(amp => {
+                if (!uniqueTitles[amp.title]) {
+                    uniqueTitles[amp.title] = amp;
+                }
+            });
+
+            ampTitles = Object.values(uniqueTitles).slice(0, 50); // Limit to first 50 unique titles
+            console.log(`Loaded ${ampTitles.length} unique AMP titles from CSV`);
+        }
+
+        // Fallback data if CSV loading fails
+        function loadFallbackData() {
+            ampTitles = [
+                {
+                    id: 1,
+                    title: "Welcome to Your Remodel",
+                    week: "Week 43 • 2026",
+                    previewLink: "https://amp2-cms.prod.walmart.com/preview/029a6006-5b63-4d7f-872a-45ffca6bf10d/49/2026",
+                    description: "Location remodel information",
+                    content: "Welcome to your store's remodel. This activity provides information about the remodel timeline and updates.",
+                    contentArea: "Store"
+                },
+                {
+                    id: 2,
+                    title: "Store Operations Update",
+                    week: "Week 42 • 2026",
+                    previewLink: "https://amp2-cms.prod.walmart.com/preview/store-ops-update/42/2025",
+                    description: "Operations updates for store teams",
+                    content: "Key operational updates and procedure changes affecting your store.",
+                    contentArea: "Store Operations"
+                },
+                {
+                    id: 3,
+                    title: "Safety Protocol Review",
+                    week: "Week 42 • 2026",
+                    previewLink: "https://amp2-cms.prod.walmart.com/preview/safety-protocol/42/2025",
+                    description: "Review safety protocols and procedures",
+                    content: "Important safety protocols and best practices for all associates.",
+                    contentArea: "Safety"
+                },
+                {
+                    id: 4,
+                    title: "Customer Service Standards",
+                    week: "Week 41 • 2026",
+                    previewLink: "https://amp2-cms.prod.walmart.com/preview/customer-service/41/2025",
+                    description: "Customer service excellence guidelines",
+                    content: "Standards and best practices for excellent customer service.",
+                    contentArea: "Customer Service"
+                },
+                {
+                    id: 5,
+                    title: "Equipment Maintenance Schedule",
+                    week: "Week 41 • 2026",
+                    previewLink: "https://amp2-cms.prod.walmart.com/preview/equipment-maint/41/2025",
+                    description: "Equipment maintenance and care",
+                    content: "Maintenance schedules and procedures for store equipment.",
+                    contentArea: "Equipment"
+                }
+            ];
+            init();
+        }
+
+        // Initialize
+        function init() {
+            renderTitlesList(ampTitles);
+            document.getElementById('totalTitles').textContent = ampTitles.length;
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+        }
+        function renderTitlesList(titles) {
+            const listEl = document.getElementById('titlesList');
+            listEl.innerHTML = titles.map(amp => `
+                <div class="title-item ${selectedAmp?.id === amp.id ? 'selected' : ''}" onclick="selectTitle(${amp.id})">
+                    <div class="title-text">${amp.title}</div>
+                    <div class="title-week">${amp.week} • ${amp.contentArea}</div>
+                </div>
+            `).join('');
+        }
+
+        // Select title
+        function selectTitle(id) {
+            selectedAmp = ampTitles.find(a => a.id === id);
+            renderPreview();
+            renderTitlesList(ampTitles);
+            document.getElementById('selectedTitle').textContent = selectedAmp.id;
+        }
+
+        // Render preview
+        function renderPreview() {
+            const previewEl = document.getElementById('previewContent');
+            previewEl.classList.remove('empty');
+            previewEl.innerHTML = `
+                <div class="amp-details">
+                    <div class="detail-row">
+                        <div class="detail-label">Title</div>
+                        <div class="detail-value">${selectedAmp.title}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Week</div>
+                        <div class="detail-value">${selectedAmp.week}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Category</div>
+                        <div class="detail-value">${selectedAmp.contentArea}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">${selectedAmp.description}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Preview Content</div>
+                        <div class="detail-value">${selectedAmp.content}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">AMP Preview Link</div>
+                        <div class="detail-value">${selectedAmp.previewLink}</div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-preview" onclick="openAmpPreview()">🔗 Open AMP Preview</button>
+                        <button class="btn-figma" onclick="generateFigmaCode()">🎨 Generate Figma Code</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Open AMP Preview
+        function openAmpPreview() {
+            if (selectedAmp && selectedAmp.previewLink) {
+                window.open(selectedAmp.previewLink, '_blank');
+            }
+        }
+
+        // Generate Figma Code
+        function generateFigmaCode() {
+            if (!selectedAmp) {
+                alert('Please select an AMP title first');
+                return;
+            }
+
+            const figmaSpec = `{
+  "project": "AMP Video Creation",
+  "title": "${selectedAmp.title}",
+  "week": "${selectedAmp.week}",
+  "category": "${selectedAmp.contentArea}",
+  "previewLink": "${selectedAmp.previewLink}",
+  
+  "frame_setup": {
+    "name": "AMP_Video_${selectedAmp.id}",
+    "width": 1920,
+    "height": 1080,
+    "background": "#FFFFFF"
+  },
+
+  "slides": [
+    {
+      "name": "Title_Slide",
+      "duration": "0-5s",
+      "elements": {
+        "header": {
+          "type": "rectangle",
+          "width": 1920,
+          "height": 300,
+          "fill": "#0071CE"
+        },
+        "title": {
+          "type": "text",
+          "content": "${selectedAmp.title}",
+          "font_size": 72,
+          "color": "#FFFFFF",
+          "weight": "Bold"
+        },
+        "week": {
+          "type": "text",
+          "content": "${selectedAmp.week}",
+          "font_size": 48,
+          "color": "#FFC220",
+          "weight": "Bold"
+        }
+      }
+    },
+    {
+      "name": "Content_Slide",
+      "duration": "6-25s",
+      "elements": {
+        "background": "#FFFFFF",
+        "content": {
+          "type": "text",
+          "content": "${selectedAmp.content}",
+          "font_size": 48,
+          "color": "#000000",
+          "padding": 80
+        },
+        "icon": {
+          "type": "shape",
+          "size": "120x120",
+          "fill": "#FFC220",
+          "position": "top_right"
+        }
+      }
+    },
+    {
+      "name": "CTA_Slide",
+      "duration": "26-30s",
+      "elements": {
+        "background": "#0071CE",
+        "cta_text": {
+          "type": "text",
+          "content": "Learn More: Review the complete details in AMP",
+          "font_size": 56,
+          "color": "#FFFFFF",
+          "alignment": "center"
+        },
+        "walmart_logo": {
+          "type": "component",
+          "name": "walmart_spark",
+          "size": "100x100",
+          "fill": "#FFC220"
+        }
+      }
+    }
+  ],
+
+  "animation_timeline": {
+    "total_duration": "30s",
+    "transitions": {
+      "type": "fade",
+      "duration": "0.5s",
+      "easing": "ease_out"
+    }
+  },
+
+  "export_settings": {
+    "format": "MP4",
+    "resolution": "1920x1080",
+    "fps": 30,
+    "duration": "30s"
+  },
+
+  "color_palette": {
+    "walmart_blue": "#0071CE",
+    "walmart_yellow": "#FFC220",
+    "white": "#FFFFFF",
+    "text_dark": "#000000"
+  }
+}`;
+
+            // Display the Figma code
+            const codeEl = document.getElementById('figmaCode');
+            codeEl.textContent = figmaSpec;
+            
+            // Show the Figma panel
+            const panelEl = document.getElementById('figmaPanel');
+            panelEl.classList.remove('hidden');
+            
+            // Increment counter
+            videosCreated++;
+            document.getElementById('videosCreated').textContent = videosCreated;
+            
+            // Scroll to the Figma panel
+            setTimeout(() => {
+                panelEl.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        // Copy Figma Code
+        function copyFigmaCode() {
+            const code = document.getElementById('figmaCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const msg = document.getElementById('successMessage');
+                msg.classList.add('show');
+                setTimeout(() => msg.classList.remove('show'), 3000);
+            });
+        }
+
+        // Close Figma Panel
+        function closeFigmaPanel() {
+            document.getElementById('figmaPanel').classList.add('hidden');
+        }
+
+        // Search
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase();
+            const filtered = ampTitles.filter(amp => 
+                amp.title.toLowerCase().includes(query) ||
+                amp.contentArea.toLowerCase().includes(query)
+            );
+            renderTitlesList(filtered);
+        }
+
+        // Modal functions
+        function openModal(content) {
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('previewModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('previewModal').classList.remove('show');
+        }
+
+        // Init on load
+        loadAmpData();
+    </script>
+</body>
+</html>

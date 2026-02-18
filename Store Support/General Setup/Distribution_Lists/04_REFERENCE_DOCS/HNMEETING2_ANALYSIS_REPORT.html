@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HNMeeting2 Distribution List Analysis Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header .meta {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .executive-summary {
+            background: #f8f9fa;
+            border-left: 5px solid #0071ce;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+        
+        .executive-summary h2 {
+            color: #0071ce;
+            margin-bottom: 15px;
+        }
+        
+        section {
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            color: #0071ce;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0071ce;
+        }
+        
+        h3 {
+            color: #004f9a;
+            font-size: 1.4em;
+            margin: 20px 0 10px 0;
+        }
+        
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin: 15px 0 10px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #0071ce;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .finding-box {
+            background: #e7f3ff;
+            border-left: 5px solid #0071ce;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .finding-box strong {
+            color: #0071ce;
+        }
+        
+        .percentage-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 30px;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .percentage-fill {
+            background: linear-gradient(90deg, #0071ce 0%, #004f9a 100%);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s ease;
+        }
+        
+        .outlier-category {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .recommendation-box {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .recommendation-box h4 {
+            color: #28a745;
+            margin-top: 0;
+        }
+        
+        ul {
+            margin: 10px 0 10px 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .code {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            border-left: 4px solid #0071ce;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            border-top: 3px solid #0071ce;
+        }
+        
+        .highlight {
+            background: #ffeb3b;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>HNMeeting2 Distribution List Analysis Report</h1>
+            <div class="meta">
+                <p><strong>Generated:</strong> December 19, 2025</p>
+                <p><strong>Total Members:</strong> 1,246 | <strong>Unique Employees:</strong> 1,235</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="executive-summary">
+                <h2>Executive Summary</h2>
+                <p>The HNMeeting2 distribution list is primarily composed of <strong>Market Managers</strong> and <strong>Senior Directors</strong> representing 59.6% of the membership. The remaining 40.4% consists of supporting roles including Group Directors, Vice Presidents, and cross-functional partners.</p>
+            </div>
+            
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="number">1,246</div>
+                    <div class="label">Total Members</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">59.6%</div>
+                    <div class="label">Primary Audience</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">98.8%</div>
+                    <div class="label">Home Office</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">437</div>
+                    <div class="label">Unique Job Codes</div>
+                </div>
+            </div>
+            
+            <section id="department">
+                <h2>1. Department Composition</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Count</th>
+                            <th>Percentage</th>
+                            <th>Visual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Home Office (HO)</strong></td>
+                            <td>1,231</td>
+                            <td><strong>98.8%</strong></td>
+                            <td>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: 98.8%;">98.8%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Other</td>
+                            <td>15</td>
+                            <td>1.2%</td>
+                            <td>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: 1.2%;">1.2%</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="finding-box">
+                    <strong>Finding:</strong> This is overwhelmingly a Home Office distribution list with minimal field representation.
+                </div>
+            </section>
+            
+            <section id="primary-audience">
+                <h2>2. Primary Audience Analysis (59.6% - 743 members)</h2>
+                
+                <h3>A. Market Managers (31.8% - 396 members)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Job Code</strong></td>
+                            <td>US-100015099</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Top Job Title</strong></td>
+                            <td>(USA) Market Manager - US (268 members)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Management Level</strong></td>
+                            <td>Predominantly E-level (60.6% of total list)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Role Description</strong></td>
+                            <td>Field operational leadership responsible for multiple stores within a geographic market</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>B. Senior Directors (27.8% - 347 members)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Job Code</th>
+                            <th>Title</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>US-100017446</td>
+                            <td>Senior Director, Merchandising</td>
+                            <td>27</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>US-100019721</td>
+                            <td>Senior Director, Merchandising Operations</td>
+                            <td>27</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>US-100020695</td>
+                            <td>(USA) Senior Director, Operations</td>
+                            <td>23</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>US-100019946</td>
+                            <td>Senior Director, Supply Chain Management</td>
+                            <td>20</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>US-100022540</td>
+                            <td>Senior Director, Product Management</td>
+                            <td>19</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>US-100022319</td>
+                            <td>(USA) Senior Director, Data Science</td>
+                            <td>18</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><strong>Functions:</strong> Cross-functional leadership across Merchandising, Operations, Supply Chain, Product, Data Science, Technology, and Real Estate</p>
+                <p><strong>Management Level:</strong> Mix of C (15.7%) and D (10.7%) levels</p>
+            </section>
+            
+            <section id="outliers">
+                <h2>3. Outliers Analysis (40.4% - 503 members)</h2>
+                
+                <div class="outlier-category">
+                    <h4>A. Group Directors (Primary Outlier Group - ~163 members)</h4>
+                    <p><strong>Top Job Codes:</strong></p>
+                    <ul>
+                        <li>US-100019949: Group Director, Supply Chain Management (14)</li>
+                        <li>US-100020696: (USA) Group Director, Operations (11)</li>
+                        <li>US-100022537: Group Director, Product Management (9)</li>
+                    </ul>
+                    <p><strong>Functions:</strong> Supply Chain, Operations, Product, Data Science, Technology, Automation</p>
+                    <p><strong>Management Level:</strong> C-level</p>
+                </div>
+                
+                <div class="outlier-category">
+                    <h4>B. Vice Presidents (296 members in hierarchy)</h4>
+                    <p><strong>Examples:</strong></p>
+                    <ul>
+                        <li>Divisional Vice Presidents, Supply Chain</li>
+                        <li>Various VP-level stakeholders</li>
+                    </ul>
+                    <p><strong>Purpose:</strong> Executive oversight and strategic alignment</p>
+                    <p><strong>Management Level:</strong> VP, SVP, EVP levels</p>
+                </div>
+                
+                <div class="outlier-category">
+                    <h4>C. Regional/Functional Directors (~163 members)</h4>
+                    <p><strong>Examples:</strong></p>
+                    <ul>
+                        <li>Director, Regional Asset Protection (10)</li>
+                        <li>Emerging Market Manager (7)</li>
+                        <li>Various functional directors</li>
+                    </ul>
+                    <p><strong>Purpose:</strong> Regional and specialized functional support</p>
+                </div>
+                
+                <div class="outlier-category">
+                    <h4>D. Other Managers & Specialists (~44 members)</h4>
+                    <p><strong>Examples:</strong></p>
+                    <ul>
+                        <li>Operations Coordinators</li>
+                        <li>Analysts</li>
+                        <li>Specialists</li>
+                    </ul>
+                    <p><strong>Purpose:</strong> Operational support and coordination</p>
+                </div>
+            </section>
+            
+            <section id="hierarchy">
+                <h2>4. Management Hierarchy Analysis</h2>
+                
+                <h3>Executive Alignment</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Members with Reporting Line</th>
+                            <th>Percentage</th>
+                            <th>Coverage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>EVP</td>
+                            <td>279</td>
+                            <td>22.4%</td>
+                            <td>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: 22.4%; background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);">22.4%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>SVP</strong></td>
+                            <td><strong>606</strong></td>
+                            <td><strong>48.6%</strong></td>
+                            <td>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: 48.6%;">48.6%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>VP</strong></td>
+                            <td><strong>556</strong></td>
+                            <td><strong>44.6%</strong></td>
+                            <td>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: 44.6%;">44.6%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Group Director</td>
+                            <td>34</td>
+                            <td>2.7%</td>
+                            <td>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: 2.7%;">2.7%</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Senior Director</td>
+                            <td>4</td>
+                            <td>0.3%</td>
+                            <td>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: 0.3%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Director</td>
+                            <td>1</td>
+                            <td>0.1%</td>
+                            <td>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: 0.1%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Top Executives in Hierarchy</h3>
+                
+                <h4>Top 5 EVPs:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Members</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Robert Montgomery</td><td>65</td></tr>
+                        <tr><td>Seth Dallaire</td><td>39</td></tr>
+                        <tr><td>Taronzi Watkins</td><td>30</td></tr>
+                        <tr><td>John Laney</td><td>29</td></tr>
+                        <tr><td>Megan Crozier</td><td>22</td></tr>
+                    </tbody>
+                </table>
+                
+                <h4>Top 5 SVPs:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Members</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Glenda Fleming Willis</td><td>74</td></tr>
+                        <tr><td>Paul Lewellen</td><td>73</td></tr>
+                        <tr><td>Jay Cordray</td><td>72</td></tr>
+                        <tr><td>Nick Berkeley</td><td>69</td></tr>
+                        <tr><td>Annie Walker</td><td>66</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="finding-box">
+                    <strong>Finding:</strong> Strong alignment with Store Operations, Supply Chain, and Technology leadership chains.
+                </div>
+            </section>
+            
+            <section id="management-level">
+                <h2>5. Management Level Distribution</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Count</th>
+                            <th>Percentage</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="highlight">
+                            <td><strong>E</strong></td>
+                            <td><strong>755</strong></td>
+                            <td><strong>60.6%</strong></td>
+                            <td>Market Managers (field leadership)</td>
+                        </tr>
+                        <tr>
+                            <td>C</td>
+                            <td>195</td>
+                            <td>15.7%</td>
+                            <td>Group Directors/Senior Directors</td>
+                        </tr>
+                        <tr>
+                            <td>D</td>
+                            <td>133</td>
+                            <td>10.7%</td>
+                            <td>Senior Directors</td>
+                        </tr>
+                        <tr>
+                            <td>B</td>
+                            <td>68</td>
+                            <td>5.5%</td>
+                            <td>Directors</td>
+                        </tr>
+                        <tr>
+                            <td>F</td>
+                            <td>33</td>
+                            <td>2.6%</td>
+                            <td>Higher field leadership</td>
+                        </tr>
+                        <tr>
+                            <td>A</td>
+                            <td>16</td>
+                            <td>1.3%</td>
+                            <td>Entry Directors</td>
+                        </tr>
+                        <tr>
+                            <td>VP</td>
+                            <td>13</td>
+                            <td>1.0%</td>
+                            <td>Vice Presidents</td>
+                        </tr>
+                        <tr>
+                            <td>SVP</td>
+                            <td>4</td>
+                            <td>0.3%</td>
+                            <td>Senior Vice Presidents</td>
+                        </tr>
+                        <tr>
+                            <td>EXECUTIVE_VP</td>
+                            <td>2</td>
+                            <td>0.2%</td>
+                            <td>Executive Vice Presidents</td>
+                        </tr>
+                        <tr>
+                            <td>Other</td>
+                            <td>27</td>
+                            <td>2.2%</td>
+                            <td>Various specialized levels</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            
+            <section id="parameters">
+                <h2>6. Key Parameters Defining the Distribution List</h2>
+                
+                <div class="code">
+<strong>PRIMARY CRITERIA (59.6%):</strong>
+├─ Job Code = US-100015099 (Market Manager) → 31.8%
+└─ Job Title contains "Senior Director" → 27.8%
+
+<strong>SECONDARY CRITERIA (40.4%):</strong>
+├─ Group Directors in Operations/Supply Chain/Merchandising/Tech
+├─ VP+ in operational reporting chains
+├─ Regional/Functional Directors (Asset Protection, etc.)
+└─ Project coordinators and specialists
+
+<strong>COMMON ATTRIBUTES:</strong>
+├─ Department: Home Office (98.8%)
+├─ Management Level: Predominantly E-level (60.6%)
+└─ Hierarchy: Report to EVPs Montgomery, Dallaire, Watkins, Laney
+                </div>
+                
+                <h3>Primary Inclusion Criteria:</h3>
+                <ol>
+                    <li><strong>Job Code = US-100015099</strong> (Market Manager)
+                        <ul>
+                            <li>Represents 31.8% of the list</li>
+                            <li>Core operational field leadership</li>
+                        </ul>
+                    </li>
+                    <li><strong>Job Title Contains "Senior Director"</strong>
+                        <ul>
+                            <li>Represents 27.8% of the list</li>
+                            <li>Cross-functional Home Office leadership</li>
+                        </ul>
+                    </li>
+                    <li><strong>Department = Home Office (HO)</strong>
+                        <ul>
+                            <li>Represents 98.8% of the list</li>
+                        </ul>
+                    </li>
+                    <li><strong>Management Level = E</strong>
+                        <ul>
+                            <li>Represents 60.6% of the list</li>
+                            <li>Operational leadership tier</li>
+                        </ul>
+                    </li>
+                </ol>
+                
+                <h3>Secondary Inclusion Pattern:</h3>
+                <ul>
+                    <li><strong>Group Directors</strong> in Operations, Supply Chain, Merchandising, Technology</li>
+                    <li><strong>VP-level stakeholders</strong> for strategic visibility</li>
+                    <li><strong>Regional Directors</strong> for specialized functions (Asset Protection, etc.)</li>
+                </ul>
+            </section>
+            
+            <section id="outlier-explanation">
+                <h2>7. Outlier Explanation</h2>
+                <p>The <span class="highlight"><strong>40.4% outliers</strong></span> serve specific business purposes:</p>
+                
+                <h3>A. Executive Stakeholders (23.8%)</h3>
+                <p><strong>Why included:</strong></p>
+                <ul>
+                    <li>Strategic visibility for field operations decisions</li>
+                    <li>Alignment between Home Office strategy and field execution</li>
+                    <li>Executive sponsorship of Market Manager initiatives</li>
+                </ul>
+                <p><strong>Examples:</strong> EVPs Robert Montgomery, Seth Dallaire; SVPs Glenda Fleming Willis, Paul Lewellen; Divisional VPs</p>
+                
+                <h3>B. Cross-Functional Partners (8.6%)</h3>
+                <p><strong>Why included:</strong> Support Market Manager operations through:</p>
+                <ul>
+                    <li>Merchandising strategies</li>
+                    <li>Supply Chain coordination</li>
+                    <li>Technology enablement</li>
+                    <li>Data & Analytics insights</li>
+                    <li>Real Estate planning</li>
+                </ul>
+                <p><strong>Examples:</strong> Senior Directors in Merchandising, Supply Chain, Product, Data Science</p>
+                
+                <h3>C. Group Directors (5.5%)</h3>
+                <p><strong>Why included:</strong></p>
+                <ul>
+                    <li>Bridge between Senior Directors and operational teams</li>
+                    <li>Project-specific coordination with Market Managers</li>
+                    <li>Regional operational oversight</li>
+                </ul>
+                <p><strong>Examples:</strong> Group Directors in Operations, Supply Chain, Product Management</p>
+                
+                <h3>D. Specialized Support (2.5%)</h3>
+                <p><strong>Why included:</strong></p>
+                <ul>
+                    <li>Asset Protection coordination with markets</li>
+                    <li>Emerging market development</li>
+                    <li>Operational coordinators for specific initiatives</li>
+                </ul>
+                <p><strong>Examples:</strong> Directors, Regional Asset Protection; Emerging Market Managers; Operations Coordinators</p>
+            </section>
+            
+            <section id="functional">
+                <h2>8. Functional Distribution</h2>
+                <h3>Top 10 Functional Areas:</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Functional Area</th>
+                            <th>Members</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><strong>Store Operations/Market Management</strong></td>
+                            <td>396</td>
+                            <td>31.8%</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Merchandising</td>
+                            <td>53+</td>
+                            <td>4.3%</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Supply Chain</td>
+                            <td>50+</td>
+                            <td>4.0%</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Operations (HO)</td>
+                            <td>36+</td>
+                            <td>2.9%</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Technology</td>
+                            <td>30+</td>
+                            <td>2.4%</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Product Management</td>
+                            <td>28+</td>
+                            <td>2.2%</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Data Science/Analytics</td>
+                            <td>26+</td>
+                            <td>2.1%</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Real Estate</td>
+                            <td>15+</td>
+                            <td>1.2%</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>Asset Protection</td>
+                            <td>14+</td>
+                            <td>1.1%</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>Finance/Strategy</td>
+                            <td>16+</td>
+                            <td>1.3%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            
+            <section id="use-case">
+                <h2>9. Use Case Analysis</h2>
+                <p>This distribution list appears designed for:</p>
+                
+                <div class="finding-box">
+                    <h4>1. Market Manager Communications</h4>
+                    <ul>
+                        <li>Primary audience is field Market Managers</li>
+                        <li>Direct communication channel for store operations</li>
+                    </ul>
+                </div>
+                
+                <div class="finding-box">
+                    <h4>2. Cross-Functional Alignment</h4>
+                    <ul>
+                        <li>Senior Directors across functions stay informed of field needs</li>
+                        <li>Enables coordination between HO strategy and field execution</li>
+                    </ul>
+                </div>
+                
+                <div class="finding-box">
+                    <h4>3. Strategic Visibility</h4>
+                    <ul>
+                        <li>VP+ executives monitor field operations</li>
+                        <li>Executive alignment on Market Manager initiatives</li>
+                    </ul>
+                </div>
+                
+                <div class="finding-box">
+                    <h4>4. Project Coordination</h4>
+                    <ul>
+                        <li>Group Directors coordinate specific initiatives</li>
+                        <li>Cross-functional project teams aligned with field</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section id="recommendations">
+                <h2>10. Recommendations</h2>
+                
+                <div class="recommendation-box">
+                    <h4>For Email Communications:</h4>
+                    <ul>
+                        <li><strong>Primary Target:</strong> Market Managers (396) and Senior Directors (347)</li>
+                        <li><strong>Secondary Audience:</strong> Group Directors and VPs for awareness</li>
+                        <li><strong>Tone:</strong> Balance field-focused content with strategic context</li>
+                    </ul>
+                </div>
+                
+                <div class="recommendation-box">
+                    <h4>For Future List Management:</h4>
+                    <ul>
+                        <li>Consider segmentation by function for targeted communications</li>
+                        <li>Create sub-lists for:
+                            <ul>
+                                <li>Market Managers only (field operations)</li>
+                                <li>Senior Director+ (strategic planning)</li>
+                                <li>Cross-functional project teams</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="recommendation-box">
+                    <h4>For Access Control:</h4>
+                    <p>Current inclusion criteria are:</p>
+                    <ul>
+                        <li>Job Code US-100015099 <strong>OR</strong></li>
+                        <li>Title contains "Senior Director" <strong>OR</strong></li>
+                        <li>Executive stakeholder (VP+) in operations/supply chain/merchandising chains <strong>OR</strong></li>
+                        <li>Group Director in supporting functions</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section id="job-code-parameters">
+                <h2>11. Job Code-Based Parameters for Automation</h2>
+                <p>To ensure the right people are always added to this list automatically, we've identified three tiers of inclusion criteria based on current membership patterns:</p>
+                
+                <h3>TIER 1 - Core Roles (47.4% coverage - 11 job codes)</h3>
+                <div class="finding-box">
+                    <strong>Recommendation:</strong> These job codes should be automatically included in all cases. They represent the most stable, high-volume roles.
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Job Code</th>
+                            <th>Job Title</th>
+                            <th>Current Members</th>
+                            <th>Coverage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>US-100015099</strong></td>
+                            <td>(USA) Market Manager - US</td>
+                            <td>396</td>
+                            <td>31.8%</td>
+                        </tr>
+                        <tr>
+                            <td>US-100017446</td>
+                            <td>Senior Director, Merchandising</td>
+                            <td>27</td>
+                            <td>2.2%</td>
+                        </tr>
+                        <tr>
+                            <td>US-100019721</td>
+                            <td>Senior Director, Merchandising Operations</td>
+                            <td>27</td>
+                            <td>2.2%</td>
+                        </tr>
+                        <tr>
+                            <td>US-100020695</td>
+                            <td>(USA) Senior Director, Operations</td>
+                            <td>23</td>
+                            <td>1.8%</td>
+                        </tr>
+                        <tr>
+                            <td>US-100019946</td>
+                            <td>Senior Director, Supply Chain Management</td>
+                            <td>20</td>
+                            <td>1.6%</td>
+                        </tr>
+                        <tr>
+                            <td>US-100022540</td>
+                            <td>Senior Director, Product Management</td>
+                            <td>19</td>
+                            <td>1.5%</td>
+                        </tr>
+                        <tr>
+                            <td>US-100022319</td>
+                            <td>(USA) Senior Director, Data Science</td>
+                            <td>18</td>
+                            <td>1.4%</td>
+                        </tr>
+                        <tr>
+                            <td>US-100022602</td>
+                            <td>Senior Director, Advanced Analytics</td>
+                            <td>16</td>
+                            <td>1.3%</td>
+                        </tr>
+                        <tr>
+                            <td>US-100024103</td>
+                            <td>Senior Director, Technology Operations</td>
+                            <td>16</td>
+                            <td>1.3%</td>
+                        </tr>
+                        <tr>
+                            <td>US-100019221</td>
+                            <td>Senior Director, Real Estate</td>
+                            <td>15</td>
+                            <td>1.2%</td>
+                        </tr>
+                        <tr>
+                            <td>US-100019949</td>
+                            <td>Group Director, Supply Chain Management</td>
+                            <td>14</td>
+                            <td>1.1%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>TIER 2 - Supporting Roles (5.9% coverage - 8 job codes)</h3>
+                <div class="finding-box">
+                    <strong>Recommendation:</strong> Add these job codes for broader coverage. Review quarterly for any job code changes.
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Job Code</th>
+                            <th>Job Title</th>
+                            <th>Current Members</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>US-100020696</td>
+                            <td>(USA) Group Director, Operations</td>
+                            <td>11</td>
+                        </tr>
+                        <tr>
+                            <td>US-100019320</td>
+                            <td>Senior Director, Business Strategy</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>US-100014419</td>
+                            <td>Director, Regional Asset Protection</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>US-100020346</td>
+                            <td>Senior Director, Product Development</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>US-100022537</td>
+                            <td>Group Director, Product Management</td>
+                            <td>9</td>
+                        </tr>
+                        <tr>
+                            <td>US-100012808</td>
+                            <td>(USA) Divisional Vice President, Supply Chain</td>
+                            <td>8</td>
+                        </tr>
+                        <tr>
+                            <td>US-100023032</td>
+                            <td>(USA) Senior Director, Automation Engineering</td>
+                            <td>8</td>
+                        </tr>
+                        <tr>
+                            <td>US-100014680</td>
+                            <td>Emerging Market Manager</td>
+                            <td>7</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>TIER 3 - Title Pattern Rules (46.7% coverage)</h3>
+                <div class="finding-box">
+                    <strong>Recommendation:</strong> Use title pattern matching for flexibility. Captures role changes and new positions.
+                </div>
+                
+                <div class="code">
+<strong>Title Patterns to Include:</strong>
+
+1. Job Title contains "Senior Director" 
+   AND Department = "HO"
+   
+2. Job Title contains "Group Director"
+   AND Department = "HO"
+   AND (
+       Job Title contains "Operations" OR
+       Job Title contains "Supply Chain" OR
+       Job Title contains "Merchandising" OR
+       Job Title contains "Product" OR
+       Job Title contains "Technology" OR
+       Job Title contains "Data Science"
+   )
+
+3. Executive Stakeholders (Manual Review):
+   - VP+ in Operations/Supply Chain/Merchandising reporting chains
+   - Divisional VPs with field oversight
+                </div>
+                
+                <h3>Complete SQL Query Logic</h3>
+                <div class="code" style="font-size: 0.9em;">
+WHERE (
+    -- TIER 1: Core Roles (Auto-Include)
+    Job_Code IN (
+        'US-100015099',  -- Market Manager
+        'US-100017446',  -- Senior Director, Merchandising
+        'US-100019721',  -- Senior Director, Merchandising Operations
+        'US-100020695',  -- Senior Director, Operations
+        'US-100019946',  -- Senior Director, Supply Chain Management
+        'US-100022540',  -- Senior Director, Product Management
+        'US-100022319',  -- Senior Director, Data Science
+        'US-100022602',  -- Senior Director, Advanced Analytics
+        'US-100024103',  -- Senior Director, Technology Operations
+        'US-100019221',  -- Senior Director, Real Estate
+        'US-100019949'   -- Group Director, Supply Chain Management
+    )
+    
+    OR
+    
+    -- TIER 2: Supporting Roles (Auto-Include)
+    Job_Code IN (
+        'US-100020696',  -- Group Director, Operations
+        'US-100019320',  -- Senior Director, Business Strategy
+        'US-100014419',  -- Director, Regional Asset Protection
+        'US-100020346',  -- Senior Director, Product Development
+        'US-100022537',  -- Group Director, Product Management
+        'US-100012808',  -- Divisional VP, Supply Chain
+        'US-100023032',  -- Senior Director, Automation Engineering
+        'US-100014680'   -- Emerging Market Manager
+    )
+    
+    OR
+    
+    -- TIER 3: Title Patterns
+    (
+        Job_Title LIKE '%Senior Director%'
+        AND Department = 'HO'
+    )
+    
+    OR
+    
+    (
+        Job_Title LIKE '%Group Director%'
+        AND Department = 'HO'
+        AND (
+            Job_Title LIKE '%Operations%'
+            OR Job_Title LIKE '%Supply Chain%'
+            OR Job_Title LIKE '%Merchandising%'
+            OR Job_Title LIKE '%Product%'
+            OR Job_Title LIKE '%Technology%'
+            OR Job_Title LIKE '%Data Science%'
+        )
+    )
+)
+AND Department = 'HO'
+AND Employment_Status = 'Active'
+AND isPrimary = TRUE
+                </div>
+            </section>
+            
+            <section id="missing-members">
+                <h2>12. Missing Members Analysis</h2>
+                
+                <div style="background: #f8d7da; border-left: 5px solid #dc3545; padding: 20px; margin: 20px 0; border-radius: 5px;">
+                    <h3 style="color: #dc3545; margin-top: 0;">🚨 CRITICAL FINDING</h3>
+                    <p style="font-size: 1.2em; margin: 10px 0;"><strong>1,091 people are MISSING from the distribution list who should be included!</strong></p>
+                    <p style="margin: 10px 0;">Based on the job code parameters and current inclusion criteria, only <strong>65% of the target audience</strong> is currently on the list.</p>
+                </div>
+                
+                <div class="stat-grid">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                        <div class="number">1,886</div>
+                        <div class="label">Should Be On List</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%);">
+                        <div class="number">1,236</div>
+                        <div class="label">Currently On List</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
+                        <div class="number">1,091</div>
+                        <div class="label">Missing Members</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                        <div class="number">57.8%</div>
+                        <div class="label">Missing Rate</div>
+                    </div>
+                </div>
+                
+                <h3>Breakdown by Category</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Total Eligible</th>
+                            <th>On Current List</th>
+                            <th>Missing</th>
+                            <th>Missing Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #fff3cd;">
+                            <td><strong>Tier 1 Core Job Codes</strong></td>
+                            <td>889</td>
+                            <td>575</td>
+                            <td><strong>314</strong></td>
+                            <td><strong>35.3%</strong></td>
+                        </tr>
+                        <tr style="background: #f8d7da;">
+                            <td><strong>Senior Directors (HO)</strong></td>
+                            <td>1,320</td>
+                            <td>344</td>
+                            <td><strong>976</strong></td>
+                            <td><strong>73.9%</strong></td>
+                        </tr>
+                        <tr style="background: #fff3cd;">
+                            <td><strong>Group Directors (Key Functions)</strong></td>
+                            <td>116</td>
+                            <td>56</td>
+                            <td><strong>60</strong></td>
+                            <td><strong>51.7%</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Top Missing Job Codes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Job Code</th>
+                            <th>Job Title</th>
+                            <th>Missing Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>US-100022366</td>
+                            <td>(USA) Senior Director, Software Engineering</td>
+                            <td><strong>113</strong></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>US-100017446</td>
+                            <td>Senior Director, Merchandising-Sam's Club</td>
+                            <td><strong>97</strong></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>US-100022540</td>
+                            <td>Senior Director, Product Management</td>
+                            <td><strong>54</strong></td>
+                        </tr>
+                        <tr style="background: #f8d7da;">
+                            <td>4</td>
+                            <td><strong>US-100015099</strong></td>
+                            <td><strong>Market Manager, Walmart US</strong></td>
+                            <td><strong>53</strong></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>US-100019531</td>
+                            <td>Senior Director, Finance</td>
+                            <td><strong>47</strong></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>US-100019918</td>
+                            <td>Senior Director, Specialty Compliance And Ethics</td>
+                            <td><strong>44</strong></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>US-100022741</td>
+                            <td>Senior Director, Health and Wellness Regional Operations</td>
+                            <td><strong>35</strong></td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>US-100022319</td>
+                            <td>Senior Director, Data Science</td>
+                            <td><strong>30</strong></td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>US-100022820</td>
+                            <td>Senior Director, Information Security</td>
+                            <td><strong>25</strong></td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>US-100019320</td>
+                            <td>Senior Director, Business Strategy</td>
+                            <td><strong>25</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div style="background: #f8d7da; border-left: 5px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px;">
+                    <h4 style="color: #dc3545; margin-top: 0;">⚠️ URGENT: 53 Market Managers Missing</h4>
+                    <p>There are 53 Market Managers (core Tier 1 job code US-100015099) who are NOT on the current distribution list. This represents a significant gap in the primary target audience.</p>
+                </div>
+                
+                <h3>Impact Analysis</h3>
+                <div class="finding-box">
+                    <strong>Coverage Gap:</strong> The current list is only capturing <strong>65% of the intended audience</strong> based on job codes and hierarchy patterns.
+                </div>
+                
+                <ul style="margin: 20px 0 20px 30px; line-height: 1.8;">
+                    <li><strong>314 Tier 1 members missing:</strong> These are core roles that should be automatically included based on job code alone</li>
+                    <li><strong>976 Senior Directors missing:</strong> The title pattern is matching 1,320 total, but only 344 are currently on the list. May need to refine to specific functions.</li>
+                    <li><strong>60 Group Directors missing:</strong> Half of eligible Group Directors in key functions are not included</li>
+                    <li><strong>53 Market Managers missing:</strong> Critical gap in the primary field leadership audience</li>
+                </ul>
+                
+                <div class="recommendation-box">
+                    <h4>Immediate Action Items</h4>
+                    <ol style="margin: 10px 0 0 20px;">
+                        <li><strong>URGENT:</strong> Review the 1,091 missing members list (exported to HNMeeting2_Missing_Members_20251219_122841.csv)</li>
+                        <li><strong>PRIORITY:</strong> Add the 53 missing Market Managers immediately</li>
+                        <li><strong>HIGH:</strong> Review and add the 314 Tier 1 core job code members</li>
+                        <li><strong>MEDIUM:</strong> Refine Senior Director criteria - may be too broad (1,320 total)</li>
+                        <li><strong>ONGOING:</strong> Implement automated sync using Tier 1+2 job codes to prevent future gaps</li>
+                    </ol>
+                </div>
+                
+                <div class="recommendation-box">
+                    <h4>Governance Recommendations</h4>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Establish quarterly reviews of membership against job code criteria</li>
+                        <li>Set up alerts for new hires in Tier 1 job codes</li>
+                        <li>Document all manual additions/removals with justification</li>
+                        <li>Validate employment status quarterly (terminated, transferred)</li>
+                        <li>Consider segmenting into sub-lists by function for more targeted communications</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section id="files">
+                <h2>13. Files Generated</h2>
+                <ol>
+                    <li><strong>HNMeeting2_With_Hierarchy_20251219_115704.csv</strong> - Full member list with department and hierarchy (1,246 members)</li>
+                    <li><strong>HNMeeting2_Outliers_Analysis.csv</strong> - Detailed outlier breakdown (503 members)</li>
+                    <li><strong>HNMeeting2_Tier1_JobCodes.csv</strong> - Tier 1 job codes for automation (11 codes)</li>
+                    <li><strong>HNMeeting2_Tier2_JobCodes.csv</strong> - Tier 2 job codes for broader coverage (8 codes)</li>
+                    <li><strong>HNMeeting2_Missing_Members_20251219_122841.csv</strong> - <span class="highlight">1,091 missing members who should be added</span></li>
+                    <li><strong>HNMEETING2_ANALYSIS_REPORT.md</strong> - Markdown version of this report</li>
+                    <li><strong>HNMEETING2_ANALYSIS_REPORT.html</strong> - This HTML report</li>
+                </ol>
+            </section>
+            
+            <section id="data-sources">
+                <h2>14. Data Sources</h2>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><strong>BigQuery Table</strong></td>
+                            <td><code>wmt-corehr-prod.US_HUDI.UNIFIED_PROFILE_SENSITIVE_VW</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Member List</strong></td>
+                            <td>archive/hnmeeting2_members.txt (1,236 unique emails)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Query Date</strong></td>
+                            <td>December 19, 2025</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Current As Of</strong></td>
+                            <td>Latest available in Unified Profile table</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Report prepared by BigQuery Analysis Pipeline</strong></p>
+            <p>For questions, contact your Asset Protection or People Analytics team</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">Generated: December 19, 2025</p>
+        </div>
+    </div>
+</body>
+</html>

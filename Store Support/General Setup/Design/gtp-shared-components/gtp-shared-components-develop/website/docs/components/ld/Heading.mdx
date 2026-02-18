@@ -1,0 +1,36 @@
+---
+title: Heading
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Headings provide a title for a content section or page.
+
+
+<ScreenshotTabs screenshotData={"screenshots/heading.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Heading} from '@walmart/gtp-shared-components`;
+
+<Heading>Heading</Heading>
+<Heading size="small" weight="400">Heading</Heading>
+<Heading size="medium" weight="400">Heading</Heading>
+<Heading size="large" weight="400">Heading</Heading>
+
+<Heading size="small" weight="700">Heading</Heading>
+<Heading size="medium" weight="700">Heading</Heading>
+<Heading size="large" weight="700">Heading</Heading>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="Heading" prop="children"/>
+ ### size
+<PropTable componentLink="Heading" prop="size"/>
+ ### weight
+<PropTable componentLink="Heading" prop="weight"/>
+ ### color
+<PropTable componentLink="Heading" prop="color"/>
+ ### UNSAFE_style
+<PropTable componentLink="Heading" prop="UNSAFE_style"/>

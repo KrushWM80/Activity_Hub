@@ -1,0 +1,64 @@
+# Terraform Variables
+# Copy this file to terraform.tfvars and update with your values
+
+# Project Configuration
+project_id          = "wmt-retail-prod"
+project_name        = "Walmart Retail Production"
+billing_account     = "01234567-89ABCD-EFGH01"
+organization_id     = "123456789012"
+region              = "us-central1"
+zones               = ["us-central1-a", "us-central1-b", "us-central1-c"]
+
+# Walmart-specific labels
+cost_center         = "CC-RETAIL-001"
+business_unit       = "retail"
+team                = "ecommerce-platform"
+environment         = "production"
+application         = "walmart-web"
+
+# Network Configuration
+vpc_name            = "walmart-production-vpc"
+web_subnet_cidr     = "10.1.0.0/24"
+app_subnet_cidr     = "10.1.1.0/24"
+data_subnet_cidr    = "10.1.2.0/24"
+mgmt_subnet_cidr    = "10.1.10.0/24"
+
+# GKE Configuration (if using Kubernetes)
+gke_cluster_name    = "walmart-prod-cluster"
+gke_node_count      = 3
+gke_machine_type    = "e2-standard-4"
+gke_pods_cidr       = "172.16.0.0/14"
+gke_services_cidr   = "172.20.0.0/16"
+
+# Database Configuration
+database_name       = "walmart-prod-db"
+database_tier       = "db-n1-standard-2"
+database_version    = "MYSQL_8_0"
+
+# Storage Configuration
+storage_bucket_name = "wmt-retail-prod-data"
+storage_class       = "STANDARD"
+storage_location    = "US-CENTRAL1"
+
+# Monitoring Configuration
+monitoring_notification_channels = [
+  "dev-team@walmart.com",
+  "ops-team@walmart.com"
+]
+
+# Security Configuration
+enable_binary_authorization = true
+enable_pod_security_policy  = true
+enable_network_policy       = true
+kms_key_rotation_period     = "7776000s"  # 90 days
+
+# Load Balancer Configuration
+ssl_domains = [
+  "walmart.com",
+  "www.walmart.com",
+  "api.walmart.com"
+]
+
+# Backup Configuration
+backup_retention_days = 30
+log_retention_days   = 2555  # 7 years for compliance

@@ -1,0 +1,10 @@
+export {default as Body2} from './body-2';
+export {default as Caption2} from './caption-2';
+export {default as Display2} from './display-2';
+export {default as Headline} from './headline';
+export {default as Price} from './price';
+export {default as Subheader} from './subheader';
+export {default as Subheader2} from './subheader-2';
+export {default as Title} from './title';
+export {default as Title2} from './title-2';
+export {default as Title3} from './title-3';

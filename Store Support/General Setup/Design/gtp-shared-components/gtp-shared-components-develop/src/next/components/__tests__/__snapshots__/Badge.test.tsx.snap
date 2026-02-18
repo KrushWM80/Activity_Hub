@@ -1,0 +1,232 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test blue Badge Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      [
+        {
+          "borderRadius": 1000,
+          "height": 12,
+          "width": 12,
+        },
+      ],
+      undefined,
+    ]
+  }
+  testID="Badge"
+>
+  <Text
+    accessibilityRole="alert"
+    style={
+      [
+        {
+          "fontFamily": "Bogle",
+          "fontSize": 12,
+          "fontStyle": "normal",
+          "fontWeight": "700",
+          "lineHeight": 16,
+        },
+      ]
+    }
+  />
+</View>
+`;
+
+exports[`Test gray Badge Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      [
+        {
+          "borderRadius": 1000,
+          "height": 12,
+          "width": 12,
+        },
+      ],
+      undefined,
+    ]
+  }
+  testID="Badge"
+>
+  <Text
+    accessibilityRole="alert"
+    style={
+      [
+        {
+          "fontFamily": "Bogle",
+          "fontSize": 12,
+          "fontStyle": "normal",
+          "fontWeight": "700",
+          "lineHeight": 16,
+        },
+      ]
+    }
+  />
+</View>
+`;
+
+exports[`Test green Badge Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      [
+        {
+          "borderRadius": 1000,
+          "height": 12,
+          "width": 12,
+        },
+      ],
+      undefined,
+    ]
+  }
+  testID="Badge"
+>
+  <Text
+    accessibilityRole="alert"
+    style={
+      [
+        {
+          "fontFamily": "Bogle",
+          "fontSize": 12,
+          "fontStyle": "normal",
+          "fontWeight": "700",
+          "lineHeight": 16,
+        },
+      ]
+    }
+  />
+</View>
+`;
+
+exports[`Test purple Badge Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      [
+        {
+          "borderRadius": 1000,
+          "height": 12,
+          "width": 12,
+        },
+      ],
+      undefined,
+    ]
+  }
+  testID="Badge"
+>
+  <Text
+    accessibilityRole="alert"
+    style={
+      [
+        {
+          "fontFamily": "Bogle",
+          "fontSize": 12,
+          "fontStyle": "normal",
+          "fontWeight": "700",
+          "lineHeight": 16,
+        },
+      ]
+    }
+  />
+</View>
+`;
+
+exports[`Test red Badge Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      [
+        {
+          "borderRadius": 1000,
+          "height": 12,
+          "width": 12,
+        },
+      ],
+      undefined,
+    ]
+  }
+  testID="Badge"
+>
+  <Text
+    accessibilityRole="alert"
+    style={
+      [
+        {
+          "fontFamily": "Bogle",
+          "fontSize": 12,
+          "fontStyle": "normal",
+          "fontWeight": "700",
+          "lineHeight": 16,
+        },
+      ]
+    }
+  />
+</View>
+`;
+
+exports[`Test spark Badge Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      [
+        {
+          "borderRadius": 1000,
+          "height": 12,
+          "width": 12,
+        },
+      ],
+      undefined,
+    ]
+  }
+  testID="Badge"
+>
+  <Text
+    accessibilityRole="alert"
+    style={
+      [
+        {
+          "fontFamily": "Bogle",
+          "fontSize": 12,
+          "fontStyle": "normal",
+          "fontWeight": "700",
+          "lineHeight": 16,
+        },
+      ]
+    }
+  />
+</View>
+`;
+
+exports[`Test white Badge Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      [
+        {
+          "borderRadius": 1000,
+          "height": 12,
+          "width": 12,
+        },
+      ],
+      undefined,
+    ]
+  }
+  testID="Badge"
+>
+  <Text
+    accessibilityRole="alert"
+    style={
+      [
+        {
+          "fontFamily": "Bogle",
+          "fontSize": 12,
+          "fontStyle": "normal",
+          "fontWeight": "700",
+          "lineHeight": 16,
+        },
+      ]
+    }
+  />
+</View>
+`;

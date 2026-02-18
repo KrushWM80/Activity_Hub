@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+
+# This script is meant to be run on the consumer app
+# It needs to be run by devs manually using npx runCodemods <transform> <path>.
+# It performs the following:
+#   - it requires jscodeshift A runner, which executes the provided transform for each file passed to it.
+#     It also outputs a summary of how many files have been transformed.
+#   - it will modify all the breaking changes using available transforms.
+# AVAILABLE TRANSFORMS:
+  # 1) updateImports - All imports have been simplified so that now you can import from root instead of `dist`.
+      # Example - > npx runCodemods updateImports <path>"
+
+# NOOP if running on Looper
+test "$(id -u -n )" = "jenkinspan" && exit 0
+
+MSG=$(cat<<'EOH'
+#
+# This script is meant to be run on the consumer app only via
+#
+# npx runCodemods <transform_name> <target_dir>
+#
+# Running it here, locally, in the gtp-shared-components root, it will have no effect.
+#
+EOH
+:)
+
+USAGE=$(cat<<'EOU'
+
+
+    USAGE:
+    npx runCodemods <transform_name> <target_dir>
+     where:
+        - transform_name = the name of the transform script, for ex: updateImports
+        - target_dir is Optional = the directory or file you want to run on (relative path), for ex: src
+        if its empty then it will run on the root folder
+
+    example:
+       npx runCodemods updateImports src # <- run the runCodemods script on the src directory recursively.
+       npx runCodemods updateJestConfig # <- run the runCodemods script on the root directory recursively.
+
+    NOTE: Before you run the script, Make sure to commit all the local changes.
+EOU
+:)
+
+currentDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+suportingExtensions="ts,tsx,js,jsx"
+# Input arguments
+TRANSFORM_NAME="$1"
+TARGET_DIR="$2"
+
+[ -z "$TRANSFORM_NAME" ] && echo "Error: you need to pass transform name$USAGE" && exit 101
+#[ -z "$TARGET_DIR" ] && echo "Error: you need to pass target dir$USAGE" && exit 102
+#[[ $# -ne 2 ]] && echo "Error: Invalid number of arguments$USAGE" && exit 103
+
+# if we are inside node_modules
+if echo "$currentDir" | grep -q "/node_modules/"; then
+  # there are 2 scenarios:
+  # 1. we are invoked directly (./runCodemods)
+  if echo "$currentDir" | grep -q "/@walmart/gtp-shared-components/scripts"; then
+    PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
+  fi
+
+  # 2. we are invoked via npx (npx runCodemods <transform_name> <target_directory>)
+  if echo "$currentDir" | grep -q "/.bin"; then
+    PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+  fi
+elif echo "$currentDir" | grep -q "gtp-shared-components/scripts"; then
+  # if we are not inside node_modules, we want a noop (it means we are inside
+  # the unpublished code of the library, we don't want to run any codemods)
+  # The script would fail anyway since there is no android or ios directory
+  echo "$MSG"
+  exit 104
+else
+  # if we are anywhere else, it's an error
+  exit 105
+fi
+
+cd "$PROJECT_DIR" || (echo "Invalid project directory" && exit 106)
+
+TRANSFORM_FILE_PATH="$PROJECT_DIR/node_modules/@walmart/gtp-shared-components/transforms/$TRANSFORM_NAME.tsx"
+
+if [[ "$TRANSFORM_NAME" == "updateJestConfig" ]]; then
+   EXTENSIONS="${suportingExtensions},json,mjs,cjs"
+else
+   EXTENSIONS="${suportingExtensions}"
+fi
+
+if [[ -z "$TARGET_DIR" ]]; then
+   TARGET_PATH="$PROJECT_DIR"
+else
+   TARGET_PATH="$PROJECT_DIR/$TARGET_DIR"
+fi
+
+echo "Running LD RN Library Codemods"
+
+# Validate Arguments
+if [[ -d $TARGET_PATH ]]; then
+    echo "Running on directory - $TARGET_PATH "
+elif [[ -f $TARGET_PATH ]]; then
+    echo "Running on File - $TARGET_PATH "
+else
+    echo "Error: $TARGET_PATH - Invalid Target Directory Path"
+    exit 107
+fi
+
+if [[ -f $TRANSFORM_FILE_PATH ]]; then
+    echo "with Transform - $TRANSFORM_NAME "
+else
+    echo "Error: $TRANSFORM_NAME - Invalid Transform. Please enter the correct transform name.
+      Available Transforms:
+        1) updateImports -  All imports have been simplified so that now you can import from root instead of `dist`.
+          - > npx runCodemods updateImports <path>"
+    exit 108
+fi
+
+ROOT_DIR="$(cd "/" && pwd)"
+
+# npx fails to run inside the project. Navigate to root to install jscodeshift with npx.
+cd $ROOT_DIR
+
+# Install and Execute jscodeshift with npx
+npx jscodeshift -t "$TRANSFORM_FILE_PATH" --ignore-pattern="**/node_modules/**" --extensions="$EXTENSIONS" --parser=tsx "$TARGET_PATH" || exit 109
+
+echo "[ PASS ] - $TRANSFORM_NAME Codemod has been applied in directory - $TARGET_DIR!"
+echo "[ NOTE ] - CODE FORMATTING MUST BE DONE ON YOUR END WITH YOUR FORMATTER.
+  Some Example references:
+  Prettier - https://prettier.io/
+  Eslint - https://eslint.org/
+"

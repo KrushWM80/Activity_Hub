@@ -1,0 +1,35 @@
+{
+  "name": "walmart-refresh-touring-guide",
+  "version": "1.0.0",
+  "description": "Walmart Refresh Touring Guide System - Business Owner Interface, Store Associate Mobile Interface, and Progress Dashboard",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "walmart",
+    "refresh",
+    "guide",
+    "survey",
+    "dashboard",
+    "mobile"
+  ],
+  "author": "Walmart ATC Team",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "@google-cloud/bigquery": "^8.1.1",
+    "dotenv": "^17.2.3",
+    "mammoth": "^1.11.0",
+    "textract": "^2.5.0",
+    "xlsx": "^0.18.5"
+  }
+}

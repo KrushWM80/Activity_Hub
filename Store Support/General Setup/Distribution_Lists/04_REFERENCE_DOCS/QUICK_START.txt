@@ -1,0 +1,220 @@
+================================================================================
+WALMART OPS SUPPORT DISTRIBUTION LIST TOOL - QUICK START GUIDE
+================================================================================
+
+Location: C:\Users\krush\Documents
+Date: December 15, 2025
+Status: ✅ PHASE 1 COMPLETE
+
+================================================================================
+30-SECOND SUMMARY
+================================================================================
+
+We've extracted 2,684 users from 3 AD groups with 99.7% email coverage.
+You now have data files, tools, and documentation ready to go.
+Next step: Get Workday job mappings and create distribution lists.
+
+================================================================================
+ FILES YOU NEED
+================================================================================
+
+👉 MAIN DATA FILE:
+   ad_groups_20251215_154559.csv (420 KB)
+   └─ Open in Excel → Review/Filter
+   └─ Contains: All 2,684 users with emails + job codes
+
+👉 EMAIL LIST (for M365):
+   email_list_20251215_154559.txt
+   └─ 2,677 emails ready to copy/paste
+   └─ For creating distribution lists
+
+👉 IF YOU HAVE WORKDAY DATA:
+   merge_workday_data.py
+   └─ Command: python merge_workday_data.py --ad-csv ad_groups_*.csv --workday-csv workday_jobs.csv --output final.csv
+   └─ Output: CSV with job descriptions
+
+================================================================================
+QUICK ACTIONS (TODAY)
+================================================================================
+
+1️⃣  OPEN CSV IN EXCEL
+    Click: ad_groups_20251215_154559.csv
+    Review: Spot-check some email addresses
+    Action: Verify data quality
+    Time: 5 minutes
+
+2️⃣  REQUEST WORKDAY DATA (EMAIL HR)
+    Template in: WORKDAY_INTEGRATION_GUIDE.md
+    Include: Job code list + format
+    Timeline: 1-3 business days
+    Time: 5 minutes to send
+
+3️⃣  CREATE DISTRIBUTION LISTS (optional - can do now)
+    Option A - Manual:
+      • Copy text from email_list_20251215_154559.txt
+      • Go to outlook.office365.com
+      • Create new group
+      • Paste emails
+      • Time: 10 minutes
+    
+    Option B - Automated:
+      • Run: .\create_distribution_list.ps1
+      • Specify group name
+      • Time: 5 minutes
+
+================================================================================
+PHASE 2: WORKDAY MERGE (WHEN YOU GET THE DATA)
+================================================================================
+
+Once HR sends you workday_jobs.csv with job mappings:
+
+1. Save workday_jobs.csv in C:\Users\krush\Documents
+
+2. Run:
+   python merge_workday_data.py --ad-csv ad_groups_20251215_154559.csv --workday-csv workday_jobs.csv
+
+3. Open output CSV (ad_users_with_workday_*.csv)
+
+4. Review job descriptions added
+
+Time: ~1 minute
+
+================================================================================
+IMPORTANT DATA
+================================================================================
+
+Groups Extracted:
+  • OPS_SUP_MARKET_TEAM  - 2,241 users
+  • OPS_SUP_REGION_TEAM  -   297 users
+  • OPS_SUP_BU_TEAM      -   312 users
+  ─────────────────────────────────────
+  TOTAL UNIQUE USERS: 2,684
+  WITH EMAIL: 2,677 (99.7%)
+
+Data Fields Available:
+  ✓ Username, Email, Display Name, Title, Department
+  ✓ Employee Number, Job Code, Position Code
+  ✓ Business Unit, Business Unit Type, Employment Status
+  ⏳ Workday Job Number (pending)
+  ⏳ Workday Job Description (pending)
+
+================================================================================
+FILE DESCRIPTIONS
+================================================================================
+
+DATA:
+  ad_groups_20251215_154559.csv      ← Main data file (use this!)
+  ad_groups_20251215_154559.json     ← Structured format (for APIs)
+  email_list_20251215_154559.txt     ← Email only (for M365)
+
+TOOLS:
+  ad_group_extractor.py              ← Extract AD groups (run monthly)
+  workday_job_lookup.py              ← Map job codes to Workday
+  merge_workday_data.py              ← Merge AD + Workday data
+  create_distribution_list.ps1       ← Create M365 DLs
+
+DOCS:
+  README.md                          ← Full guide (read first)
+  WORKDAY_INTEGRATION_GUIDE.md       ← How to get Workday data
+  FINAL_STATUS_REPORT.md             ← Complete project status
+  DELIVERABLES.txt                   ← Detailed checklist
+  QUICK_START.txt                    ← This file
+
+================================================================================
+READING ORDER (RECOMMENDED)
+================================================================================
+
+Non-Technical Users:
+  1. This file (QUICK_START.txt)
+  2. README.md sections 1-3
+  3. Open CSV in Excel
+  4. Follow Phase 2 steps when Workday data arrives
+
+Technical Users:
+  1. FINAL_STATUS_REPORT.md (full overview)
+  2. ad_group_extractor.py (understand architecture)
+  3. workday_job_lookup.py (understand mapping)
+  4. merge_workday_data.py (understand merge logic)
+  5. Extend as needed
+
+IT/Admin Users:
+  1. DELIVERABLES.txt
+  2. WORKDAY_INTEGRATION_GUIDE.md
+  3. Schedule ad_group_extractor.py monthly
+  4. Set up CI/CD for merge_workday_data.py
+  5. Deploy create_distribution_list.ps1 to Exchange
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+CSV won't open?
+  → Right-click → Open With → Excel
+  → Or: Excel → File → Open → browse to CSV
+
+PowerShell permission error?
+  → Run: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+Email addresses look wrong?
+  → They're synced from AD, check with IT
+  → All active Walmart employees should be there
+
+Missing some users?
+  → Coverage is 99.7% (7 missing emails)
+  → Those users may be inactive or test accounts
+  → Check CSV for their names
+
+Want to add more groups?
+  → Edit ad_group_extractor.py line ~205
+  → Add group name to 'groups' list
+  → Run python ad_group_extractor.py
+
+================================================================================
+WHAT'S NEXT
+================================================================================
+
+STEP 1: Get Workday data (1-3 days, you initiate)
+  └─ Email HR with template from WORKDAY_INTEGRATION_GUIDE.md
+
+STEP 2: Merge data (5 minutes, automated)
+  └─ Run merge script when data arrives
+  └─ Output CSV with job descriptions
+
+STEP 3: Create distribution lists (10 minutes - 1 hour)
+  └─ Manual: Copy/paste emails to M365
+  └─ Automated: Run PowerShell script
+  └─ Both options available
+
+STEP 4 (Optional): Build dashboard (future)
+  └─ Browse users by group, job, manager
+  └─ Create DLs by job role
+  └─ Scheduled monthly updates
+
+================================================================================
+CONTACT INFO
+================================================================================
+
+Questions about:
+  Workday data? → Contact HR/Workday team
+  Running scripts? → Check documentation or inline code comments
+  M365 setup? → See create_distribution_list.ps1
+  Data quality? → Check FINAL_STATUS_REPORT.md metrics
+  Future features? → Let's discuss in next phase
+
+================================================================================
+KEY TAKEAWAYS
+================================================================================
+
+✅ Data extraction: COMPLETE (2,684 users, 99.7% email coverage)
+✅ Tools provided: ad_group_extractor, workday merger, M365 automation
+✅ Documentation: Comprehensive guides for every use case
+⏳ Workday integration: Waiting for HR export (you request)
+⏳ Distribution lists: Ready to create (today or after Workday merge)
+
+Status: PRODUCTION READY ✓
+
+================================================================================
+
+Start with Step 1 above. All files in C:\Users\krush\Documents
+
+Good luck! 🐶

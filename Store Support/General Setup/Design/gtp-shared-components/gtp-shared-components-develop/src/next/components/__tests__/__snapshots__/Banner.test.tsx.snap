@@ -1,0 +1,489 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test error Banner Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "flex-start",
+        "flexDirection": "row",
+      },
+      {
+        "backgroundColor": "#de1c24",
+      },
+      undefined,
+    ]
+  }
+  testID="Banner"
+>
+  <View
+    style={
+      [
+        {
+          "flex": 1,
+          "paddingBottom": 16,
+          "paddingLeft": 16,
+          "paddingRight": 0,
+          "paddingTop": 16,
+        },
+        {
+          "paddingLeft": 16,
+        },
+      ]
+    }
+  >
+    <Text
+      accessibilityRole="alert"
+      style={
+        [
+          {
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "maxWidth": 700,
+            "textAlign": "center",
+          },
+          {
+            "color": "#fff",
+          },
+        ]
+      }
+    >
+      This is an error message
+    </Text>
+  </View>
+  <View
+    accessibilityLabel="close"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    testID="close-button"
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "height": 52,
+          "justifyContent": "center",
+          "width": 48,
+        }
+      }
+    >
+      <Image
+        accessibilityRole="image"
+        source={
+          {
+            "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/Close-16.png",
+          }
+        }
+        style={
+          [
+            {
+              "height": 16,
+              "tintColor": "black",
+              "width": 16,
+            },
+            {},
+          ]
+        }
+        testID="CloseIcon"
+      />
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Test info Banner Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "flex-start",
+        "flexDirection": "row",
+      },
+      {
+        "backgroundColor": "#e3e4e5",
+      },
+      undefined,
+    ]
+  }
+  testID="Banner"
+>
+  <View
+    style={
+      [
+        {
+          "flex": 1,
+          "paddingBottom": 16,
+          "paddingLeft": 16,
+          "paddingRight": 0,
+          "paddingTop": 16,
+        },
+        {
+          "paddingLeft": 16,
+        },
+      ]
+    }
+  >
+    <Text
+      accessibilityRole="alert"
+      style={
+        [
+          {
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "maxWidth": 700,
+            "textAlign": "center",
+          },
+          {
+            "color": "#000",
+          },
+        ]
+      }
+    >
+      This is an info message
+    </Text>
+  </View>
+  <View
+    accessibilityLabel="close"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    testID="close-button"
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "height": 52,
+          "justifyContent": "center",
+          "width": 48,
+        }
+      }
+    >
+      <Image
+        accessibilityRole="image"
+        source={
+          {
+            "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/Close-16.png",
+          }
+        }
+        style={
+          [
+            {
+              "height": 16,
+              "tintColor": "black",
+              "width": 16,
+            },
+            {},
+          ]
+        }
+        testID="CloseIcon"
+      />
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Test success Banner Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "flex-start",
+        "flexDirection": "row",
+      },
+      {
+        "backgroundColor": "#2a8703",
+      },
+      undefined,
+    ]
+  }
+  testID="Banner"
+>
+  <View
+    style={
+      [
+        {
+          "flex": 1,
+          "paddingBottom": 16,
+          "paddingLeft": 16,
+          "paddingRight": 0,
+          "paddingTop": 16,
+        },
+        {
+          "paddingLeft": 16,
+        },
+      ]
+    }
+  >
+    <Text
+      accessibilityRole="alert"
+      style={
+        [
+          {
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "maxWidth": 700,
+            "textAlign": "center",
+          },
+          {
+            "color": "#fff",
+          },
+        ]
+      }
+    >
+      This is an success message
+    </Text>
+  </View>
+  <View
+    accessibilityLabel="close"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    testID="close-button"
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "height": 52,
+          "justifyContent": "center",
+          "width": 48,
+        }
+      }
+    >
+      <Image
+        accessibilityRole="image"
+        source={
+          {
+            "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/Close-16.png",
+          }
+        }
+        style={
+          [
+            {
+              "height": 16,
+              "tintColor": "black",
+              "width": 16,
+            },
+            {},
+          ]
+        }
+        testID="CloseIcon"
+      />
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Test warning Banner Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "flex-start",
+        "flexDirection": "row",
+      },
+      {
+        "backgroundColor": "#ffc220",
+      },
+      undefined,
+    ]
+  }
+  testID="Banner"
+>
+  <View
+    style={
+      [
+        {
+          "flex": 1,
+          "paddingBottom": 16,
+          "paddingLeft": 16,
+          "paddingRight": 0,
+          "paddingTop": 16,
+        },
+        {
+          "paddingLeft": 16,
+        },
+      ]
+    }
+  >
+    <Text
+      accessibilityRole="alert"
+      style={
+        [
+          {
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "maxWidth": 700,
+            "textAlign": "center",
+          },
+          {
+            "color": "#000",
+          },
+        ]
+      }
+    >
+      This is an warning message
+    </Text>
+  </View>
+  <View
+    accessibilityLabel="close"
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    testID="close-button"
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "height": 52,
+          "justifyContent": "center",
+          "width": 48,
+        }
+      }
+    >
+      <Image
+        accessibilityRole="image"
+        source={
+          {
+            "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/Close-16.png",
+          }
+        }
+        style={
+          [
+            {
+              "height": 16,
+              "tintColor": "black",
+              "width": 16,
+            },
+            {},
+          ]
+        }
+        testID="CloseIcon"
+      />
+    </View>
+  </View>
+</View>
+`;

@@ -1,0 +1,47 @@
+---
+title: TabNavigation
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Tab Navigation allows for page-level navigation between sets of content, with a selected state, typically used at the top of the screen.
+
+
+<ScreenshotTabs screenshotData={"screenshots/tab-navigation.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {TabNavigation,TabNavigationItem,Icons,Badge} from '@walmart/gtp-shared-components';
+
+const [currentTab, setCurrentTab] = React.useState(1);
+
+<TabNavigation>
+  <TabNavigationItem
+    leading={<Icons.CartIcon />}
+    isCurrent={currentTab===0}
+    onPress={() => setCurrentTab(0)}
+    trailing={<Badge color="blue" UNSAFE_style={styles.badge}>10</Badge>}>
+    {"One"}
+  </TabNavigationItem>
+  <TabNavigationItem
+    isCurrent={currentTab===1}
+    leading={<Icons.CartIcon />}
+    onPress={() => setCurrentTab(1)}
+    trailing={<Badge color="blue" UNSAFE_style={styles.badge}>10</Badge>}>
+    {"Two"}
+  </TabNavigationItem>
+  <TabNavigationItem
+    leading={<Icons.CartIcon />}
+    isCurrent={currentTab===2}
+    onPress={() => setCurrentTab(2)}
+    trailing={<Badge color="blue" UNSAFE_style={styles.badge}>10</Badge>}>
+    {"Three"}
+  </TabNavigationItem>
+</TabNavigation>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="TabNavigation" prop="children"/>
+ ### UNSAFE_style
+<PropTable componentLink="TabNavigation" prop="UNSAFE_style"/>

@@ -1,0 +1,30 @@
+---
+title: Snackbar
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Snackbars provide brief messages regarding app processes.
+By default, an SnackBar appears at the bottom of the screen. You can also pass an optional custom vertical position
+it can be an absolute number (e.g. 200) or a percent (e.g 25%) of the screen height measured from the bottom of the screen.
+Snackbars contain up to two lines of text directly related to the operation performed.
+They may contain a text action, but no icons.
+
+
+
+
+
+## Usage
+```js
+import {Snackbar} from '@walmart/gtp-shared-components`;
+```
+
+## Props
+
+ ### button<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>actionButton</strong> instead</span></span>
+<PropTable componentLink="Snackbar" prop="button"/>
+ ### actionButton
+<PropTable componentLink="Snackbar" prop="actionButton"/>
+ ### closeButton
+<PropTable componentLink="Snackbar" prop="closeButton"/>

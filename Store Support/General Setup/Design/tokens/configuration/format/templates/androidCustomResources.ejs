@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<%
+// Custom Android resource template.
+//
+// style-dictionary's resource template only permits tag/attribute changes
+// based on the token's `category`. This project requires tag/attribute
+// changes based on the token's `category` and `type`.
+//
+// @see {@link https://github.com/amzn/style-dictionary/blob/main/lib/common/templates/android/resources.template}
+const propToTag = (prop) => {
+  const {attributes: {category, type}, value, path} = prop;
+
+  if (category === "color") {
+    return "color";
+  } else if (/^-?\d+(dp|sp)$/.test(prop.value) || path.includes("iconSize")) {
+    return "dimen";
+  } else if (path.includes("iconName")) {
+    return "drawable";
+  } else if (
+    category === "duration" ||
+    (category === "font" && type === "weight") ||
+    category === "zIndex" ||
+    typeof type === "number"
+  ) {
+    return "integer";
+  } else if (category === "font" && type === "family") {
+    return "item";
+  }
+
+  return "string";
+}
+
+const propToAttributes = (prop) => {
+  const {attributes: {category, type}, name} = prop;
+
+  const attributes = {
+    name,
+  };
+
+  /**
+   * Font family is an `<item />` with `type="font"`.
+   *
+   * @see {@link https://developer.android.com/guide/topics/resources/more-resources#Id}
+   * @see {@link https://gecgithub01.walmart.com/LivingDesign/tokens/pull/203#discussion_r3449416}
+   */
+  if (category === "font" && type === "family") {
+    attributes.type = "font";
+  }
+
+  return Object.keys(attributes)
+    .map((key) => `${key}="${attributes[key]}"`)
+    .join(" ");
+}
+
+const referenceToTag = (reference) => {
+  const {attributes: {category, type}} = reference;
+
+  if (category === "font" && type === "family") {
+    return "item";
+  }
+
+  return propToTag(reference);
+}
+
+const referenceToValue = (reference) => {
+  const {attributes: {category, type}} = reference;
+
+  if (category === "font" && type === "family") {
+    return `@font/${reference.name}`;
+  }
+
+  return `@${propToTag(reference)}/${reference.name}`;
+}
+%>
+<%= fileHeader({file, commentStyle: "xml"}) %>
+<resources>
+<% dictionary.allTokens.forEach((prop) => {
+  const reference = file.options?.outputReferences &&
+    dictionary.usesReference(prop.original.value) &&
+    dictionary.getReferences(prop.original.value)[0];
+
+  const attributes = propToAttributes(reference ? { ...reference, name: prop.name } : prop);
+  const tag = reference ? referenceToTag(reference) : propToTag(prop);
+  const value = reference ? referenceToValue(reference) : prop.value;
+%>
+  <<%= tag %> <%= attributes %>><%= value %></<%= tag %>><% if (prop.comment) { %> <!-- <%= prop.comment %> --><% } }); %>
+</resources>

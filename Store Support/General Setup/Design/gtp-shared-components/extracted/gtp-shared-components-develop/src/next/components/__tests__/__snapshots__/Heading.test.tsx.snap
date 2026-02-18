@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Should match snapshot of Heading with default props. 1`] = `
+<Text
+  accessibilityRole="header"
+  style={
+    [
+      {
+        "color": "#2e2f32",
+        "fontFamily": "Bogle",
+        "fontSize": 20,
+        "fontStyle": "normal",
+        "fontWeight": "700",
+        "lineHeight": 28,
+      },
+      {},
+    ]
+  }
+  testID="Heading"
+>
+  Test Children
+</Text>
+`;

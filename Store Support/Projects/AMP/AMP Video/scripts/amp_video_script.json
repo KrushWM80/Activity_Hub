@@ -1,0 +1,63 @@
+{
+  "video_info": {
+    "title": "AMP Update: Store Safety and Security Update - Week 41",
+    "duration": "30 seconds",
+    "target_audience": "All store associates and management",
+    "created_date": "2025-11-10T10:38:09.015853"
+  },
+  "storyboard": [
+    {
+      "timestamp": "0-5s",
+      "scene": "Opening",
+      "visual": "Walmart logo with AMP branding",
+      "audio": "Important update: Store Safety and Security Update - Week 41",
+      "text_overlay": "Store Safety and Security Update - Week 41"
+    },
+    {
+      "timestamp": "5-20s",
+      "scene": "Main Content",
+      "visual": "Bullet points with icons",
+      "audio": "Key actions this week: Review safety checklist with all team members, Implement new security protocols by end of week",
+      "text_overlay": "Key Actions This Week"
+    },
+    {
+      "timestamp": "20-25s",
+      "scene": "Priority",
+      "visual": "Priority indicator with deadline",
+      "audio": "Priority level: High. Deadline: End of Week 41, 2026",
+      "text_overlay": "Priority: High"
+    },
+    {
+      "timestamp": "25-30s",
+      "scene": "Call to Action",
+      "visual": "AMP dashboard preview",
+      "audio": "Check your AMP dashboard for complete details",
+      "text_overlay": "View Full Details in AMP Dashboard"
+    }
+  ],
+  "voice_script": {
+    "full_script": "\n                Important update: Store Safety and Security Update - Week 41.\n                \n                Key actions this week: Review safety checklist with all team members, Implement new security protocols by end of week.\n                \n                Priority level: High. Deadline: End of Week 41, 2026.\n                \n                Check your AMP dashboard for complete details.\n                ",
+    "notes": "Professional tone, clear pronunciation, moderate pace"
+  },
+  "visual_elements": {
+    "colors": [
+      "#004c91",
+      "#ffc220",
+      "#ffffff"
+    ],
+    "fonts": [
+      "Arial",
+      "Helvetica",
+      "Walmart Sans"
+    ],
+    "logos": [
+      "Walmart Spark",
+      "AMP Logo"
+    ],
+    "graphics": [
+      "Progress indicators",
+      "Priority badges",
+      "Action icons"
+    ]
+  }
+}

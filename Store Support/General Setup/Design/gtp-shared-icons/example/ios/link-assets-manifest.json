@@ -1,0 +1,61 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "../assets/fonts/Bogle-Black.otf",
+      "sha1": "a97a97c75f7748d2e61d8454888e6492df0737b0"
+    },
+    {
+      "path": "../assets/fonts/Bogle-BlackItalic.otf",
+      "sha1": "ead9dffb789b717aab5079e3dca20fd46c4e134c"
+    },
+    {
+      "path": "../assets/fonts/Bogle-Bold.otf",
+      "sha1": "2eae9e30d6c7037c740e78223716a5a71fe13994"
+    },
+    {
+      "path": "../assets/fonts/Bogle-BoldItalic.otf",
+      "sha1": "e99981444e9f9598bb5b11885bf4145ab519e9c4"
+    },
+    {
+      "path": "../assets/fonts/Bogle-Light.otf",
+      "sha1": "09e5a80606c1ec4c976892527e3ff9abd5c82b32"
+    },
+    {
+      "path": "../assets/fonts/Bogle-LightItalic.otf",
+      "sha1": "faee1fe427b1644a4e98672d3500cc7ed0cf2b5c"
+    },
+    {
+      "path": "../assets/fonts/Bogle-Medium.otf",
+      "sha1": "6954fa6d85f026c478db9b0806c271d9a7d1876a"
+    },
+    {
+      "path": "../assets/fonts/Bogle-MediumItalic.otf",
+      "sha1": "e1ccb717cc1a911ca552f73aeac7c9f4e3442147"
+    },
+    {
+      "path": "../assets/fonts/Bogle-Regular.otf",
+      "sha1": "73077370101c12c8ebab8c18610e09c19d667428"
+    },
+    {
+      "path": "../assets/fonts/Bogle-RegularItalic.otf",
+      "sha1": "61a6e1e2a7b1184a076301aeb02360337a1dba95"
+    },
+    {
+      "path": "../assets/fonts/Bogle-Thin.otf",
+      "sha1": "0956757ddf8e6406b53b6ee179a033aa5c037ef6"
+    },
+    {
+      "path": "../assets/fonts/Bogle-ThinItalic.otf",
+      "sha1": "64235abda920efe93351baa90b3cb5b822b96798"
+    },
+    {
+      "path": "../assets/fonts/BogleMono-Bold.otf",
+      "sha1": "09f20717ef3d28da50aa0a5549e0669ece21e7f7"
+    },
+    {
+      "path": "../assets/fonts/BogleMono-Regular.otf",
+      "sha1": "51c0aabbd36385c5042d0d260e87ccfff55eab5b"
+    }
+  ]
+}

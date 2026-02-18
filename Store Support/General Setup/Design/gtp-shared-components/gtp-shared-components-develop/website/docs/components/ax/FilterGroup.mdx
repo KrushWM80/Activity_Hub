@@ -1,0 +1,31 @@
+---
+title: FilterGroup
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+These are used in conjunction with other components, designers and engineers should use these over atoms,
+unless a variant needs to be created for a specific purpose.
+
+
+<ScreenshotTabs screenshotData={{"Filter Trigger All":"screenshots/filter-group-trigger-all.png","Filter Trigger Single":"screenshots/filter-group-trigger-single.png","Filter Toggle":"screenshots/filter-group-toggle.png","Filter Tag":"screenshots/filter-group-tag.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {FilterGroup, FilterTriggerAll, FilterTriggerSingle, FilterToggle, FilterTag} from '@walmart/gtp-shared-components/ax`;
+
+<FilterGroup>
+  <FilterTriggerAll />
+  <FilterTriggerSingle>Trigger Single</FilterTriggerSingle>
+  <FilterToggle>Toggle</FilterToggle>
+  <FilterTag>Tag</FilterTag>
+</FilterGroup>
+```
+## Props
+
+ ### children
+<PropTable componentLink="FilterGroup" prop="children"/>
+ ### wrapping
+<PropTable componentLink="FilterGroup" prop="wrapping"/>
+ ### UNSAFE_style
+<PropTable componentLink="FilterGroup" prop="UNSAFE_style"/>

@@ -1,0 +1,7 @@
+{
+  "internal": true,
+  "main": "../dist/ax/index.js",
+  "types": "../dist/ax/index.d.js",
+  "module": "../dist/ax/index.js",
+  "react-native": "../src/ax/index"
+}

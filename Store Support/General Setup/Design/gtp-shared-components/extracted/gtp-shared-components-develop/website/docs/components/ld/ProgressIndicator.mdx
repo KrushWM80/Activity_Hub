@@ -1,0 +1,37 @@
+---
+title: ProgressIndicator
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Progress Indicators display a visual representation of the completion of a task or process.
+
+
+<ScreenshotTabs screenshotData={"screenshots/progress-indicator.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {ProgressIndicator} from '@walmart/gtp-shared-components`;
+
+<ProgressIndicator
+  label={'Account setup is complete'}
+  value={50}
+  valueLabel="5 0f 10"
+/>
+```
+## Props
+
+ ### label
+<PropTable componentLink="ProgressIndicator" prop="label"/>
+ ### min
+<PropTable componentLink="ProgressIndicator" prop="min"/>
+ ### max
+<PropTable componentLink="ProgressIndicator" prop="max"/>
+ ### value
+<PropTable componentLink="ProgressIndicator" prop="value"/>
+ ### valueLabel
+<PropTable componentLink="ProgressIndicator" prop="valueLabel"/>
+ ### variant
+<PropTable componentLink="ProgressIndicator" prop="variant"/>
+ ### UNSAFE_style
+<PropTable componentLink="ProgressIndicator" prop="UNSAFE_style"/>

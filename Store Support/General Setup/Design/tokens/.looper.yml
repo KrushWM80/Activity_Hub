@@ -1,0 +1,137 @@
+useSecretStore: true
+
+envs:
+  global:
+    variables:
+      # The value stored in the LooperPro job's org secrets: https://dx.walmart.com/nextgenci/v2/secret/519bac01-a32b-41f4-a0c6-5adbd1388fc6
+      GITHUB_TOKEN: "%{credentials.secret('SVC_LD_PUBLISHER_PAT_WEB')}"
+      # semantic-release also requires GITHUB_URL and GITHUB_PREFIX, the enterprise endpoint and API prefix respectively as Github Enterprise (Walmart) requirements.
+      GITHUB_URL: https://gecgithub01.walmart.com/
+      GITHUB_PREFIX: /api/v3
+      # Enable faster build when building native packages.
+      # @see {@link https://jira.walmart.com/browse/PGPTOOLS-42563?focusedCommentId=11496811&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-11496811}
+      NODEJS_ORG_MIRROR: https://repository.walmart.com/content/repositories/nodejs/
+      REPOSITORY_NAME: "LivingDesign/tokens"
+      SLACK_CHANNEL_ID: "ld-rweb-releases"
+      SLACK_USERNAME: "Living Design Release Bot"
+
+# Multi-branch configuration
+# https://dx.walmart.com/looper/documentation/confluence/Multibranch-Support-863545606
+branches:
+- spec: main
+  call: default
+- spec: next
+  call: default
+
+tools:
+  android:
+    - tools
+    - platform-tools
+    - android-23
+    - build-tools;23.0.1
+    - extras;android;m2repository
+  gradle: 7.5.1
+  jdk:
+    flavor: azul
+    version: 11
+  nodejs: 20.10.0
+  npm: 10.5.0
+
+# Run builds in parallel
+# http://looper.walmart.com/docs/general/scheduling.html
+scheduling: concurrent
+
+triggers:
+  # Cancel builds if superseded by newer builds.
+  # @see {@link http://looper.walmart.com/docs/general/scheduling.html}
+  - pr:
+      scheduling: cancelRunning
+
+  # Don't trigger builds if author is jenkins.
+  # @see {@link http://looper.walmart.com/docs/general/triggers.html#push-trigger-configuration}
+  - push:
+      ignoreAuthor: jenkinspan
+
+flows:
+  default:
+    try:
+      - call: setup
+
+      - call: build
+
+      - exposeVars(package.json)
+      - var(previousVersion=${package.version})
+
+      # Create release
+      # @see {@link https://semantic-release.gitbook.io/semantic-release/#triggering-a-release}
+      - (name Release) npm run release
+
+      - exposeVars(package.json)
+      - var(version=${package.version})
+
+      - if: |
+          %{version != previousVersion}
+        then:
+        # Publish to proximity
+        # - call: publish
+        # Post slack message
+        - var(version): git describe --tags --abbrev=0
+
+        - slack.postMessage:
+            channelId: "${SLACK_CHANNEL_ID}"
+            iconEmoji: ":radio-bot:"
+            message: "${REPOSITORY_NAME}: Published version ${version}."
+            username: "${SLACK_USERNAME}"
+      
+      # Push to Github
+      - group(Push): git push --no-verify --follow-tags origin "$GITHUB_BRANCH_NAME"
+
+    catch:
+      # Post slack message
+      - slack.postMessage:
+          channelId: "${SLACK_CHANNEL_ID}"
+          iconEmoji: ":fire:"
+          message: "${REPOSITORY_NAME}: Build ${BUILD_NUMBER} failed."
+          username: "${SLACK_USERNAME}"
+
+  pr:
+    - call: setup
+
+    - shell (name Commit lint): |
+        #!/usr/bin/env bash
+        set -eo pipefail
+        ./node_modules/.bin/commitlint --verbose --from "origin/${GITHUB_PR_TARGET_BRANCH}" --to "${GITHUB_PR_HEAD_SHA}"
+
+    - call: build
+
+    - call: lint
+
+    - call: typecheck
+
+    - (name Test) npm run test
+
+  build:
+      - group(Build web): npm run build
+      # - group(Build Android): ./gradlew build
+
+  lint:
+    parallel:
+      # - group(Lint Android): ./gradlew lint
+      - group(Lint source): npm run lint
+
+  typecheck:
+      - group(Typecheck web): npm run typecheck
+
+  # publish:
+  #   parallel:
+      # TODO:
+      # 1. Android publication fails due to font resources being referenced
+      # via `<item />` but not being found. Fix it and un-comment the
+      # "Build Android" and "Publish Android" steps:
+      # 2. Android publication fails on the `next` branch due to incorrect
+      # parsing of vX.Y.Z-next.W in `version.gradle`
+      # - group(Publish Android): ./scripts/android-publish.sh
+
+  setup:
+    - shell (name Setup): |
+        npm install

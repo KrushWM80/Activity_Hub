@@ -1,0 +1,34 @@
+[
+  {
+    "to": "ATCTEAMSUPPORT@walmart.com",
+    "subject": "[Action Required] New Access Request: Steven Reid",
+    "body": "\n    <html>\n    <body>\n    <h2>New Access Request - Job Code Teaming Dashboard</h2>\n    <p>A new user has requested access to the Job Code Teaming Dashboard:</p>\n    <table border=\"1\" cellpadding=\"10\" style=\"border-collapse: collapse;\">\n        <tr><td><strong>Name:</strong></td><td>Steven Reid</td></tr>\n        <tr><td><strong>Username:</strong></td><td>steven.reid</td></tr>\n        <tr><td><strong>Email:</strong></td><td>steven.reid@walmart.com</td></tr>\n        <tr><td><strong>Requested:</strong></td><td>2026-01-28 10:30:43</td></tr>\n    </table>\n    <p>Please log into the <a href=\"http://localhost:8080\">Job Code Teaming Dashboard</a> to approve or reject this request.</p>\n    <p>Go to <strong>Admin</strong> tab &gt; <strong>User Management</strong> to manage access.</p>\n    </body>\n    </html>\n    ",
+    "timestamp": "2026-01-28T10:30:48.458079",
+    "sent": false,
+    "error": "timed out"
+  },
+  {
+    "to": "krush",
+    "subject": "Job Code Request Rejected - 1-615-7410",
+    "body": "\n        <html>\n        <body style=\"font-family: Arial, sans-serif;\">\n        <h2 style=\"color: red;\">\u2717 Job Code Request Rejected</h2>\n        <p>Your job code request has been rejected by Kendall Rush.</p>\n        <table border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse;\">\n            <tr><td><strong>Job Code:</strong></td><td>1-615-7410</td></tr>\n            <tr><td><strong>Type:</strong></td><td>Update</td></tr>\n            <tr><td><strong>Rejected by:</strong></td><td>Kendall Rush</td></tr>\n            <tr><td><strong>Reason:</strong></td><td>This was a test.</td></tr>\n            <tr><td><strong>Rejected date:</strong></td><td>2026-01-28 12:12:06</td></tr>\n        </table>\n        </body>\n        </html>\n        ",
+    "timestamp": "2026-01-28T12:12:11.406385",
+    "sent": false,
+    "error": "timed out"
+  },
+  {
+    "to": "ATCTEAMSUPPORT@walmart.com",
+    "subject": "Job Code Update Request - 1-996-754",
+    "body": "\n        <html>\n        <body style=\"font-family: Arial, sans-serif;\">\n        <h2>Job Code Update Request</h2>\n        <table border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse;\">\n            <tr><td><strong>Job Code:</strong></td><td>1-996-754</td></tr>\n            <tr><td><strong>Requested by:</strong></td><td>Kendall Rush (krush)</td></tr>\n            <tr><td><strong>Reason:</strong></td><td>Test - change Category</td></tr>\n            <tr><td><strong>Time:</strong></td><td>2026-01-28 12:20:57</td></tr>\n        </table>\n        <p>Please review and approve in the dashboard admin panel.</p>\n        </body>\n        </html>\n        ",
+    "timestamp": "2026-01-28T12:21:02.365949",
+    "sent": false,
+    "error": "timed out"
+  },
+  {
+    "to": "ATCTEAMSUPPORT@walmart.com",
+    "subject": "Job Code Update Request - 1-600-7200",
+    "body": "\n        <html>\n        <body style=\"font-family: Arial, sans-serif;\">\n        <h2>Job Code Update Request</h2>\n        <table border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse;\">\n            <tr><td><strong>Job Code:</strong></td><td>1-600-7200</td></tr>\n            <tr><td><strong>Requested by:</strong></td><td>Kendall Rush (krush)</td></tr>\n            <tr><td><strong>Reason:</strong></td><td>test</td></tr>\n            <tr><td><strong>Time:</strong></td><td>2026-01-28 14:25:06</td></tr>\n        </table>\n        <p>Please review and approve in the dashboard admin panel.</p>\n        </body>\n        </html>\n        ",
+    "timestamp": "2026-01-28T14:25:11.924744",
+    "sent": false,
+    "error": "timed out"
+  }
+]

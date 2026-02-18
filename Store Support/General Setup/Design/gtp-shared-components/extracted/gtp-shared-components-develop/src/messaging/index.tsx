@@ -1,0 +1,10 @@
+export {default as AlertInfo} from './alert/alert-info'; // @deprecated
+export {default as AlertInfo2} from './alert/alert-info-2'; // @deprecated
+export {default as AlertInfo3} from './alert/alert-info-3'; // @deprecated
+export {default as AlertError} from './alert/alert-error'; // @deprecated
+export {default as Message} from './message/message'; // @deprecated
+export {default as MessageError} from './message/message-error'; // @deprecated
+export {default as MessageWarning} from './message/message-warning'; // @deprecated
+export {default as MessageSuccess} from './message/message-success'; // @deprecated
+export {default as Snackbar} from './snackbar'; // @deprecated
+export {default as Tooltip} from './tooltip'; // @deprecated

@@ -1,0 +1,31 @@
+---
+title: Display
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Display text is used for decorative large text, or for displaying critical data
+
+
+<ScreenshotTabs screenshotData={"screenshots/display.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Display} from '@walmart/gtp-shared-components`;
+
+<Display size="small" weight="400">Lorem ipsum</Display>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="Display" prop="children"/>
+ ### size
+<PropTable componentLink="Display" prop="size"/>
+ ### weight
+<PropTable componentLink="Display" prop="weight"/>
+ ### color
+<PropTable componentLink="Display" prop="color"/>
+ ### UNSAFE_style
+<PropTable componentLink="Display" prop="UNSAFE_style"/>
+ ### inheritColor<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - has no effect. If you need to apply a color to the text, use e.g. UNSAFE_style=`{color: 'green'}`</span></span>
+<PropTable componentLink="Display" prop="inheritColor"/>

@@ -1,0 +1,29 @@
+---
+title: DataTableBody
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+All Data Cells of the Data Table will be added in DataTableBody
+
+
+
+## Usage
+```js
+import {DataTableBody, DataTableCell, DataTableRow} from '@walmart/gtp-shared-components';
+
+<DataTableBody>
+  <DataTableRow>
+    <DataTableCell>{'1'}</DataTableCell>
+    <DataTableCell>{'Apple'}</DataTableCell>
+    <DataTableCell variant="numeric">{'20'}</DataTableCell>
+  </DataTableRow>
+</DataTableBody>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="DataTableBody" prop="children"/>
+ ### UNSAFE_style
+<PropTable componentLink="DataTableBody" prop="UNSAFE_style"/>

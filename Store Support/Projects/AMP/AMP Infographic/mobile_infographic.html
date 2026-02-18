@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winter Health Protection - AMP Infographic</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #0071CE 0%, #004d8f 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .infographic-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0071CE, #FFC220);
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '🛡️';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 100px;
+            opacity: 0.1;
+            transform: rotate(15deg);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .week {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .content-section {
+            padding: 25px 20px;
+        }
+
+        .priority-box {
+            background: linear-gradient(135deg, #FFC220, #ffdd66);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(255,194,32,0.3);
+            position: relative;
+        }
+
+        .priority-box::before {
+            content: '⭐';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            font-size: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .priority-box h2 {
+            color: #004d8f;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .priority-box p {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .flu-highlight {
+            background: #ff6b6b;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: inline-block;
+            margin: 5px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .vaccine-section {
+            background: #e8f4fd;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .vaccine-section::before {
+            content: '💉';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 30px;
+            opacity: 0.7;
+        }
+
+        .vaccine-section h3 {
+            color: #0071CE;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .vaccine-section h3::before {
+            content: '🏥';
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .coverage-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .coverage-item {
+            background: white;
+            padding: 15px 10px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .coverage-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .coverage-item .icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .coverage-item .title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #0071CE;
+            margin-bottom: 5px;
+        }
+
+        .coverage-item .desc {
+            font-size: 10px;
+            color: #666;
+            line-height: 1.3;
+        }
+
+        .dates-banner {
+            background: linear-gradient(90deg, #0071CE, #FFC220);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 12px;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dates-banner::before {
+            content: '📅';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+        }
+
+        .dates-banner .date {
+            display: block;
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        .tips-section {
+            background: #f0fdf4;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tips-section h3 {
+            color: #059669;
+            font-size: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tips-section h3::before {
+            content: '💡';
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .tip-item .emoji {
+            font-size: 20px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .tip-item .text {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .qr-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 10px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .qr-section h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .qr-section .url {
+            font-size: 11px;
+            opacity: 0.9;
+            word-break: break-all;
+            line-height: 1.3;
+        }
+
+        .management-cta {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .management-cta::before {
+            content: '👔';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 60px;
+            opacity: 0.2;
+            transform: rotate(15deg);
+        }
+
+        .management-cta h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .management-cta p {
+            font-size: 13px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: white;
+            color: #ee5a24;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            background: #f8f9fa;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 12px;
+            border-top: 3px solid #FFC220;
+        }
+
+        .footer .walmart-logo {
+            font-size: 24px;
+            color: #0071CE;
+            margin-bottom: 5px;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 360px) {
+            .infographic-container {
+                margin: 5px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .coverage-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Interactive animations */
+        .content-section > * {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .content-section > *:nth-child(1) { animation-delay: 0.1s; }
+        .content-section > *:nth-child(2) { animation-delay: 0.2s; }
+        .content-section > *:nth-child(3) { animation-delay: 0.3s; }
+        .content-section > *:nth-child(4) { animation-delay: 0.4s; }
+        .content-section > *:nth-child(5) { animation-delay: 0.5s; }
+        .content-section > *:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="infographic-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🛡️ Winter Health Protection</h1>
+            <div class="week">Week 41 • 2026</div>
+        </div>
+
+        <!-- Content Sections -->
+        <div class="content-section">
+            <!-- Priority Message -->
+            <div class="priority-box">
+                <h2>Your Well-being is Our Priority!</h2>
+                <p>As we support our communities through the holiday season, 
+                <span class="flu-highlight">flu and strep season</span> 
+                is approaching. We want you healthy and well! 💪</p>
+            </div>
+
+            <!-- Vaccine Access Section -->
+            <div class="vaccine-section">
+                <h3>Easy Vaccine Access</h3>
+                <p>All associates have <strong>convenient access</strong> to flu shots and other vaccines!</p>
+                
+                <div class="coverage-grid">
+                    <div class="coverage-item">
+                        <div class="icon">🏥</div>
+                        <div class="title">Medical Plan</div>
+                        <div class="desc">No out-of-pocket cost with network providers</div>
+                    </div>
+                    <div class="coverage-item">
+                        <div class="icon">💳</div>
+                        <div class="title">No Coverage?</div>
+                        <div class="desc">Pay cash or visit community health resources</div>
+                    </div>
+                    <div class="coverage-item">
+                        <div class="icon">🚶</div>
+                        <div class="title">Walk-ups</div>
+                        <div class="desc">Welcome while off the clock</div>
+                    </div>
+                    <div class="coverage-item">
+                        <div class="icon">📱</div>
+                        <div class="title">Scheduler</div>
+                        <div class="desc">Use Walmart Scheduler for convenience</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Important Dates -->
+            <div class="dates-banner">
+                Immunization Events
+                <span class="date">📅 November 15</span>
+                <span class="date">📅 December 6</span>
+            </div>
+
+            <!-- Quick Tips -->
+            <div class="tips-section">
+                <h3>Quick Tips</h3>
+                <div class="tip-item">
+                    <span class="emoji">🩺</span>
+                    <span class="text">Check with your healthcare provider for personalized recommendations</span>
+                </div>
+                <div class="tip-item">
+                    <span class="emoji">🌐</span>
+                    <span class="text">Visit CDC Flu Prevention Site for additional information</span>
+                </div>
+                <div class="tip-item">
+                    <span class="emoji">💊</span>
+                    <span class="text">Consult your pharmacist about individual risk factors</span>
+                </div>
+                <div class="tip-item">
+                    <span class="emoji">🏢</span>
+                    <span class="text">Network providers and community locations available</span>
+                </div>
+            </div>
+
+            <!-- QR Code Section -->
+            <div class="qr-section">
+                <div class="qr-code">📱</div>
+                <h3>Learn More Details</h3>
+                <div class="url">amp2-cms.prod.walmart.com<br>/preview/66aec44c-cff0-4b5a-9a6d-831272318d17/41/2026</div>
+            </div>
+
+            <!-- Management CTA -->
+            <div class="management-cta">
+                <h3>🎯 For Management</h3>
+                <p>Review Associate Talking Points to address questions as needed</p>
+                <button class="cta-button">Access Resources</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="walmart-logo">⭐</div>
+            <div>Walmart Associate Health & Safety</div>
+            <div>Stay Healthy, Stay Strong</div>
+        </div>
+    </div>
+
+    <script>
+        // Add interactive touches
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click interaction to coverage items
+            const coverageItems = document.querySelectorAll('.coverage-item');
+            coverageItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+
+            // Add click interaction to CTA button
+            const ctaButton = document.querySelector('.cta-button');
+            if (ctaButton) {
+                ctaButton.addEventListener('click', function() {
+                    // Could link to actual AMP content
+                    window.open('https://amp2-cms.prod.walmart.com/preview/66aec44c-cff0-4b5a-9a6d-831272318d17/41/2026', '_blank');
+                });
+            }
+
+            // Add parallax effect to header
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const header = document.querySelector('.header');
+                if (header) {
+                    header.style.transform = `translateY(${scrolled * 0.5}px)`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

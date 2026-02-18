@@ -1,0 +1,32 @@
+---
+title: FormGroup
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+A Form Group lets you create a list of grouped form elements. The form elements can be radio buttons, checkboxes, text area, etc.
+
+
+<ScreenshotTabs screenshotData={"screenshots/form-group.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Checkbox, FormGroup} from '@walmart/gtp-shared-components`;
+
+<FormGroup label="Lorem Ipsum" helperText="Helper Text">
+  <Checkbox label="Apple"/>
+  <Checkbox label="Orange"/>
+</FormGroup>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="FormGroup" prop="children"/>
+ ### error
+<PropTable componentLink="FormGroup" prop="error"/>
+ ### helperText
+<PropTable componentLink="FormGroup" prop="helperText"/>
+ ### label
+<PropTable componentLink="FormGroup" prop="label"/>
+ ### UNSAFE_style
+<PropTable componentLink="FormGroup" prop="UNSAFE_style"/>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winter Health - WorkVivo Post</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .social-post {
+            width: 1080px;
+            height: 1920px;
+            background: white;
+            position: relative;
+            overflow: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        /* Header with brand gradient */
+        .header {
+            background: linear-gradient(135deg, #0071CE 0%, #0052a3 100%);
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            top: -150px;
+            right: -150px;
+            border-radius: 50%;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,194,32,0.2) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            border-radius: 50%;
+        }
+
+        .walmart-logo {
+            width: 140px;
+            height: 140px;
+            background: #FFC220;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 58px;
+            font-weight: 900;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .week-badge {
+            background: #FFC220;
+            color: #0071CE;
+            padding: 12px 35px;
+            border-radius: 50px;
+            font-size: 36px;
+            font-weight: 800;
+            box-shadow: 0 6px 20px rgba(255,194,32,0.4);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Content area */
+        .content {
+            padding: 50px 60px;
+        }
+
+        /* Priority message box */
+        .priority-banner {
+            background: linear-gradient(135deg, #FFC220 0%, #ffdd66 100%);
+            padding: 45px 50px;
+            border-radius: 25px;
+            margin-bottom: 45px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(255,194,32,0.3);
+            position: relative;
+        }
+
+        .priority-banner::before {
+            content: '⭐';
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 70px;
+        }
+
+        .priority-banner h2 {
+            font-size: 48px;
+            font-weight: 900;
+            color: #004d8f;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .priority-banner p {
+            font-size: 36px;
+            color: #333;
+            line-height: 1.4;
+            margin-bottom: 18px;
+        }
+
+        .flu-alert {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-size: 40px;
+            font-weight: 800;
+            display: inline-block;
+            box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+        }
+
+        /* Vaccine section */
+        .vaccine-section {
+            background: linear-gradient(135deg, #e8f4fd 0%, #d1e7f7 100%);
+            padding: 45px 50px;
+            border-radius: 25px;
+            margin-bottom: 45px;
+        }
+
+        .vaccine-section h3 {
+            font-size: 52px;
+            font-weight: 900;
+            color: #0071CE;
+            margin-bottom: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vaccine-section h3 .emoji {
+            font-size: 65px;
+            margin-right: 18px;
+        }
+
+        .vaccine-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 0;
+        }
+
+        .vaccine-card {
+            background: white;
+            padding: 35px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .vaccine-card .icon {
+            font-size: 70px;
+            margin-bottom: 15px;
+        }
+
+        .vaccine-card .title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #0071CE;
+            margin-bottom: 12px;
+        }
+
+        .vaccine-card .desc {
+            font-size: 30px;
+            color: #666;
+            line-height: 1.3;
+        }
+
+        /* Dates banner */
+        .dates-banner {
+            background: linear-gradient(90deg, #0071CE 0%, #FFC220 100%);
+            padding: 45px 50px;
+            border-radius: 25px;
+            margin-bottom: 45px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,113,206,0.3);
+        }
+
+        .dates-banner h3 {
+            font-size: 48px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .dates-container {
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+        }
+
+        .date-box {
+            background: white;
+            padding: 35px 50px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+
+        .date-box .emoji {
+            font-size: 60px;
+            margin-bottom: 12px;
+        }
+
+        .date-box .date {
+            font-size: 48px;
+            font-weight: 900;
+            color: #0071CE;
+            margin-bottom: 8px;
+        }
+
+        .date-box .month {
+            font-size: 32px;
+            color: #666;
+            font-weight: 700;
+        }
+
+        /* Tips section */
+        .tips-section {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            padding: 45px 50px;
+            border-radius: 25px;
+            margin-bottom: 45px;
+        }
+
+        .tips-section h3 {
+            font-size: 52px;
+            font-weight: 900;
+            color: #059669;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .tips-section h3 .emoji {
+            font-size: 60px;
+            margin-right: 12px;
+        }
+
+        .tip-list {
+            list-style: none;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            padding: 28px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .tip-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .tip-item .emoji {
+            font-size: 55px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .tip-item .text {
+            font-size: 34px;
+            color: #333;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        /* Footer/CTA section */
+        .footer-cta {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 50px 60px;
+            text-align: center;
+            color: white;
+        }
+
+        .footer-cta h3 {
+            font-size: 52px;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        .footer-cta .emoji {
+            font-size: 70px;
+            margin-bottom: 18px;
+        }
+
+        .footer-cta p {
+            font-size: 38px;
+            line-height: 1.4;
+            margin-bottom: 25px;
+            opacity: 0.95;
+        }
+
+        .footer-cta .cta-text {
+            background: white;
+            color: #6366f1;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 42px;
+            font-weight: 900;
+            display: inline-block;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Walmart branding footer */
+        .branding-footer {
+            background: #0071CE;
+            padding: 35px 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .branding-footer .logo {
+            font-size: 50px;
+            margin-bottom: 12px;
+        }
+
+        .branding-footer .text {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .branding-footer .tagline {
+            font-size: 28px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+
+        /* Screenshot helper text */
+        .screenshot-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            z-index: 1000;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .screenshot-info {
+                display: none;
+            }
+            .social-post {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="screenshot-info">
+        📸 Right-click image → Save As → Share to WorkVivo
+    </div>
+
+    <div class="social-post">
+        <!-- Header -->
+        <div class="header">
+            <div class="walmart-logo">⭐</div>
+            <h1>Winter Health<br>Protection</h1>
+            <div class="week-badge">WEEK 41 • 2026</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Priority Message -->
+            <div class="priority-banner">
+                <h2>Your Well-being is<br>Our Priority!</h2>
+                <p>Stay healthy as we support our communities through the holiday season.</p>
+                <div class="flu-alert">🦠 Flu & Strep Season Ahead</div>
+            </div>
+
+            <!-- Vaccine Access -->
+            <div class="vaccine-section">
+                <h3><span class="emoji">💉</span>Easy Vaccine Access</h3>
+                <div class="vaccine-grid">
+                    <div class="vaccine-card">
+                        <div class="icon">🏥</div>
+                        <div class="title">Medical Plan</div>
+                        <div class="desc">No cost with network providers</div>
+                    </div>
+                    <div class="vaccine-card">
+                        <div class="icon">🚶</div>
+                        <div class="title">Walk-ups</div>
+                        <div class="desc">Welcome when off the clock</div>
+                    </div>
+                    <div class="vaccine-card">
+                        <div class="icon">📱</div>
+                        <div class="title">Scheduler</div>
+                        <div class="desc">Use Walmart Scheduler</div>
+                    </div>
+                    <div class="vaccine-card">
+                        <div class="icon">🏘️</div>
+                        <div class="title">Community</div>
+                        <div class="desc">Local health resources</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Important Dates -->
+            <div class="dates-banner">
+                <h3>📅 Mark Your Calendar!</h3>
+                <div class="dates-container">
+                    <div class="date-box">
+                        <div class="emoji">💉</div>
+                        <div class="date">15</div>
+                        <div class="month">NOVEMBER</div>
+                    </div>
+                    <div class="date-box">
+                        <div class="emoji">💉</div>
+                        <div class="date">6</div>
+                        <div class="month">DECEMBER</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Tips -->
+            <div class="tips-section">
+                <h3><span class="emoji">💡</span>Quick Tips</h3>
+                <ul class="tip-list">
+                    <li class="tip-item">
+                        <span class="emoji">🩺</span>
+                        <span class="text">Check with your healthcare provider for personalized recommendations</span>
+                    </li>
+                    <li class="tip-item">
+                        <span class="emoji">🌐</span>
+                        <span class="text">Visit CDC Flu Prevention Site for additional information</span>
+                    </li>
+                    <li class="tip-item">
+                        <span class="emoji">💊</span>
+                        <span class="text">Consult your pharmacist about individual risk factors</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Management CTA -->
+            <div class="footer-cta">
+                <div class="emoji">👔</div>
+                <h3>For Management</h3>
+                <p>Review Associate Talking Points to address questions as needed</p>
+                <div class="cta-text">Learn More on AMP</div>
+            </div>
+        </div>
+
+        <!-- Branding Footer -->
+        <div class="branding-footer">
+            <div class="logo">⭐</div>
+            <div class="text">Walmart Associate Health & Safety</div>
+            <div class="tagline">Stay Healthy, Stay Strong</div>
+        </div>
+    </div>
+
+    <script>
+        // Log dimensions for verification
+        console.log('Social post dimensions: 1080x1920 (9:16 ratio)');
+        console.log('Optimized for WorkVivo mobile feed');
+        
+        // Add right-click save reminder
+        document.querySelector('.social-post').addEventListener('contextmenu', function(e) {
+            console.log('💾 Save this image and upload to WorkVivo!');
+        });
+    </script>
+</body>
+</html>

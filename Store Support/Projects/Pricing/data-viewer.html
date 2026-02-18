@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mixed Base Data Viewer - Interactive Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .controls {
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .stats {
+            padding: 15px 30px;
+            background: #e7f3ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #004085;
+        }
+
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-number {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #667eea;
+        }
+
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        th:hover {
+            background: #e9ecef;
+        }
+
+        th.sortable::after {
+            content: ' ⇅';
+            opacity: 0.3;
+        }
+
+        th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+            color: #667eea;
+        }
+
+        th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+            color: #667eea;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: #f1f3f5;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .no-data-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .load-data-section {
+            padding: 30px;
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 30px;
+        }
+
+        .file-input-wrapper {
+            margin: 20px 0;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .file-input-label:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .pagination {
+            padding: 20px 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination .page-info {
+            padding: 8px 16px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .table-container {
+                padding: 15px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗂️ Mixed Base Data Viewer</h1>
+            <p>wmt-pricingops-analytics.Ad_Hoc_Copp_Tables.mixed_base</p>
+        </div>
+
+        <div id="loadDataSection" class="load-data-section">
+            <h2>📊 Load Your Data</h2>
+            <p style="margin: 15px 0; color: #6c757d;">Upload a CSV or JSON file to get started</p>
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" accept=".csv,.json" />
+                <label for="fileInput" class="file-input-label">Choose File</label>
+                <p id="fileName" style="margin-top: 10px; color: #6c757d;"></p>
+            </div>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="loadSampleData()">Load Sample Data</button>
+            </div>
+        </div>
+
+        <div id="dataSection" style="display: none;">
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search across all fields..." />
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div class="filter-group" id="filterGroup">
+                    <!-- Dynamic filters will be added here -->
+                </div>
+                <div class="export-buttons">
+                    <button class="btn btn-primary" onclick="exportToCSV()">Export CSV</button>
+                    <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stats-item">
+                    <span>Total Records:</span>
+                    <span class="stats-number" id="totalRecords">0</span>
+                </div>
+                <div class="stats-item">
+                    <span>Filtered:</span>
+                    <span class="stats-number" id="filteredRecords">0</span>
+                </div>
+                <div class="stats-item">
+                    <span>Showing:</span>
+                    <span class="stats-number" id="displayedRecords">0</span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button onclick="changePage(-1)">← Previous</button>
+                <span class="page-info">
+                    Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                </span>
+                <button onclick="changePage(1)">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const rowsPerPage = 50;
+        let sortColumn = null;
+        let sortDirection = 'asc';
+        let columns = [];
+
+        // File upload handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = `Loading: ${file.name}`;
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    try {
+                        if (file.name.endsWith('.json')) {
+                            loadJSONData(content);
+                        } else if (file.name.endsWith('.csv')) {
+                            loadCSVData(content);
+                        }
+                        document.getElementById('fileName').textContent = `✓ Loaded: ${file.name}`;
+                    } catch (error) {
+                        alert('Error loading file: ' + error.message);
+                        document.getElementById('fileName').textContent = '✗ Error loading file';
+                    }
+                };
+                
+                reader.readAsText(file);
+            }
+        });
+
+        // Load JSON data
+        function loadJSONData(content) {
+            const data = JSON.parse(content);
+            allData = Array.isArray(data) ? data : [data];
+            initializeTable();
+        }
+
+        // Load CSV data
+        function loadCSVData(content) {
+            const lines = content.split('\n').filter(line => line.trim());
+            if (lines.length < 2) {
+                throw new Error('CSV file must have headers and at least one row');
+            }
+
+            const headers = parseCSVLine(lines[0]);
+            allData = lines.slice(1).map(line => {
+                const values = parseCSVLine(line);
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = values[index] || '';
+                });
+                return obj;
+            });
+
+            initializeTable();
+        }
+
+        // Parse CSV line (handles quoted values)
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        // Load sample data for demonstration
+        function loadSampleData() {
+            allData = [
+                { id: 1, product_name: 'Widget A', category: 'Electronics', price: 29.99, quantity: 150, status: 'Active', last_updated: '2025-11-01' },
+                { id: 2, product_name: 'Widget B', category: 'Home & Garden', price: 45.50, quantity: 75, status: 'Active', last_updated: '2025-11-02' },
+                { id: 3, product_name: 'Gadget X', category: 'Electronics', price: 199.99, quantity: 25, status: 'Low Stock', last_updated: '2025-11-03' },
+                { id: 4, product_name: 'Tool Y', category: 'Tools', price: 89.99, quantity: 200, status: 'Active', last_updated: '2025-11-04' },
+                { id: 5, product_name: 'Device Z', category: 'Electronics', price: 349.99, quantity: 10, status: 'Low Stock', last_updated: '2025-11-05' },
+                { id: 6, product_name: 'Item Alpha', category: 'Home & Garden', price: 15.99, quantity: 500, status: 'Active', last_updated: '2025-11-06' },
+                { id: 7, product_name: 'Product Beta', category: 'Sports', price: 125.00, quantity: 50, status: 'Active', last_updated: '2025-11-07' },
+            ];
+            initializeTable();
+        }
+
+        // Initialize table with data
+        function initializeTable() {
+            if (allData.length === 0) {
+                alert('No data found in file');
+                return;
+            }
+
+            // Get column names
+            columns = Object.keys(allData[0]);
+
+            // Create table header
+            const thead = document.getElementById('tableHead');
+            thead.innerHTML = `
+                <tr>
+                    ${columns.map(col => `<th class="sortable" onclick="sortTable('${col}')">${col}</th>`).join('')}
+                </tr>
+            `;
+
+            // Create dynamic filters
+            createFilters();
+
+            // Show data section
+            document.getElementById('loadDataSection').style.display = 'none';
+            document.getElementById('dataSection').style.display = 'block';
+
+            // Initial render
+            filteredData = [...allData];
+            renderTable();
+            updateStats();
+
+            // Add search listener
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+        }
+
+        // Create dynamic filters based on data
+        function createFilters() {
+            const filterGroup = document.getElementById('filterGroup');
+            filterGroup.innerHTML = '';
+
+            // Find columns with limited unique values (good for dropdowns)
+            columns.forEach(col => {
+                const uniqueValues = [...new Set(allData.map(row => row[col]))];
+                if (uniqueValues.length <= 20 && uniqueValues.length > 1) {
+                    const select = document.createElement('select');
+                    select.className = 'filter-select';
+                    select.id = `filter-${col}`;
+                    select.innerHTML = `
+                        <option value="">All ${col}</option>
+                        ${uniqueValues.sort().map(val => `<option value="${val}">${val}</option>`).join('')}
+                    `;
+                    select.addEventListener('change', applyFilters);
+                    filterGroup.appendChild(select);
+                }
+            });
+        }
+
+        // Apply all filters
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredData = allData.filter(row => {
+                // Search filter
+                const matchesSearch = searchTerm === '' || 
+                    Object.values(row).some(val => 
+                        String(val).toLowerCase().includes(searchTerm)
+                    );
+
+                if (!matchesSearch) return false;
+
+                // Column filters
+                const filters = document.querySelectorAll('.filter-select');
+                for (let filter of filters) {
+                    const col = filter.id.replace('filter-', '');
+                    const value = filter.value;
+                    if (value && row[col] != value) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            currentPage = 1;
+            renderTable();
+            updateStats();
+        }
+
+        // Sort table by column
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            filteredData.sort((a, b) => {
+                let valA = a[column];
+                let valB = b[column];
+
+                // Try to convert to number if possible
+                const numA = Number(valA);
+                const numB = Number(valB);
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    valA = numA;
+                    valB = numB;
+                }
+
+                if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+                if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Update header styling
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            const header = Array.from(document.querySelectorAll('th')).find(th => 
+                th.textContent.trim() === column
+            );
+            if (header) {
+                header.classList.add(sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+
+            renderTable();
+        }
+
+        // Render table with pagination
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const pageData = filteredData.slice(start, end);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="${columns.length}">
+                            <div class="no-data">
+                                <div class="no-data-icon">🔍</div>
+                                <h3>No data found</h3>
+                                <p>Try adjusting your filters or search terms</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = pageData.map(row => `
+                <tr>
+                    ${columns.map(col => `<td>${row[col] !== null && row[col] !== undefined ? row[col] : ''}</td>`).join('')}
+                </tr>
+            `).join('');
+
+            updatePagination();
+        }
+
+        // Update pagination controls
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages;
+
+            const buttons = document.querySelectorAll('.pagination button');
+            buttons[0].disabled = currentPage === 1;
+            buttons[1].disabled = currentPage === totalPages;
+        }
+
+        // Change page
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderTable();
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalRecords').textContent = allData.length;
+            document.getElementById('filteredRecords').textContent = filteredData.length;
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = Math.min(start + rowsPerPage, filteredData.length);
+            document.getElementById('displayedRecords').textContent = 
+                filteredData.length > 0 ? `${start + 1}-${end}` : '0';
+        }
+
+        // Reset all filters
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('.filter-select').forEach(select => {
+                select.value = '';
+            });
+            applyFilters();
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            if (filteredData.length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            const headers = columns.join(',');
+            const rows = filteredData.map(row => 
+                columns.map(col => {
+                    const val = row[col];
+                    // Escape values containing commas or quotes
+                    if (String(val).includes(',') || String(val).includes('"')) {
+                        return `"${String(val).replace(/"/g, '""')}"`;
+                    }
+                    return val;
+                }).join(',')
+            );
+
+            const csv = [headers, ...rows].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mixed_base_export_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

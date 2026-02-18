@@ -1,0 +1,43 @@
+Subject: Request for Job Master Data Export - Distribution List Project
+
+Hi [HR Team/Workday Team],
+
+I'm working on the OPS Support Distribution List project and need to map job codes to job descriptions for 2,684 users across our support teams.
+
+Could you please export the Workday Job Master data with the following fields:
+
+REQUIRED:
+  • Job Code (wm-jobcode field from AD)
+  • Workday Job ID / Job Number
+  • Job Title / Job Description
+
+OPTIONAL (if available):
+  • Job Family
+  • Job Level
+  • Grade
+
+We have identified these primary job codes in our AD groups:
+  • 800469 (Director roles)
+  • 814450 (Manager roles)
+  • 808250 (Market Manager roles)
+  • Plus ~240 additional unique job codes
+
+PREFERRED FORMAT:
+CSV file with columns: job_code, job_number, job_description, job_family, job_level, grade
+
+Example format:
+job_code,job_number,job_description,job_family,job_level,grade
+800469,WD12345,Director of Market Operations,Management,Director,GR45
+814450,WD12346,Market Manager,Field Operations,Manager,GR40
+
+This data will help us create targeted distribution lists based on job roles and build better organizational visibility for our support teams.
+
+Please let me know if you need any additional information or if there's a specific report I should run myself in Workday.
+
+Thank you!
+
+---
+PROJECT CONTEXT:
+- Extracted 2,684 unique users from 3 AD groups (OPS_SUP_MARKET_TEAM, OPS_SUP_REGION_TEAM, OPS_SUP_BU_TEAM)
+- Need job descriptions to create role-based distribution lists
+- Files ready to merge once we receive Workday data

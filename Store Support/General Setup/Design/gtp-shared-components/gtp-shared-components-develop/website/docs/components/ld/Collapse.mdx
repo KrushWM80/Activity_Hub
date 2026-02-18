@@ -1,0 +1,49 @@
+---
+title: Collapse
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+The Collapse component is used to put long sections of information under a block that users can expand or collapse.
+
+
+<ScreenshotTabs screenshotData={{"collapsed":"screenshots/collapse.png","expanded":"screenshots/collapse-expanded.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Collapse} from '@walmart/gtp-shared-components`;
+
+<Collapse dividerTop title="Single Line Collapse" onToggle={() => {}}>
+  <Body>Collapse content appears underneath the toggle area.</Body>
+</Collapse>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="Collapse" prop="children"/>
+ ### title(required)
+<PropTable componentLink="Collapse" prop="title"/>
+ ### subtitle
+<PropTable componentLink="Collapse" prop="subtitle"/>
+ ### icon
+<PropTable componentLink="Collapse" prop="icon"/>
+ ### expanded
+<PropTable componentLink="Collapse" prop="expanded"/>
+ ### onToggle(required)
+<PropTable componentLink="Collapse" prop="onToggle"/>
+ ### dividerTop
+<PropTable componentLink="Collapse" prop="dividerTop"/>
+ ### dividerBottom
+<PropTable componentLink="Collapse" prop="dividerBottom"/>
+ ### touchableProps
+<PropTable componentLink="Collapse" prop="touchableProps"/>
+ ### size
+<PropTable componentLink="Collapse" prop="size"/>
+ ### icon_style
+<PropTable componentLink="Collapse" prop="icon_style"/>
+ ### title_style
+<PropTable componentLink="Collapse" prop="title_style"/>
+ ### subTitle_style
+<PropTable componentLink="Collapse" prop="subTitle_style"/>
+ ### UNSAFE_style
+<PropTable componentLink="Collapse" prop="UNSAFE_style"/>

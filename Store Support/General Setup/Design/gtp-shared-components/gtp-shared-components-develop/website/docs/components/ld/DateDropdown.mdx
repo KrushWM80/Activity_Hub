@@ -1,0 +1,80 @@
+---
+title: DateDropdown
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+The Date Dropdown gives users the ability to make a single date selection from a number of options.
+
+
+<ScreenshotTabs screenshotData={{"default":"screenshots/date-dropdown.png","triggered":"screenshots/date-dropdown-triggered.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {DateDropdown} from '@walmart/gtp-shared-components`;
+
+const [date, setDate] = React.useState<Date | undefined>(undefined);
+
+<DateDropdown
+  label={'Date'}
+  value={date}
+  helperText="Select one of these dates!"
+  onSelect={(dt) => {
+    if (dt) {
+      setDate(dt);
+    }
+  }}
+/>
+```
+## Props
+
+ ### defaultValue
+<PropTable componentLink="DateDropdown" prop="defaultValue"/>
+ ### placeholder
+<PropTable componentLink="DateDropdown" prop="placeholder"/>
+ ### size
+<PropTable componentLink="DateDropdown" prop="size"/>
+ ### disabled
+<PropTable componentLink="DateDropdown" prop="disabled"/>
+ ### error
+<PropTable componentLink="DateDropdown" prop="error"/>
+ ### helperText
+<PropTable componentLink="DateDropdown" prop="helperText"/>
+ ### label(required)
+<PropTable componentLink="DateDropdown" prop="label"/>
+ ### UNSAFE_style
+<PropTable componentLink="DateDropdown" prop="UNSAFE_style"/>
+ ### ref_
+<PropTable componentLink="DateDropdown" prop="ref_"/>
+ ### leadingIcon<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>leading</strong> instead</span></span>
+<PropTable componentLink="DateDropdown" prop="leadingIcon"/>
+ ### trailingIcon<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>trailing</strong> instead</span></span>
+<PropTable componentLink="DateDropdown" prop="trailingIcon"/>
+ ### trailingLink<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>trailing</strong> instead</span></span>
+<PropTable componentLink="DateDropdown" prop="trailingLink"/>
+ ### onTrailingIconPress<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>trailing</strong> instead</span></span>
+<PropTable componentLink="DateDropdown" prop="onTrailingIconPress"/>
+ ### onLinkPress<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>trailing</strong> instead</span></span>
+<PropTable componentLink="DateDropdown" prop="onLinkPress"/>
+ ### state<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="DateDropdown" prop="state"/>
+ ### successMessage<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="DateDropdown" prop="successMessage"/>
+ ### stateIcon<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="DateDropdown" prop="stateIcon"/>
+ ### counter<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="DateDropdown" prop="counter"/>
+ ### helperTextImportantForA11y<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="DateDropdown" prop="helperTextImportantForA11y"/>
+ ### onTextChange<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>onChangeText</strong> instead</span></span>
+<PropTable componentLink="DateDropdown" prop="onTextChange"/>
+ ### value
+<PropTable componentLink="DateDropdown" prop="value"/>
+ ### minimumDate
+<PropTable componentLink="DateDropdown" prop="minimumDate"/>
+ ### maximumDate
+<PropTable componentLink="DateDropdown" prop="maximumDate"/>
+ ### dateFormat
+<PropTable componentLink="DateDropdown" prop="dateFormat"/>
+ ### onSelect(required)
+<PropTable componentLink="DateDropdown" prop="onSelect"/>

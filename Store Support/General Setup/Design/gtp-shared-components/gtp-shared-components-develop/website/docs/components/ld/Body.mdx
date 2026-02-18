@@ -1,0 +1,37 @@
+---
+title: Body
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Body text is used as the main content on a page or section.
+
+
+<ScreenshotTabs screenshotData={{"default":"screenshots/body.png","monospace":"screenshots/body-monospace.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Body} from '@walmart/gtp-shared-components`;
+
+<Body>Lorem ipsum dolor sit amet</Body>
+<Body size="small" weight="400">Lorem ipsum dolor sit amet</Body>
+<Body isMonospace>Lorem ipsum dolor sit amet</Body>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="Body" prop="children"/>
+ ### isMonospace
+<PropTable componentLink="Body" prop="isMonospace"/>
+ ### size
+<PropTable componentLink="Body" prop="size"/>
+ ### weight
+<PropTable componentLink="Body" prop="weight"/>
+ ### color
+<PropTable componentLink="Body" prop="color"/>
+ ### UNSAFE_style
+<PropTable componentLink="Body" prop="UNSAFE_style"/>
+ ### inheritColor<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - has no effect. If you need to apply a color to the text, use e.g. UNSAFE_style=`{color: 'green'}`</span></span>
+<PropTable componentLink="Body" prop="inheritColor"/>
+ ### italic<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - has no effect. Italics are not supported in LD3</span></span>
+<PropTable componentLink="Body" prop="italic"/>

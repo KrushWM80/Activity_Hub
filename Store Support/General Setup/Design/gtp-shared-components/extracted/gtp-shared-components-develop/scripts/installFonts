@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+# NOOP if running on Looper
+test "$(id -u -n )" = "jenkinspan" && exit 0
+
+MSG=$(cat<<'EOH'
+#
+# This script is meant to be run on the consumer app only via
+#
+# npx installFonts
+#
+# Running it here, locally, in the gtp-shared-components root, it will have no effect.
+#
+EOH
+:)
+# It looks for ./react-native.config.js file in the root of
+# your project. If you don't have one, the script will create one with this
+# code:
+#
+# module.exports = {
+#   project: {
+#     ios: {},
+#     android: {},
+#   },
+#   assets: ['.node_modules/@walmart/gtp-shared-components/assets/fonts'],
+# };
+#
+# The script will install the fonts found under
+# node_modules/@walmart/gtp-shared-components/assets/fonts
+# to:
+#   Android
+#     android/app/src/main/assets/fonts
+#     android/link-assets-manifest.json
+#   iOS
+#     ios/<project_name>/Info.plist
+#     ios/link-assets-manifest.json
+#     ios/<project_name>.xcodeproj/project.pbxproj
+#     add group 'Resources' in the Xcode project
+#
+
+currentDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# if we are inside node_modules
+if echo "$currentDir" | grep -q "/node_modules/"; then
+  # there are 2 scenarios:
+  # 1. we are invoked directly (./installFonts)
+  if echo "$currentDir" | grep -q "/@walmart/gtp-shared-components/scripts"; then
+    PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
+  fi
+
+  # 2. we are invoked via npx (npx installFonts)
+  if echo "$currentDir" | grep -q "/.bin"; then
+    PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+  fi
+elif echo "$currentDir" | grep -q "gtp-shared-components/scripts"; then
+  # if we are not inside node_modules, we want a noop (it means we are inside
+  # the unpublished code of the library, we don't want any fonts installed)
+  # The script would fail anyway since there is no android or ios directory
+  echo "$MSG"
+  exit 0
+else
+  # if we are anywhere else, it's an error
+  exit 1
+fi
+
+cd "$PROJECT_DIR" || (echo "Invalid project directory" && exit 101)
+FONTS_SOURCE_DIR="./node_modules/@walmart/gtp-shared-components/assets/fonts"
+CONFIG_FILE="$PROJECT_DIR/react-native.config.js"
+CONFIG_FILE_CONTENT=$(
+cat<<EOF
+module.exports = {
+  project: {
+    ios: {},
+    android: {},
+  },
+  assets: ['$FONTS_SOURCE_DIR'],
+};
+EOF
+:)
+
+checkConfigFile () {
+  grep -e "..*$FONTS_SOURCE_DIR..*" "$CONFIG_FILE" 1>/dev/null 2>&1
+  return $?
+}
+
+echo "Installing fonts from $FONTS_SOURCE_DIR"
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "Creating file $CONFIG_FILE"
+  echo "$CONFIG_FILE_CONTENT" > "$CONFIG_FILE"
+  npx react-native-asset || true
+else
+  if ( checkConfigFile  ) ; then
+    npx react-native-asset || true
+  else
+    echo "It looks like you have an existing ./react-native.config.js"
+    echo "Please edit it and add or update these sections:"
+    echo
+    echo "$CONFIG_FILE_CONTENT"
+    echo
+    echo "then run 'npx installFonts'"
+  fi
+fi

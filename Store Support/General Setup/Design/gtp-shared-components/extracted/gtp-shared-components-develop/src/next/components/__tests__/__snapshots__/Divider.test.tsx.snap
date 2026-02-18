@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Should match snapshot correctly. 1`] = `
+<View
+  accessibilityRole="none"
+  style={
+    [
+      {
+        "borderBottomColor": "#e3e4e5",
+        "borderBottomWidth": 1,
+        "flex": 1,
+        "height": 1,
+      },
+      undefined,
+    ]
+  }
+  testID="Divider"
+/>
+`;

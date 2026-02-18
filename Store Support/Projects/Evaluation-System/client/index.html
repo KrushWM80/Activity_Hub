@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluation System - Performance Review Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1976d2;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #FF5252;
+            --light: #f5f5f5;
+            --border: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--light);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .step {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 4px;
+            border-left: 4px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .step.active {
+            border-left-color: var(--primary);
+            background: #e3f2fd;
+            font-weight: 600;
+        }
+
+        .step.completed {
+            border-left-color: var(--success);
+        }
+
+        .step h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 12px;
+            line-height: 24px;
+            margin-right: 8px;
+        }
+
+        .step.completed .step-number {
+            background: var(--success);
+            content: '✓';
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .label-info {
+            font-size: 12px;
+            color: #666;
+            font-weight: normal;
+            margin-left: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1565c0;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--primary);
+            border-radius: 4px;
+            padding: 30px;
+            text-align: center;
+            background: rgba(25, 118, 210, 0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload:hover {
+            border-color: #1565c0;
+            background: rgba(25, 118, 210, 0.1);
+        }
+
+        .file-upload.dragover {
+            border-color: #1565c0;
+            background: rgba(25, 118, 210, 0.15);
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        /* Column Mapping */
+        .mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .mapping-table th,
+        .mapping-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mapping-table th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .mapping-table select {
+            width: 100%;
+        }
+
+        .info-tooltip {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-size: 12px;
+            cursor: help;
+            position: relative;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+
+        /* Hosting Guide Styles */
+        .resource-link {
+            display: block;
+            padding: 10px;
+            margin-top: 20px;
+            background: #e8f4f8;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .resource-link:hover {
+            background: #d0e8f2;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 95%;
+            max-width: 1000px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            border: none;
+            padding: 0;
+        }
+
+        .close-modal {
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: #000;
+        }
+
+        .hosting-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .hosting-tab {
+            padding: 12px 20px;
+            background: var(--light);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .hosting-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .hosting-content {
+            display: none;
+        }
+
+        .hosting-content.active {
+            display: block;
+        }
+
+        .hosting-card {
+            background: #f9f9f9;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+
+        .hosting-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .hosting-card h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .hosting-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .hosting-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .status-recommended {
+            background: #c8e6c9;
+            color: #1b5e20;
+        }
+
+        .status-limited {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+
+        .status-not-suitable {
+            background: #ffcdd2;
+            color: #b71c1c;
+        }
+
+        .hosting-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .feature-item {
+            padding: 10px;
+            background: white;
+            border-left: 3px solid var(--primary);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .feature-item.negative {
+            border-left-color: var(--danger);
+            color: #c62828;
+        }
+
+        .feature-item.warning {
+            border-left-color: var(--warning);
+            color: #f57f17;
+        }
+
+        .feature-item span {
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .comparison-table th {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: var(--light);
+        }
+
+        .comparison-table tr:hover {
+            background: #e8f4f8;
+        }
+
+        .icon-yes {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .icon-no {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .icon-conditional {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .selector-group {
+            margin: 20px 0;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+        }
+
+        .selector-group h4 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .next-steps {
+            background: #f4f4f4;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid var(--success);
+        }
+
+        .next-steps h4 {
+            margin-top: 0;
+            color: var(--success);
+        }
+
+        .next-steps ol {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .next-steps li {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+            width: 300px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+
+        .info-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        .preview-table th {
+            background: var(--light);
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            border-left: 4px solid var(--danger);
+            color: #c62828;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            border-left: 4px solid var(--success);
+            color: #2e7d32;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border-left: 4px solid var(--primary);
+            color: #1565c0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid var(--light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-card {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 30px;
+            background: var(--light);
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .score-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .score-label {
+            font-size: 18px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+                height: auto;
+            }
+
+            .step {
+                margin-bottom: 0;
+            }
+
+            .step h3 {
+                display: none;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Performance Evaluation System</h1>
+            <p class="subtitle">Generate self-evaluations from your work data - Upload files, map columns, and create narratives</p>
+        </header>
+
+        <div class="main">
+            <aside class="sidebar">
+                <div class="step completed" onclick="goToStep(1)">
+                    <span class="step-number">1</span>
+                    <h3>User Info</h3>
+                </div>
+                <div class="step" onclick="goToStep(2)">
+                    <span class="step-number">2</span>
+                    <h3>Input Data</h3>
+                </div>
+                <div class="step" onclick="goToStep(3)">
+                    <span class="step-number">3</span>
+                    <h3>Map Columns</h3>
+                </div>
+                <div class="step" onclick="goToStep(4)">
+                    <span class="step-number">4</span>
+                    <h3>Generate</h3>
+                </div>
+                <div class="step" onclick="goToStep(5)">
+                    <span class="step-number">5</span>
+                    <h3>Review</h3>
+                </div>
+
+                <div class="resource-link" onclick="openHostingGuide()">
+                    📋 Hosting & Deployment Guide
+                </div>
+            </aside>
+
+            <main class="content">
+                <!-- Alert Messages -->
+                <div id="alert" class="alert"></div>
+
+                <!-- STEP 1: User Info -->
+                <section id="step1" class="section active">
+                    <h2>Step 1: User Information</h2>
+                    <form id="userForm">
+                        <div class="form-group">
+                            <label for="userName">Name <span class="label-info">(required)</span></label>
+                            <input type="text" id="userName" required placeholder="Your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="userTitle">Title <span class="label-info">(optional)</span></label>
+                            <input type="text" id="userTitle" placeholder="Your job title">
+                        </div>
+                        <div class="form-group">
+                            <label for="userEmail">Email <span class="label-info">(optional)</span></label>
+                            <input type="email" id="userEmail" placeholder="your.email@company.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="evaluationPeriod">Evaluation Period <span class="label-info">(required)</span></label>
+                            <select id="evaluationPeriod" required>
+                                <option value="">-- Select Period --</option>
+                                <option value="quarterly">Quarterly (3 months)</option>
+                                <option value="midyear">Mid-Year (6 months)</option>
+                                <option value="fy">Fiscal Year (12 months)</option>
+                                <option value="custom">Custom Period</option>
+                            </select>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-secondary" onclick="resetForm()">Reset</button>
+                            <button type="button" class="btn-primary" onclick="goToStep(2)">Next: Input Data</button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- STEP 2: Input Data -->
+                <section id="step2" class="section">
+                    <h2>Step 2: Input Your Work Data</h2>
+                    <p style="margin-bottom: 20px; color: #666;">Choose how you want to provide your work data:</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div>
+                            <h3 style="margin-bottom: 15px;">Option A: Upload File</h3>
+                            <div class="file-upload" id="fileUpload" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" onchange="handleFileSelect(event)">
+                                <p style="margin-bottom: 10px;">📁 Drag & drop your CSV or Excel file</p>
+                                <p style="color: #999; font-size: 12px;">or click to select</p>
+                            </div>
+                            <p style="color: #999; font-size: 12px; margin-top: 10px;">Supported: CSV, XLSX, XLS</p>
+                        </div>
+                        <div>
+                            <h3 style="margin-bottom: 15px;">Option B: Manual Entry</h3>
+                            <button type="button" class="btn-primary" onclick="goToStep(4)" style="width: 100%;">Enter Projects Manually</button>
+                            <p style="color: #999; font-size: 12px; margin-top: 10px;">Add projects one at a time in the next step</p>
+                        </div>
+                    </div>
+
+                    <div id="filePreview" style="display: none;">
+                        <h3 style="margin-top: 30px; margin-bottom: 15px;">File Preview</h3>
+                        <table class="preview-table" id="previewTable"></table>
+                        <p style="color: #999; font-size: 12px; margin-top: 10px;">Showing first 5 rows of <span id="totalRows">0</span> total rows</p>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="goToStep(1)">Back</button>
+                        <button type="button" class="btn-primary" id="nextButton" onclick="goToStep(3)" disabled>Next: Map Columns</button>
+                    </div>
+                </section>
+
+                <!-- STEP 3: Map Columns -->
+                <section id="step3" class="section">
+                    <h2>Step 3: Map Your Columns</h2>
+                    <p style="margin-bottom: 20px; color: #666;">Match your file columns to the system fields. Choose what each column represents.</p>
+
+                    <div id="mappingContainer" style="overflow-x: auto;"></div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="goToStep(2)">Back</button>
+                        <button type="button" class="btn-primary" onclick="goToStep(4)">Next: Generate Evaluation</button>
+                    </div>
+                </section>
+
+                <!-- STEP 4: Generate -->
+                <section id="step4" class="section">
+                    <h2>Step 4: Generate Evaluation</h2>
+                    
+                    <div id="loadingDiv" class="loading">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 15px;">Analyzing your data and generating evaluation...</p>
+                    </div>
+
+                    <div id="generateResult" class="results">
+                        <div class="score-display">
+                            <div class="score-value" id="scoreDisplay">-</div>
+                            <div class="score-label" id="scoreLabel">-</div>
+                        </div>
+
+                        <p style="color: #666; margin-bottom: 20px;">Your evaluation has been generated. Review it in the next step, make any edits, and download as HTML.</p>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="goToStep(3)">Back</button>
+                        <button type="button" class="btn-primary" id="generateBtn" onclick="generateEvaluation()">Generate Now</button>
+                        <button type="button" class="btn-success" id="nextReviewBtn" onclick="goToStep(5)" style="display: none;">Next: Review & Download</button>
+                    </div>
+                </section>
+
+                <!-- STEP 5: Review -->
+                <section id="step5" class="section">
+                    <h2>Step 5: Review & Customize</h2>
+                    
+                    <div id="reviewContent"></div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="goToStep(4)">Back</button>
+                        <button type="button" class="btn-primary" onclick="downloadHTML()">📥 Download as HTML</button>
+                        <button type="button" class="btn-success" onclick="resetForm()">+ Create Another</button>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Hosting & Deployment Guide Modal -->
+    <div id="hostingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 Hosting & Deployment Options</h2>
+                <span class="close-modal" onclick="closeHostingGuide()">&times;</span>
+            </div>
+
+            <div class="selector-group">
+                <h4>Which hosting option interests you?</h4>
+                <p style="color: #666; margin-bottom: 15px;">Select an option below to see detailed information about requirements, constraints, and next steps.</p>
+                <select id="hostingSelector" onchange="updateHostingInfo()" style="width: 100%; padding: 10px; font-size: 14px;">
+                    <option value="">-- Select a hosting option --</option>
+                    <option value="codepuppy">Code Puppy Pages (Static Content)</option>
+                    <option value="posit">Posit (Analytics Platform)</option>
+                    <option value="selfhosted">Self-Hosted Server (Full Control)</option>
+                    <option value="wm">Walmart Internal Resources (Recommended)</option>
+                    <option value="mywm">MyWM Experiments (Store-Level Access)</option>
+                    <option value="power">Power Apps (Workflow & Business Apps)</option>
+                </select>
+            </div>
+
+            <div class="hosting-tabs">
+                <button class="hosting-tab active" onclick="switchHostingTab('overview')">Overview</button>
+                <button class="hosting-tab" onclick="switchHostingTab('comparison')">Comparison</button>
+                <button class="hosting-tab" onclick="switchHostingTab('selection')">Selection Guide</button>
+            </div>
+
+            <!-- OVERVIEW TAB -->
+            <div id="overview" class="hosting-content active">
+                <h3 style="margin-top: 0;">Hosting Platform Overview</h3>
+                <p style="color: #666;">Understand your options for deploying the Evaluation System and Activity-Hub platform.</p>
+
+                <!-- Code Puppy Pages Card -->
+                <div class="hosting-card">
+                    <div class="hosting-card-title">
+                        <h3>Code Puppy Pages</h3>
+                        <span class="hosting-status status-not-suitable">❌ Limited Use</span>
+                    </div>
+                    <div class="hosting-features">
+                        <div class="feature-item">✓ <span>Quick Setup</span> - No approval needed</div>
+                        <div class="feature-item negative">✗ <span>Static Only</span> - No live data</div>
+                        <div class="feature-item negative">✗ <span>No BigQuery</span> - Can't access real-time data</div>
+                        <div class="feature-item">✓ <span>No Cost</span> - Free platform</div>
+                    </div>
+                    <p><strong>Best For:</strong> Static documentation, archived reports, reference guides only. <strong>NOT suitable for active platforms requiring live data.</strong></p>
+                    <p style="color: #999; font-size: 13px; margin-bottom: 0;"><strong>⚠️ Note:</strong> Cannot support the Evaluation System's real-time evaluation features or Activity-Hub's live data requirements.</p>
+                </div>
+
+                <!-- Posit Card -->
+                <div class="hosting-card">
+                    <div class="hosting-card-title">
+                        <h3>Posit (RStudio Connect)</h3>
+                        <span class="hosting-status status-limited">⚠️ Conditional</span>
+                    </div>
+                    <div class="hosting-features">
+                        <div class="feature-item">✓ <span>Analytics Ready</span> - Built for R/Python</div>
+                        <div class="feature-item conditional">⚠ <span>User Limits</span> - Restricted concurrent users</div>
+                        <div class="feature-item warning">⚠ <span>SSP Required</span> - Security plan needed</div>
+                        <div class="feature-item warning">⚠ <span>Approval Timeline</span> - Weeks for approval</div>
+                    </div>
+                    <p><strong>Requirements:</strong> Updated Security & Safeguards Plan (SSP), compliance documentation, user limit agreement</p>
+                    <p><strong>Best For:</strong> R/Python analytics, smaller teams (&lt;1,000 users), interactive dashboards</p>
+                </div>
+
+                <!-- Self-Hosted Server Card -->
+                <div class="hosting-card">
+                    <div class="hosting-card-title">
+                        <h3>Self-Hosted Server</h3>
+                        <span class="hosting-status status-limited">✓ Full Control</span>
+                    </div>
+                    <div class="hosting-features">
+                        <div class="feature-item">✓ <span>Complete Independence</span> - Full control of platform</div>
+                        <div class="feature-item">✓ <span>BigQuery Support</span> - Full data access</div>
+                        <div class="feature-item negative">✗ <span>You Own Infrastructure</span> - Server & resources your responsibility</div>
+                        <div class="feature-item negative">✗ <span>Ops Overhead</span> - Monitoring, maintenance, security</div>
+                    </div>
+                    <p><strong>Requirements:</strong> Physical/Virtual server, IT ops resources, network security compliance, monitoring capabilities</p>
+                    <p><strong>Best For:</strong> Organizations with existing on-premise infrastructure, custom security needs, isolated deployments</p>
+                </div>
+
+                <!-- Walmart Internal Resources Card -->
+                <div class="hosting-card">
+                    <div class="hosting-card-title">
+                        <h3>Walmart Internal Resources</h3>
+                        <span class="hosting-status status-recommended">✅ Recommended</span>
+                    </div>
+                    <div class="hosting-features">
+                        <div class="feature-item">✓ <span>BigQuery Included</span> - Full data warehouse access</div>
+                        <div class="feature-item">✓ <span>Enterprise Scale</span> - Supports 50,000+ users</div>
+                        <div class="feature-item">✓ <span>Professional Support</span> - Walmart IT teams help</div>
+                        <div class="feature-item warning">⚠ <span>Approval Required</span> - Platform governance review</div>
+                    </div>
+                    <p><strong>Requirements:</strong> Platform approval, current SSP, architecture review, executive sponsorship, compliance certification</p>
+                    <p><strong>Best For:</strong> Enterprise-scale platforms (50,000+ users), long-term solutions, systems requiring BigQuery integration, Walmart-critical systems</p>
+                    <p style="color: #1565c0; font-weight: 600; margin-bottom: 0;">✅ <strong>RECOMMENDED FOR ACTIVITY-HUB</strong> - Only realistic option for full enterprise scale and live data integration</p>
+                </div>
+
+                <!-- MyWM Experiments Card -->
+                <div class="hosting-card">
+                    <div class="hosting-card-title">
+                        <h3>MyWM Experiments</h3>
+                        <span class="hosting-status status-recommended">✓ Store-Level Reach</span>
+                    </div>
+                    <div class="hosting-features">
+                        <div class="feature-item">✓ <span>Immediate Access</span> - All associates at store level and above</div>
+                        <div class="feature-item">✓ <span>Agent Support</span> - Agent-driven platform capabilities</div>
+                        <div class="feature-item">✓ <span>Built-In Audience</span> - 50,000+ ready users</div>
+                        <div class="feature-item">✓ <span>Rapid Rollout</span> - Quick deployment to stores</div>
+                    </div>
+                    <p><strong>Best For:</strong> Store-facing initiatives, rapid experimentation and testing, large-scale user adoption (all stores), paired with backend platform</p>
+                    <p style="color: #1565c0; font-weight: 600; margin-bottom: 0;">✅ <strong>RECOMMENDED FRONTEND</strong> for Activity-Hub user interface and distribution</p>
+                </div>
+
+                <!-- Me@Campus Card -->
+                <div class="hosting-card">
+                    <div class="hosting-card-title">
+                        <h3>Me@Campus</h3>
+                        <span class="hosting-status status-limited">⚠️ Limited Audience</span>
+                    </div>
+                    <div class="hosting-features">
+                        <div class="feature-item">✓ <span>Market-Level Focus</span> - Designed for district managers and above</div>
+                        <div class="feature-item negative">✗ <span>No Store-Level Access</span> - Cannot reach individual store managers</div>
+                        <div class="feature-item">✓ <span>Management Dashboards</span> - Good for executive views</div>
+                    </div>
+                    <p><strong>Best For:</strong> Market-level decision dashboards, market manager tools, executive summaries only</p>
+                    <p style="color: #666; margin-bottom: 0;"><strong>⚠️ Note:</strong> Limited audience scope - doesn't support store-level initiatives.</p>
+                </div>
+
+                <!-- Power Apps Card -->
+                <div class="hosting-card">
+                    <div class="hosting-card-title">
+                        <h3>Power Apps (Microsoft Power Platform)</h3>
+                        <span class="hosting-status status-recommended">✓ Active Development</span>
+                    </div>
+                    <div class="hosting-features">
+                        <div class="feature-item">✓ <span>3 Active Apps</span> - Currently deployed solutions</div>
+                        <div class="feature-item">✓ <span>Proven ROI</span> - Reducing real friction</div>
+                        <div class="feature-item warning">⚠ <span>Market-Level Only</span> - Current audience limitation</div>
+                        <div class="feature-item">✓ <span>Expansion Possible</span> - Can expand to store managers</div>
+                    </div>
+                    <p><strong>Current Deployment:</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Quarterly Operations Checklist (Store Mgr ↔ Market Mgr)</li>
+                        <li>Feedback Ticket Submission (Store Mgr → Home Office)</li>
+                        <li>Special Feature Order Management (Seasonal/Event items)</li>
+                    </ul>
+                    <p><strong>Best For:</strong> Multi-functional business apps, structured workflows, Microsoft ecosystem integration (Excel, Teams, Dynamics)</p>
+                    <p style="color: #1565c0; font-weight: 600; margin-bottom: 0;">🎯 <strong>HIGH-VALUE OPPORTUNITY:</strong> Expand to store managers to eliminate friction and increase adoption (lower complexity than full platform approvals)</p>
+                </div>
+            </div>
+
+            <!-- COMPARISON TAB -->
+            <div id="comparison" class="hosting-content">
+                <h3 style="margin-top: 0;">Platform Comparison Matrix</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>BigQuery Access</th>
+                            <th>User Scale</th>
+                            <th>Approval</th>
+                            <th>Timeline</th>
+                            <th>Best For</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Code Puppy Pages</strong></td>
+                            <td><span class="icon-no">❌ No</span></td>
+                            <td><span class="icon-conditional">Limited</span></td>
+                            <td><span class="icon-yes">No</span></td>
+                            <td>Immediate</td>
+                            <td>Static content only</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Posit</strong></td>
+                            <td><span class="icon-conditional">⚠ Limited</span></td>
+                            <td>&lt;1,000</td>
+                            <td>Yes (SSP)</td>
+                            <td>Weeks</td>
+                            <td>Analytics, smaller teams</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Self-Hosted</strong></td>
+                            <td><span class="icon-yes">✅ Yes</span></td>
+                            <td>Unlimited</td>
+                            <td><span class="icon-yes">No</span></td>
+                            <td>Days</td>
+                            <td>Full control, custom needs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WM Internal</strong></td>
+                            <td><span class="icon-yes">✅ Yes</span></td>
+                            <td>50,000+</td>
+                            <td>Yes (Gov + SSP)</td>
+                            <td>4-12 weeks</td>
+                            <td><strong>Enterprise platforms</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>MyWM Experiments</strong></td>
+                            <td><span class="icon-yes">✅ Yes (via backend)</span></td>
+                            <td>50,000+</td>
+                            <td>Via backend</td>
+                            <td>Depends</td>
+                            <td>Store-level distribution</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Power Apps</strong></td>
+                            <td><span class="icon-conditional">⚠ Depends</span></td>
+                            <td>Varies</td>
+                            <td>Yes (org policy)</td>
+                            <td>Weeks</td>
+                            <td>Business workflows</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SELECTION GUIDE TAB -->
+            <div id="selection" class="hosting-content">
+                <h3 style="margin-top: 0;">How to Choose Your Hosting Option</h3>
+                
+                <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="margin-top: 0; color: #2e7d32;">For the Activity-Hub Platform (50,000+ users)</h4>
+                    <p><strong>Recommended Architecture:</strong></p>
+                    <ol>
+                        <li><strong>Backend:</strong> Walmart Internal Resources (WM Cloud)
+                            <ul>
+                                <li>Enables enterprise scale and BigQuery integration</li>
+                                <li>Requires platform approval + SSP (4-12 weeks)</li>
+                                <li>Only realistic option for 50,000+ users with live data</li>
+                            </ul>
+                        </li>
+                        <li><strong>Frontend/Distribution:</strong> MyWM Experiments
+                            <ul>
+                                <li>Immediate access to store-level users</li>
+                                <li>Built-in platform for rapid rollout</li>
+                                <li>Integrated with Walmart app ecosystem</li>
+                            </ul>
+                        </li>
+                        <li><strong>Special Workflows:</strong> Power Apps (expansion)
+                            <ul>
+                                <li>Structured business processes</li>
+                                <li>Store manager tools and feedback collection</li>
+                                <li>High-value opportunity to eliminate friction</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+
+                <div style="background: #fff3e0; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="margin-top: 0; color: #e65100;">For Smaller Initiatives (&lt;1,000 users)</h4>
+                    <p><strong>Consider:</strong></p>
+                    <ul>
+                        <li><strong>Posit</strong> - If analytics-focused, smaller team, can wait 2-3 weeks</li>
+                        <li><strong>Power Apps</strong> - If workflow/business process focused, needs approval</li>
+                        <li><strong>Self-Hosted</strong> - If you need full control and have infrastructure resources</li>
+                    </ul>
+                </div>
+
+                <div style="background: #fce4ec; padding: 20px; border-radius: 8px;">
+                    <h4 style="margin-top: 0; color: #880e4f;">Before Choosing: Key Questions</h4>
+                    <ol>
+                        <li><strong>How many users?</strong> Draft: &lt;100 (any), Small: &lt;1,000 (Posit/Power Apps), Enterprise: 50,000+ (WM only)</li>
+                        <li><strong>Need live data?</strong> Yes → Requires WM Internal, MyWM, or Self-Hosted. No → Code Puppy Pages okay</li>
+                        <li><strong>Timeline?</strong> Urgent (weeks) → Self-Hosted/Code Puppy. Patient (months) → WM Internal (best option)</li>
+                        <li><strong>Infrastructure?</strong> Don't have → WM Internal. Have → Self-Hosted option</li>
+                        <li><strong>Walmart-critical?</strong> Yes → WM Internal (required for governance). No → Other options viable</li>
+                    </ol>
+                </div>
+
+                <div class="next-steps">
+                    <h4>Next Steps</h4>
+                    <ol>
+                        <li>Answer the 5 key questions above</li>
+                        <li>Review the recommended platform for your situation</li>
+                        <li>Check the "Requirements" section for that platform</li>
+                        <li>Contact platform governance/IT teams with your plan</li>
+                        <li>Begin approval process (4-12 weeks for enterprise platforms)</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

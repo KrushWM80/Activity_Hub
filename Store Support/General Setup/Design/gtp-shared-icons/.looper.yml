@@ -1,0 +1,86 @@
+inherit:
+  - job:///emp/looper-templates:slack
+  - job:///emp/looper-templates:strict
+
+tags:
+  - spec: v*
+    call: publish
+
+tools:
+  nodejs: 23.4.0
+  sonarscanner: 5.0.1.3006
+
+envs:
+  global:
+    variables:
+      SLACK_CHANNEL: emp-ci-alerts
+
+triggers:
+  - manual:
+      name: Publish
+      call: publish
+  - manual:
+      name: Generate Docs
+      call: generate-docs
+  - manual:
+      name: Run Test Lint
+      call: default
+  - pr:
+      call: default
+  - push:
+      ignoreAuthor: jenkinspan
+      ignoreCommitter: jenkinspan
+      call: default
+
+flows:
+  pr:
+    - call: default
+  default:
+    - echo "Running ${LOOPER_FLOW} triggered by ${LOOPER_TRIGGER}"
+    - (name Yarn Install) corepack enable
+    - (name Yarn Version) yarn --version
+    - yarn --frozen-lockfile
+    - yarn lint
+    - yarn test --passWithNoTests
+    - yarn build:noEmit
+    - dir(example):
+        - yarn --frozen-lockfile
+        - yarn lint
+    - call: run-sonar
+  generate-docs:
+    - echo "Running ${LOOPER_FLOW} triggered by ${LOOPER_TRIGGER}"
+    - var(headCommit): git rev-parse --short HEAD
+    - git status
+    - git stash push -a .
+    - git remote add --track main temp ${GITHUB_BRANCH_URL} ${GITHUB_TAG_URL}
+    - git fetch temp
+    - git switch -c temp-main --track temp/main
+    - yarn --frozen-lockfile
+    - yarn docs
+    - git status
+    - git add docs/
+    - try:
+        - git commit -m "Update production docs bundle"
+        - git push temp HEAD:main
+      catch:
+        - warn()
+    - git checkout ${headCommit}
+    - try:
+        - git stash pop
+      catch:
+        - warn()
+  publish:
+    - echo "Running ${LOOPER_FLOW} triggered by ${LOOPER_TRIGGER}"
+    - call: default
+    - try:
+        - npm publish
+        - call: generate-docs
+        - call: slack-npme-success
+      catch:
+        - call: slack-failure
+        - fail($flowErrorMessage)
+  run-sonar:
+    - sonar("Sonar"):
+      - exposeVars(package.json)
+      - (name Sonar Analysis) sonar-scanner
+        -Dsonar.projectVersion="${package.version}"

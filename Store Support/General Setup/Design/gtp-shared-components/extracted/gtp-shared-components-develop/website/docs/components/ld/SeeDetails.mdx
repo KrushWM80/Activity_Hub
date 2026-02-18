@@ -1,0 +1,52 @@
+---
+title: SeeDetails
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+The SeeDetails component is used to put long sections of information under a block that users can expand or collapse.
+
+
+<ScreenshotTabs screenshotData={{"hidden":"screenshots/see-details-hidden.png","visible":"screenshots/see-details-visible.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {SeeDetails} from '@walmart/gtp-shared-components`;
+
+const [expanded, setExpanded] = React.useState(false);
+
+<SeeDetails
+  title="Single Line Collapse"
+  onToggle={() => setExpanded(!expanded)}
+>
+  <Body>Collapse content appears underneath the toggle area.</Body>
+</SeeDetails>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="SeeDetails" prop="children"/>
+ ### expanded
+<PropTable componentLink="SeeDetails" prop="expanded"/>
+ ### onToggle(required)
+<PropTable componentLink="SeeDetails" prop="onToggle"/>
+ ### dividerTop
+<PropTable componentLink="SeeDetails" prop="dividerTop"/>
+ ### dividerBottom
+<PropTable componentLink="SeeDetails" prop="dividerBottom"/>
+ ### touchableProps
+<PropTable componentLink="SeeDetails" prop="touchableProps"/>
+ ### size
+<PropTable componentLink="SeeDetails" prop="size"/>
+ ### icon_style
+<PropTable componentLink="SeeDetails" prop="icon_style"/>
+ ### title_style
+<PropTable componentLink="SeeDetails" prop="title_style"/>
+ ### subTitle_style
+<PropTable componentLink="SeeDetails" prop="subTitle_style"/>
+ ### UNSAFE_style
+<PropTable componentLink="SeeDetails" prop="UNSAFE_style"/>
+ ### showText
+<PropTable componentLink="SeeDetails" prop="showText"/>
+ ### hideText
+<PropTable componentLink="SeeDetails" prop="hideText"/>

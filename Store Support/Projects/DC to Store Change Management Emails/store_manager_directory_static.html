@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Manager Directory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #DBEAFE 0%, #f5f7fa 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .search-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .search-title {
+            font-size: 18px;
+            color: #1E3A8A;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .search-subtitle {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .search-input-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        select {
+            padding: 12px;
+            border: 2px solid #DBEAFE;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        .dc-selector {
+            margin-top: 20px;
+        }
+        
+        .dc-selector-title {
+            font-size: 13px;
+            color: #1E3A8A;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .dc-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        
+        .dc-btn {
+            padding: 10px;
+            border: 2px solid #DBEAFE;
+            background: white;
+            color: #1E3A8A;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .dc-btn:hover {
+            border-color: #3B82F6;
+            background: #DBEAFE;
+        }
+        
+        .dc-btn.active {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+            color: white;
+            border-color: #1D4ED8;
+        }
+        
+        .results-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .results-title {
+            font-size: 18px;
+            color: #1E3A8A;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #DBEAFE;
+        }
+        
+        .manager-cards {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .manager-card {
+            background: linear-gradient(135deg, #DBEAFE 0%, #E0F4FE 100%);
+            border-left: 4px solid #3B82F6;
+            padding: 20px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .manager-card:hover {
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .manager-title {
+            font-weight: 600;
+            color: #1E3A8A;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .manager-info {
+            display: grid;
+            gap: 6px;
+            font-size: 13px;
+        }
+        
+        .manager-info-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .info-label {
+            color: #1E3A8A;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            color: #333;
+        }
+        
+        .manager-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #3B82F6;
+            background: white;
+            color: #3B82F6;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: #3B82F6;
+            color: white;
+        }
+        
+        .elm-link {
+            background: #3B82F6;
+            color: white;
+        }
+        
+        .elm-link:hover {
+            background: #1D4ED8;
+            border-color: #1D4ED8;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #D1FAE5;
+            color: #065F46;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .no-results-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .search-input-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .dc-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .manager-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👥 Store Manager Directory</h1>
+        <p>Find manager contact information by Distribution Center</p>
+    </div>
+    
+    <div class="container">
+        <div class="search-section">
+            <div class="search-title">Find Store Managers</div>
+            <div class="search-subtitle">Enter your email to auto-detect your DC, or select a DC directly</div>
+            
+            <div class="search-input-group">
+                <input type="email" id="emailInput" placeholder="Enter your email (e.g., 6020GM@email.wal-mart.com)">
+                <button class="btn btn-primary" onclick="searchByEmail()">Search</button>
+            </div>
+            
+            <div class="dc-selector">
+                <div class="dc-selector-title">Or Select Your DC:</div>
+                <div class="dc-buttons">
+                    <button class="dc-btn" onclick="selectDC('6020')">DC 6020</button>
+                    <button class="dc-btn" onclick="selectDC('6080')">DC 6080</button>
+                    <button class="dc-btn" onclick="selectDC('6050')">DC 6050</button>
+                    <button class="dc-btn" onclick="selectDC('6040')">DC 6040</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <div class="results-title">Store Managers</div>
+            <div id="resultsContainer" class="manager-cards">
+                <div class="no-results">
+                    <div class="no-results-icon">🔍</div>
+                    <p>Enter an email or select a DC to view managers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p><strong>Store Manager Directory</strong> | Manager Change Tracking System</p>
+        <p>Last updated: 2026-02-16 | Static HTML Version</p>
+    </div>
+    
+    <script>
+        // Mock data - matches the DC structure
+        const managers = {
+            '6020': {
+                'Store 2841 - BOWLING GREEN, KY': {
+                    gm: 'Michael Johnson',
+                    agm: 'Sarah Williams',
+                    stores: ['2841', '2840']
+                },
+                'Store 2840 - LOUISVILLE, KY': {
+                    gm: 'Michael Johnson',
+                    agm: 'Sarah Williams',
+                    stores: ['2841', '2840']
+                }
+            },
+            '6080': {
+                'Store 2973 - COVINGTON, KY': {
+                    gm: 'Robert Martinez',
+                    agm: 'Jennifer Anderson',
+                    stores: ['2973', '2925']
+                },
+                'Store 2925 - LEXINGTON, KY': {
+                    gm: 'David Thompson',
+                    agm: 'Emily Davis',
+                    stores: ['2973', '2925']
+                }
+            },
+            '6050': {
+                'Store 3100 - NASHVILLE, TN': {
+                    gm: 'James Wilson',
+                    agm: 'Lisa Brown',
+                    stores: ['3100', '3105']
+                },
+                'Store 3105 - MEMPHIS, TN': {
+                    gm: 'James Wilson',
+                    agm: 'Lisa Brown',
+                    stores: ['3100', '3105']
+                }
+            },
+            '6040': {
+                'Store 2200 - CHICAGO, IL': {
+                    gm: 'Christopher Lee',
+                    agm: 'Michelle Garcia',
+                    stores: ['2200', '2205']
+                },
+                'Store 2205 - AURORA, IL': {
+                    gm: 'Christopher Lee',
+                    agm: 'Michelle Garcia',
+                    stores: ['2200', '2205']
+                }
+            }
+        };
+        
+        function extractDCFromEmail(email) {
+            // Extract DC number from email like "6020GM@email.wal-mart.com"
+            const match = email.match(/^(\d{4})/);
+            return match ? match[1] : null;
+        }
+        
+        function searchByEmail() {
+            const email = document.getElementById('emailInput').value.trim();
+            if (!email) {
+                alert('Please enter an email address');
+                return;
+            }
+            
+            const dc = extractDCFromEmail(email);
+            if (!dc) {
+                alert('Invalid email format. Please use format like: 6020GM@email.wal-mart.com');
+                return;
+            }
+            
+            if (!managers[dc]) {
+                alert('DC ' + dc + ' not found in directory.');
+                return;
+            }
+            
+            displayManagers(dc);
+        }
+        
+        function selectDC(dc) {
+            // Update active button
+            document.querySelectorAll('.dc-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Clear email input
+            document.getElementById('emailInput').value = '';
+            
+            displayManagers(dc);
+        }
+        
+        function displayManagers(dc) {
+            const managerData = managers[dc];
+            let html = '';
+            
+            if (!managerData) {
+                html = '<div class="no-results"><div class="no-results-icon">❌</div><p>No managers found for DC ' + dc + '</p></div>';
+                document.getElementById('resultsContainer').innerHTML = html;
+                return;
+            }
+            
+            for (const [storeName, data] of Object.entries(managerData)) {
+                const storeNum = storeName.split(' ')[1];
+                html += `
+                    <div class="manager-card">
+                        <div class="manager-title">${storeName}</div>
+                        <div class="manager-info">
+                            <div class="manager-info-line">
+                                <span class="info-label">General Manager:</span>
+                                <span class="info-value">${data.gm}</span>
+                            </div>
+                            <div class="manager-info-line">
+                                <span class="info-label">Asst. General Manager:</span>
+                                <span class="info-value">${data.agm}</span>
+                            </div>
+                            <div class="manager-info-line">
+                                <span class="info-label">Status:</span>
+                                <span class="status-badge">Active</span>
+                            </div>
+                        </div>
+                        <div class="manager-actions">
+                            <a href="mailto:${data.gm.toLowerCase().replace(/\s+/g, '.')}@walmart.com" class="action-btn">📧 Email</a>
+                            <a href="https://sdl.prod.walmart.com/detail/US/${storeNum}" class="action-btn elm-link" target="_blank">🔗 SDL Link</a>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('resultsContainer').innerHTML = html;
+        }
+        
+        // Allow Enter key to search
+        document.getElementById('emailInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchByEmail();
+        });
+    </script>
+</body>
+</html>

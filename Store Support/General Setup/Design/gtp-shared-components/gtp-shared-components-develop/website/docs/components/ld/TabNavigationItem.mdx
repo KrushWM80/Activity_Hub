@@ -1,0 +1,39 @@
+---
+title: TabNavigationItem
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Suggested way Use TabNavigationItem inside the TabNavigation
+
+if you are using a plain TabNavigationItem you must pass index and tabCount
+(Total number of tabs) so that it will automatically allocate the width
+to the tabs
+
+
+
+## Usage
+```js
+import {Badge, TabNavigationItem} from '@walmart/gtp-shared-components`;
+
+<TabNavigationItem isCurrent trailing={<Badge color="blue">10</Badge>}>
+  {"One"}
+</TabNavigationItem>
+```
+## Props
+
+ ### index
+<PropTable componentLink="TabNavigationItem" prop="index"/>
+ ### children(required)
+<PropTable componentLink="TabNavigationItem" prop="children"/>
+ ### isCurrent
+<PropTable componentLink="TabNavigationItem" prop="isCurrent"/>
+ ### leading
+<PropTable componentLink="TabNavigationItem" prop="leading"/>
+ ### onPress
+<PropTable componentLink="TabNavigationItem" prop="onPress"/>
+ ### trailing
+<PropTable componentLink="TabNavigationItem" prop="trailing"/>
+ ### UNSAFE_style
+<PropTable componentLink="TabNavigationItem" prop="UNSAFE_style"/>

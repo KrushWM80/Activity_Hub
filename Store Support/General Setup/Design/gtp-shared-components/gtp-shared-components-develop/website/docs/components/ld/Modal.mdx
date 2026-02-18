@@ -1,0 +1,124 @@
+---
+title: Modal
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Modals focus the user’s attention on a single task in
+a window that sits on top of the page content.
+
+
+<ScreenshotTabs screenshotData={"screenshots/modal.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Button, ButtonGroup, Modal} from '@walmart/gtp-shared-components`;
+
+const [modalIsOpen, setModalIsOpen] = React.useState(false);
+
+<Modal
+  isOpen={modalIsOpen}
+  onOpen={() => setModalIsOpen(true)}
+  onClose={() => setModalIsOpen(false)}
+  title="Confirmation"
+  actions={
+    <ButtonGroup>
+      <Button variant="tertiary" onPress={() => setModalIsOpen(false)}>
+        Cancel
+      </Button>
+      <Button variant="primary" onPress={() => setModalIsOpen(false)}>
+        Continue
+      </Button>
+    </ButtonGroup>
+  }>
+  Lorem ipsum
+</Modal>
+```
+## Props
+
+ ### animationInTiming
+<PropTable componentLink="Modal" prop="animationInTiming"/>
+ ### animationOutTiming
+<PropTable componentLink="Modal" prop="animationOutTiming"/>
+ ### avoidKeyboard
+<PropTable componentLink="Modal" prop="avoidKeyboard"/>
+ ### coverScreen
+<PropTable componentLink="Modal" prop="coverScreen"/>
+ ### hasBackdrop
+<PropTable componentLink="Modal" prop="hasBackdrop"/>
+ ### backdropColor
+<PropTable componentLink="Modal" prop="backdropColor"/>
+ ### backdropOpacity
+<PropTable componentLink="Modal" prop="backdropOpacity"/>
+ ### backdropTransitionInTiming
+<PropTable componentLink="Modal" prop="backdropTransitionInTiming"/>
+ ### backdropTransitionOutTiming
+<PropTable componentLink="Modal" prop="backdropTransitionOutTiming"/>
+ ### customBackdrop
+<PropTable componentLink="Modal" prop="customBackdrop"/>
+ ### useNativeDriver
+<PropTable componentLink="Modal" prop="useNativeDriver"/>
+ ### deviceHeight
+<PropTable componentLink="Modal" prop="deviceHeight"/>
+ ### deviceWidth
+<PropTable componentLink="Modal" prop="deviceWidth"/>
+ ### hideModalContentWhileAnimating
+<PropTable componentLink="Modal" prop="hideModalContentWhileAnimating"/>
+ ### propagateSwipe
+<PropTable componentLink="Modal" prop="propagateSwipe"/>
+ ### isVisible
+<PropTable componentLink="Modal" prop="isVisible"/>
+ ### panResponderThreshold
+<PropTable componentLink="Modal" prop="panResponderThreshold"/>
+ ### swipeThreshold
+<PropTable componentLink="Modal" prop="swipeThreshold"/>
+ ### onModalShow
+<PropTable componentLink="Modal" prop="onModalShow"/>
+ ### onModalWillShow
+<PropTable componentLink="Modal" prop="onModalWillShow"/>
+ ### onModalHide
+<PropTable componentLink="Modal" prop="onModalHide"/>
+ ### onModalWillHide
+<PropTable componentLink="Modal" prop="onModalWillHide"/>
+ ### onBackdropPress
+<PropTable componentLink="Modal" prop="onBackdropPress"/>
+ ### onBackButtonPress
+<PropTable componentLink="Modal" prop="onBackButtonPress"/>
+ ### scrollTo
+<PropTable componentLink="Modal" prop="scrollTo"/>
+ ### scrollOffset
+<PropTable componentLink="Modal" prop="scrollOffset"/>
+ ### scrollOffsetMax
+<PropTable componentLink="Modal" prop="scrollOffsetMax"/>
+ ### scrollHorizontal
+<PropTable componentLink="Modal" prop="scrollHorizontal"/>
+ ### statusBarTranslucent
+<PropTable componentLink="Modal" prop="statusBarTranslucent"/>
+ ### supportedOrientations
+<PropTable componentLink="Modal" prop="supportedOrientations"/>
+ ### children(required)
+<PropTable componentLink="Modal" prop="children"/>
+ ### actions
+<PropTable componentLink="Modal" prop="actions"/>
+ ### closeButtonProps
+<PropTable componentLink="Modal" prop="closeButtonProps"/>
+ ### isOpen
+<PropTable componentLink="Modal" prop="isOpen"/>
+ ### onOpen
+<PropTable componentLink="Modal" prop="onOpen"/>
+ ### onOpened
+<PropTable componentLink="Modal" prop="onOpened"/>
+ ### onClose
+<PropTable componentLink="Modal" prop="onClose"/>
+ ### onClosed
+<PropTable componentLink="Modal" prop="onClosed"/>
+ ### size
+<PropTable componentLink="Modal" prop="size"/>
+ ### title(required)
+<PropTable componentLink="Modal" prop="title"/>
+ ### UNSAFE_style
+<PropTable componentLink="Modal" prop="UNSAFE_style"/>
+ ### withRNModal
+<PropTable componentLink="Modal" prop="withRNModal"/>
+ ### hideCloseIcon
+<PropTable componentLink="Modal" prop="hideCloseIcon"/>

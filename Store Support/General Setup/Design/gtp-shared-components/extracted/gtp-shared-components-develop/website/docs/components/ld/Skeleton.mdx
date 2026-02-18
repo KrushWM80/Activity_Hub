@@ -1,0 +1,39 @@
+---
+title: Skeleton
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+A skeleton is a low-fidelity shape that approximates a user interface element and indicates loading of content.
+A group of skeletons roughly matching a loaded screen can improve perceived responsiveness when loading data is slow.
+
+
+<ScreenshotTabs screenshotData={"screenshots/skeleton.gif"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Skeleton} from '@walmart/gtp-shared-components`;
+
+<Skeleton />
+<Skeleton variant="rounded" />
+<Skeleton height={50} width={50} />
+<Skeleton height={50} width={50} variant="rounded" />
+<Skeleton height={50} width={100} />
+<Skeleton height={50} width={100} variant="rounded" />
+```
+## Props
+
+ ### variant
+<PropTable componentLink="Skeleton" prop="variant"/>
+ ### width
+<PropTable componentLink="Skeleton" prop="width"/>
+ ### height
+<PropTable componentLink="Skeleton" prop="height"/>
+ ### animator<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - skeleton animations are now automatically synchronized</span></span>
+<PropTable componentLink="Skeleton" prop="animator"/>
+ ### rounded<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>variant</strong> instead</span></span>
+<PropTable componentLink="Skeleton" prop="rounded"/>
+ ### lines<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - use <strong>SkeletonText</strong> instead</span></span>
+<PropTable componentLink="Skeleton" prop="lines"/>
+ ### UNSAFE_style
+<PropTable componentLink="Skeleton" prop="UNSAFE_style"/>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        pre { background: white; padding: 10px; border: 1px solid #ddd; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Dashboard Debug Info</h1>
+    
+    <div id="react-check" class="status info">Checking React...</div>
+    <div id="api-check" class="status info">Checking API...</div>
+    <div id="recharts-check" class="status info">Checking Recharts...</div>
+    <div id="babel-check" class="status info">Checking Babel...</div>
+    
+    <h2>API Response:</h2>
+    <pre id="api-data">Loading...</pre>
+    
+    <h2>Console Errors:</h2>
+    <pre id="errors">None yet...</pre>
+    
+    <script>
+        const errors = [];
+        window.addEventListener('error', (e) => {
+            errors.push(e.message);
+            document.getElementById('errors').textContent = errors.join('\n');
+        });
+        
+        // Check React
+        setTimeout(() => {
+            const reactDiv = document.getElementById('react-check');
+            if (typeof React !== 'undefined') {
+                reactDiv.className = 'status success';
+                reactDiv.textContent = '✅ React loaded: v' + React.version;
+            } else {
+                reactDiv.className = 'status error';
+                reactDiv.textContent = '❌ React NOT loaded';
+            }
+        }, 2000);
+        
+        // Check ReactDOM
+        setTimeout(() => {
+            if (typeof ReactDOM !== 'undefined') {
+                console.log('✅ ReactDOM loaded');
+            } else {
+                console.error('❌ ReactDOM NOT loaded');
+            }
+        }, 2000);
+        
+        // Check Recharts
+        setTimeout(() => {
+            const chartsDiv = document.getElementById('recharts-check');
+            if (typeof Recharts !== 'undefined') {
+                chartsDiv.className = 'status success';
+                chartsDiv.textContent = '✅ Recharts loaded';
+            } else {
+                chartsDiv.className = 'status error';
+                chartsDiv.textContent = '❌ Recharts NOT loaded';
+            }
+        }, 2000);
+        
+        // Check Babel
+        setTimeout(() => {
+            const babelDiv = document.getElementById('babel-check');
+            if (typeof Babel !== 'undefined') {
+                babelDiv.className = 'status success';
+                babelDiv.textContent = '✅ Babel loaded';
+            } else {
+                babelDiv.className = 'status error';
+                babelDiv.textContent = '❌ Babel NOT loaded';
+            }
+        }, 2000);
+        
+        // Check API
+        async function checkAPI() {
+            const apiDiv = document.getElementById('api-check');
+            const apiData = document.getElementById('api-data');
+            
+            try {
+                apiDiv.textContent = 'Connecting to API...';
+                const response = await fetch('http://127.0.0.1:8000/api/health');
+                const data = await response.json();
+                
+                apiDiv.className = 'status success';
+                apiDiv.textContent = '✅ API connected: ' + data.status;
+                apiData.textContent = JSON.stringify(data, null, 2);
+                
+                // Also get summary
+                const summaryResponse = await fetch('http://127.0.0.1:8000/api/summary?status=Active');
+                const summaryData = await summaryResponse.json();
+                apiData.textContent += '\n\nSummary:\n' + JSON.stringify(summaryData, null, 2);
+                
+            } catch (error) {
+                apiDiv.className = 'status error';
+                apiDiv.textContent = '❌ API Error: ' + error.message;
+                apiData.textContent = error.stack;
+            }
+        }
+        
+        checkAPI();
+    </script>
+    
+    <!-- Load the same libraries as the main dashboard -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.10.3/dist/Recharts.js"></script>
+</body>
+</html>

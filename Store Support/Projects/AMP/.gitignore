@@ -1,0 +1,41 @@
+# Large data files (exceed GitHub 100MB limit)
+AMP data/AMP_Data_Primary.csv
+*.zip
+
+# Sensitive credentials and auth files
+*.key
+*.pem
+*.p12
+*credentials*.json
+*service-account*.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Google Cloud SDK
+GoogleCloudSDKInstaller.exe
+
+# Node modules (if any)
+node_modules/
+
+# Environment files
+.env
+.env.local
+
+# Large Data Files (Not uploaded to repository)
+AMP_Data_Primary.csv
+

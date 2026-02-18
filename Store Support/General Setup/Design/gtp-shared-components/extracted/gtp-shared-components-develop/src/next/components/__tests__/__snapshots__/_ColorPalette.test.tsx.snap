@@ -1,0 +1,6208 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test ColorPalette Should match snapshot correctly. 1`] = `
+[
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "backgroundColor": "#000",
+          },
+        ]
+      }
+    >
+      Colors.black (#000)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "backgroundColor": "#fff",
+          },
+        ]
+      }
+    >
+      Colors.white (#fff)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#f8f8f8",
+          },
+        ]
+      }
+    >
+      Colors.gray[5] (#f8f8f8)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#f1f1f2",
+          },
+        ]
+      }
+    >
+      Colors.gray[10] (#f1f1f2)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#e3e4e5",
+          },
+        ]
+      }
+    >
+      Colors.gray[20] (#e3e4e5)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#d5d6d8",
+          },
+        ]
+      }
+    >
+      Colors.gray[30] (#d5d6d8)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#c7c8cb",
+          },
+        ]
+      }
+    >
+      Colors.gray[40] (#c7c8cb)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#babbbe",
+          },
+        ]
+      }
+    >
+      Colors.gray[50] (#babbbe)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#acadb0",
+          },
+        ]
+      }
+    >
+      Colors.gray[60] (#acadb0)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#9e9fa3",
+          },
+        ]
+      }
+    >
+      Colors.gray[70] (#9e9fa3)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#909196",
+          },
+        ]
+      }
+    >
+      Colors.gray[80] (#909196)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#828489",
+          },
+        ]
+      }
+    >
+      Colors.gray[90] (#828489)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#74767c",
+          },
+        ]
+      }
+    >
+      Colors.gray[100] (#74767c)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#686a70",
+          },
+        ]
+      }
+    >
+      Colors.gray[110] (#686a70)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#5d5e63",
+          },
+        ]
+      }
+    >
+      Colors.gray[120] (#5d5e63)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#515357",
+          },
+        ]
+      }
+    >
+      Colors.gray[130] (#515357)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#46474a",
+          },
+        ]
+      }
+    >
+      Colors.gray[140] (#46474a)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#3a3b3e",
+          },
+        ]
+      }
+    >
+      Colors.gray[150] (#3a3b3e)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#2e2f32",
+          },
+        ]
+      }
+    >
+      Colors.gray[160] (#2e2f32)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#232325",
+          },
+        ]
+      }
+    >
+      Colors.gray[170] (#232325)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#171819",
+          },
+        ]
+      }
+    >
+      Colors.gray[180] (#171819)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#f2f8fd",
+          },
+        ]
+      }
+    >
+      Colors.blue[5] (#f2f8fd)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#e6f1fc",
+          },
+        ]
+      }
+    >
+      Colors.blue[10] (#e6f1fc)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#cce3f8",
+          },
+        ]
+      }
+    >
+      Colors.blue[20] (#cce3f8)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#b3d4f5",
+          },
+        ]
+      }
+    >
+      Colors.blue[30] (#b3d4f5)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#99c6f1",
+          },
+        ]
+      }
+    >
+      Colors.blue[40] (#99c6f1)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#80b8ee",
+          },
+        ]
+      }
+    >
+      Colors.blue[50] (#80b8ee)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#66aaea",
+          },
+        ]
+      }
+    >
+      Colors.blue[60] (#66aaea)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#4d9ce7",
+          },
+        ]
+      }
+    >
+      Colors.blue[70] (#4d9ce7)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#338de3",
+          },
+        ]
+      }
+    >
+      Colors.blue[80] (#338de3)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#1a7fe0",
+          },
+        ]
+      }
+    >
+      Colors.blue[90] (#1a7fe0)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#0071dc",
+          },
+        ]
+      }
+    >
+      Colors.blue[100] (#0071dc)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#0066c6",
+          },
+        ]
+      }
+    >
+      Colors.blue[110] (#0066c6)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#005ab0",
+          },
+        ]
+      }
+    >
+      Colors.blue[120] (#005ab0)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#004f9a",
+          },
+        ]
+      }
+    >
+      Colors.blue[130] (#004f9a)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#004484",
+          },
+        ]
+      }
+    >
+      Colors.blue[140] (#004484)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#00396e",
+          },
+        ]
+      }
+    >
+      Colors.blue[150] (#00396e)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#002d58",
+          },
+        ]
+      }
+    >
+      Colors.blue[160] (#002d58)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#002242",
+          },
+        ]
+      }
+    >
+      Colors.blue[170] (#002242)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#00172c",
+          },
+        ]
+      }
+    >
+      Colors.blue[180] (#00172c)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#f4f9f2",
+          },
+        ]
+      }
+    >
+      Colors.green[5] (#f4f9f2)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#eaf3e6",
+          },
+        ]
+      }
+    >
+      Colors.green[10] (#eaf3e6)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#d4e7cd",
+          },
+        ]
+      }
+    >
+      Colors.green[20] (#d4e7cd)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#bfdbb3",
+          },
+        ]
+      }
+    >
+      Colors.green[30] (#bfdbb3)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#aacf9a",
+          },
+        ]
+      }
+    >
+      Colors.green[40] (#aacf9a)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#95c381",
+          },
+        ]
+      }
+    >
+      Colors.green[50] (#95c381)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#7fb768",
+          },
+        ]
+      }
+    >
+      Colors.green[60] (#7fb768)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#6aab4f",
+          },
+        ]
+      }
+    >
+      Colors.green[70] (#6aab4f)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#559f35",
+          },
+        ]
+      }
+    >
+      Colors.green[80] (#559f35)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#3f931c",
+          },
+        ]
+      }
+    >
+      Colors.green[90] (#3f931c)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#2a8703",
+          },
+        ]
+      }
+    >
+      Colors.green[100] (#2a8703)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#267a03",
+          },
+        ]
+      }
+    >
+      Colors.green[110] (#267a03)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#226c02",
+          },
+        ]
+      }
+    >
+      Colors.green[120] (#226c02)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#1d5f02",
+          },
+        ]
+      }
+    >
+      Colors.green[130] (#1d5f02)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#195102",
+          },
+        ]
+      }
+    >
+      Colors.green[140] (#195102)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#154402",
+          },
+        ]
+      }
+    >
+      Colors.green[150] (#154402)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#113601",
+          },
+        ]
+      }
+    >
+      Colors.green[160] (#113601)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#0d2901",
+          },
+        ]
+      }
+    >
+      Colors.green[170] (#0d2901)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#081b01",
+          },
+        ]
+      }
+    >
+      Colors.green[180] (#081b01)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#fff7f2",
+          },
+        ]
+      }
+    >
+      Colors.orange[5] (#fff7f2)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#fff0e6",
+          },
+        ]
+      }
+    >
+      Colors.orange[10] (#fff0e6)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#fee0cc",
+          },
+        ]
+      }
+    >
+      Colors.orange[20] (#fee0cc)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#fed1b3",
+          },
+        ]
+      }
+    >
+      Colors.orange[30] (#fed1b3)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fdc199",
+          },
+        ]
+      }
+    >
+      Colors.orange[40] (#fdc199)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fdb280",
+          },
+        ]
+      }
+    >
+      Colors.orange[50] (#fdb280)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fca266",
+          },
+        ]
+      }
+    >
+      Colors.orange[60] (#fca266)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fc934d",
+          },
+        ]
+      }
+    >
+      Colors.orange[70] (#fc934d)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fb8333",
+          },
+        ]
+      }
+    >
+      Colors.orange[80] (#fb8333)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fb741a",
+          },
+        ]
+      }
+    >
+      Colors.orange[90] (#fb741a)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fa6400",
+          },
+        ]
+      }
+    >
+      Colors.orange[100] (#fa6400)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#e15300",
+          },
+        ]
+      }
+    >
+      Colors.orange[110] (#e15300)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#c83c00",
+          },
+        ]
+      }
+    >
+      Colors.orange[120] (#c83c00)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#af2f00",
+          },
+        ]
+      }
+    >
+      Colors.orange[130] (#af2f00)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#962300",
+          },
+        ]
+      }
+    >
+      Colors.orange[140] (#962300)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#7d1900",
+          },
+        ]
+      }
+    >
+      Colors.orange[150] (#7d1900)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#641100",
+          },
+        ]
+      }
+    >
+      Colors.orange[160] (#641100)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#4b0a00",
+          },
+        ]
+      }
+    >
+      Colors.orange[170] (#4b0a00)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#320500",
+          },
+        ]
+      }
+    >
+      Colors.orange[180] (#320500)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#fcf4f9",
+          },
+        ]
+      }
+    >
+      Colors.pink[5] (#fcf4f9)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#faeaf4",
+          },
+        ]
+      }
+    >
+      Colors.pink[10] (#faeaf4)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#f5d5e9",
+          },
+        ]
+      }
+    >
+      Colors.pink[20] (#f5d5e9)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#efc0de",
+          },
+        ]
+      }
+    >
+      Colors.pink[30] (#efc0de)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#eaabd3",
+          },
+        ]
+      }
+    >
+      Colors.pink[40] (#eaabd3)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#e596c8",
+          },
+        ]
+      }
+    >
+      Colors.pink[50] (#e596c8)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#e080bc",
+          },
+        ]
+      }
+    >
+      Colors.pink[60] (#e080bc)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#db6bb1",
+          },
+        ]
+      }
+    >
+      Colors.pink[70] (#db6bb1)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#d556a6",
+          },
+        ]
+      }
+    >
+      Colors.pink[80] (#d556a6)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#d0419b",
+          },
+        ]
+      }
+    >
+      Colors.pink[90] (#d0419b)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#cb2c90",
+          },
+        ]
+      }
+    >
+      Colors.pink[100] (#cb2c90)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#b72882",
+          },
+        ]
+      }
+    >
+      Colors.pink[110] (#b72882)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#a22373",
+          },
+        ]
+      }
+    >
+      Colors.pink[120] (#a22373)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#8e1f65",
+          },
+        ]
+      }
+    >
+      Colors.pink[130] (#8e1f65)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#7a1a56",
+          },
+        ]
+      }
+    >
+      Colors.pink[140] (#7a1a56)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#661648",
+          },
+        ]
+      }
+    >
+      Colors.pink[150] (#661648)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#51123a",
+          },
+        ]
+      }
+    >
+      Colors.pink[160] (#51123a)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#3d0d2b",
+          },
+        ]
+      }
+    >
+      Colors.pink[170] (#3d0d2b)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#29091d",
+          },
+        ]
+      }
+    >
+      Colors.pink[180] (#29091d)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#f7f5f9",
+          },
+        ]
+      }
+    >
+      Colors.purple[5] (#f7f5f9)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#efebf2",
+          },
+        ]
+      }
+    >
+      Colors.purple[10] (#efebf2)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#e0d6e5",
+          },
+        ]
+      }
+    >
+      Colors.purple[20] (#e0d6e5)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#d0c2d8",
+          },
+        ]
+      }
+    >
+      Colors.purple[30] (#d0c2d8)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#c1adcb",
+          },
+        ]
+      }
+    >
+      Colors.purple[40] (#c1adcb)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#b199bf",
+          },
+        ]
+      }
+    >
+      Colors.purple[50] (#b199bf)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#a184b2",
+          },
+        ]
+      }
+    >
+      Colors.purple[60] (#a184b2)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#9270a5",
+          },
+        ]
+      }
+    >
+      Colors.purple[70] (#9270a5)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#825b98",
+          },
+        ]
+      }
+    >
+      Colors.purple[80] (#825b98)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#73478b",
+          },
+        ]
+      }
+    >
+      Colors.purple[90] (#73478b)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#63327e",
+          },
+        ]
+      }
+    >
+      Colors.purple[100] (#63327e)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#592d71",
+          },
+        ]
+      }
+    >
+      Colors.purple[110] (#592d71)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#4f2865",
+          },
+        ]
+      }
+    >
+      Colors.purple[120] (#4f2865)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#452358",
+          },
+        ]
+      }
+    >
+      Colors.purple[130] (#452358)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#3b1e4c",
+          },
+        ]
+      }
+    >
+      Colors.purple[140] (#3b1e4c)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#32193f",
+          },
+        ]
+      }
+    >
+      Colors.purple[150] (#32193f)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#281432",
+          },
+        ]
+      }
+    >
+      Colors.purple[160] (#281432)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#1e0f26",
+          },
+        ]
+      }
+    >
+      Colors.purple[170] (#1e0f26)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#140a19",
+          },
+        ]
+      }
+    >
+      Colors.purple[180] (#140a19)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#fdf4f4",
+          },
+        ]
+      }
+    >
+      Colors.red[5] (#fdf4f4)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#fce8e9",
+          },
+        ]
+      }
+    >
+      Colors.red[10] (#fce8e9)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#f8d2d3",
+          },
+        ]
+      }
+    >
+      Colors.red[20] (#f8d2d3)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#f5bbbd",
+          },
+        ]
+      }
+    >
+      Colors.red[30] (#f5bbbd)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#f2a4a7",
+          },
+        ]
+      }
+    >
+      Colors.red[40] (#f2a4a7)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#ef8e92",
+          },
+        ]
+      }
+    >
+      Colors.red[50] (#ef8e92)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#eb777c",
+          },
+        ]
+      }
+    >
+      Colors.red[60] (#eb777c)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#e86066",
+          },
+        ]
+      }
+    >
+      Colors.red[70] (#e86066)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#e54950",
+          },
+        ]
+      }
+    >
+      Colors.red[80] (#e54950)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#e1333a",
+          },
+        ]
+      }
+    >
+      Colors.red[90] (#e1333a)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#de1c24",
+          },
+        ]
+      }
+    >
+      Colors.red[100] (#de1c24)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#c81920",
+          },
+        ]
+      }
+    >
+      Colors.red[110] (#c81920)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#b2161d",
+          },
+        ]
+      }
+    >
+      Colors.red[120] (#b2161d)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#9b1419",
+          },
+        ]
+      }
+    >
+      Colors.red[130] (#9b1419)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#851116",
+          },
+        ]
+      }
+    >
+      Colors.red[140] (#851116)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#6f0e12",
+          },
+        ]
+      }
+    >
+      Colors.red[150] (#6f0e12)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#590b0e",
+          },
+        ]
+      }
+    >
+      Colors.red[160] (#590b0e)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#43080b",
+          },
+        ]
+      }
+    >
+      Colors.red[170] (#43080b)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#2c0607",
+          },
+        ]
+      }
+    >
+      Colors.red[180] (#2c0607)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#fffcf4",
+          },
+        ]
+      }
+    >
+      Colors.spark[5] (#fffcf4)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#fff9e9",
+          },
+        ]
+      }
+    >
+      Colors.spark[10] (#fff9e9)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#fff3d2",
+          },
+        ]
+      }
+    >
+      Colors.spark[20] (#fff3d2)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#ffedbc",
+          },
+        ]
+      }
+    >
+      Colors.spark[30] (#ffedbc)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#ffe7a6",
+          },
+        ]
+      }
+    >
+      Colors.spark[40] (#ffe7a6)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#ffe190",
+          },
+        ]
+      }
+    >
+      Colors.spark[50] (#ffe190)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#ffda79",
+          },
+        ]
+      }
+    >
+      Colors.spark[60] (#ffda79)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#ffd463",
+          },
+        ]
+      }
+    >
+      Colors.spark[70] (#ffd463)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#ffce4d",
+          },
+        ]
+      }
+    >
+      Colors.spark[80] (#ffce4d)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#ffc836",
+          },
+        ]
+      }
+    >
+      Colors.spark[90] (#ffc836)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#ffc220",
+          },
+        ]
+      }
+    >
+      Colors.spark[100] (#ffc220)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#e6a31d",
+          },
+        ]
+      }
+    >
+      Colors.spark[110] (#e6a31d)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#cc851a",
+          },
+        ]
+      }
+    >
+      Colors.spark[120] (#cc851a)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#b36a16",
+          },
+        ]
+      }
+    >
+      Colors.spark[130] (#b36a16)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#995213",
+          },
+        ]
+      }
+    >
+      Colors.spark[140] (#995213)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#803d10",
+          },
+        ]
+      }
+    >
+      Colors.spark[150] (#803d10)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#662b0d",
+          },
+        ]
+      }
+    >
+      Colors.spark[160] (#662b0d)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#4d1c0a",
+          },
+        ]
+      }
+    >
+      Colors.spark[170] (#4d1c0a)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#330f06",
+          },
+        ]
+      }
+    >
+      Colors.spark[180] (#330f06)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#fffef2",
+          },
+        ]
+      }
+    >
+      Colors.yellow[5] (#fffef2)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#fffee6",
+          },
+        ]
+      }
+    >
+      Colors.yellow[10] (#fffee6)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#fffccc",
+          },
+        ]
+      }
+    >
+      Colors.yellow[20] (#fffccc)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#fffbb3",
+          },
+        ]
+      }
+    >
+      Colors.yellow[30] (#fffbb3)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fffa99",
+          },
+        ]
+      }
+    >
+      Colors.yellow[40] (#fffa99)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fff980",
+          },
+        ]
+      }
+    >
+      Colors.yellow[50] (#fff980)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fff766",
+          },
+        ]
+      }
+    >
+      Colors.yellow[60] (#fff766)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fff64d",
+          },
+        ]
+      }
+    >
+      Colors.yellow[70] (#fff64d)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fff533",
+          },
+        ]
+      }
+    >
+      Colors.yellow[80] (#fff533)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fff31a",
+          },
+        ]
+      }
+    >
+      Colors.yellow[90] (#fff31a)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#fff200",
+          },
+        ]
+      }
+    >
+      Colors.yellow[100] (#fff200)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#e6cb00",
+          },
+        ]
+      }
+    >
+      Colors.yellow[110] (#e6cb00)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#cca700",
+          },
+        ]
+      }
+    >
+      Colors.yellow[120] (#cca700)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#b38600",
+          },
+        ]
+      }
+    >
+      Colors.yellow[130] (#b38600)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#996900",
+          },
+        ]
+      }
+    >
+      Colors.yellow[140] (#996900)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#804f00",
+          },
+        ]
+      }
+    >
+      Colors.yellow[150] (#804f00)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#663800",
+          },
+        ]
+      }
+    >
+      Colors.yellow[160] (#663800)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#4d2500",
+          },
+        ]
+      }
+    >
+      Colors.yellow[170] (#4d2500)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#331500",
+          },
+        ]
+      }
+    >
+      Colors.yellow[180] (#331500)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#eaf3e6",
+          },
+        ]
+      }
+    >
+      Colors.positive[min] (#eaf3e6)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#95c381",
+          },
+        ]
+      }
+    >
+      Colors.positive[low] (#95c381)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#2a8703",
+          },
+        ]
+      }
+    >
+      Colors.positive[base] (#2a8703)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#1d5f02",
+          },
+        ]
+      }
+    >
+      Colors.positive[high] (#1d5f02)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#113601",
+          },
+        ]
+      }
+    >
+      Colors.positive[max] (#113601)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#e6f1fc",
+          },
+        ]
+      }
+    >
+      Colors.primary[min] (#e6f1fc)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#80b8ee",
+          },
+        ]
+      }
+    >
+      Colors.primary[low] (#80b8ee)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#0071dc",
+          },
+        ]
+      }
+    >
+      Colors.primary[base] (#0071dc)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#004f9a",
+          },
+        ]
+      }
+    >
+      Colors.primary[high] (#004f9a)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#002d58",
+          },
+        ]
+      }
+    >
+      Colors.primary[max] (#002d58)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#fce8e9",
+          },
+        ]
+      }
+    >
+      Colors.negative[min] (#fce8e9)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#ef8e92",
+          },
+        ]
+      }
+    >
+      Colors.negative[low] (#ef8e92)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#de1c24",
+          },
+        ]
+      }
+    >
+      Colors.negative[base] (#de1c24)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#9b1419",
+          },
+        ]
+      }
+    >
+      Colors.negative[high] (#9b1419)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#590b0e",
+          },
+        ]
+      }
+    >
+      Colors.negative[max] (#590b0e)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#fff9e9",
+          },
+        ]
+      }
+    >
+      Colors.warning[min] (#fff9e9)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#828489",
+          },
+          {
+            "backgroundColor": "#ffe190",
+          },
+        ]
+      }
+    >
+      Colors.warning[low] (#ffe190)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#909196",
+          },
+          {
+            "backgroundColor": "#ffc220",
+          },
+        ]
+      }
+    >
+      Colors.warning[base] (#ffc220)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#9e9fa3",
+          },
+          {
+            "backgroundColor": "#b36a16",
+          },
+        ]
+      }
+    >
+      Colors.warning[high] (#b36a16)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#fff",
+          },
+          {
+            "backgroundColor": "#662b0d",
+          },
+        ]
+      }
+    >
+      Colors.warning[max] (#662b0d)
+    </Text>
+  </View>,
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "color": "#74767c",
+            "fontSize": 14,
+            "fontWeight": "bold",
+            "lineHeight": 40,
+            "width": "100%",
+          },
+          {
+            "color": "#74767c",
+          },
+          {
+            "backgroundColor": "#e3e4e5",
+          },
+        ]
+      }
+    >
+      Colors.separator[100] (#e3e4e5)
+    </Text>
+  </View>,
+]
+`;

@@ -1,0 +1,42 @@
+---
+title: Nudge
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Nudges provide supplemental information to support users on their current journey.
+
+
+<ScreenshotTabs screenshotData={{"default":"screenshots/nudge.png","without-actions":"screenshots/nudge-without-actions.png","without-close":"screenshots/nudge-without-close.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Nudge, Link, Icons} from '@walmart/gtp-shared-components';
+
+<Nudge
+  title={'The years start coming'}
+  onClose={() => {}}
+  leading={<Icons.EyeIcon size={24} />}
+  actions={
+    <Link color="default" onPress={() =>
+              displayPopupAlert('Action', 'Action1 button pressed')}>
+      Look away
+    </Link>
+  }>
+  And they don't stop coming. Fed to the rules and I hit the ground running. Didn't make sense not to:
+</Nudge>
+```
+## Props
+
+ ### actions
+<PropTable componentLink="Nudge" prop="actions"/>
+ ### closeButtonProps
+<PropTable componentLink="Nudge" prop="closeButtonProps"/>
+ ### leading
+<PropTable componentLink="Nudge" prop="leading"/>
+ ### onClose
+<PropTable componentLink="Nudge" prop="onClose"/>
+ ### title(required)
+<PropTable componentLink="Nudge" prop="title"/>
+ ### UNSAFE_style
+<PropTable componentLink="Nudge" prop="UNSAFE_style"/>

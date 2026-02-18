@@ -1,0 +1,81 @@
+.container {
+  align-items: center;
+  border-radius: var(--ld-primitive-scale-border-radius-100);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ld-primitive-scale-space-100);
+  padding: var(--ld-primitive-scale-space-100);
+  justify-content: center;
+
+  &.dark {
+    background: var(--ld-primitive-color-gray-180);
+    color: var(--ld-primitive-color-gray-60);
+  }
+
+  &.light {
+    background: var(--ld-primitive-color-white);
+    color: var(--ld-primitive-color-gray-100);
+  }
+}
+
+.preview {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: var(--ld-primitive-scale-space-400);
+  width: 100%;
+}
+
+.previewColor {
+  border-radius: var(--ld-primitive-scale-border-radius-50);
+  border: var(--ld-primitive-scale-border-width-100) solid
+    var(--ld-primitive-color-transparent);
+  display: block;
+  height: var(--ld-primitive-scale-space-400);
+  width: 100%;
+
+  &.isLowContrast {
+    border-color: var(--ld-semantic-color-border-subtlest);
+  }
+}
+
+.previewElevation {
+  background: var(--ld-semantic-color-fill);
+  border-radius: var(--ld-primitive-scale-border-radius-50);
+  height: var(--ld-primitive-scale-space-400);
+  width: var(--ld-primitive-scale-space-400);
+}
+
+.previewFont {
+  color: var(--ld-semantic-color-text-brand);
+  line-height: 1;
+}
+
+.previewBorderRadius {
+  background: var(--ld-semantic-color-fill-brand-subtle);
+  border: var(--ld-primitive-scale-border-width-100) solid var(--ld-semantic-color-border-brand);
+  height: var(--ld-primitive-scale-space-400);
+  width: var(--ld-primitive-scale-space-400);
+}
+
+.previewBorderWidth {
+  background: var(--ld-semantic-color-fill-brand-subtle);
+  border-color: var(--ld-semantic-color-border-brand);
+  border-style: solid;
+  height: var(--ld-primitive-scale-space-400);
+  width: var(--ld-primitive-scale-space-400);
+}
+
+.previewSpace {
+  background: var(--ld-semantic-color-fill-brand-subtle);
+  border-color: var(--ld-semantic-color-border-brand);
+  border-style: solid;
+  border-width: var(--ld-primitive-scale-border-width-100);
+}
+
+.value {
+  font-family: var(--ld-primitive-font-family-code);
+  font-size: var(--ld-primitive-font-size-50);
+  line-height: var(--ld-primitive-scale-space-250);
+  word-break: break-all;
+}

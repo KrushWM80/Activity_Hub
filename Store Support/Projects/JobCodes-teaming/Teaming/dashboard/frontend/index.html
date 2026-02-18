@@ -1,0 +1,2783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Codes & Teaming Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --walmart-blue: #0053e2;
+            --walmart-yellow: #ffc220;
+            --walmart-dark: #002e99;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            font-family: 'EverydaySans', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--walmart-blue), var(--walmart-dark));
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+        }
+        
+        .status-badge-assigned {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .status-badge-missing {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .card {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 8px;
+        }
+        
+        .card-header {
+            background: var(--walmart-blue);
+            color: white;
+            border-radius: 8px 8px 0 0 !important;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 113, 206, 0.1);
+        }
+        
+        .btn-walmart {
+            background-color: var(--walmart-blue);
+            border-color: var(--walmart-blue);
+            color: white;
+        }
+        
+        .btn-walmart:hover {
+            background-color: var(--walmart-dark);
+            border-color: var(--walmart-dark);
+            color: white;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stats-card .number {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--walmart-blue);
+        }
+        
+        .stats-card .label {
+            color: #666;
+            font-size: 0.8rem;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+        }
+        
+        .filter-tabs .nav-link {
+            color: #666;
+            border: none;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .filter-tabs .nav-link.active {
+            color: var(--walmart-blue);
+            border-bottom-color: var(--walmart-blue);
+            background: none;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .team-badge {
+            background-color: #e9ecef;
+            color: #333;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin: 2px;
+            display: inline-block;
+        }
+        
+        .request-status-pending {
+            color: #ffc107;
+        }
+        
+        .request-status-approved {
+            color: #28a745;
+        }
+        
+        .request-status-rejected {
+            color: #dc3545;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .sortable:hover {
+            background-color: #e9ecef;
+        }
+        
+        .sortable i {
+            margin-left: 5px;
+            font-size: 0.75rem;
+            opacity: 0.5;
+        }
+        
+        .sortable.asc i.bi-sort-up,
+        .sortable.desc i.bi-sort-down {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="hidden">
+        <div class="login-container">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4><i class="bi bi-shield-lock"></i> Job Codes &amp; Teaming Dashboard</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-center text-muted mb-3">Enter your Walmart email to continue</p>
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label class="form-label">Walmart Email</label>
+                            <input type="email" class="form-control" id="loginEmail" required placeholder="firstname.lastname@walmart.com">
+                        </div>
+                        <button type="submit" class="btn btn-walmart w-100">Continue</button>
+                    </form>
+                    <p class="text-muted small mt-3 text-center">
+                        <i class="bi bi-info-circle"></i> First time? You'll be prompted to set up your account.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Setup Account Page (for new users) -->
+    <div id="setupPage" class="hidden">
+        <div class="login-container">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4><i class="bi bi-person-plus"></i> Request Access</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-center text-muted mb-3">Confirm your details to request access.</p>
+                    <form id="setupForm">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="setupEmail" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="setupName" required placeholder="e.g., John Smith">
+                        </div>
+                        <button type="submit" class="btn btn-walmart w-100">Request Access</button>
+                        <p class="text-muted small mt-2 text-center">
+                            <i class="bi bi-envelope"></i> ATCTEAMSUPPORT will be notified for approval
+                        </p>
+                    </form>
+                    <hr>
+                    <p class="text-center mb-0">
+                        <a href="#" onclick="showLoginForm()">Back</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Approval Page -->
+    <div id="pendingPage" class="hidden">
+        <div class="login-container">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4><i class="bi bi-hourglass-split"></i> Pending Approval</h4>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <p class="mb-3">Your account is pending approval.</p>
+                    <p class="text-muted">ATCTEAMSUPPORT has been notified and will review your request shortly.</p>
+                    <hr>
+                    <a href="#" onclick="showLoginForm()" class="btn btn-outline-secondary">Back to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome/Landing Page -->
+    <div id="welcomePage" class="hidden">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="bi bi-diagram-3"></i> Job Codes & Teaming Dashboard
+                </a>
+                <div class="d-flex align-items-center">
+                    <span class="text-white-50 me-3" style="font-size: 0.75rem;">Owner: Kendall Rush</span>
+                    <span class="text-white me-3">
+                        <i class="bi bi-person-circle"></i> <span id="welcomeUserName"></span>
+                    </span>
+                    <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid px-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="text-center mb-5">
+                        <h1 class="display-4 mb-3"><i class="bi bi-house-door"></i> Welcome</h1>
+                        <p class="lead text-muted">Select which module you'd like to work with</p>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <!-- Job Codes Module -->
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm" onclick="navigateToTab('jobcodes')" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div class="card-body text-center p-5">
+                                    <div class="mb-4">
+                                        <i class="bi bi-code-square" style="font-size: 4rem; color: var(--walmart-blue);"></i>
+                                    </div>
+                                    <h3 class="card-title mb-3">Job Codes</h3>
+                                    <p class="card-text text-muted mb-4">
+                                        Browse and manage the master list of all job codes. Search through 864 job codes, view details, and submit requests for new or updated job codes.
+                                    </p>
+                                    <ul class="list-unstyled text-start text-muted">
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Browse master job code list</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Search and filter by category</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> View detailed job information</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Request new or updated codes</li>
+                                    </ul>
+                                    <button class="btn btn-walmart btn-lg mt-3">
+                                        <i class="bi bi-arrow-right-circle"></i> Go to Job Codes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Teaming Module -->
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm" onclick="navigateToTab('teaming')" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div class="card-body text-center p-5">
+                                    <div class="mb-4">
+                                        <i class="bi bi-people" style="font-size: 4rem; color: var(--walmart-blue);"></i>
+                                    </div>
+                                    <h3 class="card-title mb-3">Teaming</h3>
+                                    <p class="card-text text-muted mb-4">
+                                        Manage team assignments for job codes. View assignment status and submit requests to assign job codes to specific teams and workgroups.
+                                    </p>
+                                    <ul class="list-unstyled text-start text-muted">
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> View by assignment status</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Track missing assignments</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Filter assigned/missing</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Request team assignments</li>
+                                    </ul>
+                                    <button class="btn btn-walmart btn-lg mt-3">
+                                        <i class="bi bi-arrow-right-circle"></i> Go to Teaming
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardPage" class="hidden">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="bi bi-diagram-3"></i> Job Codes &amp; Teaming Dashboard
+                </a>
+                <div class="d-flex align-items-center">
+                    <span class="text-white-50 me-3" style="font-size: 0.75rem;">Owner: Kendall Rush</span>
+                    <span class="text-white me-3">
+                        <i class="bi bi-person-circle"></i> <span id="currentUserName"></span>
+                    </span>
+                    <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid px-4">
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs mb-4" id="mainTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" onclick="showTab('jobcodes')">
+                        <i class="bi bi-code-square"></i> Job Codes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="showTab('teaming')">
+                        <i class="bi bi-people"></i> Teaming
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="showTab('requests')">
+                        <i class="bi bi-clipboard-check"></i> My Requests
+                    </a>
+                </li>
+                <li class="nav-item admin-only hidden">
+                    <a class="nav-link" href="#" onclick="showTab('admin')">
+                        <i class="bi bi-gear"></i> Admin
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Job Codes Tab -->
+            <div id="jobcodesTab">
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stats-card">
+                            <div class="number" id="totalMasterJobCodes">0</div>
+                            <div class="label">Total Job Codes</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card">
+                            <div class="number text-success" id="hourlyJobCodes">0</div>
+                            <div class="label">Hourly Positions</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card">
+                            <div class="number text-info" id="salaryJobCodes">0</div>
+                            <div class="label">Salary Positions</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card">
+                            <div class="number text-warning" id="pendingJobCodeRequests">0</div>
+                            <div class="label">Pending Requests</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions & Search -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-5">
+                                <div class="search-box">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" class="form-control" id="searchJobCodeMaster" placeholder="Search by code, title, workgroup...">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="filterCategory">
+                                    <option value="">All Categories</option>
+                                    <option value="Hourly">Hourly</option>
+                                    <option value="Salary">Salary</option>
+                                    <option value="Invalid">Invalid</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <button class="btn btn-outline-secondary btn-sm me-2" onclick="refreshJobCodesMaster()">
+                                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                                </button>
+                                <button class="btn btn-walmart btn-sm" onclick="openCreateJobCodeModal()">
+                                    <i class="bi bi-plus-circle"></i> Create Job Code
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Codes Table -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="sortable" data-sort="SMART Job Code" onclick="sortJobCodesMasterTable('SMART Job Code')">SMART Code <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="Job Title" onclick="sortJobCodesMasterTable('Job Title')">Job Title <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="Category" onclick="sortJobCodesMasterTable('Category')">Category <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="Workgroup" onclick="sortJobCodesMasterTable('Workgroup')">Workgroup <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="Team" onclick="sortJobCodesMasterTable('Team')">Team <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="PG Level" onclick="sortJobCodesMasterTable('PG Level')">PG Level <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="user_count" onclick="sortJobCodesMasterTable('user_count')">Impacted <i class="bi bi-sort-down"></i></th>
+                                        <th>Supervisor?</th>
+                                        <th>Pending Request</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="jobCodesMasterTableBody">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teaming Tab -->
+            <div id="teamingTab" class="hidden">
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-2">
+                        <div class="card stats-card">
+                            <div class="number" id="totalJobCodes">0</div>
+                            <div class="label">Total Job Codes</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card stats-card">
+                            <div class="number text-success" id="assignedCount">0</div>
+                            <div class="label">Assigned to Teams</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card stats-card">
+                            <div class="number text-danger" id="missingCount">0</div>
+                            <div class="label">Missing Teaming</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card stats-card">
+                            <div class="number text-warning" id="pendingRequestsCount">0</div>
+                            <div class="label">Pending Requests</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card stats-card">
+                            <div class="number text-info" id="totalMissingImpacted">0</div>
+                            <div class="label">Total Missing Impacted</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="card stats-card">
+                            <div class="number text-danger" id="missingImpact">0%</div>
+                            <div class="label">Missing Impact</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <div class="search-box">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Search job codes...">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <ul class="nav filter-tabs">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="#" data-filter="all">All</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#" data-filter="assigned">Assigned</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#" data-filter="missing">Missing</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <button class="btn btn-outline-secondary btn-sm" onclick="refreshJobCodes()">
+                                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Codes Table -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="sortable" data-sort="job_code" onclick="sortTable('job_code')">Job Code <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="job_title" onclick="sortTable('job_title')">Job Title <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="user_count" onclick="sortTable('user_count')">Impacted <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="status" onclick="sortTable('status')">Status <i class="bi bi-sort-down"></i></th>
+                                        <th>Assigned Teams</th>
+                                        <th>Workgroups</th>
+                                        <th>Pending Request</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="jobCodesTableBody">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requests Tab -->
+            <div id="requestsTab" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> My Requests</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs mb-3" id="myRequestsTabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#jobCodeRequestsTab">Job Code Requests</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#teamingRequestsTab">Teaming Requests</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <!-- Job Code Requests Tab -->
+                            <div class="tab-pane fade show active" id="jobCodeRequestsTab">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Job Code</th>
+                                                <th>Job Title</th>
+                                                <th>Status</th>
+                                                <th>Submitted</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="myJobCodeRequestsTableBody">
+                                            <!-- Populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- Teaming Requests Tab -->
+                            <div class="tab-pane fade" id="teamingRequestsTab">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Job Code</th>
+                                                <th>Requested Team</th>
+                                                <th>Status</th>
+                                                <th>Submitted</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="requestsTableBody">
+                                            <!-- Populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Tab -->
+            <div id="adminTab" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Administration</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs mb-4" id="adminTabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#adminUserMgmt">User Management</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#adminJobCodeRequests">Job Code Requests</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#adminTeamingRequests">Teaming Requests</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <!-- User Management Tab -->
+                            <div class="tab-pane fade show active" id="adminUserMgmt">
+                                <div class="row">
+                                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-people"></i> User Management</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Username</th>
+                                                <th>Name</th>
+                                                <th>Role</th>
+                                                <th>Default Tab</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="usersTableBody">
+                                            <!-- Populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Job Code Requests Tab -->
+                            <div class="tab-pane fade" id="adminJobCodeRequests">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Request Type</th>
+                                                <th>Job Code</th>
+                                                <th>Job Title</th>
+                                                <th>Category</th>
+                                                <th>Requested By</th>
+                                                <th>Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="jobCodeRequestsTableBody">
+                                            <!-- Populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Teaming Requests Tab -->
+                            <div class="tab-pane fade" id="adminTeamingRequests">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0"><i class="bi bi-list-check"></i> All Teaming Requests</h5>
+                                        <button class="btn btn-sm btn-success" onclick="exportApprovedRequests()">
+                                            <i class="bi bi-download"></i> Export Approved
+                                        </button>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                                            <table class="table table-hover mb-0">
+                                                <thead class="table-light sticky-top">
+                                                    <tr>
+                                                        <th>Job Code</th>
+                                                        <th>Team</th>
+                                                        <th>By</th>
+                                                        <th>Status</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="pendingRequestsTableBody">
+                                                    <!-- Populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Team Modal -->
+    <!-- Comprehensive Teaming Request Modal -->
+    <div class="modal fade" id="assignTeamModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Submit Teaming Request (MyWalmart Template Format)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignTeamForm">
+                        <!-- Job Code Information (Auto-populated) -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Job Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="assignJobCode" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Job Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="assignJobTitle" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Current Assignment Info -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Currently Assigned Teams</label>
+                                <input type="text" class="form-control" id="assignCurrentTeams" readonly style="background-color: #f8f9fa;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Current Workgroups</label>
+                                <input type="text" class="form-control" id="assignCurrentWorkgroups" readonly style="background-color: #f8f9fa;">
+                            </div>
+                        </div>
+
+                        <hr>
+                        <h6 class="text-primary">Request Details</h6>
+
+                        <!-- Team Assignment -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Team Name <span class="text-danger">*</span></label>
+                                <select class="form-select" id="assignTeamSelect" required>
+                                    <option value="">-- Select a Team --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Team ID</label>
+                                <input type="text" class="form-control" id="assignTeamId" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Workgroup Assignment -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Workgroup Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="assignWorkgroupName" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Workgroup ID</label>
+                                <input type="text" class="form-control" id="assignWorkgroupId" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Auto-populated fields from job code -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Dept Number</label>
+                                <input type="text" class="form-control" id="assignDeptNumber" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Div Number</label>
+                                <input type="text" class="form-control" id="assignDivNumber" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Base Division Code</label>
+                                <input type="text" class="form-control" id="assignBaseDivisionCode">
+                            </div>
+                        </div>
+
+                        <!-- Banner Codes (Multi-select) -->
+                        <div class="mb-3">
+                            <label class="form-label">Banner Codes <small class="text-muted">(Select all that apply)</small></label>
+                            <div class="border rounded p-2" style="max-height: 120px; overflow-y: auto;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="WAL" id="banner_WAL">
+                                    <label class="form-check-label" for="banner_WAL">WAL - Walmart Supercenter</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="DIV1" id="banner_DIV1">
+                                    <label class="form-check-label" for="banner_DIV1">DIV1 - Walmart Div 1</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="NHM" id="banner_NHM">
+                                    <label class="form-check-label" for="banner_NHM">NHM - Neighborhood Market</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="SAM" id="banner_SAM">
+                                    <label class="form-check-label" for="banner_SAM">SAM - Sam's Club</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="HTO" id="banner_HTO">
+                                    <label class="form-check-label" for="banner_HTO">HTO - Hometown</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Merch Dept Numbers (Multi-select) -->
+                        <div class="mb-3">
+                            <label class="form-label">Merch Dept Numbers <small class="text-muted">(Select all that apply)</small></label>
+                            <select class="form-select" id="assignMerchDepts" multiple style="height: 120px;">
+                                <option value="1">1 - Produce</option>
+                                <option value="2">2 - Meat & Seafood</option>
+                                <option value="3">3 - Deli/Bakery</option>
+                                <option value="4">4 - Dairy</option>
+                                <option value="5">5 - Frozen</option>
+                                <option value="38">38 - Pharmacy</option>
+                                <option value="90">90 - Grocery</option>
+                                <option value="91">91 - Candy & Tobacco</option>
+                                <option value="92">92 - Health & Beauty</option>
+                                <option value="93">93 - Pharmacy</option>
+                                <option value="94">94 - Pets & Paper Goods</option>
+                                <option value="95">95 - Chemicals</option>
+                                <option value="96">96 - Cosmetics</option>
+                                <option value="10">10 - Action Alley</option>
+                                <option value="11">11 - Apparel</option>
+                                <option value="12">12 - Shoes</option>
+                                <option value="14">14 - Jewelry</option>
+                                <option value="16">16 - Optical</option>
+                                <option value="17">17 - Toys</option>
+                                <option value="18">18 - Sporting Goods</option>
+                                <option value="19">19 - Automotive</option>
+                                <option value="20">20 - Home & Garden</option>
+                                <option value="21">21 - Paint & Hardware</option>
+                                <option value="22">22 - Home Decor</option>
+                                <option value="23">23 - Furniture</option>
+                                <option value="72">72 - Electronics</option>
+                                <option value="87">87 - Wireless</option>
+                            </select>
+                            <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple departments</small>
+                        </div>
+
+                        <!-- Role Assignment -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Role <span class="text-danger">*</span></label>
+                                <select class="form-select" id="assignRole" required>
+                                    <option value="">-- Select Role --</option>
+                                    <option value="TA">TA - Team Associate</option>
+                                    <option value="TL">TL - Team Lead</option>
+                                    <option value="SA">SA - Support Associate</option>
+                                    <option value="SM">SM - Store Manager</option>
+                                    <option value="ASM">ASM - Assistant Store Manager</option>
+                                    <option value="DM">DM - Department Manager</option>
+                                    <option value="SUP">SUP - Supervisor</option>
+                                    <option value="COACH">COACH - Coach</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Access Level</label>
+                                <select class="form-select" id="assignAccessLevel">
+                                    <option value="">-- Select Access Level --</option>
+                                    <option value="Hourly">Hourly</option>
+                                    <option value="Salary">Salary</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Team Lead Information (if applicable) -->
+                        <div class="border rounded p-3 mb-3" style="background-color: #f8f9fa;">
+                            <h6 class="text-secondary mb-3">Team Lead Information <small>(if this role reports to a TL)</small></h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">TL Job Code</label>
+                                    <input type="text" class="form-control" id="assignTlJobCode" placeholder="e.g., 1-600-7200">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">TL Job Title</label>
+                                    <input type="text" class="form-control" id="assignTlJobTitle" placeholder="e.g., Fresh Team Lead">
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">TL Dept Number</label>
+                                    <input type="text" class="form-control" id="assignTlDeptNumber">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">TL Div Number</label>
+                                    <input type="text" class="form-control" id="assignTlDivNumber">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Store Leader Information (if applicable) -->
+                        <div class="border rounded p-3 mb-3" style="background-color: #f8f9fa;">
+                            <h6 class="text-secondary mb-3">Store Leader Information <small>(if this role reports to SL/SM)</small></h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label class="form-label">SL Job Code</label>
+                                    <input type="text" class="form-control" id="assignSlJobCode" placeholder="e.g., 1-0-40301">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">SL Dept Number</label>
+                                    <input type="text" class="form-control" id="assignSlDeptNumber">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">SL Div Number</label>
+                                    <input type="text" class="form-control" id="assignSlDivNumber">
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <label class="form-label">SL Job Title</label>
+                                    <input type="text" class="form-control" id="assignSlJobTitle" placeholder="e.g., Store Manager">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Auto-generated Action (readonly) -->
+                        <div class="mb-3">
+                            <label class="form-label">Action <small class="text-muted">(Auto-generated based on changes)</small></label>
+                            <input type="text" class="form-control" id="assignAction" readonly style="background-color: #e9ecef;">
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label class="form-label">Notes <small class="text-muted">(optional)</small></label>
+                            <textarea class="form-control" id="assignNotes" rows="3" placeholder="Additional context or reasoning for this request..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-walmart" onclick="submitComprehensiveTeamingRequest()">Submit Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Detail Modal -->
+    <div class="modal fade" id="requestDetailModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-clipboard-data"></i> Request Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-muted small">Request ID</label>
+                            <div id="detailRequestId" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted small">Status</label>
+                            <div id="detailStatus">-</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-muted small">Job Code</label>
+                            <div id="detailJobCode" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted small">Submitted</label>
+                            <div id="detailSubmitted">-</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div id="detailPreviousValues" class="mb-3" style="display: none;">
+                        <div class="alert alert-info">
+                            <strong><i class="bi bi-info-circle"></i> Previous Assignment:</strong>
+                            <div id="detailPreviousTeamName" class="mt-2">-</div>
+                            <div id="detailPreviousWorkgroup" class="text-muted small">-</div>
+                        </div>
+                        <div class="text-center my-2">
+                            <i class="bi bi-arrow-down-circle text-primary" style="font-size: 1.5rem;"></i>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Requested Team</label>
+                        <div id="detailTeamName" class="fw-bold">-</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Workgroup</label>
+                        <div id="detailWorkgroup">-</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Requested By</label>
+                        <div id="detailRequestedBy">-</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Notes</label>
+                        <div id="detailNotes" class="p-2 bg-light rounded">-</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Code Detail Modal -->
+    <div class="modal fade" id="jobCodeDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-code-square"></i> Job Code Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">SMART Job Code</label>
+                            <div id="detailSmartCode" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Workday Job Code</label>
+                            <div id="detailWorkdayCode">-</div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="text-muted small">Job Title</label>
+                            <div id="detailJobTitle" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="text-muted small">Category</label>
+                            <div id="detailJobCategory">-</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="text-muted small">Workgroup</label>
+                            <div id="detailWorkgroup">-</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="text-muted small">Team</label>
+                            <div id="detailTeam">-</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Job Family</label>
+                            <div id="detailJobFamily">-</div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="text-muted small">PG Level</label>
+                            <div id="detailPGLevel">-</div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="text-muted small">Supervisor?</label>
+                            <div id="detailSupervisor">-</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Reports to Title</label>
+                            <div id="detailReportsTo">-</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Position/Job Mgmt</label>
+                            <div id="detailMgmtType">-</div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="text-muted small">Notes <span class="admin-only hidden"><button class="btn btn-sm btn-outline-secondary" onclick="editJobCodeNotes()"><i class="bi bi-pencil"></i> Edit</button></span></label>
+                            <div id="detailJobNotes" class="p-2 bg-light rounded" style="max-height: 150px; overflow-y: auto;">-</div>
+                            <textarea id="detailJobNotesEdit" class="form-control mt-2" rows="3" style="display: none;"></textarea>
+                            <div id="detailJobNotesButtons" class="mt-2" style="display: none;">
+                                <button class="btn btn-sm btn-success" onclick="saveJobCodeNotes()"><i class="bi bi-check"></i> Save</button>
+                                <button class="btn btn-sm btn-secondary" onclick="cancelEditJobCodeNotes()"><i class="bi bi-x"></i> Cancel</button>
+                            </div>
+                        </div>
+                        <div id="detailRejectionHistory" class="col-md-12 mb-3" style="display: none;">
+                            <div class="alert alert-warning">
+                                <h6><i class="bi bi-exclamation-triangle"></i> Previous Rejection History</h6>
+                                <div id="detailRejectionHistoryContent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-walmart" onclick="requestJobCodeUpdate()">
+                        <i class="bi bi-pencil"></i> Request Update
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Job Code Request Modal -->
+    <div class="modal fade" id="jobCodeRequestModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> <span id="requestModalTitle">Create New Job Code</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="jobCodeRequestForm">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Your request will be sent to administrators for review and approval.
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">SMART Job Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="reqSmartCode" required placeholder="e.g., 1-202-2104">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Workday Job Code</label>
+                                <input type="text" class="form-control" id="reqWorkdayCode" placeholder="e.g., US-01-0202-002104">
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Job Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="reqJobTitle" required placeholder="e.g., Food & Consumables Coach">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="reqCategory" required>
+                                    <option value="">-- Select --</option>
+                                    <option value="Hourly">Hourly</option>
+                                    <option value="Salary">Salary</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Workgroup <span class="text-danger">*</span></label>
+                                <select class="form-select" id="reqWorkgroup" required>
+                                    <option value="">-- Select Workgroup --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Team <span class="text-danger">*</span></label>
+                                <select class="form-select" id="reqTeam" required>
+                                    <option value="">-- Select Team --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Job Family</label>
+                                <select class="form-select" id="reqJobFamily">
+                                    <option value="">-- Select Job Family --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">PG Level</label>
+                                <select class="form-select" id="reqPGLevel">
+                                    <option value="">-- Select PG Level --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Supervisor?</label>
+                                <select class="form-select" id="reqSupervisor">
+                                    <option value="">--</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Reports to Title</label>
+                                <input type="text" class="form-control" id="reqReportsTo" placeholder="e.g., Store Manager">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Position Mgmt or Job Mgmt</label>
+                                <select class="form-select" id="reqMgmtType">
+                                    <option value="">--</option>
+                                    <option value="PM">Position Management (PM)</option>
+                                    <option value="JM">Job Management (JM)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Reason for Request <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="reqReason" rows="3" required placeholder="Explain why this job code is needed or what changes are required..."></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-walmart w-100">Submit Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global state
+        let currentUser = null;
+        let jobCodes = [];
+        let teams = [];
+        let allRequests = [];
+        let pendingRequests = [];
+        let currentFilter = 'all';
+        let currentSort = { column: null, direction: 'asc' };
+
+        // API Helper
+        async function api(endpoint, options = {}) {
+            const response = await fetch(`/api${endpoint}`, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                credentials: 'include'
+            });
+            
+            if (response.status === 401) {
+                showLoginForm();
+                throw new Error('Not authenticated');
+            }
+            
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.detail || 'API Error');
+            }
+            return data;
+        }
+
+        // Show/Hide Loading
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        // Toast Notifications
+        function showToast(message, type = 'success') {
+            const toastHtml = `
+                <div class="toast show" role="alert">
+                    <div class="toast-header bg-${type === 'success' ? 'success' : 'danger'} text-white">
+                        <strong class="me-auto">${type === 'success' ? 'Success' : 'Error'}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">${message}</div>
+                </div>
+            `;
+            const container = document.getElementById('toastContainer');
+            container.innerHTML = toastHtml;
+            setTimeout(() => container.innerHTML = '', 3000);
+        }
+
+        // Show Request Detail Modal
+        function showRequestDetail(requestId) {
+            const request = allRequests.find(r => r.id === requestId);
+            if (!request) {
+                showToast('Request not found', 'error');
+                return;
+            }
+            
+            const statusBadge = request.status === 'pending' 
+                ? '<span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Pending</span>'
+                : request.status === 'approved'
+                    ? '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Approved</span>'
+                    : '<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Rejected</span>';
+            
+            // Populate the modal fields using the existing element IDs
+            document.getElementById('detailRequestId').textContent = '#' + request.id;
+            document.getElementById('detailStatus').innerHTML = statusBadge;
+            document.getElementById('detailJobCode').textContent = request.job_code;
+            document.getElementById('detailSubmitted').textContent = new Date(request.requested_at).toLocaleString();
+            document.getElementById('detailTeamName').textContent = request.team_name;
+            document.getElementById('detailWorkgroup').textContent = request.workgroup_name;
+            document.getElementById('detailRequestedBy').textContent = request.requested_by_name + ' (' + request.requested_by + ')';
+            document.getElementById('detailNotes').textContent = request.notes || 'No notes provided';
+            
+            // Show previous values if this is an update
+            const prevValuesDiv = document.getElementById('detailPreviousValues');
+            if (request.previous_values) {
+                const prevTeam = request.previous_values.team_name || 'None';
+                const prevWorkgroup = request.previous_values.workgroup_name || 'None';
+                const newTeam = request.team_name;
+                const newWorkgroup = request.workgroup_name;
+                
+                // Highlight what changed
+                const teamChanged = prevTeam !== newTeam;
+                const workgroupChanged = prevWorkgroup !== newWorkgroup;
+                
+                document.getElementById('detailPreviousTeamName').innerHTML = 
+                    `<strong>Team:</strong> ${prevTeam}${teamChanged ? ' <span class="badge bg-warning">Changed</span>' : ''}`;
+                document.getElementById('detailPreviousWorkgroup').innerHTML = 
+                    `<strong>Workgroup:</strong> ${prevWorkgroup}${workgroupChanged ? ' <span class="badge bg-warning">Changed</span>' : ''}`;
+                prevValuesDiv.style.display = 'block';
+            } else {
+                prevValuesDiv.style.display = 'none';
+            }
+            
+            new bootstrap.Modal(document.getElementById('requestDetailModal')).show();
+        }
+
+        // Page Navigation
+        function showLoginForm() {
+            showPage('loginPage');
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginEmail').focus();
+        }
+
+        function showDashboard() {
+            console.log('showDashboard called. currentUser:', currentUser);
+            console.log('default_tab value:', currentUser.default_tab);
+            console.log('default_tab type:', typeof currentUser.default_tab);
+            
+            // Check if user has default tab preference
+            const defaultTab = currentUser.default_tab ? String(currentUser.default_tab).trim() : '';
+            console.log('Trimmed defaultTab:', defaultTab, 'Length:', defaultTab.length);
+            
+            if (defaultTab && defaultTab !== 'none' && defaultTab !== 'undefined') {
+                console.log('Navigating to default tab:', defaultTab);
+                // Navigate to user's default tab
+                navigateToTab(defaultTab);
+            } else {
+                console.log('No default tab or set to none, showing welcome page');
+                // Show welcome page if no default tab set
+                showWelcomePage();
+            }
+        }
+        
+        function showWelcomePage() {
+            showPage('welcomePage');
+            document.getElementById('welcomeUserName').textContent = currentUser.name;
+        }
+        
+        function navigateToTab(tab) {
+            showPage('dashboardPage');
+            
+            // Show admin tab if admin
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.classList.toggle('hidden', currentUser.role !== 'admin');
+            });
+            
+            document.getElementById('currentUserName').textContent = currentUser.name;
+            loadDashboardData();
+            loadJobCodesMaster();
+            loadJobCodeRequests();
+            
+            // Activate the tab
+            document.querySelectorAll('#mainTabs .nav-link').forEach(el => el.classList.remove('active'));
+            const tabLink = Array.from(document.querySelectorAll('#mainTabs .nav-link')).find(el => el.getAttribute('onclick').includes(tab));
+            if (tabLink) tabLink.classList.add('active');
+            
+            document.getElementById('jobcodesTab').classList.add('hidden');
+            document.getElementById('teamingTab').classList.add('hidden');
+            document.getElementById('requestsTab').classList.add('hidden');
+            document.getElementById('adminTab').classList.add('hidden');
+            document.getElementById(tab + 'Tab').classList.remove('hidden');
+            
+            if (tab === 'jobcodes') loadJobCodesMaster();
+            if (tab === 'teaming') loadJobCodesData();
+            if (tab === 'requests') loadRequests();
+            if (tab === 'admin') loadAdminData();
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('#mainTabs .nav-link').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('jobcodesTab').classList.add('hidden');
+            document.getElementById('teamingTab').classList.add('hidden');
+            document.getElementById('requestsTab').classList.add('hidden');
+            document.getElementById('adminTab').classList.add('hidden');
+            document.getElementById(tab + 'Tab').classList.remove('hidden');
+            
+            if (tab === 'jobcodes') loadJobCodesMaster();
+            if (tab === 'teaming') loadJobCodesData();
+            if (tab === 'requests') loadRequests();
+            if (tab === 'admin') loadAdminData();
+        }
+
+        // Authentication - Email-based flow (passwordless for approved users)
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            try {
+                const email = document.getElementById('loginEmail').value.toLowerCase();
+                
+                // Check if user exists with this email
+                const result = await api('/check-email', {
+                    method: 'POST',
+                    body: JSON.stringify({ email })
+                });
+                
+                if (result.exists) {
+                    if (result.status === 'pending') {
+                        // User is pending approval
+                        hideLoading();
+                        showPage('pendingPage');
+                    } else {
+                        // User exists and is approved - log them in directly!
+                        const loginResult = await api('/login-by-email', {
+                            method: 'POST',
+                            body: JSON.stringify({ email })
+                        });
+                        currentUser = loginResult.user;
+                        // Remember email for next time
+                        localStorage.setItem('rememberedEmail', email);
+                        showDashboard();
+                    }
+                } else {
+                    // New user - show setup form
+                    document.getElementById('setupEmail').value = email;
+                    // Pre-fill name from email (e.g., john.smith@walmart.com -> John Smith)
+                    const namePart = email.split('@')[0];
+                    const guessedName = namePart.replace('.', ' ').replace(/\b\w/g, c => c.toUpperCase());
+                    document.getElementById('setupName').value = guessedName;
+                    hideLoading();
+                    showPage('setupPage');
+                    document.getElementById('setupName').focus();
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+                hideLoading();
+            }
+        });
+
+        // Setup form for new users (no password needed)
+        document.getElementById('setupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            try {
+                const email = document.getElementById('setupEmail').value;
+                const result = await api('/register', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: document.getElementById('setupName').value,
+                        email: email,
+                        username: email.split('@')[0] // Use email prefix as username
+                    })
+                });
+                showToast(result.message || 'Access request submitted! ATCTEAMSUPPORT has been notified.');
+                showPage('pendingPage');
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+            hideLoading();
+        });
+        
+        function showPage(pageId) {
+            document.querySelectorAll('#loginPage, #setupPage, #pendingPage, #welcomePage, #dashboardPage').forEach(el => {
+                el.classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        async function logout() {
+            await api('/logout', { method: 'POST' });
+            // Keep the email for next time, just end the session
+            currentUser = null;
+            showLoginForm();
+        }
+
+        // Check if already logged in
+        async function checkAuth() {
+            try {
+                // First check if there's an active session
+                const result = await api('/me');
+                currentUser = result;
+                showDashboard();
+            } catch {
+                // No active session, try auto-login with remembered email
+                const rememberedEmail = localStorage.getItem('rememberedEmail');
+                if (rememberedEmail) {
+                    try {
+                        // Show a brief "logging in" message
+                        document.getElementById('loginEmail').value = rememberedEmail;
+                        showPage('loginPage');
+                        showLoading();
+                        
+                        const result = await api('/login-by-email', {
+                            method: 'POST',
+                            body: JSON.stringify({ email: rememberedEmail })
+                        });
+                        currentUser = result.user;
+                        hideLoading();
+                        showDashboard();
+                        return;
+                    } catch (e) {
+                        // Auto-login failed (user may no longer be approved)
+                        localStorage.removeItem('rememberedEmail');
+                        hideLoading();
+                    }
+                }
+                
+                // Pre-fill email if we have it stored
+                const storedEmail = localStorage.getItem('rememberedEmail');
+                if (storedEmail) {
+                    document.getElementById('loginEmail').value = storedEmail;
+                }
+                
+                showLoginForm();
+            }
+        }
+
+        // Data Loading
+        async function loadDashboardData() {
+            await loadJobCodesData();
+        }
+        
+        async function loadJobCodesData() {
+            showLoading();
+            try {
+                const [jobCodesData, teamsData, requestsData] = await Promise.all([
+                    api('/job-codes'),
+                    api('/teams'),
+                    api('/requests')
+                ]);
+                
+                jobCodes = jobCodesData.job_codes;
+                teams = teamsData.teams;
+                allRequests = requestsData.requests || [];
+                pendingRequests = allRequests.filter(r => r.status === 'pending');
+                
+                // Reset sort to default
+                currentSort = { column: null, direction: 'asc' };
+                
+                // Reset sort icons
+                document.querySelectorAll('#teamingTab th.sortable').forEach(th => {
+                    th.classList.remove('asc', 'desc');
+                });
+                
+                updateStats();
+                renderJobCodes();
+                populateTeamSelect();
+            } catch (error) {
+                showToast('Failed to load data: ' + error.message, 'error');
+            }
+            hideLoading();
+        }
+        
+        async function refreshTeamingData() {
+            await loadJobCodesData();
+            showToast('Teaming data refreshed');
+        }
+
+        function updateStats() {
+            const total = jobCodes.length;
+            const assigned = jobCodes.filter(j => j.status === 'Assigned').length;
+            const missing = jobCodes.filter(j => j.status === 'Missing').length;
+            const pendingCount = pendingRequests.length;
+            
+            // Calculate users impacted by missing job codes
+            const missingImpacted = jobCodes.filter(j => j.status === 'Missing')
+                .reduce((sum, j) => sum + (j.user_count || 0), 0);
+            // Missing Impact % = missing job codes / total job codes
+            const missingImpactPct = total ? Math.round(missing / total * 100) : 0;
+            
+            document.getElementById('totalJobCodes').textContent = total;
+            document.getElementById('assignedCount').textContent = assigned;
+            document.getElementById('missingCount').textContent = missing;
+            document.getElementById('pendingRequestsCount').textContent = pendingCount;
+            document.getElementById('totalMissingImpacted').textContent = missingImpacted.toLocaleString();
+            document.getElementById('missingImpact').textContent = missingImpactPct + '%';
+        }
+
+        // Helper to get pending request for a job code
+        function getPendingRequestForJobCode(jobCode) {
+            return pendingRequests.find(r => r.job_code === jobCode);
+        }
+
+        // Sort table by column
+        function sortTable(column) {
+            // Toggle direction if same column, otherwise default to ascending
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+            
+            // Update header icons
+            document.querySelectorAll('th.sortable').forEach(th => {
+                th.classList.remove('asc', 'desc');
+                if (th.dataset.sort === column) {
+                    th.classList.add(currentSort.direction);
+                }
+            });
+            
+            renderJobCodes();
+        }
+
+        function renderJobCodes() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const tbody = document.getElementById('jobCodesTableBody');
+            
+            let filtered = jobCodes.filter(j => {
+                const matchesSearch = !search || 
+                    j.job_code.toLowerCase().includes(search) ||
+                    (j.job_title || '').toLowerCase().includes(search);
+                const matchesFilter = currentFilter === 'all' || 
+                    j.status.toLowerCase() === currentFilter;
+                return matchesSearch && matchesFilter;
+            });
+            
+            // Apply sorting
+            if (currentSort.column) {
+                filtered.sort((a, b) => {
+                    let valA, valB;
+                    
+                    switch (currentSort.column) {
+                        case 'job_code':
+                            valA = a.job_code || '';
+                            valB = b.job_code || '';
+                            break;
+                        case 'job_title':
+                            valA = (a.job_title || a.job_name || '').toLowerCase();
+                            valB = (b.job_title || b.job_name || '').toLowerCase();
+                            break;
+                        case 'user_count':
+                            valA = a.user_count || 0;
+                            valB = b.user_count || 0;
+                            break;
+                        case 'status':
+                            valA = a.status || '';
+                            valB = b.status || '';
+                            break;
+                        default:
+                            return 0;
+                    }
+                    
+                    let comparison = 0;
+                    if (typeof valA === 'number' && typeof valB === 'number') {
+                        comparison = valA - valB;
+                    } else {
+                        comparison = String(valA).localeCompare(String(valB));
+                    }
+                    
+                    return currentSort.direction === 'desc' ? -comparison : comparison;
+                });
+            }
+            
+            tbody.innerHTML = filtered.map(j => {
+                const pendingReq = getPendingRequestForJobCode(j.job_code);
+                const pendingBadge = pendingReq 
+                    ? `<span class="badge bg-warning text-dark" style="cursor:pointer" onclick="showRequestDetail(${pendingReq.id})"><i class="bi bi-hourglass-split"></i> Pending</span>`
+                    : '-';
+                return `
+                <tr>
+                    <td><strong>${j.job_code}</strong></td>
+                    <td>${j.job_title || j.job_name || '-'}</td>
+                    <td>${(j.user_count || 0).toLocaleString()}</td>
+                    <td>
+                        <span class="badge status-badge-${j.status.toLowerCase()}">
+                            ${j.status}
+                        </span>
+                    </td>
+                    <td>
+                        ${j.teams && j.teams.length ? j.teams.map(t => `<span class="team-badge">${t}</span>`).join('') : '-'}
+                    </td>
+                    <td>
+                        ${j.workgroups && j.workgroups.length ? j.workgroups.map(w => `<span class="team-badge">${w}</span>`).join('') : '-'}
+                    </td>
+                    <td>${pendingBadge}</td>
+                    <td>
+                        <button class="btn btn-sm btn-walmart" onclick="openAssignModal('${j.job_code}', '${(j.job_title || j.job_name || '').replace(/'/g, "\\'")}', '${(j.teams || []).join(', ') || '-'}', '${(j.workgroups || []).join(', ') || '-'}')">
+                            <i class="bi bi-plus-circle"></i> ${j.status === 'Missing' ? 'Assign' : 'Update'}
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function populateTeamSelect() {
+            const select = document.getElementById('assignTeamSelect');
+            const uniqueTeams = [...new Map(teams.map(t => [t.teamName, t])).values()];
+            
+            select.innerHTML = '<option value="">-- Select a Team --</option>' +
+                uniqueTeams.map(t => `
+                    <option value="${t.teamId}" data-team-name="${t.teamName}" 
+                            data-workgroup-id="${t.workgroupId}" data-workgroup-name="${t.workgroupName}">
+                        ${t.teamName} (${t.workgroupName})
+                    </option>
+                `).join('');
+        }
+
+        // Search and Filter
+        document.getElementById('searchInput').addEventListener('input', renderJobCodes);
+        
+        document.querySelectorAll('.filter-tabs .nav-link').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.filter-tabs .nav-link').forEach(l => l.classList.remove('active'));
+                el.classList.add('active');
+                currentFilter = el.dataset.filter;
+                renderJobCodes();
+            });
+        });
+
+        function refreshJobCodes() {
+            // Reset search input
+            document.getElementById('searchInput').value = '';
+            // Reset filter to 'all'
+            currentFilter = 'all';
+            document.querySelectorAll('.filter-tabs .nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelector('.filter-tabs .nav-link[data-filter="all"]').classList.add('active');
+            // Reload data (which will reset sort)
+            loadDashboardData();
+            showToast('Teaming data refreshed');
+        }
+
+        // Assign Team Modal
+        function openAssignModal(jobCode, jobTitle, currentTeams, currentWorkgroups) {
+            document.getElementById('assignJobCode').value = jobCode;
+            document.getElementById('assignJobTitle').value = jobTitle;
+            document.getElementById('assignCurrentTeams').value = currentTeams || '-';
+            document.getElementById('assignCurrentWorkgroups').value = currentWorkgroups || '-';
+            document.getElementById('assignTeamSelect').value = '';
+            document.getElementById('assignNotes').value = '';
+            
+            // Auto-populate dept/div numbers from job code
+            populateJobCodeInfo(jobCode);
+            
+            // Clear edit mode
+            delete document.getElementById('assignTeamForm').dataset.editRequestId;
+            new bootstrap.Modal(document.getElementById('assignTeamModal')).show();
+        }
+
+        function populateJobCodeInfo(jobCode) {
+            // Extract dept and div numbers from job code format (div-dept-code)
+            const parts = jobCode.split('-');
+            if (parts.length >= 3) {
+                document.getElementById('assignDivNumber').value = parts[0] || '';
+                document.getElementById('assignDeptNumber').value = parts[1] || '';
+            }
+            
+            // Generate action based on current vs new assignment
+            updateActionField();
+        }
+
+        function updateActionField() {
+            const currentTeams = document.getElementById('assignCurrentTeams').value;
+            const newTeam = document.getElementById('assignTeamSelect').selectedOptions[0]?.text;
+            
+            let action = '';
+            if (!currentTeams || currentTeams === '-' || currentTeams === 'None') {
+                action = 'Add Job Code';
+            } else if (newTeam && newTeam !== currentTeams) {
+                action = `Update Team from ${currentTeams} to ${newTeam}`;
+            }
+            
+            document.getElementById('assignAction').value = action;
+        }
+
+        // Add event listener for team selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const teamSelect = document.getElementById('assignTeamSelect');
+            if (teamSelect) {
+                teamSelect.addEventListener('change', function() {
+                    const option = this.options[this.selectedIndex];
+                    if (option && option.value) {
+                        document.getElementById('assignTeamId').value = option.value;
+                        document.getElementById('assignWorkgroupName').value = option.dataset.workgroupName || '';
+                        document.getElementById('assignWorkgroupId').value = option.dataset.workgroupId || '';
+                        updateActionField();
+                    }
+                });
+            }
+        });
+
+        async function submitComprehensiveTeamingRequest() {
+            const form = document.getElementById('assignTeamForm');
+            const teamSelect = document.getElementById('assignTeamSelect');
+            const editRequestId = form.dataset.editRequestId;
+            
+            if (!teamSelect.value) {
+                showToast('Please select a team', 'error');
+                return;
+            }
+            
+            if (!document.getElementById('assignRole').value) {
+                showToast('Please select a role', 'error');
+                return;
+            }
+            
+            // Collect banner codes
+            const bannerCodes = [];
+            document.querySelectorAll('input[type="checkbox"][id^="banner_"]:checked').forEach(cb => {
+                bannerCodes.push(cb.value);
+            });
+            
+            // Collect merch dept numbers
+            const merchDepts = Array.from(document.getElementById('assignMerchDepts').selectedOptions)
+                .map(option => option.value);
+            
+            const requestData = {
+                job_code: document.getElementById('assignJobCode').value,
+                job_title: document.getElementById('assignJobTitle').value,
+                team_name: teamSelect.options[teamSelect.selectedIndex].dataset.teamName,
+                team_id: teamSelect.value,
+                workgroup_name: document.getElementById('assignWorkgroupName').value,
+                workgroup_id: document.getElementById('assignWorkgroupId').value,
+                dept_number: document.getElementById('assignDeptNumber').value,
+                div_number: document.getElementById('assignDivNumber').value,
+                base_division_code: document.getElementById('assignBaseDivisionCode').value,
+                banner_codes: bannerCodes,
+                merch_dept_numbers: merchDepts,
+                role: document.getElementById('assignRole').value,
+                access_level: document.getElementById('assignAccessLevel').value,
+                tl_job_code: document.getElementById('assignTlJobCode').value,
+                tl_job_title: document.getElementById('assignTlJobTitle').value,
+                tl_dept_number: document.getElementById('assignTlDeptNumber').value,
+                tl_div_number: document.getElementById('assignTlDivNumber').value,
+                sl_job_code: document.getElementById('assignSlJobCode').value,
+                sl_dept_number: document.getElementById('assignSlDeptNumber').value,
+                sl_div_number: document.getElementById('assignSlDivNumber').value,
+                sl_job_title: document.getElementById('assignSlJobTitle').value,
+                action: document.getElementById('assignAction').value,
+                notes: document.getElementById('assignNotes').value
+            };
+            
+            showLoading();
+            try {
+                if (editRequestId) {
+                    // Update existing request
+                    await api(`/requests/${editRequestId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(requestData)
+                    });
+                    showToast('Request updated successfully!');
+                } else {
+                    // Create new request
+                    await api('/comprehensive-teaming-request', {
+                        method: 'POST',
+                        body: JSON.stringify(requestData)
+                    });
+                    showToast('Comprehensive teaming request submitted successfully!');
+                }
+                
+                bootstrap.Modal.getInstance(document.getElementById('assignTeamModal')).hide();
+                await loadJobCodesData();
+                updatePendingCount();
+            } catch (error) {
+                showToast('Failed to submit request: ' + error.message, 'error');
+            }
+            hideLoading();
+        }
+
+        async function submitAssignRequest() {
+            const form = document.getElementById('assignTeamForm');
+            const select = document.getElementById('assignTeamSelect');
+            const option = select.options[select.selectedIndex];
+            const editRequestId = form.dataset.editRequestId;
+            
+            if (!select.value) {
+                showToast('Please select a team', 'error');
+                return;
+            }
+            
+            showLoading();
+            try {
+                if (editRequestId) {
+                    // Update existing request
+                    await api(`/requests/${editRequestId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            team_name: option.dataset.teamName,
+                            team_id: select.value,
+                            workgroup_name: option.dataset.workgroupName,
+                            workgroup_id: option.dataset.workgroupId,
+                            notes: document.getElementById('assignNotes').value
+                        })
+                    });
+                    showToast('Request updated successfully!');
+                } else {
+                    // Create new request
+                    await api('/request-update', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            job_code: document.getElementById('assignJobCode').value,
+                            team_name: option.dataset.teamName,
+                            team_id: select.value,
+                            workgroup_name: option.dataset.workgroupName,
+                            workgroup_id: option.dataset.workgroupId,
+                            notes: document.getElementById('assignNotes').value
+                        })
+                    });
+                    showToast('Update request submitted successfully!');
+                }
+                
+                bootstrap.Modal.getInstance(document.getElementById('assignTeamModal')).hide();
+                delete form.dataset.editRequestId;
+                loadRequests();
+                loadDashboardData();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+            hideLoading();
+        }
+
+        // Requests Tab
+        async function loadRequests() {
+            showLoading();
+            try {
+                // Load teaming requests
+                const data = await api('/requests');
+                const tbody = document.getElementById('requestsTableBody');
+                
+                tbody.innerHTML = data.requests.map(r => {
+                    const isOwner = r.requested_by === currentUser.username;
+                    const canEdit = isOwner && r.status === 'pending';
+                    return `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td><strong>${r.job_code}</strong></td>
+                        <td>${r.team_name} (${r.workgroup_name})</td>
+                        <td>
+                            <span class="request-status-${r.status}">
+                                <i class="bi bi-${r.status === 'pending' ? 'hourglass-split' : r.status === 'approved' ? 'check-circle' : 'x-circle'}"></i>
+                                ${r.status.charAt(0).toUpperCase() + r.status.slice(1)}
+                            </span>
+                        </td>
+                        <td>${new Date(r.requested_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="showRequestDetail(${r.id})">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            ${canEdit ? `
+                            <button class="btn btn-sm btn-outline-warning" onclick="editRequest(${r.id})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteRequest(${r.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `}).join('') || '<tr><td colspan="6" class="text-center">No requests yet</td></tr>';
+                
+                // Load job code requests
+                const jcData = await api('/job-codes-master/requests');
+                const jcTbody = document.getElementById('myJobCodeRequestsTableBody');
+                const myJobCodeRequests = (jcData.requests || []).filter(r => r.requested_by === currentUser.username);
+                
+                jcTbody.innerHTML = myJobCodeRequests.map(req => {
+                    const requestType = req.request_type === 'create' ? 
+                        '<span class="badge bg-success">New</span>' : 
+                        '<span class="badge bg-warning">Update</span>';
+                    const changes = req.changes || {};
+                    const smartCode = changes['SMART Job Code'] || req.smart_job_code || '-';
+                    const jobTitle = changes['Job Title'] || req.job_title || '-';
+                    const statusIcon = req.status === 'pending' ? 'hourglass-split' : req.status === 'approved' ? 'check-circle' : 'x-circle';
+                    const statusColor = req.status === 'pending' ? 'warning' : req.status === 'approved' ? 'success' : 'danger';
+                    
+                    return `
+                    <tr>
+                        <td>${requestType}</td>
+                        <td><strong>${smartCode}</strong></td>
+                        <td>${jobTitle}</td>
+                        <td>
+                            <span class="badge bg-${statusColor}">
+                                <i class="bi bi-${statusIcon}"></i>
+                                ${req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                            </span>
+                        </td>
+                        <td>${new Date(req.requested_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="showJobCodeRequestDetail(${req.id})">
+                                <i class="bi bi-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                    `;
+                }).join('') || '<tr><td colspan="6" class="text-center">No job code requests yet</td></tr>';
+                
+            } catch (error) {
+                showToast('Failed to load requests', 'error');
+            }
+            hideLoading();
+        }
+
+        // Admin Tab
+        async function loadAdminData() {
+            showLoading();
+            try {
+                const [usersData, requestsData] = await Promise.all([
+                    api('/admin/users'),
+                    api('/requests?status=pending')
+                ]);
+                
+                // Users table
+                const usersBody = document.getElementById('usersTableBody');
+                usersBody.innerHTML = Object.entries(usersData.users).map(([username, user]) => `
+                    <tr>
+                        <td>${username}</td>
+                        <td>${user.name}</td>
+                        <td>
+                            <select class="form-select form-select-sm" onchange="updateUserRole('${username}', this.value)" 
+                                    ${username === currentUser.username ? 'disabled' : ''}>
+                                <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" onchange="updateUserDefaultTab('${username}', this.value)">
+                                <option value="none" ${!user.default_tab || user.default_tab === 'none' ? 'selected' : ''}>Welcome Page</option>
+                                <option value="jobcodes" ${user.default_tab === 'jobcodes' ? 'selected' : ''}>Job Codes</option>
+                                <option value="teaming" ${user.default_tab === 'teaming' ? 'selected' : ''}>Teaming</option>
+                                <option value="admin" ${user.default_tab === 'admin' ? 'selected' : ''}>Admin</option>
+                            </select>
+                        </td>
+                        <td>
+                            <span class="badge bg-${user.approved ? 'success' : 'warning'}">
+                                ${user.approved ? 'Approved' : 'Pending'}
+                            </span>
+                        </td>
+                        <td>
+                            ${!user.approved ? `<button class="btn btn-sm btn-success" onclick="approveUser('${username}')"><i class="bi bi-check"></i></button>` : ''}
+                            ${username !== currentUser.username ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${username}')"><i class="bi bi-trash"></i></button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+                
+                // All requests table (admin view)
+                const pendingBody = document.getElementById('pendingRequestsTableBody');
+                const allRequestsData = await api('/requests');
+                pendingBody.innerHTML = allRequestsData.requests.map(r => {
+                    const statusBadge = r.status === 'approved' ? 'success' : r.status === 'rejected' ? 'danger' : 'warning';
+                    const statusIcon = r.status === 'approved' ? 'check-circle' : r.status === 'rejected' ? 'x-circle' : 'hourglass-split';
+                    return `
+                    <tr>
+                        <td><strong>${r.job_code}</strong></td>
+                        <td>${r.team_name}</td>
+                        <td>${r.requested_by_name}</td>
+                        <td>
+                            <span class="badge bg-${statusBadge}">
+                                <i class="bi bi-${statusIcon}"></i> ${r.status.charAt(0).toUpperCase() + r.status.slice(1)}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="showRequestDetail(${r.id})" title="View">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            ${r.status !== 'approved' ? `
+                            <button class="btn btn-sm btn-success me-1" onclick="processRequest(${r.id}, 'approved')" title="Approve">
+                                <i class="bi bi-check"></i>
+                            </button>` : ''}
+                            ${r.status !== 'rejected' ? `
+                            <button class="btn btn-sm btn-danger me-1" onclick="processRequest(${r.id}, 'rejected')" title="Reject">
+                                <i class="bi bi-x"></i>
+                            </button>` : ''}
+                            ${r.status !== 'pending' ? `
+                            <button class="btn btn-sm btn-warning" onclick="processRequest(${r.id}, 'pending')" title="Revert to Pending">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>` : ''}
+                        </td>
+                    </tr>
+                `}).join('') || '<tr><td colspan="5" class="text-center">No requests</td></tr>';
+                
+                // Load job code requests
+                loadAdminJobCodeRequests();
+                
+            } catch (error) {
+                showToast('Failed to load admin data', 'error');
+            }
+            hideLoading();
+        }
+        
+        async function loadAdminJobCodeRequests() {
+            try {
+                const data = await api('/job-codes-master/requests');
+                const tbody = document.getElementById('jobCodeRequestsTableBody');
+                
+                if (!data.requests || data.requests.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center">No pending job code requests</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = data.requests.map(req => {
+                    const requestType = req.request_type === 'create' ? 
+                        '<span class="badge bg-success">New</span>' : 
+                        '<span class="badge bg-warning">Update</span>';
+                    const changes = req.changes || {};
+                    const smartCode = changes['SMART Job Code'] || req.smart_job_code || '-';
+                    const jobTitle = changes['Job Title'] || req.job_title || '-';
+                    const category = changes['Category'] || '-';
+                    
+                    return `
+                    <tr>
+                        <td>${requestType}</td>
+                        <td><strong>${smartCode}</strong></td>
+                        <td>${jobTitle}</td>
+                        <td>${category}</td>
+                        <td>${req.requested_by}</td>
+                        <td>${new Date(req.requested_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="showJobCodeRequestDetail(${req.id})" title="View Details">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-success me-1" onclick="approveJobCodeRequest(${req.id})" title="Approve">
+                                <i class="bi bi-check-circle"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="rejectJobCodeRequest(${req.id})" title="Reject">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Failed to load job code requests:', error);
+                showToast('Failed to load job code requests', 'error');
+            }
+        }
+        
+        async function showJobCodeRequestDetail(requestId) {
+            try {
+                const data = await api('/job-codes-master/requests');
+                const request = data.requests.find(r => r.id === requestId);
+                
+                if (!request) {
+                    showToast('Request not found', 'error');
+                    return;
+                }
+                
+                const changes = request.changes || {};
+                const previousValues = request.previous_values || {};
+                
+                let detailsHtml = `
+                    <div class="mb-3">
+                        <strong>Request Type:</strong> ${request.type === 'create' ? 'New Job Code' : 'Update Existing Job Code'}<br>
+                        <strong>Requested By:</strong> ${request.requested_by_name || request.requested_by}<br>
+                        <strong>Date:</strong> ${new Date(request.submitted).toLocaleString()}<br>
+                        <strong>Reason:</strong> ${request.reason || 'Not provided'}
+                    </div>
+                    <hr>
+                `;
+                
+                detailsHtml += `
+                    <h6>Requested ${request.type === 'create' ? 'Values' : 'Changes'}:</h6>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                for (const [field, value] of Object.entries(changes)) {
+                    if (value !== null && value !== undefined && value !== '') {
+                        // Show previous value with strikethrough if changed
+                        const previousValue = previousValues ? previousValues[field] : null;
+                        const hasChanged = request.type === 'update' && previousValue && previousValue !== value;
+                        
+                        let valueDisplay = '';
+                        if (hasChanged) {
+                            valueDisplay = `<span style="text-decoration: line-through; color: #999;">${previousValue}</span> → <strong>${value}</strong> <i class="bi bi-pencil-fill text-warning"></i>`;
+                        } else {
+                            valueDisplay = `<strong>${value}</strong>`;
+                        }
+                        
+                        detailsHtml += `
+                            <tr ${hasChanged ? 'class="table-warning"' : ''}>
+                                <td><strong>${field}</strong></td>
+                                <td>${valueDisplay}</td>
+                            </tr>
+                        `;
+                    }
+                }
+                
+                detailsHtml += `
+                        </tbody>
+                    </table>
+                `;
+                
+                // Show in a modal
+                const modalHtml = `
+                    <div class="modal fade" id="jobCodeRequestDetailModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Job Code Request Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ${detailsHtml}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-success" onclick="approveJobCodeRequest(${requestId}); bootstrap.Modal.getInstance(document.getElementById('jobCodeRequestDetailModal')).hide();">
+                                        <i class="bi bi-check-circle"></i> Approve
+                                    </button>
+                                    <button type="button" class="btn btn-danger" onclick="rejectJobCodeRequest(${requestId}); bootstrap.Modal.getInstance(document.getElementById('jobCodeRequestDetailModal')).hide();">
+                                        <i class="bi bi-x-circle"></i> Reject
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove any existing modal
+                const existingModal = document.getElementById('jobCodeRequestDetailModal');
+                if (existingModal) existingModal.remove();
+                
+                // Add and show new modal
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                const modal = new bootstrap.Modal(document.getElementById('jobCodeRequestDetailModal'));
+                modal.show();
+                
+            } catch (error) {
+                console.error('Failed to show request detail:', error);
+                showToast('Failed to load request details', 'error');
+            }
+        }
+        
+        async function approveJobCodeRequest(requestId) {
+            if (!confirm('Approve this job code request? This will update the master data.')) return;
+            
+            try {
+                await api(`/job-codes-master/requests/${requestId}/approve`, {
+                    method: 'POST'
+                });
+                showToast('Job code request approved');
+                loadAdminJobCodeRequests();
+                loadJobCodesMaster(); // Refresh main data
+            } catch (error) {
+                showToast(error.message || 'Failed to approve request', 'error');
+            }
+        }
+        
+        async function rejectJobCodeRequest(requestId) {
+            const reason = prompt('Enter rejection reason (optional):');
+            if (reason === null) return; // User cancelled
+            
+            try {
+                await api(`/job-codes-master/requests/${requestId}/reject`, {
+                    method: 'POST',
+                    body: JSON.stringify({ reason })
+                });
+                showToast('Job code request rejected');
+                loadAdminJobCodeRequests();
+            } catch (error) {
+                showToast(error.message || 'Failed to reject request', 'error');
+            }
+        }
+
+        async function approveUser(username) {
+            try {
+                await api(`/admin/users/${username}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ approved: true })
+                });
+                showToast('User approved');
+                loadAdminData();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function updateUserRole(username, role) {
+            try {
+                await api(`/admin/users/${username}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ role })
+                });
+                showToast('User role updated');
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+        
+        async function updateUserDefaultTab(username, defaultTab) {
+            try {
+                await api(`/admin/users/${username}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ default_tab: defaultTab })
+                });
+                showToast('Default tab updated');
+                
+                // Update current user if updating own settings
+                if (username === currentUser.username) {
+                    currentUser.default_tab = defaultTab;
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function deleteUser(username) {
+            if (!confirm(`Delete user ${username}?`)) return;
+            try {
+                await api(`/admin/users/${username}`, { method: 'DELETE' });
+                showToast('User deleted');
+                loadAdminData();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function processRequest(requestId, status) {
+            try {
+                await api(`/requests/${requestId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status })
+                });
+                showToast(`Request ${status}`);
+                loadAdminData();
+                loadDashboardData(); // Refresh stats
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function editRequest(requestId) {
+            // Find the request
+            const req = allRequests.find(r => r.id === requestId);
+            if (!req) return;
+            
+            // Open the assign modal with current values
+            document.getElementById('selectedJobCode').value = req.job_code;
+            document.getElementById('assignTeamSelect').value = req.team_id;
+            document.getElementById('assignNotes').value = req.notes || '';
+            
+            // Store the request ID for update
+            document.getElementById('assignTeamForm').dataset.editRequestId = requestId;
+            
+            new bootstrap.Modal(document.getElementById('assignTeamModal')).show();
+        }
+
+        async function deleteRequest(requestId) {
+            if (!confirm('Delete this request?')) return;
+            try {
+                await api(`/requests/${requestId}`, { method: 'DELETE' });
+                showToast('Request deleted');
+                loadRequests();
+                loadDashboardData(); // Refresh stats
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function exportApprovedRequests() {
+            try {
+                const data = await api('/export-requests?status=approved');
+                
+                // Create CSV
+                if (data.export_data.length === 0) {
+                    showToast('No approved requests to export', 'error');
+                    return;
+                }
+                
+                const headers = Object.keys(data.export_data[0]);
+                const csv = [
+                    headers.join(','),
+                    ...data.export_data.map(row => headers.map(h => `"${row[h] || ''}"`).join(','))
+                ].join('\n');
+                
+                // Download
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `teaming_updates_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                showToast(`Exported ${data.count} requests`);
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // JOB CODE MASTER MANAGEMENT
+        // ============================================================
+
+        let jobCodesMaster = [];
+        let jobCodeRequests = [];
+        let currentJobCodeDetail = null;
+        let jobCodeMasterSortField = null;
+        let jobCodeMasterSortDirection = 'asc';
+
+        async function loadJobCodesMaster() {
+            showLoading();
+            try {
+                const data = await api('/job-codes-master');
+                jobCodesMaster = data.job_codes || [];
+                
+                // Debug: Check first job code
+                if (jobCodesMaster.length > 0) {
+                    console.log('Sample job code data:', jobCodesMaster[0]);
+                }
+                
+                // Reset sort when loading
+                jobCodeMasterSortField = null;
+                jobCodeMasterSortDirection = 'asc';
+                
+                updateJobCodesMasterStats();
+                renderJobCodesMaster();
+                populateJobCodeDropdowns();
+            } catch (error) {
+                showToast('Failed to load job codes master: ' + error.message, 'error');
+            }
+            hideLoading();
+        }
+        
+        async function refreshJobCodesMaster() {
+            document.getElementById('searchJobCodeMaster').value = '';
+            document.getElementById('filterCategory').value = '';
+            await loadJobCodesMaster();
+            await loadJobCodeRequests();
+            showToast('Job codes refreshed');
+        }
+        
+        function populateJobCodeDropdowns() {
+            // Get unique values for dropdowns
+            const workgroups = [...new Set(jobCodesMaster.map(jc => jc['Workgroup']).filter(Boolean))].sort();
+            const teams = [...new Set(jobCodesMaster.map(jc => jc['Team']).filter(Boolean))].sort();
+            const jobFamilies = [...new Set(jobCodesMaster.map(jc => jc['Job Family']).filter(Boolean))].sort();
+            const pgLevels = [...new Set(jobCodesMaster.map(jc => jc['PG Level']).filter(Boolean))].sort();
+            
+            // Populate Workgroup dropdown
+            const workgroupSelect = document.getElementById('reqWorkgroup');
+            workgroupSelect.innerHTML = '<option value="">-- Select Workgroup --</option>' +
+                workgroups.map(w => `<option value="${w}">${w}</option>`).join('');
+            
+            // Populate Team dropdown
+            const teamSelect = document.getElementById('reqTeam');
+            teamSelect.innerHTML = '<option value="">-- Select Team --</option>' +
+                teams.map(t => `<option value="${t}">${t}</option>`).join('');
+            
+            // Populate Job Family dropdown
+            const jobFamilySelect = document.getElementById('reqJobFamily');
+            jobFamilySelect.innerHTML = '<option value="">-- Select Job Family --</option>' +
+                jobFamilies.map(jf => `<option value="${jf}">${jf}</option>`).join('');
+            
+            // Populate PG Level dropdown
+            const pgLevelSelect = document.getElementById('reqPGLevel');
+            pgLevelSelect.innerHTML = '<option value="">-- Select PG Level --</option>' +
+                pgLevels.map(pg => `<option value="${pg}">${pg}</option>`).join('');
+        }
+        
+        function sortJobCodesMasterTable(field) {
+            // Toggle sort direction if same field, otherwise reset to ascending
+            if (jobCodeMasterSortField === field) {
+                jobCodeMasterSortDirection = jobCodeMasterSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                jobCodeMasterSortField = field;
+                jobCodeMasterSortDirection = 'asc';
+            }
+            
+            // Sort the data
+            jobCodesMaster.sort((a, b) => {
+                const aVal = (a[field] || '').toString().toLowerCase();
+                const bVal = (b[field] || '').toString().toLowerCase();
+                
+                if (aVal < bVal) return jobCodeMasterSortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return jobCodeMasterSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            // Update sort icons - find the table containing jobCodesMasterTableBody
+            const table = document.getElementById('jobCodesMasterTableBody').parentElement;
+            table.querySelectorAll('th.sortable i').forEach(icon => {
+                icon.className = 'bi bi-sort-down';
+            });
+            
+            const th = table.querySelector(`th.sortable[data-sort="${field}"] i`);
+            if (th) {
+                th.className = jobCodeMasterSortDirection === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down';
+            }
+            
+            renderJobCodesMaster();
+        }
+
+        function updateJobCodesMasterStats() {
+            const total = jobCodesMaster.length;
+            const hourly = jobCodesMaster.filter(jc => jc.Category === 'Hourly').length;
+            const salary = jobCodesMaster.filter(jc => jc.Category === 'Salary').length;
+            
+            document.getElementById('totalMasterJobCodes').textContent = total;
+            document.getElementById('hourlyJobCodes').textContent = hourly;
+            document.getElementById('salaryJobCodes').textContent = salary;
+        }
+
+        function renderJobCodesMaster() {
+            const search = document.getElementById('searchJobCodeMaster').value.toLowerCase();
+            const category = document.getElementById('filterCategory').value;
+            const tbody = document.getElementById('jobCodesMasterTableBody');
+            
+            let filtered = jobCodesMaster.filter(jc => {
+                const smartCode = (jc['SMART Job Code'] || '').toLowerCase();
+                const jobTitle = (jc['Job Title'] || '').toLowerCase();
+                const workgroup = (jc['Workgroup'] || '').toLowerCase();
+                const team = (jc['Team'] || '').toLowerCase();
+                
+                const matchesSearch = !search || 
+                    smartCode.includes(search) ||
+                    jobTitle.includes(search) ||
+                    workgroup.includes(search) ||
+                    team.includes(search);
+                const matchesCategory = !category || jc.Category === category;
+                return matchesSearch && matchesCategory;
+            });
+            
+            tbody.innerHTML = filtered.map(jc => {
+                // Check if there's a pending request for this job code
+                const pendingRequest = jobCodeRequests.find(req => 
+                    req.status === 'pending' && 
+                    (req.smart_job_code === jc['SMART Job Code'] || 
+                     (req.changes && req.changes['SMART Job Code'] === jc['SMART Job Code']))
+                );
+                
+                const userCount = jc.user_count || 0;
+                const jobCode = jc['SMART Job Code'];
+                
+                // Debug logging for specific job codes
+                if (jobCode === '1-202-2104' || jobCode === '1-0-40386') {
+                    console.log(`Rendering Job Code: ${jobCode}, User Count: ${userCount}, Raw:`, jc.user_count);
+                }
+                
+                return `
+                <tr style="cursor: pointer;" onclick="showJobCodeDetail('${jc['SMART Job Code']}')">
+                    <td><strong>${jc['SMART Job Code'] || '-'}</strong></td>
+                    <td>${jc['Job Title'] || '-'}</td>
+                    <td><span class="badge ${jc.Category === 'Hourly' ? 'bg-success' : 'bg-info'}">${jc.Category || '-'}</span></td>
+                    <td>${jc['Workgroup'] || '-'}</td>
+                    <td>${jc['Team'] || '-'}</td>
+                    <td>${jc['PG Level'] || '-'}</td>
+                    <td><strong>${userCount}</strong></td>
+                    <td>${jc['Supervisor?'] || '-'}</td>
+                    <td>${pendingRequest ? '<span class="badge bg-warning"><i class="bi bi-hourglass-split"></i> Pending</span>' : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); showJobCodeDetail('${jc['SMART Job Code']}')">
+                            <i class="bi bi-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        async function showJobCodeDetail(smartCode) {
+            const jobCode = jobCodesMaster.find(jc => jc['SMART Job Code'] === smartCode);
+            if (!jobCode) return;
+            
+            currentJobCodeDetail = jobCode;
+            
+            document.getElementById('detailSmartCode').textContent = jobCode['SMART Job Code'] || '-';
+            document.getElementById('detailWorkdayCode').textContent = jobCode['Workday Job Code'] || '-';
+            document.getElementById('detailJobTitle').textContent = jobCode['Job Title'] || '-';
+            document.getElementById('detailJobCategory').textContent = jobCode['Category'] || '-';
+            document.getElementById('detailWorkgroup').textContent = jobCode['Workgroup'] || '-';
+            document.getElementById('detailTeam').textContent = jobCode['Team'] || '-';
+            document.getElementById('detailJobFamily').textContent = jobCode['Job Family'] || '-';
+            document.getElementById('detailPGLevel').textContent = jobCode['PG Level'] || '-';
+            document.getElementById('detailSupervisor').textContent = jobCode['Supervisor?'] || '-';
+            document.getElementById('detailReportsTo').textContent = jobCode['Reports to Title'] || '-';
+            document.getElementById('detailMgmtType').textContent = jobCode['Position Mgmt or Job Mgmt'] || '-';
+            document.getElementById('detailJobNotes').textContent = jobCode['Notes'] || 'No notes available';
+            
+            // Load rejection history
+            try {
+                const history = await api(`/rejection-history/${encodeURIComponent(smartCode)}`);
+                const historyDiv = document.getElementById('detailRejectionHistory');
+                const historyContent = document.getElementById('detailRejectionHistoryContent');
+                
+                const allRejections = [
+                    ...history.job_code_rejections.map(r => ({...r, type: 'Job Code Request'})),
+                    ...history.teaming_rejections.map(r => ({...r, type: 'Teaming Request'}))
+                ];
+                
+                if (allRejections.length > 0) {
+                    historyContent.innerHTML = allRejections.map(r => `
+                        <div class="mb-2">
+                            <strong>${r.type}</strong> rejected by ${r.rejected_by} on ${new Date(r.rejected_date).toLocaleDateString()}<br>
+                            <span class="text-muted small">Requested by: ${r.requested_by}</span><br>
+                            <em>"${r.reason}"</em>
+                        </div>
+                    `).join('<hr class="my-2">');
+                    historyDiv.style.display = 'block';
+                } else {
+                    historyDiv.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Failed to load rejection history:', error);
+                document.getElementById('detailRejectionHistory').style.display = 'none';
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('jobCodeDetailModal'));
+            modal.show();
+        }
+
+        function openCreateJobCodeModal() {
+            document.getElementById('requestModalTitle').textContent = 'Create New Job Code';
+            document.getElementById('jobCodeRequestForm').reset();
+            document.getElementById('reqSmartCode').readOnly = false;
+            
+            const modal = new bootstrap.Modal(document.getElementById('jobCodeRequestModal'));
+            modal.show();
+        }
+
+        function requestJobCodeUpdate() {
+            if (!currentJobCodeDetail) return;
+            
+            document.getElementById('requestModalTitle').textContent = 'Request Job Code Update';
+            document.getElementById('reqSmartCode').value = currentJobCodeDetail['SMART Job Code'] || '';
+            document.getElementById('reqSmartCode').readOnly = true;
+            document.getElementById('reqWorkdayCode').value = currentJobCodeDetail['Workday Job Code'] || '';
+            document.getElementById('reqJobTitle').value = currentJobCodeDetail['Job Title'] || '';
+            document.getElementById('reqCategory').value = currentJobCodeDetail['Category'] || '';
+            document.getElementById('reqWorkgroup').value = currentJobCodeDetail['Workgroup'] || '';
+            document.getElementById('reqTeam').value = currentJobCodeDetail['Team'] || '';
+            document.getElementById('reqJobFamily').value = currentJobCodeDetail['Job Family'] || '';
+            document.getElementById('reqPGLevel').value = currentJobCodeDetail['PG Level'] || '';
+            document.getElementById('reqSupervisor').value = currentJobCodeDetail['Supervisor?'] || '';
+            document.getElementById('reqReportsTo').value = currentJobCodeDetail['Reports to Title'] || '';
+            document.getElementById('reqMgmtType').value = currentJobCodeDetail['Position Mgmt or Job Mgmt'] || '';
+            
+            bootstrap.Modal.getInstance(document.getElementById('jobCodeDetailModal')).hide();
+            
+            const modal = new bootstrap.Modal(document.getElementById('jobCodeRequestModal'));
+            modal.show();
+        }
+
+        function editJobCodeNotes() {
+            const notesDiv = document.getElementById('detailJobNotes');
+            const notesEdit = document.getElementById('detailJobNotesEdit');
+            const notesButtons = document.getElementById('detailJobNotesButtons');
+            
+            notesEdit.value = notesDiv.textContent === 'No notes available' ? '' : notesDiv.textContent;
+            notesDiv.style.display = 'none';
+            notesEdit.style.display = 'block';
+            notesButtons.style.display = 'block';
+        }
+
+        function cancelEditJobCodeNotes() {
+            const notesDiv = document.getElementById('detailJobNotes');
+            const notesEdit = document.getElementById('detailJobNotesEdit');
+            const notesButtons = document.getElementById('detailJobNotesButtons');
+            
+            notesDiv.style.display = 'block';
+            notesEdit.style.display = 'none';
+            notesButtons.style.display = 'none';
+        }
+
+        async function saveJobCodeNotes() {
+            if (!currentJobCodeDetail) return;
+            
+            const notesEdit = document.getElementById('detailJobNotesEdit');
+            const notes = notesEdit.value.trim();
+            
+            try {
+                await api(`/job-codes-master/${encodeURIComponent(currentJobCodeDetail['SMART Job Code'])}/notes`, {
+                    method: 'POST',
+                    body: JSON.stringify({ notes })
+                });
+                
+                document.getElementById('detailJobNotes').textContent = notes || 'No notes available';
+                cancelEditJobCodeNotes();
+                showToast('Notes updated successfully', 'success');
+                
+                // Refresh the job codes list
+                await loadJobCodesMaster();
+            } catch (error) {
+                showToast('Failed to update notes: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('jobCodeRequestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const isUpdate = document.getElementById('reqSmartCode').readOnly;
+            const changes = {
+                'SMART Job Code': document.getElementById('reqSmartCode').value,
+                'Workday Job Code': document.getElementById('reqWorkdayCode').value,
+                'Job Title': document.getElementById('reqJobTitle').value,
+                'Category': document.getElementById('reqCategory').value,
+                'Workgroup': document.getElementById('reqWorkgroup').value,
+                'Team': document.getElementById('reqTeam').value,
+                'Job Family': document.getElementById('reqJobFamily').value,
+                'PG Level': document.getElementById('reqPGLevel').value,
+                'Supervisor?': document.getElementById('reqSupervisor').value,
+                'Reports to Title': document.getElementById('reqReportsTo').value,
+                'Position Mgmt or Job Mgmt': document.getElementById('reqMgmtType').value
+            };
+            
+            showLoading();
+            try {
+                await api('/job-codes-master/request', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        type: isUpdate ? 'update' : 'create',
+                        job_code: changes['SMART Job Code'],
+                        changes: changes,
+                        reason: document.getElementById('reqReason').value
+                    })
+                });
+                
+                showToast(isUpdate ? 'Update request submitted successfully!' : 'Job code creation request submitted!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('jobCodeRequestModal')).hide();
+                document.getElementById('jobCodeRequestForm').reset();
+                
+                // Load requests to update pending count and refresh display
+                await loadJobCodeRequests();
+                await loadJobCodesMaster();
+            } catch (error) {
+                showToast('Failed to submit request: ' + error.message, 'error');
+            }
+            hideLoading();
+        });
+
+        async function syncJobCodesFromExcel() {
+            if (!confirm('This will reload job codes from the Excel file. Continue?')) return;
+            
+            showLoading();
+            try {
+                const data = await api('/job-codes-master/sync', { method: 'POST' });
+                jobCodesMaster = data.data.job_codes || [];
+                updateJobCodesMasterStats();
+                renderJobCodesMaster();
+                showToast(`Synced ${jobCodesMaster.length} job codes from Excel`, 'success');
+            } catch (error) {
+                showToast('Failed to sync job codes: ' + error.message, 'error');
+            }
+            hideLoading();
+        }
+
+        async function loadJobCodeRequests() {
+            try {
+                const data = await api('/job-codes-master/requests');
+                jobCodeRequests = data.requests || [];
+                const pending = jobCodeRequests.filter(r => r.status === 'pending').length;
+                document.getElementById('pendingJobCodeRequests').textContent = pending;
+                
+                // Also update the rendering
+                renderJobCodesMaster();
+            } catch (error) {
+                console.error('Failed to load job code requests:', error);
+            }
+        }
+
+        // Event listeners for job code management
+        document.getElementById('searchJobCodeMaster').addEventListener('input', renderJobCodesMaster);
+        document.getElementById('filterCategory').addEventListener('change', renderJobCodesMaster);
+
+        // Initialize
+        checkAuth();
+    </script>
+</body>
+</html>

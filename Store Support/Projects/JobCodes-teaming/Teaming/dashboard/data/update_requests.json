@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "job_code": "1-0-40410",
+    "team_name": "Food/Consumables",
+    "team_id": "1000318",
+    "workgroup_name": "Food & Consumables",
+    "workgroup_id": "1000214",
+    "notes": "",
+    "requested_by": "admin",
+    "requested_by_name": "Administrator",
+    "requested_at": "2026-01-21T12:19:38.908065",
+    "status": "pending"
+  },
+  {
+    "id": 2,
+    "job_code": "1-0-40405",
+    "team_name": "Food/Consumables",
+    "team_id": "1000318",
+    "workgroup_name": "Food & Consumables",
+    "workgroup_id": "1000214",
+    "notes": "",
+    "requested_by": "admin",
+    "requested_by_name": "Administrator",
+    "requested_at": "2026-01-21T12:19:47.334221",
+    "status": "pending"
+  },
+  {
+    "id": 3,
+    "job_code": "10-38-821",
+    "team_name": "Pharmacy",
+    "team_id": "1000121",
+    "workgroup_name": "Pharmacy",
+    "workgroup_id": "1000121",
+    "notes": "Needs to be added associate is not able to see Pharmacy specific Store Updates. ",
+    "requested_by": "krush",
+    "requested_by_name": "Kendall Rush",
+    "requested_at": "2026-01-23T13:13:18.269143",
+    "status": "approved",
+    "admin_notes": "",
+    "processed_by": "krush",
+    "processed_at": "2026-01-23T13:13:30.783476"
+  }
+]

@@ -1,0 +1,39 @@
+---
+title: StyledText
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Styled text visually enhances copy and can help convey meaning by
+adding color and/or an optional icon.
+
+
+<ScreenshotTabs screenshotData={"screenshots/styled-text.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {StyledText} from '@walmart/gtp-shared-components`;
+
+<StyledText>Styled Text</StyledText>
+<StyledText size="small" color="blue" leading={<Icons.CheckIcon />}>
+  Blue small StyledText with Check Icon
+</StyledText>
+<StyledText size="large" color="green" leading={<Icons.CheckIcon />}>
+  Green large StyledText with Check Icon
+</StyledText>
+<StyledText size="large" color="gray" leading={<Icons.CheckIcon />}>
+  Gray large StyledText with Check Icon
+</StyledText>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="StyledText" prop="children"/>
+ ### size
+<PropTable componentLink="StyledText" prop="size"/>
+ ### color
+<PropTable componentLink="StyledText" prop="color"/>
+ ### leading
+<PropTable componentLink="StyledText" prop="leading"/>
+ ### UNSAFE_style
+<PropTable componentLink="StyledText" prop="UNSAFE_style"/>

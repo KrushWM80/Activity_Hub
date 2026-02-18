@@ -1,0 +1,34 @@
+[
+  {
+    "config_id": "4b80e040-b338-4489-b8ff-6b3f8f5ee4be",
+    "report_name": "Kendall's Daily",
+    "timestamp": "2026-02-13T12:12:41.290695",
+    "status": "success",
+    "recipients": "kendall.rush@walmart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "4b80e040-b338-4489-b8ff-6b3f8f5ee4be",
+    "report_name": "Kendall's Daily",
+    "timestamp": "2026-02-13T12:12:43.337964",
+    "status": "success",
+    "recipients": "kendall.rush@walmart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "4b80e040-b338-4489-b8ff-6b3f8f5ee4be",
+    "report_name": "Kendall's Daily",
+    "timestamp": "2026-02-13T12:18:03.935917",
+    "status": "success",
+    "recipients": "kendall.rush@walmart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "4b80e040-b338-4489-b8ff-6b3f8f5ee4be",
+    "report_name": "Kendall's Daily",
+    "timestamp": "2026-02-13T12:19:26.716551",
+    "status": "success",
+    "recipients": "kendall.rush@walmart.com",
+    "error_message": null
+  }
+]

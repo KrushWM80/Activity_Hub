@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribution List Selector - Walmart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0071ce 0%, #004c91 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #0071ce;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .stats-bar {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0071ce;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .search-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #0071ce;
+        }
+
+        .autocomplete-container {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .autocomplete-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .autocomplete-input:focus {
+            outline: none;
+            border-color: #0071ce;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #0071ce;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+        }
+
+        .autocomplete-dropdown.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item:hover, .autocomplete-item.active {
+            background-color: #f8f9fa;
+        }
+
+        .autocomplete-item-email {
+            font-weight: 600;
+            color: #0071ce;
+        }
+
+        .autocomplete-item-name {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        .autocomplete-item-description {
+            font-size: 12px;
+            color: #adb5bd;
+            margin-top: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .filters-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        select {
+            padding: 8px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #0071ce;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #0071ce;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #004c91;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 113, 206, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-clear {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-clear:hover {
+            background: #e0a800;
+        }
+
+        .selection-bar {
+            background: #fff3cd;
+            padding: 15px 30px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ffc107;
+        }
+
+        .selection-bar.show {
+            display: flex;
+        }
+
+        .selection-info {
+            font-weight: 600;
+            color: #856404;
+        }
+
+        .selected-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: none;
+        }
+
+        .selected-items.show {
+            display: flex;
+        }
+
+        .selected-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #0071ce;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .selected-tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            padding: 0 5px;
+            transition: transform 0.2s;
+        }
+
+        .selected-tag-remove:hover {
+            transform: scale(1.2);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .dl-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dl-table thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+        }
+
+        .dl-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .dl-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .dl-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .dl-email {
+            color: #0071ce;
+            font-weight: 600;
+        }
+
+        .dl-description {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .category-general { background: #e9ecef; color: #495057; }
+        .category-market { background: #d1ecf1; color: #0c5460; }
+        .category-team { background: #d4edda; color: #155724; }
+        .category-operations { background: #fff3cd; color: #856404; }
+        .category-support { background: #f8d7da; color: #721c24; }
+        .category-management { background: #d6d8db; color: #383d41; }
+        .category-region { background: #cce5ff; color: #004085; }
+
+        .member-count {
+            color: #0071ce;
+            font-weight: 600;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 2px solid #0071ce;
+            background: white;
+            color: #0071ce;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #0071ce;
+            color: white;
+        }
+
+        .pagination button:disabled {
+            border-color: #dee2e6;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .pagination span {
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #6c757d;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #721c24;
+            background: #f8d7da;
+            border-radius: 8px;
+            margin: 20px;
+        }
+
+        .checkbox-cell {
+            width: 50px;
+            text-align: center;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+            }
+
+            .controls {
+                padding: 15px;
+            }
+
+            .search-section {
+                flex-direction: column;
+            }
+
+            .filters-section {
+                flex-direction: column;
+            }
+
+            .dl-table {
+                font-size: 14px;
+            }
+
+            .dl-table th,
+            .dl-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Distribution List Selector</h1>
+            <p>Search, filter, and compose emails to distribution lists</p>
+        </div>
+
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalLists">-</div>
+                <div class="stat-label">Total Lists</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="generalCount">-</div>
+                <div class="stat-label">General</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="marketCount">-</div>
+                <div class="stat-label">Market</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="teamCount">-</div>
+                <div class="stat-label">Team</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="operationsCount">-</div>
+                <div class="stat-label">Operations</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-section">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search by keyword (email, name, or description)...">
+                </div>
+                <div class="autocomplete-container">
+                    <input type="text" class="autocomplete-input" id="dlTypeInput" placeholder="📋 Type or select distribution list..." autocomplete="off">
+                    <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+                </div>
+                <button class="btn btn-clear" onclick="clearAllFilters()">Clear All</button>
+            </div>
+            <div class="filters-section">
+                <div class="filter-group">
+                    <label class="filter-label">Category:</label>
+                    <select id="categoryFilter" onchange="applyFilters()">
+                        <option value="">All Categories</option>
+                        <option value="General">General</option>
+                        <option value="Market">Market</option>
+                        <option value="Team">Team</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Support">Support</option>
+                        <option value="Management">Management</option>
+                        <option value="Region">Region</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Size:</label>
+                    <select id="sizeFilter" onchange="applyFilters()">
+                        <option value="">All Sizes</option>
+                        <option value="small">Small (< 50)</option>
+                        <option value="medium">Medium (50-499)</option>
+                        <option value="large">Large (500+)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Per Page:</label>
+                    <select id="perPageSelect" onchange="changePerPage()">
+                        <option value="50">50</option>
+                        <option value="100" selected>100</option>
+                        <option value="250">250</option>
+                        <option value="500">500</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="selection-bar" id="selectionBar">
+            <span class="selection-info" id="selectionInfo">0 lists selected</span>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="composeEmail()">Compose Email</button>
+                <button class="btn btn-secondary" onclick="clearSelection()">Clear Selection</button>
+            </div>
+        </div>
+
+        <div class="selected-items" id="selectedItems"></div>
+
+        <div class="content">
+            <div id="loadingMessage" class="loading">Loading distribution lists...</div>
+            <div id="errorMessage" class="error" style="display: none;"></div>
+            <table class="dl-table" id="dlTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell">
+                            <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                        </th>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Members</th>
+                    </tr>
+                </thead>
+                <tbody id="dlTableBody">
+                </tbody>
+            </table>
+            <div class="pagination" id="pagination" style="display: none;">
+                <button onclick="previousPage()" id="prevButton">Previous</button>
+                <span id="pageInfo">Page 1 of 1</span>
+                <button onclick="nextPage()" id="nextButton">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allDLs = [];
+        let filteredDLs = [];
+        let selectedDLs = new Set();
+        let currentPage = 1;
+        let itemsPerPage = 100;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDistributionLists();
+            setupAutocomplete();
+            setupSearchDebounce();
+        });
+
+        // Load distribution lists from BigQuery via API (Code Puppy Pages only)
+        async function loadDistributionLists() {
+            try {
+                const response = await fetch('/api/distribution-lists');
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Map BigQuery column names to frontend data structure
+                allDLs = data.map(row => ({
+                    email: row.email || '',
+                    name: row.name || '',
+                    displayName: row.display_name || row.displayName || '',
+                    description: row.description || '',
+                    memberCount: parseInt(row.member_count || row.memberCount) || 0,
+                    category: row.category || 'General'
+                }));
+                
+                if (allDLs.length === 0) {
+                    throw new Error('No distribution lists returned from BigQuery');
+                }
+                
+                console.log(`Successfully loaded ${allDLs.length.toLocaleString()} distribution lists from BigQuery`);
+                
+                displayStats();
+                applyFilters();
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('dlTable').style.display = 'table';
+                document.getElementById('pagination').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error loading distribution lists from BigQuery:', error);
+                document.getElementById('loadingMessage').style.display = 'none';
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.innerHTML = `
+                    <strong>Error loading distribution lists from BigQuery:</strong><br>
+                    ${error.message}<br><br>
+                    <strong>Troubleshooting:</strong><br>
+                    • Verify API endpoint is deployed: <code>/api/distribution-lists</code><br>
+                    • Check BigQuery table exists: <code>wmt-assetprotection-prod.Store_Support_Dev.dl_catalog</code><br>
+                    • Confirm service account has BigQuery dataViewer role<br>
+                    • Check browser console for detailed error logs
+                `;
+                errorMsg.style.display = 'block';
+            }
+        }
+
+
+        // Display statistics
+        function displayStats() {
+            document.getElementById('totalLists').textContent = allDLs.length.toLocaleString();
+            
+            const categoryCounts = {};
+            allDLs.forEach(dl => {
+                categoryCounts[dl.category] = (categoryCounts[dl.category] || 0) + 1;
+            });
+
+            document.getElementById('generalCount').textContent = (categoryCounts['General'] || 0).toLocaleString();
+            document.getElementById('marketCount').textContent = (categoryCounts['Market'] || 0).toLocaleString();
+            document.getElementById('teamCount').textContent = (categoryCounts['Team'] || 0).toLocaleString();
+            document.getElementById('operationsCount').textContent = (categoryCounts['Operations'] || 0).toLocaleString();
+        }
+
+        // Autocomplete functionality
+        function setupAutocomplete() {
+            const input = document.getElementById('dlTypeInput');
+            const dropdown = document.getElementById('autocompleteDropdown');
+            let currentFocus = -1;
+
+            input.addEventListener('input', function() {
+                const value = this.value.toLowerCase();
+                dropdown.innerHTML = '';
+                currentFocus = -1;
+
+                if (!value) {
+                    dropdown.classList.remove('show');
+                    return;
+                }
+
+                const matches = allDLs.filter(dl => 
+                    dl.email.toLowerCase().includes(value) ||
+                    dl.name.toLowerCase().includes(value) ||
+                    dl.description.toLowerCase().includes(value)
+                ).slice(0, 10);
+
+                if (matches.length === 0) {
+                    dropdown.classList.remove('show');
+                    return;
+                }
+
+                matches.forEach((dl, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.innerHTML = `
+                        <div class="autocomplete-item-email">${dl.email}</div>
+                        <div class="autocomplete-item-name">${dl.name}</div>
+                        ${dl.description ? `<div class="autocomplete-item-description">${dl.description}</div>` : ''}
+                    `;
+                    item.addEventListener('click', function() {
+                        selectDL(dl);
+                        input.value = '';
+                        dropdown.classList.remove('show');
+                    });
+                    dropdown.appendChild(item);
+                });
+
+                dropdown.classList.add('show');
+            });
+
+            // Keyboard navigation
+            input.addEventListener('keydown', function(e) {
+                const items = dropdown.getElementsByClassName('autocomplete-item');
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    currentFocus++;
+                    addActive(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    currentFocus--;
+                    addActive(items);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentFocus > -1 && items[currentFocus]) {
+                        items[currentFocus].click();
+                    }
+                } else if (e.key === 'Escape') {
+                    dropdown.classList.remove('show');
+                }
+            });
+
+            function addActive(items) {
+                if (!items) return false;
+                removeActive(items);
+                if (currentFocus >= items.length) currentFocus = 0;
+                if (currentFocus < 0) currentFocus = items.length - 1;
+                items[currentFocus].classList.add('active');
+                items[currentFocus].scrollIntoView({ block: 'nearest' });
+            }
+
+            function removeActive(items) {
+                for (let i = 0; i < items.length; i++) {
+                    items[i].classList.remove('active');
+                }
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target !== input) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // Select a DL from autocomplete
+        function selectDL(dl) {
+            if (!selectedDLs.has(dl.email)) {
+                selectedDLs.add(dl.email);
+                updateSelectionDisplay();
+            }
+        }
+
+        // Setup search debounce
+        function setupSearchDebounce() {
+            let debounceTimer;
+            document.getElementById('searchInput').addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    applyFilters();
+                }, 300);
+            });
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const size = document.getElementById('sizeFilter').value;
+
+            filteredDLs = allDLs.filter(dl => {
+                // Search filter
+                if (searchQuery && !dl.email.toLowerCase().includes(searchQuery) &&
+                    !dl.name.toLowerCase().includes(searchQuery) &&
+                    !dl.description.toLowerCase().includes(searchQuery)) {
+                    return false;
+                }
+
+                // Category filter
+                if (category && dl.category !== category) {
+                    return false;
+                }
+
+                // Size filter
+                if (size === 'small' && dl.memberCount >= 50) return false;
+                if (size === 'medium' && (dl.memberCount < 50 || dl.memberCount >= 500)) return false;
+                if (size === 'large' && dl.memberCount < 500) return false;
+
+                return true;
+            });
+
+            currentPage = 1;
+            displayPage();
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('dlTypeInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('sizeFilter').value = '';
+            document.getElementById('autocompleteDropdown').classList.remove('show');
+            applyFilters();
+        }
+
+        // Display current page
+        function displayPage() {
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = startIdx + itemsPerPage;
+            const pageData = filteredDLs.slice(startIdx, endIdx);
+
+            const tbody = document.getElementById('dlTableBody');
+            tbody.innerHTML = '';
+
+            pageData.forEach(dl => {
+                const row = tbody.insertRow();
+                const isSelected = selectedDLs.has(dl.email);
+
+                row.innerHTML = `
+                    <td class="checkbox-cell">
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                               onchange="toggleDL('${dl.email.replace(/'/g, "\\'")}')">
+                    </td>
+                    <td class="dl-email">${dl.email}</td>
+                    <td>${dl.name}</td>
+                    <td class="dl-description">${dl.description || '-'}</td>
+                    <td><span class="category-badge category-${dl.category.toLowerCase()}">${dl.category}</span></td>
+                    <td class="member-count">${dl.memberCount.toLocaleString()}</td>
+                `;
+            });
+
+            updatePagination();
+        }
+
+        // Toggle individual DL selection
+        function toggleDL(email) {
+            if (selectedDLs.has(email)) {
+                selectedDLs.delete(email);
+            } else {
+                selectedDLs.add(email);
+            }
+            updateSelectionDisplay();
+        }
+
+        // Toggle select all on current page
+        function toggleSelectAll() {
+            const checkbox = document.getElementById('selectAllCheckbox');
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = startIdx + itemsPerPage;
+            const pageData = filteredDLs.slice(startIdx, endIdx);
+
+            if (checkbox.checked) {
+                pageData.forEach(dl => selectedDLs.add(dl.email));
+            } else {
+                pageData.forEach(dl => selectedDLs.delete(dl.email));
+            }
+
+            updateSelectionDisplay();
+            displayPage();
+        }
+
+        // Update selection display
+        function updateSelectionDisplay() {
+            const count = selectedDLs.size;
+            const selectionBar = document.getElementById('selectionBar');
+            const selectionInfo = document.getElementById('selectionInfo');
+            const selectedItems = document.getElementById('selectedItems');
+
+            selectionInfo.textContent = `${count} list${count !== 1 ? 's' : ''} selected`;
+
+            if (count > 0) {
+                selectionBar.classList.add('show');
+                selectedItems.classList.add('show');
+                
+                // Display selected tags
+                selectedItems.innerHTML = '';
+                selectedDLs.forEach(email => {
+                    const tag = document.createElement('span');
+                    tag.className = 'selected-tag';
+                    tag.innerHTML = `
+                        ${email}
+                        <span class="selected-tag-remove" onclick="toggleDL('${email.replace(/'/g, "\\'")}')">×</span>
+                    `;
+                    selectedItems.appendChild(tag);
+                });
+            } else {
+                selectionBar.classList.remove('show');
+                selectedItems.classList.remove('show');
+            }
+
+            // Update checkboxes
+            const checkboxes = document.querySelectorAll('#dlTableBody input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                const email = cb.onchange.toString().match(/'([^']+)'/)[1];
+                cb.checked = selectedDLs.has(email);
+            });
+        }
+
+        // Clear selection
+        function clearSelection() {
+            selectedDLs.clear();
+            updateSelectionDisplay();
+            displayPage();
+        }
+
+        // Compose email with selected DLs
+        function composeEmail() {
+            if (selectedDLs.size === 0) {
+                alert('Please select at least one distribution list.');
+                return;
+            }
+
+            const emails = Array.from(selectedDLs).join(';');
+            const outlookWebUrl = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(emails)}`;
+            window.open(outlookWebUrl, '_blank');
+        }
+
+        // Pagination controls
+        function changePerPage() {
+            itemsPerPage = parseInt(document.getElementById('perPageSelect').value);
+            currentPage = 1;
+            displayPage();
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayPage();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredDLs.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayPage();
+            }
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredDLs.length / itemsPerPage);
+            document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages} (${filteredDLs.length.toLocaleString()} lists)`;
+            document.getElementById('prevButton').disabled = currentPage === 1;
+            document.getElementById('nextButton').disabled = currentPage === totalPages;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+---
+title: Variants
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Variant indicators show customers that an item is available in multiple styles or colors.
+They are informative and not actionable.
+
+
+<ScreenshotTabs screenshotData={"screenshots/variants.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Variants} from '@walmart/gtp-shared-components';
+
+<Variants variants={[colors.blue['100'], colors.green['100']]} />;
+```
+## Props
+
+ ### variants(required)
+<PropTable componentLink="Variants" prop="variants"/>
+ ### colors
+<PropTable componentLink="Variants" prop="colors"/>
+ ### UNSAFE_style
+<PropTable componentLink="Variants" prop="UNSAFE_style"/>

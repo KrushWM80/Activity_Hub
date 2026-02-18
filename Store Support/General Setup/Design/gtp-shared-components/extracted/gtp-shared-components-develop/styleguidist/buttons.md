@@ -1,0 +1,1 @@
+Buttons allow users to take actions, and make choices, with a single press or a tap. Buttons are used as calls-to-action (CTA) across the experience. These CTAs provide key functionality across the experience and are organized in the order or their importance - primary, secondary, tertiary etc.

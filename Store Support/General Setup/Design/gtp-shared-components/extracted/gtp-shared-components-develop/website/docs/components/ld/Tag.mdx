@@ -1,0 +1,32 @@
+---
+title: Tag
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Tags are used to draw a customer’s focus to item traits such as availability, status, or media rating.
+Items may be products, fulfillment slots, or something else. They are visual only and non-interactive.
+
+
+<ScreenshotTabs screenshotData={"screenshots/tag.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Tag} from '@walmart/gtp-shared-components`;
+
+<Tag variant="primary" color="spark" leading={<Icons.TruckIcon />}>
+  Spark Primary Tag
+</Tag>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="Tag" prop="children"/>
+ ### color(required)
+<PropTable componentLink="Tag" prop="color"/>
+ ### leading
+<PropTable componentLink="Tag" prop="leading"/>
+ ### UNSAFE_style
+<PropTable componentLink="Tag" prop="UNSAFE_style"/>
+ ### variant(required)
+<PropTable componentLink="Tag" prop="variant"/>

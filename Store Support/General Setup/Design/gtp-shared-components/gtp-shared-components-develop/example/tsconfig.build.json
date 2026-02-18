@@ -1,0 +1,12 @@
+{
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.stories.ts",
+    "**/*.stories.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ],
+  "extends": "./tsconfig.json",
+  "include": ["./declarations.d.ts", "./src/**/*"]
+}

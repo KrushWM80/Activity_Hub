@@ -1,0 +1,56 @@
+---
+title: SpinnerOverlay
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+SpinnerOverlay is a component that displays a Spinner over the content of the screen.
+
+
+<ScreenshotTabs screenshotData={"screenshots/spinner-overlay.gif"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {SpinnerOverlay} from '@walmart/gtp-shared-components`;
+
+const [isLoading, setLoading] = useState(false);
+
+const getData = async () => {
+  setLoading(true);
+  try {
+    const response = await fetch('<Your API URL here>');
+    const json = await response.json();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  getData();
+}, []);
+
+<SpinnerOverlay
+  visible={isLoading}
+  darken={true}
+  spinnerColor={'white'}
+  transparent={true}
+/>
+```
+## Props
+
+ ### children
+<PropTable componentLink="SpinnerOverlay" prop="children"/>
+ ### spinnerColor
+<PropTable componentLink="SpinnerOverlay" prop="spinnerColor"/>
+ ### spinnerSize
+<PropTable componentLink="SpinnerOverlay" prop="spinnerSize"/>
+ ### darken
+<PropTable componentLink="SpinnerOverlay" prop="darken"/>
+ ### transparent
+<PropTable componentLink="SpinnerOverlay" prop="transparent"/>
+ ### visible(required)
+<PropTable componentLink="SpinnerOverlay" prop="visible"/>
+ ### UNSAFE_style
+<PropTable componentLink="SpinnerOverlay" prop="UNSAFE_style"/>

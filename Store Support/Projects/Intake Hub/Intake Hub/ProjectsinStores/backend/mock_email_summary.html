@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+        }
+        .header {
+            background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%);
+            color: white;
+            padding: 20px 25px;
+        }
+        .header h1 { font-size: 22px; margin-bottom: 3px; }
+        .header p { font-size: 11px; opacity: 0.85; }
+        .content { padding: 20px 25px; }
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0071ce;
+            margin-top: 18px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #0071ce;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+        th {
+            background: #2d3748;
+            color: white;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #1a202c;
+        }
+        td {
+            padding: 7px 10px;
+            border: 1px solid #e2e8f0;
+        }
+        tr:nth-child(even) { background: #f7fafc; }
+        tr:hover { background: #edf2f7; }
+        a { color: #0071ce; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .footer {
+            padding: 12px 25px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 10px;
+            color: #718096;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Kendall's Daily</h1>
+            <p>February 13, 2026 at 12:12 PM | 7 Projects</p>
+        </div>
+        
+        <div class="content">
+            <div class="section-title">New</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Owner</th>
+                        <th>Created</th>
+                        <th>Start</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ice House America Vending Solution</strong></td>
+                        <td>Jasmine Allen</td>
+                        <td>02/11/26</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>DSD - KDP Delivery Notifications</strong></td>
+                        <td>Kenneth Deal</td>
+                        <td>02/10/26</td>
+                        <td>03/01/26</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Store Maintenance Scheduler</strong></td>
+                        <td>Marcus Webb</td>
+                        <td>02/09/26</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Inventory Sync - EAST Region</strong></td>
+                        <td>Priya Sharma</td>
+                        <td>02/08/26</td>
+                        <td>02/20/26</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Payment Processing Upgrade</strong></td>
+                        <td>Sandra Lopez</td>
+                        <td>02/07/26</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="section-title">Upcoming</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Phase</th>
+                        <th>Target Date</th>
+                        <th>Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mobile App Rollout Phase 2</strong></td>
+                        <td>Testing</td>
+                        <td>02/20/26</td>
+                        <td>James Chen</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Network Upgrade - NCC Region</strong></td>
+                        <td>Planning</td>
+                        <td>03/01/26</td>
+                        <td>Robert Taylor</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Security Audit Implementation</strong></td>
+                        <td>In Progress</td>
+                        <td>02/28/26</td>
+                        <td>Michelle Zhao</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="section-title">Notes</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>User</th>
+                        <th>Note</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>DSD - KDP Delivery Notifications</strong></td>
+                        <td>Kenneth Deal</td>
+                        <td>Update: Testing signup validation completed successfully...</td>
+                        <td>2/11 2:35 PM</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ice House America Vending Solution</strong></td>
+                        <td>Jasmine Allen</td>
+                        <td>Scheduled vendor meeting for Phase 1 kickoff on 2/14...</td>
+                        <td>2/11 1:12 PM</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Store Maintenance Scheduler</strong></td>
+                        <td>Marcus Webb</td>
+                        <td>Database schema approved. Ready for development sprint...</td>
+                        <td>2/10 11:47 AM</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>Automated report from Intake Hub Dashboard | Questions? Email ATCTEAMSUPPORT@Walmart.com</p>
+        </div>
+    </div>
+</body>
+</html>

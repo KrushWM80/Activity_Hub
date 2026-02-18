@@ -1,0 +1,93 @@
+{
+  "system_name": "Weekly Report Generation System",
+  "version": "1.0",
+  "created": "2026-01-23",
+  
+  "scan_paths": [
+    "Refresh Guide",
+    "Evaluation-System",
+    "Activity-Hub",
+    "Spark-Playground",
+    "Spark-Playground/General Setup/Distribution_Lists",
+    "Spark-Playground/General Setup/Production_Path",
+    "Intake Hub/ProjectsinStores",
+    "Store Support/Projects/DC to Store Change Management Emails",
+    "Store Support/Projects/JobCodes-teaming"
+  ],
+  
+  "file_patterns": [
+    "README.md",
+    "*_SUMMARY.md",
+    "*_STATUS.md",
+    "*_PLAN.md",
+    "DELIVERY_SUMMARY.txt",
+    "BUILD_SUMMARY.md",
+    "PROJECT_SUMMARY.md",
+    "QUICKSTART.md",
+    "LAUNCH_READY.md"
+  ],
+  
+  "look_back_days": 7,
+  
+  "project_categories": {
+    "main_applications": [
+      "Refresh Guide",
+      "Evaluation-System",
+      "Activity-Hub"
+    ],
+    "governance_infrastructure": [
+      "Spark-Playground/General Setup/Production_Path",
+      "Spark-Playground/General Setup/Compliance"
+    ],
+    "strategic_initiatives": [
+      "Spark-Playground/General Setup/Distribution_Lists",
+      "Intake Hub/ProjectsinStores",
+      "Store Support/Projects/DC to Store Change Management Emails",
+      "Store Support/Projects/JobCodes-teaming"
+    ]
+  },
+  
+  "capture_log_template": "WEEKLY_CAPTURE_LOG_TEMPLATE.md",
+  "capture_log_current": "WEEKLY_CAPTURE_LOG.md",
+  "checklist_template": "PRE_REPORT_CHECKLIST.md",
+  "report_template": "REPORT_TEMPLATE.md",
+  
+  "output_folders": {
+    "reports": "reports/",
+    "captured_work": "captured_work/",
+    "scripts": "scripts/"
+  },
+  
+  "report_sections": [
+    "executive_summary",
+    "time_spent_total",
+    "project_breakdowns",
+    "captured_work",
+    "time_analysis",
+    "metrics",
+    "next_week_preview"
+  ],
+  
+  "prompts": {
+    "additional_projects": "Any additional projects to include this week? (Y/N)",
+    "time_estimates": "Enter time spent on [PROJECT] this week (hours):",
+    "breakdown": "Provide activity breakdown for [PROJECT] (optional):",
+    "special_notes": "Any special notes for this week's report? (Y/N)",
+    "confirm": "Generate report with this data? (Y/N)"
+  },
+  
+  "file_naming": {
+    "report": "WEEKLY_REPORT_{DATE}.md",
+    "capture": "WEEKLY_CAPTURE_{DATE}.md",
+    "date_format": "YYYY-MM-DD"
+  },
+  
+  "settings": {
+    "auto_backup": true,
+    "auto_archive": true,
+    "keep_weeks": 13,
+    "timestamp_reports": true,
+    "include_metrics": true,
+    "include_projections": true
+  }
+}

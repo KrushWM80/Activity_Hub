@@ -1,0 +1,19 @@
+import groovy.json.JsonSlurper
+
+ext {
+    // Load package.json file
+    def file = rootProject.file("package.json")
+    def packageJson = new JsonSlurper().parse(file, "UTF-8")
+    assert packageJson instanceof Map
+    assert packageJson.version.class == String
+
+    // Extract project-wide version property
+    def projectVersion = packageJson.version.tokenize(".")
+    major = projectVersion[0]
+    minor = projectVersion[1]
+    patch = projectVersion[2]
+
+    // Calculate Android version information and expose to build
+    versionCode = Integer.parseInt(patch) + Integer.parseInt(minor) * 1000 + Integer.parseInt(major) * 100000
+    versionName = packageJson.version
+}

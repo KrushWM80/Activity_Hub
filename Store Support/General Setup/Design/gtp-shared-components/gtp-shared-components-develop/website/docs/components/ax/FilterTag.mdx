@@ -1,0 +1,32 @@
+---
+title: FilterTag
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Only shown once a filter is being applied.
+- Use when a filter is applied and a tag is needed to show what has been selected.
+- Use when interacting with complex data such that a user would often apply multiple filters at
+  once and require visibility of all applied filter parameters.
+
+
+<ScreenshotTabs screenshotData={"screenshots/filter-tag.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {FilterTag} from '@walmart/gtp-shared-components/ax`;
+
+<FilterTag onPress={() => {}}>Filter Tag</FilterTag>
+<FilterTag disabled>Filter Tag</FilterTag>
+
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="FilterTag" prop="children"/>
+ ### disabled
+<PropTable componentLink="FilterTag" prop="disabled"/>
+ ### onPress
+<PropTable componentLink="FilterTag" prop="onPress"/>
+ ### UNSAFE_style
+<PropTable componentLink="FilterTag" prop="UNSAFE_style"/>

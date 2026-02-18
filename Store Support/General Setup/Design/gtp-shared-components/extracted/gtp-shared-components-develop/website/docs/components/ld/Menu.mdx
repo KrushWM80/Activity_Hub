@@ -1,0 +1,41 @@
+---
+title: Menu
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+A Menu is a container with items for user-triggered actions.
+
+
+<ScreenshotTabs screenshotData={"screenshots/menu.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {IconButton, Menu} from '@walmart/gtp-shared-components`;
+
+const [isOpen, setIsOpen] = React.useState(false);
+
+<Menu
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
+  position="bottomLeft"
+  trigger={<IconButton icon="more" onPress={() => setIsOpen(true)} />}
+>
+  <MenuItem>Item 1</MenuItem>
+  <MenuItem>Item 2</MenuItem>
+</Menu>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="Menu" prop="children"/>
+ ### isOpen
+<PropTable componentLink="Menu" prop="isOpen"/>
+ ### onClose
+<PropTable componentLink="Menu" prop="onClose"/>
+ ### position(required)
+<PropTable componentLink="Menu" prop="position"/>
+ ### trigger
+<PropTable componentLink="Menu" prop="trigger"/>
+ ### UNSAFE_style
+<PropTable componentLink="Menu" prop="UNSAFE_style"/>

@@ -1,0 +1,32 @@
+{
+  "user_id": "kendall.rush",
+  "report_name": "Kendall's Daily",
+  "content_types": [
+    "Overview",
+    "New"
+  ],
+  "columns": {
+    "intake_card_number": true,
+    "title_with_link": true,
+    "facility_total_count": true
+  },
+  "filters": {
+    "store_areas": [
+      "Asset Protection",
+      "Frontend"
+    ]
+  },
+  "frequency": "Daily",
+  "delivery_day": null,
+  "delivery_time": "06:00",
+  "timeframes": [
+    "Last 24 Hours"
+  ],
+  "primary_email": "kendall.rush@walmart.com",
+  "cc_emails": [],
+  "report_format": "Both",
+  "is_active": true,
+  "config_id": "4b80e040-b338-4489-b8ff-6b3f8f5ee4be",
+  "created_at": "2026-02-12T15:34:23.408479",
+  "last_sent": "2026-02-13T12:19:26.625688"
+}

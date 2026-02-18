@@ -1,0 +1,44 @@
+---
+title: Chip
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Chips allow users to make selections, filter content, or trigger actions.
+
+
+<ScreenshotTabs screenshotData={{"default":"screenshots/chip.png","chip-with-icons":"screenshots/chip-with-icons.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Chip} from '@walmart/gtp-shared-components`;
+
+<Chip
+  id={0}
+  selected
+  children="Sam's Choice"
+  onPress={(id, sel) => console.log(id, sel)}
+/>
+```
+## Props
+
+ ### id(required)
+<PropTable componentLink="Chip" prop="id"/>
+ ### children(required)
+<PropTable componentLink="Chip" prop="children"/>
+ ### disabled
+<PropTable componentLink="Chip" prop="disabled"/>
+ ### leading
+<PropTable componentLink="Chip" prop="leading"/>
+ ### trailing
+<PropTable componentLink="Chip" prop="trailing"/>
+ ### onPress
+<PropTable componentLink="Chip" prop="onPress"/>
+ ### selected
+<PropTable componentLink="Chip" prop="selected"/>
+ ### size
+<PropTable componentLink="Chip" prop="size"/>
+ ### UNSAFE_style
+<PropTable componentLink="Chip" prop="UNSAFE_style"/>
+ ### disableOnPress
+<PropTable componentLink="Chip" prop="disableOnPress"/>

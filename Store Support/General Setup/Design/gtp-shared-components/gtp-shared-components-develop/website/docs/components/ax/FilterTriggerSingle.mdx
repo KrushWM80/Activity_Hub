@@ -1,0 +1,47 @@
+---
+title: FilterTriggerSingle
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Show/hide a quick filter that has 3< options.
+- Use when needing to quickly apply a simple boolean filter to a data set or results list.
+- Don't use when what you really need is a tab that changes your data/results to a different view
+  without actually filtering down the list.
+
+
+<ScreenshotTabs screenshotData={"screenshots/filter-trigger-single.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {FilterTriggerSingle, Icons} from '@walmart/gtp-shared-components/ax`;
+
+<FilterTriggerSingle leading={<Icons.TruckIcon />}>
+  Closed
+</FilterTriggerSingle>
+<FilterTriggerSingle leading={<Icons.TruckIcon />} isOpen>
+  Opened
+</FilterTriggerSingle>
+<FilterTriggerSingle leading={<Icons.TruckIcon />} isApplied>
+  Closed Applied
+</FilterTriggerSingle>
+<FilterTriggerSingle leading={<Icons.TruckIcon />} isApplied isOpen>
+  Open Applied
+</FilterTriggerSingle>
+```
+## Props
+
+ ### children(required)
+<PropTable componentLink="FilterTriggerSingle" prop="children"/>
+ ### disabled
+<PropTable componentLink="FilterTriggerSingle" prop="disabled"/>
+ ### onPress
+<PropTable componentLink="FilterTriggerSingle" prop="onPress"/>
+ ### isApplied
+<PropTable componentLink="FilterTriggerSingle" prop="isApplied"/>
+ ### isOpen
+<PropTable componentLink="FilterTriggerSingle" prop="isOpen"/>
+ ### leading
+<PropTable componentLink="FilterTriggerSingle" prop="leading"/>
+ ### UNSAFE_style
+<PropTable componentLink="FilterTriggerSingle" prop="UNSAFE_style"/>

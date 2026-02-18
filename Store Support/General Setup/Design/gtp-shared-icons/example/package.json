@@ -1,0 +1,74 @@
+{
+  "name": "example",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android --port 6688",
+    "ios": "react-native run-ios --port 6688",
+    "start": "react-native start --port 6688",
+    "typecheck": "npx tsc -p . --noEmit",
+    "typecheck:watch": "npx tsc -p . --noEmit --watch",
+    "format": "npx prettier --write .",
+    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:watch": "npx esw . --clear --quiet --watch --ext .js,.jsx,.ts,.tsx",
+    "test": "npx jest"
+  },
+  "dependencies": {
+    "@react-native-masked-view/masked-view": "^0.3.0",
+    "@react-navigation/native": "^6.0.10",
+    "@react-navigation/stack": "^6.2.1",
+    "react": "18.2.0",
+    "react-native": "0.72.9",
+    "react-native-gesture-handler": "^1.10.3",
+    "react-native-safe-area-context": "^3.0.5",
+    "react-native-screens": "^3.21.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "@react-native/eslint-config": "^0.72.2",
+    "@react-native/metro-config": "^0.72.11",
+    "@tsconfig/react-native": "^3.0.0",
+    "@types/jest": "^29.2.1",
+    "@types/react-test-renderer": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/parser": "^5.7.0",
+    "babel-jest": "^29.2.1",
+    "eslint": "^8.19.0",
+    "eslint-watch": "^8.0.0",
+    "jest": "^29.2.1",
+    "metro-react-native-babel-preset": "0.76.8",
+    "prettier": "^2.5.1",
+    "react-test-renderer": "18.2.0",
+    "typescript": "4.8.4"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "resolutions": {
+    "@types/react": "^18.2.0",
+    "react-devtools-core": "4.27.2"
+  },
+  "jest": {
+    "rootDir": ".",
+    "preset": "react-native",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/.tmp/"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/.tmp/"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.tmp/"
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+---
+title: Spinner
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Spinners inform users of the processes, including retrieval
+of data, loading state and saving.
+
+Visually expresses an undetermined wait time, or unquantifiable task.
+The spinner dismisses when the process is completed.
+Spinners are not interactive.
+
+
+<ScreenshotTabs screenshotData={"screenshots/spinner.gif"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Spinner} from '@walmart/gtp-shared-components';
+
+<Spinner />
+<Spinner size="small" />
+<Spinner color="white" />
+<Spinner color="white" size="small" />
+```
+## Props
+
+ ### color
+<PropTable componentLink="Spinner" prop="color"/>
+ ### size
+<PropTable componentLink="Spinner" prop="size"/>
+ ### UNSAFE_style
+<PropTable componentLink="Spinner" prop="UNSAFE_style"/>
+ ### small<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Use <strong>size="small"</strong> instead.</span></span>
+<PropTable componentLink="Spinner" prop="small"/>

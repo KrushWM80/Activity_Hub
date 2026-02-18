@@ -1,0 +1,40 @@
+---
+title: Alert
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Alerts provide brief information and feedback to a user.
+
+
+<ScreenshotTabs screenshotData={{"short-text":"screenshots/alert.png","long-text":"screenshots/alert-long-text.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Alert} from '@walmart/gtp-shared-components;
+
+<Alert
+  variant="info"
+  children="This is an info alert"
+  actionButtonProps={{
+    children: 'Action',
+    onPress: () => Alert.alert('Action', 'Action pressed'),
+  }}
+/>
+```
+## Props
+
+ ### variant
+<PropTable componentLink="Alert" prop="variant"/>
+ ### children(required)
+<PropTable componentLink="Alert" prop="children"/>
+ ### actionButtonProps
+<PropTable componentLink="Alert" prop="actionButtonProps"/>
+ ### UNSAFE_style
+<PropTable componentLink="Alert" prop="UNSAFE_style"/>
+ ### iconAccessibilityLabel
+<PropTable componentLink="Alert" prop="iconAccessibilityLabel"/>
+ ### icon<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="Alert" prop="icon"/>
+ ### onDismiss<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="Alert" prop="onDismiss"/>

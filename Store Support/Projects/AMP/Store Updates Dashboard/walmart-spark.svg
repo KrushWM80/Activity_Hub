@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <g fill="#FFC220">
+    <!-- Center circle -->
+    <circle cx="50" cy="50" r="6"/>
+    
+    <!-- Top ray -->
+    <rect x="46" y="15" width="8" height="25" rx="4"/>
+    
+    <!-- Top-right ray -->
+    <rect x="65" y="25" width="25" height="8" rx="4" transform="rotate(45 77.5 29)"/>
+    
+    <!-- Right ray -->
+    <rect x="75" y="46" width="25" height="8" rx="4"/>
+    
+    <!-- Bottom-right ray -->
+    <rect x="65" y="67" width="25" height="8" rx="4" transform="rotate(-45 77.5 71)"/>
+    
+    <!-- Bottom ray -->
+    <rect x="46" y="75" width="8" height="25" rx="4"/>
+    
+    <!-- Bottom-left ray -->
+    <rect x="10" y="67" width="25" height="8" rx="4" transform="rotate(45 22.5 71)"/>
+    
+    <!-- Left ray -->
+    <rect x="0" y="46" width="25" height="8" rx="4"/>
+    
+    <!-- Top-left ray -->
+    <rect x="10" y="25" width="25" height="8" rx="4" transform="rotate(-45 22.5 29)"/>
+  </g>
+</svg>

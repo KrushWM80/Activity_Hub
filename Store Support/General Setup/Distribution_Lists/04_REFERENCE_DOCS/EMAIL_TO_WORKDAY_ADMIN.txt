@@ -1,0 +1,136 @@
+Subject: Request for Workday API Access - Distribution List Automation Project
+
+Hi [Workday Admin / IT Team],
+
+I'm working on automating our OPS Support Distribution List management and need to establish a direct API connection to Workday for real-time job data extraction.
+
+════════════════════════════════════════════════════════════════════════════════
+WHAT I NEED
+════════════════════════════════════════════════════════════════════════════════
+
+1. API Integration User Account
+   - Integration username for REST API access
+   - Integration password (or API token)
+   - Permissions: Read access to Job Master / Job Profiles
+
+2. Workday Instance Details
+   - Tenant name (likely "walmart")
+   - Base API URL (e.g., https://wd5-impl-services1.workday.com)
+   - API version (e.g., v1 or v2)
+
+3. RaaS Report URL (Recommended)
+   - Custom report for Job Master data export
+   - Should include these fields:
+     • Job Code (wm-jobcode from AD)
+     • Workday Job ID / Job Number
+     • Job Title / Job Description
+     • Job Family (optional)
+     • Job Level / Management Level (optional)
+     • Compensation Grade (optional)
+   - JSON or CSV output format
+
+════════════════════════════════════════════════════════════════════════════════
+PROJECT CONTEXT
+════════════════════════════════════════════════════════════════════════════════
+
+• Purpose: Automated mapping of AD job codes to Workday job descriptions
+• Scope: 2,684 users across 3 AD groups (OPS_SUP teams)
+• Job Codes: ~245 unique codes to map
+• Frequency: Will query monthly for updates (minimal API load)
+• Security: Using secure credential storage, no data sharing outside team
+
+════════════════════════════════════════════════════════════════════════════════
+USE CASE
+════════════════════════════════════════════════════════════════════════════════
+
+Current manual process:
+1. Extract users from AD (with job codes)
+2. Manually request job descriptions from HR
+3. Wait 1-3 days for CSV export
+4. Merge data manually
+
+Automated process with API:
+1. Extract users from AD (with job codes)
+2. Query Workday API automatically
+3. Real-time job description mapping
+4. Instant distribution list creation
+
+════════════════════════════════════════════════════════════════════════════════
+ALTERNATIVE OPTION (If API Access Takes Time)
+════════════════════════════════════════════════════════════════════════════════
+
+If setting up API access requires extensive approvals, could you please:
+
+• Create a scheduled RaaS report that exports Job Master data daily/weekly
+• Share the report URL or auto-email the CSV export
+• This would still automate the process without needing API credentials
+
+════════════════════════════════════════════════════════════════════════════════
+SECURITY CONSIDERATIONS
+════════════════════════════════════════════════════════════════════════════════
+
+✓ Read-only access required (no write/update operations)
+✓ Credentials will be stored in encrypted config file
+✓ API queries logged for audit trail
+✓ Only job/position data needed (no personal/compensation details)
+✓ Access limited to authorized personnel only
+
+════════════════════════════════════════════════════════════════════════════════
+TIMELINE
+════════════════════════════════════════════════════════════════════════════════
+
+• Immediate need: One-time bulk export of job codes
+• Long-term: API access for monthly automated updates
+• No rush if approval process required - we can use manual CSV in interim
+
+════════════════════════════════════════════════════════════════════════════════
+TECHNICAL DETAILS
+════════════════════════════════════════════════════════════════════════════════
+
+Integration method: Python script using Workday REST API
+Authentication: Basic Auth or OAuth (whatever you recommend)
+API endpoints needed:
+  • Job Profiles / Job Master
+  • Job Code lookup
+
+Example API call (for reference):
+GET /ccx/service/walmart/Human_Resources/v1/Job_Profiles?Job_Code=800469
+
+════════════════════════════════════════════════════════════════════════════════
+QUESTIONS I CAN ANSWER
+════════════════════════════════════════════════════════════════════════════════
+
+• What specific job codes do you need?
+  → We have a list of ~245 unique codes extracted from AD
+
+• How often will you query the API?
+  → Monthly bulk updates (not real-time constant queries)
+
+• What data fields do you need?
+  → Job Code, Job ID/Number, Job Title/Description (minimum)
+
+• Who will have access?
+  → [Your name/team] for OPS Support distribution list management
+
+════════════════════════════════════════════════════════════════════════════════
+
+Please let me know:
+1. If you can provide API access - what's the process and timeline?
+2. If you need any additional information or approvals
+3. If there's an alternative automated solution you'd recommend
+
+I'm happy to schedule a quick call to discuss technical requirements if needed.
+
+Thank you for your help!
+
+Best regards,
+[Your Name]
+[Your Title]
+[Contact Information]
+
+════════════════════════════════════════════════════════════════════════════════
+ATTACHMENTS (if helpful)
+════════════════════════════════════════════════════════════════════════════════
+• List of job codes we need to map (can provide separately)
+• Technical documentation of our integration approach
+• Sample output format we're expecting

@@ -1,0 +1,17 @@
+# http://insights.walmart.com/docs/hygieia/metadata.html
+# https://gecgithub01.walmart.com/devtools/insights-tools
+# https://gecgithub01.walmart.com/devtools/insights-tools/blob/main/languages.yml
+---
+team:
+  - id: 3835 # CE - Project Glass
+languages: # An array of one or more of the following language ecosystems:
+  - Android
+  - CSS # Cascading Style Sheets
+  - iOS # Swift or Objective-C
+  - JavaScript # Front end or back end JavasScript
+  - Shell # Any of the multitude of Shell Scripting languages: Bash, Csh,  Ksh, Zsh, Sh
+product:
+  - {}
+cloud:
+  - autoRestart: false
+ignoreNotify: false

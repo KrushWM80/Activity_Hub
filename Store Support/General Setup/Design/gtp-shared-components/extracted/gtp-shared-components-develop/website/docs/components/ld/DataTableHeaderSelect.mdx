@@ -1,0 +1,49 @@
+---
+title: DataTableHeaderSelect
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Column selection is implemented with the DataTableHeaderSelect and DataTableCellSelect components.
+
+
+
+## Usage
+```js
+import {DataTableHeaderSelect} from '@walmart/gtp-shared-components`;
+
+const [simpleCellChecked, setSimpleCellChecked] = React.useState(false);
+
+<DataTableHeaderSelect
+ name={'Options'}
+ numberOfColumns ={1}
+ alignment={'right'}
+ onChange={()=>setSimpleCellChecked(!simpleCellChecked)}
+ checked={simpleCellChecked}
+/>
+```
+## Props
+
+ ### a11yCheckboxLabel
+<PropTable componentLink="DataTableHeaderSelect" prop="a11yCheckboxLabel"/>
+ ### checkboxProps
+<PropTable componentLink="DataTableHeaderSelect" prop="checkboxProps"/>
+ ### checked
+<PropTable componentLink="DataTableHeaderSelect" prop="checked"/>
+ ### disabled
+<PropTable componentLink="DataTableHeaderSelect" prop="disabled"/>
+ ### indeterminate
+<PropTable componentLink="DataTableHeaderSelect" prop="indeterminate"/>
+ ### name
+<PropTable componentLink="DataTableHeaderSelect" prop="name"/>
+ ### onChange(required)
+<PropTable componentLink="DataTableHeaderSelect" prop="onChange"/>
+ ### alignment
+<PropTable componentLink="DataTableHeaderSelect" prop="alignment"/>
+ ### width
+<PropTable componentLink="DataTableHeaderSelect" prop="width"/>
+ ### numberOfColumns(required)
+<PropTable componentLink="DataTableHeaderSelect" prop="numberOfColumns"/>
+ ### UNSAFE_style
+<PropTable componentLink="DataTableHeaderSelect" prop="UNSAFE_style"/>

@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Refresh Checklist - Notes Analysis Report</title>
+    <style>
+        :root {
+            --walmart-blue: #0071ce;
+            --walmart-yellow: #ffc220;
+            --dark-blue: #004c91;
+            --light-gray: #f5f5f5;
+            --border-gray: #e0e0e0;
+            --text-dark: #333;
+            --success-green: #2e7d32;
+            --warning-orange: #f57c00;
+            --error-red: #c62828;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: #fff;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--walmart-blue), var(--dark-blue));
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        header .meta {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .executive-summary {
+            background: var(--light-gray);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--walmart-yellow);
+        }
+        
+        .executive-summary h2 {
+            color: var(--dark-blue);
+            margin-bottom: 15px;
+        }
+        
+        .key-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .metric-card .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--walmart-blue);
+        }
+        
+        .metric-card .label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        section {
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            color: var(--dark-blue);
+            border-bottom: 2px solid var(--walmart-blue);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        h3 {
+            color: var(--walmart-blue);
+            margin: 20px 0 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+        
+        th {
+            background: var(--walmart-blue);
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-gray);
+        }
+        
+        tr:hover {
+            background: var(--light-gray);
+        }
+        
+        tr:nth-child(even) {
+            background: #fafafa;
+        }
+        
+        .highlight-row {
+            background: #fff3cd !important;
+        }
+        
+        .number {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .percentage {
+            text-align: center;
+        }
+        
+        .recommendation-card {
+            background: white;
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .recommendation-card.high {
+            border-left: 4px solid var(--error-red);
+        }
+        
+        .recommendation-card.medium {
+            border-left: 4px solid var(--warning-orange);
+        }
+        
+        .recommendation-card.low {
+            border-left: 4px solid var(--success-green);
+        }
+        
+        .priority-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .priority-badge.high {
+            background: #ffebee;
+            color: var(--error-red);
+        }
+        
+        .priority-badge.medium {
+            background: #fff3e0;
+            color: var(--warning-orange);
+        }
+        
+        .priority-badge.low {
+            background: #e8f5e9;
+            color: var(--success-green);
+        }
+        
+        .bar-chart {
+            margin: 20px 0;
+        }
+        
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .bar-label {
+            width: 100px;
+            font-size: 0.85rem;
+            text-align: right;
+            padding-right: 10px;
+        }
+        
+        .bar-container {
+            flex: 1;
+            background: var(--light-gray);
+            height: 24px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--walmart-blue), var(--dark-blue));
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .bar-value {
+            width: 80px;
+            text-align: right;
+            font-size: 0.85rem;
+            padding-left: 10px;
+        }
+        
+        .insight-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--walmart-blue);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box strong {
+            color: var(--dark-blue);
+        }
+        
+        .sample-notes {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .sample-note {
+            background: white;
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 4px;
+            border-left: 3px solid var(--walmart-yellow);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .impact-summary {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .impact-summary h3 {
+            color: var(--success-green);
+        }
+        
+        .impact-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--success-green);
+        }
+        
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-gray);
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .toc {
+            background: var(--light-gray);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .toc h3 {
+            margin-bottom: 10px;
+        }
+        
+        .toc ul {
+            list-style: none;
+            columns: 2;
+        }
+        
+        .toc li {
+            padding: 5px 0;
+        }
+        
+        .toc a {
+            color: var(--walmart-blue);
+            text-decoration: none;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        @media print {
+            body {
+                max-width: 100%;
+            }
+            
+            header {
+                background: var(--walmart-blue) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Store Refresh Checklist - Notes Analysis Report</h1>
+        <div class="meta">
+            <strong>Generated:</strong> February 16, 2026 &nbsp;|&nbsp;
+            <strong>Data Source:</strong> 874,557 Assignment Records &nbsp;|&nbsp;
+            <strong>Period:</strong> January 2026 Refresh Cycle
+        </div>
+    </header>
+
+    <nav class="toc no-print">
+        <h3>Table of Contents</h3>
+        <ul>
+            <li><a href="#executive-summary">Executive Summary</a></li>
+            <li><a href="#categories">1. Notes Categories</a></li>
+            <li><a href="#not-available">2. "Not Available" Analysis</a></li>
+            <li><a href="#sc-div1">3. SC/DIV1-Only Deep Dive</a></li>
+            <li><a href="#all-format">4. All-Format Analysis</a></li>
+            <li><a href="#specific-actions">5. Specific Action Notes</a></li>
+            <li><a href="#recommendations">6. Recommendations</a></li>
+            <li><a href="#roles">7. Assignment Roles</a></li>
+            <li><a href="#timing">8. Completion Timing</a></li>
+            <li><a href="#top-questions">9. Top Questions</a></li>
+            <li><a href="#conclusion">10. Conclusion</a></li>
+        </ul>
+    </nav>
+
+    <section id="executive-summary" class="executive-summary">
+        <h2>Executive Summary</h2>
+        <p>This report analyzes <strong>126,104 notes</strong> from store associates completing the Store Refresh checklist. The analysis identifies patterns in associate feedback, highlights opportunities for checklist improvements, and provides insights into assignment workflows.</p>
+        
+        <div class="key-metrics">
+            <div class="metric-card">
+                <div class="value">874,557</div>
+                <div class="label">Total Assignments</div>
+            </div>
+            <div class="metric-card">
+                <div class="value">126,104</div>
+                <div class="label">Assignments with Notes (14.4%)</div>
+            </div>
+            <div class="metric-card">
+                <div class="value">3,830</div>
+                <div class="label">Unique Stores with Notes</div>
+            </div>
+            <div class="metric-card">
+                <div class="value">49.1%</div>
+                <div class="label">Completion Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="value">2 days</div>
+                <div class="label">Median Completion Time</div>
+            </div>
+            <div class="metric-card">
+                <div class="value">330</div>
+                <div class="label">Questions with Notes</div>
+            </div>
+        </div>
+
+        <h3>Top Recommendations</h3>
+        <ol>
+            <li><strong>Add store feature filters</strong> to hide irrelevant questions (ACC, Fuel Station, InHome)</li>
+            <li><strong>Add regional filters</strong> for California-specific questions</li>
+            <li><strong>Reduce "Not Available" friction</strong> - could eliminate ~17,000+ unnecessary notes</li>
+        </ol>
+    </section>
+
+    <section id="categories">
+        <h2>1. Notes Categories Breakdown</h2>
+        <p>Of the 126,104 notes analyzed, associates provided feedback in these categories:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Count</th>
+                    <th class="percentage">Percentage</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="highlight-row">
+                    <td><strong>Specific Action</strong></td>
+                    <td class="number">71,918</td>
+                    <td class="percentage">57.0%</td>
+                    <td>Detailed actions taken by associates</td>
+                </tr>
+                <tr>
+                    <td><strong>Not Available</strong></td>
+                    <td class="number">22,401</td>
+                    <td class="percentage">17.8%</td>
+                    <td>Item/service doesn't exist at store</td>
+                </tr>
+                <tr>
+                    <td><strong>Ordering/Supplies</strong></td>
+                    <td class="number">15,179</td>
+                    <td class="percentage">12.0%</td>
+                    <td>Items ordered or supply requests</td>
+                </tr>
+                <tr>
+                    <td><strong>Completion Status</strong></td>
+                    <td class="number">13,308</td>
+                    <td class="percentage">10.6%</td>
+                    <td>Already complete, in progress, etc.</td>
+                </tr>
+                <tr>
+                    <td><strong>Repair Needed</strong></td>
+                    <td class="number">2,548</td>
+                    <td class="percentage">2.0%</td>
+                    <td>Maintenance/repair requests</td>
+                </tr>
+                <tr>
+                    <td><strong>Work Order</strong></td>
+                    <td class="number">2,091</td>
+                    <td class="percentage">1.7%</td>
+                    <td>Work orders submitted</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="insight-box">
+            <strong>Insight:</strong> The high percentage of "Not Available" notes (17.8%) indicates opportunities to improve question filtering based on store features.
+        </div>
+    </section>
+
+    <section id="not-available">
+        <h2>2. "Not Available" Notes Analysis (22,401 total)</h2>
+        
+        <h3>2.1 By Store Format Type</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Format Type</th>
+                    <th class="number">Count</th>
+                    <th class="number">Stores</th>
+                    <th class="number">Questions</th>
+                    <th>Key Issue</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="highlight-row">
+                    <td><strong>SC/DIV1-Only Questions</strong></td>
+                    <td class="number">12,647</td>
+                    <td class="number">1,515</td>
+                    <td class="number">110</td>
+                    <td>NHM stores seeing SC-specific questions</td>
+                </tr>
+                <tr>
+                    <td><strong>All-Format Questions</strong></td>
+                    <td class="number">9,702</td>
+                    <td class="number">2,306</td>
+                    <td class="number">177</td>
+                    <td>Universal questions that don't apply</td>
+                </tr>
+                <tr>
+                    <td><strong>NHM-Only Questions</strong></td>
+                    <td class="number">51</td>
+                    <td class="number">51</td>
+                    <td class="number">2</td>
+                    <td>SC/DIV1 stores seeing NHM questions</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>2.2 By Area</h3>
+        <div class="bar-chart">
+            <div class="bar-row">
+                <div class="bar-label">ACC</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 100%;">10,934 (48.8%)</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">Fulfillment</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 28%;">3,053</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">Fresh</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 20%;">2,198</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">Backroom</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 18%;">1,954</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">Front End</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 16%;">1,765</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">Asset Prot.</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 14%;">1,539</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">Salesfloor</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 6%;">639</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">Fashion</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 3%;">318</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="sc-div1">
+        <h2>3. SC/DIV1-Only "Not Available" Deep Dive (12,647 notes)</h2>
+        <p>These notes come from <strong>Neighborhood Market stores</strong> being shown questions designed for <strong>Supercenters/Division 1</strong> stores.</p>
+
+        <h3>Top 20 Questions Generating N/A Notes</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th class="number">Rank</th>
+                    <th>Question ID</th>
+                    <th class="number">Count</th>
+                    <th>Area</th>
+                    <th>Topic</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="number">1</td><td>Q_75</td><td class="number">489</td><td>Asset Protection</td><td>Receiving/Claims (DSL stores only)</td></tr>
+                <tr><td class="number">2</td><td>Q_38</td><td class="number">332</td><td>Backroom</td><td>FAST Unloader Equipment</td></tr>
+                <tr><td class="number">3</td><td>Q_242</td><td class="number">329</td><td>ACC</td><td>Lower Bay/Upper Bay</td></tr>
+                <tr><td class="number">4</td><td>Q_255</td><td class="number">319</td><td>ACC</td><td>Oil Bay/Filter Modular</td></tr>
+                <tr><td class="number">5</td><td>Q_224</td><td class="number">287</td><td>ACC</td><td>Exterior Service Writer Station</td></tr>
+                <tr><td class="number">6</td><td>Q_254</td><td class="number">266</td><td>ACC</td><td>Oil Bay/Filter Modular</td></tr>
+                <tr><td class="number">7</td><td>Q_229</td><td class="number">243</td><td>ACC</td><td>Tools Boards/Wheel Weight</td></tr>
+                <tr><td class="number">8</td><td>Q_227</td><td class="number">241</td><td>ACC</td><td>Service Area</td></tr>
+                <tr><td class="number">9</td><td>Q_243</td><td class="number">241</td><td>ACC</td><td>Lower Bay/Upper Bay</td></tr>
+                <tr><td class="number">10</td><td>Q_225</td><td class="number">239</td><td>ACC</td><td>Exterior Signing</td></tr>
+                <tr><td class="number">11</td><td>Q_228</td><td class="number">229</td><td>ACC</td><td>Tools Boards/Wheel Weight</td></tr>
+                <tr><td class="number">12</td><td>Q_230</td><td class="number">229</td><td>ACC</td><td>Tools Boards/Wheel Weight</td></tr>
+                <tr><td class="number">13</td><td>Q_232</td><td class="number">227</td><td>ACC</td><td>Tools Boards/Wheel Weight</td></tr>
+                <tr><td class="number">14</td><td>Q_226</td><td class="number">226</td><td>ACC</td><td>Exterior Signing</td></tr>
+                <tr><td class="number">15</td><td>Q_239</td><td class="number">223</td><td>ACC</td><td>Lower Bay/Upper Bay</td></tr>
+                <tr><td class="number">16</td><td>Q_231</td><td class="number">221</td><td>ACC</td><td>Tools Boards/Wheel Weight</td></tr>
+                <tr><td class="number">17</td><td>Q_238</td><td class="number">218</td><td>ACC</td><td>Service Area Equipment</td></tr>
+                <tr><td class="number">18</td><td>Q_246</td><td class="number">216</td><td>ACC</td><td>Backroom</td></tr>
+                <tr><td class="number">19</td><td>Q_234</td><td class="number">212</td><td>ACC</td><td>Service Area Equipment</td></tr>
+                <tr><td class="number">20</td><td>Q_233</td><td class="number">211</td><td>ACC</td><td>Service Area Equipment</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Sample Associate Notes</h3>
+        <div class="sample-notes">
+            <div class="sample-note">"We do not have an ACC"</div>
+            <div class="sample-note">"not available in store"</div>
+            <div class="sample-note">"N/A"</div>
+        </div>
+
+        <div class="insight-box">
+            <strong>Key Finding:</strong> ~90% of SC/DIV1-Only "Not Available" notes are ACC questions being shown to stores without Auto Care Centers. This is a checklist filtering issue.
+        </div>
+    </section>
+
+    <section id="all-format">
+        <h2>4. All-Format "Not Available" Analysis (9,702 notes)</h2>
+        <p>These are questions sent to <strong>all store formats</strong> but still receive "Not Available" responses.</p>
+
+        <h3>Top Questions Driving N/A Notes</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Question ID</th>
+                    <th class="number">Count</th>
+                    <th>Area</th>
+                    <th>Topic</th>
+                    <th>Root Cause</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="highlight-row"><td>Q_68</td><td class="number">928</td><td>Asset Protection</td><td>Security</td><td><strong>No Fuel Station</strong></td></tr>
+                <tr><td>Q_33</td><td class="number">602</td><td>Backroom</td><td>Compactor/Baler</td><td><strong>Non-California</strong></td></tr>
+                <tr><td>Q_223</td><td class="number">593</td><td>Store Fulfillment</td><td>InHome</td><td><strong>No InHome program</strong></td></tr>
+                <tr><td>Q_202</td><td class="number">585</td><td>Store Fulfillment</td><td>Equipment</td><td><strong>No InHome program</strong></td></tr>
+                <tr><td>Q_220</td><td class="number">583</td><td>Store Fulfillment</td><td>InHome</td><td><strong>No InHome program</strong></td></tr>
+                <tr><td>Q_221</td><td class="number">582</td><td>Store Fulfillment</td><td>InHome</td><td><strong>No InHome program</strong></td></tr>
+                <tr><td>Q_222</td><td class="number">503</td><td>Store Fulfillment</td><td>InHome</td><td><strong>No InHome program</strong></td></tr>
+                <tr><td>Q_307</td><td class="number">464</td><td>Front End</td><td>Service Desk</td><td><strong>NHM layout N/A for SC</strong></td></tr>
+                <tr><td>Q_41</td><td class="number">303</td><td>Backroom</td><td>Fixture Cage</td><td>Not applicable</td></tr>
+                <tr><td>Q_282</td><td class="number">238</td><td>Front End</td><td>First Impressions</td><td><strong>No smoking canopy</strong></td></tr>
+            </tbody>
+        </table>
+
+        <h3>Sample Associate Notes</h3>
+        <div class="sample-notes">
+            <div class="sample-note">"we are not California" (Q_33)</div>
+            <div class="sample-note">"N/A" (InHome questions)</div>
+            <div class="sample-note">"we don't have the space to do it" (Q_301)</div>
+        </div>
+    </section>
+
+    <section id="specific-actions">
+        <h2>5. Specific Action Notes Analysis (102,760 notes)</h2>
+        <p>These notes describe actual actions taken by associates.</p>
+
+        <h3>Action Categories</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Count</th>
+                    <th class="percentage">%</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Uncategorized</strong></td><td class="number">70,340</td><td class="percentage">68.5%</td><td>Unique/mixed actions</td></tr>
+                <tr class="highlight-row"><td><strong>Ordered</strong></td><td class="number">9,669</td><td class="percentage">9.4%</td><td>Supplies/equipment ordered via GNFR</td></tr>
+                <tr><td><strong>Issues Found</strong></td><td class="number">4,631</td><td class="percentage">4.5%</td><td>Missing, broken, damaged items</td></tr>
+                <tr><td><strong>Cleaned</strong></td><td class="number">4,076</td><td class="percentage">4.0%</td><td>Cleaning/sanitization completed</td></tr>
+                <tr><td><strong>Verified</strong></td><td class="number">3,754</td><td class="percentage">3.7%</td><td>Inspected/confirmed items</td></tr>
+                <tr><td><strong>Submitted</strong></td><td class="number">3,453</td><td class="percentage">3.4%</td><td>Work orders/tickets submitted</td></tr>
+                <tr><td><strong>Replaced</strong></td><td class="number">2,646</td><td class="percentage">2.6%</td><td>Items replaced/swapped</td></tr>
+                <tr><td><strong>Good Condition</strong></td><td class="number">2,614</td><td class="percentage">2.5%</td><td>Confirmed in good shape</td></tr>
+                <tr><td><strong>Delegation</strong></td><td class="number">2,256</td><td class="percentage">2.2%</td><td>Assigned to team lead/coach</td></tr>
+                <tr><td><strong>Waiting</strong></td><td class="number">1,900</td><td class="percentage">1.8%</td><td>Pending delivery/backorder</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Top Actions by Area</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>#1 Area</th>
+                    <th>#2 Area</th>
+                    <th>#3 Area</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Ordered</strong></td><td>Front End (2,189)</td><td>Asset Protection (1,738)</td><td>Backroom (1,617)</td></tr>
+                <tr><td><strong>Issues Found</strong></td><td>Fresh (988)</td><td>Front End (779)</td><td>Backroom (693)</td></tr>
+                <tr><td><strong>Cleaned</strong></td><td>Fresh (1,230)</td><td>Backroom (960)</td><td>Front End (823)</td></tr>
+                <tr><td><strong>Verified</strong></td><td>Fresh (774)</td><td>Front End (757)</td><td>Asset Protection (628)</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="recommendations">
+        <h2>6. Recommended Question Improvements</h2>
+
+        <div class="recommendation-card high">
+            <span class="priority-badge high">High Priority</span>
+            <h3>Add Store Feature Filters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Area</th>
+                        <th>Issue</th>
+                        <th>Recommendation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>All ACC Questions (Q_224-Q_267)</td><td>ACC</td><td>10,934 N/A from NHM</td><td>Add: "Does store have ACC?" → Hide if No</td></tr>
+                    <tr><td>Q_68 (Fuel Station panic buttons)</td><td>Asset Protection</td><td>928 N/A</td><td>Add: "Does store have Fuel Station?"</td></tr>
+                    <tr><td>Q_33 (California baler keys)</td><td>Backroom</td><td>602 N/A</td><td>Filter: Store state = California only</td></tr>
+                    <tr><td>InHome Questions (Q_202, Q_220-223)</td><td>Store Fulfillment</td><td>~2,846 N/A</td><td>Add: "Does store have InHome program?"</td></tr>
+                    <tr><td>Q_307 (NHM Service Desk Layout)</td><td>Front End</td><td>464 N/A from SC</td><td>Make NHM-format only</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="recommendation-card medium">
+            <span class="priority-badge medium">Medium Priority</span>
+            <h3>Clarify Department Existence</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Area</th>
+                        <th>Issue</th>
+                        <th>Recommendation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Q_100 (Bakery)</td><td>Fresh</td><td>144 "no bakery"</td><td>Pre-question: "Does store have Bakery?"</td></tr>
+                    <tr><td>Q_93 (Meat)</td><td>Fresh</td><td>130 N/A</td><td>Pre-question: "Does store have Meat dept?"</td></tr>
+                    <tr><td>Q_324-326 (Kiosks/Vending)</td><td>Front End</td><td>~358 N/A</td><td>Add: "Does store have kiosks?"</td></tr>
+                    <tr><td>Q_331 (Tenant Services)</td><td>Front End</td><td>160 N/A</td><td>Add: "Does store have tenant services?"</td></tr>
+                    <tr><td>Q_75 (DSL Blue Tote)</td><td>Asset Protection</td><td>489 N/A</td><td>Add: "Is store a DSL store?"</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="recommendation-card low">
+            <span class="priority-badge low">Lower Priority</span>
+            <h3>Clarify Question Text</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Area</th>
+                        <th>Issue</th>
+                        <th>Suggestion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Q_41 (Fixture Cage)</td><td>Backroom</td><td>303 N/A</td><td>Add "if applicable" or pre-filter</td></tr>
+                    <tr><td>Q_282 (Smoking Area Canopy)</td><td>Front End</td><td>238 N/A</td><td>Add "if your store has one"</td></tr>
+                    <tr><td>Q_48 (Trailers)</td><td>Backroom</td><td>129 N/A</td><td>Add "if your store has trailer area"</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="impact-summary">
+            <h3>Estimated Impact</h3>
+            <p>Implementing smart filtering could eliminate:</p>
+            <div class="impact-number">~17,055+ Notes</div>
+            <p>(76% of all "Not Available" notes)</p>
+            
+            <table style="margin-top: 20px; background: white;">
+                <thead>
+                    <tr>
+                        <th>Filter</th>
+                        <th class="number">Notes Eliminated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>ACC Store Feature</td><td class="number">~10,934</td></tr>
+                    <tr><td>InHome Program</td><td class="number">~2,846</td></tr>
+                    <tr><td>Fuel Station</td><td class="number">~928</td></tr>
+                    <tr><td>California Stores</td><td class="number">~602</td></tr>
+                    <tr><td>DSL Store</td><td class="number">~489</td></tr>
+                    <tr><td>NHM Service Desk</td><td class="number">~464</td></tr>
+                    <tr><td>Tenant/Kiosk Services</td><td class="number">~518</td></tr>
+                    <tr><td>Fresh Departments</td><td class="number">~274</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="roles">
+        <h2>7. Assignment Role Patterns</h2>
+
+        <div class="two-column">
+            <div>
+                <h3>Overall Statistics</h3>
+                <table>
+                    <tbody>
+                        <tr><td>Total Assignments</td><td class="number">874,557</td></tr>
+                        <tr><td>Unique Assigners</td><td class="number">38,011</td></tr>
+                        <tr><td>Unique Assignees</td><td class="number">79,354</td></tr>
+                        <tr><td>Self-Assigned</td><td class="number">387,489 (44.3%)</td></tr>
+                        <tr><td>Cross-Assigned</td><td class="number">487,068 (55.7%)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3>Store-Level Patterns</h3>
+                <table>
+                    <tbody>
+                        <tr><td>Total Stores</td><td class="number">4,102</td></tr>
+                        <tr><td>Avg Assigners per Store</td><td class="number">9.3</td></tr>
+                        <tr><td>Avg Assignees per Store</td><td class="number">19.3</td></tr>
+                        <tr><td>Avg Self-Assigned %</td><td class="number">45.5%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <h3>Top Assignees by Task Completion</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th class="number">Tasks Received</th>
+                    <th class="percentage">Completion Rate</th>
+                    <th class="number">Stores</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>htgrady</td><td class="number">316</td><td class="percentage">99.4%</td><td class="number">1</td></tr>
+                <tr><td>jmf00a7</td><td class="number">266</td><td class="percentage">100.0%</td><td class="number">1</td></tr>
+                <tr><td>k0t00tr</td><td class="number">260</td><td class="percentage">99.2%</td><td class="number">1</td></tr>
+                <tr><td>j0g0r1x</td><td class="number">253</td><td class="percentage">100.0%</td><td class="number">1</td></tr>
+                <tr><td>w0m00se</td><td class="number">227</td><td class="percentage">67.0%</td><td class="number">1</td></tr>
+                <tr><td>bnfox</td><td class="number">220</td><td class="percentage">89.5%</td><td class="number">1</td></tr>
+                <tr><td>r0s021o</td><td class="number">202</td><td class="percentage">100.0%</td><td class="number">1</td></tr>
+                <tr><td>sadean</td><td class="number">197</td><td class="percentage">100.0%</td><td class="number">1</td></tr>
+                <tr><td>dzwrigh</td><td class="number">195</td><td class="percentage">98.5%</td><td class="number">1</td></tr>
+                <tr><td>cms00f3</td><td class="number">193</td><td class="percentage">97.9%</td><td class="number">1</td></tr>
+            </tbody>
+        </table>
+
+        <div class="insight-box">
+            <strong>Key Insight:</strong> All top assigners operate within single stores, indicating store-level management rather than market/regional assignment patterns.
+        </div>
+    </section>
+
+    <section id="timing">
+        <h2>8. Assignment-to-Completion Timing</h2>
+
+        <div class="two-column">
+            <div>
+                <h3>Overall Status</h3>
+                <table>
+                    <tbody>
+                        <tr><td>Total Completed</td><td class="number">429,743</td></tr>
+                        <tr><td>Total Pending</td><td class="number">444,814</td></tr>
+                        <tr><td>Completion Rate</td><td class="number">49.1%</td></tr>
+                        <tr><td>With Timing Data</td><td class="number">241,913</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3>Completion Time Statistics</h3>
+                <table>
+                    <tbody>
+                        <tr><td>Minimum</td><td class="number">0 days</td></tr>
+                        <tr><td>25th Percentile</td><td class="number">1 day</td></tr>
+                        <tr class="highlight-row"><td><strong>Median</strong></td><td class="number"><strong>2 days</strong></td></tr>
+                        <tr><td>Mean</td><td class="number">2.8 days</td></tr>
+                        <tr><td>75th Percentile</td><td class="number">4 days</td></tr>
+                        <tr><td>90th Percentile</td><td class="number">6 days</td></tr>
+                        <tr><td>95th Percentile</td><td class="number">7 days</td></tr>
+                        <tr><td>Maximum</td><td class="number">18 days</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <h3>Speed Categories</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="number">Count</th>
+                    <th class="percentage">Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Quick</strong> (&lt;1 day)</td><td class="number">45,637</td><td class="percentage">18.9%</td></tr>
+                <tr class="highlight-row"><td><strong>Normal</strong> (1-7 days)</td><td class="number">187,770</td><td class="percentage">77.6%</td></tr>
+                <tr><td><strong>Slow</strong> (8-14 days)</td><td class="number">8,492</td><td class="percentage">3.5%</td></tr>
+                <tr><td><strong>Very Slow</strong> (&gt;14 days)</td><td class="number">14</td><td class="percentage">0.0%</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Time Distribution</h3>
+        <div class="bar-chart">
+            <div class="bar-row">
+                <div class="bar-label">0 days</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 100%;">45,637 (18.9%)</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">1 day</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 91%;">41,345 (17.1%)</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">2 days</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 83%;">37,878 (15.7%)</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">3 days</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 77%;">35,241 (14.6%)</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">4 days</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 60%;">27,508 (11.4%)</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">5 days</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 42%;">19,307 (8.0%)</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">6 days</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 36%;">16,208 (6.7%)</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-label">7 days</div>
+                <div class="bar-container">
+                    <div class="bar" style="width: 23%;">10,283 (4.3%)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-box">
+            <strong>Key Insights:</strong>
+            <ul style="margin-top: 10px; padding-left: 20px;">
+                <li><strong>97% of tasks complete within 1 week</strong> - Strong performance</li>
+                <li><strong>Median 2 days</strong> - Most tasks completed quickly</li>
+                <li><strong>19% same-day completion</strong> - Quick turnaround for urgent items</li>
+                <li><strong>Only 3.5% take &gt;7 days</strong> - Few stragglers</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="top-questions">
+        <h2>9. Top Questions by Note Count</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th class="number">Rank</th>
+                    <th>Question ID</th>
+                    <th>Area</th>
+                    <th>Topic</th>
+                    <th class="number">Note Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="number">1</td><td>Q_68</td><td>Asset Protection</td><td>Security (Fuel Station)</td><td class="number">1,728</td></tr>
+                <tr><td class="number">2</td><td>Q_67</td><td>Asset Protection</td><td>CCTV System</td><td class="number">1,175</td></tr>
+                <tr><td class="number">3</td><td>Q_202</td><td>Store Fulfillment</td><td>InHome Equipment</td><td class="number">1,107</td></tr>
+                <tr><td class="number">4</td><td>Q_33</td><td>Backroom</td><td>California Baler Keys</td><td class="number">1,081</td></tr>
+                <tr><td class="number">5</td><td>Q_221</td><td>Store Fulfillment</td><td>InHome Vehicle Guide</td><td class="number">1,041</td></tr>
+                <tr><td class="number">6</td><td>Q_223</td><td>Store Fulfillment</td><td>InHome Pre-trip</td><td class="number">1,037</td></tr>
+                <tr><td class="number">7</td><td>Q_220</td><td>Store Fulfillment</td><td>InHome Shift Guide</td><td class="number">1,000</td></tr>
+                <tr><td class="number">8</td><td>Q_70</td><td>Asset Protection</td><td>Call Boxes</td><td class="number">991</td></tr>
+                <tr><td class="number">9</td><td>Q_222</td><td>Store Fulfillment</td><td>InHome Uniforms</td><td class="number">990</td></tr>
+                <tr><td class="number">10</td><td>Q_75</td><td>Asset Protection</td><td>DSL Blue Tote</td><td class="number">889</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="conclusion">
+        <h2>10. Conclusion & Next Steps</h2>
+
+        <h3>Summary</h3>
+        <ul style="padding-left: 20px; margin: 15px 0;">
+            <li><strong>22,401 "Not Available" notes</strong> (17.8% of all notes) represent unnecessary friction</li>
+            <li><strong>ACC questions account for 49%</strong> of all N/A notes - stores without ACC still see these</li>
+            <li><strong>InHome questions generate 2,846 N/A notes</strong> from non-InHome stores</li>
+            <li><strong>California-specific questions</strong> shown to all stores nationally</li>
+        </ul>
+
+        <h3>Recommended Actions</h3>
+        <div class="two-column">
+            <div class="recommendation-card">
+                <h4>1. Implement Store Feature Filters</h4>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>ACC presence</li>
+                    <li>Fuel Station presence</li>
+                    <li>InHome program participation</li>
+                    <li>State-based filtering (California)</li>
+                </ul>
+            </div>
+            <div class="recommendation-card">
+                <h4>2. Add Department Existence Checks</h4>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>Bakery, Meat, Fashion departments</li>
+                    <li>Tenant services, Kiosks</li>
+                </ul>
+            </div>
+            <div class="recommendation-card">
+                <h4>3. Review Assignment Workflow</h4>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>49.1% completion rate indicates room for improvement</li>
+                    <li>Consider deadline reminders</li>
+                </ul>
+            </div>
+            <div class="recommendation-card">
+                <h4>4. Leverage High Performers</h4>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>Multiple associates show 100% completion rates</li>
+                    <li>Identify best practices from top performers</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>Store Refresh Checklist - Notes Analysis Report</strong></p>
+        <p>Generated: February 16, 2026 | Data Period: January 2026 Refresh Cycle</p>
+        <p>Contact: Store Refresh Team</p>
+    </footer>
+</body>
+</html>

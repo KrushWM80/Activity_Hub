@@ -1,0 +1,42 @@
+---
+title: Segmented
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+A Segmented control is a linear set of two or more Segments, each of which functions as a mutually exclusive button.
+Segmented controls are often used to display different views; Segmented controls manipulate the content shown following an exclusive or “either/or” pattern.
+It is used to toggle between two or more content sections within the same space on screen. Only one section can be shown at a time.
+
+
+<ScreenshotTabs screenshotData={"screenshots/segmented.png"} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Segmented, Segment} from '@walmart/gtp-shared-components';
+
+const [selectedSegment1, setSelectedSegment1] = React.useState(0)
+
+<Segmented
+  size='small'
+  selectedIndex={selectedSegment1}
+  onChange={index => setSelectedSegment1(index)}>
+  <Segment>First</Segment>
+  <Segment>Second</Segment>
+  <Segment>Third</Segment>
+</Segmented>
+```
+## Props
+
+ ### size
+<PropTable componentLink="Segmented" prop="size"/>
+ ### selectedIndex
+<PropTable componentLink="Segmented" prop="selectedIndex"/>
+ ### disabled
+<PropTable componentLink="Segmented" prop="disabled"/>
+ ### onChange
+<PropTable componentLink="Segmented" prop="onChange"/>
+ ### UNSAFE_style
+<PropTable componentLink="Segmented" prop="UNSAFE_style"/>
+ ### small<span class="badge badge-deprecated "><span class="badge-text">DEPRECATED - it has no effect. Provided just for API backwards compatibility.</span></span>
+<PropTable componentLink="Segmented" prop="small"/>

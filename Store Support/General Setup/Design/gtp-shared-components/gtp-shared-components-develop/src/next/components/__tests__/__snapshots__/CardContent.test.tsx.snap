@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing CardMedia should display correctly 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "center",
+        "alignSelf": "flex-start",
+        "justifyContent": "center",
+        "marginVertical": 16,
+        "paddingHorizontal": 16,
+      },
+      undefined,
+    ]
+  }
+  testID="CardContent"
+>
+  This is the content
+</View>
+`;

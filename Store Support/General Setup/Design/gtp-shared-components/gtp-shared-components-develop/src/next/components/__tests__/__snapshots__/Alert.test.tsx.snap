@@ -1,0 +1,585 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Alert Variant = error  Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "flex-start",
+        "borderBottomWidth": 1,
+        "borderLeftWidth": 4,
+        "borderRadius": 4,
+        "borderRightWidth": 1,
+        "borderTopWidth": 1,
+        "flexDirection": "row",
+        "paddingLeft": 12,
+        "paddingRight": 15,
+        "paddingVertical": 6,
+      },
+      {
+        "backgroundColor": "#fce8e9",
+        "borderBottomColor": "#ef8e92",
+        "borderLeftColor": "#de1c24",
+        "borderRightColor": "#ef8e92",
+        "borderTopColor": "#ef8e92",
+      },
+      undefined,
+    ]
+  }
+  testID="Alert"
+>
+  <View
+    style={
+      {
+        "marginRight": 8,
+        "marginTop": 2,
+      }
+    }
+  >
+    <Image
+      accessibilityLabel="error icon"
+      accessibilityRole="image"
+      source={
+        {
+          "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/ExclamationCircle-16.png",
+        }
+      }
+      style={
+        [
+          {
+            "height": 16,
+            "tintColor": "#9b1419",
+            "width": 16,
+          },
+          {},
+        ]
+      }
+      testID="ExclamationCircleIcon"
+    />
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "flex-start",
+        "flex": 1,
+        "flexDirection": "row",
+        "flexWrap": "wrap",
+        "justifyContent": "flex-start",
+      }
+    }
+  >
+    <Text
+      accessibilityRole="alert"
+      accessible={true}
+      style={
+        [
+          {
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginRight": 16,
+            "maxWidth": "95%",
+          },
+          {
+            "color": "#9b1419",
+          },
+        ]
+      }
+    >
+      This is an alert
+    </Text>
+    <Text
+      accessibilityRole="link"
+      accessibilityState={
+        {
+          "disabled": false,
+        }
+      }
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        [
+          [
+            {
+              "color": "#000",
+              "fontFamily": "Bogle",
+              "fontSize": 16,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 24,
+              "textAlign": "center",
+              "textDecorationLine": "underline",
+            },
+            {
+              "color": "#000",
+              "fontFamily": "Bogle",
+              "fontSize": 16,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 24,
+              "textAlign": "center",
+              "textDecorationLine": "underline",
+            },
+          ],
+          [
+            {
+              "fontFamily": "Bogle",
+              "fontSize": 14,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 20,
+            },
+            {
+              "color": "#9b1419",
+            },
+          ],
+        ]
+      }
+      testID="Link"
+    >
+      Action
+    </Text>
+  </View>
+</View>
+`;
+
+exports[`Test Alert Variant = info  Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "flex-start",
+        "borderBottomWidth": 1,
+        "borderLeftWidth": 4,
+        "borderRadius": 4,
+        "borderRightWidth": 1,
+        "borderTopWidth": 1,
+        "flexDirection": "row",
+        "paddingLeft": 12,
+        "paddingRight": 15,
+        "paddingVertical": 6,
+      },
+      {
+        "backgroundColor": "#f1f1f2",
+        "borderBottomColor": "#babbbe",
+        "borderLeftColor": "#000",
+        "borderRightColor": "#babbbe",
+        "borderTopColor": "#babbbe",
+      },
+      undefined,
+    ]
+  }
+  testID="Alert"
+>
+  <View
+    style={
+      {
+        "marginRight": 8,
+        "marginTop": 2,
+      }
+    }
+  >
+    <Image
+      accessibilityLabel="info icon"
+      accessibilityRole="image"
+      source={
+        {
+          "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/InfoCircle-16.png",
+        }
+      }
+      style={
+        [
+          {
+            "height": 16,
+            "tintColor": "#000",
+            "width": 16,
+          },
+          {},
+        ]
+      }
+      testID="InfoCircleIcon"
+    />
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "flex-start",
+        "flex": 1,
+        "flexDirection": "row",
+        "flexWrap": "wrap",
+        "justifyContent": "flex-start",
+      }
+    }
+  >
+    <Text
+      accessibilityRole="alert"
+      accessible={true}
+      style={
+        [
+          {
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginRight": 16,
+            "maxWidth": "95%",
+          },
+          {
+            "color": "#000",
+          },
+        ]
+      }
+    >
+      This is an alert
+    </Text>
+    <Text
+      accessibilityRole="link"
+      accessibilityState={
+        {
+          "disabled": false,
+        }
+      }
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        [
+          [
+            {
+              "color": "#000",
+              "fontFamily": "Bogle",
+              "fontSize": 16,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 24,
+              "textAlign": "center",
+              "textDecorationLine": "underline",
+            },
+            {
+              "color": "#000",
+              "fontFamily": "Bogle",
+              "fontSize": 16,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 24,
+              "textAlign": "center",
+              "textDecorationLine": "underline",
+            },
+          ],
+          [
+            {
+              "fontFamily": "Bogle",
+              "fontSize": 14,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 20,
+            },
+            {
+              "color": "#000",
+            },
+          ],
+        ]
+      }
+      testID="Link"
+    >
+      Action
+    </Text>
+  </View>
+</View>
+`;
+
+exports[`Test Alert Variant = success  Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "flex-start",
+        "borderBottomWidth": 1,
+        "borderLeftWidth": 4,
+        "borderRadius": 4,
+        "borderRightWidth": 1,
+        "borderTopWidth": 1,
+        "flexDirection": "row",
+        "paddingLeft": 12,
+        "paddingRight": 15,
+        "paddingVertical": 6,
+      },
+      {
+        "backgroundColor": "#eaf3e6",
+        "borderBottomColor": "#95c381",
+        "borderLeftColor": "#2a8703",
+        "borderRightColor": "#95c381",
+        "borderTopColor": "#95c381",
+      },
+      undefined,
+    ]
+  }
+  testID="Alert"
+>
+  <View
+    style={
+      {
+        "marginRight": 8,
+        "marginTop": 2,
+      }
+    }
+  >
+    <Image
+      accessibilityLabel="success icon"
+      accessibilityRole="image"
+      source={
+        {
+          "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/CheckCircle-16.png",
+        }
+      }
+      style={
+        [
+          {
+            "height": 16,
+            "tintColor": "#1d5f02",
+            "width": 16,
+          },
+          {},
+        ]
+      }
+      testID="CheckCircleIcon"
+    />
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "flex-start",
+        "flex": 1,
+        "flexDirection": "row",
+        "flexWrap": "wrap",
+        "justifyContent": "flex-start",
+      }
+    }
+  >
+    <Text
+      accessibilityRole="alert"
+      accessible={true}
+      style={
+        [
+          {
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginRight": 16,
+            "maxWidth": "95%",
+          },
+          {
+            "color": "#1d5f02",
+          },
+        ]
+      }
+    >
+      This is an alert
+    </Text>
+    <Text
+      accessibilityRole="link"
+      accessibilityState={
+        {
+          "disabled": false,
+        }
+      }
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        [
+          [
+            {
+              "color": "#000",
+              "fontFamily": "Bogle",
+              "fontSize": 16,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 24,
+              "textAlign": "center",
+              "textDecorationLine": "underline",
+            },
+            {
+              "color": "#000",
+              "fontFamily": "Bogle",
+              "fontSize": 16,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 24,
+              "textAlign": "center",
+              "textDecorationLine": "underline",
+            },
+          ],
+          [
+            {
+              "fontFamily": "Bogle",
+              "fontSize": 14,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 20,
+            },
+            {
+              "color": "#1d5f02",
+            },
+          ],
+        ]
+      }
+      testID="Link"
+    >
+      Action
+    </Text>
+  </View>
+</View>
+`;
+
+exports[`Test Alert Variant = warning  Should match snapshot correctly. 1`] = `
+<View
+  style={
+    [
+      {
+        "alignItems": "flex-start",
+        "borderBottomWidth": 1,
+        "borderLeftWidth": 4,
+        "borderRadius": 4,
+        "borderRightWidth": 1,
+        "borderTopWidth": 1,
+        "flexDirection": "row",
+        "paddingLeft": 12,
+        "paddingRight": 15,
+        "paddingVertical": 6,
+      },
+      {
+        "backgroundColor": "#fff9e9",
+        "borderBottomColor": "#ffe190",
+        "borderLeftColor": "#ffc220",
+        "borderRightColor": "#ffe190",
+        "borderTopColor": "#ffe190",
+      },
+      undefined,
+    ]
+  }
+  testID="Alert"
+>
+  <View
+    style={
+      {
+        "marginRight": 8,
+        "marginTop": 2,
+      }
+    }
+  >
+    <Image
+      accessibilityLabel="warning icon"
+      accessibilityRole="image"
+      source={
+        {
+          "testUri": "../../@walmart/gtp-shared-icons/assets/images/icons/Warning-16.png",
+        }
+      }
+      style={
+        [
+          {
+            "height": 16,
+            "tintColor": "#662b0d",
+            "width": 16,
+          },
+          {},
+        ]
+      }
+      testID="WarningIcon"
+    />
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "flex-start",
+        "flex": 1,
+        "flexDirection": "row",
+        "flexWrap": "wrap",
+        "justifyContent": "flex-start",
+      }
+    }
+  >
+    <Text
+      accessibilityRole="alert"
+      accessible={true}
+      style={
+        [
+          {
+            "fontFamily": "Bogle",
+            "fontSize": 14,
+            "fontStyle": "normal",
+            "fontWeight": "400",
+            "lineHeight": 20,
+            "marginRight": 16,
+            "maxWidth": "95%",
+          },
+          {
+            "color": "#662b0d",
+          },
+        ]
+      }
+    >
+      This is an alert
+    </Text>
+    <Text
+      accessibilityRole="link"
+      accessibilityState={
+        {
+          "disabled": false,
+        }
+      }
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        [
+          [
+            {
+              "color": "#000",
+              "fontFamily": "Bogle",
+              "fontSize": 16,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 24,
+              "textAlign": "center",
+              "textDecorationLine": "underline",
+            },
+            {
+              "color": "#000",
+              "fontFamily": "Bogle",
+              "fontSize": 16,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 24,
+              "textAlign": "center",
+              "textDecorationLine": "underline",
+            },
+          ],
+          [
+            {
+              "fontFamily": "Bogle",
+              "fontSize": 14,
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "lineHeight": 20,
+            },
+            {
+              "color": "#662b0d",
+            },
+          ],
+        ]
+      }
+      testID="Link"
+    >
+      Action
+    </Text>
+  </View>
+</View>
+`;

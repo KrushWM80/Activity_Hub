@@ -1,0 +1,44 @@
+---
+title: Callout
+---
+
+import PropTable from '@site/src/components/PropTable.tsx';
+import ScreenshotTabs from '@site/src/components/ScreenshotTabs.tsx';
+
+Callouts are overlays that display contextual content on demand.
+
+
+<ScreenshotTabs screenshotData={{"bottom-left":"screenshots/callout-bottom-left.png","bottom-center":"screenshots/callout-bottom-center.png","bottom-right":"screenshots/callout-bottom-right.png","top-left":"screenshots/callout-top-left.png","top-center":"screenshots/callout-top-center.png","top-right":"screenshots/callout-top-right.png","left":"screenshots/callout-left.png","right":"screenshots/callout-right.png"}} baseUrl="/pages/electrode-mobile-platform/gtp-shared-components/"/>
+## Usage
+```js
+import {Callout} from '@walmart/gtp-shared-components`;
+
+const [isOpen, setIsOpen] = React.useState(false);
+
+<Callout
+  content={'Example Callout content.'}
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
+  position="bottomRight">
+  <Link
+    onPress={() => setIsOpen(false)}>
+    Bottom{'\n'}Right
+  </Link>
+</Callout>
+```
+## Props
+
+ ### content(required)
+<PropTable componentLink="Callout" prop="content"/>
+ ### children(required)
+<PropTable componentLink="Callout" prop="children"/>
+ ### isOpen
+<PropTable componentLink="Callout" prop="isOpen"/>
+ ### onClose
+<PropTable componentLink="Callout" prop="onClose"/>
+ ### position
+<PropTable componentLink="Callout" prop="position"/>
+ ### closeText
+<PropTable componentLink="Callout" prop="closeText"/>
+ ### UNSAFE_style
+<PropTable componentLink="Callout" prop="UNSAFE_style"/>
