@@ -50,6 +50,10 @@ class Project:
         self.store_count: int = 0
         self.owner: str = ""  # Project Owner
         self.partner: str = ""  # Partner name
+        self.health: Optional[str] = None  # Project health status
+        self.business_type: Optional[str] = None  # Business type
+        self.associate_impact: Optional[str] = None  # Impact on associates
+        self.customer_impact: Optional[str] = None  # Impact on customers
         self.created_date: Optional[datetime] = None
         self.last_updated: Optional[datetime] = None
         self.description: Optional[str] = None

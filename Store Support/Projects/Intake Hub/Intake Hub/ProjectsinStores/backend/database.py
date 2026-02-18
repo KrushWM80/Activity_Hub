@@ -385,7 +385,6 @@ class DatabaseService:
     _filters_cache_timestamp = None
     _filters_cache_ttl = 0  # DISABLED: Use SQLite cache instead of in-memory cache
     
-    @async_wrap
     def get_filter_options(self) -> Dict:
         """Get all available filter options with caching"""
         if not self.client:

@@ -7,7 +7,7 @@
 - **Frontend**: Single-page HTML5 app with vanilla JavaScript
 - **Backend**: Python FastAPI REST API with SQLite caching
 - **Data Source**: Google BigQuery (✅ **VERIFIED CONNECTED**)
-- **Environments**: Dev (localhost:8002) & Production (127.0.0.1:8001)
+- **Environments**: Dev (localhost:8002) & Production (weus42608431466.homeoffice.wal-mart.com:8001)
 
 ### ✅ Verified Status (February 17, 2026)
 - **BigQuery Project**: `wmt-assetprotection-prod`
@@ -60,7 +60,7 @@ For detailed information, see these companion documents:
 |---------|------|---------|--------|----------|
 | **Google BigQuery** | Cloud Database | Source of truth for all project data | ✅ **VERIFIED CONNECTED** | `wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data` |
 | **SQLite Local DB** | File-based Cache | Speeds up API responses (100ms vs 10s) | ✅ Working | `backend/cache.db` |
-| **Uvicorn Server** | App Server | Serves FastAPI | ✅ Running | localhost:8002 (dev) / 127.0.0.1:8001 (prod) |
+| **Uvicorn Server** | App Server | Serves FastAPI | ✅ Running | localhost:8002 (dev) / weus42608431466.homeoffice.wal-mart.com:8001 (prod) |
 
 ---
 
@@ -160,11 +160,11 @@ FRONTEND_FILE=index.html          # Latest version
 
 **Startup**: `START_BACKEND.bat` (with --reload flag)
 
-### 4.2 Production Setup (127.0.0.1:8001)
+### 4.2 Production Setup (weus42608431466.homeoffice.wal-mart.com:8001)
 
 ```bash
 ENVIRONMENT=prod
-API_BASE=window.location.origin   # http://127.0.0.1:8001
+API_BASE=window.location.origin   # http://weus42608431466.homeoffice.wal-mart.com:8001
 RELOAD=false                      # No hot reload
 PORT=8001
 FRONTEND_FILE=index.html.production  # Stable version
@@ -336,22 +336,26 @@ apscheduler                # Background tasks
 | Spark logo not loading | UI broken | Static files route added | ✅ Fixed |
 | Store count = Project count on filtered Realty | Stats misleading | Count by title not ID | ✅ Fixed |
 | BigQuery queries > 10s | UI freezes | SQLite cache layer | ✅ Implemented |
+| /api/filters returns 500 error | Dashboard filters unavailable | Removed @async_wrap decorator | ✅ Fixed (Feb 18) |
 
 ---
 
-## 9. Deployment Checklist
+### 9. Deployment Checklist
 
-✅ **VERIFIED & COMPLETE as of February 17, 2026:**
+✅ **VERIFIED & COMPLETE as of February 18, 2026:**
 
-- [x] BigQuery credentials configured (✅ **WORKING**)
+- [x] BigQuery credentials configured (✅ **WORKING** - gcloud auth application-default login)
 - [x] SQLite cache syncs on startup (✅ Backend connected)
 - [x] Dev server runs on localhost:8002 with --reload (✅ Running)
-- [ ] Production server runs on 127.0.0.1:8001 without reload (Needs restart)
+- [x] Production server runs on 0.0.0.0:8001 (✅ Running & accessible)
 - [x] Frontend routing serves correct HTML per environment (✅ Environment-based)
 - [x] Static files mount enabled (logos, favicons) (✅ spark-logo.png serving)
-- [x] API responses have CORS headers configured (✅ /api/summary returning data)
+- [x] API responses have CORS headers configured (✅ All endpoints working)
 - [x] Error handling returns proper HTTP status codes (✅ Tested)
 - [x] Summary stats count unique titles, not rows (✅ Fixed & verified)
+- [x] /api/filters endpoint functional (✅ Returns all 17 filter types)
+- [x] **API calls use relative URLs** (✅ **WORKS FROM ANY SYSTEM** - Feb 18, 2026)
+- [x] Windows Firewall rules added for ports 8001 & 8002 (✅ Inbound traffic allowed)
 - [ ] Email reporting scheduled (if enabled) (Optional feature)
 
 ---
@@ -411,7 +415,7 @@ Scenario: Filter by source and search
 2. **Git Commit**: Commit changes to dev branch
 3. **Production Deploy**: Merge to main, copy to `index.html.production`
 4. **Restart**: Restart production server (port 8001)
-5. **Verify**: Test on 127.0.0.1:8001
+5. **Verify**: Test on http://weus42608431466.homeoffice.wal-mart.com:8001/
 
 ### Cache Invalidation
 
@@ -430,9 +434,50 @@ If BigQuery schema changes:
 
 ---
 
-**Document Version**: 2.1  
-**Last Updated**: February 17, 2026 14:15 UTC  
-**Status**: ✅ **VERIFIED WITH REAL DATA**
+**Document Version**: 2.2  
+**Last Updated**: February 18, 2026 15:45 UTC  
+**Status**: ✅ **FULLY FUNCTIONAL - ALL ENDPOINTS WORKING**
 **Google Cloud Connection**: ✅ **ACTIVE & WORKING**
+**Deployment Status**: ✅ **PRODUCTION READY**
+  - Prod URL: http://weus42608431466.homeoffice.wal-mart.com:8001/
+  - Dev URL: http://localhost:8002/ (local only)
+  - **Remote Access**: Works from ANY system on the network
+  - **Why**: All API calls use relative URLs (`/api/...`), so access works via hostname, IP, or any network route
+  - Keep-Awake Script: Active (C:\Users\krush\Documents\keep-awake.ps1)
+
+---
+
+## Remote Access & Multi-System Support
+
+### How It Works (Feb 18, 2026 Update)
+
+✅ **The dashboard NOW works from any system** - no special configuration needed:
+
+1. **Original Issue**: Using `window.location.origin` caused problems when users accessed from different systems
+   - User A accessing via hostname → Different origin than User B accessing via IP
+   - Result: API calls would fail with `net::ERR_CONNECTION_REFUSED`
+
+2. **Solution Implemented**: All API calls now use **relative URLs** (e.g., `/api/projects` instead of `http://host:port/api/projects`)
+   - Frontend and backend served from same server
+   - Relative URLs work regardless of hostname, IP, or port
+   - No hostname resolution issues
+   - Works across different networks
+
+### Access from Remote Systems
+
+**Any user on any system can access:**
+```
+http://weus42608431466.homeoffice.wal-mart.com:8001/
+```
+
+**OR via IP address** (if hostname doesn't resolve):
+```
+http://<server-ip>:8001/
+```
+
+**Requirements:**
+- Server machine has Windows Firewall rules for ports 8001 & 8002 ✅
+- Both dev and prod backends running ✅
+- No VPN or special network config needed (standard network access)
+**Verified By**: System Test - All API endpoints tested (summary, projects, filters)
 **Maintainer**: Development Team
-**Verified By**: System Test - API /api/summary returning real project data

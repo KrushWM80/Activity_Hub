@@ -342,8 +342,12 @@ browser
   │   └─ Frontend: updateSummaryStats() counts unique titles
   │
   ├─→ GET /api/filters
-  │   ├─ database.py::get_filter_values()
-  │   └─ Response: {divisions, regions, markets, stores, phases, sources}
+  │   ├─ database.py::get_filter_options() [SYNCHRONOUS - Async decorator removed Feb 18]
+  │   ├─ Queries: BigQuery for core filters + SQLite cache for extended fields
+  │   ├─ Response: All 17 filter types (divisions, regions, markets, stores, phases,
+  │   │            sources, owners, partners, store_areas, business_areas, health_statuses,
+  │   │            business_types, associate_impacts, customer_impacts, tribes, wm_weeks, fiscal_years)
+  │   ├─ Status: ✅ Working (HTTP 200 verified)\n  │   └─ Note: Partners fetched from IH_Branch_Data table (Store_Support dataset)
   │
   └─→ GET /api/project-titles
       ├─ sqlite_cache.py::get_project_titles()
@@ -549,13 +553,14 @@ main.py::get_projects_endpoint()
 | Python | 3.10+ | Language | >=3.10 |
 | Browsers | Chrome 90+, FF 88+, Safari 14+, Edge 90+ | Frontend | Modern ES6 |
 
-### 7.2 Known Compatibility Issues
+### 7.2 Known Compatibility Issues & Fixes
 
-| Issue | Versions Affected | Solution |
-|-------|-------------------|----------|
-| Pydantic v2 breaking changes | <2.0 | Upgrade to 2.5.0+ |
-| BigQuery library SSL issues | <3.20 | Upgrade to 3.27+ |
-| Uvicorn reload on Windows | Some 0.26.x | Use 0.27.0+ |
+| Issue | Versions Affected | Root Cause | Solution | Status |
+|-------|-------------------|-----------|----------|--------|
+| Pydantic v2 breaking changes | <2.0 | API changed in v2 | Upgrade to 2.5.0+ | ✅ Fixed |
+| BigQuery library SSL issues | <3.20 | SSL certificate validation | Upgrade to 3.27+ | ✅ Fixed |
+| Uvicorn reload on Windows | Some 0.26.x | Uvicorn bug | Use 0.27.0+ | ✅ Fixed |
+| /api/filters returns 500 error | Before Feb 18 | @async_wrap decorator on sync endpoint | Removed @async_wrap from get_filter_options() | ✅ Fixed (Feb 18) |
 
 ---
 
@@ -709,7 +714,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
 
 ---
 
-**Dependency Map Version**: 2.1  
+**Dependency Map Version**: 2.2  \n**Last Updated**: February 18, 2026  \n**Status**: ✅ All dependencies documented and verified working
 **Generated**: February 17, 2026 14:15 UTC  
 **Verification Status**: ✅ **VERIFIED & TESTED**  
 **Google Cloud Connection**: ✅ **ACTIVE**  

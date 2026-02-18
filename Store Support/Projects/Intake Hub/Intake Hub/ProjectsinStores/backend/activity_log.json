@@ -63,6 +63,14 @@
       "user": "kendall.rush",
       "details": "Logged into admin dashboard",
       "category": "admin"
+    },
+    {
+      "id": "8252a858",
+      "timestamp": "2026-02-18 10:56:56",
+      "action": "Admin Login",
+      "user": "kendall.rush",
+      "details": "Logged into admin dashboard",
+      "category": "admin"
     }
   ]
 }

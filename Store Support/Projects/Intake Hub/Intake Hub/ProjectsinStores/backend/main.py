@@ -563,49 +563,53 @@ def get_filter_options():
     """Get all available filter options - ALWAYS use cache if it has data"""
     import threading
     
-    # SIMPLIFIED LOGIC: Check cache first, use it if it has any data
-    record_count = sqlite_cache.get_record_count()
-    
-    # If cache has data, use it (don't rely on timestamp validity check)
-    if record_count > 0:
-        filters = sqlite_cache.get_filter_options()
-    else:
-        # Only fall back to database if cache is completely empty
-        filters = db_service.get_filter_options()
-    
-    # Load partners asynchronously with timeout to avoid blocking
-    partners_list = []
-    def fetch_partners():
-        nonlocal partners_list
-        try:
-            partner_client = db_service.client
-            if partner_client:
-                # Simplified query without ORDER BY for performance
-                partner_query = """
-                    SELECT DISTINCT Partner as partner_name
-                    FROM `wmt-assetprotection-prod.Store_Support.IH_Branch_Data`
-                    WHERE Partner IS NOT NULL
-                    LIMIT 1000
-                """
-                job_config = {
-                    'query_parameters': [],
-                    'priority': 'INTERACTIVE'
-                }
-                query_job = partner_client.query(partner_query, job_config=partner_client.QueryJobConfig(**job_config))
-                # Set timeout to 5 seconds
-                results = query_job.result(timeout=5)
-                partners_list = sorted(list(set([str(row.partner_name).strip() for row in results if row.partner_name])))
-        except Exception as e:
-            print(f"[API] Warning: Could not fetch partners - {e}", flush=True)
-            partners_list = []
-    
-    # Run partner fetch in a thread with timeout
-    partner_thread = threading.Thread(target=fetch_partners, daemon=True)
-    partner_thread.start()
-    partner_thread.join(timeout=3)  # Only wait 3 seconds max
-    
-    filters['partners'] = partners_list
-    return filters
+    try:
+        # SIMPLIFIED LOGIC: Check cache first, use it if it has any data
+        record_count = sqlite_cache.get_record_count()
+        
+        # If cache has data, use it (don't rely on timestamp validity check)
+        if record_count > 0:
+            filters = sqlite_cache.get_filter_options()
+        else:
+            # Only fall back to database if cache is completely empty
+            filters = db_service.get_filter_options()
+        
+        # Load partners asynchronously with timeout to avoid blocking
+        partners_list = []
+        def fetch_partners():
+            nonlocal partners_list
+            try:
+                partner_client = db_service.client
+                if partner_client:
+                    # Simplified query without ORDER BY for performance
+                    partner_query = """
+                        SELECT DISTINCT Partner as partner_name
+                        FROM `wmt-assetprotection-prod.Store_Support.IH_Branch_Data`
+                        WHERE Partner IS NOT NULL
+                        LIMIT 1000
+                    """
+                    query_job = partner_client.query(partner_query)
+                    # Set timeout to 5 seconds
+                    results = query_job.result(timeout=5)
+                    partners_list = sorted(list(set([str(row.partner_name).strip() for row in results if row.partner_name])))
+            except Exception as e:
+                print(f"[API] Warning: Could not fetch partners - {e}", flush=True)
+                import traceback
+                traceback.print_exc()
+                partners_list = []
+        
+        # Run partner fetch in a thread with timeout
+        partner_thread = threading.Thread(target=fetch_partners, daemon=True)
+        partner_thread.start()
+        partner_thread.join(timeout=3)  # Only wait 3 seconds max
+        
+        filters['partners'] = partners_list
+        return filters
+    except Exception as e:
+        print(f"[API] ERROR in /api/filters: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/debug/cache-state")
 def debug_cache_state():
