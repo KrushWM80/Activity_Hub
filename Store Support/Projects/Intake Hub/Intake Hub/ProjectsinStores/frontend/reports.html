@@ -780,6 +780,32 @@
         let currentUserId = '';
         let currentUserEmail = '';
 
+        // Activity logging function
+        async function logReportActivity(action, details = '') {
+            try {
+                const email = currentUserEmail || `${currentUserId}@homeoffice.wal-mart.com`;
+                console.log('[Reports Activity] Logging:', action, 'for', email);
+                
+                const response = await fetch(window.location.origin + '/api/admin/activity-log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: action,
+                        user: email,
+                        details: details,
+                        category: 'email_reports'
+                    })
+                });
+                
+                console.log('[Reports Activity] Response status:', response.status);
+                if (!response.ok) {
+                    console.error('[Reports Activity] Server error:', response.status);
+                }
+            } catch (error) {
+                console.error('[Reports Activity] Error logging:', error.message);
+            }
+        }
+
         // Auto-detect user information from Windows environment
         function detectUserInfo() {
             // First, check URL parameters
@@ -808,7 +834,7 @@
             }
             
             currentUserId = user.toLowerCase();
-            currentUserEmail = user.includes('@') ? user : `${user}@walmart.com`;
+            currentUserEmail = user.includes('@') ? user : `${user}@homeoffice.wal-mart.com`;
             
             // Set hidden fields
             document.getElementById('userId').value = currentUserId;
@@ -816,6 +842,9 @@
             document.getElementById('userEmailDisplay').textContent = currentUserEmail;
             
             console.log('👤 Detected user:', currentUserId, '|', currentUserEmail);
+            
+            // Log the access to Email Reports
+            logReportActivity('Accessed Email Reports', 'Opened Email Reports configuration page');
         }
 
         // Dark Mode Toggle
@@ -848,7 +877,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
             initDarkMode();
-            detectUserInfo();
+            detectUserInfo();  // This now includes activity logging
             await loadOptions();
             await loadReports();
         });
@@ -1332,6 +1361,11 @@
 
                 if (response.ok) {
                     showToast(`Report ${isEdit ? 'updated' : 'created'} successfully!`, 'success');
+                    const reportName = document.getElementById('reportName').value;
+                    await logReportActivity(
+                        isEdit ? 'Updated Email Report' : 'Created Email Report',
+                        `Report: ${reportName} ${isEdit ? '(ID: ' + configId + ')' : ''}`
+                    );
                     closeModal();
                     await loadReports();
                 } else {
@@ -1367,6 +1401,7 @@
                 const result = await response.json();
                 if (result.success) {
                     showToast('Test report sent successfully!', 'success');
+                    await logReportActivity('Sent Test Email Report', `Report ID: ${configId}, Recipient: ${email}`);
                 } else {
                     showToast(`Failed to send test report: ${result.message}`, 'error');
                 }
@@ -1467,6 +1502,10 @@
 
                 if (response.ok) {
                     showToast(`Report ${isActive ? 'activated' : 'paused'} successfully!`, 'success');
+                    await logReportActivity(
+                        isActive ? 'Activated Email Report' : 'Paused Email Report',
+                        `Report ID: ${configId}`
+                    );
                     await loadReports();
                 } else {
                     showToast('Failed to update report status', 'error');
@@ -1490,6 +1529,7 @@
 
                 if (response.ok) {
                     showToast('Report deleted successfully!', 'success');
+                    await logReportActivity('Deleted Email Report', `Report ID: ${configId}`);
                     await loadReports();
                 } else {
                     showToast('Failed to delete report', 'error');
