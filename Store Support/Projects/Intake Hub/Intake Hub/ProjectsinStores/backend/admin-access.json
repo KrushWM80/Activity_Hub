@@ -1,0 +1,11 @@
+{
+  "authorized_admins": [
+    "kendall.rush@walmart.com",
+    "kristii.buttrey@walmart.com",
+    "matthew.farnworth@walmart.com",
+    "robert.isaacs@walmart.com",
+    "micah.roth@walmart.com"
+  ],
+  "fallback_password": "Admin2026",
+  "notes": "Used by both Dev (8002) and Prod (8001) - Controls admin button visibility and access"
+}

@@ -1253,36 +1253,44 @@
     <div class="toast" id="toast"></div>
     
     <script>
-        const API_BASE = window.location.origin;
+        // Use relative URLs for API calls (works across all networks)
         
-        // Authorized admins (in production, this would be server-side)
-        const AUTHORIZED_ADMINS = {
-            'kendall.rush': 'admin2026',
-            'admin': 'copilot123'
-        };
-        
+        // Authorized admins (now server-side in admin-access.json)
         let currentUser = null;
         let activityData = [];
         let activeUsersInterval = null;
         
-        function login() {
+        async function login() {
             const user = document.getElementById('adminUser').value.trim();
             const pass = document.getElementById('adminPass').value;
             
-            if (AUTHORIZED_ADMINS[user] && AUTHORIZED_ADMINS[user] === pass) {
-                currentUser = user;
-                sessionStorage.setItem('adminUser', user);
-                localStorage.setItem('reportUser', user);
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+                
+                if (!response.ok) {
+                    document.getElementById('authError').style.display = 'block';
+                    return;
+                }
+                
+                const authResponse = await response.json();
+                currentUser = authResponse.email;
+                sessionStorage.setItem('adminUser', authResponse.email);
+                localStorage.setItem('reportUser', authResponse.email);
                 document.getElementById('authScreen').classList.add('hidden');
                 document.getElementById('dashboard').classList.add('active');
-                document.getElementById('currentUser').textContent = user.includes('@') ? user : user + '@walmart.com';
+                document.getElementById('currentUser').textContent = authResponse.email;
                 loadDashboard();
                 // Log login activity
                 logActivity('Admin Login', currentUser, 'Logged into admin dashboard', 'admin');
                 // Start tracking active users
                 trackAdminUser();
                 activeUsersInterval = setInterval(trackAdminUser, 60000); // Every minute
-            } else {
+            } catch (error) {
+                console.error('Login error:', error);
                 document.getElementById('authError').style.display = 'block';
             }
         }
@@ -1297,17 +1305,42 @@
             document.getElementById('adminPass').value = '';
         }
         
-        function checkAuth() {
-            const user = sessionStorage.getItem('adminUser');
-            if (user && AUTHORIZED_ADMINS[user]) {
-                currentUser = user;
-                sessionStorage.setItem('adminUser', user);
-                localStorage.setItem('reportUser', user);
-                document.getElementById('authScreen').classList.add('hidden');
-                document.getElementById('dashboard').classList.add('active');
-                document.getElementById('currentUser').textContent = user.includes('@') ? user : user + '@walmart.com';
-                loadDashboard();
-                trackAdminUser();
+        async function checkAuth() {
+            try {
+                // First check if user is already logged in via session
+                const user = sessionStorage.getItem('adminUser');
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('authScreen').classList.add('hidden');
+                    document.getElementById('dashboard').classList.add('active');
+                    document.getElementById('currentUser').textContent = user;
+                    loadDashboard();
+                    trackAdminUser();
+                    activeUsersInterval = setInterval(trackAdminUser, 60000);
+                    return;
+                }
+                
+                // Then try Windows AD auto-login
+                const response = await fetch('/api/auth/user');
+                if (!response.ok) return;
+                
+                const authResponse = await response.json();
+                if (authResponse.is_admin) {
+                    currentUser = authResponse.email;
+                    sessionStorage.setItem('adminUser', authResponse.email);
+                    localStorage.setItem('reportUser', authResponse.email);
+                    document.getElementById('authScreen').classList.add('hidden');
+                    document.getElementById('dashboard').classList.add('active');
+                    document.getElementById('currentUser').textContent = authResponse.email;
+                    loadDashboard();
+                    trackAdminUser();
+                    activeUsersInterval = setInterval(trackAdminUser, 60000);
+                    console.log('[Auth] Admin auto-login via Windows AD:', authResponse.email);
+                }
+            } catch (error) {
+                console.log('[Auth] Could not auto-login, showing login form');
+            }
+        }
                 activeUsersInterval = setInterval(trackAdminUser, 60000);
             }
         }

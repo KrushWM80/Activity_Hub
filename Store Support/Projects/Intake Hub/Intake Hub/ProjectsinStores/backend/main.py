@@ -66,6 +66,103 @@ from pathlib import Path
 configs_dir = Path(__file__).parent / "report_configs"
 configs_dir.mkdir(exist_ok=True)
 
+# =============================================
+# AUTHENTICATION & ADMIN ACCESS CONTROL
+# =============================================
+
+import json
+
+def load_admin_access_list():
+    """Load authorized admin users from admin-access.json"""
+    try:
+        admin_access_path = os.path.join(os.path.dirname(__file__), "admin-access.json")
+        with open(admin_access_path, 'r') as f:
+            data = json.load(f)
+            return {
+                'admins': [email.lower() for email in data.get('authorized_admins', [])],
+                'fallback_password': data.get('fallback_password', 'Admin2026')
+            }
+    except Exception as e:
+        print(f"[AUTH] Error loading admin access list: {e}")
+        return {'admins': [], 'fallback_password': 'Admin2026'}
+
+admin_config = load_admin_access_list()
+
+def get_windows_username():
+    """Get current Windows username from environment"""
+    try:
+        username = os.getenv('USERNAME', '').lower()
+        if username:
+            # Convert to email format if it's just a username
+            if '@' not in username:
+                username = f"{username}@walmart.com"
+            return username
+    except:
+        pass
+    return None
+
+class AuthResponse(BaseModel):
+    """Response model for authentication endpoints"""
+    email: Optional[str] = None
+    username: Optional[str] = None
+    is_admin: bool = False
+    auth_method: str = "none"  # 'windows_ad', 'fallback_password', 'none'
+    message: str = ""
+
+class LoginRequest(BaseModel):
+    """Request model for manual login"""
+    username: str
+    password: str
+
+@app.get("/api/auth/user")
+async def get_current_user():
+    """Check current user from Windows AD and return admin status"""
+    windows_user = get_windows_username()
+    
+    if windows_user:
+        is_admin = windows_user in admin_config['admins']
+        return AuthResponse(
+            email=windows_user,
+            username=windows_user.split('@')[0],
+            is_admin=is_admin,
+            auth_method='windows_ad',
+            message='Authenticated via Windows AD'
+        )
+    
+    # Not on network or Windows auth failed
+    return AuthResponse(
+        is_admin=False,
+        auth_method='none',
+        message='Not authenticated - Windows AD failed, fallback login available'
+    )
+
+@app.post("/api/auth/login")
+async def fallback_login(request: LoginRequest):
+    """Fallback login using username and password"""
+    username = request.username.lower()
+    password = request.password
+    
+    # Check password
+    if password != admin_config['fallback_password']:
+        raise HTTPException(status_code=401, detail="Invalid password")
+    
+    # Convert username to email format
+    email = f"{username}@walmart.com"
+    
+    # Check if user is in admin list
+    is_admin = email in admin_config['admins']
+    
+    if not is_admin:
+        raise HTTPException(status_code=403, detail="User is not authorized as admin")
+    
+    return AuthResponse(
+        email=email,
+        username=username,
+        is_admin=True,
+        auth_method='fallback_password',
+        message='Authenticated via fallback password'
+    )
+
 # Startup and shutdown events for SQLite cache sync
 @app.on_event("startup")
 async def startup_event():

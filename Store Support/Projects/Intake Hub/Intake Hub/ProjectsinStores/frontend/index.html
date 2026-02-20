@@ -142,6 +142,7 @@
         </div>
         <div class="header-bottom-right">
             <a href="reports.html" class="email-reports-btn">📧 Email Reports</a>
+            <a href="admin.html" class="email-reports-btn" id="admin-button" style="margin-left: 10px; display: none;">⚙️ Admin</a>
             <button onclick="openFeedback()" class="email-reports-btn" style="margin-left: 10px; cursor: pointer;">? Feedback</button>
         </div>
     </div>
@@ -464,6 +465,30 @@
         // Both frontend and backend are served from the same server, so relative URLs work perfectly
         console.log('[Dashboard] Loaded successfully');
         console.log('[API] Using relative URLs for all API calls (works from any network)');
+        
+        // STATE: Authentication and admin status
+        let currentUser = null;
+        let isCurrentUserAdmin = false;
+        
+        // Check admin status on page load
+        async function checkAdminStatus() {
+            try {
+                const response = await fetch('/api/auth/user');
+                currentUser = await response.json();
+                isCurrentUserAdmin = currentUser.is_admin;
+                
+                // Show/hide admin button based on admin status
+                const adminButton = document.getElementById('admin-button');
+                if (adminButton) {
+                    adminButton.style.display = isCurrentUserAdmin ? 'inline-block' : 'none';
+                }
+                
+                console.log(`[Auth] User: ${currentUser.email || 'unknown'}, Admin: ${isCurrentUserAdmin}, Method: ${currentUser.auth_method}`);
+            } catch (e) {
+                console.log('[Auth] Error checking admin status:', e.message);
+            }
+        }
+        
         let allProjects = [];
         let currentView = 'division'; // 'division', 'region', 'market', 'store'
         let hierarchyLevel = 'division'; // Track current hierarchy level
@@ -2022,6 +2047,7 @@
 
 // Load data on page load
         initDarkMode();
+        checkAdminStatus();  // Check if user is admin and show/hide admin button
         loadData();
     </script>
 </body>

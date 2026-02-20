@@ -142,6 +142,7 @@
         </div>
         <div class="header-bottom-right">
             <a href="reports.html" class="email-reports-btn">📧 Email Reports</a>
+            <a href="admin.html" class="email-reports-btn" id="admin-button" style="margin-left: 10px; display: none;">⚙️ Admin</a>
             <button onclick="openFeedback()" class="email-reports-btn" style="margin-left: 10px; cursor: pointer;">? Feedback</button>
         </div>
     </div>
@@ -459,8 +460,35 @@
     </div>
 
     <script>
-        // Use the backend API server - production endpoint
-        const API_BASE = 'http://127.0.0.1:8001'; // Production API backend (same server as frontend)
+        // API calls use RELATIVE URLs (e.g., /api/summary instead of http://host:port/api/summary)
+        // This allows the dashboard to work from ANY system regardless of hostname, IP, or port
+        // Both frontend and backend are served from the same server, so relative URLs work perfectly
+        console.log('[Dashboard] Loaded successfully');
+        console.log('[API] Using relative URLs for all API calls (works from any network)');
+        
+        // STATE: Authentication and admin status
+        let currentUser = null;
+        let isCurrentUserAdmin = false;
+        
+        // Check admin status on page load
+        async function checkAdminStatus() {
+            try {
+                const response = await fetch('/api/auth/user');
+                currentUser = await response.json();
+                isCurrentUserAdmin = currentUser.is_admin;
+                
+                // Show/hide admin button based on admin status
+                const adminButton = document.getElementById('admin-button');
+                if (adminButton) {
+                    adminButton.style.display = isCurrentUserAdmin ? 'inline-block' : 'none';
+                }
+                
+                console.log(`[Auth] User: ${currentUser.email || 'unknown'}, Admin: ${isCurrentUserAdmin}, Method: ${currentUser.auth_method}`);
+            } catch (e) {
+                console.log('[Auth] Error checking admin status:', e.message);
+            }
+        }
+        
         let allProjects = [];
         let currentView = 'division'; // 'division', 'region', 'market', 'store'
         let hierarchyLevel = 'division'; // Track current hierarchy level
@@ -689,7 +717,7 @@
                 
                 // Load summary first for accurate totals
                 console.log('Fetching summary...');
-                const summaryRes = await fetch(`${API_BASE}/api/summary`);
+                const summaryRes = await fetch(`/api/summary`);
                 const summary = await summaryRes.json();
                 console.log('Summary:', summary);
                 
@@ -704,7 +732,7 @@
                 
                 // Load projects (request high limit to get all unique titles for preview)
                 console.log('Fetching projects...');
-                const projectsRes = await fetch(`${API_BASE}/api/projects?limit=50000`);
+                const projectsRes = await fetch(`/api/projects?limit=50000`);
                 const projectsData = await projectsRes.json();
                 console.log('Projects response:', projectsData);
                 
@@ -729,7 +757,7 @@
                 
                 // Load filter options
                 console.log('Fetching filters...');
-                const filtersRes = await fetch(`${API_BASE}/api/filters`);
+                const filtersRes = await fetch(`/api/filters`);
                 const filters = await filtersRes.json();
                 console.log('Filters:', filters);
                 console.log('Available project_sources from API:', filters.project_sources);
@@ -1291,7 +1319,7 @@
                 // Call backend API with filters for server-side filtering, then apply client-side filtering
                 try {
                     params.append('limit', '50000'); // Higher limit for filtered results (captures all unique projects)
-                    const response = await fetch(`${API_BASE}/api/projects?${params.toString()}`);
+                    const response = await fetch(`/api/projects?${params.toString()}`);
                     const backendFiltered = await response.json();
                     console.log(`Backend filtered: ${backendFiltered.length} projects`);
                     
@@ -1843,7 +1871,7 @@
                     owner: p.owner || ''   // Include both formats for compatibility
                 }));
                 
-                const response = await fetch(`${API_BASE}/api/ai/query`, {
+                const response = await fetch(`/api/ai/query`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1990,7 +2018,7 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE}/api/feedback`, {
+                const response = await fetch(`/api/feedback`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -2019,6 +2047,7 @@
 
 // Load data on page load
         initDarkMode();
+        checkAdminStatus();  // Check if user is admin and show/hide admin button
         loadData();
     </script>
 </body>
