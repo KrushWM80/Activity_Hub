@@ -95,7 +95,7 @@ def get_windows_username():
         if username:
             # Convert to email format if it's just a username
             if '@' not in username:
-                username = f"{username}@walmart.com"
+                username = f"{username}@homeoffice.wal-mart.com"
             return username
     except:
         pass
