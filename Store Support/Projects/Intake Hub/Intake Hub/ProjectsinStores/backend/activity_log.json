@@ -71,6 +71,30 @@
       "user": "kendall.rush",
       "details": "Logged into admin dashboard",
       "category": "admin"
+    },
+    {
+      "id": "2ec6425c",
+      "timestamp": "2026-02-20 09:16:06",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "5abaf48d",
+      "timestamp": "2026-02-20 09:16:30",
+      "action": "Applied Filters",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Title: 2026 next/fet 5 projects",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "e23b764f",
+      "timestamp": "2026-02-20 09:17:06",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
     }
   ]
 }

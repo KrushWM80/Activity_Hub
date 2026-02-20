@@ -1367,9 +1367,11 @@
             document.getElementById(`tab-${tabName}`).classList.add('active');
             
             if (tabName === 'activity') {
+                logActivity('Accessed Activity Log', currentUser, 'Viewed activity log and active users', 'dashboard_admin');
                 loadActivityLog();
                 loadActiveUsers();
             } else if (tabName === 'reports') {
+                logActivity('Accessed Email Reports', currentUser, 'Opened Email Reports dashboard', 'dashboard_admin');
                 loadReportsData();
                 loadReportsLogs();
             }
@@ -1808,6 +1810,7 @@ ${formatCodeDiff(fix.code_changes)}
                 document.getElementById('reportsActive').textContent = activeCount;
 
                 renderReportsTable(allReportsData);
+                logActivity('Loaded Reports List', currentUser, `Viewed ${allReportsData.length} total reports, ${activeCount} active`, 'dashboard_admin');
             } catch (error) {
                 console.error('Error loading reports:', error);
                 document.getElementById('reportsTableBodyAdmin').innerHTML = `
@@ -1942,12 +1945,14 @@ ${formatCodeDiff(fix.code_changes)}
             }
 
             try {
+                const reportName = allReportsData.find(r => r.config_id === configId)?.report_name || configId;
                 const resp = await fetch(`${REPORTS_API_BASE}/configs/${configId}`, {
                     method: 'DELETE'
                 });
 
                 if (resp.ok) {
                     showToast('Report deleted successfully', 'success');
+                    await logActivity('Deleted Email Report', currentUser, `Deleted report: ${reportName}`, 'dashboard_admin');
                     loadReportsData();
                     loadReportsLogs();
                 } else {
@@ -2009,6 +2014,7 @@ ${formatCodeDiff(fix.code_changes)}
             try {
                 // Get current admin user email from sessionStorage
                 const currentUserEmail = sessionStorage.getItem('adminUser') || localStorage.getItem('userEmail');
+                const reportName = allReportsData.find(r => r.config_id === configId)?.report_name || configId;
                 
                 const resp = await fetch(`${REPORTS_API_BASE}/generate`, {
                     method: 'POST',
@@ -2021,6 +2027,7 @@ ${formatCodeDiff(fix.code_changes)}
 
                 if (resp.ok) {
                     showToast('Test report sent successfully', 'success');
+                    await logActivity('Sent Test Email Report', currentUser, `Sent test email for report: ${reportName}`, 'dashboard_admin');
                     loadReportsLogs();
                 } else {
                     showToast('Error sending test report', 'error');
@@ -2091,10 +2098,11 @@ ${formatCodeDiff(fix.code_changes)}
             try {
                 const ccEmailsText = document.getElementById('modalCCEmails').value.trim();
                 const ccEmails = ccEmailsText ? ccEmailsText.split(',').map(e => e.trim()) : [];
+                const reportName = document.getElementById('modalReportName').value;
 
                 const updatedConfig = {
                     ...currentEditingReport,
-                    report_name: document.getElementById('modalReportName').value,
+                    report_name: reportName,
                     is_active: document.getElementById('modalReportStatus').value === 'active',
                     cc_emails: ccEmails,
                     updated_at: new Date().toISOString()
@@ -2108,6 +2116,7 @@ ${formatCodeDiff(fix.code_changes)}
 
                 if (resp.ok) {
                     showToast('Report updated successfully', 'success');
+                    await logActivity('Updated Email Report', currentUser, `Updated report: ${reportName}`, 'dashboard_admin');
                     closeReportModal();
                     loadReportsData();
                     loadReportsLogs();
