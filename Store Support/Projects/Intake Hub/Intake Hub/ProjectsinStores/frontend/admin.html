@@ -961,8 +961,7 @@
             <h1>🔧 Copilot Admin</h1>
             <div class="auth-error" id="authError">Invalid credentials</div>
             <input type="text" id="adminUser" placeholder="Username" autocomplete="off">
-            <inpua href="/index.html" class="back-btn">← Back to Projects</a>
-                <t type="password" id="adminPass" placeholder="Password">
+            <input type="password" id="adminPass" placeholder="Password">
             <button onclick="login()">Sign In</button>
             <p style="margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.5); text-align: center;">
                 Authorized administrators only
@@ -976,6 +975,7 @@
             <h1>🔧 Copilot Admin - Fix Management</h1>
             <div class="user-info">
                 <span id="currentUser">Admin</span>
+                <a href="/index.html" class="back-btn">← Back to Projects</a>
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
         </header>
@@ -1269,6 +1269,7 @@
     
     <script>
         // Use relative URLs for API calls (works across all networks)
+        const API_BASE = ''; // Empty string for relative URLs
         
         // Authorized admins (now server-side in admin-access.json)
         let currentUser = null;
