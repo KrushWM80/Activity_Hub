@@ -28,9 +28,10 @@ class SimpleEmailReportService:
     
     def __init__(self, db_service: DatabaseService):
         self.db_service = db_service
-        self.smtp_server = os.getenv("SMTP_SERVER", "mailhub.wal-mart.com")
+        self.smtp_server = os.getenv("SMTP_SERVER", "smtp-gw1.homeoffice.wal-mart.com")
         self.smtp_port = int(os.getenv("SMTP_PORT", "25"))
         self.from_email = os.getenv("FROM_EMAIL", "ATCTEAMSUPPORT@Walmart.com")
+        self.mock_mode = os.getenv("MOCK_EMAIL_MODE", "false").lower() == "true"
         
     async def generate_and_send_report(
         self, 
@@ -381,7 +382,7 @@ class SimpleEmailReportService:
         html_body: str,
         cc_emails: List[str] = None
     ):
-        """Send email via SMTP using built-in libraries"""
+        """Send email via SMTP using built-in libraries, or save to file in mock mode"""
         
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
@@ -395,7 +396,32 @@ class SimpleEmailReportService:
         html_part = MIMEText(html_body, 'html')
         msg.attach(html_part)
         
-        # Send via SMTP
+        # Handle mock mode - save to file instead of sending
+        if self.mock_mode:
+            mock_dir = os.path.join(os.path.dirname(__file__), "mock_emails")
+            os.makedirs(mock_dir, exist_ok=True)
+            
+            # Create filename with timestamp
+            from datetime import datetime
+            filename = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+            filepath = os.path.join(mock_dir, filename)
+            
+            # Save the HTML content and metadata
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(f"<!-- EMAIL METADATA -->\n")
+                f.write(f"<!-- From: {self.from_email} -->\n")
+                f.write(f"<!-- To: {', '.join(to_emails)} -->\n")
+                if cc_emails:
+                    f.write(f"<!-- CC: {', '.join(cc_emails)} -->\n")
+                f.write(f"<!-- Subject: {subject} -->\n")
+                f.write(f"<!-- Timestamp: {datetime.now().isoformat()} -->\n")
+                f.write(f"<!-- Mode: MOCK EMAIL (Not Actually Sent) -->\n")
+                f.write(f"\n{html_body}\n")
+            
+            print(f"✅ [MOCK MODE] Email report saved to: {filepath}")
+            return
+        
+        # Send via SMTP (production mode)
         try:
             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
                 recipients = to_emails + (cc_emails if cc_emails else [])

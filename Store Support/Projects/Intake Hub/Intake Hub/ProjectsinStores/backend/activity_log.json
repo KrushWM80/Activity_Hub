@@ -223,6 +223,190 @@
       "user": "krush@homeoffice.wal-mart.com",
       "details": "Viewed 3 total reports, 3 active",
       "category": "dashboard_admin"
+    },
+    {
+      "id": "3e1fdb58",
+      "timestamp": "2026-02-20 09:53:25",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "dcca524b",
+      "timestamp": "2026-02-20 09:54:30",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "cd98fe0d",
+      "timestamp": "2026-02-20 09:54:33",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "8e973cd0",
+      "timestamp": "2026-02-20 09:54:41",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "be86f5ee",
+      "timestamp": "2026-02-20 09:54:41",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "2ae86577",
+      "timestamp": "2026-02-20 09:55:18",
+      "action": "Accessed Email Reports",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Opened Email Reports dashboard",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "2a045992",
+      "timestamp": "2026-02-20 09:55:18",
+      "action": "Loaded Reports List",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed 3 total reports, 3 active",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "42540c3a",
+      "timestamp": "2026-02-20 09:55:26",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "c25e7279",
+      "timestamp": "2026-02-20 09:55:35",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "73754d5d",
+      "timestamp": "2026-02-20 09:56:47",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "d44bccaf",
+      "timestamp": "2026-02-20 10:01:03",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "8c54e3a6",
+      "timestamp": "2026-02-20 10:01:06",
+      "action": "Accessed Email Reports",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Opened Email Reports dashboard",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "0deebb27",
+      "timestamp": "2026-02-20 10:01:06",
+      "action": "Loaded Reports List",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed 3 total reports, 3 active",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "6aaa58b5",
+      "timestamp": "2026-02-20 10:01:52",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "7d07a144",
+      "timestamp": "2026-02-20 10:02:00",
+      "action": "Accessed Fix Management",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Opened pending fixes dashboard",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "caae4fe1",
+      "timestamp": "2026-02-20 10:02:06",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "b569e3af",
+      "timestamp": "2026-02-20 10:12:37",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "b91307e0",
+      "timestamp": "2026-02-20 10:21:19",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "e845d799",
+      "timestamp": "2026-02-20 10:31:07",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "efb0c9a4",
+      "timestamp": "2026-02-20 10:31:09",
+      "action": "Accessed Email Reports",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Opened Email Reports dashboard",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "de24a389",
+      "timestamp": "2026-02-20 10:31:09",
+      "action": "Loaded Reports List",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed 3 total reports, 3 active",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "ab7eb509",
+      "timestamp": "2026-02-20 10:31:11",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "2ecfd657",
+      "timestamp": "2026-02-20 10:31:33",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
     }
   ]
 }
