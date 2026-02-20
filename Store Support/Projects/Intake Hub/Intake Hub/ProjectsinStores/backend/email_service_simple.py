@@ -48,8 +48,11 @@ class SimpleEmailReportService:
         """
         
         try:
+            print(f"📧 Starting report generation: {config.get('report_name', 'Unknown')}")
+            
             # Get data from database based on filters and timeframe
             projects = await self._get_report_data(config)
+            print(f"📊 Retrieved {len(projects)} projects from database")
             
             # Convert Project objects to dictionaries
             projects_dicts = []
@@ -60,7 +63,6 @@ class SimpleEmailReportService:
                         'project_id': getattr(p, 'project_id', ''),
                         'title': getattr(p, 'title', ''),
                         'project_title': getattr(p, 'title', ''),
-                        'partner': getattr(p, 'partner', ''),
                         'store_id': getattr(p, 'store', ''),
                         'store_name': getattr(p, 'store_address', ''),
                         'status': getattr(p, 'status', ''),
@@ -75,13 +77,18 @@ class SimpleEmailReportService:
                 else:
                     projects_dicts.append(p)
             
+            print(f"🔄 Converted {len(projects_dicts)} projects to dicts")
+            
             # Generate HTML email body
             html_body = self._generate_html_report(config, projects_dicts)
+            print(f"📝 Generated HTML email body ({len(html_body)} characters)")
             
             # Determine recipients - use current user email if provided, otherwise use config email
             primary_recipient = override_email or current_user_email or config['primary_email']
             to_emails = [primary_recipient]
             cc_emails = [] if override_email else config.get('cc_emails', [])
+            
+            print(f"📬 Sending email to: {', '.join(to_emails)}")
             
             # Send email
             self._send_email(
@@ -91,6 +98,8 @@ class SimpleEmailReportService:
                 html_body=html_body
             )
             
+            print(f"✅ Report sent successfully")
+            
             return {
                 "success": True,
                 "message": f"Report sent successfully to {', '.join(to_emails)}",
@@ -99,6 +108,9 @@ class SimpleEmailReportService:
             }
             
         except Exception as e:
+            print(f"❌ Error in generate_and_send_report: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return {
                 "success": False,
                 "message": f"Error generating report: {str(e)}",
@@ -114,8 +126,6 @@ class SimpleEmailReportService:
         
         if 'filters' in config:
             filter_config = config['filters']
-            if 'partner' in filter_config:
-                filters.partners = filter_config['partner']
             if 'store_area' in filter_config:
                 filters.store_areas = filter_config['store_area']
             if 'business_organization' in filter_config:
@@ -126,9 +136,12 @@ class SimpleEmailReportService:
             timeframe = config['timeframes'][0]  # Use first timeframe
             filters.date_from = self._calculate_date_from_timeframe(timeframe)
         
-        # Get projects from database
-        projects = await self.db_service.get_projects(filters)
+        # IMPORTANT: Add a reasonable limit for email reports (max 100 projects per email)
+        # and use the cache when available
+        print(f"📥 Fetching projects with timeframe: {config.get('timeframes', ['All Time'])[0]}")
+        projects = await self.db_service.get_projects(filters, limit=100)
         
+        print(f"✅ Fetched {len(projects)} projects (limited to 100 max for email)")
         return projects
     
     def _calculate_date_from_timeframe(self, timeframe: str) -> Optional[datetime]:
@@ -153,6 +166,8 @@ class SimpleEmailReportService:
         
         report_name = config['report_name']
         content_types = config.get('content_types', [])
+        
+        print(f"🎨 Building HTML with content types: {content_types}")
         
         # Build header - MORE COMPACT
         html = f"""
@@ -249,16 +264,24 @@ class SimpleEmailReportService:
         
         # Generate tables for each content type - WITH LIMITS
         if 'New' in content_types or 'Overview' in content_types:
-            html += self._generate_new_projects_table(projects)
+            new_content = self._generate_new_projects_table(projects)
+            html += new_content
+            print(f"✅ Added 'New Projects' section ({len(new_content)} chars)")
         
         if 'Upcoming' in content_types:
-            html += self._generate_upcoming_table(projects)
+            upcoming_content = self._generate_upcoming_table(projects)
+            html += upcoming_content
+            print(f"✅ Added 'Upcoming' section ({len(upcoming_content)} chars)")
         
         if 'Notes' in content_types:
-            html += self._generate_notes_table(projects)
+            notes_content = self._generate_notes_table(projects)
+            html += notes_content
+            print(f"✅ Added 'Notes' section ({len(notes_content)} chars)")
         
         if not projects:
-            html += '<p style="text-align:center; color:#718096; padding:20px;">No projects found matching your criteria.</p>'
+            empty_msg = '<p style="text-align:center; color:#718096; padding:20px;">No projects found matching your criteria.</p>'
+            html += empty_msg
+            print(f"⚠️ No projects found - added message")
         
         # Footer
         html += f"""
@@ -384,6 +407,9 @@ class SimpleEmailReportService:
     ):
         """Send email via SMTP using built-in libraries, or save to file in mock mode"""
         
+        print(f"📧 Preparing to send email to {', '.join(to_emails)}")
+        print(f"📏 HTML body size: {len(html_body)} characters")
+        
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = self.from_email
@@ -395,6 +421,8 @@ class SimpleEmailReportService:
         # Attach HTML body
         html_part = MIMEText(html_body, 'html')
         msg.attach(html_part)
+        
+        print(f"🎯 Mock mode: {self.mock_mode}")
         
         # Handle mock mode - save to file instead of sending
         if self.mock_mode:
@@ -416,9 +444,11 @@ class SimpleEmailReportService:
                 f.write(f"<!-- Subject: {subject} -->\n")
                 f.write(f"<!-- Timestamp: {datetime.now().isoformat()} -->\n")
                 f.write(f"<!-- Mode: MOCK EMAIL (Not Actually Sent) -->\n")
+                f.write(f"<!-- Body Size: {len(html_body)} characters -->\n")
                 f.write(f"\n{html_body}\n")
             
             print(f"✅ [MOCK MODE] Email report saved to: {filepath}")
+            print(f"📄 File size on disk: {os.path.getsize(filepath)} bytes")
             return
         
         # Send via SMTP (production mode)

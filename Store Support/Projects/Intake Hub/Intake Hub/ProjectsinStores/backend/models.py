@@ -93,6 +93,7 @@ class FilterCriteria:
         self.project_source: Optional[List[str]] = None
         self.wm_week: Optional[List[str]] = None
         self.fy: Optional[List[str]] = None
+        self.partners: Optional[List[str]] = None
         self.status: ProjectStatus = ProjectStatus.ACTIVE  # Default to active only
 
 class ProjectSummary:
