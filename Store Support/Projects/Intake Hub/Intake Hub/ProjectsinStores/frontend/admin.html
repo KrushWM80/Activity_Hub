@@ -1499,6 +1499,7 @@
                 await fetch(`${API_BASE}/api/admin/activity-log`, { method: 'DELETE' });
                 activityData = [];
                 renderActivityLog([]);
+                await logActivity('Cleared Activity Log', currentUser, 'Admin cleared all activity log entries', 'dashboard_admin');
                 showToast('Activity log cleared', 'success');
             } catch (error) {
                 showToast('Error clearing log', 'error');
@@ -1716,6 +1717,7 @@ ${formatCodeDiff(fix.code_changes)}
                 
                 if (result.success) {
                     showToast('Fix approved and implemented!', 'success');
+                    await logActivity('Approved Fix', currentUser, `Fixed issue FIX-${fixId} - ${isAutoFix ? 'Auto-implemented' : 'Manual acknowledgment'}`, 'dashboard_admin');
                     loadDashboard();
                 } else {
                     showToast(result.error || 'Failed to implement fix', 'error');
@@ -1740,6 +1742,7 @@ ${formatCodeDiff(fix.code_changes)}
                 
                 if (result.success) {
                     showToast('Fix denied', 'info');
+                    await logActivity('Denied Fix', currentUser, `Denied fix FIX-${fixId}`, 'dashboard_admin');
                     loadDashboard();
                 } else {
                     showToast(result.error || 'Failed to deny fix', 'error');
@@ -1761,6 +1764,7 @@ ${formatCodeDiff(fix.code_changes)}
                 
                 if (result.success) {
                     showToast('Fix placed on hold', 'info');
+                    await logActivity('Held Fix', currentUser, `Placed fix FIX-${fixId} on hold for later review`, 'dashboard_admin');
                     loadDashboard();
                 } else {
                     showToast(result.error || 'Failed to hold fix', 'error');

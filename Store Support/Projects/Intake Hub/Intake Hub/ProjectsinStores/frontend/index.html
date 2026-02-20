@@ -484,8 +484,30 @@
                 }
                 
                 console.log(`[Auth] User: ${currentUser.email || 'unknown'}, Admin: ${isCurrentUserAdmin}, Method: ${currentUser.auth_method}`);
+                
+                // Log main dashboard access
+                logDashboardActivity('Accessed Main Dashboard', `Logged in via ${currentUser.auth_method}`);
             } catch (e) {
                 console.log('[Auth] Error checking admin status:', e.message);
+            }
+        }
+        
+        // Activity logging for main dashboard
+        async function logDashboardActivity(action, details = '') {
+            if (!currentUser || !currentUser.email) return;
+            try {
+                await fetch('/api/admin/activity-log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: action,
+                        user: currentUser.email,
+                        details: details,
+                        category: 'dashboard_main'
+                    })
+                });
+            } catch (e) {
+                console.log('[Activity Log] Error logging activity:', e.message);
             }
         }
         
@@ -1269,6 +1291,17 @@
             const title = document.getElementById('filter-title').value.toLowerCase();
             const source = document.getElementById('filter-source').value;
             
+            // Log filter activity if any filters are applied
+            if (title || source || Object.values(selectedFilters).some(f => f.length > 0)) {
+                const filterSummary = [
+                    title ? `Title: ${title}` : null,
+                    source ? `Source: ${source}` : null,
+                    selectedFilters.division.length > 0 ? `Division: ${selectedFilters.division[0]}` : null,
+                    selectedFilters.region.length > 0 ? `Region: ${selectedFilters.region[0]}` : null
+                ].filter(Boolean).join(', ');
+                logDashboardActivity('Applied Filters', filterSummary);
+            }
+            
             // Build query parameters for backend filtering (use first selected value for each filter to reduce dataset)
             const params = new URLSearchParams();
             
@@ -1892,6 +1925,9 @@
                 
                 const data = await response.json();
                 messagesDiv.innerHTML += `<div style="margin-bottom: 10px; padding: 10px; background: #e3f2fd; border-radius: 8px;"><strong>😊 Sparky:</strong> ${data.answer}</div>`;
+                
+                // Log AI query activity
+                logDashboardActivity('Ran AI Query', `Query: ${message.substring(0, 100)}`);
                 
                 // Helper function to update multi-select filter
                 const updateMultiSelectFilter = (filterKey, value, dropdownId) => {
