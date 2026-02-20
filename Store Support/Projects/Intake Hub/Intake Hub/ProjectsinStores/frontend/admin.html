@@ -98,6 +98,20 @@
             transition: background 0.2s;
         }
         header .logout-btn:hover { background: rgba(220,53,69,0.5); }
+        header .back-btn {
+            padding: 8px 16px;
+            background: rgba(0,113,206,0.3);
+            border: 1px solid #0071ce;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        header .back-btn:hover { background: rgba(0,113,206,0.5); }
         
         .container {
             max-width: 1400px;
@@ -947,7 +961,8 @@
             <h1>🔧 Copilot Admin</h1>
             <div class="auth-error" id="authError">Invalid credentials</div>
             <input type="text" id="adminUser" placeholder="Username" autocomplete="off">
-            <input type="password" id="adminPass" placeholder="Password">
+            <inpua href="/index.html" class="back-btn">← Back to Projects</a>
+                <t type="password" id="adminPass" placeholder="Password">
             <button onclick="login()">Sign In</button>
             <p style="margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.5); text-align: center;">
                 Authorized administrators only
