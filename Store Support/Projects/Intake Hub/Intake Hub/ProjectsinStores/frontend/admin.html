@@ -1375,6 +1375,8 @@
                 } else if (tabName === 'activity') {
                     console.log('[Log] Logging Activity Log access');
                     await logActivity('Accessed Activity Log', currentUser, 'Viewed activity log and active users', 'dashboard_admin');
+                    // Small delay to ensure activity was written before loading log
+                    await new Promise(resolve => setTimeout(resolve, 100));
                 } else if (tabName === 'reports') {
                     console.log('[Log] Logging Email Reports access');
                     await logActivity('Accessed Email Reports', currentUser, 'Opened Email Reports dashboard', 'dashboard_admin');
@@ -1383,7 +1385,7 @@
                 console.warn('[Tab] currentUser not set, cannot log activity');
             }
             
-            // Load tab data
+            // Load tab data (with slight delay to ensure data is flushed)
             if (tabName === 'activity') {
                 loadActivityLog();
                 loadActiveUsers();
@@ -1423,9 +1425,12 @@
         // Activity Log Functions
         async function loadActivityLog() {
             try {
+                console.log('[loadActivityLog] Fetching activity log');
                 const response = await fetch(`${API_BASE}/api/admin/activity-log?limit=100`);
                 const data = await response.json();
                 activityData = data.activities || [];
+                console.log('[loadActivityLog] Received', activityData.length, 'activities');
+                activityData.forEach(a => console.log('[loadActivityLog] -', a.action, 'by', a.user, 'at', a.timestamp));
                 renderActivityLog(activityData);
             } catch (error) {
                 console.error('Error loading activity log:', error);
@@ -1433,14 +1438,34 @@
         }
         
         async function logActivity(action, user, details, category) {
+            console.log('[logActivity] Attempting to log:', { action, user, details, category });
+            
+            if (!user) {
+                console.warn('[logActivity] Cannot log - user is not set:', user);
+                return;
+            }
+            
             try {
-                await fetch(`${API_BASE}/api/admin/activity-log`, {
+                const endpoint = `${API_BASE}/api/admin/activity-log`;
+                console.log('[logActivity] Posting to endpoint:', endpoint);
+                
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action, user, details, category })
                 });
+                
+                console.log('[logActivity] Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('[logActivity] Server error:', response.status, errorText);
+                } else {
+                    const result = await response.json();
+                    console.log('[logActivity] Success:', result);
+                }
             } catch (error) {
-                console.error('Error logging activity:', error);
+                console.error('[logActivity] Fetch error:', error.message, error);
             }
         }
         

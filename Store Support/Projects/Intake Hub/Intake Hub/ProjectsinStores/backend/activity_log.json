@@ -127,6 +127,46 @@
       "user": "krush@homeoffice.wal-mart.com",
       "details": "Viewed activity log and active users",
       "category": "dashboard_admin"
+    },
+    {
+      "id": "1e27ed80",
+      "timestamp": "2026-02-20 09:34:05",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "9c97de9d",
+      "timestamp": "2026-02-20 09:34:12",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "9697ab53",
+      "timestamp": "2026-02-20 09:34:24",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "6ad189cf",
+      "timestamp": "2026-02-20 09:34:27",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "7f0193c9",
+      "timestamp": "2026-02-20 09:35:15",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
     }
   ]
 }
