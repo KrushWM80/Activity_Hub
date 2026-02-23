@@ -1,5 +1,169 @@
 {
-  "fixes": [],
+  "fixes": [
+    {
+      "id": "f76d4183",
+      "title": "Feedback Analysis: Sparky AI",
+      "feedback_category": "Sparky AI",
+      "feedback_rating": 1,
+      "feedback_comments": "I was searching for remodels at store 100 and you searched for projects with store in the title. \n\nLook at the context clues they give you. \n\nWhen I manually filtered store 100 and searched for remodel, it gave me 17 projects. \n\n\nYou: remodel in store 100\n\ud83d\ude0a Sparky: \ud83d\udd0d **Found 4 projects matching 'remodel in store 100':** \u2022 Activity - Store Support - Practice Card \u2022 Avidbots - Non-Auto C Stores \u2022 Digital Lock Padlock(Ulock) Full Store Pilot \u2022 EXP - Store Speaker Upgrade \ud83d\udcca **Total:** 375 stores across these projects \ud83c\udfaf Dashboard is now filtered to these results! \ud83d\udca1 **Tip:** Type a specific project name for more details.\n\u2713 Filters Applied:\nSearch: store",
+      "timestamp": "2026-02-23T19:54:03.674Z",
+      "priority": "high",
+      "root_cause": "Issue reported in 'Sparky AI' category requires detailed analysis.",
+      "resolution": "This feedback requires manual AI review to determine specific root cause and resolution.",
+      "code_changes": null,
+      "user_context": {
+        "current_filters": {
+          "division": [],
+          "region": [],
+          "market": [],
+          "store": [
+            "100"
+          ],
+          "wmweek": [],
+          "fy": [],
+          "phase": [],
+          "owner": [],
+          "partner": [],
+          "businessorg": [],
+          "storearea": [],
+          "health": [],
+          "businesstype": [],
+          "associateimpact": [],
+          "customerimpact": []
+        },
+        "projects_displayed": 50000
+      },
+      "investigation_notes": [
+        "No specific pattern matched - flagged for detailed review",
+        "Active filters at time of feedback: {'store': ['100']}",
+        "Projects displayed: 50000"
+      ],
+      "files_analyzed": [],
+      "requires_ai_review": true
+    },
+    {
+      "id": "b50131b6",
+      "title": "UI/Visual Issue",
+      "feedback_category": "Sparky AI",
+      "feedback_rating": 1,
+      "feedback_comments": "I want to see a list of all the projects in store 5260 and asked: \"You: Can you show me all the projects in store 5260 \ud83d\ude0a Sparky: \u274c **No projects found** for Store 5260. This store may not have any active projects currently, or the data may not include this store number. \ud83d\udca1 **Try:** Searching for a project name, or check if the store number is correct. \n\n When I search manually there are 21 projects",
+      "timestamp": "2026-02-23T19:54:47.648Z",
+      "priority": "high",
+      "root_cause": "User interface element not behaving as expected. Need to identify specific element and expected vs actual behavior.",
+      "resolution": "Identify specific UI element from feedback. Review CSS styling and JavaScript event handlers. Test across browsers.",
+      "code_changes": null,
+      "user_context": {
+        "current_filters": {
+          "division": [],
+          "region": [],
+          "market": [],
+          "store": [
+            "5260"
+          ],
+          "wmweek": [],
+          "fy": [],
+          "phase": [],
+          "owner": [],
+          "partner": [],
+          "businessorg": [],
+          "storearea": [],
+          "health": [],
+          "businesstype": [],
+          "associateimpact": [],
+          "customerimpact": []
+        },
+        "projects_displayed": 50000
+      },
+      "investigation_notes": [
+        "Active filters at time of feedback: {'store': ['5260']}",
+        "Projects displayed: 50000"
+      ],
+      "files_analyzed": [
+        "frontend/index.html"
+      ],
+      "requires_ai_review": true
+    },
+    {
+      "id": "4bd62d53",
+      "title": "Feedback Analysis: Sparky AI",
+      "feedback_category": "Sparky AI",
+      "feedback_rating": 1,
+      "feedback_comments": "I asked: You: how many stores is 2 Hour Picking SLA Test in?\n\ud83d\ude0a Sparky: \ud83d\udd0d **Found 2 projects matching 'HOUR SLA + Test Phase':** \u2022 2 Hour Picking SLA Test \u2022 Faster Unscheduled Pickup for Customers (2 Hour Unscheduled Pickup in Supercenters) \ud83d\udcca **Total:** 609 stores across these projects \ud83c\udfaf Applied filters: \u2022 Project: HOUR SLA \u2022 Phase: Test \ud83d\udca1 **Tip:** Type a specific project name for more details.\n\u2713 Filters Applied:\nSearch: hour sla\nPhase: Test\n\nWhy did it add Phase Test criteria when the title of the project is \"2 Hour Picking SLA Test\"",
+      "timestamp": "2026-02-23T19:59:00.075Z",
+      "priority": "high",
+      "root_cause": "Issue reported in 'Sparky AI' category requires detailed analysis.",
+      "resolution": "This feedback requires manual AI review to determine specific root cause and resolution.",
+      "code_changes": null,
+      "user_context": {
+        "current_filters": {
+          "division": [],
+          "region": [],
+          "market": [],
+          "store": [],
+          "wmweek": [],
+          "fy": [],
+          "phase": [
+            "Test"
+          ],
+          "owner": [],
+          "partner": [],
+          "businessorg": [],
+          "storearea": [],
+          "health": [],
+          "businesstype": [],
+          "associateimpact": [],
+          "customerimpact": []
+        },
+        "projects_displayed": 50000
+      },
+      "investigation_notes": [
+        "No specific pattern matched - flagged for detailed review",
+        "Active filters at time of feedback: {'phase': ['Test']}",
+        "Projects displayed: 50000"
+      ],
+      "files_analyzed": [],
+      "requires_ai_review": true
+    },
+    {
+      "id": "5f4b7a69",
+      "title": "Feedback Analysis: Other",
+      "feedback_category": "Other",
+      "feedback_rating": 1,
+      "feedback_comments": "I created a daily report, but it created it under Kendall's name instead of mine",
+      "timestamp": "2026-02-23T20:04:04.599Z",
+      "priority": "high",
+      "root_cause": "Issue reported in 'Other' category requires detailed analysis.",
+      "resolution": "This feedback requires manual AI review to determine specific root cause and resolution.",
+      "code_changes": null,
+      "user_context": {
+        "current_filters": {
+          "division": [],
+          "region": [],
+          "market": [],
+          "store": [],
+          "wmweek": [],
+          "fy": [],
+          "phase": [],
+          "owner": [],
+          "partner": [],
+          "businessorg": [],
+          "storearea": [],
+          "health": [],
+          "businesstype": [],
+          "associateimpact": [],
+          "customerimpact": []
+        },
+        "projects_displayed": 50000
+      },
+      "investigation_notes": [
+        "No specific pattern matched - flagged for detailed review",
+        "Active filters at time of feedback: {}",
+        "Projects displayed: 50000"
+      ],
+      "files_analyzed": [],
+      "requires_ai_review": true
+    }
+  ],
   "history": [
     {
       "id": "a89640f6",
@@ -142,6 +306,54 @@
       "status": "denied",
       "actioned_by": "kendall.rush",
       "actioned_at": "2026-02-06 07:43:35"
+    },
+    {
+      "id": "ba342bc0",
+      "title": "Feedback Analysis: Sparky AI",
+      "feedback_category": "Sparky AI",
+      "feedback_rating": 1,
+      "feedback_comments": "I was looking for the number of projects in the frontend.  this is what I asked for: You: How many projects do we have with the store area of frontend\n\ud83d\ude0a Sparky: \ud83d\udd0d **Found 2 projects matching 'AREA FRONTEND':** \u2022 Area Operations - Fashion \u2022 Connected Frontend - Automated Check-In & Check-Out \ud83d\udcca **Total:** 3917 stores across these projects \ud83d\udca1 **Tip:** Type a specific project name for more details.\n\u2713 Filters Applied:\nSearch: area frontend\n\nWhen I manually searched I found 31 projects on the frontend.  ",
+      "timestamp": "2026-02-23T19:28:30.819Z",
+      "priority": "high",
+      "root_cause": "Issue reported in 'Sparky AI' category requires detailed analysis.",
+      "resolution": "This feedback requires manual AI review to determine specific root cause and resolution.",
+      "code_changes": null,
+      "user_context": {
+        "current_filters": {
+          "division": [],
+          "region": [],
+          "market": [],
+          "store": [],
+          "wmweek": [],
+          "fy": [],
+          "phase": [],
+          "owner": [],
+          "partner": [],
+          "businessorg": [],
+          "storearea": [
+            "Frontend"
+          ],
+          "health": [],
+          "businesstype": [],
+          "associateimpact": [],
+          "customerimpact": []
+        },
+        "projects_displayed": 50000
+      },
+      "investigation_notes": [
+        "No specific pattern matched - flagged for detailed review",
+        "Active filters at time of feedback: {'storearea': ['Frontend']}",
+        "Projects displayed: 50000"
+      ],
+      "files_analyzed": [],
+      "requires_ai_review": true,
+      "status": "approved",
+      "actioned_by": "kendall.rush@walmart.com",
+      "actioned_at": "2026-02-23 13:33:23",
+      "implementation_result": {
+        "success": true,
+        "message": ""
+      }
     }
   ]
 }

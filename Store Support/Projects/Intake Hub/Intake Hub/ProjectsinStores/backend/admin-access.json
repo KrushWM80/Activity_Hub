@@ -6,6 +6,6 @@
     "mdroth@homeoffice.wal-mart.com",
     "hrisaac@homeoffice.wal-mart.com"
   ],
-  "fallback_password": "Admin2026",
-  "notes": "Used by both Dev (8002) and Prod (8001) - Controls admin button visibility and access"
+  "notes": "User admin list - Controls admin button visibility and access. No password authentication required - uses Kerberos/Windows AD instead."
 }
+

@@ -469,6 +469,7 @@
         // STATE: Authentication and admin status
         let currentUser = null;
         let isCurrentUserAdmin = false;
+        let userTrackingInterval = null;
         
         // Check admin status on page load
         async function checkAdminStatus() {
@@ -487,6 +488,11 @@
                 
                 // Log main dashboard access
                 logDashboardActivity('Accessed Main Dashboard', `Logged in via ${currentUser.auth_method}`);
+                
+                // Track user as active
+                trackUserActivity();
+                // Set up periodic tracking (every 60 seconds)
+                userTrackingInterval = setInterval(trackUserActivity, 60000);
             } catch (e) {
                 console.log('[Auth] Error checking admin status:', e.message);
             }
@@ -508,6 +514,24 @@
                 });
             } catch (e) {
                 console.log('[Activity Log] Error logging activity:', e.message);
+            }
+        }
+        
+        // Track user as active in the system
+        async function trackUserActivity() {
+            if (!currentUser || !currentUser.email) return;
+            try {
+                await fetch('/api/admin/track-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        user_id: currentUser.email, 
+                        page: 'Main Dashboard' 
+                    })
+                });
+                console.log('[Tracking] User activity recorded');
+            } catch (e) {
+                console.log('[Tracking] Error tracking user activity:', e.message);
             }
         }
         

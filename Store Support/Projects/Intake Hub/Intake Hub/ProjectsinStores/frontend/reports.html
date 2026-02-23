@@ -808,43 +808,74 @@
 
         // Auto-detect user information from Windows environment
         function detectUserInfo() {
-            // First, check URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            let user = urlParams.get('user_id');
-            
-            // Try to get user from sessionStorage (set by admin.html) if not in URL
-            if (!user) {
-                user = sessionStorage.getItem('adminUser');
-            }
-            
-            if (!user) {
-                // Try localStorage as backup
-                user = localStorage.getItem('reportUser');
-            }
-            
-            if (!user) {
-                // Fallback: try to get from environment or use default
-                const username = window.navigator.userAgent.match(/Windows NT.*?;.*?([A-Za-z]+)\\/)?.[1] || 'CurrentUser';
-                user = username.toLowerCase();
-            }
-            
-            // Extract just the username part if it's an email
-            if (user.includes('@')) {
-                user = user.split('@')[0];
-            }
-            
-            currentUserId = user.toLowerCase();
-            currentUserEmail = user.includes('@') ? user : `${user}@homeoffice.wal-mart.com`;
-            
-            // Set hidden fields
-            document.getElementById('userId').value = currentUserId;
-            document.getElementById('primaryEmail').value = currentUserEmail;
-            document.getElementById('userEmailDisplay').textContent = currentUserEmail;
-            
-            console.log('👤 Detected user:', currentUserId, '|', currentUserEmail);
-            
-            // Log the access to Email Reports
-            logReportActivity('Accessed Email Reports', 'Opened Email Reports configuration page');
+            // First, try to get user from the auth endpoint (most authoritative)
+            fetch('/api/auth/user')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Auth check failed');
+                })
+                .then(authData => {
+                    // Use the email from auth endpoint (e.g., kendall.rush@walmart.com)
+                    if (authData.email) {
+                        currentUserId = authData.email.toLowerCase();
+                        currentUserEmail = authData.email;
+                    } else if (authData.username) {
+                        // Fallback to username if email not provided
+                        currentUserId = authData.username.toLowerCase();
+                        currentUserEmail = `${authData.username}@homeoffice.wal-mart.com`;
+                    }
+                    
+                    console.log('👤 Detected user:', currentUserId, '|', currentUserEmail);
+                    
+                    // Set hidden fields
+                    document.getElementById('userId').value = currentUserId;
+                    document.getElementById('primaryEmail').value = currentUserEmail;
+                    document.getElementById('userEmailDisplay').textContent = currentUserEmail;
+                    
+                    // Log the access to Email Reports
+                    logReportActivity('Accessed Email Reports', 'Opened Email Reports configuration page');
+                })
+                .catch(() => {
+                    // Fallback: try other sources
+                    const urlParams = new URLSearchParams(window.location.search);
+                    let user = urlParams.get('user_id');
+                    
+                    // Try to get user from sessionStorage (set by admin.html) if not in URL
+                    if (!user) {
+                        user = sessionStorage.getItem('adminUser');
+                    }
+                    
+                    if (!user) {
+                        // Try localStorage as backup
+                        user = localStorage.getItem('reportUser');
+                    }
+                    
+                    if (!user) {
+                        // Fallback: use default
+                        user = 'CurrentUser';
+                    }
+                    
+                    // If it's an email, use as-is. Otherwise, construct email
+                    if (user.includes('@')) {
+                        currentUserId = user.toLowerCase();
+                    } else {
+                        currentUserId = `${user.toLowerCase()}@homeoffice.wal-mart.com`;
+                    }
+                    
+                    currentUserEmail = currentUserId;
+                    
+                    console.log('👤 Detected user (fallback):', currentUserId, '|', currentUserEmail);
+                    
+                    // Set hidden fields
+                    document.getElementById('userId').value = currentUserId;
+                    document.getElementById('primaryEmail').value = currentUserEmail;
+                    document.getElementById('userEmailDisplay').textContent = currentUserEmail;
+                    
+                    // Log the access to Email Reports
+                    logReportActivity('Accessed Email Reports', 'Opened Email Reports configuration page');
+                });
         }
 
         // Dark Mode Toggle
@@ -1177,13 +1208,10 @@
             `;
 
             try {
-                // Build API URL - include user_id if detected, otherwise get all
-                let apiUrl = `${API_BASE}/configs`;
-                if (currentUserId && currentUserId !== 'CurrentUser') {
-                    apiUrl += `?user_id=${currentUserId}`;
-                }
+                // Backend automatically uses authenticated user identity - no need to pass user_id
+                const apiUrl = `${API_BASE}/configs`;
                 
-                console.log('📡 Loading reports:', apiUrl, '| currentUserId:', currentUserId);
+                console.log('📡 Loading reports:', apiUrl, '(authenticated user used server-side)');
                 const response = await fetch(apiUrl);
                 
                 if (!response.ok) {

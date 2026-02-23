@@ -1,13 +1,15 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from typing import List, Optional
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from typing import List, Optional, Dict
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timedelta
 import uvicorn
 import os
 import smtplib
+import uuid
+import json
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -28,6 +30,12 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "dev").lower()
 IS_DEV = ENVIRONMENT == "dev"
 
 app = FastAPI(title="Projects in Stores Dashboard API")
+
+# ===== SESSION MANAGEMENT FOR REMOTE USERS =====
+# Simple in-memory session store: session_id -> {email, expires, is_admin}
+# Declare EARLY so middleware can use it
+_SESSIONS: Dict[str, dict] = {}
+SESSION_TIMEOUT_MINUTES = 480  # 8 hours
 
 # ==============================================
 # IMPORTANT: FRONTEND SINGLE SOURCE OF TRUTH
@@ -52,6 +60,101 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# =============================================
+# AUTOMATIC USER TRACKING MIDDLEWARE
+# =============================================
+# This middleware automatically tracks ANY authenticated user
+# on ANY request, so everyone is tracked regardless of frontend code
+
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
+
+class AutomaticUserTrackingMiddleware(BaseHTTPMiddleware):
+    """Middleware that automatically tracks authenticated users on every request"""
+    
+    async def dispatch(self, request: Request, call_next):
+        # Try to get authenticated user
+        current_user = None
+        page = request.url.path
+        
+        try:
+            # Method 1: Check session cookie first
+            session_id = request.cookies.get('session_id')
+            if session_id:
+                from datetime import datetime, timedelta
+                if session_id in _SESSIONS:
+                    session = _SESSIONS[session_id]
+                    if datetime.utcnow() < session['expires']:
+                        current_user = session['email']
+            
+            # Method 2: Check Kerberos/Windows AD headers
+            if not current_user:
+                # Check for Kerberos headers
+                kerberos_user = (
+                    request.headers.get('X-Remote-User') or
+                    request.headers.get('Remote-User') or
+                    request.headers.get('HTTP_REMOTE_USER') or
+                    request.headers.get('X-Authenticated-User')
+                )
+                
+                if kerberos_user:
+                    if '\\' in kerberos_user:
+                        kerberos_user = kerberos_user.split('\\')[-1]
+                    if '@' not in kerberos_user:
+                        # Map to email format
+                        username_map = {'krush': 'kendall.rush@walmart.com'}
+                        kerberos_user_lower = kerberos_user.lower()
+                        if kerberos_user_lower in username_map:
+                            current_user = username_map[kerberos_user_lower]
+                        else:
+                            current_user = f"{kerberos_user_lower}@homeoffice.wal-mart.com"
+                    else:
+                        current_user = kerberos_user.lower()
+            
+            # Method 3: Fall back to Windows username
+            if not current_user:
+                windows_user = os.getenv('USERNAME', '').lower()
+                if windows_user:
+                    username_map = {'krush': 'kendall.rush@walmart.com'}
+                    if windows_user in username_map:
+                        current_user = username_map[windows_user]
+                    else:
+                        if '@' not in windows_user:
+                            current_user = f"{windows_user}@homeoffice.wal-mart.com"
+                        else:
+                            current_user = windows_user
+            
+            # Track the user if we found one
+            if current_user:
+                # Determine page name from path
+                if page in ['/', '/index.html']:
+                    page = 'Main Dashboard'
+                elif page == '/admin.html':
+                    page = 'Admin Dashboard'
+                elif '/api/' in page:
+                    # API endpoint - extract meaningful name
+                    parts = page.split('/')
+                    page = f"API: {parts[-1]}" if len(parts) > 2 else page
+                
+                # Call tracking function asynchronously to not block request
+                try:
+                    from functools import partial
+                    track_user_activity(current_user, page)
+                except Exception as e:
+                    # Silently fail - don't break the request if tracking fails
+                    print(f"[TRACKING] Error tracking {current_user}: {e}")
+        
+        except Exception as e:
+            # Silently continue if anything goes wrong
+            print(f"[MIDDLEWARE] Error in tracking middleware: {e}")
+        
+        # Always call the next middleware/endpoint
+        response = await call_next(request)
+        return response
+
+# Add the middleware to the app
+app.add_middleware(AutomaticUserTrackingMiddleware)
 
 # Initialize services
 db_service = DatabaseService()
@@ -88,18 +191,161 @@ def load_admin_access_list():
 
 admin_config = load_admin_access_list()
 
+def create_session(user_email: str, is_admin: bool = False) -> str:
+    """Create a new session and return session ID"""
+    session_id = str(uuid.uuid4())
+    expires = datetime.utcnow() + timedelta(minutes=SESSION_TIMEOUT_MINUTES)
+    _SESSIONS[session_id] = {
+        'email': user_email,
+        'is_admin': is_admin,
+        'expires': expires,
+        'created': datetime.utcnow()
+    }
+    return session_id
+
+def get_session_user(session_id: str) -> Optional[str]:
+    """Get user email from session, returns None if expired or invalid"""
+    if session_id not in _SESSIONS:
+        return None
+    session = _SESSIONS[session_id]
+    if datetime.utcnow() > session['expires']:
+        # Session expired, clean it up
+        del _SESSIONS[session_id]
+        return None
+    # Update last accessed time (extend expiry on each access)
+    session['expires'] = datetime.utcnow() + timedelta(minutes=SESSION_TIMEOUT_MINUTES)
+    return session['email']
+
+def clear_session(session_id: str):
+    """Clear/logout a session"""
+    _SESSIONS.pop(session_id, None)
+
+def cleanup_expired_sessions():
+    """Remove expired sessions"""
+    now = datetime.utcnow()
+    expired = [sid for sid, sess in _SESSIONS.items() if now > sess['expires']]
+    for sid in expired:
+        del _SESSIONS[sid]
+
+def get_current_authenticated_user(request: Request = None) -> Optional[str]:
+    """Get current authenticated user from: session → Kerberos headers → Windows AD"""
+    # 1. Try session first (for remote users with active session)
+    if request:
+        session_id = request.cookies.get('session_id')
+        if session_id:
+            user = get_session_user(session_id)
+            if user:
+                return user
+        
+        # 2. Try Kerberos/NTLM headers (for domain-joined machines)
+        # Check various headers that IIS/reverse proxy might set
+        kerberos_user = None
+        
+        # Check Authorization header for Negotiate/NTLM token
+        auth_header = request.headers.get('Authorization', '')
+        if auth_header.startswith('Negotiate ') or auth_header.startswith('NTLM '):
+            # User is authenticated via Kerberos/NTLM, extract username from other headers
+            kerberos_user = extract_kerberos_username(request)
+        
+        # Also check common header aliases
+        if not kerberos_user:
+            kerberos_user = (
+                request.headers.get('X-Remote-User') or
+                request.headers.get('Remote-User') or
+                request.headers.get('HTTP_REMOTE_USER') or
+                request.headers.get('X-Authenticated-User')
+            )
+        
+        if kerberos_user:
+            return kerberos_user.lower()
+    
+    # 3. Fall back to Windows AD (for local users on same machine)
+    return get_windows_username()
+
 def get_windows_username():
-    """Get current Windows username from environment"""
+    """Get current Windows username from environment and map to correct email"""
     try:
         username = os.getenv('USERNAME', '').lower()
         if username:
-            # Convert to email format if it's just a username
+            # Map Windows usernames to their canonical Walmart email addresses
+            # This ensures consistent user identity across the system
+            username_map = {
+                'krush': 'kendall.rush@walmart.com',
+                # Add more mappings as needed: 'username': 'firstname.lastname@walmart.com'
+            }
+            
+            # Check if there's a mapping for this user
+            if username in username_map:
+                return username_map[username]
+            
+            # Default: Convert to email format if it's just a username
             if '@' not in username:
                 username = f"{username}@homeoffice.wal-mart.com"
             return username
     except:
         pass
     return None
+
+def extract_kerberos_username(request: Request) -> Optional[str]:
+    """Extract username from Kerberos/NTLM authentication headers
+    
+    When a user accesses from a domain-joined machine, the web server receives
+    Kerberos authentication tokens. This function extracts the username.
+    """
+    try:
+        # Try to extract from various possible header locations
+        # Method 1: Direct remote user header (set by IIS/reverse proxy after Kerberos validation)
+        user = (
+            request.headers.get('X-Remote-User') or
+            request.headers.get('Remote-User') or
+            request.headers.get('HTTP_REMOTE_USER') or
+            request.headers.get('X-Authenticated-User')
+        )
+        
+        if user:
+            # Clean up the username (remove domain prefix if present)
+            if '\\' in user:
+                # Format: DOMAIN\username → extract username
+                user = user.split('\\')[-1]
+            if '@' in user:
+                # Already in email format or contains domain
+                return user.lower()
+            else:
+                # Just a Windows username, map to Walmart email
+                user_lower = user.lower()
+                username_map = {
+                    'krush': 'kendall.rush@walmart.com',
+                    # Add more mappings as needed
+                }
+                if user_lower in username_map:
+                    return username_map[user_lower]
+                else:
+                    # Default: convert to @homeoffice.wal-mart.com format
+                    return f"{user_lower}@homeoffice.wal-mart.com"
+    except:
+        pass
+    
+    return None
+
+def get_admin_email_variants(windows_user):
+    """Get all possible email variants for a user to check admin access
+    Handles both mapped and unmapped users"""
+    variants = [windows_user]  # Original mapped email (in canonical format)
+    
+    # Check if this user is in the username map (reverse lookup)
+    username_map = {
+        'krush': 'kendall.rush@walmart.com',
+        # Add more mappings as needed
+    }
+    
+    # If this user was mapped from a Windows username, also include the homeoffice variant
+    for windows_username, mapped_email in username_map.items():
+        if mapped_email == windows_user:
+            # Add the homeoffice email variant for backward compatibility
+            variants.append(f"{windows_username}@homeoffice.wal-mart.com")
+            break
+    
+    return variants
 
 class AuthResponse(BaseModel):
     """Response model for authentication endpoints"""
@@ -110,23 +356,31 @@ class AuthResponse(BaseModel):
     message: str = ""
 
 class LoginRequest(BaseModel):
-    """Request model for manual login"""
+    """Request model for manual login - username only (password ignored)"""
     username: str
-    password: str
+    password: str = ""  # Optional, not used for authentication
 
 @app.get("/api/auth/user")
-async def get_current_user():
-    """Check current user from Windows AD and return admin status"""
-    windows_user = get_windows_username()
+async def get_current_user(request: Request):
+    """Check current user from session (if logged in) or Windows AD and return admin status"""
+    # Check session first, fall back to Windows
+    current_user = get_current_authenticated_user(request)
     
-    if windows_user:
-        is_admin = windows_user in admin_config['admins']
+    if current_user:
+        # Check admin access using all possible email variants
+        email_variants = get_admin_email_variants(current_user)
+        is_admin = any(variant in admin_config['admins'] for variant in email_variants)
+        
+        # Determine auth method
+        session_id = request.cookies.get('session_id')
+        auth_method = 'session' if session_id else 'windows_ad'
+        
         return AuthResponse(
-            email=windows_user,
-            username=windows_user.split('@')[0],
+            email=current_user,
+            username=current_user.split('@')[0],
             is_admin=is_admin,
-            auth_method='windows_ad',
-            message='Authenticated via Windows AD'
+            auth_method=auth_method,
+            message=f'Authenticated via {auth_method}'
         )
     
     # Not on network or Windows auth failed
@@ -138,30 +392,95 @@ async def get_current_user():
 
 @app.post("/api/auth/login")
 async def fallback_login(request: LoginRequest):
-    """Fallback login using username and password"""
-    username = request.username.lower()
-    password = request.password
+    """Fallback login for remote users by username only (NO PASSWORD REQUIRED)
     
-    # Check password
-    if password != admin_config['fallback_password']:
-        raise HTTPException(status_code=401, detail="Invalid password")
+    Allows any Walmart domain user to log in by providing just their username.
+    This endpoint is only used when Kerberos/NTLM headers are not detected.
+    No password validation - any domain username can authenticate.
+    Returns session info for user tracking and sets session cookie.
+    """
+    username = request.username.lower().strip()
     
-    # Convert username to email format
-    email = f"{username}@walmart.com"
+    if not username:
+        raise HTTPException(status_code=400, detail="Username required")
     
-    # Check if user is in admin list
-    is_admin = email in admin_config['admins']
+    # Map username to canonical email format
+    username_map = {
+        'krush': 'kendall.rush@walmart.com',
+        # Add more mappings as needed
+    }
     
-    if not is_admin:
-        raise HTTPException(status_code=403, detail="User is not authorized as admin")
+    if username in username_map:
+        user_email = username_map[username]
+    else:
+        # Default: convert to @homeoffice.wal-mart.com format
+        user_email = f"{username}@homeoffice.wal-mart.com"
     
-    return AuthResponse(
-        email=email,
-        username=username,
-        is_admin=True,
-        auth_method='fallback_password',
-        message='Authenticated via fallback password'
+    # Check if user is admin
+    email_variants = [user_email]
+    # Add walmart.com variant if not already
+    if '@homeoffice.wal-mart.com' in user_email:
+        email_variants.append(user_email.replace('@homeoffice.wal-mart.com', '@walmart.com'))
+    
+    is_admin = any(variant in admin_config.get('admins', []) for variant in email_variants)
+    
+    # Create session for this user
+    session_id = create_session(user_email, is_admin)
+    
+    # Track user activity (login)
+    track_user_activity(user_email, "Logged in (Fallback - No Password)")
+    log_activity(
+        action='User Login',
+        user=user_email,
+        details='User logged in via username-only authentication (Kerberos not detected)',
+        category='auth'
     )
+    
+    # Create response with session cookie
+    response_data = AuthResponse(
+        email=user_email,
+        username=username,
+        is_admin=is_admin,
+        auth_method='session',
+        message=f'Logged in as {user_email}'
+    )
+    
+    response = JSONResponse(content=response_data.dict())
+    # Set HttpOnly cookie with session ID (httpOnly prevents JavaScript access for security)
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        httponly=True,
+        secure=False,  # Set to True if using HTTPS in production
+        samesite="lax",
+        max_age=SESSION_TIMEOUT_MINUTES * 60,  # Seconds
+        path="/"
+    )
+    
+    return response
+
+@app.post("/api/auth/logout")
+async def logout(request: Request):
+    """Logout the current user and clear session"""
+    session_id = request.cookies.get('session_id')
+    if session_id:
+        # Get user email before clearing
+        user_email = get_session_user(session_id)
+        # Clear the session
+        clear_session(session_id)
+        
+        if user_email:
+            log_activity(
+                action='User Logout',
+                user=user_email,
+                details='User logged out',
+                category='auth'
+            )
+    
+    # Create response and clear the cookie
+    response = JSONResponse(content={'message': 'Logged out successfully'})
+    response.delete_cookie('session_id', path='/')
+    return response
 
 # Startup and shutdown events for SQLite cache sync
 @app.on_event("startup")
@@ -219,6 +538,54 @@ async def shutdown_event():
     """Stop background sync on shutdown"""
     print("[Shutdown] Stopping background sync...")
     sqlite_cache.stop_background_sync()
+
+
+# Middleware for automatic user tracking on API calls
+@app.middleware("http")
+async def track_user_middleware(request, call_next):
+    """
+    Automatically track authenticated users on every API request.
+    This ensures all users are visible in active users list regardless of page.
+    Only tracks API endpoints, not static files.
+    Also checks for session cookies and Windows auth.
+    """
+    try:
+        # Only track API requests
+        if request.url.path.startswith("/api/"):
+            # Skip auth endpoints and other non-tracking endpoints
+            if not any(skip in request.url.path for skip in [
+                "/api/auth/user",
+                "/api/auth/login",
+                "/api/auth/logout",
+                "/api/health",
+                "/api/admin/track-user"  # Skip explicit track-user to avoid double tracking
+            ]):
+                # Get authenticated user (checks session first, then Windows)
+                current_user = get_current_authenticated_user(request)
+                
+                if current_user:
+                    # Derive page name from endpoint
+                    path = request.url.path
+                    if "/reports/" in path:
+                        page = "Email Reports"
+                    elif "/admin/" in path:
+                        page = "Admin Dashboard"
+                    elif "/projects" in path:
+                        page = "Projects Dashboard"
+                    elif "/summary" in path:
+                        page = "Summary"
+                    else:
+                        page = path.replace("/api/", "").split("/")[0].title() or "API"
+                    
+                    # Track user activity (updates last_seen and page)
+                    track_user_activity(current_user, page)
+    except Exception as e:
+        # Log but don't fail the request if tracking fails
+        print(f"[Tracking] Error in user tracking middleware: {e}")
+    
+    # Continue with the request
+    response = await call_next(request)
+    return response
 
 # Pydantic models for API
 class ProjectResponse(BaseModel):
@@ -291,30 +658,171 @@ class AIQueryResponse(BaseModel):
     query: str
 
 @app.get("/")
-async def root():
-    # Serve different files based on environment
-    # Dev (localhost:8002) serves index.html with latest revisions
-    # Production (127.0.0.1:8001) serves index.html.production (stable version)
-    html_file = "index.html" if IS_DEV else "index.html.production"
-    html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", html_file)
+async def root(request: Request):
+    """Serve main dashboard - with automatic authentication
+    
+    If user is authenticated (via session or Kerberos), serve dashboard.
+    If user is not authenticated, redirect to login page for username entry.
+    """
+    # Check if user is authenticated
+    current_user = get_current_authenticated_user(request)
+    if current_user:
+        # Auto-login: User detected via Kerberos or session
+        # Create session if they came via Kerberos headers but don't have a session cookie yet
+        session_id = request.cookies.get('session_id')
+        if not session_id:
+            # Extract admin status
+            email_variants = [current_user]
+            if '@homeoffice.wal-mart.com' in current_user:
+                email_variants.append(current_user.replace('@homeoffice.wal-mart.com', '@walmart.com'))
+            is_admin = any(variant in admin_config.get('admins', []) for variant in email_variants)
+            
+            # Create a new session for this auto-detected user
+            session_id = create_session(current_user, is_admin)
+            
+            # Track this auto-login
+            track_user_activity(current_user, "Auto-Login (Kerberos/Windows)")
+            log_activity(
+                action='Auto-Login',
+                user=current_user,
+                details='User automatically detected and logged in via Kerberos/Windows auth',
+                category='auth'
+            )
+        else:
+            # Just track normal access
+            track_user_activity(current_user, "Main Dashboard")
+        
+        # Serve dashboard
+        html_file = "index.html" if IS_DEV else "index.html.production"
+        html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", html_file)
+        if os.path.exists(html_path):
+            response = FileResponse(html_path, media_type="text/html")
+            # Ensure session cookie is set (if it was created above)
+            if session_id:
+                response.set_cookie(
+                    key="session_id",
+                    value=session_id,
+                    httponly=True,
+                    secure=False,
+                    samesite="lax",
+                    max_age=SESSION_TIMEOUT_MINUTES * 60,
+                    path="/"
+                )
+            return response
+        else:
+            # Fallback to API info if HTML not found
+            return {
+                "message": "Projects in Stores Dashboard API",
+                "version": "1.0.0",
+                "endpoints": [
+                    "/api/projects",
+                    "/api/summary",
+                    "/api/filters",
+                    "/api/store-counts",
+                    "/api/ai/query"
+                ]
+            }
+    else:
+        # Not authenticated - redirect to login page
+        return RedirectResponse(url="/login.html", status_code=302)
+
+@app.get("/index.html")
+async def index_html(request: Request):
+    """Serve dashboard via index.html - PRIMARY ENTRY POINT
+    
+    Users access this URL directly: http://weus.../8001/index.html
+    Supports same auto-authentication as root endpoint.
+    """
+    # Check if user is authenticated
+    current_user = get_current_authenticated_user(request)
+    if current_user:
+        # Auto-login: User detected via Kerberos or session
+        # Create session if they came via Kerberos headers but don't have a session cookie yet
+        session_id = request.cookies.get('session_id')
+        if not session_id:
+            # Extract admin status
+            email_variants = [current_user]
+            if '@homeoffice.wal-mart.com' in current_user:
+                email_variants.append(current_user.replace('@homeoffice.wal-mart.com', '@walmart.com'))
+            is_admin = any(variant in admin_config.get('admins', []) for variant in email_variants)
+            
+            # Create a new session for this auto-detected user
+            session_id = create_session(current_user, is_admin)
+            
+            # Track this auto-login
+            track_user_activity(current_user, "Auto-Login (Kerberos/Windows)")
+            log_activity(
+                action='Auto-Login',
+                user=current_user,
+                details='User automatically detected and logged in via Kerberos/Windows auth',
+                category='auth'
+            )
+        else:
+            # Just track normal access
+            track_user_activity(current_user, "Dashboard Access")
+        
+        # Serve dashboard
+        html_file = "index.html" if IS_DEV else "index.html.production"
+        html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", html_file)
+        if os.path.exists(html_path):
+            response = FileResponse(html_path, media_type="text/html")
+            # Ensure session cookie is set (if it was created above)
+            if session_id:
+                response.set_cookie(
+                    key="session_id",
+                    value=session_id,
+                    httponly=True,
+                    secure=False,
+                    samesite="lax",
+                    max_age=SESSION_TIMEOUT_MINUTES * 60,
+                    path="/"
+                )
+            return response
+        else:
+            # Fallback to API info if HTML not found
+            return {
+                "message": "Projects in Stores Dashboard API",
+                "version": "1.0.0",
+                "endpoints": [
+                    "/api/projects",
+                    "/api/summary",
+                    "/api/filters",
+                    "/api/store-counts",
+                    "/api/ai/query"
+                ]
+            }
+    else:
+        # Not authenticated - redirect to login page
+        return RedirectResponse(url="/login.html", status_code=302)
+
+@app.get("/login.html")
+async def login_page(request: Request):
+    """Serve login page - username-only form for non-domain users
+    
+    If user is already authenticated (Kerberos detected), redirect to dashboard.
+    Otherwise, serve username-only login form.
+    """
+    # Check if user is already authenticated
+    current_user = get_current_authenticated_user(request)
+    if current_user:
+        # User already authenticated, redirect to dashboard
+        return RedirectResponse(url="/", status_code=302)
+    
+    # Not authenticated yet - serve login form
+    html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "login.html")
     if os.path.exists(html_path):
         return FileResponse(html_path, media_type="text/html")
     else:
-        # Fallback to API info if HTML not found
-        return {
-            "message": "Projects in Stores Dashboard API",
-            "version": "1.0.0",
-            "endpoints": [
-                "/api/projects",
-                "/api/summary",
-                "/api/filters",
-                "/api/store-counts",
-                "/api/ai/query"
-            ]
-        }
+        raise HTTPException(status_code=404, detail="Login page not found")
 
 @app.get("/reports.html")
-async def reports_page():
+async def reports_page(request: Request):
+    """Serve reports management interface - track user"""
+    # Track user access to reports page
+    current_user = get_current_authenticated_user(request)
+    if current_user:
+        track_user_activity(current_user, "Email Reports")
+    
     # Serve the reports management interface
     html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "reports.html")
     if os.path.exists(html_path):
@@ -323,8 +831,13 @@ async def reports_page():
         raise HTTPException(status_code=404, detail="Reports page not found")
 
 @app.get("/admin.html")
-async def admin_page():
-    """Serve the admin dashboard directly via /admin.html"""
+async def admin_page(request: Request):
+    """Serve the admin dashboard directly via /admin.html - track user"""
+    # Track user access to admin dashboard
+    current_user = get_current_authenticated_user(request)
+    if current_user:
+        track_user_activity(current_user, "Admin Dashboard")
+    
     admin_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "admin.html")
     if os.path.exists(admin_path):
         return FileResponse(admin_path, media_type="text/html")
@@ -1929,9 +2442,19 @@ async def get_report_options():
 
 
 @app.get("/api/reports/configs")
-async def get_report_configs(user_id: str = None):
-    """Get all report configurations - all reports if called by admin, or filtered by user_id"""
+async def get_report_configs(request: Request, user_id: str = None):
+    """Get report configurations - only return reports for authenticated user (or all if admin)"""
     import json
+    
+    # Get the currently authenticated user (checks session first, then Windows AD) - ALWAYS use this, ignore user_id parameter
+    current_user = get_current_authenticated_user(request)
+    
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated. Please log in via Windows AD.")
+    
+    # Check if user is admin
+    email_variants = get_admin_email_variants(current_user)
+    is_admin = any(variant in admin_config.get('admins', []) for variant in email_variants)
     
     configs = []
     configs_dir = Path(__file__).parent / "report_configs"
@@ -1942,48 +2465,84 @@ async def get_report_configs(user_id: str = None):
             try:
                 with open(config_file, 'r') as f:
                     config = json.load(f)
-                    # If user_id is provided, filter by it; otherwise return all (admin view)
-                    if user_id is None or config.get('user_id') == user_id:
+                    # Return config if:
+                    # 1. User is admin (can see all reports), OR
+                    # 2. Report belongs to the authenticated user
+                    if is_admin or config.get('user_id') == current_user:
                         configs.append(config)
             except:
                 pass
+    
+    # Log access for audit trail
+    log_activity(
+        action='Accessed Email Reports',
+        user=current_user,
+        details=f'Retrieved {len(configs)} report configurations',
+        category='email_reports'
+    )
     
     return {"configs": configs}
 
 
 @app.post("/api/reports/configs")
-async def create_report_config(request: dict):
-    """Create new report configuration with Windows Task Scheduler"""
+async def create_report_config(request: Request):
+    """Create new report configuration with Windows Task Scheduler
+    
+    Automatically assigns report to authenticated user - user_id parameter is ignored.
+    Only authenticated users can create reports for themselves.
+    """
     import json
     import uuid
     
     try:
+        # Get authenticated user (checks session first, then Windows) - ALWAYS use this, never trust request data
+        current_user = get_current_authenticated_user(request)
+        
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated. Please log in via Windows AD.")
+        
+        # Parse request body
+        body = await request.json()
+        
         # Generate config ID
         config_id = str(uuid.uuid4())
         
-        # Add metadata
-        request['config_id'] = config_id
-        request['created_at'] = datetime.now().isoformat()
-        request['last_sent'] = None
+        # Add metadata AND FORCE user_id to authenticated user
+        # This prevents any user from creating reports for other users
+        body['config_id'] = config_id
+        body['user_id'] = current_user  # FORCE to authenticated user
+        body['created_at'] = datetime.now().isoformat()
+        body['last_sent'] = None
         
         # Save config to file
         configs_dir = Path(__file__).parent / "report_configs"
+        configs_dir.mkdir(exist_ok=True)
         config_file = configs_dir / f"{config_id}.json"
         
         with open(config_file, 'w') as f:
-            json.dump(request, f, indent=2)
+            json.dump(body, f, indent=2)
+        
+        # Log the action
+        log_activity(
+            action='Created Email Report',
+            user=current_user,
+            details=f'Report: {body.get("report_name", "Unnamed")} (ID: {config_id})',
+            category='email_reports'
+        )
         
         # Create Windows scheduled task if active
-        if request.get('is_active', False):
-            scheduler_manager.create_scheduled_task(request)
+        if body.get('is_active', False):
+            scheduler_manager.create_scheduled_task(body)
         
         return {
             "success": True,
             "message": "Report configuration created successfully",
             "config_id": config_id,
-            "config": request
+            "config": body
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating report: {str(e)}")
 
@@ -2012,23 +2571,61 @@ async def get_report_config(config_id: str):
 
 
 @app.put("/api/reports/configs/{config_id}")
-async def update_report_config(config_id: str, request: dict):
-    """Update report configuration"""
+async def update_report_config(config_id: str, http_request: Request):
+    """Update report configuration - only owner or admin can update
+    
+    Preserves the original user_id - reports cannot be transferred between users.
+    """
     import json
     
     try:
+        # Get authenticated user (checks session first, then Windows)
+        current_user = get_current_authenticated_user(http_request)
+        
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated. Please log in via Windows AD.")
+        
+        # Parse request body
+        request = await http_request.json()
+        
+        # Check admin status
+        email_variants = get_admin_email_variants(current_user)
+        is_admin = any(variant in admin_config.get('admins', []) for variant in email_variants)
+        
         configs_dir = Path(__file__).parent / "report_configs"
         config_file = configs_dir / f"{config_id}.json"
         
         if not config_file.exists():
             raise HTTPException(status_code=404, detail="Configuration not found")
         
-        # Update config
+        # Load existing config to verify ownership
+        with open(config_file, 'r') as f:
+            existing_config = json.load(f)
+        
+        # Check authorization: must be owner or admin
+        owner = existing_config.get('user_id')
+        if owner != current_user and not is_admin:
+            raise HTTPException(
+                status_code=403, 
+                detail="You can only update your own reports. Contact admin if you need help."
+            )
+        
+        # Update config - PRESERVE user_id, never allow changing ownership
         request['config_id'] = config_id
+        request['user_id'] = owner  # FORCE preservation of original owner
         request['updated_at'] = datetime.now().isoformat()
+        request['created_at'] = existing_config.get('created_at')  # Keep original creation date
         
         with open(config_file, 'w') as f:
             json.dump(request, f, indent=2)
+        
+        # Log the action
+        log_activity(
+            action='Updated Email Report',
+            user=current_user,
+            details=f'Report: {request.get("report_name", "Unnamed")} (ID: {config_id})',
+            category='email_reports'
+        )
         
         # Update Windows scheduled task
         if request.get('is_active', False):
@@ -2049,16 +2646,46 @@ async def update_report_config(config_id: str, request: dict):
 
 
 @app.delete("/api/reports/configs/{config_id}")
-async def delete_report_config(config_id: str):
-    """Delete report configuration and scheduled task"""
+async def delete_report_config(config_id: str, request: Request):
+    """Delete report configuration - only owner or admin can delete"""
     import json
     
     try:
+        # Get authenticated user (checks session first, then Windows)
+        current_user = get_current_authenticated_user(request)
+        
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Not authenticated. Please log in via Windows AD.")
+        
+        # Check admin status
+        email_variants = get_admin_email_variants(current_user)
+        is_admin = any(variant in admin_config.get('admins', []) for variant in email_variants)
+        
         configs_dir = Path(__file__).parent / "report_configs"
         config_file = configs_dir / f"{config_id}.json"
         
         if not config_file.exists():
             raise HTTPException(status_code=404, detail="Configuration not found")
+        
+        # Load config to verify ownership
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+        
+        # Check authorization: must be owner or admin
+        owner = config.get('user_id')
+        if owner != current_user and not is_admin:
+            raise HTTPException(
+                status_code=403, 
+                detail="You can only delete your own reports. Contact admin if you need help."
+            )
+        
+        # Log the action
+        log_activity(
+            action='Deleted Email Report',
+            user=current_user,
+            details=f'Report: {config.get("report_name", "Unnamed")} (ID: {config_id})',
+            category='email_reports'
+        )
         
         # Delete Windows scheduled task
         scheduler_manager.delete_scheduled_task(config_id)

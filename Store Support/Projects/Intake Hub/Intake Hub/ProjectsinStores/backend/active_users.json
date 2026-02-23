@@ -1,9 +1,14 @@
 {
   "users": {
-    "krush@homeoffice.wal-mart.com": {
-      "last_seen": "2026-02-20 16:22:13",
+    "kendall.rush@walmart.com": {
+      "last_seen": "2026-02-23 17:03:30",
+      "page": "API: active-users",
+      "timestamp": 1771887810.032841
+    },
+    "kristii.buttrey@walmart.com": {
+      "last_seen": "2026-02-23 17:01:02",
       "page": "Admin Dashboard",
-      "timestamp": 1771626133.277152
+      "timestamp": 1771887662.635365
     }
   }
 }
