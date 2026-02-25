@@ -1580,13 +1580,16 @@
                 return;
             }
             
-            container.innerHTML = userList.map(([userId, info]) => {
-                const initials = userId.split('.').map(n => n[0]?.toUpperCase() || '').join('').slice(0, 2);
+            container.innerHTML = userList.map(([sessionId, info]) => {
+                const email = info.user_email || info.user || 'Unknown';
+                const deviceType = info.device_info || 'Unknown Device';
+                const userDisplay = `${email} - ${deviceType}`;
+                const initials = email.split('@')[0].split('.').map(n => n[0]?.toUpperCase() || '').join('').slice(0, 2);
                 return `
                     <div class="user-item">
                         <div class="user-avatar">${initials || '?'}</div>
                         <div class="user-info">
-                            <div class="name">${escapeHtml(userId)}</div>
+                            <div class="name">${escapeHtml(userDisplay)}</div>
                             <div class="page">📄 ${escapeHtml(info.page || 'Unknown')}</div>
                         </div>
                         <div class="user-status"></div>
@@ -1844,8 +1847,8 @@ ${formatCodeDiff(fix.code_changes)}
 
         async function loadReportsData() {
             try {
-                // Admin view - load ALL reports (no user_id filter)
-                const resp = await fetch(`${REPORTS_API_BASE}/configs`, {
+                // Filter reports by logged-in user's email - only show their own reports
+                const resp = await fetch(`${REPORTS_API_BASE}/configs?user_id=${encodeURIComponent(currentUser)}`, {
                     headers: { 'Content-Type': 'application/json' }
                 });
                 const data = await resp.json();
@@ -1857,7 +1860,7 @@ ${formatCodeDiff(fix.code_changes)}
                 document.getElementById('reportsActive').textContent = activeCount;
 
                 renderReportsTable(allReportsData);
-                logActivity('Loaded Reports List', currentUser, `Viewed ${allReportsData.length} total reports, ${activeCount} active`, 'dashboard_admin');
+                logActivity('Loaded Reports List', currentUser, `Viewed ${allReportsData.length} total reports (filtered by user), ${activeCount} active`, 'dashboard_admin');
             } catch (error) {
                 console.error('Error loading reports:', error);
                 document.getElementById('reportsTableBodyAdmin').innerHTML = `

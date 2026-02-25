@@ -1714,59 +1714,121 @@
         // ==========================================
         // AUDIT LOG SYSTEM
         // ==========================================
-        const AuditLog = {
-            STORAGE_KEY: 'activityHub_auditLog',
-            
-            // Get current user (placeholder - integrate with actual auth)
-            getCurrentUser() {
-                return localStorage.getItem('activityHub_currentUser') || 'Admin User';
-            },
-            
-            // Log an audit event
-            log(area, action, details, metadata = {}) {
-                const logs = this.getAll();
-                const entry = {
-                    id: Date.now() + Math.random().toString(36).substr(2, 9),
-                    timestamp: new Date().toISOString(),
-                    user: this.getCurrentUser(),
-                    area: area,
-                    action: action,
-                    details: details,
-                    metadata: metadata
-                };
-                logs.unshift(entry); // Add to beginning
-                
-                // Keep only last 500 entries
-                if (logs.length > 500) logs.length = 500;
-                
-                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(logs));
-                this.updateStats();
-                this.renderLog();
-                return entry;
-            },
-            
-            // Get all logs
-            getAll() {
-                try {
-                    return JSON.parse(localStorage.getItem(this.STORAGE_KEY)) || [];
-                } catch {
-                    return [];
+
+        // =============================
+        // BACKEND-POWERED ACTIVITY LOG & ACTIVE USERS
+        // =============================
+        // API endpoints (adjust if needed)
+        const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:8001/api/admin' : '/api/admin';
+
+        // Fetch and render Activity Log from backend
+        async function fetchAndRenderActivityLog() {
+            const container = document.getElementById('activity-log-list');
+            if (!container) return;
+            container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--gray-500);">Loading activity log...</div>';
+            try {
+                const areaFilter = document.getElementById('log-area-filter')?.value || 'all';
+                const actionFilter = document.getElementById('log-action-filter')?.value || 'all';
+                let url = `${API_BASE}/activity-log`;
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error('Failed to fetch activity log');
+                const data = await resp.json();
+                let logs = data.activities || data.logs || data || [];
+                if (areaFilter !== 'all') logs = logs.filter(l => l.area === areaFilter);
+                if (actionFilter !== 'all') logs = logs.filter(l => (l.action||'').toLowerCase().includes(actionFilter));
+                if (!Array.isArray(logs) || logs.length === 0) {
+                    container.innerHTML = `<div style="padding: var(--space-8); text-align: center; color: var(--gray-500);"><div style="font-size: 3rem; margin-bottom: var(--space-4);">📋</div><p>No activity logs found</p></div>`;
+                    return;
                 }
-            },
-            
-            // Clear all logs
-            clear() {
-                if (confirm('Are you sure you want to clear all activity logs? This cannot be undone.')) {
-                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify([]));
-                    this.updateStats();
-                    this.renderLog();
-                    showNotification('Activity log cleared', 'success');
+                let html = '<table style="width: 100%; border-collapse: collapse; font-size: 13px;">';
+                html += `<thead style="position: sticky; top: 0; background: var(--gray-100); z-index: 5;"><tr><th style="padding: var(--space-3); text-align: left; width: 160px;">Timestamp</th><th style="padding: var(--space-3); text-align: left; width: 220px;">Email • Device</th><th style="padding: var(--space-3); text-align: left; width: 120px;">Area</th><th style="padding: var(--space-3); text-align: left; width: 100px;">Action</th><th style="padding: var(--space-3); text-align: left;">Details</th></tr></thead><tbody>`;
+                for (const log of logs) {
+                    const date = new Date(log.timestamp);
+                    const timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    let userInfo = `<div><strong>${log.user_email || log.user || '-'}</strong>${log.device_info ? ' • <strong>' + log.device_info + '</strong>' : ''}</div>`;
+                    html += `<tr style="border-bottom: 1px solid var(--gray-200);"><td style="padding: var(--space-3); color: var(--gray-500);">${timeStr}</td><td style="padding: var(--space-3);">${userInfo}</td><td style="padding: var(--space-3);"><span class=\"area-badge\">${log.area||'-'}</span></td><td style="padding: var(--space-3);"><span class=\"action-badge\">${log.action||'-'}</span></td><td style="padding: var(--space-3);">${log.details||'-'}</td></tr>`;
                 }
-            },
-            
-            // Export logs as JSON
-            export() {
-                const logs = this.getAll();
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div style='color:var(--error);padding:2rem;text-align:center;'>Failed to load activity log.<br>${e.message}</div>`;
+            }
+        }
+
+        // Fetch and render Active Users (sessions) from backend
+        async function fetchAndRenderActiveUsers() {
+            const usersEl = document.getElementById('log-users-count');
+            const usersPanel = document.querySelector('.stat-card + .stat-card + .stat-card + .stat-card')?.parentElement?.parentElement?.nextElementSibling;
+            if (usersEl) usersEl.textContent = '...';
+            // Find or create a container for the session list
+            let sessionList = document.getElementById('active-users-session-list');
+            if (!sessionList) {
+                sessionList = document.createElement('div');
+                sessionList.id = 'active-users-session-list';
+                sessionList.style.marginTop = '1rem';
+                const panel = document.querySelector('.stat-card + .stat-card + .stat-card + .stat-card')?.parentElement?.parentElement?.parentElement;
+                if (panel) panel.appendChild(sessionList);
+            }
+            try {
+                const resp = await fetch(`${API_BASE}/active-users`);
+                if (!resp.ok) throw new Error('Failed to fetch active users');
+                const data = await resp.json();
+                let sessions = data.users || data.sessions || data || [];
+                if (typeof sessions === 'object' && !Array.isArray(sessions)) sessions = Object.values(sessions);
+                if (usersEl) usersEl.textContent = sessions.length;
+                // Render session/device info for each session
+                let html = '<div style="margin-top:1rem;">';
+                for (const s of sessions) {
+                    html += `<div style="background:var(--gray-100);border-radius:8px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+                        <span style="background:var(--walmart-blue);color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;">${(s.user_email||s.user||'')[0]?.toUpperCase()||'?'}</span>
+                        <div style="flex:1;">
+                            <div><strong>${s.user_email || s.user || '-'}</strong><br><span style="color:var(--gray-600);font-size:11px;">${s.page||'Dashboard'} • ${s.device_info || 'Unknown'}</span></div>
+                        </div>
+                        <span style="color:var(--success);font-size:18px;">●</span>
+                    </div>`;
+                }
+                html += '</div>';
+                sessionList.innerHTML = html;
+            } catch (e) {
+                if (usersEl) usersEl.textContent = '0';
+                sessionList.innerHTML = '<div style="color:var(--error);padding:1rem;">Failed to load sessions</div>';
+            }
+        }
+
+        // Update stats cards (total actions, today, week, active sessions)
+        async function updateActivityStats() {
+            try {
+                const resp = await fetch(`${API_BASE}/activity-log`);
+                if (!resp.ok) throw new Error('Failed to fetch activity log');
+                const data = await resp.json();
+                let logs = data.activities || data.logs || data || [];
+                const now = new Date();
+                const today = now.toDateString();
+                const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+                const todayCount = logs.filter(l => new Date(l.timestamp).toDateString() === today).length;
+                const weekCount = logs.filter(l => new Date(l.timestamp) >= weekAgo).length;
+                const totalEl = document.getElementById('log-total-count');
+                const todayEl = document.getElementById('log-today-count');
+                const weekEl = document.getElementById('log-week-count');
+                if (totalEl) totalEl.textContent = logs.length;
+                if (todayEl) todayEl.textContent = todayCount;
+                if (weekEl) weekEl.textContent = weekCount;
+            } catch {}
+            fetchAndRenderActiveUsers();
+        }
+
+        // Filtering
+        function filterActivityLog() {
+            fetchAndRenderActivityLog();
+        }
+
+        // Export Activity Log from backend
+        async function exportActivityLog() {
+            try {
+                const resp = await fetch(`${API_BASE}/activity-log`);
+                if (!resp.ok) throw new Error('Failed to fetch activity log');
+                const data = await resp.json();
+                let logs = data.activities || data.logs || data || [];
                 const dataStr = JSON.stringify(logs, null, 2);
                 const blob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -1775,123 +1837,48 @@
                 a.download = `activity-log-${new Date().toISOString().split('T')[0]}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
-            },
-            
-            // Update stats cards
-            updateStats() {
-                const logs = this.getAll();
-                const now = new Date();
-                const today = now.toDateString();
-                const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
-                
-                const todayCount = logs.filter(l => new Date(l.timestamp).toDateString() === today).length;
-                const weekCount = logs.filter(l => new Date(l.timestamp) >= weekAgo).length;
-                const uniqueUsers = new Set(logs.map(l => l.user)).size;
-                
-                const totalEl = document.getElementById('log-total-count');
-                const todayEl = document.getElementById('log-today-count');
-                const weekEl = document.getElementById('log-week-count');
-                const usersEl = document.getElementById('log-users-count');
-                
-                if (totalEl) totalEl.textContent = logs.length;
-                if (todayEl) todayEl.textContent = todayCount;
-                if (weekEl) weekEl.textContent = weekCount;
-                if (usersEl) usersEl.textContent = uniqueUsers;
-            },
-            
-            // Render the activity log list
-            renderLog() {
-                const container = document.getElementById('activity-log-list');
-                if (!container) return;
-                
-                const areaFilter = document.getElementById('log-area-filter')?.value || 'all';
-                const actionFilter = document.getElementById('log-action-filter')?.value || 'all';
-                
-                let logs = this.getAll();
-                
-                // Apply filters
-                if (areaFilter !== 'all') {
-                    logs = logs.filter(l => l.area === areaFilter);
-                }
-                if (actionFilter !== 'all') {
-                    logs = logs.filter(l => l.action.toLowerCase().includes(actionFilter));
-                }
-                
-                if (logs.length === 0) {
-                    container.innerHTML = `
-                        <div style="padding: var(--space-8); text-align: center; color: var(--gray-500);">
-                            <div style="font-size: 3rem; margin-bottom: var(--space-4);">📋</div>
-                            <p>No activity logs found</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                let html = '<table style="width: 100%; border-collapse: collapse; font-size: 13px;">';
-                html += `
-                    <thead style="position: sticky; top: 0; background: var(--gray-100); z-index: 5;">
-                        <tr>
-                            <th style="padding: var(--space-3); text-align: left; width: 160px;">Timestamp</th>
-                            <th style="padding: var(--space-3); text-align: left; width: 120px;">User</th>
-                            <th style="padding: var(--space-3); text-align: left; width: 120px;">Area</th>
-                            <th style="padding: var(--space-3); text-align: left; width: 100px;">Action</th>
-                            <th style="padding: var(--space-3); text-align: left;">Details</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                `;
-                
-                for (const log of logs) {
-                    const date = new Date(log.timestamp);
-                    const timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    const actionClass = this.getActionClass(log.action);
-                    
-                    html += `
-                        <tr style="border-bottom: 1px solid var(--gray-200);">
-                            <td style="padding: var(--space-3); color: var(--gray-500);">${timeStr}</td>
-                            <td style="padding: var(--space-3);">
-                                <span style="display: inline-flex; align-items: center; gap: 6px;">
-                                    <span style="width: 24px; height: 24px; background: var(--primary-blue); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">${log.user.charAt(0).toUpperCase()}</span>
-                                    ${log.user}
-                                </span>
-                            </td>
-                            <td style="padding: var(--space-3);"><span class="area-badge">${log.area}</span></td>
-                            <td style="padding: var(--space-3);"><span class="action-badge ${actionClass}">${log.action}</span></td>
-                            <td style="padding: var(--space-3);">${log.details}</td>
-                        </tr>
-                    `;
-                }
-                
-                html += '</tbody></table>';
-                container.innerHTML = html;
-            },
-            
-            getActionClass(action) {
-                const a = action.toLowerCase();
-                if (a.includes('delete')) return 'action-delete';
-                if (a.includes('create') || a.includes('add')) return 'action-create';
-                if (a.includes('update') || a.includes('edit') || a.includes('save')) return 'action-update';
-                if (a.includes('toggle')) return 'action-toggle';
-                return '';
+            } catch (e) {
+                showNotification('Failed to export activity log', 'error');
+            }
+        }
+
+        // Clear Activity Log (if backend supports)
+        async function clearActivityLog() {
+            if (!confirm('Are you sure you want to clear all activity logs? This cannot be undone.')) return;
+            try {
+                const resp = await fetch(`${API_BASE}/activity-log`, { method: 'DELETE' });
+                if (!resp.ok) throw new Error('Failed to clear activity log');
+                showNotification('Activity log cleared', 'success');
+                fetchAndRenderActivityLog();
+                updateActivityStats();
+            } catch (e) {
+                showNotification('Failed to clear activity log', 'error');
+            }
+        }
+
+        // On tab show, load from backend
+        const origShowTab = showTab;
+        showTab = function(tabName) {
+            origShowTab(tabName);
+            if (tabName === 'activity-log') {
+                updateActivityStats();
+                fetchAndRenderActivityLog();
             }
         };
-        
-        // Convenience functions for audit logging
-        function logAudit(area, action, details, metadata = {}) {
-            return AuditLog.log(area, action, details, metadata);
-        }
-        
-        function filterActivityLog() {
-            AuditLog.renderLog();
-        }
-        
-        function exportActivityLog() {
-            AuditLog.export();
-        }
-        
-        function clearActivityLog() {
-            AuditLog.clear();
-        }
+        const origNavigateToTab = navigateToTab;
+        navigateToTab = function(tabName) {
+            origNavigateToTab(tabName);
+            if (tabName === 'activity-log') {
+                updateActivityStats();
+                fetchAndRenderActivityLog();
+            }
+        };
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                updateActivityStats();
+                fetchAndRenderActivityLog();
+            }, 500);
+        });
         
         // ==========================================
         // TAB NAVIGATION

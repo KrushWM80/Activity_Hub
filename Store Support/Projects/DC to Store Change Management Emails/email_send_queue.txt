@@ -1,0 +1,1 @@
+emails_sent\TEST_EMAIL_ACTUAL_SEND_20260225_112930.html|Kristine.Torres@walmart.com, Matthew.Farnworth@walmart.com, Kendall.Rush@walmart.com|✅ TEST - Manager Change Detection System (ACTUAL SEND)|

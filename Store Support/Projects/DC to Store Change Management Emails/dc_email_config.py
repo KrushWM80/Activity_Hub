@@ -22,9 +22,14 @@ SEND_FROM_NAME = "ELM Manager Change Tracking System"
 # Use BCC for all recipients (privacy and prevents reply-all)
 USE_BCC = True
 
-# Test mode - send all emails here for validation
+# Test mode - send all emails to these recipients for validation
 TEST_MODE = True  # Set to False when ready for production
-TEST_RECIPIENT = "kendall.rush@walmart.com"
+TEST_RECIPIENTS = [
+    "Kristine.Torres@walmart.com",
+    "Matthew.Farnworth@walmart.com",
+    "Kendall.Rush@walmart.com"
+]  # 3-person test group
+TEST_RECIPIENT = TEST_RECIPIENTS[0]  # Backward compatibility
 
 # Admin email - ALWAYS receives error and no-change notifications (even in production)
 ADMIN_EMAIL = "jhendr6@homeoffice.wal-mart.com"

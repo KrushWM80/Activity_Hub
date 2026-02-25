@@ -1151,9 +1151,166 @@ Access Control:
 
 ---
 
+## 📊 Refresh Guide Dashboard Workflow
+
+### **Weekly Data Extraction & Dashboard Update Flow**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ PHASE 1: Data Extraction (Friday Start of Week)         │
+│                                                           │
+│ BigQuery Query (athena-gateway-prod)                    │
+│   ├─ Store refresh metrics                              │
+│   ├─ Division performance (7 divisions)                 │
+│   ├─ Format breakdown (SC, NHM, DIV1)                   │
+│   ├─ Area performance (8 areas)                         │
+│   └─ User engagement metrics (workers, managers)        │
+└─────────────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────────────┐
+│ PHASE 2: Data Transformation (Mid-Week)                 │
+│                                                           │
+│ Convert to JSON Structure                                │
+│   ├─ Organize by week, division, format, area          │
+│   ├─ Calculate percentages, changes                      │
+│   ├─ Validate data integrity                             │
+│   └─ Format for HTML embedding                           │
+└─────────────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────────────┐
+│ PHASE 3: Dashboard Update (End of Week)                 │
+│                                                           │
+│ business-overview-comparison-dashboard-2-23-26.html    │
+│   ├─ Add new week object to COMPARISON_DATA             │
+│   ├─ No rendering code changes (handles any week count) │
+│   ├─ Update file date in header                         │
+│   └─ Commit to GitHub                                   │
+└─────────────────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────────────────┐
+│ PHASE 4: Validation & Deployment (Friday End)           │
+│                                                           │
+│ Browser Testing                                          │
+│   ├─ Verify all weeks display (4-col grid, 2 rows)     │
+│   ├─ Check trend calculations                           │
+│   ├─ Test responsive breakpoints (1600px, 1200px, 768px)│
+│   ├─ Validate no console errors                         │
+│   └─ Mobile device testing                              │
+│                                                           │
+│ Deploy to Code Puppy Pages                              │
+│   └─ Upload HTML file to platform                       │
+└─────────────────────────────────────────────────────────┘
+```
+
+### **Data Dependencies: Dashboard Components**
+
+```
+business-overview-comparison-dashboard-2-23-26.html (61.31 KB)
+│
+├─ Input Data: COMPARISON_DATA (JSON embedded)
+│   ├─ weeks[0-7] array (8 weeks total)
+│   ├─ Each week contains:
+│   │  ├─ summary (completion %, stores, items)
+│   │  ├─ divisionStats[] (7 divisions)
+│   │  ├─ formatStats[] (SC, NHM, DIV1)
+│   │  ├─ areaStats[] (8 store areas)
+│   │  └─ userEngagement (metrics)
+│   │
+│   └─ Data Sources (BigQuery):
+│      ├─ athena-gateway-prod.store_refresh.store_refresh_data
+│      └─ wmt-assetprotection-prod.Store_Support_Dev.Store_Cur_Data
+│
+├─ Rendering Functions (Dynamic - no code changes needed):
+│   ├─ renderTrendChart() → loops through all weeks
+│   ├─ renderUserEngagement() → creates cards for all weeks
+│   ├─ renderInsights() → auto-calculates week-by-week changes
+│   ├─ renderDivisionComparison() → all divisions × all weeks
+│   └─ renderAreaComparison() → all areas × all weeks
+│
+├─ Styling Layers:
+│   ├─ CSS Variables (dark/light mode)
+│   ├─ CSS Grid (auto-wrapping, responsive)
+│   │  ├─ trendChart: repeat(4, 1fr) → 2 rows
+│   │  ├─ userEngagement: repeat(4, 1fr) → 2 rows
+│   │  └─ divisionComparison: 1.2fr repeat(7, 0.8fr) → 1 row
+│   └─ Responsive Breakpoints:
+│      ├─ 1600px: max 7 columns
+│      ├─ 1200px: 4 columns + switch to mobile grid
+│      └─ 768px: 2 columns mobile view
+│
+└─ Output: Browser Display
+    ├─ Overall Completion Trend (2-row grid)
+    ├─ Key Insights (week-by-week analysis)
+    ├─ Division Performance (7-column table)
+    ├─ Format Comparison (3 cards)
+    ├─ Area Performance (7-column table)
+    └─ User Engagement (2-row cards)
+```
+
+### **Process Timeline Dependencies**
+
+```
+Week 1-7 (Historical Data) → Available ✅
+        ↓
+Week 8 Data Extraction (2/28/26)
+        ↓
+Data Validation
+        ↓
+Dashboard Update (add Week 8 object)
+        ↓
+Browser Testing
+        ↓
+GitHub Commit
+        ↓
+Code Puppy Pages Deployment ✅
+```
+
+### **File Dependencies: Extraction Scripts**
+
+```
+Refresh Guide: Store Support/Projects/Refresh Guide/
+
+├─ extract_week7_data.py
+│  ├─ Dependencies: BigQuery client, pandas
+│  ├─ Input: BigQuery credentials
+│  └─ Output: JSON metrics file
+│
+├─ query_bigquery.py
+│  ├─ Input: SQL query, credentials
+│  └─ Output: BigQuery results
+│
+├─ extract_html_from_text.py
+│  ├─ Dependencies: BeautifulSoup, regex
+│  └─ Output: Cleaned HTML/JSON
+│
+├─ business-overview-comparison-dashboard-2-23-26.html ✅ PRODUCTION
+│  ├─ Input: COMPARISON_DATA (embedded JSON)
+│  ├─ No external dependencies
+│  └─ Size: 61.31 KB
+│
+└─ Docs:
+   ├─ WEEKLY_DASHBOARD_UPDATE_PROCESS.md ✅ NEW SOP
+   ├─ WEEKLY_USER_ENGAGEMENT_ANALYSIS.md
+   └─ README.md
+```
+
+### **Critical Dependencies for Dashboard Accuracy**
+
+| Dependency | Source | Impact | Status |
+|-----------|--------|--------|--------|
+| Week 1-7 Data | BigQuery | Historical comparison baseline | ✅ Complete |
+| Week 8 Query | BigQuery | Current week metrics | ⏳ Pending 2/28 |
+| Data Transformation | Python/JSON | Format conversion | ✅ Template Ready |
+| Rendering Functions | JavaScript | Visual display | ✅ Dynamic |
+| CSS Grid Layout | HTML/CSS | Responsive layout | ✅ Auto-wrapping |
+| Browser Support | Chrome/Edge | Final output | ✅ Tested |
+
+---
+
 ## 🎯 Critical Path Analysis
 
 **Most Critical Dependencies** (system fails without these):
+
 
 1. **PostgreSQL Database** - 99.99% uptime required
    - Contains all operational data

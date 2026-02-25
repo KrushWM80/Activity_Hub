@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "description": "Email Recipients Configuration - Easy update system",
+    "created": "2026-02-25",
+    "version": "1.0",
+    "notes": "Update 'active_mode' to switch between test and production. Update recipient lists as DC users change."
+  },
+  "active_mode": "test",
+  "modes": {
+    "test": {
+      "description": "Testing with 3 designated testers",
+      "active": true,
+      "recipients": [
+        {
+          "name": "Kristine Torres",
+          "email": "Kristine.Torres@walmart.com",
+          "role": "Project Lead",
+          "active": true
+        },
+        {
+          "name": "Matthew Farnworth",
+          "email": "Matthew.Farnworth@walmart.com",
+          "role": "Tester",
+          "active": true
+        },
+        {
+          "name": "Kendall Rush",
+          "email": "Kendall.Rush@walmart.com",
+          "role": "Tester",
+          "active": true
+        }
+      ],
+      "total_count": 3,
+      "last_updated": "2026-02-25"
+    },
+    "production": {
+      "description": "Production mode - DC distribution lists and managers",
+      "active": false,
+      "recipients": [
+        {
+          "name": "DC District Manager - Region 1",
+          "email": "[TO_BE_ADDED]",
+          "role": "DC District Manager",
+          "active": false,
+          "notes": "Add actual DC manager emails here"
+        },
+        {
+          "name": "DC General Manager - Dallas",
+          "email": "[TO_BE_ADDED]",
+          "role": "DC General Manager",
+          "active": false,
+          "notes": "Add actual DC manager emails here"
+        },
+        {
+          "name": "Store Manager Distribution List",
+          "email": "[TO_BE_ADDED]",
+          "role": "Distribution List",
+          "active": false,
+          "notes": "Add store manager distribution list email here"
+        }
+      ],
+      "total_count": 0,
+      "last_updated": "2026-02-25",
+      "instructions": "Add DC and store manager emails in production section as needed"
+    }
+  },
+  "instructions": {
+    "how_to_use": "This file manages all email recipients. Update as needed and commit changes.",
+    "switch_mode": "Change 'active_mode' from 'test' to 'production' to switch recipient lists",
+    "add_recipients": "Add new recipients to the appropriate mode's 'recipients' array",
+    "deactivate_recipient": "Set 'active': false to exclude a recipient without deleting them",
+    "format": {
+      "name": "Human readable name",
+      "email": "Email address",
+      "role": "Job title or role (for documentation)",
+      "active": "true/false - whether to include in emails",
+      "notes": "Optional notes about this recipient"
+    }
+  },
+  "usage_examples": {
+    "test_phase": {
+      "mode": "test",
+      "recipients_count": 3,
+      "when": "Feb 2026 - Mar 2026",
+      "purpose": "Validate system with trusted testers"
+    },
+    "early_production": {
+      "mode": "production",
+      "recipients_count": "TBD",
+      "when": "Apr 2026+",
+      "purpose": "Send to actual DC managers",
+      "how_to_transition": "1. Update recipient emails in production section\n2. Set active_mode to 'production'\n3. Test with one PayCycle\n4. Expand gradually as comfortable"
+    }
+  },
+  "recipient_sources": {
+    "dc_managers": "Get from HRIS or ask DC leadership",
+    "store_managers": "May need distribution list from Talent/Store Ops",
+    "distribution_lists": "Ask for automated/shared mailbox lists if available"
+  }
+}

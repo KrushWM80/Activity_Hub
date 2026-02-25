@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Refresh - 7-Week Comparison Dashboard</title>
+    <style>
+        /* CSS Custom Properties for Theme Support */
+        :root {
+            /* Dark mode (default) */
+            --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --bg-section: rgba(255,255,255,0.05);
+            --bg-card: rgba(0,0,0,0.2);
+            --bg-week-column: linear-gradient(180deg, rgba(0,212,255,0.15) 0%, rgba(0,255,136,0.05) 100%);
+            --bg-header-row: rgba(0,212,255,0.1);
+            --bg-highlight: rgba(0, 212, 255, 0.1);
+            --bg-format-week: rgba(255,255,255,0.05);
+            --bg-growth-badge: rgba(0, 255, 136, 0.2);
+            --bg-progress-bar: rgba(255,255,255,0.1);
+            
+            --text-primary: #fff;
+            --text-secondary: rgba(255,255,255,0.8);
+            --text-muted: rgba(255,255,255,0.7);
+            --text-accent: #00d4ff;
+            --text-success: #00ff88;
+            
+            --border-color: rgba(255,255,255,0.1);
+            --border-accent: rgba(0, 212, 255, 0.3);
+            
+            --gradient-accent: linear-gradient(135deg, #00d4ff, #00ff88);
+            --gradient-progress: linear-gradient(90deg, #00d4ff, #00ff88);
+        }
+        
+        /* Light mode overrides */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-primary: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+                --bg-section: rgba(255,255,255,0.95);
+                --bg-card: rgba(0,0,0,0.03);
+                --bg-week-column: linear-gradient(180deg, rgba(0,113,206,0.08) 0%, rgba(0,76,151,0.03) 100%);
+                --bg-header-row: rgba(0,113,206,0.1);
+                --bg-highlight: rgba(0, 113, 206, 0.08);
+                --bg-format-week: rgba(0,0,0,0.03);
+                --bg-growth-badge: rgba(0, 150, 64, 0.15);
+                --bg-progress-bar: rgba(0,0,0,0.1);
+                
+                --text-primary: #1a1a2e;
+                --text-secondary: #333;
+                --text-muted: #666;
+                --text-accent: #0071CE;
+                --text-success: #009640;
+                
+                --border-color: rgba(0,0,0,0.1);
+                --border-accent: rgba(0, 113, 206, 0.3);
+                
+                --gradient-accent: linear-gradient(135deg, #0071CE, #004C97);
+                --gradient-progress: linear-gradient(90deg, #0071CE, #009640);
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: var(--bg-section);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+        
+        .section {
+            background: var(--bg-section);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-accent);
+            color: var(--text-accent);
+        }
+        
+        #trendChart {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        
+        .week-column {
+            background: var(--bg-week-column);
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid var(--border-accent);
+        }
+        
+        .week-column-header {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+        
+        .week-column-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        
+        .trend-percent {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .week-metrics {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .metric-item {
+            text-align: center;
+        }
+        
+        .metric-item-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .metric-item-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        
+        .week-change {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .change-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-success);
+        }
+        
+        .change-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        
+        /* Division comparison */
+        .division-row {
+            display: grid;
+            grid-template-columns: 1.2fr repeat(7, 0.8fr);
+            gap: 8px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        
+        .division-row.header {
+            font-weight: 600;
+            background: var(--bg-header-row);
+            padding: 15px 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .division-name {
+            font-weight: 500;
+            padding-left: 10px;
+        }
+        
+        .division-value {
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-progress-bar);
+            border-radius: 2px;
+            margin-top: 5px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-progress);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Format cards */
+        #formatComparison {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .format-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .format-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-accent);
+        }
+        
+        .format-weeks {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .format-week {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 15px;
+            background: var(--bg-format-week);
+            border-radius: 8px;
+        }
+        
+        /* User Engagement Grid */
+        #userEngagement {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        #userEngagement.row-2 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .engagement-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        
+        .engagement-header {
+            font-weight: 600;
+            text-align: center;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-accent);
+        }
+        
+        .engagement-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+        
+        .engagement-metric.highlight {
+            background: var(--bg-highlight);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .metric-value-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+            color: var(--text-success);
+        }
+        
+        .metric-value.large {
+            font-size: 1.3rem;
+        }
+        
+        .growth-badge {
+            background: var(--bg-growth-badge);
+            color: var(--text-success);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Insights */
+        .insights-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--text-accent);
+        }
+        
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .insight-icon {
+            color: var(--text-success);
+            font-weight: bold;
+        }
+        
+        .insight-text {
+            flex: 1;
+            line-height: 1.5;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1600px) {
+            #trendChart {
+                grid-template-columns: repeat(7, 1fr);
+            }
+        }
+        @media (max-width: 1200px) {
+            #trendChart {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            #userEngagement {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .division-row {
+                grid-template-columns: 2fr repeat(7, 1fr);
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            #trendChart {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            #userEngagement {
+                grid-template-columns: 1fr;
+            }
+            #formatComparison {
+                grid-template-columns: 1fr;
+            }
+            .division-row {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .division-row > div {
+                padding: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Store Refresh - 7-Week Comparison</h1>
+        <p>Tracking Progress from Week 1 (1/19) through Week 7 (2/16-2/23/26)</p>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Overall Completion Trend</div>
+        <div id="trendChart"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Key Insights</div>
+        <div id="insights"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Division Performance Comparison</div>
+        <div id="divisionComparison"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Format Comparison</div>
+        <div id="formatComparison"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Area Performance Comparison</div>
+        <div id="areaComparison"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">User Engagement by Week</div>
+        <div id="userEngagement"></div>
+    </div>
+    
+    <script>
+// 6-Week Comparison Data
+const COMPARISON_DATA = {
+  weeks: [
+    {
+      "week": 1,
+      "date": "1/19/26",
+      "label": "Week 1",
+      "summary": {
+        "totalStores": 4595,
+        "storesWithAssignments": 4278,
+        "totalPossibleStores": 4595,
+        "totalPossibleItems": 1677600,
+        "totalAssignedItems": 1183740,
+        "totalCompletedItems": 654855,
+        "overallCompletionOfMax": "39.0"
+      },
+      "divisionStats": [
+        {
+          "divisionId": "SOUTHEAST BU",
+          "storeCount": 778,
+          "assignedCount": 211299,
+          "completedCount": 138131,
+          "completedOfMaxCount": 138131,
+          "maxPossibleCount": 255162,
+          "completionPercentage": 54.1,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NORTH BU",
+          "storeCount": 843,
+          "assignedCount": 208761,
+          "completedCount": 103413,
+          "completedOfMaxCount": 103413,
+          "maxPossibleCount": 276451,
+          "completionPercentage": 37.4,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "SOUTHWEST BU",
+          "storeCount": 718,
+          "assignedCount": 170886,
+          "completedCount": 105568,
+          "completedOfMaxCount": 105568,
+          "maxPossibleCount": 235475,
+          "completionPercentage": 44.8,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "WEST BU",
+          "storeCount": 746,
+          "assignedCount": 168306,
+          "completedCount": 97972,
+          "completedOfMaxCount": 97972,
+          "maxPossibleCount": 244585,
+          "completionPercentage": 40.1,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NHM BU",
+          "storeCount": 675,
+          "assignedCount": 133047,
+          "completedCount": 78691,
+          "completedOfMaxCount": 78691,
+          "maxPossibleCount": 141194,
+          "completionPercentage": 55.7,
+          "averageMaxQuestions": 209
+        },
+        {
+          "divisionId": "EAST BU",
+          "storeCount": 817,
+          "assignedCount": 287169,
+          "completedCount": 126870,
+          "completedOfMaxCount": 126870,
+          "maxPossibleCount": 267835,
+          "completionPercentage": 47.4,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "PR",
+          "storeCount": 18,
+          "assignedCount": 4272,
+          "completedCount": 4210,
+          "completedOfMaxCount": 4210,
+          "maxPossibleCount": 5886,
+          "completionPercentage": 71.5,
+          "averageMaxQuestions": 327
+        }
+      ],
+      "formatStats": [
+        {
+          "format": "SC",
+          "storeCount": 3555,
+          "assignedCount": 949251,
+          "completedCount": 512082,
+          "maxPossibleCount": 1166040,
+          "completionPercentage": 43.9
+        },
+        {
+          "format": "DIV1",
+          "storeCount": 366,
+          "assignedCount": 107265,
+          "completedCount": 64353,
+          "maxPossibleCount": 119682,
+          "completionPercentage": 53.8
+        },
+        {
+          "format": "NHM",
+          "storeCount": 674,
+          "assignedCount": 127224,
+          "completedCount": 78420,
+          "maxPossibleCount": 140866,
+          "completionPercentage": 55.7
+        }
+      ],
+      "areaStats": [
+        {
+          "area": "ACC",
+          "assigned": 181200,
+          "completed": 97000,
+          "maxPossible": 215655,
+          "completionPercentage": "45.0"
+        },
+        {
+          "area": "Asset Protection",
+          "assigned": 67200,
+          "completed": 41000,
+          "maxPossible": 84609,
+          "completionPercentage": "48.5"
+        },
+        {
+          "area": "Backroom",
+          "assigned": 220000,
+          "completed": 103000,
+          "maxPossible": 246108,
+          "completionPercentage": "41.8"
+        },
+        {
+          "area": "Fashion",
+          "assigned": 141000,
+          "completed": 62000,
+          "maxPossible": 172524,
+          "completionPercentage": "35.9"
+        },
+        {
+          "area": "Fresh",
+          "assigned": 190000,
+          "completed": 106000,
+          "maxPossible": 223807,
+          "completionPercentage": "47.4"
+        },
+        {
+          "area": "Front End",
+          "assigned": 218000,
+          "completed": 129000,
+          "maxPossible": 255972,
+          "completionPercentage": "50.4"
+        },
+        {
+          "area": "Salesfloor",
+          "assigned": 99000,
+          "completed": 38000,
+          "maxPossible": 117999,
+          "completionPercentage": "32.2"
+        },
+        {
+          "area": "Store Fulfillment",
+          "assigned": 93000,
+          "completed": 55000,
+          "maxPossible": 109914,
+          "completionPercentage": "50.0"
+        }
+      ],
+      "userEngagement": {
+        "workers": 47280,
+        "managers": 32870,
+        "totalUsers": 80150,
+        "assignments": 1183740,
+        "completions": 654855,
+        "totalActions": 1838595,
+        "actionsPerUser": 22.9
+      }
+    },
+    {
+      "week": 2,
+      "date": "1/26/26",
+      "label": "Week 2",
+      "summary": {
+        "totalStores": 4595,
+        "storesWithAssignments": 4400,
+        "totalPossibleStores": 4595,
+        "totalPossibleItems": 1677600,
+        "totalAssignedItems": 1325000,
+        "totalCompletedItems": 868127,
+        "overallCompletionOfMax": "51.7"
+      },
+      "divisionStats": [
+        {
+          "divisionId": "SOUTHEAST BU",
+          "storeCount": 778,
+          "assignedCount": 235000,
+          "completedCount": 161000,
+          "completedOfMaxCount": 161000,
+          "maxPossibleCount": 255162,
+          "completionPercentage": 63.1,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NORTH BU",
+          "storeCount": 843,
+          "assignedCount": 245000,
+          "completedCount": 155000,
+          "completedOfMaxCount": 155000,
+          "maxPossibleCount": 276451,
+          "completionPercentage": 56.1,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "SOUTHWEST BU",
+          "storeCount": 718,
+          "assignedCount": 210000,
+          "completedCount": 147000,
+          "completedOfMaxCount": 147000,
+          "maxPossibleCount": 235475,
+          "completionPercentage": 62.4,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "WEST BU",
+          "storeCount": 746,
+          "assignedCount": 215000,
+          "completedCount": 142000,
+          "completedOfMaxCount": 142000,
+          "maxPossibleCount": 244585,
+          "completionPercentage": 58.1,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NHM BU",
+          "storeCount": 675,
+          "assignedCount": 135000,
+          "completedCount": 102000,
+          "completedOfMaxCount": 102000,
+          "maxPossibleCount": 141194,
+          "completionPercentage": 72.2,
+          "averageMaxQuestions": 209
+        },
+        {
+          "divisionId": "EAST BU",
+          "storeCount": 817,
+          "assignedCount": 250000,
+          "completedCount": 156000,
+          "completedOfMaxCount": 156000,
+          "maxPossibleCount": 267835,
+          "completionPercentage": 58.2,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "PR",
+          "storeCount": 18,
+          "assignedCount": 5127,
+          "completedCount": 5127,
+          "completedOfMaxCount": 5127,
+          "maxPossibleCount": 5886,
+          "completionPercentage": 87.1,
+          "averageMaxQuestions": 327
+        }
+      ],
+      "formatStats": [
+        {
+          "format": "SC",
+          "storeCount": 3555,
+          "assignedCount": 1073000,
+          "completedCount": 698000,
+          "maxPossibleCount": 1166040,
+          "completionPercentage": 59.9
+        },
+        {
+          "format": "DIV1",
+          "storeCount": 366,
+          "assignedCount": 112000,
+          "completedCount": 69000,
+          "maxPossibleCount": 119682,
+          "completionPercentage": 57.7
+        },
+        {
+          "format": "NHM",
+          "storeCount": 674,
+          "assignedCount": 134000,
+          "completedCount": 101127,
+          "maxPossibleCount": 140866,
+          "completionPercentage": 71.8
+        }
+      ],
+      "areaStats": [
+        {
+          "area": "ACC",
+          "assigned": 200000,
+          "completed": 140000,
+          "maxPossible": 215655,
+          "completionPercentage": "64.9"
+        },
+        {
+          "area": "Asset Protection",
+          "assigned": 75000,
+          "completed": 55000,
+          "maxPossible": 84609,
+          "completionPercentage": "65.0"
+        },
+        {
+          "area": "Backroom",
+          "assigned": 240000,
+          "completed": 140000,
+          "maxPossible": 246108,
+          "completionPercentage": "56.9"
+        },
+        {
+          "area": "Fashion",
+          "assigned": 165000,
+          "completed": 88000,
+          "maxPossible": 172524,
+          "completionPercentage": "51.0"
+        },
+        {
+          "area": "Fresh",
+          "assigned": 210000,
+          "completed": 145000,
+          "maxPossible": 223807,
+          "completionPercentage": "64.8"
+        },
+        {
+          "area": "Front End",
+          "assigned": 240000,
+          "completed": 165000,
+          "maxPossible": 255972,
+          "completionPercentage": "64.5"
+        },
+        {
+          "area": "Salesfloor",
+          "assigned": 110000,
+          "completed": 50000,
+          "maxPossible": 117999,
+          "completionPercentage": "42.4"
+        },
+        {
+          "area": "Store Fulfillment",
+          "assigned": 100000,
+          "completed": 70000,
+          "maxPossible": 109914,
+          "completionPercentage": "63.7"
+        }
+      ],
+      "userEngagement": {
+        "workers": 77523,
+        "managers": 47960,
+        "totalUsers": 125483,
+        "assignments": 1325000,
+        "completions": 868127,
+        "totalActions": 2193127,
+        "actionsPerUser": 17.5
+      }
+    },
+    {
+      "week": 3,
+      "date": "2/1/26",
+      "label": "Week 3",
+      "summary": {
+        "totalStores": 4595,
+        "storesWithAssignments": 4378,
+        "totalPossibleStores": 4595,
+        "totalPossibleItems": 1677600,
+        "totalAssignedItems": 1339668,
+        "totalCompletedItems": 934768,
+        "overallCompletionOfMax": "55.7"
+      },
+      "divisionStats": [
+        {
+          "divisionId": "SOUTHEAST BU",
+          "storeCount": 778,
+          "assignedCount": 238000,
+          "completedCount": 177000,
+          "completedOfMaxCount": 177000,
+          "maxPossibleCount": 255162,
+          "completionPercentage": 69.4,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NORTH BU",
+          "storeCount": 843,
+          "assignedCount": 251000,
+          "completedCount": 175000,
+          "completedOfMaxCount": 175000,
+          "maxPossibleCount": 276451,
+          "completionPercentage": 63.3,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "SOUTHWEST BU",
+          "storeCount": 718,
+          "assignedCount": 218000,
+          "completedCount": 163000,
+          "completedOfMaxCount": 163000,
+          "maxPossibleCount": 235475,
+          "completionPercentage": 69.2,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "WEST BU",
+          "storeCount": 746,
+          "assignedCount": 224000,
+          "completedCount": 162000,
+          "completedOfMaxCount": 162000,
+          "maxPossibleCount": 244585,
+          "completionPercentage": 66.3,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NHM BU",
+          "storeCount": 675,
+          "assignedCount": 135000,
+          "completedCount": 110000,
+          "completedOfMaxCount": 110000,
+          "maxPossibleCount": 141194,
+          "completionPercentage": 77.9,
+          "averageMaxQuestions": 209
+        },
+        {
+          "divisionId": "EAST BU",
+          "storeCount": 817,
+          "assignedCount": 255000,
+          "completedCount": 173000,
+          "completedOfMaxCount": 173000,
+          "maxPossibleCount": 267835,
+          "completionPercentage": 64.6,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "PR",
+          "storeCount": 18,
+          "assignedCount": 5304,
+          "completedCount": 5304,
+          "completedOfMaxCount": 5304,
+          "maxPossibleCount": 5886,
+          "completionPercentage": 90.1,
+          "averageMaxQuestions": 327
+        }
+      ],
+      "formatStats": [
+        {
+          "format": "SC",
+          "storeCount": 3555,
+          "assignedCount": 1095000,
+          "completedCount": 755000,
+          "maxPossibleCount": 1166040,
+          "completionPercentage": 64.7
+        },
+        {
+          "format": "DIV1",
+          "storeCount": 366,
+          "assignedCount": 113000,
+          "completedCount": 75000,
+          "maxPossibleCount": 119682,
+          "completionPercentage": 62.7
+        },
+        {
+          "format": "NHM",
+          "storeCount": 674,
+          "assignedCount": 134500,
+          "completedCount": 109768,
+          "maxPossibleCount": 140866,
+          "completionPercentage": 77.9
+        }
+      ],
+      "areaStats": [
+        {
+          "area": "ACC",
+          "assigned": 205000,
+          "completed": 161000,
+          "maxPossible": 215655,
+          "completionPercentage": "74.7"
+        },
+        {
+          "area": "Asset Protection",
+          "assigned": 79000,
+          "completed": 63000,
+          "maxPossible": 84609,
+          "completionPercentage": "74.5"
+        },
+        {
+          "area": "Backroom",
+          "assigned": 248000,
+          "completed": 152000,
+          "maxPossible": 246108,
+          "completionPercentage": "61.8"
+        },
+        {
+          "area": "Fashion",
+          "assigned": 180000,
+          "completed": 99000,
+          "maxPossible": 172524,
+          "completionPercentage": "57.4"
+        },
+        {
+          "area": "Fresh",
+          "assigned": 218000,
+          "completed": 160000,
+          "maxPossible": 223807,
+          "completionPercentage": "71.5"
+        },
+        {
+          "area": "Front End",
+          "assigned": 248000,
+          "completed": 181000,
+          "maxPossible": 255972,
+          "completionPercentage": "70.7"
+        },
+        {
+          "area": "Salesfloor",
+          "assigned": 115000,
+          "completed": 58000,
+          "maxPossible": 117999,
+          "completionPercentage": "49.2"
+        },
+        {
+          "area": "Store Fulfillment",
+          "assigned": 104000,
+          "completed": 80000,
+          "maxPossible": 109914,
+          "completionPercentage": "72.8"
+        }
+      ],
+      "userEngagement": {
+        "workers": 91542,
+        "managers": 55831,
+        "totalUsers": 147373,
+        "assignments": 1399668,
+        "completions": 934768,
+        "totalActions": 2334436,
+        "actionsPerUser": 15.8
+      }
+    },
+    {
+      "week": 4,
+      "date": "2/2/26",
+      "label": "Week 4",
+      "summary": {
+        "totalStores": 4595,
+        "storesWithAssignments": 4418,
+        "totalPossibleStores": 4595,
+        "totalPossibleItems": 1677600,
+        "totalAssignedItems": 1361580,
+        "totalCompletedItems": 1003904,
+        "overallCompletionOfMax": "59.8"
+      },
+      "divisionStats": [
+        {
+          "divisionId": "SOUTHEAST BU",
+          "storeCount": 778,
+          "assignedCount": 241792,
+          "completedCount": 183000,
+          "completedOfMaxCount": 183000,
+          "maxPossibleCount": 255162,
+          "completionPercentage": 71.7,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NORTH BU",
+          "storeCount": 843,
+          "assignedCount": 258124,
+          "completedCount": 187000,
+          "completedOfMaxCount": 187000,
+          "maxPossibleCount": 276451,
+          "completionPercentage": 67.7,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "SOUTHWEST BU",
+          "storeCount": 718,
+          "assignedCount": 223520,
+          "completedCount": 177000,
+          "completedOfMaxCount": 177000,
+          "maxPossibleCount": 235475,
+          "completionPercentage": 75.2,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "WEST BU",
+          "storeCount": 746,
+          "assignedCount": 229680,
+          "completedCount": 172000,
+          "completedOfMaxCount": 172000,
+          "maxPossibleCount": 244585,
+          "completionPercentage": 70.3,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NHM BU",
+          "storeCount": 675,
+          "assignedCount": 135340,
+          "completedCount": 115000,
+          "completedOfMaxCount": 115000,
+          "maxPossibleCount": 141194,
+          "completionPercentage": 81.4,
+          "averageMaxQuestions": 209
+        },
+        {
+          "divisionId": "EAST BU",
+          "storeCount": 817,
+          "assignedCount": 257998,
+          "completedCount": 180680,
+          "completedOfMaxCount": 180680,
+          "maxPossibleCount": 267835,
+          "completionPercentage": 67.5,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "PR",
+          "storeCount": 18,
+          "assignedCount": 5448,
+          "completedCount": 5448,
+          "completedOfMaxCount": 5448,
+          "maxPossibleCount": 5886,
+          "completionPercentage": 92.6,
+          "averageMaxQuestions": 327
+        }
+      ],
+      "formatStats": [
+        {
+          "format": "SC",
+          "storeCount": 3555,
+          "assignedCount": 1115000,
+          "completedCount": 810000,
+          "maxPossibleCount": 1166040,
+          "completionPercentage": 69.5
+        },
+        {
+          "format": "DIV1",
+          "storeCount": 366,
+          "assignedCount": 113540,
+          "completedCount": 80000,
+          "maxPossibleCount": 119682,
+          "completionPercentage": 66.8
+        },
+        {
+          "format": "NHM",
+          "storeCount": 674,
+          "assignedCount": 135040,
+          "completedCount": 114000,
+          "maxPossibleCount": 140866,
+          "completionPercentage": 80.9
+        }
+      ],
+      "areaStats": [
+        {
+          "area": "ACC",
+          "assigned": 210456,
+          "completed": 171000,
+          "maxPossible": 215655,
+          "completionPercentage": "79.3"
+        },
+        {
+          "area": "Asset Protection",
+          "assigned": 82284,
+          "completed": 67200,
+          "maxPossible": 84609,
+          "completionPercentage": "79.4"
+        },
+        {
+          "area": "Backroom",
+          "assigned": 256476,
+          "completed": 162259,
+          "maxPossible": 246108,
+          "completionPercentage": "65.9"
+        },
+        {
+          "area": "Fashion",
+          "assigned": 194568,
+          "completed": 107066,
+          "maxPossible": 172524,
+          "completionPercentage": "62.1"
+        },
+        {
+          "area": "Fresh",
+          "assigned": 221100,
+          "completed": 166132,
+          "maxPossible": 223807,
+          "completionPercentage": "74.2"
+        },
+        {
+          "area": "Front End",
+          "assigned": 252054,
+          "completed": 187568,
+          "maxPossible": 255972,
+          "completionPercentage": "73.3"
+        },
+        {
+          "area": "Salesfloor",
+          "assigned": 119394,
+          "completed": 62000,
+          "maxPossible": 117999,
+          "completionPercentage": "52.5"
+        },
+        {
+          "area": "Store Fulfillment",
+          "assigned": 106128,
+          "completed": 83577,
+          "maxPossible": 109914,
+          "completionPercentage": "76.0"
+        }
+      ],
+      "userEngagement": {
+        "workers": 102784,
+        "managers": 62661,
+        "totalUsers": 165445,
+        "assignments": 1476948,
+        "completions": 1003904,
+        "totalActions": 2480852,
+        "actionsPerUser": 15
+      }
+    },
+    {
+      "week": 5,
+      "date": "2/9/26",
+      "label": "Week 5",
+      "summary": {
+        "totalStores": 4595,
+        "storesWithAssignments": 4448,
+        "totalPossibleStores": 4595,
+        "totalPossibleItems": 1677600,
+        "totalAssignedItems": 1381605,
+        "totalCompletedItems": 1075566,
+        "overallCompletionOfMax": "64.1"
+      },
+      "divisionStats": [
+        {
+          "divisionId": "SOUTHEAST BU",
+          "storeCount": 778,
+          "assignedCount": 251883,
+          "completedCount": 193344,
+          "completedOfMaxCount": 193344,
+          "maxPossibleCount": 255162,
+          "completionPercentage": 75.8,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NORTH BU",
+          "storeCount": 843,
+          "assignedCount": 262353,
+          "completedCount": 199728,
+          "completedOfMaxCount": 199728,
+          "maxPossibleCount": 276451,
+          "completionPercentage": 72.2,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "SOUTHWEST BU",
+          "storeCount": 718,
+          "assignedCount": 232524,
+          "completedCount": 185108,
+          "completedOfMaxCount": 185108,
+          "maxPossibleCount": 235475,
+          "completionPercentage": 78.6,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "WEST BU",
+          "storeCount": 746,
+          "assignedCount": 235410,
+          "completedCount": 182742,
+          "completedOfMaxCount": 182742,
+          "maxPossibleCount": 244585,
+          "completionPercentage": 74.7,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NHM BU",
+          "storeCount": 675,
+          "assignedCount": 135551,
+          "completedCount": 118610,
+          "completedOfMaxCount": 118610,
+          "maxPossibleCount": 141194,
+          "completionPercentage": 84,
+          "averageMaxQuestions": 209
+        },
+        {
+          "divisionId": "EAST BU",
+          "storeCount": 817,
+          "assignedCount": 257998,
+          "completedCount": 190509,
+          "completedOfMaxCount": 190509,
+          "maxPossibleCount": 267835,
+          "completionPercentage": 71.1,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "PR",
+          "storeCount": 18,
+          "assignedCount": 5886,
+          "completedCount": 5525,
+          "completedOfMaxCount": 5525,
+          "maxPossibleCount": 5886,
+          "completionPercentage": 93.9,
+          "averageMaxQuestions": 327
+        }
+      ],
+      "formatStats": [
+        {
+          "format": "SC",
+          "storeCount": 3555,
+          "assignedCount": 1133240,
+          "completedCount": 871050,
+          "maxPossibleCount": 1166040,
+          "completionPercentage": 74.7
+        },
+        {
+          "format": "DIV1",
+          "storeCount": 366,
+          "assignedCount": 113142,
+          "completedCount": 86224,
+          "maxPossibleCount": 119682,
+          "completionPercentage": 72
+        },
+        {
+          "format": "NHM",
+          "storeCount": 674,
+          "assignedCount": 135223,
+          "completedCount": 118292,
+          "maxPossibleCount": 140866,
+          "completionPercentage": 84
+        }
+      ],
+      "areaStats": [
+        {
+          "area": "ACC",
+          "assigned": 215000,
+          "completed": 179000,
+          "maxPossible": 215655,
+          "completionPercentage": "83.0"
+        },
+        {
+          "area": "Asset Protection",
+          "assigned": 84000,
+          "completed": 71000,
+          "maxPossible": 84609,
+          "completionPercentage": "83.9"
+        },
+        {
+          "area": "Backroom",
+          "assigned": 258000,
+          "completed": 175000,
+          "maxPossible": 246108,
+          "completionPercentage": "71.1"
+        },
+        {
+          "area": "Fashion",
+          "assigned": 165000,
+          "completed": 118000,
+          "maxPossible": 172524,
+          "completionPercentage": "68.4"
+        },
+        {
+          "area": "Fresh",
+          "assigned": 222000,
+          "completed": 178000,
+          "maxPossible": 223807,
+          "completionPercentage": "79.5"
+        },
+        {
+          "area": "Front End",
+          "assigned": 254000,
+          "completed": 200000,
+          "maxPossible": 255972,
+          "completionPercentage": "78.1"
+        },
+        {
+          "area": "Salesfloor",
+          "assigned": 117000,
+          "completed": 72000,
+          "maxPossible": 117999,
+          "completionPercentage": "61.0"
+        },
+        {
+          "area": "Store Fulfillment",
+          "assigned": 108000,
+          "completed": 88000,
+          "maxPossible": 109914,
+          "completionPercentage": "80.1"
+        }
+      ],
+      "userEngagement": {
+        "workers": 108500,
+        "managers": 68000,
+        "totalUsers": 176500,
+        "assignments": 1520000,
+        "completions": 1075566,
+        "totalActions": 2595566,
+        "actionsPerUser": 14.7
+      }
+    },
+    {
+      "week": 6,
+      "date": "2/16/26",
+      "label": "Week 6",
+      "summary": {
+        "totalStores": 4595,
+        "storesWithAssignments": 4457,
+        "totalPossibleStores": 4595,
+        "totalPossibleItems": 1677600,
+        "totalAssignedItems": 1421900,
+        "totalCompletedItems": 1100127,
+        "overallCompletionOfMax": "65.6"
+      },
+      "divisionStats": [
+        {
+          "divisionId": "SOUTHEAST BU",
+          "storeCount": 778,
+          "assignedCount": 255162,
+          "completedCount": 200743,
+          "completedOfMaxCount": 200743,
+          "maxPossibleCount": 255162,
+          "completionPercentage": 78.6,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NORTH BU",
+          "storeCount": 843,
+          "assignedCount": 270353,
+          "completedCount": 204117,
+          "completedOfMaxCount": 204117,
+          "maxPossibleCount": 276451,
+          "completionPercentage": 73.8,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "SOUTHWEST BU",
+          "storeCount": 718,
+          "assignedCount": 235475,
+          "completedCount": 188663,
+          "completedOfMaxCount": 188663,
+          "maxPossibleCount": 235475,
+          "completionPercentage": 80.1,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "WEST BU",
+          "storeCount": 746,
+          "assignedCount": 240052,
+          "completedCount": 186190,
+          "completedOfMaxCount": 186190,
+          "maxPossibleCount": 244585,
+          "completionPercentage": 76.1,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NHM BU",
+          "storeCount": 675,
+          "assignedCount": 139972,
+          "completedCount": 121568,
+          "completedOfMaxCount": 121568,
+          "maxPossibleCount": 141194,
+          "completionPercentage": 86.1,
+          "averageMaxQuestions": 209
+        },
+        {
+          "divisionId": "EAST BU",
+          "storeCount": 817,
+          "assignedCount": 265000,
+          "completedCount": 193560,
+          "completedOfMaxCount": 193560,
+          "maxPossibleCount": 267835,
+          "completionPercentage": 72.3,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "PR",
+          "storeCount": 18,
+          "assignedCount": 5886,
+          "completedCount": 5686,
+          "completedOfMaxCount": 5686,
+          "maxPossibleCount": 5886,
+          "completionPercentage": 96.6,
+          "averageMaxQuestions": 327
+        }
+      ],
+      "formatStats": [
+        {
+          "format": "SC",
+          "storeCount": 3555,
+          "assignedCount": 1155000,
+          "completedCount": 891505,
+          "maxPossibleCount": 1166040,
+          "completionPercentage": 76.5
+        },
+        {
+          "format": "DIV1",
+          "storeCount": 366,
+          "assignedCount": 118000,
+          "completedCount": 87422,
+          "maxPossibleCount": 119682,
+          "completionPercentage": 73
+        },
+        {
+          "format": "NHM",
+          "storeCount": 674,
+          "assignedCount": 140000,
+          "completedCount": 121200,
+          "maxPossibleCount": 140866,
+          "completionPercentage": 86
+        }
+      ],
+      "areaStats": [
+        {
+          "area": "ACC",
+          "assigned": 215655,
+          "completed": 183000,
+          "maxPossible": 215655,
+          "completionPercentage": "84.8"
+        },
+        {
+          "area": "Asset Protection",
+          "assigned": 84609,
+          "completed": 72500,
+          "maxPossible": 84609,
+          "completionPercentage": "85.7"
+        },
+        {
+          "area": "Backroom",
+          "assigned": 260000,
+          "completed": 183000,
+          "maxPossible": 246108,
+          "completionPercentage": "74.4"
+        },
+        {
+          "area": "Fashion",
+          "assigned": 172524,
+          "completed": 123000,
+          "maxPossible": 172524,
+          "completionPercentage": "71.3"
+        },
+        {
+          "area": "Fresh",
+          "assigned": 223807,
+          "completed": 182000,
+          "maxPossible": 223807,
+          "completionPercentage": "81.3"
+        },
+        {
+          "area": "Front End",
+          "assigned": 255972,
+          "completed": 206000,
+          "maxPossible": 255972,
+          "completionPercentage": "80.5"
+        },
+        {
+          "area": "Salesfloor",
+          "assigned": 117999,
+          "completed": 76000,
+          "maxPossible": 117999,
+          "completionPercentage": "64.4"
+        },
+        {
+          "area": "Store Fulfillment",
+          "assigned": 109914,
+          "completed": 91000,
+          "maxPossible": 109914,
+          "completionPercentage": "82.8"
+        }
+      ],
+      "userEngagement": {
+        "workers": 113500,
+        "managers": 72000,
+        "totalUsers": 185500,
+        "assignments": 1560000,
+        "completions": 1100127,
+        "totalActions": 2660127,
+        "actionsPerUser": 14.3
+      }
+    },
+    {
+      "week": 7,
+      "date": "2/23/26",
+      "label": "Week 7",
+      "summary": {
+        "totalStores": 4595,
+        "storesWithAssignments": 4510,
+        "totalPossibleStores": 4595,
+        "totalPossibleItems": 1677600,
+        "totalAssignedItems": 1680900,
+        "totalCompletedItems": 1111851,
+        "overallCompletionOfMax": "66.3"
+      },
+      "divisionStats": [
+        {
+          "divisionId": "SOUTHEAST BU",
+          "storeCount": 778,
+          "assignedCount": 280640,
+          "completedCount": 202916,
+          "completedOfMaxCount": 202916,
+          "maxPossibleCount": 255162,
+          "completionPercentage": 79.5,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NORTH BU",
+          "storeCount": 843,
+          "assignedCount": 296235,
+          "completedCount": 206348,
+          "completedOfMaxCount": 206348,
+          "maxPossibleCount": 276451,
+          "completionPercentage": 74.6,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "SOUTHWEST BU",
+          "storeCount": 718,
+          "assignedCount": 262450,
+          "completedCount": 190649,
+          "completedOfMaxCount": 190649,
+          "maxPossibleCount": 235475,
+          "completionPercentage": 81.0,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "WEST BU",
+          "storeCount": 746,
+          "assignedCount": 267388,
+          "completedCount": 188108,
+          "completedOfMaxCount": 188108,
+          "maxPossibleCount": 244585,
+          "completionPercentage": 76.9,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "NHM BU",
+          "storeCount": 675,
+          "assignedCount": 156182,
+          "completedCount": 122817,
+          "completedOfMaxCount": 122817,
+          "maxPossibleCount": 141194,
+          "completionPercentage": 87.0,
+          "averageMaxQuestions": 209
+        },
+        {
+          "divisionId": "EAST BU",
+          "storeCount": 817,
+          "assignedCount": 296470,
+          "completedCount": 195516,
+          "completedOfMaxCount": 195516,
+          "maxPossibleCount": 267835,
+          "completionPercentage": 73.0,
+          "averageMaxQuestions": 328
+        },
+        {
+          "divisionId": "PR",
+          "storeCount": 18,
+          "assignedCount": 6574,
+          "completedCount": 5747,
+          "completedOfMaxCount": 5747,
+          "maxPossibleCount": 5886,
+          "completionPercentage": 97.6,
+          "averageMaxQuestions": 327
+        }
+      ],
+      "formatStats": [
+        {
+          "format": "SC",
+          "storeCount": 3555,
+          "assignedCount": 1295340,
+          "completedCount": 901168,
+          "maxPossibleCount": 1166040,
+          "completionPercentage": 77.3
+        },
+        {
+          "format": "DIV1",
+          "storeCount": 366,
+          "assignedCount": 131724,
+          "completedCount": 88412,
+          "maxPossibleCount": 119682,
+          "completionPercentage": 73.8
+        },
+        {
+          "format": "NHM",
+          "storeCount": 674,
+          "assignedCount": 156182,
+          "completedCount": 122271,
+          "maxPossibleCount": 140866,
+          "completionPercentage": 86.8
+        }
+      ],
+      "areaStats": [
+        {
+          "area": "ACC",
+          "assigned": 241286,
+          "completed": 184791,
+          "maxPossible": 215655,
+          "completionPercentage": "85.7"
+        },
+        {
+          "area": "Asset Protection",
+          "assigned": 94620,
+          "completed": 73223,
+          "maxPossible": 84609,
+          "completionPercentage": "86.6"
+        },
+        {
+          "area": "Backroom",
+          "assigned": 290478,
+          "completed": 184791,
+          "maxPossible": 246108,
+          "completionPercentage": "75.1"
+        },
+        {
+          "area": "Fashion",
+          "assigned": 192745,
+          "completed": 124306,
+          "maxPossible": 172524,
+          "completionPercentage": "72.1"
+        },
+        {
+          "area": "Fresh",
+          "assigned": 249732,
+          "completed": 183762,
+          "maxPossible": 223807,
+          "completionPercentage": "82.1"
+        },
+        {
+          "area": "Front End",
+          "assigned": 285804,
+          "completed": 208021,
+          "maxPossible": 255972,
+          "completionPercentage": "81.3"
+        },
+        {
+          "area": "Salesfloor",
+          "assigned": 131767,
+          "completed": 76830,
+          "maxPossible": 117999,
+          "completionPercentage": "65.1"
+        },
+        {
+          "area": "Store Fulfillment",
+          "assigned": 122849,
+          "completed": 91945,
+          "maxPossible": 109914,
+          "completionPercentage": "83.6"
+        }
+      ],
+      "userEngagement": {
+        "workers": 105420,
+        "managers": 58930,
+        "totalUsers": 107850,
+        "assignments": 1680900,
+        "completions": 1111851,
+        "totalActions": 2380450,
+        "actionsPerUser": 22.2
+      }
+    }
+  ]
+};
+    
+    // Render unified trend chart - first row (weeks 1-4)
+    function renderTrendChart() {
+        const container = document.getElementById("trendChart");
+        
+        COMPARISON_DATA.weeks.forEach((week, index) => {
+            const prevWeek = index > 0 ? COMPARISON_DATA.weeks[index - 1] : null;
+            const completion = parseFloat(week.summary.overallCompletionOfMax);
+            const prevCompletion = prevWeek ? parseFloat(prevWeek.summary.overallCompletionOfMax) : 0;
+            const change = prevWeek ? (completion - prevCompletion).toFixed(1) : completion.toFixed(1);
+            const isWeek1 = index === 0;
+            
+            const column = document.createElement("div");
+            column.className = "week-column";
+            
+            let changeHTML = "";
+            if (isWeek1) {
+                changeHTML = '<div class="week-change"><div class="change-value">+' + change + '%</div><div class="change-label">from 1/3/26</div></div>';
+            } else {
+                changeHTML = '<div class="week-change"><div class="change-value">' + (change >= 0 ? '+' : '') + change + '%</div><div class="change-label">vs Previous Week</div></div>';
+            }
+            
+            column.innerHTML = 
+                '<div class="week-column-header">' + week.label + '</div>' +
+                '<div class="week-column-date">' + week.date + '</div>' +
+                '<div class="trend-percent">' + week.summary.overallCompletionOfMax + '%</div>' +
+                '<div class="week-metrics">' +
+                '<div class="metric-item"><div class="metric-item-value">' + (week.summary.totalCompletedItems / 1000).toFixed(0) + 'k</div><div class="metric-item-label">Completed</div></div>' +
+                '<div class="metric-item"><div class="metric-item-value">' + (week.summary.storesWithAssignments / 1000).toFixed(1) + 'k</div><div class="metric-item-label">Stores Active</div></div>' +
+                '</div>' +
+                changeHTML +
+                '</div>';
+            
+            container.appendChild(column);
+        });
+        
+        // Add blank week 8 placeholder
+        const blankColumn = document.createElement("div");
+        blankColumn.className = "week-column";
+        blankColumn.style.opacity = "0.3";
+        blankColumn.innerHTML = '<div class="week-column-header">Week 8</div><div class="week-column-date" style="height: 80px; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">Coming Soon</div>';
+        container.appendChild(blankColumn);
+    }
+    
+    // Generate insights
+    function renderInsights() {
+        const container = document.getElementById("insights");
+        const weeks = COMPARISON_DATA.weeks;
+        
+        // Calculate week-by-week changes
+        const changes = [];
+        for (let i = 1; i < weeks.length; i++) {
+            const change = (parseFloat(weeks[i].summary.overallCompletionOfMax) - parseFloat(weeks[i-1].summary.overallCompletionOfMax)).toFixed(1);
+            changes.push({
+                week: i + 1,
+                change: change,
+                completion: weeks[i].summary.overallCompletionOfMax
+            });
+        }
+        
+        const itemsCompleted = weeks[6].summary.totalCompletedItems - weeks[0].summary.totalCompletedItems;
+        const totalChange = (parseFloat(weeks[6].summary.overallCompletionOfMax) - parseFloat(weeks[0].summary.overallCompletionOfMax)).toFixed(1);
+        
+        const insights = [
+            "<strong>Week 7 Progress:</strong> Achieved " + changes[5].change + "% change (" + changes[5].completion + "% completion)",
+            "<strong>Week 6 Progress:</strong> Achieved " + changes[4].change + "% change (" + changes[4].completion + "% completion)",
+            "<strong>Week 5 Progress:</strong> Achieved " + changes[3].change + "% change (" + changes[3].completion + "% completion)",
+            "<strong>Week 4 Progress:</strong> Achieved " + changes[2].change + "% change (" + changes[2].completion + "% completion)",
+            "<strong>Week 3 Progress:</strong> Achieved " + changes[1].change + "% change (" + changes[1].completion + "% completion)",
+            "<strong>Week 2 Progress:</strong> Achieved " + changes[0].change + "% change (" + changes[0].completion + "% completion)",
+            "<strong>Items Completed:</strong> " + itemsCompleted.toLocaleString() + " additional questions completed since Week 1",
+            "<strong>Current Status:</strong> " + weeks[6].summary.totalCompletedItems.toLocaleString() + " of " + weeks[6].summary.totalPossibleItems.toLocaleString() + " total questions completed",
+            "<strong>Stores Active:</strong> " + weeks[6].summary.storesWithAssignments + " of " + weeks[6].summary.totalStores + " stores have assignments (" + (weeks[6].summary.storesWithAssignments/weeks[6].summary.totalStores*100).toFixed(1) + "%)"
+        ];
+        
+        let html = '<div class="insights-title">📈 Key Insights</div>';
+        insights.forEach(insight => {
+            html += '<div class="insight-item"><span class="insight-icon">✓</span><span class="insight-text">' + insight + '</span></div>';
+        });
+        container.innerHTML = html;
+    }
+    
+    // Render division comparison
+    function renderDivisionComparison() {
+        const container = document.getElementById("divisionComparison");
+        
+        const divisions = new Set();
+        COMPARISON_DATA.weeks.forEach(week => {
+            week.divisionStats.forEach(div => divisions.add(div.divisionId));
+        });
+        
+        let headerHTML = '<div class="division-row header"><div>Division</div>';
+        COMPARISON_DATA.weeks.forEach(week => {
+            headerHTML += '<div>Week ' + week.week + '</div>';
+        });
+        headerHTML += '</div>';
+        
+        let html = headerHTML;
+        
+        Array.from(divisions).sort().forEach(divisionId => {
+            html += '<div class="division-row"><div class="division-name">' + divisionId + '</div>';
+            
+            COMPARISON_DATA.weeks.forEach(week => {
+                const weekDiv = week.divisionStats.find(d => d.divisionId === divisionId);
+                html += '<div class="division-value">' + (weekDiv ? weekDiv.completionPercentage + "%" : "N/A") + 
+                    '<div class="progress-bar"><div class="progress-fill" style="width: ' + (weekDiv ? weekDiv.completionPercentage : 0) + '%"></div></div></div>';
+            });
+            
+            html += '</div>';
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    // Render format comparison
+    function renderFormatComparison() {
+        const container = document.getElementById("formatComparison");
+        
+        const formats = ["SC", "NHM", "DIV1"];
+        
+        formats.forEach(format => {
+            const card = document.createElement("div");
+            card.className = "format-card";
+            
+            let html = '<div class="format-name">' + format + '</div><div class="format-weeks">';
+            
+            COMPARISON_DATA.weeks.forEach(week => {
+                const formatData = week.formatStats.find(f => f.format === format);
+                html += '<div class="format-week"><span>' + week.label + '</span><strong>' + (formatData ? formatData.completionPercentage + "%" : "N/A") + '</strong></div>';
+            });
+            
+            html += '</div>';
+            card.innerHTML = html;
+            container.appendChild(card);
+        });
+    }
+    
+    // Render area comparison
+    function renderAreaComparison() {
+        const container = document.getElementById("areaComparison");
+        
+        // Get all unique areas from all weeks
+        const areas = new Set();
+        COMPARISON_DATA.weeks.forEach(week => {
+            if (week.areaStats) {
+                week.areaStats.forEach(area => areas.add(area.area));
+            }
+        });
+        
+        let headerHTML = '<div class="division-row header"><div>Area</div>';
+        COMPARISON_DATA.weeks.forEach(week => {
+            headerHTML += '<div>Week ' + week.week + '</div>';
+        });
+        headerHTML += '</div>';
+        
+        let html = headerHTML;
+        
+        Array.from(areas).sort().forEach(areaName => {
+            html += '<div class="division-row"><div class="division-name">' + areaName + '</div>';
+            
+            COMPARISON_DATA.weeks.forEach(week => {
+                const weekArea = week.areaStats ? week.areaStats.find(a => a.area === areaName) : null;
+                html += '<div class="division-value">' + (weekArea ? weekArea.completionPercentage + "%" : "N/A") + 
+                    '<div class="progress-bar"><div class="progress-fill" style="width: ' + (weekArea ? parseFloat(weekArea.completionPercentage) : 0) + '%"></div></div></div>';
+            });
+            
+            html += '</div>';
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    // Render user engagement - first row (weeks 1-4)
+    function renderUserEngagement() {
+        const container = document.getElementById("userEngagement");
+        let html = "";
+        
+        COMPARISON_DATA.weeks.forEach((week, index) => {
+            const prevWeek = index > 0 ? COMPARISON_DATA.weeks[index - 1].userEngagement : null;
+            const current = week.userEngagement;
+            
+            const workersGrowth = prevWeek && prevWeek.workers > 0 ? ((current.workers - prevWeek.workers) / prevWeek.workers * 100).toFixed(1) : null;
+            const managersGrowth = prevWeek && prevWeek.managers > 0 ? ((current.managers - prevWeek.managers) / prevWeek.managers * 100).toFixed(1) : null;
+            const totalUsersGrowth = prevWeek && prevWeek.totalUsers > 0 ? ((current.totalUsers - prevWeek.totalUsers) / prevWeek.totalUsers * 100).toFixed(1) : null;
+            const assignmentsGrowth = prevWeek && prevWeek.assignments > 0 ? ((current.assignments - prevWeek.assignments) / prevWeek.assignments * 100).toFixed(1) : null;
+            const completionsGrowth = prevWeek && prevWeek.completions > 0 ? ((current.completions - prevWeek.completions) / prevWeek.completions * 100).toFixed(1) : null;
+            const totalActionsGrowth = prevWeek && prevWeek.totalActions > 0 ? ((current.totalActions - prevWeek.totalActions) / prevWeek.totalActions * 100).toFixed(1) : null;
+            
+            html += "<div class=\"engagement-card\">" +
+                "<div class=\"engagement-header\">" + week.label + " (" + week.date + ")</div>" +
+                "<div class=\"engagement-metric highlight\">" +
+                "<div class=\"metric-label\"><strong>📊 Total Actions</strong></div>" +
+                "<div class=\"metric-value-wrapper\">" + 
+                (totalActionsGrowth !== null ? "<div class=\"growth-badge\">" + (totalActionsGrowth >= 0 ? '+' : '') + totalActionsGrowth + "%</div>" : "") + 
+                "<div class=\"metric-value large\">" + (current.totalActions / 1000000).toFixed(2) + "M</div></div>" +
+                "</div>" +
+                "<div class=\"engagement-metric\">" +
+                "<div class=\"metric-label\">Associates</div>" +
+                "<div class=\"metric-value-wrapper\">" + 
+                (workersGrowth !== null ? "<div class=\"growth-badge\">" + (workersGrowth >= 0 ? '+' : '') + workersGrowth + "%</div>" : "") + 
+                "<div class=\"metric-value\">" + current.workers.toLocaleString() + "</div></div>" +
+                "</div>" +
+                "<div class=\"engagement-metric\">" +
+                "<div class=\"metric-label\">Managers</div>" +
+                "<div class=\"metric-value-wrapper\">" + 
+                (managersGrowth !== null ? "<div class=\"growth-badge\">" + (managersGrowth >= 0 ? '+' : '') + managersGrowth + "%</div>" : "") + 
+                "<div class=\"metric-value\">" + current.managers.toLocaleString() + "</div></div>" +
+                "</div>" +
+                "<div class=\"engagement-metric\">" +
+                "<div class=\"metric-label\">Total Users</div>" +
+                "<div class=\"metric-value-wrapper\">" + 
+                (totalUsersGrowth !== null ? "<div class=\"growth-badge\">" + (totalUsersGrowth >= 0 ? '+' : '') + totalUsersGrowth + "%</div>" : "") + 
+                "<div class=\"metric-value\">" + current.totalUsers.toLocaleString() + "</div></div>" +
+                "</div>" +
+                "</div>";
+        });
+        
+        // Add blank week 8 placeholder
+        html += "<div class=\"engagement-card\" style=\"opacity: 0.3;\">" +
+            "<div class=\"engagement-header\">Week 8</div>" +
+            "<div class=\"engagement-metric\" style=\"text-align: center; color: var(--text-muted);\">Coming Soon</div>" +
+            "</div>";
+        
+        container.innerHTML = html;
+    }
+    
+    // Initialize dashboard
+    renderTrendChart();
+    renderInsights();
+    renderDivisionComparison();
+    renderFormatComparison();
+    renderAreaComparison();
+    renderUserEngagement();
+    
+    console.log("✅ 7-Week Comparison Dashboard loaded successfully");
+    </script>
+</body>
+</html>

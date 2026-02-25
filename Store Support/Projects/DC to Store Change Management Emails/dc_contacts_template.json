@@ -1,0 +1,203 @@
+{
+  "metadata": {
+    "description": "DC Regional Contacts - Organized by Distribution Center",
+    "purpose": "Central list of all DC recipients - update here, system uses automatically",
+    "last_updated": "2026-02-25",
+    "total_dcs": "TBD - Add as needed",
+    "status": "Template - Ready for population"
+  },
+  "instructions": {
+    "how_to_use": "Add DC contacts here. When ready, run: python manage_paycycle.py add-recipient production email@walmart.com 'Name' 'Title'",
+    "by_region": "Organize by region/DC name for easy reference",
+    "format": "Email, Full Name, Title, Region, Notes"
+  },
+  "dcs": {
+    "dallas": {
+      "dc_name": "Dallas Distribution Center",
+      "region": "Southwest",
+      "contacts": [
+        {
+          "name": "[DC Manager Name]",
+          "email": "[email@walmart.com]",
+          "title": "General Manager",
+          "role": "DC Leadership",
+          "active": false,
+          "notes": "Add actual email when available"
+        },
+        {
+          "name": "[District Manager Name]",
+          "email": "[email@walmart.com]",
+          "title": "Distribution Manager",
+          "role": "DC Operations",
+          "active": false,
+          "notes": "Add actual email when available"
+        }
+      ],
+      "distribution_list": {
+        "name": "Dallas DC All Managers",
+        "email": "[dallas-dc@walmart.com]",
+        "title": "Distribution List",
+        "active": false,
+        "notes": "If available, can send to entire DC at once"
+      },
+      "ready_to_add": false
+    },
+    "atlanta": {
+      "dc_name": "Atlanta Distribution Center",
+      "region": "Southeast",
+      "contacts": [
+        {
+          "name": "[DC Manager Name]",
+          "email": "[email@walmart.com]",
+          "title": "General Manager",
+          "role": "DC Leadership",
+          "active": false,
+          "notes": "Add actual email when available"
+        },
+        {
+          "name": "[District Manager Name]",
+          "email": "[email@walmart.com]",
+          "title": "Distribution Manager",
+          "role": "DC Operations",
+          "active": false,
+          "notes": "Add actual email when available"
+        }
+      ],
+      "distribution_list": {
+        "name": "Atlanta DC All Managers",
+        "email": "[atlanta-dc@walmart.com]",
+        "title": "Distribution List",
+        "active": false,
+        "notes": "If available, can send to entire DC at once"
+      },
+      "ready_to_add": false
+    },
+    "chicago": {
+      "dc_name": "Chicago Distribution Center",
+      "region": "Midwest",
+      "contacts": [
+        {
+          "name": "[DC Manager Name]",
+          "email": "[email@walmart.com]",
+          "title": "General Manager",
+          "role": "DC Leadership",
+          "active": false,
+          "notes": "Add actual email when available"
+        },
+        {
+          "name": "[District Manager Name]",
+          "email": "[email@walmart.com]",
+          "title": "Distribution Manager",
+          "role": "DC Operations",
+          "active": false,
+          "notes": "Add actual email when available"
+        }
+      ],
+      "distribution_list": {
+        "name": "Chicago DC All Managers",
+        "email": "[chicago-dc@walmart.com]",
+        "title": "Distribution List",
+        "active": false,
+        "notes": "If available, can send to entire DC at once"
+      },
+      "ready_to_add": false
+    },
+    "denver": {
+      "dc_name": "Denver Distribution Center",
+      "region": "Mountain",
+      "contacts": [
+        {
+          "name": "[DC Manager Name]",
+          "email": "[email@walmart.com]",
+          "title": "General Manager",
+          "role": "DC Leadership",
+          "active": false,
+          "notes": "Add actual email when available"
+        },
+        {
+          "name": "[District Manager Name]",
+          "email": "[email@walmart.com]",
+          "title": "Distribution Manager",
+          "role": "DC Operations",
+          "active": false,
+          "notes": "Add actual email when available"
+        }
+      ],
+      "distribution_list": {
+        "name": "Denver DC All Managers",
+        "email": "[denver-dc@walmart.com]",
+        "title": "Distribution List",
+        "active": false,
+        "notes": "If available, can send to entire DC at once"
+      },
+      "ready_to_add": false
+    },
+    "los_angeles": {
+      "dc_name": "Los Angeles Distribution Center",
+      "region": "West",
+      "contacts": [
+        {
+          "name": "[DC Manager Name]",
+          "email": "[email@walmart.com]",
+          "title": "General Manager",
+          "role": "DC Leadership",
+          "active": false,
+          "notes": "Add actual email when available"
+        },
+        {
+          "name": "[District Manager Name]",
+          "email": "[email@walmart.com]",
+          "title": "Distribution Manager",
+          "role": "DC Operations",
+          "active": false,
+          "notes": "Add actual email when available"
+        }
+      ],
+      "distribution_list": {
+        "name": "Los Angeles DC All Managers",
+        "email": "[los-angeles-dc@walmart.com]",
+        "title": "Distribution List",
+        "active": false,
+        "notes": "If available, can send to entire DC at once"
+      },
+      "ready_to_add": false
+    }
+  },
+  "quick_reference": {
+    "purpose": "When you're ready, this is what you'll give us",
+    "example": "You'll say: 'Here are the DC contacts by region, add these to production'",
+    "format_provided": [
+      {
+        "dc": "Dallas",
+        "manager_email": "john.smith@walmart.com",
+        "manager_name": "John Smith",
+        "title": "DC General Manager"
+      },
+      {
+        "dc": "Dallas",
+        "manager_email": "jane.doe@walmart.com",
+        "manager_name": "Jane Doe",
+        "title": "Distribution Manager"
+      },
+      {
+        "dc": "Atlanta",
+        "manager_email": "bob.jones@walmart.com",
+        "manager_name": "Bob Jones",
+        "title": "DC General Manager"
+      }
+    ]
+  },
+  "implementation_workflow": {
+    "step1": "You provide: DC contacts by region (names, emails, titles)",
+    "step2": "I add them to production: python manage_paycycle.py add-recipient production email@walmart.com 'Name' 'DC Title'",
+    "step3": "You switch to production: python manage_paycycle.py switch-mode production",
+    "step4": "System sends to all DC contacts on next PayCycle",
+    "total_time": "< 5 minutes"
+  },
+  "summary": {
+    "when_ready": "Just let me know you have the DC contacts",
+    "what_to_provide": "List of: Name, Email, Title, DC/Region",
+    "what_i_will_do": "Add them all to production and switch system over",
+    "no_disruption": "Test mode remains active until you approve switch"
+  }
+}

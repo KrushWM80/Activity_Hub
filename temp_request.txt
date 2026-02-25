@@ -1,0 +1,6 @@
+﻿POST http://localhost:8001/api/admin/track-user HTTP/1.1
+Host: localhost:8001
+Content-Type: application/json
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+
+{"user_id": "test_user", "page": "dashboard"}

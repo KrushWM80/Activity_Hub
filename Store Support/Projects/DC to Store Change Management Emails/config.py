@@ -57,9 +57,14 @@ VPN_RETRY_INTERVAL_HOURS = 1  # Check every hour
 EMAIL_ENABLED = True  # Set to True to enable email notifications
 EMAIL_METHOD = "MSGRAPH"  # Options: "MSGRAPH" (Microsoft Graph), "HERMES" (future)
 
-# Test mode - send all emails to this address instead of distribution lists
+# Test mode - send all emails to these addresses instead of distribution lists
 TEST_MODE = True
-TEST_EMAIL = "kendall.rush@walmart.com"  # Your email for testing
+TEST_EMAILS = [
+    "Kristine.Torres@walmart.com",
+    "Matthew.Farnworth@walmart.com",
+    "Kendall.Rush@walmart.com"
+]  # Test recipients during testing phase
+TEST_EMAIL = TEST_EMAILS[0]  # Backward compatibility
 
 # Distribution lists per role type (will be used when TEST_MODE = False)
 EMAIL_DISTRIBUTION = {

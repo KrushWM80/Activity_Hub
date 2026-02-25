@@ -19,7 +19,13 @@ class EmailHelper:
     
     def __init__(self, test_mode: bool = config.TEST_MODE):
         self.test_mode = test_mode
-        self.test_email = config.TEST_EMAIL
+        # Support both single email and list of test emails
+        if hasattr(config, 'TEST_EMAILS'):
+            self.test_emails = config.TEST_EMAILS
+            self.test_email = config.TEST_EMAILS[0]  # For backward compatibility
+        else:
+            self.test_email = config.TEST_EMAIL
+            self.test_emails = [config.TEST_EMAIL]
     
     def _invoke_msgraph(self, prompt: str) -> str:
         """
@@ -43,7 +49,8 @@ class EmailHelper:
             List of email addresses
         """
         if self.test_mode:
-            return [self.test_email]
+            # Return all test recipients (supports 1 or more)
+            return self.test_emails
         
         # Get role-specific distribution list
         recipients = config.EMAIL_DISTRIBUTION.get(role)

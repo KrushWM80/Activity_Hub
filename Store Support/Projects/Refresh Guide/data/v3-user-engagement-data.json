@@ -1,0 +1,89 @@
+{
+  "week": 7,
+  "period": "2/16-2/23/26",
+  "extraction_date": "2026-02-23T17:08:22.678936",
+  "source": "SAMPLE_DATA",
+  "note": "This is sample data. For production, configure BigQuery access.",
+  "metrics": {
+    "unique_workers": 105420,
+    "unique_managers": 58930,
+    "total_unique_users": 107850,
+    "total_assignments": 1680900,
+    "total_completions": 742560,
+    "total_platform_actions": 2380450,
+    "actions_per_user": 22.1,
+    "assignment_saturation_pct": 105.2,
+    "store_coverage": {
+      "count": 4451,
+      "total_stores": 4577,
+      "percentage": 97.2
+    },
+    "completion_rate_pct": 44.2
+  },
+  "comparison_vs_week6": {
+    "period": "2/9-2/16/26",
+    "unique_users": {
+      "week6": 102150,
+      "week7": 107850,
+      "change": 5700,
+      "change_pct": 5.6,
+      "trend": "↑"
+    },
+    "unique_workers": {
+      "week6": 101200,
+      "week7": 105420,
+      "change": 4220,
+      "change_pct": 4.2,
+      "trend": "↑"
+    },
+    "unique_managers": {
+      "week6": 56890,
+      "week7": 58930,
+      "change": 2040,
+      "change_pct": 3.6,
+      "trend": "↑"
+    },
+    "total_assignments": {
+      "week6": 1620400,
+      "week7": 1680900,
+      "change": 60500,
+      "change_pct": 3.7,
+      "trend": "↑"
+    },
+    "total_completions": {
+      "week6": 705840,
+      "week7": 742560,
+      "change": 36720,
+      "change_pct": 5.2,
+      "trend": "↑"
+    },
+    "total_platform_actions": {
+      "week6": 2248350,
+      "week7": 2380450,
+      "change": 132100,
+      "change_pct": 5.9,
+      "trend": "↑"
+    },
+    "actions_per_user": {
+      "week6": 22.0,
+      "week7": 22.1,
+      "change": 0.1,
+      "change_pct": 0.5,
+      "trend": "↑"
+    },
+    "assignment_saturation_pct": {
+      "week6": 104.8,
+      "week7": 105.2,
+      "change": 0.4,
+      "change_pct": 0.4,
+      "trend": "↑"
+    },
+    "completion_rate_pct": {
+      "week6": 43.5,
+      "week7": 44.2,
+      "change": 0.7,
+      "change_pct": 1.6,
+      "trend": "↑"
+    }
+  }
+}

@@ -491,6 +491,86 @@ Located in [Platform/Documents/Compliance/](Platform/Documents/Compliance/)
 
 ---
 
+## � Refresh Guide - Store Refresh Dashboard
+
+The Store Refresh Guide manages enterprise-wide store refresh processes with real-time performance tracking via BigQuery integration.
+
+### **Core Dashboards**
+
+**1. Business Overview Dashboard**
+- **File**: `Store Support/Projects/Refresh Guide/business-overview-dashboard-v3-2-23-26.html` (8.8 MB)
+- **Purpose**: Main store refresh metrics and performance tracking
+- **Status**: Validation errors present (regex pattern, deprecated meta tag) - not currently deployable
+- **Data Source**: BigQuery `athena-gateway-prod.store_refresh.store_refresh_data`
+- **Metrics**: Completion %, stores active, total assignments, divisions, areas, formats
+
+**2. 7-Week Comparison Dashboard** ⭐ **PRODUCTION READY**
+- **File**: `Store Support/Projects/Refresh Guide/business-overview-comparison-dashboard-2-23-26.html` (61.31 KB)
+- **Date Range**: Week 1 (1/19/26) → Week 7 (2/16-2/23/26)
+- **Purpose**: Multi-week trend analysis and performance comparison
+- **Status**: ✅ Production-ready for Code Puppy Pages deployment
+- **Update Frequency**: Weekly (Fridays, starting Week 8)
+- **Platform**: Code Puppy Pages (embedded HTML, no external dependencies)
+
+### **Weekly Data Extraction & Update Process**
+
+**📝 Complete SOP**: [Store Support/Projects/Refresh Guide/WEEKLY_DASHBOARD_UPDATE_PROCESS.md](Store%20Support/Projects/Refresh%20Guide/WEEKLY_DASHBOARD_UPDATE_PROCESS.md)
+
+**Key Steps:**
+1. Extract weekly metrics from BigQuery (Friday afternoon)
+2. Add new week object to dashboard JSON data
+3. Test in browser (auto-wrapping 4-column grid)
+4. Deploy to Code Puppy Pages
+
+**Timeline:**
+- Week 1 (1/19/26): 45.9% completion
+- Week 2 (1/26/26): 60.9% (+15.0%)
+- Week 3 (2/1/26): 65.5% (+4.6%)
+- Week 4 (2/2/26): 70.4% (+4.9%)
+- Week 5 (2/9/26): 75.4% (+5.0%, peak)
+- Week 6 (2/16/26): 77.1% (+1.7%)
+- Week 7 (2/16-2/23/26): 44.2% (-32.9%, new cycle)
+- **Week 8 (2/23-2/28/26)**: ⏳ Ready for update
+
+### **Dashboard Architecture**
+
+**Layout:**
+- **Overall Completion Trend**: 4-column grid, 2 rows (Weeks 1-4 | Weeks 5-8)
+- **Key Insights**: Week-by-week changes, totals, store activity
+- **Division Performance**: 1.2fr label + 7 weeks (0.8fr each)
+- **Format Comparison**: SC, NHM, DIV1 format breakdown across all weeks
+- **Area Performance**: 8 store areas (ACC, Asset Protection, Backroom, etc.) across weeks
+- **User Engagement**: 4-column cards, 2 rows with growth badges
+
+**Technology:**
+- Pure HTML5/CSS3/JavaScript (no external dependencies)
+- CSS Grid auto-wrapping for responsive design
+- Embedded JSON data (no server required)
+- Dark/Light mode support via CSS variables
+- File size: 61.31 KB (highly optimized)
+
+### **Data Extraction Resources**
+
+**Scripts:**
+- `extract_week7_data.py` - Week 7 extraction template
+- `query_bigquery.py` - Direct BigQuery query utility
+- `extract_html_from_text.py` - HTML parsing utility
+
+**BigQuery Tables:**
+- Primary: `athena-gateway-prod.store_refresh.store_refresh_data`
+- Reference: `wmt-assetprotection-prod.Store_Support_Dev.Store_Cur_Data`
+
+### **Key Metrics Structure**
+
+Each week object captures:
+- **Summary**: Overall completion %, stores active, assignments, completions
+- **Division Stats**: 7 divisions with completion % and progress
+- **Format Stats**: SC, NHM, DIV1 format breakdown
+- **Area Stats**: Backroom, Front End, Fashion, Fresh, ACC, Asset Protection, Salesfloor, Store Fulfillment
+- **User Engagement**: Workers, managers, total users, actions, actions per user
+
+---
+
 ## 📞 Support & Contact
 
 For questions about:
@@ -499,9 +579,11 @@ For questions about:
 - **Compliance**: Check Platform/Documents/Compliance/
 - **Design & Branding**: Visit Platform/Design/
 - **Backend/API**: Read Platform/Sparky AI/BACKEND_API.md
+- **Refresh Guide Dashboards**: See [WEEKLY_DASHBOARD_UPDATE_PROCESS.md](Store%20Support/Projects/Refresh%20Guide/WEEKLY_DASHBOARD_UPDATE_PROCESS.md)
+- **Data Extraction**: Contact BigQuery Data Engineering team
 
 ---
 
-**Version**: 1.0  
+**Version**: 1.1  
 **Status**: Active  
-**Last Reviewed**: February 17, 2026
+**Last Reviewed**: February 24, 2026

@@ -4,7 +4,9 @@
     "k1walke@homeoffice.wal-mart.com",
     "mnf000x@homeoffice.wal-mart.com",
     "mdroth@homeoffice.wal-mart.com",
-    "hrisaac@homeoffice.wal-mart.com"
+    "hrisaac@homeoffice.wal-mart.com",
+    "kristii.buttery@walmart.com",
+    "kendall.rush@walmart.com"
   ],
   "notes": "User admin list - Controls admin button visibility and access. No password authentication required - uses Kerberos/Windows AD instead."
 }
