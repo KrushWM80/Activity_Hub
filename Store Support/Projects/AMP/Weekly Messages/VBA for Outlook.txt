@@ -1,0 +1,281 @@
+' =============================================================
+' Outlook VBA Backup - ThisOutlookSession
+' Version: 1.1
+' Date: 2026-02-16
+'
+' Description:
+' - Main Application_NewMailEx trigger
+' - Adobe Weekly CSV rule
+' - Ops Recap PDF rule
+' - Playbook rule (CSV->XLSX conversion & overwrite target)
+' - Folder creation utility
+' - Logging utility (SaveAttachments_Log.txt)
+' =============================================================
+
+
+' =========================
+' MAIN TRIGGER (ONLY ONE)
+' =========================
+Private Sub Application_NewMailEx(ByVal EntryIDCollection As String)
+
+    Dim arr() As String
+    Dim i As Long
+    Dim ns As Outlook.NameSpace
+    Dim itm As Object
+    Dim mailID As String
+
+    Set ns = Application.GetNamespace("MAPI")
+    arr = Split(EntryIDCollection, ",")
+
+    For i = LBound(arr) To UBound(arr)
+        mailID = arr(i)
+        On Error Resume Next
+        Set itm = ns.GetItemFromID(mailID)
+        On Error GoTo 0
+
+        If TypeOf itm Is Outlook.MailItem Then
+            ProcessAdobeWeekly itm
+            ProcessOpsRecap itm
+            ProcessPlaybook itm
+        End If
+
+        Set itm = Nothing
+    Next i
+
+    Set ns = Nothing
+
+End Sub
+
+
+' =========================
+' RULE 1 – Adobe Weekly CSV
+' =========================
+Private Sub ProcessAdobeWeekly(itm As Outlook.MailItem)
+
+    Dim savePath As String
+    savePath = "C:\Users\krush\Documents\VSCode\AMP\Weekly Messages\Docs\"
+
+    If InStr(1, LCase(SafeStr(itm.Subject)), "weekly messages") = 0 Then Exit Sub
+    If itm.Attachments.Count = 0 Then Exit Sub
+
+    EnsureFolderExists savePath
+
+    Dim atmt As Outlook.Attachment
+    Dim fname As String
+
+    For Each atmt In itm.Attachments
+        If LCase(Right(atmt.FileName, 4)) = ".csv" Then
+            fname = Format(Now, "yyyy-mm-dd_hh-nn-ss_") & atmt.FileName
+            On Error Resume Next
+            atmt.SaveAsFile savePath & fname
+            If Err.Number = 0 Then
+                LogLine "AdobeWeekly saved: " & savePath & fname, savePath
+            Else
+                LogLine "AdobeWeekly failed to save: " & atmt.FileName & " Err: " & Err.Number & " - " & Err.Description, savePath
+                Err.Clear
+            End If
+            On Error GoTo 0
+        End If
+    Next atmt
+
+End Sub
+
+
+' =========================
+' RULE 2 – Ops Recap PDF
+' =========================
+Private Sub ProcessOpsRecap(itm As Outlook.MailItem)
+
+    Dim savePath As String
+    savePath = "C:\Users\krush\Walmart Inc\E2E ATC Reporting - Documents\Out of Stocks\"
+
+    If InStr(1, LCase(SafeStr(itm.Subject)), "ops recap") = 0 Then Exit Sub
+    If itm.Attachments.Count = 0 Then Exit Sub
+
+    EnsureFolderExists savePath
+
+    Dim atmt As Outlook.Attachment
+    Dim fname As String
+
+    For Each atmt In itm.Attachments
+        If LCase(Right(atmt.FileName, 4)) = ".pdf" Then
+            fname = Format(Now, "yyyy-mm-dd_hh-nn-ss_") & atmt.FileName
+            On Error Resume Next
+            atmt.SaveAsFile savePath & fname
+            If Err.Number = 0 Then
+                LogLine "OpsRecap saved: " & savePath & fname, savePath
+            Else
+                LogLine "OpsRecap failed to save: " & atmt.FileName & " Err: " & Err.Number & " - " & Err.Description, savePath
+                Err.Clear
+            End If
+            On Error GoTo 0
+        End If
+    Next atmt
+
+End Sub
+
+
+' =========================
+' RULE 3 – Playbook (replace target .xlsx)
+' =========================
+Private Sub ProcessPlaybook(itm As Outlook.MailItem)
+
+    Dim targetPath As String
+    Dim targetFolder As String
+    Dim tmpFolder As String
+    Dim atmt As Outlook.Attachment
+    Dim atName As String
+    Dim atExt As String
+    Dim tmpFile As String
+    Dim saved As Boolean
+    Dim chk As Outlook.Attachment
+    Dim found As Boolean
+
+    ' Exact target file to replace (user-specified)
+    targetPath = "C:\Users\krush\Walmart Inc\ATC Team - Documents\Activity - Walmart US\Reporting\Data\Me@\MM\Input\Playbook Hub and Active Playbooks - Weekly Report.xlsx"
+    targetFolder = Left(targetPath, InStrRev(targetPath, "\"))
+
+    ' Temp folder to hold incoming CSV if needed
+    tmpFolder = Environ("TEMP") & "\PlaybookTemp\"
+
+    ' Quick subject/attachment detection - case-insensitive "playbook"
+    found = False
+    If InStr(1, LCase(SafeStr(itm.Subject)), "playbook") > 0 Then found = True
+    If Not found Then
+        If InStr(1, LCase(SafeStr(itm.Body)), "playbook") > 0 Then found = True
+    End If
+    If Not found Then
+        For Each chk In itm.Attachments
+            If InStr(1, LCase(SafeStr(chk.FileName)), "playbook") > 0 Then
+                found = True
+                Exit For
+            End If
+        Next chk
+    End If
+    If Not found Then Exit Sub
+
+    If itm.Attachments.Count = 0 Then Exit Sub
+
+    EnsureFolderExists targetFolder
+    EnsureFolderExists tmpFolder
+
+    saved = False
+
+    For Each atmt In itm.Attachments
+        atName = SafeStr(atmt.FileName)
+        atExt = LCase(Right(atName, 5))
+        If atExt = ".xlsx" Then
+            On Error Resume Next
+            If Dir(targetPath) <> "" Then Kill targetPath
+            atmt.SaveAsFile targetPath
+            If Err.Number = 0 Then
+                LogLine "Playbook: Overwrote target with incoming xlsx -> " & targetPath, targetFolder
+                saved = True
+            Else
+                LogLine "Playbook: Failed writing xlsx to target. Err: " & Err.Number & " - " & Err.Description, targetFolder
+                Err.Clear
+            End If
+            On Error GoTo 0
+
+        ElseIf LCase(Right(atName, 4)) = ".csv" Then
+            tmpFile = tmpFolder & Format(Now, "yyyy-mm-dd_hh-nn-ss_") & atName
+            On Error Resume Next
+            atmt.SaveAsFile tmpFile
+            If Err.Number <> 0 Then
+                LogLine "Playbook: Failed to save temp CSV '" & atName & "'. Err: " & Err.Number & " - " & Err.Description, targetFolder
+                Err.Clear
+            Else
+                ' Convert CSV -> XLSX using Excel automation (late binding)
+                Dim xlApp As Object
+                Dim wb As Object
+                On Error Resume Next
+                Set xlApp = CreateObject("Excel.Application")
+                If xlApp Is Nothing Then
+                    LogLine "Playbook: Could not create Excel.Application. Conversion skipped.", targetFolder
+                Else
+                    xlApp.DisplayAlerts = False
+                    xlApp.Visible = False
+                    Set wb = xlApp.Workbooks.Open(tmpFile)
+                    If Not wb Is Nothing Then
+                        If Dir(targetPath) <> "" Then
+                            On Error Resume Next
+                            Kill targetPath
+                            Err.Clear
+                        End If
+                        wb.SaveAs targetPath, 51   ' 51 = xlOpenXMLWorkbook (.xlsx)
+                        wb.Close False
+                        LogLine "Playbook: Converted CSV to XLSX and saved to target -> " & targetPath, targetFolder
+                        saved = True
+                    Else
+                        LogLine "Playbook: Excel failed to open temp CSV: " & tmpFile, targetFolder
+                    End If
+                    xlApp.Quit
+                    Set wb = Nothing
+                    Set xlApp = Nothing
+                End If
+            End If
+            On Error GoTo 0
+            ' Clean up temp file (attempt)
+            On Error Resume Next
+            If Dir(tmpFile) <> "" Then Kill tmpFile
+            On Error GoTo 0
+
+        Else
+            LogLine "Playbook: Skipped attachment (unsupported ext): " & atName, targetFolder
+        End If
+
+        If saved Then Exit For
+    Next atmt
+
+    If Not saved Then
+        LogLine "Playbook: No suitable attachment saved for message: " & SafeStr(itm.Subject), targetFolder
+    End If
+
+End Sub
+
+
+' =========================
+' FOLDER CREATION UTILITY
+' =========================
+Private Sub EnsureFolderExists(folderPath As String)
+
+    If Right(folderPath, 1) <> "\" Then folderPath = folderPath & "\"
+    If Dir(folderPath, vbDirectory) = "" Then
+        On Error Resume Next
+        MkDir folderPath
+        On Error GoTo 0
+    End If
+
+End Sub
+
+
+' =========================
+' LOGGING UTILITY
+' Appends to SaveAttachments_Log.txt inside the folder passed
+' =========================
+Private Sub LogLine(msg As String, folderPath As String)
+    On Error Resume Next
+    If Right(folderPath, 1) <> "\" Then folderPath = folderPath & "\"
+    EnsureFolderExists folderPath
+    Dim fpath As String
+    fpath = folderPath & "SaveAttachments_Log.txt"
+    Dim fnum As Integer
+    fnum = FreeFile
+    Open fpath For Append As #fnum
+    Print #fnum, Format(Now, "yyyy-mm-dd hh:nn:ss") & " - " & msg
+    Close #fnum
+    On Error GoTo 0
+End Sub
+
+
+' =========================
+' SAFE STRING UTILITY
+' =========================
+Private Function SafeStr(v As Variant) As String
+    On Error Resume Next
+    If IsNull(v) Then
+        SafeStr = ""
+    Else
+        SafeStr = CStr(v)
+    End If
+End Function

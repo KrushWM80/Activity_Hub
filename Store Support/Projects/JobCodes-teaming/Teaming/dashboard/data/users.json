@@ -54,5 +54,21 @@
     "email": "andrea.hanson@walmart.com",
     "approved": true,
     "registered": "2026-02-09T10:51:42.293884"
+  },
+  "alaya.hardy": {
+    "password_hash": "",
+    "role": "user",
+    "name": "Alaya Hardy",
+    "email": "alaya.hardy@walmart.com",
+    "approved": true,
+    "registered": "2026-02-25T13:37:34.546019"
+  },
+  "kristii.buttrey": {
+    "password_hash": "",
+    "role": "user",
+    "name": "Kristii Buttrey",
+    "email": "kristii.buttrey@walmart.com",
+    "approved": true,
+    "registered": "2026-02-25T16:33:25.182194"
   }
 }

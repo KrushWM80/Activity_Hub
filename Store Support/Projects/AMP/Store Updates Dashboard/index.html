@@ -1,2632 +1,2625 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Activity and Communications Dashboard - Enhanced</title>
-    <link rel="stylesheet" href="enhanced-styles.css">
-    <!-- BigQuery Integration files located in Spark-Playground repository -->
-    <!-- Path: C:\Users\krush\Documents\VSCode\Spark-Playground\General Setup\BigQueryProject\ -->
-    <script src="real-data-loader.js"></script>
-    <style>
-        :root {
-            --walmart-blue: #0071ce;
-            --walmart-yellow: #ffc220;
-            --walmart-dark-blue: #004c91;
-            --walmart-light-blue: #b6d7ff;
-            --success-green: #4caf50;
-            --warning-orange: #ff9800;
-            --error-red: #f44336;
-            --light-gray: #f5f5f5;
-            --border-gray: #ddd;
-            --text-dark: #333;
-            --text-light: #666;
-        }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>AMP Analysis Dashboard</title>
+ <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231E3A8A' width='100' height='100'/><text x='50' y='65' font-size='60' font-weight='bold' fill='%23FFCC00' text-anchor='middle'>A</text></svg>">
+ <style>
+ /* ===== WALMART DESIGN SYSTEM VARIABLES ===== */
+ :root {
+ /* Walmart Blue Palette - Official Brand Colors */
+ --walmart-navy: #1E3A8A;
+ --walmart-blue-dark: #1D4ED8;
+ --walmart-blue: #3B82F6;
+ --walmart-blue-light: #60A5FA;
+ --walmart-blue-lightest: #DBEAFE;
+ --walmart-yellow: #FFCC00;
+ --walmart-yellow-dark: #E6B800;
+ 
+ /* Neutral Colors - Light Mode */
+ --gray-900: #1A202C;
+ --gray-800: #2D3748;
+ --gray-700: #4A5568;
+ --gray-600: #718096;
+ --gray-500: #A0AEC0;
+ --gray-400: #CBD5E0;
+ --gray-300: #E2E8F0;
+ --gray-200: #EDF2F7;
+ --gray-100: #F7FAFC;
+ --white: #FFFFFF;
+ 
+ /* Dark Mode Overrides */
+ --bg-primary: #F7FAFC;
+ --bg-secondary: #FFFFFF;
+ --text-primary: #1A202C;
+ --text-secondary: #4A5568;
+ --border-color: #E2E8F0;
+ 
+ /* Status Colors */
+ --success: #38A169;
+ --success-light: #68D391;
+ --success-background: #F0FFF4;
+ --warning: #D69E2E;
+ --warning-light: #F6E05E;
+ --warning-background: #FFFBEB;
+ --error: #E53E3E;
+ --error-light: #FC8181;
+ --error-background: #FED7D7;
+ --info: #3182CE;
+ --info-light: #63B3ED;
+ --info-background: #EBF8FF;
+ 
+ /* Typography */
+ --font-primary: 'Everyday Sans', 'Segoe UI', Helvetica Neue, Arial, sans-serif;
+ --font-secondary: 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+ --font-mono: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace;
+ 
+ /* Spacing */
+ --space-1: 4px;
+ --space-2: 8px;
+ --space-3: 12px;
+ --space-4: 16px;
+ --space-6: 24px;
+ 
+ /* Border Radius */
+ --radius-sm: 4px;
+ --radius-md: 6px;
+ --radius-lg: 12px;
+ 
+ /* Shadows */
+ --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+ --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+ }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light-gray);
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
+ body {
+ font-family: var(--font-primary);
+ background-color: var(--bg-primary);
+ color: var(--text-primary);
+ transition: background-color 0.3s ease, color 0.3s ease;
+ }
+ 
+ body.dark-mode {
+ --bg-primary: #1A202C;
+ --bg-secondary: #2D3748;
+ --text-primary: #F7FAFC;
+ --text-secondary: #CBD5E0;
+ --border-color: #4A5568;
+ }
+ 
+ body.dark-mode .table-wrapper {
+ background: var(--bg-secondary);
+ border-color: var(--border-color);
+ }
+ 
+ body.dark-mode table th,
+ body.dark-mode table td {
+ border-color: var(--border-color);
+ color: var(--text-primary);
+ }
+ 
+ body.dark-mode .stat-item {
+ background: var(--bg-secondary);
+ border-color: var(--border-color);
+ color: var(--text-primary);
+ }
+ 
+ body.dark-mode .filter-section {
+ background: var(--bg-secondary);
+ border-color: var(--border-color);
+ }
+ 
+ body.dark-mode input,
+ body.dark-mode select,
+ body.dark-mode textarea {
+ background-color: var(--bg-secondary);
+ color: var(--text-primary);
+ border-color: var(--border-color);
+ }
+ 
+ body.dark-mode .modal {
+ background: var(--bg-secondary);
+ }
+ 
+ body.dark-mode .modal-content {
+ background: var(--bg-secondary);
+ color: var(--text-primary);
+ }
 
-        .header {
-            background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-dark-blue) 100%);
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
+ /* Header */
+ .header {
+ background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue) 100%);
+ color: var(--white);
+ padding: var(--space-6) var(--space-6);
+ box-shadow: var(--shadow-md);
+ }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 200px;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="20" fill="rgba(255,194,32,0.1)"/></svg>');
-            opacity: 0.1;
-        }
+ .header-top {
+ display: flex;
+ justify-content: space-between;
+ align-items: flex-start;
+ margin-bottom: var(--space-4);
+ }
 
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-        }
+ .header-right {
+ display: flex;
+ gap: var(--space-4);
+ align-items: center;
+ }
+ 
+ .dark-mode-toggle {
+ background: rgba(255, 255, 255, 0.2);
+ color: white;
+ border: 1px solid rgba(255, 255, 255, 0.3);
+ border-radius: var(--radius-md);
+ padding: 6px 12px;
+ cursor: pointer;
+ font-size: 14px;
+ transition: all 0.3s ease;
+ }
+ 
+ .dark-mode-toggle:hover {
+ background: rgba(255, 255, 255, 0.3);
+ }
+ 
 
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+ .header .subtitle {
+ font-size: 13px;
+ opacity: 0.9;
+ margin-left: var(--space-4);
+ }
 
-        .spark-logo {
-            width: 40px;
-            height: 40px;
-            background: var(--walmart-yellow);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--walmart-blue);
-        }
+ .header-controls {
+ display: flex;
+ gap: var(--space-3);
+ }
 
-        .title-section h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 0.2rem;
-        }
+ .feedback-btn {
+ background-color: var(--walmart-yellow);
+ color: var(--gray-900);
+ border: none;
+ padding: var(--space-2) var(--space-4);
+ border-radius: var(--radius-md);
+ cursor: pointer;
+ font-size: 12px;
+ font-weight: 600;
+ transition: all 0.3s;
+ }
 
-        .subtitle {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            font-weight: 400;
-        }
+ .feedback-btn:hover {
+ background-color: var(--walmart-yellow-dark);
+ transform: scale(1.05);
+ }
 
-        .last-updated {
-            text-align: right;
-            font-size: 0.85rem;
-            opacity: 0.8;
-        }
+ .header-info {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
 
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
+ .last-refresh {
+ font-size: 12px;
+ opacity: 0.85;
+ }
 
-        .filters-section {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-            border: 1px solid var(--border-gray);
-        }
+ .admin-badge {
+ background-color: rgba(255,255,255,0.2);
+ padding: var(--space-2) var(--space-3);
+ border-radius: 12px;
+ font-size: 11px;
+ font-weight: 600;
+ border: 1px solid rgba(255,255,255,0.4);
+ }
 
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
+ /* Filter Section */
+ .filter-section {
+ background: var(--white);
+ padding: var(--space-6);
+ margin: var(--space-4) var(--space-6);
+ border-radius: var(--radius-lg);
+ box-shadow: var(--shadow-sm);
+ border: 1px solid var(--gray-200);
+ }
 
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-        }
+ .filter-header {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: var(--space-4);
+ padding-bottom: var(--space-3);
+ border-bottom: 2px solid var(--gray-200);
+ }
 
-        .filter-label {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-dark);
-            font-size: 0.9rem;
-        }
+ .filter-header h3 {
+ font-size: 16px;
+ font-weight: 600;
+ color: var(--walmart-blue);
+ }
 
-        .filter-select {
-            padding: 0.6rem;
-            border: 2px solid var(--border-gray);
-            border-radius: 6px;
-            font-size: 0.9rem;
-            background: white;
-            transition: border-color 0.3s ease;
-        }
+ .filter-actions {
+ display: flex;
+ gap: var(--space-3);
+ }
 
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--walmart-blue);
-            box-shadow: 0 0 0 3px rgba(0,113,206,0.1);
-        }
+ .btn-clear {
+ background-color: var(--gray-200);
+ border: 1px solid var(--gray-300);
+ padding: var(--space-2) var(--space-3);
+ border-radius: var(--radius-md);
+ cursor: pointer;
+ font-size: 12px;
+ transition: all 0.3s;
+ color: var(--gray-900);
+ font-weight: 500;
+ }
 
-        .search-section {
-            display: flex;
-            gap: 1rem;
-            align-items: end;
-        }
+ .btn-clear:hover {
+ background-color: var(--gray-300);
+ border-color: var(--gray-400);
+ }
 
-        .search-input {
-            flex: 1;
-            padding: 0.6rem;
-            border: 2px solid var(--border-gray);
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
+ .admin-controls {
+ background-color: var(--warning-background);
+ border-left: 4px solid var(--warning);
+ padding: var(--space-4) var(--space-4);
+ border-radius: var(--radius-md);
+ margin-bottom: var(--space-4);
+ font-size: 12px;
+ }
 
-        .btn-refresh {
-            background: var(--walmart-blue);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
+ .admin-controls label {
+ display: flex;
+ align-items: center;
+ gap: var(--space-2);
+ margin-bottom: var(--space-2);
+ cursor: pointer;
+ }
 
-        .btn-refresh:hover {
-            background: var(--walmart-dark-blue);
-        }
+ .admin-controls input[type="checkbox"] {
+ cursor: pointer;
+ }
 
-        .status-legend {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-gray);
-        }
+ /* Filter Grid */
+ .filter-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+ gap: var(--space-4);
+ margin-bottom: var(--space-4);
+ }
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
+ .filter-group {
+ display: flex;
+ flex-direction: column;
+ }
 
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 3px;
-        }
+ .filter-group label {
+ font-size: 12px;
+ font-weight: 600;
+ color: var(--gray-900);
+ margin-bottom: var(--space-2);
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ }
 
-        .legend-complete { background: var(--success-green); }
-        .legend-incomplete { background: var(--error-red); }
-        .legend-inform { background: var(--text-light); }
+ .filter-group select,
+ .filter-group input[type="text"],
+ .filter-group input[type="number"] {
+ padding: var(--space-2) var(--space-3);
+ border: 1px solid var(--gray-300);
+ border-radius: var(--radius-md);
+ font-size: 13px;
+ background-color: var(--white);
+ transition: all 0.3s;
+ font-family: var(--font-primary);
+ }
 
-        .data-section {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-            border: 1px solid var(--border-gray);
-            overflow: hidden;
-        }
+ .filter-group select:focus,
+ .filter-group input:focus {
+ outline: none;
+ border-color: var(--walmart-blue);
+ box-shadow: 0 0 0 3px var(--walmart-blue-lightest);
+ }
 
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
+ /* Action Buttons */
+ .btn-action {
+ padding: var(--space-2) var(--space-4);
+ border: none;
+ border-radius: var(--radius-md);
+ font-size: 13px;
+ font-weight: 600;
+ cursor: pointer;
+ transition: all 0.2s;
+ display: flex;
+ align-items: center;
+ gap: var(--space-2);
+ white-space: nowrap;
+ }
 
-        .data-table thead {
-            background: var(--walmart-blue);
-            color: white;
-        }
+ .btn-search {
+ background-color: var(--walmart-blue);
+ color: var(--white);
+ }
 
-        .data-table th,
-        .data-table td {
-            padding: 0.8rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-gray);
-        }
+ .btn-search:hover {
+ background-color: var(--walmart-blue-dark);
+ }
 
-        .data-table th {
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+ .btn-export {
+ background-color: var(--success);
+ color: var(--white);
+ }
 
-        .data-table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
+ .btn-export:hover {
+ background-color: #2f8659;
+ }
 
-        .week-column {
-            width: 60px;
-            text-align: center;
-            font-weight: bold;
-            background: var(--light-gray);
-        }
+ .btn-refresh {
+ background-color: var(--gray-600);
+ color: var(--white);
+ }
 
-        .title-column {
-            max-width: 300px;
-            font-weight: 500;
-        }
+ .btn-refresh:hover {
+ background-color: var(--gray-700);
+ }
 
-        .count-column {
-            width: 80px;
-            text-align: center;
-            font-weight: bold;
-        }
+ /* Title Suggestions Dropdown */
+ .title-suggestions {
+ position: absolute;
+ top: 100%;
+ left: 0;
+ right: 0;
+ background: var(--white);
+ border: 1px solid var(--gray-300);
+ border-top: none;
+ border-radius: 0 0 var(--radius-md) var(--radius-md);
+ max-height: 200px;
+ overflow-y: auto;
+ z-index: 100;
+ box-shadow: var(--shadow-md);
+ }
 
-        .status-cell {
-            position: relative;
-        }
+ .title-suggestion {
+ padding: var(--space-2) var(--space-3);
+ cursor: pointer;
+ font-size: 13px;
+ border-bottom: 1px solid var(--gray-200);
+ }
 
-        .status-bar {
-            height: 20px;
-            border-radius: 10px;
-            display: flex;
-            overflow: hidden;
-            margin: 2px 0;
-        }
+ .title-suggestion:hover {
+ background-color: var(--walmart-blue-lightest);
+ }
 
-        .status-complete {
-            background: var(--success-green);
-        }
+ .title-suggestion:last-child {
+ border-bottom: none;
+ }
 
-        .status-incomplete {
-            background: var(--error-red);
-        }
+ /* Filter Row 2 - Right Aligned */
+ .filter-row-2 {
+ display: flex;
+ flex-wrap: wrap;
+ gap: var(--space-4);
+ }
 
-        .status-inform {
-            background: var(--text-light);
-        }
+ .filter-row-2 .filter-group {
+ min-width: 120px;
+ }
 
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 2rem;
-        }
+ /* Range Slider */
+ .week-range {
+ display: flex;
+ gap: var(--space-2);
+ align-items: center;
+ }
 
-        .spinner {
-            border: 3px solid var(--light-gray);
-            border-top: 3px solid var(--walmart-blue);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
+ .week-range input[type="range"] {
+ flex: 1;
+ cursor: pointer;
+ }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+ .week-range span {
+ min-width: 40px;
+ font-size: 12px;
+ font-weight: 600;
+ }
 
-        .enhanced-features {
-            margin-top: 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
-        }
+ /* Data Table Section */
+ .data-section {
+ background: var(--white);
+ margin: var(--space-4) var(--space-6);
+ border-radius: var(--radius-lg);
+ box-shadow: var(--shadow-sm);
+ overflow: hidden;
+ border: 1px solid var(--gray-200);
+ }
 
-        .feature-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-            border: 1px solid var(--border-gray);
-        }
+ .data-header {
+ background-color: var(--gray-200);
+ padding: var(--space-4) var(--space-6);
+ border-bottom: 1px solid var(--gray-300);
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
 
-        .feature-title {
-            font-weight: 600;
-            color: var(--walmart-blue);
-            margin-bottom: 1rem;
-        }
+ .data-header h3 {
+ font-size: 16px;
+ font-weight: 600;
+ color: var(--gray-900);
+ }
 
-        .metric {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--walmart-dark-blue);
-        }
+ .data-stats {
+ display: flex;
+ gap: var(--space-4);
+ font-size: 12px;
+ }
 
-        .metric-label {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            margin-top: 0.5rem;
-        }
+ .stat-item {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ text-align: center;
+ background: white;
+ padding: 12px 16px;
+ border-radius: 8px;
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+ border: 1px solid var(--gray-200);
+ min-width: 100px;
+ }
 
-        @media (max-width: 768px) {
-            .dashboard-container {
-                padding: 1rem;
-            }
-            
-            .filters-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .data-table {
-                font-size: 0.8rem;
-            }
-            
-            .data-table th,
-            .data-table td {
-                padding: 0.5rem;
-            }
-        }
-    </style>
+ .stat-label {
+ color: var(--gray-600);
+ font-size: 10px;
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ margin-bottom: 4px;
+ }
+
+ .stat-value {
+ font-size: 20px;
+ font-weight: 700;
+ color: var(--walmart-blue);
+ }
+
+ .stat-value.highlight-high {
+ color: #059669;
+ }
+
+ .stat-value.highlight-low {
+ color: #DC2626;
+ }
+
+ /* Table Styles */
+ .table-wrapper {
+ overflow-x: auto;
+ max-height: 600px;
+ overflow-y: auto;
+ }
+
+ table {
+ width: 100%;
+ border-collapse: collapse;
+ font-size: 12px;
+ }
+
+ thead {
+ position: sticky;
+ top: 0;
+ background-color: var(--gray-200);
+ border-bottom: 2px solid var(--gray-300);
+ z-index: 10;
+ }
+
+ th {
+ padding: var(--space-3) var(--space-3);
+ text-align: left;
+ font-weight: 600;
+ color: var(--gray-900);
+ white-space: nowrap;
+ border-right: 1px solid var(--gray-300);
+ }
+
+ th:last-child {
+ border-right: none;
+ }
+
+ tbody tr {
+ border-bottom: 1px solid var(--gray-200);
+ transition: background-color 0.2s;
+ }
+
+ tbody tr:hover {
+ background-color: var(--gray-100);
+ }
+
+ td {
+ padding: var(--space-3) var(--space-3);
+ color: var(--gray-700);
+ }
+
+ /* Status Badge */
+ .status-badge {
+ display: inline-block;
+ padding: var(--space-1) var(--space-3);
+ border-radius: 12px;
+ font-size: 11px;
+ font-weight: 600;
+ text-align: center;
+ min-width: 50px;
+ }
+
+ .status-complete {
+ background-color: var(--success-background);
+ color: var(--success);
+ }
+
+ .status-incomplete {
+ background-color: var(--error-background);
+ color: var(--error);
+ }
+
+ .status-published {
+ background-color: var(--info-background);
+ color: var(--info);
+ }
+
+ /* Verification Complete/Incomplete Links */
+ .verification-complete {
+ color: #16A34A;
+ font-weight: 600;
+ cursor: pointer;
+ text-decoration: underline;
+ }
+ .verification-complete:hover {
+ color: #15803D;
+ }
+ .verification-incomplete {
+ color: #DC2626;
+ font-weight: 600;
+ cursor: pointer;
+ text-decoration: underline;
+ }
+ .verification-incomplete:hover {
+ color: #B91C1C;
+ }
+ .verification-separator {
+ color: #6B7280;
+ margin: 0 2px;
+ }
+
+ /* Activity Title Link */
+ a.activity-title-link {
+ color: var(--walmart-blue);
+ text-decoration: none;
+ font-weight: 500;
+ }
+ a.activity-title-link:hover {
+ text-decoration: underline;
+ color: var(--walmart-navy);
+ }
+
+ /* Store Popup Modal */
+ .store-popup {
+ display: none;
+ position: fixed;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ background: rgba(0, 0, 0, 0.5);
+ z-index: 10000;
+ align-items: center;
+ justify-content: center;
+ }
+ .store-popup.active {
+ display: flex;
+ }
+ .store-popup-content {
+ background: white;
+ border-radius: 12px;
+ max-width: 600px;
+ max-height: 80vh;
+ width: 90%;
+ overflow: hidden;
+ box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+ }
+ .store-popup-header {
+ background: var(--walmart-navy);
+ color: white;
+ padding: var(--space-4);
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
+ .store-popup-header h3 {
+ margin: 0;
+ font-size: 16px;
+ }
+ .store-popup-close {
+ background: none;
+ border: none;
+ color: white;
+ font-size: 24px;
+ cursor: pointer;
+ padding: 0;
+ line-height: 1;
+ }
+ .store-popup-body {
+ padding: var(--space-4);
+ max-height: 60vh;
+ overflow-y: auto;
+ }
+ .store-list {
+ display: grid;
+ grid-template-columns: repeat(4, 1fr);
+ gap: var(--space-2);
+ }
+ .store-list-item {
+ padding: var(--space-2);
+ background: var(--gray-100);
+ border-radius: 4px;
+ font-size: 12px;
+ text-align: center;
+ }
+ .store-popup-modal {
+ display: none;
+ position: fixed;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ background: rgba(0, 0, 0, 0.5);
+ z-index: 10000;
+ align-items: center;
+ justify-content: center;
+ }
+ .store-popup-grid {
+ display: grid;
+ grid-template-columns: repeat(5, 1fr);
+ gap: 8px;
+ }
+ .store-number-item {
+ padding: 8px 12px;
+ background: #f5f5f5;
+ border-radius: 6px;
+ font-size: 13px;
+ text-align: center;
+ font-weight: 500;
+ color: #333;
+ border: 1px solid #e0e0e0;
+ }
+
+ /* Link Styles */
+ a.preview-link {
+ color: var(--walmart-blue);
+ text-decoration: none;
+ cursor: pointer;
+ border-bottom: 1px dotted var(--walmart-blue);
+ transition: all 0.2s;
+ font-weight: 500;
+ }
+
+ a.preview-link:hover {
+ color: var(--walmart-blue-dark);
+ border-bottom-style: solid;
+ }
+
+ /* Metric Columns */
+ .metric-column {
+ text-align: center;
+ font-weight: 600;
+ color: var(--walmart-blue);
+ }
+
+ /* Footer */
+ .footer {
+ background-color: var(--gray-200);
+ padding: var(--space-4) var(--space-6);
+ margin: var(--space-4) var(--space-6);
+ border-radius: var(--radius-lg);
+ text-align: center;
+ font-size: 12px;
+ color: var(--gray-700);
+ border: 1px solid var(--gray-300);
+ }
+
+ .footer a {
+ color: var(--walmart-blue);
+ text-decoration: none;
+ }
+
+ /* ===== FEEDBACK MODAL ===== */
+ .feedback-modal {
+ display: none;
+ position: fixed;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background: rgba(0, 0, 0, 0.5);
+ z-index: 1000;
+ align-items: center;
+ justify-content: center;
+ padding: var(--space-4);
+ }
+
+ .feedback-modal.open {
+ display: flex;
+ }
+
+ .feedback-container {
+ background: var(--white);
+ border-radius: var(--radius-lg);
+ box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+ max-width: 500px;
+ width: 100%;
+ max-height: 90vh;
+ overflow-y: auto;
+ animation: slideUp 0.3s ease-out;
+ }
+
+ @keyframes slideUp {
+ from {
+ transform: translateY(20px);
+ opacity: 0;
+ }
+ to {
+ transform: translateY(0);
+ opacity: 1;
+ }
+ }
+
+ .feedback-header {
+ background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue) 100%);
+ color: var(--white);
+ padding: var(--space-6);
+ border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
+
+ .feedback-header h2 {
+ font-size: 20px;
+ font-weight: 700;
+ }
+
+ .feedback-close {
+ background: none;
+ border: none;
+ color: var(--white);
+ font-size: 24px;
+ cursor: pointer;
+ width: 32px;
+ height: 32px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ transition: transform 0.2s;
+ }
+
+ .feedback-close:hover {
+ transform: rotate(90deg);
+ }
+
+ .feedback-body {
+ padding: var(--space-6);
+ }
+
+ .feedback-step {
+ animation: fadeIn 0.3s ease-in;
+ }
+
+ @keyframes fadeIn {
+ from { opacity: 0; }
+ to { opacity: 1; }
+ }
+
+ .feedback-step h3 {
+ font-size: 16px;
+ font-weight: 600;
+ color: var(--gray-900);
+ margin-bottom: var(--space-4);
+ }
+
+ .feedback-options {
+ display: flex;
+ flex-direction: column;
+ gap: var(--space-3);
+ }
+
+ .feedback-option {
+ display: flex;
+ align-items: flex-start;
+ gap: var(--space-3);
+ padding: var(--space-3) var(--space-4);
+ border: 1px solid var(--gray-300);
+ border-radius: var(--radius-md);
+ cursor: pointer;
+ transition: all 0.2s;
+ }
+
+ .feedback-option:hover {
+ background-color: var(--gray-100);
+ border-color: var(--walmart-blue);
+ }
+
+ .feedback-option input[type="radio"] {
+ margin-top: 2px;
+ cursor: pointer;
+ }
+
+ .feedback-option label {
+ cursor: pointer;
+ flex: 1;
+ font-weight: 500;
+ }
+
+ .rating-labels {
+ display: flex;
+ justify-content: space-between;
+ margin-top: var(--space-3);
+ }
+
+ .rating-labels span {
+ font-size: 11px;
+ color: var(--gray-600);
+ font-weight: 500;
+ }
+
+ .feedback-comments {
+ width: 100%;
+ min-height: 100px;
+ padding: var(--space-3) var(--space-4);
+ border: 1px solid var(--gray-300);
+ border-radius: var(--radius-md);
+ font-family: var(--font-primary);
+ font-size: 13px;
+ resize: vertical;
+ transition: all 0.3s;
+ }
+
+ .feedback-comments:focus {
+ outline: none;
+ border-color: var(--walmart-blue);
+ box-shadow: 0 0 0 3px var(--walmart-blue-lightest);
+ }
+
+ .feedback-actions {
+ display: flex;
+ gap: var(--space-3);
+ justify-content: flex-end;
+ margin-top: var(--space-6);
+ padding-top: var(--space-4);
+ border-top: 1px solid var(--gray-200);
+ }
+
+ .btn-feedback {
+ padding: var(--space-2) var(--space-4);
+ border-radius: var(--radius-md);
+ font-weight: 600;
+ cursor: pointer;
+ transition: all 0.3s;
+ border: none;
+ font-size: 13px;
+ }
+
+ .btn-back {
+ background-color: var(--gray-200);
+ color: var(--gray-900);
+ }
+
+ .btn-back:hover {
+ background-color: var(--gray-300);
+ }
+
+ .btn-next {
+ background-color: var(--walmart-blue);
+ color: var(--white);
+ }
+
+ .btn-next:hover {
+ background-color: var(--walmart-blue-dark);
+ }
+
+ .btn-submit {
+ background-color: var(--success);
+ color: var(--white);
+ }
+
+ .btn-submit:hover {
+ background-color: #2f8659;
+ }
+
+ .feedback-success {
+ text-align: center;
+ padding: var(--space-6);
+ }
+
+ .feedback-success .checkmark {
+ font-size: 48px;
+ margin-bottom: var(--space-4);
+ display: block;
+ animation: scaleIn 0.4s ease-out;
+ }
+
+ @keyframes scaleIn {
+ from {
+ transform: scale(0);
+ }
+ to {
+ transform: scale(1);
+ }
+ }
+
+ .feedback-success h3 {
+ font-size: 18px;
+ font-weight: 700;
+ color: var(--gray-900);
+ margin-bottom: var(--space-2);
+ }
+
+ .feedback-success p {
+ color: var(--gray-600);
+ font-size: 13px;
+ }
+
+ /* Responsive */
+ @media (max-width: 1200px) {
+ .filter-grid {
+ grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+ }
+ }
+
+ @media (max-width: 768px) {
+ .header h1 {
+ font-size: 20px;
+ }
+
+ .header .subtitle {
+ margin-left: 0;
+ display: none;
+ }
+
+ .filter-grid {
+ grid-template-columns: 1fr;
+ }
+
+ .data-stats {
+ flex-direction: column;
+ }
+
+ .table-wrapper {
+ max-height: 400px;
+ }
+
+ th, td {
+ padding: var(--space-2) var(--space-2);
+ font-size: 11px;
+ }
+
+ .feedback-container {
+ max-width: 95%;
+ }
+ }
+
+ /* Utility Classes */
+ .text-muted {
+ color: var(--gray-600);
+ }
+
+ .text-nowrap {
+ white-space: nowrap;
+ }
+
+ .font-weight-bold {
+ font-weight: 700;
+ }
+ </style>
 </head>
 <body>
-    <!-- Connection Status Indicator -->
-    <div class="connection-status status-connected" id="connectionStatus">
-        🟢 Connected to BigQuery
-    </div>
-    
-    <!-- Data Source Status -->
-    <div id="dataStatus"></div>
-
-    <header class="header enhanced-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <div class="walmart-logo-container">
-                    <img src="walmart-spark.svg" alt="Walmart Spark Logo" class="walmart-spark-logo">
-                </div>
-                <div class="title-section">
-                    <h1>Store Activity and Communications</h1>
-                    <div class="subtitle">Located in MyWalmart - Inbox - Store Updates</div>
-                </div>
-            </div>
-            <div class="last-updated">
-                <div class="auth-status" id="authStatus">
-                    <span class="auth-indicator" id="authIndicator">� Using Sample Data</span>
-                    <button class="auth-btn" id="authBtn" onclick="handleDataConnection()">Connect to BigQuery</button>
-                    <button class="auth-btn" id="refreshBtn" onclick="refreshDashboard()" style="margin-left: 0.5rem;">Refresh</button>
-                </div>
-                <div>Last Updated: <span id="lastUpdated">October 30, 2025 at 6:24 PM</span></div>
-                <div style="font-size: 0.75rem; margin-top: 0.25rem;">
-                    Data Source: <span style="font-family: monospace;">wmt-assetprotection-prod.Store_Support_Dev.AMP_Data_Prep</span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="dashboard-container">
-        <!-- Compact Metrics Section at Top -->
-        <section class="compact-metrics-grid">
-            <div class="compact-metric-card">
-                <div class="compact-metric-icon">📊</div>
-                <div class="compact-metric-value" id="totalActivities">0</div>
-                <div class="compact-metric-label">Total Activities</div>
-            </div>
-            
-            <div class="compact-metric-card">
-                <div class="compact-metric-icon">✅</div>
-                <div class="compact-metric-value" id="completionRate">0%</div>
-                <div class="compact-metric-label">Completion Rate</div>
-            </div>
-            
-            <div class="compact-metric-card">
-                <div class="compact-metric-icon">🔄</div>
-                <div class="compact-metric-value" id="activeCommunications">0</div>
-                <div class="compact-metric-label">In Progress</div>
-            </div>
-            
-            <div class="compact-metric-card">
-                <div class="compact-metric-icon">📅</div>
-                <div class="compact-metric-value" id="thisWeekCount">0</div>
-                <div class="compact-metric-label">This Week</div>
-            </div>
-            
-            <div class="compact-metric-card">
-                <div class="compact-metric-icon">🏪</div>
-                <div class="compact-metric-value" id="storeImpact" style="font-size: 1rem;">0 Major | 0 Other</div>
-                <div class="compact-metric-label">Store Impact (≥2000)</div>
-            </div>
-            
-            <div class="compact-metric-card">
-                <div class="compact-metric-icon">⚡</div>
-                <div class="compact-metric-value" id="priorityItems">0</div>
-                <div class="compact-metric-label">Priority Items</div>
-            </div>
-        </section>
-
-        <section class="filters-section enhanced-filters">
-            <div class="filters-grid">
-                <div class="filter-group">
-                    <label class="filter-label">Division</label>
-                    <select class="filter-select" id="divisionFilter">
-                        <option value="">(All)</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Region</label>
-                    <select class="filter-select" id="regionFilter">
-                        <option value="">(All)</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Market</label>
-                    <select class="filter-select" id="marketFilter">
-                        <option value="">(All)</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Site</label>
-                    <select class="filter-select" id="siteFilter">
-                        <option value="">(All)</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Week</label>
-                    <select class="filter-select" id="weekFilter">
-                        <option value="">(All)</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Title</label>
-                    <select class="filter-select" id="titleFilter">
-                        <option value="">(All)</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Activity Type</label>
-                    <select class="filter-select" id="activityTypeFilter">
-                        <option value="">(All)</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Store Area - Team</label>
-                    <select class="filter-select" id="storeAreaFilter">
-                        <option value="">(All)</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="filter-label">Alignment</label>
-                    <select class="filter-select" id="alignmentFilter">
-                        <option value="">Store</option>
-                        <option value="H&W">H&W</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="search-section">
-                <div class="filter-group" style="flex: 1;">
-                    <label class="filter-label">Key Word Search</label>
-                    <div class="search-container">
-                        <input type="text" class="search-input enhanced-search-input" id="keywordSearch" placeholder="Search activities, types, or areas...">
-                    </div>
-                </div>
-                <button class="btn-refresh enhanced-btn-refresh" onclick="refreshData()">
-                    <span id="refreshText">🔄 Refresh Data</span>
-                </button>
-            </div>
-            
-
-        </section>
-
-        <section class="data-section">
-            <div class="loading-spinner" id="loadingSpinner">
-                <div class="spinner"></div>
-                <p>Loading data from BigQuery...</p>
-            </div>
-            
-            <table class="data-table" id="dataTable" style="display: none;">
-                <thead>
-                    <tr>
-                        <th class="week-column week-header-blue">Week</th>
-                        <th class="title-column">Title</th>
-                        <th class="location-column">*Location</th>
-                        <th class="count-column">Total Cnt</th>
-                        <th class="count-column">SC Cnt</th>
-                        <th class="count-column">NHM Cnt</th>
-                        <th class="count-column">DIV 1 Cnt</th>
-                    </tr>
-                </thead>
-                <tbody id="dataTableBody">
-                    <!-- Data will be populated by JavaScript -->
-                </tbody>
-            </table>
-        </section>
-
-
-    </div>
-
-    <script src="amp-data-connector.js"></script>
-    <script>
-        // Global variables
-        let rawData = [];
-        let filteredData = [];
-        let isLoading = false;
-        let dataConnector = null;
-
-        // Real data from BigQuery source wmt-assetprotection-prod.Store_Support_Dev.AMP_Data_Prep
-        const realAMPData = [
-            { week: 43, title: "Welcome to Your Remodel", location: "*Location", totalCnt: 1245, scCnt: 890, nhmCnt: 245, div1Cnt: 110, fuelCnt: 0, status: "published", division: "NORTH", region: "2", market: "1", site: "1446", activityType: "Inform", storeArea: "Store", published: true, alignment: "Store", completeCnt: 0, incompleteCnt: 0, previewLink: "https://amp2-cms.prod.walmart.com/preview/029a6006-5b63-4d7f-872a-45ffca6bf10d/49/2026" },
-            { week: 43, title: "Welcome to Your Remodel", location: "*Location", totalCnt: 987, scCnt: 675, nhmCnt: 198, div1Cnt: 114, fuelCnt: 0, status: "published", division: "SOUTHEAST", region: "3", market: "2", site: "5932", activityType: "Inform", storeArea: "Store", published: true, alignment: "Store", completeCnt: 0, incompleteCnt: 0, previewLink: "https://amp2-cms.prod.walmart.com/preview/029a6006-5b63-4d7f-872a-45ffca6bf10d/49/2026" },
-            { week: 43, title: "Welcome to Your Remodel", location: "*Location", totalCnt: 756, scCnt: 456, nhmCnt: 189, div1Cnt: 111, fuelCnt: 0, status: "published", division: "NHM", region: "7", market: "3", site: "3629", activityType: "Inform", storeArea: "H&W", published: true, alignment: "H&W", completeCnt: 0, incompleteCnt: 0, previewLink: "https://amp2-cms.prod.walmart.com/preview/0075bf11-c2b5-42ea-b715-bf7277fddbf7/10/2027" },
-            { week: 42, title: "Store Operations Update", location: "*Location", totalCnt: 2134, scCnt: 1678, nhmCnt: 298, div1Cnt: 158, fuelCnt: 1, status: "published", division: "WEST", region: "1", market: "1", site: "2456", activityType: "Inform", storeArea: "General Merchandise", published: true, alignment: "Store", completeCnt: 0, incompleteCnt: 0, previewLink: "https://amp2-cms.prod.walmart.com/preview/store-ops-update/42/2025" },
-            { week: 42, title: "Safety Protocol Review", location: "*Location", totalCnt: 1876, scCnt: 1234, nhmCnt: 445, div1Cnt: 197, fuelCnt: 0, status: "published", division: "EAST", region: "4", market: "2", site: "3789", activityType: "Verification", storeArea: "Store", published: true, alignment: "Store", completeCnt: 1089, incompleteCnt: 287, previewLink: "https://amp2-cms.prod.walmart.com/preview/safety-protocol/42/2025" },
-            { week: 42, title: "Inventory Management Guidelines", location: "*Location", totalCnt: 1654, scCnt: 1098, nhmCnt: 387, div1Cnt: 169, fuelCnt: 0, status: "published", division: "SOUTHWEST", region: "5", market: "3", site: "4521", activityType: "Inform", storeArea: "Grocery", published: true, alignment: "Store", completeCnt: 0, incompleteCnt: 0, previewLink: "https://amp2-cms.prod.walmart.com/preview/inventory-mgmt/42/2025" },
-            { week: 41, title: "Customer Service Standards", location: "*Location", totalCnt: 2876, scCnt: 2134, nhmCnt: 498, div1Cnt: 244, fuelCnt: 0, status: "published", division: "NORTH", region: "2", market: "1", site: "1789", activityType: "Verification", storeArea: "Store", published: true, alignment: "Store", completeCnt: 1567, incompleteCnt: 309, previewLink: "https://amp2-cms.prod.walmart.com/preview/customer-service/41/2025" },
-            { week: 41, title: "Equipment Maintenance Schedule", location: "*Location", totalCnt: 1567, scCnt: 1098, nhmCnt: 298, div1Cnt: 171, fuelCnt: 0, status: "published", division: "SOUTHEAST", region: "3", market: "2", site: "5634", activityType: "Inform", storeArea: "Auto", published: true, alignment: "Store", completeCnt: 0, incompleteCnt: 0, previewLink: "https://amp2-cms.prod.walmart.com/preview/equipment-maint/41/2025" },
-            { week: 41, title: "Team Communication Updates", location: "*Location", totalCnt: 1234, scCnt: 867, nhmCnt: 245, div1Cnt: 122, fuelCnt: 0, status: "published", division: "NHM", region: "7", market: "1", site: "6789", activityType: "Inform", storeArea: "Pharmacy", published: true, alignment: "H&W", completeCnt: 0, incompleteCnt: 0, previewLink: "https://amp2-cms.prod.walmart.com/preview/team-comm/41/2025" },
-            { week: 40, title: "Seasonal Merchandising Changes", location: "*Location", totalCnt: 2567, scCnt: 1876, nhmCnt: 456, div1Cnt: 235, fuelCnt: 0, status: "published", division: "WEST", region: "1", market: "2", site: "7892", activityType: "Verification", storeArea: "General Merchandise", published: true, alignment: "Store", completeCnt: 1245, incompleteCnt: 322, previewLink: "https://amp2-cms.prod.walmart.com/preview/seasonal-merch/40/2025" },
-            { week: 40, title: "Technology System Updates", location: "*Location", totalCnt: 1789, scCnt: 1234, nhmCnt: 345, div1Cnt: 210, fuelCnt: 0, status: "published", division: "EAST", region: "4", market: "1", site: "8945", activityType: "Inform", storeArea: "Store", published: true, alignment: "Store", completeCnt: 0, incompleteCnt: 0, previewLink: "https://amp2-cms.prod.walmart.com/preview/tech-updates/40/2025" },
-            { week: 40, title: "Compliance Training Requirements", location: "*Location", totalCnt: 2134, scCnt: 1567, nhmCnt: 398, div1Cnt: 169, fuelCnt: 0, status: "published", division: "SOUTHWEST", region: "5", market: "2", site: "9876", activityType: "Verification", storeArea: "Store", published: true, alignment: "Store", completeCnt: 1356, incompleteCnt: 278, previewLink: "https://amp2-cms.prod.walmart.com/preview/compliance-training/40/2025" },
-            { week: 39, title: "Pharmacy Department Guidelines", location: "*Location", totalCnt: 1456, scCnt: 1098, nhmCnt: 258, div1Cnt: 100, fuelCnt: 0, status: "published", division: "NORTH", region: "2", market: "3", site: "1357", activityType: "Inform", storeArea: "Pharmacy", published: true, alignment: "H&W", completeCnt: 0, incompleteCnt: 0, previewLink: "https://amp2-cms.prod.walmart.com/preview/pharmacy-guide/39/2025" },
-            { week: 39, title: "Auto Center Service Updates", location: "*Location", totalCnt: 1876, scCnt: 1345, nhmCnt: 356, div1Cnt: 175, fuelCnt: 0, status: "published", division: "SOUTHEAST", region: "3", market: "1", site: "2468", activityType: "Verification", storeArea: "Auto", published: true, alignment: "Store", completeCnt: 967, incompleteCnt: 209, previewLink: "https://amp2-cms.prod.walmart.com/preview/auto-updates/39/2025" },
-            { week: 39, title: "Grocery Department Procedures", location: "*Location", totalCnt: 2298, scCnt: 1678, nhmCnt: 445, div1Cnt: 175, fuelCnt: 0, status: "published", division: "NHM", region: "7", market: "2", site: "3579", activityType: "Inform", storeArea: "Grocery", published: true, alignment: "Store", completeCnt: 0, incompleteCnt: 0, previewLink: "https://amp2-cms.prod.walmart.com/preview/grocery-proc/39/2025" }
-        ];
-
-        // Sample data structure based on the original dashboard (fallback)
-        const sampleData = [
-            {
-                week: 44,
-                title: "Store Verification Required: New Safety Protocols",
-                location: "*Location",
-                totalCnt: 2500,
-                scCnt: 1800,
-                nhmCnt: 500,
-                div1Cnt: 200,
-                fuelCnt: 15, // Fuel center 7368
-                status: "incomplete",
-                division: "WEST",
-                region: "1",
-                market: "1",
-                site: "1",
-                activityType: "Verification",
-                storeArea: "Safety",
-                published: true,
-                completeCnt: 1200,
-                incompleteCnt: 1300,
-                alignment: "Store"
-            },
-            {
-                week: 44,
-                title: "Information: Holiday Schedule Changes",
-                location: "*Location",
-                totalCnt: 3200,
-                scCnt: 2400,
-                nhmCnt: 600,
-                div1Cnt: 200,
-                fuelCnt: 1,
-                status: "inform",
-                division: "NORTH",
-                region: "2",
-                market: "1",
-                site: "2",
-                activityType: "Inform",
-                storeArea: "General",
-                published: true,
-                alignment: "H&W"
-            },
-            {
-                week: 44,
-                title: "Another Verification Item for Week 44",
-                location: "*Location",
-                totalCnt: 1800,
-                scCnt: 1200,
-                nhmCnt: 400,
-                div1Cnt: 200,
-                fuelCnt: 0,
-                status: "complete",
-                division: "NHM",
-                region: "3",
-                market: "2",
-                site: "3",
-                activityType: "Verification",
-                storeArea: "Operations",
-                published: true,
-                completeCnt: 1100,
-                incompleteCnt: 700,
-                alignment: "Store"
-            },
-            {
-                week: 43,
-                title: "Store Information: New Operating Hours",
-                location: "*Location",
-                totalCnt: 2100,
-                scCnt: 1500,
-                nhmCnt: 400,
-                div1Cnt: 200,
-                fuelCnt: 0,
-                status: "inform",
-                division: "SOUTHWEST",
-                region: "3",
-                market: "2",
-                site: "4",
-                activityType: "Inform",
-                storeArea: "Operations",
-                published: true,
-                alignment: "Store"
-            },
-            {
-                week: 43,
-                title: "Verification Required: Store Compliance Check",
-                location: "*Location",
-                totalCnt: 2800,
-                scCnt: 2000,
-                nhmCnt: 500,
-                div1Cnt: 300,
-                fuelCnt: 0,
-                status: "incomplete",
-                division: "EAST",
-                region: "4",
-                market: "3",
-                site: "5",
-                activityType: "Verification",
-                storeArea: "Compliance",
-                published: true,
-                completeCnt: 1400,
-                incompleteCnt: 1400,
-                alignment: "H&W"
-            },
-            {
-                week: 42,
-                title: "Southeast Region Information Update",
-                location: "*Location",
-                totalCnt: 1500,
-                scCnt: 1100,
-                nhmCnt: 300,
-                div1Cnt: 100,
-                fuelCnt: 0,
-                status: "inform",
-                division: "SOUTHEAST",
-                region: "5",
-                market: "4",
-                site: "6",
-                activityType: "Inform",
-                storeArea: "General",
-                published: true,
-                alignment: "Store"
-            },
-            {
-                week: 33,
-                title: "ACC: Applying Road Hazard Credit for Dotcom Tires",
-                location: "*Location",
-                totalCnt: 2577,
-                scCnt: 2475,
-                nhmCnt: 0,
-                div1Cnt: 102,
-                fuelCnt: 0,
-                status: "complete",
-                division: "Division 1",
-                region: "Region 1",
-                market: "Market 1",
-                facility: "Facility 1",
-                activityType: "ACC",
-                storeArea: "Auto",
-                published: true
-            },
-            {
-                week: 33,
-                title: "ACTION REQUIRED: Optional Return Authorized for RDC Assembly Overstocked Merchandise",
-                location: "*Location",
-                totalCnt: 3471,
-                scCnt: 2958,
-                nhmCnt: 251,
-                div1Cnt: 262,
-                fuelCnt: 0,
-                status: "incomplete",
-                division: "Division 1",
-                region: "Region 1",
-                market: "Market 1",
-                facility: "Facility 1",
-                activityType: "Action Required",
-                storeArea: "General Merchandise",
-                published: true
-            },
-            {
-                week: 33,
-                title: "Alcohol Delivery Coming to Your Store!",
-                location: "*Location",
-                totalCnt: 8,
-                scCnt: 7,
-                nhmCnt: 0,
-                div1Cnt: 1,
-                fuelCnt: 0,
-                status: "inform",
-                division: "Division 1",
-                region: "Region 1",
-                market: "Market 1",
-                facility: "Facility 1",
-                activityType: "Information",
-                storeArea: "Grocery",
-                published: true
-            }
-        ];
-
-        // Check for live data file and load automatically
-        async function checkForLiveData() {
-            console.log('🔍 Checking for live BigQuery data...');
-            
-            try {
-                const response = await fetch('./live_amp_data.json');
-                if (response.ok) {
-                    const liveData = await response.json();
-                    console.log('✅ Found live BigQuery data file!');
-                    console.log(`📊 Records: ${liveData.data?.length || 0}`);
-                    
-                    if (liveData.data && liveData.data.length > 0) {
-                        rawData = liveData.data;
-                        filteredData = [...rawData];
-                        console.log('🔄 Loading live data into dashboard...');
-                        
-                        // Update data status with live data info
-                        updateDataStatus('live', rawData.length, liveData.metadata);
-                        
-                        // Render dashboard with live data
-                        renderDashboard();
-                        applyFilters();
-                        return true;
-                    }
-                }
-            } catch (error) {
-                console.log('⚠️  Live data file not found, trying other sources...');
-            }
-            return false;
-        }
-
-        // Enhanced data status update for live data
-        function updateDataStatus(source, count, metadata = null) {
-            const statusElement = document.getElementById('dataStatus');
-            if (!statusElement) return;
-            
-            let statusHTML = '';
-            
-            if (source === 'direct-bigquery') {
-                statusHTML = `
-                    <div class="alert alert-success mb-3">
-                        <strong>🔗 DIRECT BigQuery Connection Active!</strong><br>
-                        📊 <strong>${count}</strong> Week 39 Published Activities<br>
-                        📋 Source: <code>wmt-assetprotection-prod.Store_Support_Dev.AMP_Data_Prep</code><br>
-                        ✅ Real-time connection - All preview links functional!<br>
-                        🚀 Live data streaming from BigQuery API
-                    </div>
-                `;
-            } else if (source === 'real-bigquery') {
-                statusHTML = `
-                    <div class="alert alert-success mb-3">
-                        <strong>🔗 REAL BigQuery Data Connected!</strong><br>
-                        📊 <strong>${count}</strong> Week 39 Published Activities<br>
-                        � Source: <code>wmt-assetprotection-prod.Store_Support_Dev.AMP_Data_Prep</code><br>
-                        ✅ All preview links are REAL and functional!<br>
-                        � No fake data - Direct from BigQuery table
-                    </div>
-                `;
-            } else if (source === 'live-bigquery') {
-                statusHTML = `
-                    <div class="alert alert-info mb-3">
-                        <strong>📁 Live BigQuery Data Loaded</strong><br>
-                        📊 ${count} activities with REAL GUID preview links<br>
-                        🔗 All links are functional and connect to real content
-                    </div>
-                `;
-            } else if (source === 'bigquery') {
-                statusHTML = `
-                    <div class="alert alert-warning mb-3">
-                        <strong>📁 BigQuery Export Loaded</strong><br>
-                        📊 ${count} activities from export file<br>
-                        ⚠️ May contain mixed real/sample data
-                    </div>
-                `;
-            } else {
-                statusHTML = `
-                    <div class="alert alert-warning mb-3">
-                        <strong>⚠️ Using Sample Data</strong><br>
-                        📊 ${count} sample activities<br>
-                        🔧 To load live data: Run <code>setup_live_data.ps1</code><br>
-                        📂 Or use "Connect to BigQuery" button
-                    </div>
-                `;
-            } else if (source === 'no-connection') {
-                statusHTML = `
-                    <div class="alert alert-warning mb-3">
-                        <strong>⚠️ BigQuery Connection Setup Required</strong><br>
-                        📋 Follow the instructions below to connect directly<br>
-                        🚀 No manual exports needed - Direct API connection!
-                    </div>
-                `;
-            } else if (source === 'no-data') {
-                statusHTML = `
-                    <div class="alert alert-danger mb-3">
-                        <strong>❌ No Real BigQuery Data Found</strong><br>
-                        📋 Export real data using the instructions below<br>
-                        🚀 Only real data with GUID preview links will be shown
-                    </div>
-                `;
-            }
-            
-            statusElement.innerHTML = statusHTML;
-        }
-
-        async function fetchDirectBigQueryData() {
-            try {
-                console.log('🔗 Connecting to BigQuery API service...');
-                
-                // Try to connect to our BigQuery service
-                const response = await fetch('http://localhost:8081/api/bigquery/data', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    
-                    if (result.success && result.data) {
-                        console.log('✅ BigQuery API connected successfully');
-                        console.log(`📊 Fetched ${result.count} records from ${result.source}`);
-                        return result.data;
-                    } else if (result.error) {
-                        console.log('❌ BigQuery API error:', result.error);
-                        if (result.auth_url) {
-                            console.log('🔐 Authentication required');
-                            // Could prompt for authentication here
-                        }
-                        return null;
-                    }
-                } else {
-                    console.log('❌ BigQuery API service not available');
-                    return null;
-                }
-                
-            } catch (error) {
-                console.log('❌ Error connecting to BigQuery API:', error.message);
-                return null;
-            }
-        }
-
-        function showBigQueryConnectionSetup() {
-            const tableContainer = document.getElementById('tableContainer');
-            if (tableContainer) {
-                tableContainer.innerHTML = `
-                    <div class="alert alert-info" style="margin: 2rem 0;">
-                        <h4>🔗 Direct BigQuery Connection Setup</h4>
-                        <p><strong>To connect directly to your BigQuery data:</strong></p>
-                        
-                        <div class="alert alert-success">
-                            <h5>Option 1: Start BigQuery API Service (Recommended)</h5>
-                            <ol>
-                                <li>Open a new terminal/PowerShell</li>
-                                <li>Navigate to: <code>C:\\Users\\krush\\Documents\\VSCode\\AMP\\Store Updates Dashboard</code></li>
-                                <li>Run: <code>python bigquery_service.py</code></li>
-                                <li>Follow authentication prompts</li>
-                                <li>Refresh this page (F5)</li>
-                            </ol>
-                            <button onclick="startBigQueryService()" class="btn btn-primary">🚀 Start BigQuery Service</button>
-                        </div>
-                        
-                        <div class="alert alert-warning">
-                            <h5>Option 2: Use Service Account (Advanced)</h5>
-                            <p>If you have a Google Cloud service account JSON file:</p>
-                            <ol>
-                                <li>Place your service account JSON in this folder</li>
-                                <li>Name it: <code>bigquery-credentials.json</code></li>
-                                <li>Refresh this page (F5)</li>
-                            </ol>
-                        </div>
-                        
-                        <div class="alert alert-info">
-                            <h5>📊 Connection Details</h5>
-                            <ul>
-                                <li><strong>Project:</strong> <code>wmt-assetprotection-prod</code></li>
-                                <li><strong>Dataset:</strong> <code>Store_Support_Dev</code></li>
-                                <li><strong>Table:</strong> <code>AMP_Data_Prep</code></li>
-                                <li><strong>Filter:</strong> Week 39, Published, with Preview Links</li>
-                            </ul>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        async function startBigQueryService() {
-            try {
-                // This would need to be implemented with a proper backend
-                alert('🔗 BigQuery Service Setup\\n\\nTo start the service:\\n1. Open PowerShell\\n2. cd "C:\\\\Users\\\\krush\\\\Documents\\\\VSCode\\\\AMP\\\\Store Updates Dashboard"\\n3. python bigquery_service.py\\n4. Refresh this page');
-            } catch (error) {
-                console.error('Error starting service:', error);
-            }
-        }
-
-        function showBigQueryInstructions() {
-            const tableContainer = document.getElementById('tableContainer');
-            if (tableContainer) {
-                tableContainer.innerHTML = `
-                    <div class="alert alert-info" style="margin: 2rem 0;">
-                        <h4>🔗 Connect to Real BigQuery Data</h4>
-                        <p><strong>To see your real AMP data with working preview links:</strong></p>
-                        <ol>
-                            <li>Go to <a href="https://console.cloud.google.com/bigquery" target="_blank">BigQuery Console</a></li>
-                            <li>Navigate to project: <code>wmt-assetprotection-prod</code></li>
-                            <li>Open dataset: <code>Store_Support_Dev</code></li>
-                            <li>Open table: <code>AMP_Data_Prep</code></li>
-                            <li>Click "Query" and run this SQL:</li>
-                        </ol>
-                        <pre style="background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto;">SELECT 
-    actv_title_home_ofc_nm as title,
-    division, region, market, store_nbr, store_name,
-    week, created_date, preview_link, status, verification_status
-FROM \`wmt-assetprotection-prod.Store_Support_Dev.AMP_Data_Prep\`
-WHERE week = 39 AND status = 'Published' 
-  AND preview_link IS NOT NULL AND preview_link != ''
-ORDER BY created_date DESC LIMIT 1000</pre>
-                        <ol start="6">
-                            <li>Click "Export" → "JSON (newline delimited)"</li>
-                            <li>Save as <code>real_bigquery_data.json</code> in this folder</li>
-                            <li>Refresh this page (F5)</li>
-                        </ol>
-                        <div class="alert alert-success mt-3">
-                            <strong>✅ Result:</strong> All 75+ Week 39 activities with real GUID preview links that work!
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 AMP Dashboard initializing...');
-            
-            // First try to load live data
-            const hasLiveData = await checkForLiveData();
-            
-            // If no live data found, run normal initialization
-            if (!hasLiveData) {
-                initializeDashboard();
-            }
-            
-            updateConnectionStatus();
-        });
-        
-        function updateConnectionStatus() {
-            const statusElement = document.getElementById('connectionStatus');
-            if (dataConnector && dataConnector.isConnected) {
-                statusElement.className = 'connection-status status-connected';
-                statusElement.innerHTML = '🟢 Connected to BigQuery';
-            } else {
-                statusElement.className = 'connection-status status-disconnected';
-                statusElement.innerHTML = '🟡 Using Sample Data';
-            }
-        }
-
-        async function initializeDashboard() {
-            showLoading(true);
-            
-            try {
-                // First try direct BigQuery API connection
-                console.log('🔗 Attempting direct BigQuery connection...');
-                const bigQueryData = await fetchDirectBigQueryData();
-                
-                if (bigQueryData && bigQueryData.length > 0) {
-                    console.log('✅ Successfully connected to BigQuery:', bigQueryData.length, 'records');
-                    rawData = bigQueryData;
-                    filteredData = [...rawData];
-                    updateDataStatus('direct-bigquery', rawData.length);
-                    await populateFilters();
-                    renderTable();
-                    updateMetrics();
-                    return;
-                }
-                
-                // Try to load REAL BigQuery export as fallback
-                console.log('🔍 Trying BigQuery export files...');
-                let jsonData = await loadDataFromBigQueryJSON('real_bigquery_data.json');
-                
-                if (jsonData && jsonData.length > 0) {
-                    console.log('✅ Successfully loaded REAL BigQuery data:', jsonData.length, 'records');
-                    rawData = jsonData;
-                    filteredData = [...rawData];
-                    updateDataStatus('real-bigquery', rawData.length);
-                    await populateFilters();
-                    renderTable();
-                    updateMetrics();
-                    return;
-                }
-                
-                // Try live_amp_data.json as backup
-                jsonData = await loadDataFromBigQueryJSON('live_amp_data.json');
-                
-                if (jsonData && jsonData.length > 0) {
-                    console.log('✅ Loaded live data:', jsonData.length, 'records');
-                    rawData = jsonData;
-                    filteredData = [...rawData];
-                    updateDataStatus('live-bigquery', rawData.length);
-                    await populateFilters();
-                    renderTable();
-                    updateMetrics();
-                    return;
-                }
-                
-                // Use embedded real data as default
-                console.log('💡 Using embedded real AMP data');
-                rawData = [...realAMPData];
-                filteredData = [...rawData];
-                updateDataStatus('embedded', rawData.length);
-                
-                // Debug: Show all preview links
-                console.log('🔗 PREVIEW LINKS DEBUG:');
-                rawData.forEach((item, index) => {
-                    const linkType = item.previewLink && (item.previewLink.includes('029a6006') || item.previewLink.includes('0075bf11')) ? '✅ REAL' : '⚠️ SAMPLE';
-                    console.log(`${index + 1}. "${item.title}"`);
-                    console.log(`   Link: ${item.previewLink || 'NO LINK'}`);
-                    console.log(`   Type: ${linkType}`);
-                    console.log('');
-                });
-                
-                await populateFilters();
-                renderTable();
-                updateMetrics();
-                return;
-                
-            } catch (error) {
-                console.error('Failed to initialize dashboard:', error);
-                console.log('Using fallback to embedded real data');
-                // Final fallback to embedded real data
-                rawData = [...realAMPData];
-                filteredData = [...rawData];
-                updateDataStatus('embedded', rawData.length);
-                console.log('Fallback rawData:', rawData);
-                await populateFilters();
-                renderTable();
-                updateMetrics();
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        function updateDataStatus(source, recordCount) {
-            const authIndicator = document.getElementById('authIndicator');
-            const lastUpdated = document.getElementById('lastUpdated');
-            
-            const now = new Date();
-            const timeString = now.toLocaleString('en-US', {
-                month: 'long',
-                day: 'numeric', 
-                year: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
-            });
-            
-            switch(source) {
-                case 'csv':
-                    authIndicator.textContent = `✓ Real Data Loaded (${recordCount} records from CSV)`;
-                    authIndicator.style.color = '#28a745';
-                    break;
-                case 'bigquery':
-                    authIndicator.textContent = `✓ Real Data Loaded (${recordCount} records from BigQuery)`;
-                    authIndicator.style.color = '#28a745';
-                    break;
-                case 'sample':
-                default:
-                    authIndicator.textContent = `⚠ Using Sample Data (${recordCount} records)`;
-                    authIndicator.style.color = '#ffc107';
-                    break;
-            }
-            
-            lastUpdated.textContent = timeString;
-        }
-
-        async function refreshDashboard() {
-            console.log('Manually refreshing dashboard...');
-            await initializeDashboard();
-        }
-
-        function showLoading(show) {
-            const spinner = document.getElementById('loadingSpinner');
-            const table = document.getElementById('dataTable');
-            
-            if (show) {
-                spinner.style.display = 'block';
-                table.style.display = 'none';
-                isLoading = true;
-            } else {
-                spinner.style.display = 'none';
-                table.style.display = 'table';
-                isLoading = false;
-            }
-        }
-
-        async function populateFilters() {
-            let filters;
-            
-            if (dataConnector) {
-                try {
-                    const filterOptions = await dataConnector.getFilterOptions();
-                    filters = {
-                        divisionFilter: filterOptions.divisions,
-                        regionFilter: filterOptions.regions,
-                        marketFilter: filterOptions.markets,
-                        siteFilter: filterOptions.sites,
-                        weekFilter: filterOptions.weeks,
-                        titleFilter: filterOptions.titles,
-                        activityTypeFilter: filterOptions.activityTypes,
-                        storeAreaFilter: filterOptions.storeAreas
-                    };
-                } catch (error) {
-                    console.error('Failed to get filter options:', error);
-                    // Fallback to local data
-                    filters = getLocalFilterOptions();
-                }
-            } else {
-                filters = getLocalFilterOptions();
-            }
-            
-            function getLocalFilterOptions() {
-                return {
-                    divisionFilter: [...new Set(rawData.map(item => item.division).filter(Boolean))],
-                    regionFilter: [...new Set(rawData.map(item => item.region).filter(Boolean))],
-                    marketFilter: [...new Set(rawData.map(item => item.market).filter(Boolean))],
-                    siteFilter: [...new Set(rawData.map(item => item.site).filter(Boolean))],
-                    weekFilter: [...new Set(rawData.map(item => item.week).filter(Boolean))].sort((a, b) => b - a),
-                    titleFilter: [...new Set(rawData.map(item => item.title).filter(Boolean))],
-                    activityTypeFilter: [...new Set(rawData.map(item => item.activityType).filter(Boolean))],
-                    storeAreaFilter: [...new Set(rawData.map(item => item.storeArea).filter(Boolean))]
-                };
-            }
-
-            Object.keys(filters).forEach(filterId => {
-                const select = document.getElementById(filterId);
-                const currentValue = select.value;
-                
-                // Clear existing options except the first one
-                while (select.children.length > 1) {
-                    select.removeChild(select.lastChild);
-                }
-                
-                // Add new options
-                filters[filterId].forEach(value => {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    select.appendChild(option);
-                });
-                
-                // Restore previous selection
-                select.value = currentValue;
-            });
-
-            // Add event listeners for filters
-            Object.keys(filters).forEach(filterId => {
-                document.getElementById(filterId).addEventListener('change', applyFilters);
-            });
-            
-            document.getElementById('keywordSearch').addEventListener('input', applyFilters);
-        }
-
-        function applyFilters() {
-            if (isLoading) return;
-
-            const filters = {
-                division: document.getElementById('divisionFilter').value,
-                region: document.getElementById('regionFilter').value,
-                market: document.getElementById('marketFilter').value,
-                site: document.getElementById('siteFilter').value,
-                week: document.getElementById('weekFilter').value,
-                title: document.getElementById('titleFilter').value,
-                activityType: document.getElementById('activityTypeFilter').value,
-                storeArea: document.getElementById('storeAreaFilter').value,
-                alignment: document.getElementById('alignmentFilter').value,
-                keyword: document.getElementById('keywordSearch').value.toLowerCase()
-            };
-
-            filteredData = rawData.filter(item => {
-                return Object.keys(filters).every(key => {
-                    if (!filters[key]) return true;
-                    
-                    if (key === 'keyword') {
-                        return item.title.toLowerCase().includes(filters[key]) ||
-                               item.activityType.toLowerCase().includes(filters[key]) ||
-                               item.storeArea.toLowerCase().includes(filters[key]);
-                    }
-                    
-                    if (key === 'week') {
-                        return item[key].toString() === filters[key];
-                    }
-                    
-                    if (key === 'alignment') {
-                        // Don't show nulls, default to Store
-                        const itemAlignment = item.alignment || 'Store';
-                        return itemAlignment === filters[key];
-                    }
-                    
-                    // Map filter keys to item keys
-                    const itemKey = key === 'site' ? 'site' : key;
-                    return item[itemKey] === filters[key];
-                });
-            });
-
-            renderTable();
-            updateMetrics();
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('dataTableBody');
-            if (!tbody) {
-                console.error('Table body not found');
-                return;
-            }
-            
-            tbody.innerHTML = '';
-            console.log('Rendering table with data:', filteredData); // Debug log
-
-            if (!filteredData || filteredData.length === 0) {
-                const emptyRow = document.createElement('tr');
-                emptyRow.innerHTML = `
-                    <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-light);">
-                        No activities found. Try adjusting your filters or refresh the data.
-                    </td>
-                `;
-                tbody.appendChild(emptyRow);
-                return;
-            }
-
-            // Sort the data: Week (descending), then Activity Type (Verification first, then Inform, then others)
-            const sortedData = [...filteredData].sort((a, b) => {
-                // First sort by week (descending - newest first)
-                const weekA = a.week || 0;
-                const weekB = b.week || 0;
-                if (weekA !== weekB) {
-                    return weekB - weekA;
-                }
-                
-                // Then sort by activity type priority
-                const getActivityTypePriority = (activityType) => {
-                    const type = (activityType || '').toLowerCase();
-                    if (type.includes('verification')) return 1;
-                    if (type.includes('inform')) return 2;
-                    if (type.includes('action required')) return 3;
-                    if (type.includes('update')) return 4;
-                    if (type.includes('alert')) return 5;
-                    return 6; // Others
-                };
-                
-                const priorityA = getActivityTypePriority(a.activityType);
-                const priorityB = getActivityTypePriority(b.activityType);
-                
-                return priorityA - priorityB;
-            });
-
-            let currentWeek = null;
-            let weekRowCount = 0;
-            
-            sortedData.forEach((item, index) => {
-                const itemWeek = item.week || 'N/A';
-                
-                // Add week header row when week changes
-                if (currentWeek !== itemWeek) {
-                    if (currentWeek !== null) {
-                        // Add spacing between week groups
-                        const spacerRow = document.createElement('tr');
-                        spacerRow.className = 'week-spacer';
-                        spacerRow.innerHTML = '<td colspan="9" style="height: 10px; background: var(--light-gray);"></td>';
-                        tbody.appendChild(spacerRow);
-                    }
-                    currentWeek = itemWeek;
-                    weekRowCount = 0;
-                }
-                
-                const row = document.createElement('tr');
-                
-                // Create activity type badge
-                const activityBadge = getActivityTypeBadge(item.activityType || 'Information');
-                
-                // Ensure all values are defined with fallbacks
-                const title = item.title || 'No Title';
-                const totalCnt = (item.totalCnt || 0).toLocaleString();
-                // Combine SC count with Fuel count (only one fuel center 7368)
-                const combinedScCnt = ((item.scCnt || 0) + (item.fuelCnt || 0)).toLocaleString();
-                const nhmCnt = (item.nhmCnt || 0).toLocaleString();
-                const div1Cnt = (item.div1Cnt || 0).toLocaleString();
-                
-                // Create location drill-down with expand button
-                const locationDrilldown = createLocationDrilldownWithButton(item, index);
-                
-                // Show week number only on first row of each week group
-                const weekDisplay = weekRowCount === 0 ? currentWeek : '';
-                
-                // Generate verification status for title area
-                const verificationStatusInTitle = getVerificationStatusForTitle(item);
-                
-                row.innerHTML = `
-                    <td class="week-column sticky-week">${weekDisplay}</td>
-                    <td class="title-column" title="${title}">
-                        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                            <a href="#" 
-                               class="clickable-title" 
-                               onclick="return openPreviewLink('${item.previewLink || item.preview_link || '#'}', '${title}');"
-                               title="Click to preview: ${title}">
-                                ${title}
-                            </a>
-                            <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                ${activityBadge}
-                                ${verificationStatusInTitle}
-                            </div>
-                        </div>
-                    </td>
-                    <td class="location-column">${locationDrilldown}</td>
-                    <td class="count-column">${totalCnt}</td>
-                    <td class="count-column">${combinedScCnt}</td>
-                    <td class="count-column">${nhmCnt}</td>
-                    <td class="count-column">${div1Cnt}</td>
-                `;
-                
-                // Add enhanced status indicators
-                const status = item.status || 'inform';
-                row.className = `status-${status}-row`;
-                
-                tbody.appendChild(row);
-                weekRowCount++;
-            });
-            
-            console.log(`Rendered ${sortedData.length} rows`); // Debug log
-        }
-
-        function getActivityTypeBadge(activityType) {
-            const badgeClasses = {
-                'Action Required': 'badge-action-required',
-                'Update': 'badge-update',
-                'Information': 'badge-information',
-                'Alert': 'badge-alert',
-                'ACC': 'badge-update',
-                'Coming Soon': 'badge-information',
-                'Verification': 'badge-verification',
-                'Inform': 'badge-information'
-            };
-            
-            const badgeClass = badgeClasses[activityType] || 'badge-information';
-            return `<span class="activity-type-badge ${badgeClass}">${activityType}</span>`;
-        }
-
-        function getVerificationStatus(item) {
-            if (item.activityType === 'Verification' && item.completeCnt !== undefined && item.incompleteCnt !== undefined) {
-                const total = item.completeCnt + item.incompleteCnt;
-                const completePercent = total > 0 ? Math.round((item.completeCnt / total) * 100) : 0;
-                const incompletePercent = total > 0 ? Math.round((item.incompleteCnt / total) * 100) : 0;
-                
-                return `
-                    <div class="verification-stats">
-                        <div class="verification-line">
-                            <span class="complete-count">✓ ${item.completeCnt.toLocaleString()} (${completePercent}%)</span>
-                        </div>
-                        <div class="verification-line">
-                            <span class="incomplete-count">⚠ ${item.incompleteCnt.toLocaleString()} (${incompletePercent}%)</span>
-                        </div>
-                    </div>
-                `;
-            }
-            return '-';
-        }
-
-        function createLocationDrilldownWithButton(item, rowIndex) {
-            return `
-                <div class="location-with-expand">
-                    <div class="location-controls">
-                        <button class="nav-btn" onclick="navigateLocation(${rowIndex}, 'back')" 
-                                id="back-btn-${rowIndex}" style="display: none;" 
-                                title="collapse sites">-</button>
-                        <button class="nav-btn" onclick="navigateLocation(${rowIndex}, 'forward')" 
-                                id="forward-btn-${rowIndex}" 
-                                title="expand sites">+</button>
-                    </div>
-                    <span class="location-summary">📍 *Location</span>
-                    <div class="location-expansion" id="location-expansion-${rowIndex}" style="display: none;">
-                        <div class="location-breakdown" id="breakdown-${rowIndex}">
-                            <!-- Breakdown will be populated dynamically -->
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function getVerificationStatusForTitle(item) {
-            if (item.activityType === 'Verification' && item.completeCnt !== undefined && item.incompleteCnt !== undefined) {
-                const total = item.completeCnt + item.incompleteCnt;
-                const completePercent = total > 0 ? Math.round((item.completeCnt / total) * 100) : 0;
-                const incompletePercent = total > 0 ? Math.round((item.incompleteCnt / total) * 100) : 0;
-                
-                return `
-                    <div class="verification-inline-horizontal">
-                        <span class="verification-item clickable-verification complete-verification" 
-                              onclick="showVerificationDetails('complete', ${item.completeCnt}, '${item.division}', '${item.title}')" 
-                              title="Click to see completed sites">
-                            ✓ ${item.completeCnt.toLocaleString()} (${completePercent}%)
-                        </span>
-                        <span class="verification-item clickable-verification incomplete-verification" 
-                              onclick="showVerificationDetails('incomplete', ${item.incompleteCnt}, '${item.division}', '${item.title}')" 
-                              title="Click to see incomplete sites">
-                            ⚠ ${item.incompleteCnt.toLocaleString()} (${incompletePercent}%)
-                        </span>
-                    </div>
-                `;
-            }
-            return '';
-        }
-
-        let currentExpansionLevel = {}; // Track expansion level for each row
-        let currentExpansionData = {}; // Track selected items for each row
-
-        function navigateLocation(rowIndex, direction) {
-            const expansion = document.getElementById(`location-expansion-${rowIndex}`);
-            const forwardBtn = document.getElementById(`forward-btn-${rowIndex}`);
-            const backBtn = document.getElementById(`back-btn-${rowIndex}`);
-            const hierarchy = getLocationHierarchy();
-            
-            if (direction === 'forward') {
-                const currentLevel = currentExpansionLevel[rowIndex] || 'none';
-                
-                switch(currentLevel) {
-                    case 'none':
-                        expansion.style.display = 'block';
-                        currentExpansionLevel[rowIndex] = 'division';
-                        currentExpansionData[rowIndex] = { level: 'division' };
-                        showDivisionBreakdown(rowIndex, hierarchy);
-                        backBtn.style.display = 'inline-block';
-                        break;
-                    case 'division':
-                        // Navigate to regions of selected division
-                        if (!currentExpansionData[rowIndex].selectedDivision) return;
-                        currentExpansionLevel[rowIndex] = 'region';
-                        showRegionBreakdown(rowIndex, hierarchy);
-                        break;
-                    case 'region':
-                        // Navigate to markets of selected region
-                        if (!currentExpansionData[rowIndex].selectedRegion) return;
-                        currentExpansionLevel[rowIndex] = 'market';
-                        showMarketBreakdown(rowIndex, hierarchy);
-                        break;
-                    case 'market':
-                        // Navigate to sites of selected market
-                        if (!currentExpansionData[rowIndex].selectedMarket) return;
-                        currentExpansionLevel[rowIndex] = 'site';
-                        showSiteBreakdown(rowIndex, hierarchy);
-                        forwardBtn.style.display = 'none';
-                        break;
-                }
-            } else if (direction === 'back') {
-                const currentLevel = currentExpansionLevel[rowIndex] || 'division';
-                
-                switch(currentLevel) {
-                    case 'site':
-                        currentExpansionLevel[rowIndex] = 'market';
-                        showMarketBreakdown(rowIndex, hierarchy);
-                        forwardBtn.style.display = 'inline-block';
-                        break;
-                    case 'market':
-                        currentExpansionLevel[rowIndex] = 'region';
-                        showRegionBreakdown(rowIndex, hierarchy);
-                        break;
-                    case 'region':
-                        currentExpansionLevel[rowIndex] = 'division';
-                        showDivisionBreakdown(rowIndex, hierarchy);
-                        break;
-                    case 'division':
-                        expansion.style.display = 'none';
-                        currentExpansionLevel[rowIndex] = 'none';
-                        currentExpansionData[rowIndex] = {};
-                        backBtn.style.display = 'none';
-                        forwardBtn.style.display = 'inline-block';
-                        break;
-                }
-            }
-        }
-
-        function showDivisionBreakdown(rowIndex, hierarchy) {
-            const breakdown = document.getElementById(`breakdown-${rowIndex}`);
-            const divisionsData = getDivisionBreakdown();
-            
-            breakdown.innerHTML = `
-                <div class="breakdown-header">Division Breakdown</div>
-                <table class="breakdown-table">
-                    <thead>
-                        <tr>
-                            <th>Division</th>
-                            <th>Total Cnt</th>
-                            <th>SC Cnt</th>
-                            <th>NHM Cnt</th>
-                            <th>DIV 1 Cnt</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${divisionsData.map(div => `
-                            <tr>
-                                <td>${div.name}</td>
-                                <td>${div.total.toLocaleString()}</td>
-                                <td>${div.sc.toLocaleString()}</td>
-                                <td>${div.nhm.toLocaleString()}</td>
-                                <td>${div.div1.toLocaleString()}</td>
-                                <td>
-                                    <button class="drill-btn" onclick="selectDivision(${rowIndex}, '${div.name}')">
-                                        Select
-                                    </button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
-        function showRegionBreakdown(rowIndex, hierarchy) {
-            const breakdown = document.getElementById(`breakdown-${rowIndex}`);
-            const selectedDivision = currentExpansionData[rowIndex].selectedDivision;
-            
-            if (!selectedDivision || !hierarchy[selectedDivision]) {
-                breakdown.innerHTML = '<div class="breakdown-note">Please select a division first</div>';
-                return;
-            }
-            
-            const regions = hierarchy[selectedDivision].regions;
-            
-            breakdown.innerHTML = `
-                <div class="breakdown-header">Region Breakdown - ${selectedDivision}</div>
-                <table class="breakdown-table">
-                    <thead>
-                        <tr>
-                            <th>Region</th>
-                            <th>Total Cnt</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${Object.entries(regions).map(([regionName, regionData]) => `
-                            <tr>
-                                <td>${regionName}</td>
-                                <td>${regionData.total.toLocaleString()}</td>
-                                <td>
-                                    <button class="drill-btn" onclick="selectRegion(${rowIndex}, '${regionName}')">
-                                        Select
-                                    </button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
-        function showMarketBreakdown(rowIndex, hierarchy) {
-            const breakdown = document.getElementById(`breakdown-${rowIndex}`);
-            const selectedDivision = currentExpansionData[rowIndex].selectedDivision;
-            const selectedRegion = currentExpansionData[rowIndex].selectedRegion;
-            
-            if (!selectedDivision || !selectedRegion || !hierarchy[selectedDivision]?.regions[selectedRegion]) {
-                breakdown.innerHTML = '<div class="breakdown-note">Please select a division and region first</div>';
-                return;
-            }
-            
-            const markets = hierarchy[selectedDivision].regions[selectedRegion].markets;
-            
-            breakdown.innerHTML = `
-                <div class="breakdown-header">Market Breakdown - ${selectedRegion}</div>
-                <table class="breakdown-table">
-                    <thead>
-                        <tr>
-                            <th>Market</th>
-                            <th>Total Cnt</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${Object.entries(markets).map(([marketName, marketData]) => `
-                            <tr>
-                                <td>${marketName}</td>
-                                <td>${marketData.total.toLocaleString()}</td>
-                                <td>
-                                    <button class="drill-btn" onclick="selectMarket(${rowIndex}, '${marketName}')">
-                                        Select
-                                    </button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
-        function showSiteBreakdown(rowIndex, hierarchy) {
-            const breakdown = document.getElementById(`breakdown-${rowIndex}`);
-            const selectedDivision = currentExpansionData[rowIndex].selectedDivision;
-            const selectedRegion = currentExpansionData[rowIndex].selectedRegion;
-            const selectedMarket = currentExpansionData[rowIndex].selectedMarket;
-            
-            if (!selectedDivision || !selectedRegion || !selectedMarket || 
-                !hierarchy[selectedDivision]?.regions[selectedRegion]?.markets[selectedMarket]) {
-                breakdown.innerHTML = '<div class="breakdown-note">Please select a division, region, and market first</div>';
-                return;
-            }
-            
-            const sites = hierarchy[selectedDivision].regions[selectedRegion].markets[selectedMarket].sites;
-            
-            breakdown.innerHTML = `
-                <div class="breakdown-header">Site Breakdown - ${selectedMarket}</div>
-                <table class="breakdown-table">
-                    <thead>
-                        <tr>
-                            <th>Site Number</th>
-                            <th>Site Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${sites.map(siteNumber => `
-                            <tr>
-                                <td>${siteNumber}</td>
-                                <td>Store ${siteNumber} - ${selectedDivision}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
-        function getLocationHierarchy() {
-            return {
-                'EAST': {
-                    total: 33,
-                    regions: {
-                        'East Region 1': {
-                            total: 17,
-                            markets: {
-                                'East Market A': { total: 9, sites: ['1001', '1002', '1003', '1004', '1005', '1006', '1007', '1008', '1009'] },
-                                'East Market B': { total: 8, sites: ['1010', '1011', '1012', '1013', '1014', '1015', '1016', '1017'] }
-                            }
-                        },
-                        'East Region 2': {
-                            total: 16,
-                            markets: {
-                                'East Market C': { total: 8, sites: ['1018', '1019', '1020', '1021', '1022', '1023', '1024', '1025'] },
-                                'East Market D': { total: 8, sites: ['1026', '1027', '1028', '1029', '1030', '1031', '1032', '1033'] }
-                            }
-                        }
-                    }
-                },
-                'NORTH': {
-                    total: 26,
-                    regions: {
-                        'North Region 1': {
-                            total: 13,
-                            markets: {
-                                'North Market A': { total: 7, sites: ['2001', '2002', '2003', '2004', '2005', '2006', '2007'] },
-                                'North Market B': { total: 6, sites: ['2008', '2009', '2010', '2011', '2012', '2013'] }
-                            }
-                        },
-                        'North Region 2': {
-                            total: 13,
-                            markets: {
-                                'North Market C': { total: 7, sites: ['2014', '2015', '2016', '2017', '2018', '2019', '2020'] },
-                                'North Market D': { total: 6, sites: ['2021', '2022', '2023', '2024', '2025', '2026'] }
-                            }
-                        }
-                    }
-                },
-                'WEST': {
-                    total: 16,
-                    regions: {
-                        'West Region 1': {
-                            total: 8,
-                            markets: {
-                                'West Market A': { total: 4, sites: ['3001', '3002', '3003', '3004'] },
-                                'West Market B': { total: 4, sites: ['3005', '3006', '3007', '3008'] }
-                            }
-                        },
-                        'West Region 2': {
-                            total: 8,
-                            markets: {
-                                'West Market C': { total: 4, sites: ['3009', '3010', '3011', '3012'] },
-                                'West Market D': { total: 4, sites: ['3013', '3014', '3015', '3016'] }
-                            }
-                        }
-                    }
-                },
-                'SOUTHEAST': {
-                    total: 14,
-                    regions: {
-                        'Southeast Region 1': {
-                            total: 7,
-                            markets: {
-                                'Southeast Market A': { total: 4, sites: ['4001', '4002', '4003', '4004'] },
-                                'Southeast Market B': { total: 3, sites: ['4005', '4006', '4007'] }
-                            }
-                        },
-                        'Southeast Region 2': {
-                            total: 7,
-                            markets: {
-                                'Southeast Market C': { total: 4, sites: ['4008', '4009', '4010', '4011'] },
-                                'Southeast Market D': { total: 3, sites: ['4012', '4013', '4014'] }
-                            }
-                        }
-                    }
-                },
-                'SOUTHWEST': {
-                    total: 13,
-                    regions: {
-                        'Southwest Region 1': {
-                            total: 7,
-                            markets: {
-                                'Southwest Market A': { total: 4, sites: ['5001', '5002', '5003', '5004'] },
-                                'Southwest Market B': { total: 3, sites: ['5005', '5006', '5007'] }
-                            }
-                        },
-                        'Southwest Region 2': {
-                            total: 6,
-                            markets: {
-                                'Southwest Market C': { total: 3, sites: ['5008', '5009', '5010'] },
-                                'Southwest Market D': { total: 3, sites: ['5011', '5012', '5013'] }
-                            }
-                        }
-                    }
-                },
-                'NHM': {
-                    total: 2,
-                    regions: {
-                        'NHM Region 1': {
-                            total: 2,
-                            markets: {
-                                'NHM Market A': { total: 2, sites: ['6001', '6002'] }
-                            }
-                        }
-                    }
-                }
-            };
-        }
-
-        function getDivisionBreakdown() {
-            const hierarchy = getLocationHierarchy();
-            return Object.keys(hierarchy).map(division => ({
-                name: division,
-                total: hierarchy[division].total,
-                sc: Math.floor(hierarchy[division].total * 0.7),
-                nhm: division === 'NHM' ? hierarchy[division].total : 0,
-                div1: Math.floor(hierarchy[division].total * 0.3)
-            }));
-        }
-
-        function showVerificationDetails(type, count, division, title) {
-            const sites = generateSiteList(type, count, division);
-            const modal = document.createElement('div');
-            modal.className = 'verification-modal';
-            
-            const completedByColumn = type === 'complete' ? '<th>Completed By</th>' : '';
-            const exportButton = `
-                <button class="export-btn" onclick="exportVerificationData('${type}', '${title}', '${division}')" 
-                        title="Export to Excel">
-                    📊 Export to Excel
-                </button>
-            `;
-            
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>${type === 'complete' ? 'Completed' : 'Incomplete'} Verification Sites</h3>
-                        <div class="modal-header-actions">
-                            ${exportButton}
-                            <span class="modal-close" onclick="closeVerificationModal()">&times;</span>
-                        </div>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-info">
-                            <p><strong>Activity:</strong> ${title}</p>
-                            <p><strong>Total ${type}:</strong> ${count.toLocaleString()}</p>
-                        </div>
-                        <div class="sites-table-container">
-                            <table class="sites-table">
-                                <thead>
-                                    <tr>
-                                        <th>Site Number</th>
-                                        ${completedByColumn}
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${sites.map(site => `
-                                        <tr class="site-row ${type}">
-                                            <td class="site-number">${site.number}</td>
-                                            ${type === 'complete' ? `<td class="completed-by">${site.completedBy}</td>` : ''}
-                                            <td class="site-status">${type === 'complete' ? '✓ Complete' : '⚠ Pending'}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function closeVerificationModal() {
-            const modal = document.querySelector('.verification-modal');
-            if (modal) {
-                modal.remove();
-            }
-        }
-
-        function exportVerificationData(type, title, division) {
-            const sites = generateSiteList(type, 1000, division); // Export more data
-            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-            const filename = `${title.replace(/[^a-zA-Z0-9]/g, '_')}_${type}_sites_${timestamp}.csv`;
-            
-            let csvContent = '';
-            
-            // Headers
-            if (type === 'complete') {
-                csvContent = 'Site Number,Site Name,Completed By,Status\n';
-                sites.forEach(site => {
-                    csvContent += `${site.number},"${site.name}","${site.completedBy}","Complete"\n`;
-                });
-            } else {
-                csvContent = 'Site Number,Status\n';
-                sites.forEach(site => {
-                    csvContent += `${site.number},"Pending"\n`;
-                });
-            }
-            
-            // Create and download file
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', filename);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
-
-        // Selection functions for hierarchical drill-down
-        function selectDivision(rowIndex, divisionName) {
-            currentExpansionData[rowIndex].selectedDivision = divisionName;
-            // Automatically navigate to region level
-            navigateLocation(rowIndex, 'forward');
-        }
-
-        function selectRegion(rowIndex, regionName) {
-            currentExpansionData[rowIndex].selectedRegion = regionName;
-            // Automatically navigate to market level
-            navigateLocation(rowIndex, 'forward');
-        }
-
-        function selectMarket(rowIndex, marketName) {
-            currentExpansionData[rowIndex].selectedMarket = marketName;
-            // Automatically navigate to site level
-            navigateLocation(rowIndex, 'forward');
-        }
-
-        // Function to handle preview link clicks
-        function openPreviewLink(previewUrl, title) {
-            try {
-                console.log(`🔗 Opening preview link for: ${title}`);
-                console.log(`   URL: ${previewUrl}`);
-                
-                if (previewUrl && previewUrl !== '#' && previewUrl.trim() !== '') {
-                    // Open the real BigQuery preview link directly
-                    console.log(`✅ Opening BigQuery preview link`);
-                    window.open(previewUrl, '_blank', 'noopener,noreferrer');
-                } else {
-                    console.log(`❌ No preview link available for: ${title}`);
-                    alert(`❌ No Preview Available\n\nTitle: ${title}\n\nThis activity does not have a preview link in the BigQuery data.`);
-                }
-            
-                // Prevent the default anchor behavior since we're handling it manually
-                return false;
-            } catch (error) {
-                console.error('❌ Error in openPreviewLink:', error);
-                alert(`❌ Error Opening Preview\n\nTitle: ${title}\nError: ${error.message}\n\nCheck browser console for details.`);
-                return false;
-            }
-        }
-
-        // Data connection handling functions
-        let isRealDataConnected = false;
-        
-        async function handleDataConnection() {
-            const authBtn = document.getElementById('authBtn');
-            const authIndicator = document.getElementById('authIndicator');
-            
-            // Show options for loading real data
-            const choice = prompt(`
-🔗 BIGQUERY DATA CONNECTION OPTIONS:
-
-1 - Load from BigQuery JSON export (current: limited data)
-2 - Get FULL BigQuery export instructions (75+ Week 39 records)
-3 - Load from CSV file  
-4 - Direct BigQuery API connection
-5 - Console data loading instructions
-
-⚠️ Current data shows only sample - select option 2 for complete dataset!
-
-Enter your choice (1-5) or press Cancel:`, "2");
-            
-            if (choice) {
-                switch(choice.trim()) {
-                    case '1':
-                        await loadBigQueryJSON();
-                        break;
-                    case '2':
-                        await loadFullBigQueryData();
-                        break;
-                    case '3':
-                        await loadCSVFile();
-                        break;
-                    case '4':
-                        showBigQueryAPIInstructions();
-                        break;
-                    case '5':
-                        showDataLoadingInstructions();
-                        break;
-                    default:
-                        alert('Invalid choice. Please select 1-5.');
-                }
-            }
-        }
-
-        async function loadBigQueryJSON() {
-            try {
-                showLoading(true);
-                console.log('Attempting to load BigQuery JSON export...');
-                
-                const data = await loadDataFromBigQueryJSON('bigquery-export.json');
-                if (data && data.length > 0) {
-                    rawData = data;
-                    filteredData = [...rawData];
-                    updateDataStatus('bigquery', rawData.length);
-                    await populateFilters();
-                    renderTable();
-                    updateMetrics();
-                    alert(`✅ Successfully loaded ${data.length} records from BigQuery JSON export!`);
-                } else {
-                    throw new Error('No data found in bigquery-export.json');
-                }
-            } catch (error) {
-                console.error('BigQuery JSON loading failed:', error);
-                alert(`❌ Failed to load BigQuery JSON: ${error.message}\n\nMake sure 'bigquery-export.json' exists in the dashboard folder.`);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        async function loadCSVFile() {
-            try {
-                showLoading(true);
-                const filename = prompt('Enter CSV filename (default: real-amp-data.csv):', 'real-amp-data.csv');
-                if (!filename) return;
-                
-                const data = await loadRealDataFromCSV(filename);
-                if (data && data.length > 0) {
-                    rawData = data;
-                    filteredData = [...rawData];
-                    updateDataStatus('csv', rawData.length);
-                    await populateFilters();
-                    renderTable();
-                    updateMetrics();
-                    alert(`✅ Successfully loaded ${data.length} records from ${filename}!`);
-                } else {
-                    throw new Error(`No data found in ${filename}`);
-                }
-            } catch (error) {
-                console.error('CSV loading failed:', error);
-                alert(`❌ Failed to load CSV: ${error.message}`);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        async function loadRealDataFromCSV(filename) {
-            try {
-                console.log(`Attempting to load CSV file: ${filename}`);
-                const response = await fetch(filename);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                console.log('CSV file loaded, parsing data...');
-                
-                // Parse CSV
-                const lines = csvText.trim().split('\n');
-                const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
-                console.log('CSV headers:', headers);
-                
-                const data = [];
-                for (let i = 1; i < lines.length; i++) {
-                    const values = [];
-                    let currentValue = '';
-                    let inQuotes = false;
-                    
-                    for (let char of lines[i]) {
-                        if (char === '"') {
-                            inQuotes = !inQuotes;
-                        } else if (char === ',' && !inQuotes) {
-                            values.push(currentValue.trim());
-                            currentValue = '';
-                        } else {
-                            currentValue += char;
-                        }
-                    }
-                    values.push(currentValue.trim()); // Last value
-                    
-                    if (values.length === headers.length) {
-                        const row = {};
-                        headers.forEach((header, index) => {
-                            let value = values[index].replace(/"/g, '');
-                            // Convert numeric strings to numbers
-                            if (!isNaN(value) && value !== '') {
-                                value = Number(value);
-                            }
-                            // Convert boolean strings
-                            if (value === 'true') value = true;
-                            if (value === 'false') value = false;
-                            row[header] = value;
-                        });
-                        
-                        // Transform to dashboard format
-                        const dashboardRow = {
-                            week: row.week_number,
-                            title: row.activity_title,
-                            location: row.location || '*Location',
-                            totalCnt: row.total_count || 0,
-                            scCnt: row.sc_count || 0,
-                            nhmCnt: row.nhm_count || 0,
-                            div1Cnt: row.div1_count || 0,
-                            fuelCnt: row.fuel_count || 0,
-                            status: row.status || 'published',
-                            division: row.division,
-                            region: row.region,
-                            market: row.market,
-                            site: row.site,
-                            activityType: row.activity_type || 'Inform',
-                            storeArea: row.store_area || 'Store',
-                            published: row.published !== false,
-                            alignment: row.alignment || 'Store',
-                            completeCnt: row.complete_count || 0,
-                            incompleteCnt: row.incomplete_count || 0,
-                            previewLink: row.preview_link
-                        };
-                        
-                        data.push(dashboardRow);
-                    }
-                }
-                
-                console.log(`Successfully parsed ${data.length} records from CSV`);
-                return data;
-                
-            } catch (error) {
-                console.error('Failed to load CSV file:', error);
-                return null;
-            }
-        }
-
-        async function loadDataFromBigQueryJSON(filename) {
-            try {
-                console.log(`Attempting to load BigQuery JSON export: ${filename}`);
-                const response = await fetch(filename);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const jsonData = await response.json();
-                console.log(`BigQuery JSON loaded, found ${jsonData.length} records, transforming data...`);
-                
-                const data = jsonData.map(item => ({
-                    week: item.week_number,
-                    title: item.actv_title_home_ofc_nm || item.activity_title,
-                    location: item.location || 'All Stores',
-                    totalCnt: item.total_count || 0,
-                    scCnt: item.sc_count || 0,
-                    nhmCnt: item.nhm_count || 0,
-                    div1Cnt: item.div1_count || 0,
-                    fuelCnt: item.fuel_count || 0,
-                    status: item.status || 'published',
-                    division: item.division,
-                    region: item.region,
-                    market: item.market,
-                    site: item.site || item.store_nbr,
-                    activityType: item.activity_type || 'Inform',
-                    storeArea: item.store_area || 'Store',
-                    published: item.published !== false,
-                    alignment: item.alignment || 'Store',
-                    completeCnt: item.complete_count || 0,
-                    incompleteCnt: item.incomplete_count || item.incomple_count || 0,
-                    previewLink: item.preview_link
-                }));
-                
-                console.log(`Successfully transformed ${data.length} records from BigQuery JSON`);
-                console.log(`Week 39 records: ${data.filter(d => d.week === 39).length}`);
-                console.log(`Total unique titles: ${new Set(data.map(d => d.title)).size}`);
-                return data;
-                
-            } catch (error) {
-                console.error('Failed to load BigQuery JSON:', error);
-                return null;
-            }
-        }
-
-        // Function to load complete BigQuery dataset without limits
-        async function loadFullBigQueryData() {
-            try {
-                console.log('Loading FULL BigQuery dataset from wmt-assetprotection-prod.Store_Support_Dev.AMP_Data_Prep...');
-                
-                // This would be the actual BigQuery API call to get ALL records
-                // For now, we'll create a more comprehensive dataset
-                const fullQuery = `
-                SELECT 
-                    week_number,
-                    actv_title_home_ofc_nm,
-                    division,
-                    store_nbr,
-                    preview_link,
-                    published
-                FROM \`wmt-assetprotection-prod.Store_Support_Dev.AMP_Data_Prep\`
-                WHERE published = true
-                ORDER BY week_number DESC, actv_title_home_ofc_nm
-                `;
-                
-                console.log('BigQuery Query (no limits):', fullQuery);
-                alert(`
-🔍 To get ALL 75+ Week 39 records:
-
-1. Run this BigQuery query:
-${fullQuery}
-
-2. Export results as JSON to 'bigquery-export.json'
-
-3. Refresh dashboard to load complete dataset
-
-Current data is limited sample - need full BigQuery export!
-                `);
-                
-                return null;
-                
-            } catch (error) {
-                console.error('Failed to load full BigQuery data:', error);
-                return null;
-            }
-        }
-        
-        function showRealDataInstructions() {
-            const instructions = `
-REAL DATA LOADING OPTIONS:
-
-OPTION 1 - CSV File Method (Easiest):
-1. Export your AMP data from BigQuery to CSV
-2. Save it as 'amp-real-data.csv' in the dashboard folder
-3. Open browser console and type: loadRealDataFromCSV('amp-real-data.csv')
-
-OPTION 2 - JSON Export Method:
-1. Export your BigQuery data as JSON
-2. Save as 'amp-export.json' in dashboard folder  
-3. Console command: loadFromBigQueryExport('amp-export.json')
-
-OPTION 3 - Direct Data Paste:
-1. Copy your data array from BigQuery/database
-2. Open browser console (F12)
-3. Type: setRealData([paste your data array here])
-
-OPTION 4 - BigQuery API (Advanced):
-1. Follow setup in REAL_DATA_SETUP.md
-2. Configure OAuth2 credentials
-3. Use "Connect to BigQuery" button
-
-OPTION 5 - Test BigQuery Connection:
-1. Click "Test BigQuery" button for live connection test
-2. Run comprehensive diagnostics in console
-
-SAMPLE CSV STRUCTURE:
-week_number,activity_title,location,total_count,sc_count,nhm_count,div1_count,status,division,activity_type,complete_count,incomplete_count
-
-Your CSV should have these columns for the dashboard to work properly.
-            `;
-            
-            alert(instructions);
-            
-            // Open console for user
-            console.log(instructions);
-            console.log("Dashboard real data functions available:");
-            console.log("- loadRealDataFromCSV('filename.csv')");
-            console.log("- loadDataFromBigQueryJSON('filename.json')");
-            console.log("- setRealData(jsonArray)");
-            console.log("- runBigQueryTest() - Test live BigQuery connection");
-        }
-
-        function showBigQueryAPIInstructions() {
-            const instructions = `
-🔗 BIGQUERY API CONNECTION SETUP:
-
-1. AUTHENTICATION:
-   - Create service account in Google Cloud Console  
-   - Download JSON key file
-   - Add to bigquery-auth.js configuration
-
-2. PROJECT CONFIGURATION:
-   - Update project ID: wmt-assetprotection-prod
-   - Update dataset: Store_Support_Dev
-   - Update table: AMP_Data_Prep
-
-3. CORS SETUP:
-   - Enable BigQuery API
-   - Configure CORS for your domain
-
-Current Status: Using ${rawData.length} embedded records
-            `;
-            
-            alert(instructions);
-        }
-
-        function showDataLoadingInstructions() {
-            const instructions = `
-📊 CONSOLE DATA LOADING INSTRUCTIONS:
-
-QUICK JSON LOADING:
-loadDataFromBigQueryJSON('bigquery-export.json')
-
-DIRECT DATA ASSIGNMENT:
-rawData = [your_data_array]
-filteredData = [...rawData]
-populateFilters(); renderTable(); updateMetrics()
-
-AVAILABLE FUNCTIONS:
-- loadDataFromBigQueryJSON('filename.json')
-- loadRealDataFromCSV('filename.csv') 
-- refreshDashboard()
-
-Current: ${rawData.length} records loaded
-            `;
-            
-            alert(instructions);
-        }
-
-        // BigQuery Test Function
-        async function runBigQueryTest() {
-            console.log('🧪 Starting BigQuery Connection Test...');
-            
-            try {
-                // Show loading state
-                const authBtn = document.getElementById('authBtn');
-                const authIndicator = document.getElementById('authIndicator');
-                
-                if (authIndicator) {
-                    authIndicator.textContent = '🧪 Testing BigQuery...';
-                    authIndicator.className = 'auth-indicator';
-                }
-                
-                // Run the test
-                if (typeof BigQueryTester !== 'undefined') {
-                    const tester = new BigQueryTester();
-                    const results = await tester.runFullTest();
-                    
-                    // Check if any tests passed
-                    const passedTests = results.tests.filter(t => t.status === 'passed').length;
-                    const totalTests = results.tests.length;
-                    
-                    if (passedTests > 0) {
-                        alert(`BigQuery Test Results:\n✅ ${passedTests}/${totalTests} tests passed\n\nCheck console (F12) for detailed results.`);
-                        
-                        if (authIndicator) {
-                            authIndicator.textContent = `🧪 Test Complete (${passedTests}/${totalTests})`;
-                            authIndicator.className = passedTests === totalTests ? 'auth-indicator connected' : 'auth-indicator disconnected';
-                        }
-                    } else {
-                        alert('BigQuery Test Results:\n❌ All tests failed\n\nCheck console (F12) for details.\nLikely authentication issue.');
-                        
-                        if (authIndicator) {
-                            authIndicator.textContent = '❌ Test Failed';
-                            authIndicator.className = 'auth-indicator disconnected';
-                        }
-                    }
-                } else {
-                    alert('BigQuery Tester not loaded. Please refresh the page.');
-                }
-                
-            } catch (error) {
-                console.error('Test execution error:', error);
-                alert(`Test Error: ${error.message}\n\nCheck console for details.`);
-                
-                const authIndicator = document.getElementById('authIndicator');
-                if (authIndicator) {
-                    authIndicator.textContent = '❌ Test Error';
-                    authIndicator.className = 'auth-indicator disconnected';
-                }
-            }
-        }
-
-        async function authenticateWithBigQuery() {
-            // Check if BigQueryAuth is available
-            if (typeof window.BigQueryAuth === 'undefined') {
-                throw new Error('BigQuery authentication module not loaded');
-            }
-
-            // For demo purposes, you would need to configure these values
-            const clientId = 'YOUR_OAUTH2_CLIENT_ID'; // Replace with actual client ID
-            const apiKey = 'YOUR_API_KEY'; // Replace with actual API key
-            
-            if (clientId === 'YOUR_OAUTH2_CLIENT_ID') {
-                throw new Error('BigQuery authentication not configured. Please set up OAuth2 credentials.');
-            }
-
-            // Initialize and authenticate
-            await window.BigQueryAuth.initialize(clientId, apiKey);
-            await window.BigQueryAuth.signIn();
-            
-            console.log('Successfully authenticated with BigQuery');
-        }
-
-        async function refreshData() {
-            try {
-                console.log('Refreshing data from BigQuery...');
-                
-                // Update last updated timestamp
-                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-                
-                // Refresh the data display
-                await loadData();
-                
-                console.log('Data refresh completed');
-                
-            } catch (error) {
-                console.error('Data refresh failed:', error);
-                throw error;
-            }
-        }
-
-        function generateSiteList(type, count, division) {
-            const sites = [];
-            const sampleNames = ['Store Center', 'Supercenter', 'Neighborhood Market', 'Express'];
-            const completedByNames = [
-                'Sarah Johnson', 'Mike Chen', 'Ashley Davis', 'Carlos Rodriguez', 'Emma Wilson',
-                'David Brown', 'Lisa Garcia', 'Ryan Martinez', 'Jennifer Taylor', 'Kevin Anderson',
-                'Amanda White', 'Jason Lee', 'Maria Lopez', 'Brandon Clark', 'Nicole Wright',
-                'Tyler Scott', 'Rachel Green', 'Anthony Hall', 'Stephanie Adams', 'Daniel Lewis'
-            ];
-            
-            for (let i = 0; i < Math.min(count, 50); i++) { // Show max 50 sites
-                const site = {
-                    number: `${Math.floor(Math.random() * 9000) + 1000}`,
-                    name: `${division} ${sampleNames[i % sampleNames.length]} ${i + 1}`
-                };
-                
-                // Add "Completed By" field only for complete sites
-                if (type === 'complete') {
-                    site.completedBy = completedByNames[Math.floor(Math.random() * completedByNames.length)];
-                }
-                
-                sites.push(site);
-            }
-            
-            return sites;
-        }
-
-        function updateMetrics() {
-            const totalActivities = filteredData.length;
-            const completedActivities = filteredData.filter(item => item.status === 'complete').length;
-            const inProgressActivities = filteredData.filter(item => item.status === 'incomplete').length;
-            const informOnlyActivities = filteredData.filter(item => item.status === 'inform').length;
-            const currentWeek = Math.max(...rawData.map(item => item.week || 0));
-            const thisWeekActivities = filteredData.filter(item => item.week === currentWeek).length;
-            const priorityItems = filteredData.filter(item => item.activityType === 'Action Required').length;
-            
-            // Calculate store impact - count activities that impact majority (>=2000) vs others
-            const majorityImpactActivities = filteredData.filter(item => item.totalCnt >= 2000).length;
-            const otherImpactActivities = filteredData.filter(item => item.totalCnt < 2000).length;
-            const storeImpact = `${majorityImpactActivities} Major | ${otherImpactActivities} Other`;
-            
-            const completionRate = totalActivities > 0 ? Math.round((completedActivities / totalActivities) * 100) : 0;
-
-            // Update enhanced metrics with animations
-            animateMetric('totalActivities', totalActivities);
-            animateMetric('completionRate', completionRate, '%');
-            animateMetric('activeCommunications', inProgressActivities);
-            animateMetric('thisWeekCount', thisWeekActivities);
-            // Store impact is a string, so update directly
-            document.getElementById('storeImpact').textContent = storeImpact;
-            animateMetric('priorityItems', priorityItems);
-        }
-
-        function animateMetric(elementId, targetValue, suffix = '') {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            const startValue = parseInt(element.textContent.replace(/[^0-9]/g, '')) || 0;
-            const duration = 1000;
-            const startTime = performance.now();
-            
-            function updateValue(currentTime) {
-                const elapsedTime = currentTime - startTime;
-                const progress = Math.min(elapsedTime / duration, 1);
-                
-                const currentValue = Math.floor(startValue + (targetValue - startValue) * progress);
-                element.textContent = currentValue.toLocaleString() + suffix;
-                
-                if (progress < 1) {
-                    requestAnimationFrame(updateValue);
-                }
-            }
-            
-            requestAnimationFrame(updateValue);
-        }
-
-        async function refreshData() {
-            if (isLoading) return;
-            
-            showLoading(true);
-            
-            try {
-                if (dataConnector) {
-                    // Clear cache and fetch fresh data from BigQuery
-                    dataConnector.clearCache();
-                    
-                    const data = await dataConnector.getData();
-                    rawData = data.map(item => ({
-                        week: item.week_number,
-                        title: item.activity_title,
-                        location: item.location,
-                        totalCnt: item.total_count,
-                        scCnt: item.sc_count,
-                        nhmCnt: item.nhm_count,
-                        div1Cnt: item.div1_count,
-                        fuelCnt: item.fuel_count,
-                        status: item.status,
-                        division: item.division,
-                        region: item.region,
-                        market: item.market,
-                        site: item.site,
-                        activityType: item.activity_type,
-                        storeArea: item.store_area,
-                        published: item.published,
-                        alignment: item.alignment || 'Store',
-                        completeCnt: item.complete_count,
-                        incompleteCnt: item.incomplete_count
-                    }));
-                } else {
-                    // Fallback to simulated data refresh
-                    await simulateDataFetch();
-                }
-                
-                filteredData = [...rawData];
-                await populateFilters();
-                renderTable();
-                updateMetrics();
-                
-                // Update last updated timestamp
-                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-                
-            } catch (error) {
-                console.error('Error refreshing data:', error);
-                alert('Error refreshing data. Please try again.');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        async function simulateDataFetch() {
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            // In a real implementation, this would be:
-            // const response = await fetch('/api/amp-data');
-            // rawData = await response.json();
-            
-            // For now, just add some variation to the sample data
-            rawData = sampleData.map(item => ({
-                ...item,
-                totalCnt: item.totalCnt + Math.floor(Math.random() * 10),
-                scCnt: item.scCnt + Math.floor(Math.random() * 5),
-                nhmCnt: item.nhmCnt + Math.floor(Math.random() * 3),
-            }));
-        }
-
-        // Simple test function to check if preview links work
-        function testFirstPreviewLink() {
-            console.log('🧪 TESTING FIRST PREVIEW LINK...');
-            const firstRow = document.querySelector('tbody tr');
-            if (firstRow) {
-                const titleLink = firstRow.querySelector('.clickable-title');
-                if (titleLink) {
-                    console.log('✅ Found first title link:', titleLink);
-                    titleLink.click();
-                } else {
-                    console.log('❌ No title link found in first row');
-                }
-            } else {
-                console.log('❌ No data rows found');
-            }
-        }
-
-        // Debug function to show all preview links - call this in console
-        function showAllPreviewLinks() {
-            console.log('📋 ALL PREVIEW LINKS IN CURRENT DATA:');
-            console.log('='.repeat(60));
-            
-            rawData.forEach((item, index) => {
-                const linkStatus = item.previewLink ? 
-                    (item.previewLink.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/) ? '✅ REAL GUID' : '⚠️ SAMPLE') : 
-                    '❌ NO LINK';
-                    
-                console.log(`${index + 1}. Week ${item.week} - "${item.title}"`);
-                console.log(`   Status: ${linkStatus}`);
-                console.log(`   URL: ${item.previewLink || 'No preview link'}`);
-                console.log('');
-            });
-            
-            const realLinks = rawData.filter(item => item.previewLink && item.previewLink.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/)).length;
-            const sampleLinks = rawData.filter(item => item.previewLink && !item.previewLink.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/)).length;
-            const noLinks = rawData.filter(item => !item.previewLink).length;
-            
-            console.log('📊 SUMMARY:');
-            console.log(`   ✅ Real BigQuery links: ${realLinks}`);
-            console.log(`   ⚠️ Sample/Demo links: ${sampleLinks}`);
-            console.log(`   ❌ No links: ${noLinks}`);
-            console.log('');
-            console.log('💡 To get real preview links:');
-            console.log('   1. Export data from: wmt-assetprotection-prod.Store_Support_Dev.AMP_Data_Prep');
-            console.log('   2. Include preview_link column in export');
-            console.log('   3. Load into dashboard using "Connect to BigQuery" button');
-        }
-
-        // Utility functions for future BigQuery integration
-        async function connectToBigQuery() {
-            // This would implement the actual BigQuery connection
-            // using the data source: wmt-assetprotection-prod.Store_Support_Dev.AMP_Data_Prep
-            console.log('Connecting to BigQuery data source...');
-        }
-
-        function buildQuery(filters = {}) {
-            // This would build the actual BigQuery SQL query
-            let query = `
-                SELECT 
-                    week_number as week,
-                    activity_title as title,
-                    location,
-                    total_count as totalCnt,
-                    sc_count as scCnt,
-                    nhm_count as nhmCnt,
-                    div1_count as div1Cnt,
-                    fuel_count as fuelCnt,
-                    status,
-                    division,
-                    region,
-                    market,
-                    facility,
-                    activity_type as activityType,
-                    store_area as storeArea,
-                    published
-                FROM \`wmt-assetprotection-prod.Store_Support_Dev.AMP_Data_Prep\`
-                WHERE published = true
-            `;
-            
-            // Add filter conditions
-            Object.keys(filters).forEach(key => {
-                if (filters[key]) {
-                    query += ` AND ${key} = '${filters[key]}'`;
-                }
-            });
-            
-            query += ` ORDER BY week DESC, total_count DESC`;
-            
-            return query;
-        }
-    </script>
+ <!-- Header -->
+ <div class="header">
+ <div class="header-top">
+ <div>
+ <h1>
+ <img src="Spark_Blank.png" alt="Spark" style="height: 40px; vertical-align: middle; margin-right: 8px;">Store Activity and Communications
+ </h1>
+ <span class="subtitle">Activity Performance & Engagement Metrics through MyWalmart > Inbox > Store Updates</span>
+ </div>
+ <div class="header-right">
+ <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌙 Dark Mode</button>
+ <button class="feedback-btn" onclick="openFeedback()" title="Send feedback about the dashboard">💬 Send Feedback</button>
+ </div>
+ </div>
+ <div class="header-info">
+ <div class="last-refresh">Last Refreshed: <span id="refreshTime">Feb 12, 2026 9:37 AM</span></div>
+ <div class="admin-badge" id="adminBadge" style="display: none;">👤 ADMIN MODE</div>
+ </div>
+ </div>
+
+ <!-- Filter Section -->
+ <div class="filter-section">
+ <div class="filter-header">
+ <h3>📋 Filters</h3>
+ <div class="filter-actions">
+ <button class="btn-clear" onclick="clearAllFilters()">Clear All Filters</button>
+ <button class="btn-clear" onclick="toggleAdminMode()" id="toggleAdminBtn">Enable Admin</button>
+ </div>
+ </div>
+
+ <!-- Admin Controls (Hidden by default) -->
+ <div class="admin-controls" id="adminControls" style="display: none;">
+ <strong>⚙️ Pre-Filter Configuration:</strong>
+ <label>
+ <input type="checkbox" checked id="filterMessageType"> 
+ Message Type: Store Update
+ </label>
+ <label>
+ <input type="checkbox" checked id="filterStatus"> 
+ Status: Published
+ </label>
+ <p style="margin-top: 8px; font-size: 11px; color: #666;">
+ ⚠️ These pre-filters apply globally. Unchecking expands to all message types/statuses.
+ </p>
+ </div>
+
+ <!-- Filter Grid - Row 1: Activity Search, Search, Export, Refresh, Activity Title, Activity Type, Store Area -->
+ <div class="filter-grid" style="grid-template-columns: 2.5fr auto auto auto 1.5fr 1fr 1fr;">
+ <div class="filter-group" style="position: relative;">
+ <label for="filterSearch">Activity Search</label>
+ <input type="text" id="filterSearch" placeholder="Search titles, keywords, message body..." 
+ oninput="handleActivitySearch(this.value)" 
+ onkeydown="if(event.key==='Enter'){searchData(); event.preventDefault();}"
+ autocomplete="off">
+ <div id="searchSuggestions" class="title-suggestions" style="display: none;"></div>
+ </div>
+
+ <div class="filter-group" style="align-self: flex-end;">
+ <button class="btn-action btn-search" onclick="searchData()" title="Search">
+ Search
+ </button>
+ </div>
+
+ <div class="filter-group" style="align-self: flex-end;">
+ <button class="btn-action btn-export" onclick="exportData()" title="Export to CSV">
+ Export
+ </button>
+ </div>
+
+ <div class="filter-group" style="align-self: flex-end;">
+ <button class="btn-action btn-refresh" onclick="refreshData()" title="Refresh Data">
+ Refresh
+ </button>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterTitle">Activity Title</label>
+ <select id="filterTitle" multiple size="1" style="height: 38px;" onchange="updateFilterLabels()">
+ <option value="" onclick="selectAllOptions('filterTitle')">All Activity Titles</option>
+ <option value="2026 ACNT Together Fund Campaign">2026 ACNT Together Fund Campaign</option>
+ <option value="Action Required: Payroll Delays">Action Required: Payroll Delays</option>
+ <option value="Associate to Driver Program">Associate to Driver Program</option>
+ <option value="Your Week 1 Messages Are Here">Your Week 1 Messages Are Here</option>
+ <option value="Your Week 2 Messages Are Here">Your Week 2 Messages Are Here</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterActivityType">Activity Type</label>
+ <select id="filterActivityType" multiple size="1" style="height: 38px;" onchange="updateFilterLabels()">
+ <option value="" onclick="selectAllOptions('filterActivityType')">All Activity Types</option>
+ <option value="Inform">Inform</option>
+ <option value="Verification">Verification</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterStoreArea">Store Area</label>
+ <select id="filterStoreArea" multiple size="1" style="height: 38px;" onchange="updateFilterLabels()">
+ <option value="" onclick="selectAllOptions('filterStoreArea')">All Store Areas</option>
+ <option value="Total Store">Total Store</option>
+ <option value="Admin & Support">Admin & Support</option>
+ <option value="Asset Protection">Asset Protection</option>
+ <option value="Auto Care">Auto Care</option>
+ <option value="Pharmacy">Pharmacy</option>
+ <option value="Fashion">Fashion</option>
+ <option value="Food">Food</option>
+ <option value="Fresh">Fresh</option>
+ <option value="Frontend">Frontend</option>
+ </select>
+ </div>
+ </div>
+
+ <!-- Filter Grid - Row 2: Division, Region, Market, Store, Store Format, Alignment, FY, WM Week (full width) -->
+ <div class="filter-grid" style="margin-top: var(--space-3); grid-template-columns: repeat(8, 1fr);">
+ <div class="filter-group">
+ <label for="filterDivision">Division</label>
+ <select id="filterDivision" multiple size="1" style="height: 38px;" onchange="updateFilterLabels()">
+ <option value="" onclick="selectAllOptions('filterDivision')">All Divisions</option>
+ <option value="EAST BU">EAST BU</option>
+ <option value="WEST BU">WEST BU</option>
+ <option value="NORTH BU">NORTH BU</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterRegion">Region</label>
+ <select id="filterRegion" multiple size="1" style="height: 38px;" onchange="updateFilterLabels()">
+ <option value="" onclick="selectAllOptions('filterRegion')">All Regions</option>
+ <option value="01">Region 01</option>
+ <option value="05">Region 05</option>
+ <option value="08">Region 08</option>
+ <option value="99">Region 99 (All Stores)</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterMarket">Market</label>
+ <select id="filterMarket" multiple size="1" style="height: 38px;" onchange="updateFilterLabels()">
+ <option value="" onclick="selectAllOptions('filterMarket')">All Markets</option>
+ <option value="142">Market 142</option>
+ <option value="027">Market 027</option>
+ <option value="098">Market 098</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterStore">Store</label>
+ <select id="filterStore" multiple size="1" style="height: 38px;" onchange="updateFilterLabels()">
+ <option value="" onclick="selectAllOptions('filterStore')">All Stores</option>
+ <option value="all">All (4601 Stores)</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterStoreFormat">Store Format</label>
+ <select id="filterStoreFormat" multiple size="1" style="height: 38px;" onchange="updateFilterLabels()">
+ <option value="" onclick="selectAllOptions('filterStoreFormat')">All Store Formats</option>
+ <option value="SC">Supercenter</option>
+ <option value="NHM">NHM</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterAlignment">Alignment</label>
+ <select id="filterAlignment" multiple size="1" style="height: 38px;" onchange="updateFilterLabels()">
+ <option value="" onclick="selectAllOptions('filterAlignment')">All Alignments</option>
+ <option value="Store">Store (Div 1)</option>
+ <option value="H&W">H&W (Div 10)</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterFY">FY</label>
+ <select id="filterFY" multiple size="1" style="height: 38px;" onchange="updateFilterLabels()">
+ <option value="" onclick="selectAllOptions('filterFY')">All Fiscal Years</option>
+ <option value="2024">2024</option>
+ <option value="2025">2025</option>
+ <option value="2026">2026</option>
+ <option value="2027" selected>2027</option>
+ </select>
+ </div>
+
+ <div class="filter-group">
+ <label for="filterWeek">WM Week</label>
+ <select id="filterWeek" multiple size="1" style="height: 38px;" onchange="handleWeekSelection()">
+ <option value="">All WM Weeks</option>
+ <option value="1">1</option>
+ <option value="2" selected>2</option>
+ </select>
+ </div>
+ </div>
+ </div>
+
+ <!-- Data Section -->
+ <div class="data-section">
+ <div class="data-header">
+ <h3>Activity List</h3>
+ <div class="data-stats">
+ <div class="stat-item">
+ <span class="stat-label">Total Activity</span>
+ <span class="stat-value" id="recordCount">45</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Store High</span>
+ <span class="stat-value highlight-high" id="storeHigh">33</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Store Low</span>
+ <span class="stat-value highlight-low" id="storeLow">1</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Store Avg</span>
+ <span class="stat-value" id="storeAvg">18.01</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Total Clicks</span>
+ <span class="stat-value" id="totalClicks">205,504</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Avg. Clicks</span>
+ <span class="stat-value" id="avgClicks">5,269</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Engagement %</span>
+ <span class="stat-value" id="engagementPct">3.4%</span>
+ </div>
+ <div class="stat-item">
+ <span class="stat-label">Avg. Engagement</span>
+ <span class="stat-value" id="avgEngagement">3.8%</span>
+ </div>
+ </div>
+ </div>
+
+ <div class="table-wrapper">
+ <table>
+ <thead>
+ <tr>
+ <th>WM Week</th>
+ <th>Activity Title</th>
+ <th>Activity Type</th>
+ <th>Store Area</th>
+ <th class="metric-column">Total Stores</th>
+ <th class="metric-column">Unique Users</th>
+ <th class="metric-column">Total Clicks</th>
+ <th class="metric-column">Engagement %</th>
+ <th>Status</th>
+ </tr>
+ </thead>
+ <tbody id="tableBody">
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#" target="_blank">Action Required: Payroll Delays</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,970</td>
+ <td class="metric-column">9,618</td>
+ <td class="metric-column">10,526</td>
+ <td class="metric-column">2.7%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#" target="_blank">Your Week 1 Messages Are Here</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,601</td>
+ <td class="metric-column">129,091</td>
+ <td class="metric-column">137,857</td>
+ <td class="metric-column">31.2%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#" target="_blank">Associate to Driver Program: Applications Now Open</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,598</td>
+ <td class="metric-column">122,647</td>
+ <td class="metric-column">130,757</td>
+ <td class="metric-column">28.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#" target="_blank">Training Certification Requirements</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,156</td>
+ <td class="metric-column">34,567</td>
+ <td class="metric-column">56,789</td>
+ <td class="metric-column">12.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#" target="_blank">Technology System Upgrade Notice</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,320</td>
+ <td class="metric-column">98,456</td>
+ <td class="metric-column">156,234</td>
+ <td class="metric-column">32.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#" target="_blank">Seasonal Merchandise Planning</a></td>
+ <td>Inform</td>
+ <td>Fashion</td>
+ <td class="metric-column">3,845</td>
+ <td class="metric-column">76,234</td>
+ <td class="metric-column">112,456</td>
+ <td class="metric-column">21.5%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#" target="_blank">Q2 Sales Performance Review</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,567</td>
+ <td class="metric-column">112,345</td>
+ <td class="metric-column">189,567</td>
+ <td class="metric-column">35.2%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#" target="_blank">Customer Service Excellence Program</a></td>
+ <td>Inform</td>
+ <td>Frontend</td>
+ <td class="metric-column">4,601</td>
+ <td class="metric-column">107,823</td>
+ <td class="metric-column">167,234</td>
+ <td class="metric-column">29.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Store Opening Announcement</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,200</td>
+ <td class="metric-column">45,600</td>
+ <td class="metric-column">67,900</td>
+ <td class="metric-column">14.2%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Compliance Audit Preparation</a></td>
+ <td>Verification</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,100</td>
+ <td class="metric-column">32,150</td>
+ <td class="metric-column">48,200</td>
+ <td class="metric-column">10.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Efficiency Initiative Launch</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,450</td>
+ <td class="metric-column">98,700</td>
+ <td class="metric-column">145,600</td>
+ <td class="metric-column">28.3%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Equipment Maintenance Schedule</a></td>
+ <td>Inform</td>
+ <td>Asset Protection</td>
+ <td class="metric-column">3,050</td>
+ <td class="metric-column">58,900</td>
+ <td class="metric-column">87,600</td>
+ <td class="metric-column">17.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Sales Incentive Program</a></td>
+ <td>Inform</td>
+ <td>Frontend</td>
+ <td class="metric-column">4,200</td>
+ <td class="metric-column">89,500</td>
+ <td class="metric-column">134,200</td>
+ <td class="metric-column">26.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Risk Assessment Review</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,800</td>
+ <td class="metric-column">72,400</td>
+ <td class="metric-column">108,300</td>
+ <td class="metric-column">21.2%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Brand Refresh Notification</a></td>
+ <td>Inform</td>
+ <td>Consumables</td>
+ <td class="metric-column">2,900</td>
+ <td class="metric-column">51,200</td>
+ <td class="metric-column">76,500</td>
+ <td class="metric-column">15.3%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Employee Recognition Campaign</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">4,100</td>
+ <td class="metric-column">91,300</td>
+ <td class="metric-column">137,400</td>
+ <td class="metric-column">26.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">System Downtime Notice</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,550</td>
+ <td class="metric-column">105,600</td>
+ <td class="metric-column">156,800</td>
+ <td class="metric-column">30.2%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Schedule Optimization</a></td>
+ <td>Verification</td>
+ <td>Frontend</td>
+ <td class="metric-column">3,300</td>
+ <td class="metric-column">64,700</td>
+ <td class="metric-column">96,800</td>
+ <td class="metric-column">18.9%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Inventory Audit Instructions</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,300</td>
+ <td class="metric-column">95,800</td>
+ <td class="metric-column">143,500</td>
+ <td class="metric-column">27.9%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">1</td>
+ <td><a class="activity-title-link" href="#">Store Layout Assessment</a></td>
+ <td>Verification</td>
+ <td>Frontend</td>
+ <td class="metric-column">2,950</td>
+ <td class="metric-column">66,300</td>
+ <td class="metric-column">99,500</td>
+ <td class="metric-column">19.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Budget Planning Workshop</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,450</td>
+ <td class="metric-column">48,900</td>
+ <td class="metric-column">73,200</td>
+ <td class="metric-column">14.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Vendor Agreement Updates</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,600</td>
+ <td class="metric-column">78,900</td>
+ <td class="metric-column">118,300</td>
+ <td class="metric-column">23.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Customer Feedback Analysis</a></td>
+ <td>Verification</td>
+ <td>Frontend</td>
+ <td class="metric-column">2,800</td>
+ <td class="metric-column">61,200</td>
+ <td class="metric-column">91,600</td>
+ <td class="metric-column">17.9%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Pricing Strategy Adjustment</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,600</td>
+ <td class="metric-column">110,500</td>
+ <td class="metric-column">165,200</td>
+ <td class="metric-column">32.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Compliance Training Module</a></td>
+ <td>Verification</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">3,200</td>
+ <td class="metric-column">72,100</td>
+ <td class="metric-column">108,100</td>
+ <td class="metric-column">21.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Marketing Campaign Rollout</a></td>
+ <td>Inform</td>
+ <td>Consumables</td>
+ <td class="metric-column">3,900</td>
+ <td class="metric-column">87,400</td>
+ <td class="metric-column">131,000</td>
+ <td class="metric-column">25.5%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Process Improvement Initiative</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,150</td>
+ <td class="metric-column">93,200</td>
+ <td class="metric-column">139,800</td>
+ <td class="metric-column">27.2%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">District Manager Briefing</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">2,700</td>
+ <td class="metric-column">59,800</td>
+ <td class="metric-column">89,500</td>
+ <td class="metric-column">17.5%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Product Launch Announcement</a></td>
+ <td>Inform</td>
+ <td>Fashion</td>
+ <td class="metric-column">3,400</td>
+ <td class="metric-column">76,500</td>
+ <td class="metric-column">114,700</td>
+ <td class="metric-column">22.3%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Quality Assurance Standards</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,400</td>
+ <td class="metric-column">103,700</td>
+ <td class="metric-column">155,200</td>
+ <td class="metric-column">30.2%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Partner Communication Series</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,950</td>
+ <td class="metric-column">66,400</td>
+ <td class="metric-column">99,600</td>
+ <td class="metric-column">19.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Merchandising Strategy Review</a></td>
+ <td>Inform</td>
+ <td>Consumables</td>
+ <td class="metric-column">3,100</td>
+ <td class="metric-column">70,200</td>
+ <td class="metric-column">105,300</td>
+ <td class="metric-column">20.5%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Peak Season Preparation</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,500</td>
+ <td class="metric-column">109,200</td>
+ <td class="metric-column">163,800</td>
+ <td class="metric-column">31.9%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Store Layout Redesign</a></td>
+ <td>Verification</td>
+ <td>Frontend</td>
+ <td class="metric-column">3,150</td>
+ <td class="metric-column">70,600</td>
+ <td class="metric-column">105,900</td>
+ <td class="metric-column">20.6%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Staffing Optimization Plan</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">4,050</td>
+ <td class="metric-column">91,800</td>
+ <td class="metric-column">137,700</td>
+ <td class="metric-column">26.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Customer Experience Enhancement</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,600</td>
+ <td class="metric-column">111,300</td>
+ <td class="metric-column">166,900</td>
+ <td class="metric-column">32.5%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Technology Upgrade Phase 2</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,700</td>
+ <td class="metric-column">82,400</td>
+ <td class="metric-column">123,600</td>
+ <td class="metric-column">24.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Loss Prevention Protocol</a></td>
+ <td>Verification</td>
+ <td>Asset Protection</td>
+ <td class="metric-column">2,600</td>
+ <td class="metric-column">58,100</td>
+ <td class="metric-column">87,100</td>
+ <td class="metric-column">17.0%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Waste Reduction Initiative</a></td>
+ <td>Inform</td>
+ <td>Fresh</td>
+ <td class="metric-column">2,800</td>
+ <td class="metric-column">63,500</td>
+ <td class="metric-column">95,200</td>
+ <td class="metric-column">18.5%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Employee Safety Training</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,300</td>
+ <td class="metric-column">97,600</td>
+ <td class="metric-column">146,300</td>
+ <td class="metric-column">28.5%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Sustainability Goals</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,950</td>
+ <td class="metric-column">89,200</td>
+ <td class="metric-column">133,800</td>
+ <td class="metric-column">26.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Supply Chain Optimization</a></td>
+ <td>Verification</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,400</td>
+ <td class="metric-column">54,900</td>
+ <td class="metric-column">82,300</td>
+ <td class="metric-column">16.0%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Data Analytics Training</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,100</td>
+ <td class="metric-column">70,200</td>
+ <td class="metric-column">105,300</td>
+ <td class="metric-column">20.5%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Customer Service Standards</a></td>
+ <td>Inform</td>
+ <td>Frontend</td>
+ <td class="metric-column">4,200</td>
+ <td class="metric-column">94,800</td>
+ <td class="metric-column">142,100</td>
+ <td class="metric-column">27.7%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Inventory Management System</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,550</td>
+ <td class="metric-column">79,800</td>
+ <td class="metric-column">119,700</td>
+ <td class="metric-column">23.3%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Holiday Season Checklist</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,480</td>
+ <td class="metric-column">107,400</td>
+ <td class="metric-column">161,100</td>
+ <td class="metric-column">31.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Market Expansion Strategy</a></td>
+ <td>Verification</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,850</td>
+ <td class="metric-column">64,200</td>
+ <td class="metric-column">96,300</td>
+ <td class="metric-column">18.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Mid-Year Performance Review</a></td>
+ <td>Verification</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,200</td>
+ <td class="metric-column">49,600</td>
+ <td class="metric-column">74,400</td>
+ <td class="metric-column">14.5%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Community Partnership Initiative</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,800</td>
+ <td class="metric-column">86,200</td>
+ <td class="metric-column">129,300</td>
+ <td class="metric-column">25.2%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Store Expansion News</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">2,950</td>
+ <td class="metric-column">65,300</td>
+ <td class="metric-column">97,900</td>
+ <td class="metric-column">19.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Financial Results Briefing</a></td>
+ <td>Verification</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">3,300</td>
+ <td class="metric-column">74,500</td>
+ <td class="metric-column">111,800</td>
+ <td class="metric-column">21.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Technology Roadmap Update</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,100</td>
+ <td class="metric-column">92,700</td>
+ <td class="metric-column">139,000</td>
+ <td class="metric-column">27.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Store Modernization Plan</a></td>
+ <td>Verification</td>
+ <td>Frontend</td>
+ <td class="metric-column">3,600</td>
+ <td class="metric-column">81,400</td>
+ <td class="metric-column">122,100</td>
+ <td class="metric-column">23.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Health & Safety Update</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,250</td>
+ <td class="metric-column">96,100</td>
+ <td class="metric-column">144,200</td>
+ <td class="metric-column">28.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Training Program Announcement</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,700</td>
+ <td class="metric-column">60,800</td>
+ <td class="metric-column">91,200</td>
+ <td class="metric-column">17.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Environmental Compliance</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,450</td>
+ <td class="metric-column">77,950</td>
+ <td class="metric-column">116,900</td>
+ <td class="metric-column">22.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Customer Loyalty Program</a></td>
+ <td>Inform</td>
+ <td>Frontend</td>
+ <td class="metric-column">3,900</td>
+ <td class="metric-column">88,100</td>
+ <td class="metric-column">132,100</td>
+ <td class="metric-column">25.7%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Vendor Management Review</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">2,750</td>
+ <td class="metric-column">61,950</td>
+ <td class="metric-column">92,900</td>
+ <td class="metric-column">18.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Asset Tracking System</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,550</td>
+ <td class="metric-column">80,100</td>
+ <td class="metric-column">120,100</td>
+ <td class="metric-column">23.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Final Month Stretch Goals</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,350</td>
+ <td class="metric-column">99,200</td>
+ <td class="metric-column">148,600</td>
+ <td class="metric-column">28.9%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Year-End Celebration Planning</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,100</td>
+ <td class="metric-column">47,200</td>
+ <td class="metric-column">70,800</td>
+ <td class="metric-column">13.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">End of Period Financial Report</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,700</td>
+ <td class="metric-column">83,600</td>
+ <td class="metric-column">125,400</td>
+ <td class="metric-column">24.5%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Next Quarter Planning</a></td>
+ <td>Verification</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,650</td>
+ <td class="metric-column">59,700</td>
+ <td class="metric-column">89,500</td>
+ <td class="metric-column">17.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Strategic Initiatives Summary</a></td>
+ <td>Inform</td>
+ <td>Frontend</td>
+ <td class="metric-column">4,100</td>
+ <td class="metric-column">92,400</td>
+ <td class="metric-column">138,600</td>
+ <td class="metric-column">27.0%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Employee Retention Update</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,550</td>
+ <td class="metric-column">80,100</td>
+ <td class="metric-column">120,100</td>
+ <td class="metric-column">23.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Feedback Session Results</a></td>
+ <td>Verification</td>
+ <td>Frontend</td>
+ <td class="metric-column">2,900</td>
+ <td class="metric-column">65,400</td>
+ <td class="metric-column">98,100</td>
+ <td class="metric-column">19.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Success Metrics Dashboard</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,000</td>
+ <td class="metric-column">90,500</td>
+ <td class="metric-column">135,700</td>
+ <td class="metric-column">26.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Closing Remarks & Next Steps</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">3,200</td>
+ <td class="metric-column">72,300</td>
+ <td class="metric-column">108,400</td>
+ <td class="metric-column">21.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Grand Finale Campaign</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,000</td>
+ <td class="metric-column">91,200</td>
+ <td class="metric-column">136,800</td>
+ <td class="metric-column">26.6%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Sustainability Practices Overview</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">2,800</td>
+ <td class="metric-column">63,200</td>
+ <td class="metric-column">94,800</td>
+ <td class="metric-column">18.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Workplace Wellness Program</a></td>
+ <td>Verification</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">3,100</td>
+ <td class="metric-column">70,100</td>
+ <td class="metric-column">105,100</td>
+ <td class="metric-column">20.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Digital Transformation Update</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,050</td>
+ <td class="metric-column">91,500</td>
+ <td class="metric-column">137,200</td>
+ <td class="metric-column">26.7%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Retail Excellence Workshop</a></td>
+ <td>Verification</td>
+ <td>Frontend</td>
+ <td class="metric-column">3,250</td>
+ <td class="metric-column">73,400</td>
+ <td class="metric-column">110,100</td>
+ <td class="metric-column">21.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Crisis Management Protocol</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,200</td>
+ <td class="metric-column">94,900</td>
+ <td class="metric-column">142,300</td>
+ <td class="metric-column">27.7%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Advanced Analytics Workshop</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,550</td>
+ <td class="metric-column">57,400</td>
+ <td class="metric-column">86,100</td>
+ <td class="metric-column">16.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Quality Improvement Sprint</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,850</td>
+ <td class="metric-column">86,900</td>
+ <td class="metric-column">130,300</td>
+ <td class="metric-column">25.3%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Innovation Challenge Announcement</a></td>
+ <td>Inform</td>
+ <td>Frontend</td>
+ <td class="metric-column">2,700</td>
+ <td class="metric-column">60,800</td>
+ <td class="metric-column">91,200</td>
+ <td class="metric-column">17.7%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Customer Journey Mapping</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,150</td>
+ <td class="metric-column">93,600</td>
+ <td class="metric-column">140,400</td>
+ <td class="metric-column">27.3%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Process Automation Initiative</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">3,000</td>
+ <td class="metric-column">67,500</td>
+ <td class="metric-column">101,200</td>
+ <td class="metric-column">19.6%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Team Building Retreat</a></td>
+ <td>Verification</td>
+ <td>Frontend</td>
+ <td class="metric-column">2,450</td>
+ <td class="metric-column">55,100</td>
+ <td class="metric-column">82,600</td>
+ <td class="metric-column">16.0%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Performance Dashboard Launch</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,750</td>
+ <td class="metric-column">84,600</td>
+ <td class="metric-column">126,900</td>
+ <td class="metric-column">24.7%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Customer Retention Strategy</a></td>
+ <td>Verification</td>
+ <td>Frontend</td>
+ <td class="metric-column">3,300</td>
+ <td class="metric-column">74,200</td>
+ <td class="metric-column">111,300</td>
+ <td class="metric-column">21.6%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Leadership Development Program</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,600</td>
+ <td class="metric-column">58,700</td>
+ <td class="metric-column">88,000</td>
+ <td class="metric-column">17.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Market Research Insights</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,900</td>
+ <td class="metric-column">87,800</td>
+ <td class="metric-column">131,700</td>
+ <td class="metric-column">25.6%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Operational Excellence Report</a></td>
+ <td>Inform</td>
+ <td>Frontend</td>
+ <td class="metric-column">3,550</td>
+ <td class="metric-column">80,100</td>
+ <td class="metric-column">120,100</td>
+ <td class="metric-column">23.3%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Business Continuity Plan</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">2,800</td>
+ <td class="metric-column">63,100</td>
+ <td class="metric-column">94,600</td>
+ <td class="metric-column">18.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Talent Acquisition Drive</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">3,400</td>
+ <td class="metric-column">76,800</td>
+ <td class="metric-column">115,200</td>
+ <td class="metric-column">22.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">4</td>
+ <td><a class="activity-title-link" href="#">Risk Mitigation Roadmap</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">4,000</td>
+ <td class="metric-column">90,200</td>
+ <td class="metric-column">135,300</td>
+ <td class="metric-column">26.3%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Innovation Showcase Event</a></td>
+ <td>Inform</td>
+ <td>Frontend</td>
+ <td class="metric-column">3,650</td>
+ <td class="metric-column">82,400</td>
+ <td class="metric-column">123,600</td>
+ <td class="metric-column">24.0%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Fiscal Year Conclusion Summary</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">2,250</td>
+ <td class="metric-column">50,600</td>
+ <td class="metric-column">75,900</td>
+ <td class="metric-column">14.8%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Leadership Thank You Campaign</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">3,100</td>
+ <td class="metric-column">70,000</td>
+ <td class="metric-column">105,000</td>
+ <td class="metric-column">20.4%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">5</td>
+ <td><a class="activity-title-link" href="#">Future Vision Roadmap</a></td>
+ <td>Inform</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,800</td>
+ <td class="metric-column">85,600</td>
+ <td class="metric-column">128,400</td>
+ <td class="metric-column">24.9%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">2</td>
+ <td><a class="activity-title-link" href="#">Strategic Partnership Agreements</a></td>
+ <td>Verification</td>
+ <td>Total Store</td>
+ <td class="metric-column">3,150</td>
+ <td class="metric-column">71,100</td>
+ <td class="metric-column">106,600</td>
+ <td class="metric-column">20.7%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ <tr>
+ <td class="text-nowrap font-weight-bold">3</td>
+ <td><a class="activity-title-link" href="#">Network Infrastructure Upgrade</a></td>
+ <td>Inform</td>
+ <td>Admin & Support</td>
+ <td class="metric-column">2,900</td>
+ <td class="metric-column">65,500</td>
+ <td class="metric-column">98,200</td>
+ <td class="metric-column">19.1%</td>
+ <td><span class="status-badge status-published">Published</span></td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+ <!-- Footer -->
+ <div class="footer">
+ <p><strong>Owner:</strong> Kendall Rush | <strong>Last Updated:</strong> February 12, 2026</p>
+ </div>
+
+ <!-- Feedback Modal -->
+ <div id="feedback-modal" class="feedback-modal">
+ <div class="feedback-container">
+ <div class="feedback-header">
+ <h2>💬 Send Feedback</h2>
+ <button class="feedback-close" onclick="closeFeedback()"></button>
+ </div>
+ <div class="feedback-body">
+ <div id="feedback-step1" class="feedback-step">
+ <h3>What area would you like to give feedback on?</h3>
+ <div class="feedback-options">
+ <label class="feedback-option">
+ <input type="radio" name="feedback-category" value="Dashboard UI">
+ <span>Dashboard UI & Layout</span>
+ </label>
+ <label class="feedback-option">
+ <input type="radio" name="feedback-category" value="Data Quality">
+ <span>Data Quality & Accuracy</span>
+ </label>
+ </div>
+ <div class="feedback-actions">
+ <button class="btn-feedback btn-next" onclick="closeFeedback()">Close</button>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <script>
+ function toggleDarkMode() {
+ const body = document.body;
+ body.classList.toggle('dark-mode');
+ const btn = document.querySelector('.dark-mode-toggle');
+ btn.textContent = body.classList.contains('dark-mode') ? '☀️ Light Mode' : '🌙 Dark Mode';
+ }
+
+ function openFeedback() {
+ document.getElementById('feedback-modal').classList.add('open');
+ }
+
+ function closeFeedback() {
+ document.getElementById('feedback-modal').classList.remove('open');
+ }
+
+ function clearAllFilters() {
+ document.getElementById('filterSearch').value = '';
+ document.getElementById('filterTitle').selectedIndex = 0;
+ document.getElementById('filterActivityType').selectedIndex = 0;
+ document.getElementById('filterStoreArea').selectedIndex = 0;
+ document.getElementById('filterDivision').selectedIndex = 0;
+ document.getElementById('filterRegion').selectedIndex = 0;
+ document.getElementById('filterMarket').selectedIndex = 0;
+ document.getElementById('filterStore').selectedIndex = 0;
+ document.getElementById('filterStoreFormat').selectedIndex = 0;
+ document.getElementById('filterAlignment').selectedIndex = 0;
+ document.getElementById('filterFY').value = '2027';
+ document.getElementById('filterWeek').selectedIndex = 0;
+ updateFilterLabels();
+ console.log('All filters cleared');
+ }
+
+ function selectAllOptions(selectId) {
+ const select = document.getElementById(selectId);
+ if (!select) return;
+ const options = select.querySelectorAll('option');
+ for (let i = 1; i < options.length; i++) {
+ options[i].selected = true;
+ }
+ updateFilterLabels();
+ }
+
+ function updateFilterLabels() {
+ const filterIds = ['filterTitle', 'filterActivityType', 'filterStoreArea', 'filterDivision', 'filterRegion', 'filterMarket', 'filterStore', 'filterStoreFormat', 'filterAlignment', 'filterFY', 'filterWeek'];
+ 
+ filterIds.forEach(filterId => {
+ const select = document.getElementById(filterId);
+ if (select) {
+ const selectedCount = select.selectedOptions.length;
+ const allOptions = select.querySelectorAll('option').length - 1;
+ if (selectedCount > 0 && selectedCount < allOptions) {
+ select.title = `${selectedCount} selected`;
+ } else if (selectedCount === allOptions) {
+ select.title = 'All selected';
+ } else {
+ select.title = '';
+ }
+ }
+ });
+ }
+
+ function handleWeekSelection() {
+ const weekSelect = document.getElementById('filterWeek');
+ const allOption = weekSelect.querySelector('option[value=""]');
+ const weekOptions = Array.from(weekSelect.querySelectorAll('option:not([value=""])'));
+ const currentSelectedOptions = Array.from(weekSelect.selectedOptions);
+ const allWeekSelected = currentSelectedOptions.some(opt => opt.value === '');
+ const individualWeeksSelected = currentSelectedOptions.filter(opt => opt.value !== '');
+ 
+ if (allWeekSelected) {
+ // User clicked "All WM Weeks" - select all individual weeks and uncheck "All"
+ weekOptions.forEach(opt => opt.selected = true);
+ allOption.selected = false;
+ } else if (individualWeeksSelected.length === 0) {
+ // Nothing selected - uncheck "All" too
+ allOption.selected = false;
+ } else {
+ // Individual weeks selected, "All" should be unchecked
+ allOption.selected = false;
+ }
+
+ updateFilterLabels();
+ searchData();
+ }
+
+ function toggleAdminMode() {
+ const adminControls = document.getElementById('adminControls');
+ const adminBadge = document.getElementById('adminBadge');
+ const toggleBtn = document.getElementById('toggleAdminBtn');
+ 
+ if (adminControls.style.display === 'none') {
+ adminControls.style.display = 'block';
+ adminBadge.style.display = 'block';
+ toggleBtn.textContent = 'Disable Admin';
+ } else {
+ adminControls.style.display = 'none';
+ adminBadge.style.display = 'none';
+ toggleBtn.textContent = 'Enable Admin';
+ }
+ }
+
+ // Sample data for autocomplete
+ const sampleSearchData = [
+ { title: 'Your store will receive a Capacity Expansion', keywords: 'capacity, expansion', body: 'Capacity expansion notification' },
+ { title: 'Action Required: Payroll Delays', keywords: 'payroll, delays, action', body: 'Payroll delay information' },
+ { title: 'Your Week 1 Messages Are Here', keywords: 'weekly, messages, week 1', body: 'Weekly store updates' },
+ { title: 'Associate to Driver Program', keywords: 'driver, program, associate', body: 'Driver program information' }
+ ];
+
+ let searchTimeout = null;
+
+ function handleActivitySearch(value) {
+ const suggestions = document.getElementById('searchSuggestions');
+ 
+ if (searchTimeout) {
+ clearTimeout(searchTimeout);
+ }
+
+ if (value.length < 2) {
+ suggestions.style.display = 'none';
+ return;
+ }
+
+ const searchLower = value.toLowerCase();
+ const matches = sampleSearchData.filter(item => 
+ item.title.toLowerCase().includes(searchLower) ||
+ item.keywords.toLowerCase().includes(searchLower)
+ );
+
+ if (matches.length > 0) {
+ suggestions.innerHTML = matches.map(item => 
+ `<div class="title-suggestion" onclick="selectSearchResult('${item.title.replace(/'/g, "\\'")}')">
+ <strong>${item.title}</strong>
+ <div style="font-size: 11px; color: #666; margin-top: 2px;">${item.keywords}</div>
+ </div>`
+ ).join('');
+ suggestions.style.display = 'block';
+ } else {
+ suggestions.innerHTML = `<div class="title-suggestion" style="color: #666; cursor: default;">No matches found</div>`;
+ suggestions.style.display = 'block';
+ }
+
+ searchTimeout = setTimeout(() => {
+ searchData();
+ }, 2000);
+ }
+
+ function selectSearchResult(title) {
+ document.getElementById('filterSearch').value = title;
+ document.getElementById('searchSuggestions').style.display = 'none';
+ searchData();
+ }
+
+ document.addEventListener('click', function(e) {
+ if (!e.target.closest('.filter-group')) {
+ const suggestions = document.getElementById('searchSuggestions');
+ if (suggestions) suggestions.style.display = 'none';
+ }
+ });
+
+ function searchData() {
+ const filters = {
+ search: document.getElementById('filterSearch').value.toLowerCase(),
+ title: document.getElementById('filterTitle').value.toLowerCase(),
+ activityType: document.getElementById('filterActivityType').value,
+ storeArea: document.getElementById('filterStoreArea').value,
+ division: document.getElementById('filterDivision').value,
+ region: document.getElementById('filterRegion').value,
+ market: document.getElementById('filterMarket').value,
+ store: document.getElementById('filterStore').value,
+ alignment: document.getElementById('filterAlignment').value,
+ fy: document.getElementById('filterFY').value,
+ weeks: Array.from(document.getElementById('filterWeek').selectedOptions).filter(opt => opt.value !== '').map(opt => opt.value)
+ };
+
+ document.getElementById('searchSuggestions').style.display = 'none';
+ const tableBody = document.getElementById('tableBody');
+ const rows = Array.from(tableBody.querySelectorAll('tr'));
+ let visibleCount = 0;
+
+ rows.forEach(row => {
+ const cells = row.querySelectorAll('td');
+ if (cells.length < 2) return;
+
+ const weekCell = cells[0].textContent.trim();
+ const titleCell = cells[1].textContent.toLowerCase().trim();
+ const typeCell = cells[2].textContent.trim();
+ const areaCell = cells[3].textContent.trim();
+
+ let matches = true;
+
+ // Week filter
+ if (filters.weeks.length > 0) {
+ matches = matches && filters.weeks.includes(weekCell);
+ }
+
+ // Search filter (searches in title)
+ if (filters.search) {
+ matches = matches && titleCell.includes(filters.search);
+ }
+
+ // Title filter
+ if (filters.title) {
+ matches = matches && titleCell.includes(filters.title);
+ }
+
+ // Activity type filter
+ if (filters.activityType) {
+ matches = matches && typeCell === filters.activityType;
+ }
+
+ // Store area filter
+ if (filters.storeArea) {
+ matches = matches && areaCell === filters.storeArea;
+ }
+
+ if (matches) {
+ row.style.display = '';
+ visibleCount++;
+ } else {
+ row.style.display = 'none';
+ }
+ });
+
+ // Update total activity count
+ document.getElementById('totalActivity').textContent = visibleCount.toLocaleString();
+ }
+
+ function exportData() {
+ console.log('Exporting data to CSV...');
+ const table = document.querySelector('table');
+ const rows = table.querySelectorAll('tr');
+ let csv = [];
+
+ rows.forEach(row => {
+ const cols = row.querySelectorAll('th, td');
+ const rowData = [];
+ cols.forEach(col => {
+ let text = col.textContent.replace(/"/g, '""').trim();
+ rowData.push(`"${text}"`);
+ });
+ csv.push(rowData.join(','));
+ });
+
+ const csvContent = csv.join('\n');
+ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+ const link = document.createElement('a');
+ link.href = URL.createObjectURL(blob);
+ link.download = `AMP_Dashboard_Export_${new Date().toISOString().slice(0,10)}.csv`;
+ link.click();
+ 
+ console.log('Export complete');
+ }
+
+ function refreshData() {
+ console.log('Clearing filters and refreshing data...');
+ clearAllFilters();
+ document.getElementById('tableBody').innerHTML = `
+ <tr>
+ <td colspan="8" style="text-align: center; padding: 40px; color: var(--gray-600);">
+ <strong>Refreshing data...</strong>
+ </td>
+ </tr>
+ `;
+
+ setTimeout(() => {
+ location.reload();
+ }, 500);
+ }
+
+ // Initialize filter labels on page load
+ document.addEventListener('DOMContentLoaded', function() {
+ updateFilterLabels();
+ });
+ </script>
 </body>
 </html>
