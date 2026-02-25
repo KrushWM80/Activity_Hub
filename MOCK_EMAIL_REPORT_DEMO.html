@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mock Email Report - Intake Hub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #0071ce 0%, #004f9a 100%);
+            color: white;
+            padding: 18px 25px;
+        }
+        .header h1 { font-size: 20px; margin-bottom: 3px; }
+        .header p { font-size: 11px; opacity: 0.85; }
+        .content { padding: 18px 25px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+        th {
+            background: #2d3748;
+            color: white;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #1a202c;
+        }
+        td {
+            padding: 7px 10px;
+            border: 1px solid #e2e8f0;
+            word-break: break-word;
+            max-width: 200px;
+        }
+        tr:nth-child(even) { background: #f7fafc; }
+        tr:hover { background: #edf2f7; }
+        a { color: #0071ce; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0071ce;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #0071ce;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .footer {
+            padding: 12px 25px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 10px;
+            color: #718096;
+            text-align: center;
+        }
+        .footer a { color: #0071ce; }
+        .count-note {
+            font-size: 11px;
+            color: #718096;
+            text-align: center;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        .demo-note {
+            background: #fffacd;
+            border: 2px solid #ffd700;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-note">
+        <strong>📧 MOCK EMAIL REPORT TEMPLATE</strong><br>
+        This is what the automated email report looks like when sent to users. 
+        Content includes customizable sections with summarized project data in easy-to-read tables.
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📊 Weekly Partner Status</h1>
+            <p>February 20, 2026 at 10:30 AM | 247 Projects</p>
+        </div>
+        
+        <div class="content">
+            <!-- NEW PROJECTS SECTION -->
+            <div class="section-title">🆕 New Projects</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Owner</th>
+                        <th>Created</th>
+                        <th>Start Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="#">Supercenter Expansion - Phoenix AZ Store 4521</a></td>
+                        <td>John Smith</td>
+                        <td>02/18/26</td>
+                        <td>02/20/26</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Pharmacy Remodel - Dallas TX Store 3847</a></td>
+                        <td>Sarah Johnson</td>
+                        <td>02/17/26</td>
+                        <td>02/19/26</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Parking Lot Enhancement - Denver CO Store 2105</a></td>
+                        <td>Mike Davis</td>
+                        <td>02/16/26</td>
+                        <td>02/18/26</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">HVAC System Replacement - Atlanta GA Store 5632</a></td>
+                        <td>Lisa Chen</td>
+                        <td>02/15/26</td>
+                        <td>02/17/26</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Security System Upgrade - Houston TX Store 1928</a></td>
+                        <td>Robert Martinez</td>
+                        <td>02/14/26</td>
+                        <td>02/16/26</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="count-note">Showing 5 of 47 new projects</p>
+
+            <!-- UPCOMING SECTION -->
+            <div class="section-title">📅 Upcoming</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Phase</th>
+                        <th>Target Date</th>
+                        <th>Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="#">Retail Floor Redesign - Chicago IL Store 2847</a></td>
+                        <td>In Progress</td>
+                        <td>02/25/26</td>
+                        <td>Amanda Wilson</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Customer Service Area Expansion - Los Angeles CA Store 3421</a></td>
+                        <td>Planning</td>
+                        <td>03/05/26</td>
+                        <td>James Lee</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Back-Office Technology Update - Boston MA Store 1547</a></td>
+                        <td>Pending Approval</td>
+                        <td>03/15/26</td>
+                        <td>Nicole Brown</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- NOTES SECTION -->
+            <div class="section-title">📝 Notes</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>User</th>
+                        <th>Note</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="#">Flooring Replacement - Seattle WA Store 4156</a></td>
+                        <td>Thomas Green</td>
+                        <td>Waiting on final permits from city. Should have approval by...</td>
+                        <td>02/19 03:47 PM</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Entrance Renovation - Miami FL Store 2934</a></td>
+                        <td>Patricia Lopez</td>
+                        <td>Contractor requested 2-week delay due to material shortage....</td>
+                        <td>02/18 09:22 AM</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#">Lighting System Update - Portland OR Store 3625</a></td>
+                        <td>Kevin Anderson</td>
+                        <td>LED installation 75% complete. Expected to finish by Feb 2...</td>
+                        <td>02/17 02:15 PM</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>Automated report from Intake Hub Dashboard | Questions? Email <a href="mailto:ATCTEAMSUPPORT@Walmart.com">ATCTEAMSUPPORT@Walmart.com</a></p>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px; padding: 20px; background: #f0f0f0; border-radius: 8px; max-width: 900px; margin-left: auto; margin-right: auto;">
+        <h2 style="color: #0071ce; margin-bottom: 15px;">📋 Report Configuration Details</h2>
+        <p><strong>Report Name:</strong> Weekly Partner Status</p>
+        <p><strong>Content Types:</strong> New Projects, Upcoming, Notes</p>
+        <p><strong>Frequency:</strong> Weekly</p>
+        <p><strong>Delivery Day:</strong> Friday</p>
+        <p><strong>Delivery Time:</strong> 08:00 AM</p>
+        <p><strong>Timeframes:</strong> Current Week</p>
+        <p><strong>Primary Email:</strong> krush@homeoffice.wal-mart.com</p>
+        <p><strong>CC Emails:</strong> team@walmart.com</p>
+        <p><strong>Format:</strong> Email & PDF Attachment</p>
+        <p><strong>Status:</strong> ✅ Active</p>
+    </div>
+</body>
+</html>

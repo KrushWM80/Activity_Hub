@@ -1,0 +1,42 @@
+INSTALLATION GUIDE FOR MICROSOFT JENNY & GUY VOICES
+====================================================
+
+CURRENT STATUS:
+✓ Voices are downloaded
+⚠️ They need to be fully installed/activated
+
+EXACT STEPS:
+
+1. Press: Windows Key + I (to open Settings)
+
+2. Left sidebar → Click "Accessibility"
+
+3. Left sidebar → Click "Text-to-speech"
+
+4. Click "Manage voices" button
+
+5. Check for "Microsoft Jenny" and "Microsoft Guy"
+   
+   IF "Install" button visible:
+   └─ Click Install, wait for download (2-3 min)
+   
+   IF "Installed" status shown:
+   └─ Voice is ready
+   
+   IF Not in list:
+   ├─ Click "Add voices" button
+   ├─ Search "Jenny" → Click Get
+   ├─ Search "Guy" → Click Get
+   └─ Wait for installation
+
+6. After installation complete:
+   ├─ Close all PowerShell windows
+   ├─ Open NEW PowerShell window
+   ├─ Run: python list_exact_voices.py
+   └─ You should now see Jenny and Guy listed
+
+7. Generate podcasts:
+   └─ Run: python generate_jenny_guy.py
+
+AFTER COMPLETE, ACCESS AT:
+http://localhost:8888

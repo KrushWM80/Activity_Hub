@@ -84,9 +84,10 @@ class DatabaseService:
         # A full query test happens during __init__, so assume True if client is initialized
         return True
     
-    def _build_where_clause(self, filters: FilterCriteria) -> str:
-        """Build SQL WHERE clause from filters"""
+    def _build_where_clause(self, filters: FilterCriteria) -> tuple:
+        """Build SQL WHERE clause from filters and return (where_clause, join_clause)"""
         conditions = []
+        join_clause = ""
         
         # Always filter by status
         if filters.status:
@@ -136,7 +137,112 @@ class DatabaseService:
         # Exclude Operational projects without store numbers (Unknown stores)
         conditions.append("NOT (Project_Source IN ('Operations', 'Intake Hub') AND (Facility IS NULL OR CAST(Facility AS STRING) = ''))")
         
-        return " AND ".join(conditions) if conditions else "1=1"
+        where_clause = " AND ".join(conditions) if conditions else "1=1"
+        return (where_clause, join_clause)
+    
+    def _get_projects_with_partner_filter(self, filters: FilterCriteria, limit: Optional[int] = None) -> List[Project]:
+        """Get projects filtered by partners using JOIN to IH_Branch_Data"""
+        if not self.client:
+            return []
+        
+        try:
+            # Build partner filter condition
+            partner_list = "','".join(filters.partners)
+            
+            # Get other filter conditions (without partner)
+            where_clause, join_clause = self._build_where_clause(filters)
+            
+            limit_clause = f"LIMIT {limit}" if limit else ""
+            
+            # Query with JOIN to IH_Branch_Data
+            query = f"""
+                SELECT DISTINCT
+                    COALESCE(CAST(main.Intake_Card AS STRING), CONCAT('R-', CAST(main.Facility AS STRING))) as project_id,
+                    CAST(main.Intake_Card AS STRING) as intake_card,
+                    CASE
+                        WHEN main.Project_Title IS NOT NULL AND main.Project_Title != '' THEN main.Project_Title
+                        WHEN main.Title IS NOT NULL AND main.Title != '' THEN main.Title
+                        WHEN main.Project_Type IS NOT NULL AND main.Project_Type != 'None' AND main.Project_Type != '' 
+                             AND main.Initiative_Type IS NOT NULL AND Initiative_Type != '' 
+                            THEN CONCAT(main.Project_Type, ' - ', main.Initiative_Type)
+                        WHEN main.Initiative_Type IS NOT NULL AND main.Initiative_Type != '' THEN main.Initiative_Type
+                        ELSE 'Untitled'
+                    END as title,
+                    main.Division as division,
+                    main.Region as region,
+                    main.Market as market,
+                    CAST(COALESCE(main.Facility, 0) AS STRING) as store,
+                    COALESCE(main.Store_Area, '') as store_area,
+                    COALESCE(main.Business_Area, '') as business_area,
+                    COALESCE(main.PROJECT_PHASE_2, main.Phase, '') as phase,
+                    '' as tribe,
+                    CAST(COALESCE(main.WM_Week, 0) AS STRING) as wm_week,
+                    CAST(COALESCE(main.FY, 0) AS STRING) as fy,
+                    COALESCE(main.PROJECT_HEALTH, main.Status, '') as status,
+                    COALESCE(main.Owner, main.PROJECT_OWNER, '') as owner,
+                    branch.BRANCH_NAME as partner,
+                    1 as store_count,
+                    main.CREATED_TS as created_date,
+                    main.Last_Updated as last_updated,
+                    COALESCE(main.PRESENTATION_SUMMARY, main.OVERVIEW, '') as description
+                FROM `{self.project_id}.{self.dataset}.{self.table}` as main
+                INNER JOIN `{self.project_id}.Store_Support.IH_Branch_Data` as branch
+                    ON CAST(main.Intake_Card AS STRING) = CAST(branch.Intake_Card_Nbr AS STRING)
+                WHERE branch.BRANCH_NAME IN ('{partner_list}')
+                    AND {where_clause}
+                ORDER BY 
+                    last_updated DESC, 
+                    title ASC
+                {limit_clause}
+            """
+            
+            print(f"[DEBUG] Running partner-filtered query")
+            results = self.client.query(query).result()
+            
+            projects = []
+            for row in results:
+                project = Project()
+                project.project_id = row.project_id or ""
+                project.intake_card = row.intake_card or ""
+                project.title = row.title or ""
+                project.division = row.division or ""
+                project.region = row.region or ""
+                project.market = row.market or ""
+                project.store = row.store or ""
+                project.store_area = row.store_area or ""
+                project.business_area = row.business_area or ""
+                project.phase = row.phase or ""
+                project.tribe = row.tribe or ""
+                project.wm_week = row.wm_week or ""
+                project.fy = row.fy or ""
+                project.owner = row.owner or ""
+                project.partner = row.partner or ""
+                project.store_count = row.store_count or 1
+                project.created_date = row.created_date
+                project.last_updated = row.last_updated
+                project.description = row.description or ""
+                
+                # Set status enum (defaults to ACTIVE if empty)
+                status_str = (row.status or "").strip().lower()
+                if status_str == "archived":
+                    project.status = ProjectStatus.ARCHIVED
+                elif status_str == "pending":
+                    project.status = ProjectStatus.PENDING
+                else:
+                    project.status = ProjectStatus.ACTIVE
+                
+                # Set project_source enum (defaults to INTAKE_HUB)
+                project.project_source = ProjectSource.INTAKE_HUB
+                
+                projects.append(project)
+            
+            return projects
+            
+        except Exception as e:
+            print(f"[ERROR] _get_projects_with_partner_filter exception: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+            return []
     
     @async_wrap
     def get_projects(self, filters: FilterCriteria, include_location: bool = False, limit: Optional[int] = None, title_search: Optional[str] = None) -> List[Project]:
@@ -145,6 +251,19 @@ class DatabaseService:
             return self._get_mock_projects()
         
         try:
+            # Check if partner filter is applied - use BigQuery JOIN if so
+            if filters.partners:
+                print(f"[API] Using BigQuery with partner JOIN for /api/projects")
+                try:
+                    result = self._get_projects_with_partner_filter(filters, limit)
+                    print(f"[API] Partner filter returned {len(result)} projects")
+                    return result
+                except Exception as e:
+                    print(f"[ERROR] Partner filter exception: {type(e).__name__}: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return []  # Return empty list instead of mock data for partner filters
+            
             # Check if we have a valid cache for the base query (no filters, no location)
             is_base_query = (
                 not filters.tribe and not filters.store and not filters.division and
@@ -158,11 +277,11 @@ class DatabaseService:
                 print(f"[CACHE] Returning {len(DatabaseService._projects_cache)} cached projects")
                 return DatabaseService._projects_cache
             
-            where_clause = self._build_where_clause(filters)
+            where_clause, join_clause = self._build_where_clause(filters)
             
             # Add title search if provided
             if title_search:
-                where_clause += f" AND (LOWER(PROJECT_TITLE) LIKE '%{title_search.lower()}%' OR LOWER(Title) LIKE '%{title_search.lower()}%')"
+                where_clause += f" AND (LOWER(main.PROJECT_TITLE) LIKE '%{title_search.lower()}%' OR LOWER(main.Title) LIKE '%{title_search.lower()}%')"
             
             # Add LIMIT clause
             limit_clause = f"LIMIT {limit}" if limit else ""
@@ -173,48 +292,49 @@ class DatabaseService:
                 query = f"""
                     SELECT 
                         CASE 
-                            WHEN PROJECT_ID IS NOT NULL THEN CAST(PROJECT_ID AS STRING)
-                            WHEN Intake_Card IS NOT NULL THEN CAST(Intake_Card AS STRING)
-                            ELSE CONCAT('R-', CAST(Facility AS STRING))
+                            WHEN main.PROJECT_ID IS NOT NULL THEN CAST(main.PROJECT_ID AS STRING)
+                            WHEN main.Intake_Card IS NOT NULL THEN CAST(main.Intake_Card AS STRING)
+                            ELSE CONCAT('R-', CAST(main.Facility AS STRING))
                         END as project_id,
-                        Project_Source as project_source,
+                        main.Project_Source as project_source,
                         CASE 
-                            WHEN PROJECT_TITLE IS NOT NULL THEN PROJECT_TITLE
-                            WHEN Title IS NOT NULL THEN Title
-                            WHEN Project_Type IS NOT NULL AND Project_Type != 'None' AND Initiative_Type IS NOT NULL THEN CONCAT(Project_Type, ' - ', Initiative_Type)
-                            WHEN Project_Type IS NOT NULL AND Project_Type != 'None' THEN Project_Type
-                            WHEN Initiative_Type IS NOT NULL THEN Initiative_Type
+                            WHEN main.PROJECT_TITLE IS NOT NULL THEN main.PROJECT_TITLE
+                            WHEN main.Title IS NOT NULL THEN main.Title
+                            WHEN main.Project_Type IS NOT NULL AND main.Project_Type != 'None' AND main.Initiative_Type IS NOT NULL THEN CONCAT(main.Project_Type, ' - ', main.Initiative_Type)
+                            WHEN main.Project_Type IS NOT NULL AND main.Project_Type != 'None' THEN main.Project_Type
+                            WHEN main.Initiative_Type IS NOT NULL THEN main.Initiative_Type
                             ELSE 'Untitled'
                         END as title,
-                        Division as division,
-                        Region as region,
-                        Market as market,
-                        CAST(COALESCE(Facility, 0) AS STRING) as store,
-                        COALESCE(Store_Area, '') as store_area,
-                        COALESCE(Business_Area, '') as business_area,
-                        COALESCE(PROJECT_PHASE_2, Phase, '') as phase,
+                        main.Division as division,
+                        main.Region as region,
+                        main.Market as market,
+                        CAST(COALESCE(main.Facility, 0) AS STRING) as store,
+                        COALESCE(main.Store_Area, '') as store_area,
+                        COALESCE(main.Business_Area, '') as business_area,
+                        COALESCE(main.PROJECT_PHASE_2, main.Phase, '') as phase,
                         '' as tribe,
-                        CAST(COALESCE(WM_Week, 0) AS STRING) as wm_week,
-                        CAST(COALESCE(FY, 0) AS STRING) as fy,
-                        COALESCE(PROJECT_HEALTH, Status, '') as status,
-                        COALESCE(Owner, PROJECT_OWNER, '') as owner,
-                        COALESCE(Partner, '') as partner,
+                        CAST(COALESCE(main.WM_Week, 0) AS STRING) as wm_week,
+                        CAST(COALESCE(main.FY, 0) AS STRING) as fy,
+                        COALESCE(main.PROJECT_HEALTH, main.Status, '') as status,
+                        COALESCE(main.Owner, main.PROJECT_OWNER, '') as owner,
+                        '' as partner,
                         1 as store_count,
-                        CREATED_TS as created_date,
-                        Last_Updated as last_updated,
-                        COALESCE(PRESENTATION_SUMMARY, OVERVIEW, '') as description,
-                        Latitude as latitude,
-                        Longitude as longitude,
-                        CONCAT('Store ', CAST(COALESCE(Facility, 0) AS STRING)) as store_address,
-                        City as city,
-                        State as state,
-                        COALESCE(Postal_Code, '00000') as zip_code
-                    FROM `{self.project_id}.{self.dataset}.{self.table}`
+                        main.CREATED_TS as created_date,
+                        main.Last_Updated as last_updated,
+                        COALESCE(main.PRESENTATION_SUMMARY, main.OVERVIEW, '') as description,
+                        main.Latitude as latitude,
+                        main.Longitude as longitude,
+                        CONCAT('Store ', CAST(COALESCE(main.Facility, 0) AS STRING)) as store_address,
+                        main.City as city,
+                        main.State as state,
+                        COALESCE(main.Postal_Code, '00000') as zip_code
+                    FROM `{self.project_id}.{self.dataset}.{self.table}` as main
+                    {join_clause}
                     WHERE {where_clause}
                     ORDER BY 
-                        Last_Updated DESC, 
-                        PROJECT_TITLE ASC,
-                        Title ASC
+                        main.Last_Updated DESC, 
+                        main.PROJECT_TITLE ASC,
+                        main.Title ASC
                     {limit_clause}
                 """
             else:
@@ -222,42 +342,43 @@ class DatabaseService:
                 query = f"""
                     SELECT 
                         CASE 
-                            WHEN PROJECT_ID IS NOT NULL THEN CAST(PROJECT_ID AS STRING)
-                            WHEN Intake_Card IS NOT NULL THEN CAST(Intake_Card AS STRING)
-                            ELSE CONCAT('R-', CAST(Facility AS STRING))
+                            WHEN main.PROJECT_ID IS NOT NULL THEN CAST(main.PROJECT_ID AS STRING)
+                            WHEN main.Intake_Card IS NOT NULL THEN CAST(main.Intake_Card AS STRING)
+                            ELSE CONCAT('R-', CAST(main.Facility AS STRING))
                         END as project_id,
-                        Project_Source as project_source,
+                        main.Project_Source as project_source,
                         CASE 
-                            WHEN PROJECT_TITLE IS NOT NULL THEN PROJECT_TITLE
-                            WHEN Title IS NOT NULL THEN Title
-                            WHEN Project_Type IS NOT NULL AND Project_Type != 'None' AND Initiative_Type IS NOT NULL THEN CONCAT(Project_Type, ' - ', Initiative_Type)
-                            WHEN Project_Type IS NOT NULL AND Project_Type != 'None' THEN Project_Type
-                            WHEN Initiative_Type IS NOT NULL THEN Initiative_Type
+                            WHEN main.PROJECT_TITLE IS NOT NULL THEN main.PROJECT_TITLE
+                            WHEN main.Title IS NOT NULL THEN main.Title
+                            WHEN main.Project_Type IS NOT NULL AND main.Project_Type != 'None' AND main.Initiative_Type IS NOT NULL THEN CONCAT(main.Project_Type, ' - ', main.Initiative_Type)
+                            WHEN main.Project_Type IS NOT NULL AND main.Project_Type != 'None' THEN main.Project_Type
+                            WHEN main.Initiative_Type IS NOT NULL THEN main.Initiative_Type
                             ELSE 'Untitled'
                         END as title,
-                        Division as division,
-                        Region as region,
-                        Market as market,
-                        CAST(COALESCE(Facility, 0) AS STRING) as store,
-                        COALESCE(Store_Area, '') as store_area,
-                        COALESCE(Business_Area, '') as business_area,
-                        COALESCE(PROJECT_PHASE_2, Phase, '') as phase,
+                        main.Division as division,
+                        main.Region as region,
+                        main.Market as market,
+                        CAST(COALESCE(main.Facility, 0) AS STRING) as store,
+                        COALESCE(main.Store_Area, '') as store_area,
+                        COALESCE(main.Business_Area, '') as business_area,
+                        COALESCE(main.PROJECT_PHASE_2, main.Phase, '') as phase,
                         '' as tribe,
-                        CAST(COALESCE(WM_Week, 0) AS STRING) as wm_week,
-                        CAST(COALESCE(FY, 0) AS STRING) as fy,
-                        COALESCE(PROJECT_HEALTH, Status, '') as status,
-                        COALESCE(Owner, PROJECT_OWNER, '') as owner,
-                        COALESCE(Partner, '') as partner,
+                        CAST(COALESCE(main.WM_Week, 0) AS STRING) as wm_week,
+                        CAST(COALESCE(main.FY, 0) AS STRING) as fy,
+                        COALESCE(main.PROJECT_HEALTH, main.Status, '') as status,
+                        COALESCE(main.Owner, main.PROJECT_OWNER, '') as owner,
+                        '' as partner,
                         1 as store_count,
-                        CREATED_TS as created_date,
-                        Last_Updated as last_updated,
-                        COALESCE(PRESENTATION_SUMMARY, OVERVIEW, '') as description
-                    FROM `{self.project_id}.{self.dataset}.{self.table}`
+                        main.CREATED_TS as created_date,
+                        main.Last_Updated as last_updated,
+                        COALESCE(main.PRESENTATION_SUMMARY, main.OVERVIEW, '') as description
+                    FROM `{self.project_id}.{self.dataset}.{self.table}` as main
+                    {join_clause}
                     WHERE {where_clause}
                     ORDER BY 
-                        Last_Updated DESC, 
-                        PROJECT_TITLE ASC,
-                        Title ASC
+                        main.Last_Updated DESC, 
+                        main.PROJECT_TITLE ASC,
+                        main.Title ASC
                     {limit_clause}
                 """
             
@@ -325,21 +446,24 @@ class DatabaseService:
             return self._get_mock_summary()
         
         try:
-            where_clause = self._build_where_clause(filters)
+            where_clause, join_clause = self._build_where_clause(filters)
+            
+            # Add table alias when using join clause
+            table_ref = "main" if join_clause else f"`{self.project_id}.{self.dataset}.{self.table}`"
             
             query = f"""
                 SELECT 
                     COUNT(DISTINCT CASE 
-                        WHEN Intake_Card IS NOT NULL THEN CAST(Intake_Card AS STRING)
-                        ELSE CONCAT('R-', CAST(Facility AS STRING))
+                        WHEN {table_ref}.Intake_Card IS NOT NULL THEN CAST({table_ref}.Intake_Card AS STRING)
+                        ELSE CONCAT('R-', CAST({table_ref}.Facility AS STRING))
                     END) as total_active_projects,
-                    COUNT(DISTINCT Facility) as total_stores,
-                    COUNT(DISTINCT CASE WHEN Project_Source IN ('Operations', 'Intake Hub') THEN Intake_Card END) as intake_hub_projects,
-                    COUNT(DISTINCT CASE WHEN Project_Source IN ('Operations', 'Intake Hub') THEN Facility END) as intake_hub_stores,
-                    COUNT(DISTINCT CASE WHEN Project_Source = 'Realty' THEN CONCAT('R-', CAST(Facility AS STRING)) END) as realty_projects,
-                    COUNT(DISTINCT CASE WHEN Project_Source = 'Realty' THEN Facility END) as realty_stores,
-                    MAX(Last_Updated) as last_updated
-                FROM `{self.project_id}.{self.dataset}.{self.table}`
+                    COUNT(DISTINCT {table_ref}.Facility) as total_stores,
+                    COUNT(DISTINCT CASE WHEN {table_ref}.Project_Source IN ('Operations', 'Intake Hub') THEN {table_ref}.Intake_Card END) as intake_hub_projects,
+                    COUNT(DISTINCT CASE WHEN {table_ref}.Project_Source IN ('Operations', 'Intake Hub') THEN {table_ref}.Facility END) as intake_hub_stores,
+                    COUNT(DISTINCT CASE WHEN {table_ref}.Project_Source = 'Realty' THEN CONCAT('R-', CAST({table_ref}.Facility AS STRING)) END) as realty_projects,
+                    COUNT(DISTINCT CASE WHEN {table_ref}.Project_Source = 'Realty' THEN {table_ref}.Facility END) as realty_stores,
+                    MAX({table_ref}.Last_Updated) as last_updated
+                FROM `{self.project_id}.{self.dataset}.{self.table}`{"as main " + join_clause if join_clause else ""}
                 WHERE {where_clause}
             """
             
@@ -357,20 +481,20 @@ class DatabaseService:
             
             # Get by division
             div_query = f"""
-                SELECT Division as division, COUNT(DISTINCT Intake_Card) as count
-                FROM `{self.project_id}.{self.dataset}.{self.table}`
-                WHERE {where_clause} AND Division IS NOT NULL
-                GROUP BY Division
+                SELECT {table_ref}.Division as division, COUNT(DISTINCT {table_ref}.Intake_Card) as count
+                FROM `{self.project_id}.{self.dataset}.{self.table}`{"as main " + join_clause if join_clause else ""}
+                WHERE {where_clause} AND {table_ref}.Division IS NOT NULL
+                GROUP BY {table_ref}.Division
             """
             div_results = self.client.query(div_query).result()
             summary.by_division = {row.division: row.count for row in div_results}
             
             # Get by phase
             phase_query = f"""
-                SELECT Phase as phase, COUNT(DISTINCT Intake_Card) as count
-                FROM `{self.project_id}.{self.dataset}.{self.table}`
-                WHERE {where_clause} AND Phase IS NOT NULL
-                GROUP BY Phase
+                SELECT {table_ref}.Phase as phase, COUNT(DISTINCT {table_ref}.Intake_Card) as count
+                FROM `{self.project_id}.{self.dataset}.{self.table}`{"as main " + join_clause if join_clause else ""}
+                WHERE {where_clause} AND {table_ref}.Phase IS NOT NULL
+                GROUP BY {table_ref}.Phase
             """
             phase_results = self.client.query(phase_query).result()
             summary.by_phase = {row.phase: row.count for row in phase_results}

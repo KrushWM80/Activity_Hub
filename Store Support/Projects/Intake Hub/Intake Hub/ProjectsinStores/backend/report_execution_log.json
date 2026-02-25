@@ -30,5 +30,133 @@
     "status": "success",
     "recipients": "kendall.rush@walmart.com",
     "error_message": null
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T10:02:11.020173",
+    "status": "failed",
+    "recipients": "",
+    "error_message": "Error generating report: [Errno 11001] getaddrinfo failed"
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T10:03:40.695558",
+    "status": "success",
+    "recipients": "krush@homeoffice.wal-mart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T10:11:59.676707",
+    "status": "success",
+    "recipients": "Kendall.rush@walmart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T10:21:55.982631",
+    "status": "success",
+    "recipients": "kendall.rush@walmart.con",
+    "error_message": null
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T10:22:05.303314",
+    "status": "success",
+    "recipients": "kendall.rush@walmart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T10:31:01.231569",
+    "status": "success",
+    "recipients": "Kendall.rush@walmart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T10:46:04.825223",
+    "status": "success",
+    "recipients": "Kendall.rush@walmart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "4b80e040-b338-4489-b8ff-6b3f8f5ee4be",
+    "report_name": "Kendall's Daily",
+    "timestamp": "2026-02-20T10:46:41.876001",
+    "status": "success",
+    "recipients": "kendall.rush@homeoffice.wal-mart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T11:00:04.547360",
+    "status": "success",
+    "recipients": "kendall.rush@walmart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T15:51:38.243588",
+    "status": "success",
+    "recipients": "Kendall.rush@walmart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "4b80e040-b338-4489-b8ff-6b3f8f5ee4be",
+    "report_name": "Kendall's Daily",
+    "timestamp": "2026-02-20T16:06:35.200112",
+    "status": "success",
+    "recipients": "debug@test.com",
+    "error_message": null
+  },
+  {
+    "config_id": "4b80e040-b338-4489-b8ff-6b3f8f5ee4be",
+    "report_name": "Kendall's Daily",
+    "timestamp": "2026-02-20T16:10:11.334980",
+    "status": "success",
+    "recipients": "debug@test.com",
+    "error_message": null
+  },
+  {
+    "config_id": "4b80e040-b338-4489-b8ff-6b3f8f5ee4be",
+    "report_name": "Kendall's Daily",
+    "timestamp": "2026-02-20T16:13:06.940547",
+    "status": "success",
+    "recipients": "debug@test.com",
+    "error_message": null
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T16:16:42.259790",
+    "status": "failed",
+    "recipients": "",
+    "error_message": "Error generating report: [Errno 11001] getaddrinfo failed"
+  },
+  {
+    "config_id": "4b80e040-b338-4489-b8ff-6b3f8f5ee4be",
+    "report_name": "Kendall's Daily",
+    "timestamp": "2026-02-20T16:20:42.131156",
+    "status": "success",
+    "recipients": "test@walmart.com",
+    "error_message": null
+  },
+  {
+    "config_id": "5dcd62e6-2795-4a05-a7f0-15b2025e4060",
+    "report_name": "Test Report",
+    "timestamp": "2026-02-20T16:22:02.390423",
+    "status": "success",
+    "recipients": "Kendall.rush@walmart.com",
+    "error_message": null
   }
 ]

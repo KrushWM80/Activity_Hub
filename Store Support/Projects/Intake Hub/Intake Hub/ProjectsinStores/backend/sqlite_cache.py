@@ -114,6 +114,20 @@ class SQLiteCache:
             )
         """)
         
+        # Project-Partner lookup table for fast partner filtering
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS project_partners (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                intake_card TEXT NOT NULL,
+                partner_name TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        # Index for fast partner lookups
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_project_partners_intake_card ON project_partners(intake_card)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_project_partners_partner ON project_partners(partner_name)")
+        
         conn.commit()
         conn.close()
         print(f"[SQLite] Database initialized at {self.db_path}")
@@ -201,6 +215,7 @@ class SQLiteCache:
                     FY as fy,
                     Status as status,
                     COALESCE(Owner, PROJECT_OWNER, '') as owner,
+                    '' as partner,
                     COALESCE(Store_Area, '') as store_area,
                     COALESCE(Business_Area, '') as business_area,
                     COALESCE(Health, PROJECT_HEALTH, '') as health,
@@ -252,7 +267,7 @@ class SQLiteCache:
                     row.fy,
                     row.status,
                     row.owner,
-                    None,  # partner - will be populated from IH_Branch_Data separately
+                    row.partner,
                     row.store_area,
                     row.business_area,
                     row.health,
@@ -271,6 +286,45 @@ class SQLiteCache:
             if batch:
                 cursor.executemany(insert_sql, batch)
             
+            # Sync partner data from IH_Branch_Data
+            print("[SQLite] Syncing partner data...")
+            try:
+                partner_query = """
+                    SELECT 
+                        CAST(Intake_Card_Nbr AS STRING) as intake_card,
+                        BRANCH_NAME as partner_name
+                    FROM `{project_id}.Store_Support.IH_Branch_Data`
+                    WHERE BRANCH_NAME IS NOT NULL AND BRANCH_NAME != ''
+                """.format(project_id=project_id)
+                
+                partner_result = bigquery_client.query(partner_query).result()
+                partner_rows = list(partner_result)
+                
+                # Clear existing partner data
+                cursor.execute("DELETE FROM project_partners")
+                
+                # Insert partners
+                partner_insert_sql = """
+                    INSERT INTO project_partners (intake_card, partner_name)
+                    VALUES (?, ?)
+                """
+                
+                partner_batch = []
+                for row in partner_rows:
+                    partner_batch.append((row.intake_card, row.partner_name))
+                    
+                    if len(partner_batch) >= 5000:
+                        cursor.executemany(partner_insert_sql, partner_batch)
+                        partner_batch = []
+                
+                if partner_batch:
+                    cursor.executemany(partner_insert_sql, partner_batch)
+                
+                print(f"[SQLite] Synced {len(partner_rows)} partner records")
+                
+            except Exception as e:
+                print(f"[SQLite] Partner sync warning: {e} (continuing without partners)")
+            
             # Update sync metadata
             now = datetime.now().isoformat()
             cursor.execute("""
@@ -279,6 +333,14 @@ class SQLiteCache:
             """, (now, now))
             
             conn.commit()
+            
+            # Invalidate in-memory caches - partner data now comes from BigQuery JOIN
+            from database import DatabaseService
+            DatabaseService._projects_cache = None
+            DatabaseService._cache_timestamp = None
+            SQLiteCache._filter_cache = None
+            SQLiteCache._filter_cache_timestamp = None
+            
             conn.close()
             
             elapsed = time.time() - start_time
@@ -563,6 +625,45 @@ class SQLiteCache:
         if self._sync_thread:
             self._sync_thread.join(timeout=5)
         print("[SQLite] Background sync stopped")
+    
+    def get_project_ids_by_partners(self, partners: List[str]) -> List[str]:
+        """Get list of intake_cards (project IDs) for given partners"""
+        if not partners:
+            return []
+        
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        # Build a parameter list for the IN clause
+        placeholders = ','.join('?' * len(partners))
+        query = f"""
+            SELECT DISTINCT intake_card
+            FROM project_partners
+            WHERE partner_name IN ({placeholders})
+        """
+        
+        cursor.execute(query, partners)
+        results = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        
+        return results
+    
+    def get_partners_for_project(self, intake_card: str) -> List[str]:
+        """Get list of partners for a given project (intake_card)"""
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT DISTINCT partner_name
+            FROM project_partners
+            WHERE intake_card = ?
+            ORDER BY partner_name
+        """, (intake_card,))
+        
+        results = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        
+        return results
     
     def force_sync(self, bigquery_client, project_id: str, dataset: str, table: str) -> bool:
         """Force an immediate sync from BigQuery"""

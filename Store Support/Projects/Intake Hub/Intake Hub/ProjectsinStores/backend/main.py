@@ -465,7 +465,6 @@ async def get_projects(
                     'wm_week': wm_week,
                     'project_source': project_source,
                     'owner': owner,
-                    'partner': partner,
                     'business_area': business_area,
                     'store_area': store_area,
                     'business_type': business_type,
@@ -473,6 +472,19 @@ async def get_projects(
                     'associate_impact': associate_impact,
                     'customer_impact': customer_impact
                 }
+                
+                # If partner filter applied, get intake_cards from partner cache
+                partner_intake_cards = None
+                if partner:
+                    print(f"[API] Getting projects for partner(s): {partner}")
+                    partner_list = [p.strip() for p in partner.split(',')] if isinstance(partner, str) else [partner]
+                    partner_intake_cards = sqlite_cache.get_project_ids_by_partners(partner_list)
+                    print(f"[API] Found {len(partner_intake_cards)} projects with partner(s)")
+                    
+                    if not partner_intake_cards:
+                        # No projects found for this partner
+                        return []
+                
                 # Remove None values
                 cache_filters = {k: v for k, v in cache_filters.items() if v is not None}
                 
@@ -481,6 +493,14 @@ async def get_projects(
                     limit=limit,
                     title_search=title
                 )
+                
+                # Filter by partner intake cards if partner filter was applied
+                if partner_intake_cards:
+                    partner_set = set(partner_intake_cards)
+                    cached_projects = [
+                        p for p in cached_projects 
+                        if p.get('intake_card') in partner_set
+                    ]
                 
                 return [
                     ProjectResponse(
@@ -498,7 +518,7 @@ async def get_projects(
                         status=p['status'] or 'Active',
                         store_count=p['store_count'] or 1,
                         owner=p.get('owner'),
-                        partner=p.get('partner'),
+                        partner=partner if partner else (p.get('partner') or ''),  # Use filter or cached
                         store_area=p.get('store_area'),
                         business_area=p.get('business_area'),
                         health=p.get('health'),
@@ -541,6 +561,8 @@ async def get_projects(
             filters.fy = [fy]
         if store:
             filters.store = [store]
+        if partner:
+            filters.partners = [partner]
         
         projects = await db_service.get_projects(filters, include_location=include_location, limit=limit, title_search=title)
         
