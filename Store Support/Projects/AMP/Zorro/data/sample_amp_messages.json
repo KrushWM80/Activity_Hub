@@ -1,0 +1,139 @@
+{
+  "messages": [
+    {
+      "id": "amp_001",
+      "title": "Safety Training Reminder",
+      "content": "Complete your annual safety training by Friday. This includes forklift certification and emergency procedures review.",
+      "category": "training",
+      "priority": "high",
+      "source": "Safety Team",
+      "created_at": "2025-12-05T08:00:00Z",
+      "due_date": "2025-12-08",
+      "status": "pending",
+      "target_audience": "All Associates",
+      "facilities": ["all"]
+    },
+    {
+      "id": "amp_002",
+      "title": "Holiday Schedule Update",
+      "content": "Store hours extended to 10 PM starting December 15th through December 24th. Please check your schedules for any changes.",
+      "category": "announcement",
+      "priority": "medium",
+      "source": "Store Operations",
+      "created_at": "2025-12-05T09:00:00Z",
+      "due_date": "2025-12-15",
+      "status": "pending",
+      "target_audience": "All Associates",
+      "facilities": ["all"]
+    },
+    {
+      "id": "amp_003",
+      "title": "Customer Service Excellence Award",
+      "content": "Congratulations to Team 7 for achieving 100% customer satisfaction scores this month! Your dedication to our customers is truly outstanding.",
+      "category": "recognition",
+      "priority": "medium",
+      "source": "Store Manager",
+      "created_at": "2025-12-04T14:00:00Z",
+      "due_date": null,
+      "status": "pending",
+      "target_audience": "Team 7",
+      "facilities": ["store_1234"]
+    },
+    {
+      "id": "amp_004",
+      "title": "New CBL Modules Available",
+      "content": "Three new CBL modules are now available: Customer Engagement, Inventory Management, and Loss Prevention Basics. Complete by end of month.",
+      "category": "training",
+      "priority": "medium",
+      "source": "Learning & Development",
+      "created_at": "2025-12-03T10:00:00Z",
+      "due_date": "2025-12-31",
+      "status": "pending",
+      "target_audience": "All Associates",
+      "facilities": ["all"]
+    },
+    {
+      "id": "amp_005",
+      "title": "Inventory Count Reminder",
+      "content": "Annual inventory count scheduled for January 15th. All departments must complete pre-count organization by January 10th.",
+      "category": "operational",
+      "priority": "high",
+      "source": "Inventory Control",
+      "created_at": "2025-12-05T07:00:00Z",
+      "due_date": "2026-01-10",
+      "status": "pending",
+      "target_audience": "Department Managers",
+      "facilities": ["all"]
+    },
+    {
+      "id": "amp_006",
+      "title": "Fire Drill Notice",
+      "content": "Mandatory fire drill scheduled for December 10th at 2:00 PM. All associates must participate. Know your evacuation routes.",
+      "category": "safety",
+      "priority": "critical",
+      "source": "Safety Team",
+      "created_at": "2025-12-05T06:00:00Z",
+      "due_date": "2025-12-10",
+      "status": "pending",
+      "target_audience": "All Associates",
+      "facilities": ["all"]
+    },
+    {
+      "id": "amp_007",
+      "title": "Team Meeting Schedule",
+      "content": "Weekly team meetings will now be held every Monday at 7:00 AM in the break room. Attendance is required for all team leads.",
+      "category": "announcement",
+      "priority": "low",
+      "source": "Store Manager",
+      "created_at": "2025-12-04T16:00:00Z",
+      "due_date": null,
+      "status": "pending",
+      "target_audience": "Team Leads",
+      "facilities": ["all"]
+    },
+    {
+      "id": "amp_008",
+      "title": "OBW Process Update",
+      "content": "Updated One Best Way procedures for checkout efficiency now available. Review the new 5-step customer greeting protocol.",
+      "category": "operational",
+      "priority": "medium",
+      "source": "Process Improvement",
+      "created_at": "2025-12-04T11:00:00Z",
+      "due_date": "2025-12-20",
+      "status": "pending",
+      "target_audience": "Front End Associates",
+      "facilities": ["all"]
+    },
+    {
+      "id": "amp_009",
+      "title": "Holiday Party Announcement",
+      "content": "Join us for the annual holiday party on December 20th at 6:00 PM! Food, games, and prizes. RSVP by December 15th.",
+      "category": "celebration",
+      "priority": "low",
+      "source": "HR Team",
+      "created_at": "2025-12-03T15:00:00Z",
+      "due_date": "2025-12-15",
+      "status": "pending",
+      "target_audience": "All Associates",
+      "facilities": ["all"]
+    },
+    {
+      "id": "amp_010",
+      "title": "GWP Recognition Program",
+      "content": "Great Workplace program nominations now open! Nominate a coworker who demonstrates excellent teamwork and customer service.",
+      "category": "recognition",
+      "priority": "medium",
+      "source": "HR Team",
+      "created_at": "2025-12-02T09:00:00Z",
+      "due_date": "2025-12-31",
+      "status": "pending",
+      "target_audience": "All Associates",
+      "facilities": ["all"]
+    }
+  ],
+  "metadata": {
+    "last_sync": "2025-12-05T10:00:00Z",
+    "source": "AMP System Demo Data",
+    "version": "1.0"
+  }
+}

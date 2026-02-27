@@ -1,0 +1,337 @@
+{
+  "characters": [
+    {
+      "id": "character_97ef6bad",
+      "name": "Carl - Purple Monster",
+      "type": "character",
+      "description": "A friendly, energetic purple monster character wearing Walmart blue vest. Carl is welcoming, motivational, and approachable. Uses expressive hand gestures.",
+      "category": "training",
+      "tags": [
+        "character",
+        "friendly",
+        "mascot",
+        "training"
+      ],
+      "visual_reference_path": null,
+      "prompt_template": "Feature Carl, a friendly purple monster wearing a Walmart blue vest. He should be energetic, welcoming, and use expressive gestures. Carl is the primary character in this video.",
+      "metadata": {
+        "primary_color": null,
+        "secondary_colors": [],
+        "personality": null,
+        "use_cases": [],
+        "brand_approved": false,
+        "guidelines": null,
+        "restrictions": "Carl should always wear Walmart blue vest. Keep expressions positive and welcoming.",
+        "accessibility_notes": null
+      },
+      "facility_id": "global",
+      "created_by": "system_init",
+      "visibility": "facility",
+      "shared_facilities": [],
+      "created_at": "2025-12-03T18:44:45.023219Z",
+      "updated_at": "2025-12-03T19:31:39.423084Z",
+      "usage_count": 2,
+      "is_approved": true,
+      "approved_by": "admin",
+      "approval_notes": "Example character - pre-approved",
+      "version": 1
+    },
+    {
+      "id": "character_tammy_safety",
+      "name": "Tammy - Safety Champion",
+      "type": "character",
+      "description": "An experienced safety trainer with salt-and-pepper hair, wearing safety vest over Walmart polo. Tammy is authoritative yet approachable, demonstrating proper safety techniques.",
+      "category": "safety",
+      "tags": [
+        "character",
+        "safety",
+        "trainer",
+        "operations"
+      ],
+      "visual_reference_path": null,
+      "prompt_template": "Feature Tammy, an experienced safety champion in Pixar-style animation. She has salt-and-pepper short professional hair, tan skin, athletic build. Wearing a bright safety vest over Walmart polo shirt. She demonstrates safety procedures with confident, clear gestures. Authoritative but friendly demeanor.",
+      "metadata": {
+        "primary_color": "#FF6600",
+        "secondary_colors": ["#0071CE"],
+        "personality": "authoritative, patient, safety-focused",
+        "use_cases": ["safety training", "compliance videos", "procedure demonstrations"],
+        "brand_approved": true,
+        "guidelines": "Always show proper PPE. Demonstrate correct safety posture.",
+        "restrictions": "Must wear safety vest. No unsafe behavior depicted.",
+        "accessibility_notes": "Clear hand signals for key safety points"
+      },
+      "facility_id": "global",
+      "created_by": "system_init",
+      "visibility": "facility",
+      "shared_facilities": [],
+      "created_at": "2025-12-08T10:00:00.000000Z",
+      "updated_at": "2025-12-08T10:00:00.000000Z",
+      "usage_count": 0,
+      "is_approved": true,
+      "approved_by": "admin",
+      "approval_notes": "Pre-approved safety training character",
+      "version": 1
+    },
+    {
+      "id": "character_marcus_tech",
+      "name": "Marcus - Tech Specialist",
+      "type": "character",
+      "description": "A young, enthusiastic electronics specialist with a modern haircut. Marcus is knowledgeable, helpful, and patient when explaining technology to customers.",
+      "category": "training",
+      "tags": [
+        "character",
+        "electronics",
+        "specialist",
+        "customer-service"
+      ],
+      "visual_reference_path": null,
+      "prompt_template": "Feature Marcus, a young tech specialist in Pixar-style animation. He is in his early 20s with fair skin, black hair in a modern fade with styled top, brown eyes. Wearing Walmart blue polo with visible name badge. He gestures helpfully toward electronic products, with a patient and knowledgeable expression. Modern, approachable demeanor.",
+      "metadata": {
+        "primary_color": "#0071CE",
+        "secondary_colors": ["#FFB81C"],
+        "personality": "helpful, patient, tech-savvy, enthusiastic",
+        "use_cases": ["electronics training", "product demos", "customer service videos"],
+        "brand_approved": true,
+        "guidelines": "Show product knowledge through helpful gestures",
+        "restrictions": "Must wear Walmart polo and name badge",
+        "accessibility_notes": "Clear pointing and demonstrative gestures"
+      },
+      "facility_id": "global",
+      "created_by": "system_init",
+      "visibility": "facility",
+      "shared_facilities": [],
+      "created_at": "2025-12-08T10:00:00.000000Z",
+      "updated_at": "2025-12-08T10:00:00.000000Z",
+      "usage_count": 0,
+      "is_approved": true,
+      "approved_by": "admin",
+      "approval_notes": "Pre-approved electronics department character",
+      "version": 1
+    }
+  ],
+  "logos": [
+    {
+      "id": "logo_c015eb2d",
+      "name": "Walmart Logo",
+      "type": "logo",
+      "description": "Official Walmart logo with spark. Blue and yellow Walmart text with signature spark graphic.",
+      "category": "marketing",
+      "tags": [
+        "logo",
+        "branding",
+        "walmart"
+      ],
+      "visual_reference_path": null,
+      "prompt_template": "Include the official Walmart logo (blue and yellow with spark) prominently displayed. Logo should be visible but not overwhelming.",
+      "metadata": {
+        "primary_color": null,
+        "secondary_colors": [],
+        "personality": null,
+        "use_cases": [],
+        "brand_approved": false,
+        "guidelines": null,
+        "restrictions": "Use only official Walmart logos. Must follow brand guidelines for sizing and placement.",
+        "accessibility_notes": null
+      },
+      "facility_id": "global",
+      "created_by": "system_init",
+      "visibility": "facility",
+      "shared_facilities": [],
+      "created_at": "2025-12-03T18:44:45.028138Z",
+      "updated_at": "2025-12-03T18:44:45.029272Z",
+      "usage_count": 0,
+      "is_approved": true,
+      "approved_by": "admin",
+      "approval_notes": "Example logo - pre-approved",
+      "version": 1
+    }
+  ],
+  "environments": [
+    {
+      "id": "environment_0b5f6cc6",
+      "name": "Walmart Store Floor",
+      "type": "environment",
+      "description": "Bright, professional Walmart store setting with checkout counters, aisles, and customers. Clean, well-lit environment with Walmart branding visible.",
+      "category": "operations",
+      "tags": [
+        "environment",
+        "store",
+        "operations",
+        "retail"
+      ],
+      "visual_reference_path": null,
+      "prompt_template": "Set the scene in a modern Walmart store with bright lighting, clean aisles, and visible Walmart branding. Show a professional retail environment with customers and associates.",
+      "metadata": {
+        "primary_color": null,
+        "secondary_colors": [],
+        "personality": null,
+        "use_cases": [],
+        "brand_approved": false,
+        "guidelines": null,
+        "restrictions": "Always keep Walmart branding visible and accurate.",
+        "accessibility_notes": null
+      },
+      "facility_id": "global",
+      "created_by": "system_init",
+      "visibility": "facility",
+      "shared_facilities": [],
+      "created_at": "2025-12-03T18:44:45.026379Z",
+      "updated_at": "2025-12-03T18:44:45.027152Z",
+      "usage_count": 0,
+      "is_approved": true,
+      "approved_by": "admin",
+      "approval_notes": "Example environment - pre-approved",
+      "version": 1
+    },
+    {
+      "id": "environment_break_room",
+      "name": "Associate Break Room",
+      "type": "environment",
+      "description": "Clean, comfortable Walmart associate break room with tables, chairs, and bulletin boards. A welcoming space for team meetings and announcements.",
+      "category": "training",
+      "tags": [
+        "environment",
+        "break-room",
+        "training",
+        "meetings"
+      ],
+      "visual_reference_path": null,
+      "prompt_template": "Set the scene in a clean Walmart associate break room. Show comfortable seating areas, tables, a bulletin board with announcements, vending machines, and Walmart motivational posters. Bright, welcoming lighting. A space where associates gather for breaks and team huddles.",
+      "metadata": {
+        "primary_color": "#0071CE",
+        "secondary_colors": ["#FFFFFF", "#FFB81C"],
+        "personality": "welcoming, comfortable, team-oriented",
+        "use_cases": ["team announcements", "training videos", "policy updates"],
+        "brand_approved": true,
+        "guidelines": "Show a clean, organized space. Include Walmart branding subtly.",
+        "restrictions": "No confidential information visible on bulletin boards.",
+        "accessibility_notes": "Well-lit space with clear pathways"
+      },
+      "facility_id": "global",
+      "created_by": "system_init",
+      "visibility": "facility",
+      "shared_facilities": [],
+      "created_at": "2025-12-08T10:00:00.000000Z",
+      "updated_at": "2025-12-08T10:00:00.000000Z",
+      "usage_count": 0,
+      "is_approved": true,
+      "approved_by": "admin",
+      "approval_notes": "Pre-approved break room environment",
+      "version": 1
+    },
+    {
+      "id": "environment_warehouse",
+      "name": "Distribution Center / Backroom",
+      "type": "environment",
+      "description": "Organized warehouse or backroom setting with shelving, pallets, and inventory. Professional logistics environment for operations training.",
+      "category": "operations",
+      "tags": [
+        "environment",
+        "warehouse",
+        "backroom",
+        "logistics",
+        "operations"
+      ],
+      "visual_reference_path": null,
+      "prompt_template": "Set the scene in a Walmart distribution center or store backroom. Show organized industrial shelving with inventory, pallet jacks, clear safety markings on the floor. Professional warehouse lighting. Associates in safety vests working efficiently. Clean, organized logistics environment.",
+      "metadata": {
+        "primary_color": "#FF6600",
+        "secondary_colors": ["#0071CE", "#FFFF00"],
+        "personality": "efficient, organized, safety-focused",
+        "use_cases": ["safety training", "logistics procedures", "inventory management"],
+        "brand_approved": true,
+        "guidelines": "Show proper safety equipment and clear floor markings",
+        "restrictions": "Safety vests required for all depicted associates. No unsafe practices.",
+        "accessibility_notes": "Clear safety signage visible"
+      },
+      "facility_id": "global",
+      "created_by": "system_init",
+      "visibility": "facility",
+      "shared_facilities": [],
+      "created_at": "2025-12-08T10:00:00.000000Z",
+      "updated_at": "2025-12-08T10:00:00.000000Z",
+      "usage_count": 0,
+      "is_approved": true,
+      "approved_by": "admin",
+      "approval_notes": "Pre-approved warehouse/backroom environment",
+      "version": 1
+    }
+  ],
+  "props": [],
+  "animation_styles": [
+    {
+      "id": "animation_style_a60347cc",
+      "name": "Energetic Animation Style",
+      "type": "animation_style",
+      "description": "Fast-paced, dynamic animations with smooth transitions. Characters should move with energy and enthusiasm.",
+      "category": "training",
+      "tags": [
+        "animation",
+        "energetic",
+        "dynamic"
+      ],
+      "visual_reference_path": null,
+      "prompt_template": "Use energetic, dynamic animations with smooth transitions. Movements should convey enthusiasm and forward momentum.",
+      "metadata": {
+        "primary_color": null,
+        "secondary_colors": [],
+        "personality": null,
+        "use_cases": [],
+        "brand_approved": false,
+        "guidelines": null,
+        "restrictions": "Maintain smooth transitions and avoid jarring movements.",
+        "accessibility_notes": null
+      },
+      "facility_id": "global",
+      "created_by": "system_init",
+      "visibility": "facility",
+      "shared_facilities": [],
+      "created_at": "2025-12-03T18:44:45.030371Z",
+      "updated_at": "2025-12-03T18:44:45.031299Z",
+      "usage_count": 0,
+      "is_approved": true,
+      "approved_by": "admin",
+      "approval_notes": "Example animation style - pre-approved",
+      "version": 1
+    }
+  ],
+  "color_schemes": [
+    {
+      "id": "color_scheme_efecbf70",
+      "name": "Walmart Brand Palette",
+      "type": "color_scheme",
+      "description": "Official Walmart color scheme: Walmart Blue (#0071CE), Walmart Yellow (#FFB81C), with supporting neutrals.",
+      "category": "marketing",
+      "tags": [
+        "colors",
+        "branding",
+        "palette"
+      ],
+      "visual_reference_path": null,
+      "prompt_template": "Use the official Walmart color palette: Walmart Blue (#0071CE) for primary elements, Walmart Yellow (#FFB81C) for accents, with white and neutral backgrounds.",
+      "metadata": {
+        "primary_color": null,
+        "secondary_colors": [],
+        "personality": null,
+        "use_cases": [],
+        "brand_approved": false,
+        "guidelines": null,
+        "restrictions": "Do not deviate from approved brand colors without prior approval.",
+        "accessibility_notes": null
+      },
+      "facility_id": "global",
+      "created_by": "system_init",
+      "visibility": "facility",
+      "shared_facilities": [],
+      "created_at": "2025-12-03T18:44:45.032371Z",
+      "updated_at": "2025-12-03T18:44:45.033284Z",
+      "usage_count": 0,
+      "is_approved": true,
+      "approved_by": "admin",
+      "approval_notes": "Example color scheme - pre-approved",
+      "version": 1
+    }
+  ],
+  "created_at": "2025-12-03T18:44:45.023145Z",
+  "updated_at": "2025-12-03T18:44:45.023149Z"
+}

@@ -1,0 +1,85 @@
+[
+    {
+        "id": "msg_001",
+        "content": "Reminder: Complete your safety training CBL by Friday",
+        "category": "training",
+        "priority": "high",
+        "sender": "Safety Team",
+        "target_audience": "all_associates"
+    },
+    {
+        "id": "msg_002",
+        "content": "Great news! Our store achieved 100% customer satisfaction this week!",
+        "category": "celebration",
+        "priority": "medium",
+        "sender": "Store Manager",
+        "target_audience": "all_associates"
+    },
+    {
+        "id": "msg_003",
+        "content": "URGENT: Store closing early today at 6 PM due to weather",
+        "category": "announcement",
+        "priority": "urgent",
+        "sender": "Operations",
+        "target_audience": "all_stores"
+    },
+    {
+        "id": "msg_004",
+        "content": "New OBW procedures for checkout effective Monday",
+        "category": "policy",
+        "priority": "high",
+        "sender": "Operations Team",
+        "target_audience": "cashiers"
+    },
+    {
+        "id": "msg_005",
+        "content": "Don't forget to take your break! GWP reminder",
+        "category": "reminder",
+        "priority": "low",
+        "sender": "System",
+        "target_audience": "all_associates"
+    },
+    {
+        "id": "msg_006",
+        "content": "AP alert: Be vigilant during high traffic hours",
+        "category": "safety",
+        "priority": "medium",
+        "sender": "Asset Protection",
+        "target_audience": "floor_associates"
+    },
+    {
+        "id": "msg_007",
+        "content": "Welcome our new ASM, Sarah Johnson! She starts Monday in Electronics",
+        "category": "announcement",
+        "priority": "medium",
+        "sender": "HR Team",
+        "target_audience": "all_associates"
+    },
+    {
+        "id": "msg_008",
+        "content": "<script>alert('test')</script>Complete your training",
+        "category": "training",
+        "priority": "medium",
+        "sender": "System",
+        "target_audience": "all_associates",
+        "note": "This message contains malicious content for testing sanitization"
+    },
+    {
+        "id": "msg_009",
+        "content": "Hi",
+        "category": "announcement",
+        "priority": "low",
+        "sender": "Test",
+        "target_audience": "test",
+        "note": "This message is too short and should fail validation"
+    },
+    {
+        "id": "msg_010",
+        "content": "THIS IS A VERY LONG MESSAGE THAT EXCEEDS THE MAXIMUM CHARACTER LIMIT AND SHOULD BE REJECTED BY THE VALIDATION SYSTEM. THIS IS A VERY LONG MESSAGE THAT EXCEEDS THE MAXIMUM CHARACTER LIMIT AND SHOULD BE REJECTED BY THE VALIDATION SYSTEM. THIS IS A VERY LONG MESSAGE THAT EXCEEDS THE MAXIMUM CHARACTER LIMIT AND SHOULD BE REJECTED BY THE VALIDATION SYSTEM. THIS IS A VERY LONG MESSAGE THAT EXCEEDS THE MAXIMUM CHARACTER LIMIT AND SHOULD BE REJECTED BY THE VALIDATION SYSTEM. THIS IS A VERY LONG MESSAGE THAT EXCEEDS THE MAXIMUM CHARACTER LIMIT.",
+        "category": "announcement",
+        "priority": "low",
+        "sender": "Test",
+        "target_audience": "test",
+        "note": "This message is too long and should fail validation"
+    }
+]

@@ -1,0 +1,29 @@
+# Development Environment Configuration
+app:
+  environment: "development"
+  debug: true
+
+logging:
+  level: "DEBUG"
+
+video:
+  generator:
+    device: "cpu"  # Use CPU for development
+    num_inference_steps: 10  # Faster iterations
+
+llm:
+  model: "gpt-3.5-turbo"  # Cheaper for development
+  temperature: 0.8
+
+performance:
+  max_concurrent_generations: 1
+  enable_model_caching: true
+
+error_handling:
+  notify_on_error: false
+
+monitoring:
+  enable_metrics: false
+
+features:
+  experimental_models: true

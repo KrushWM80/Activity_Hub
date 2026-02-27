@@ -1,0 +1,17 @@
+{
+  "event_id": "91202b13-3e65-4870-885f-f4a66e221eed",
+  "podcast_id": "a6d2110a",
+  "title": "Your Week 4 Messages Are Here",
+  "filename": "amp_podcast_91202b13_Your_Week_4_Messages_Are__20260225_142554.mp3",
+  "filepath": "C:\\Users\\krush\\Documents\\VSCode\\Activity-Hub\\Store Support\\Projects\\AMP\\Zorro\\output\\podcasts\\amp_podcast_91202b13_Your_Week_4_Messages_Are__20260225_142554.mp3",
+  "file_size_bytes": 21720128,
+  "file_size_mb": 20.71,
+  "format": "MP3/WAV (Windows Media Compatible)",
+  "voice": "Windows System Speech",
+  "created_date": "20260225_142554",
+  "tracking_id": "f175a5fa8bf19b31",
+  "local_url": "http://localhost:8888/podcasts/amp_podcast_91202b13_Your_Week_4_Messages_Are__20260225_142554.mp3",
+  "relative_path": "output/podcasts/amp_podcast_91202b13_Your_Week_4_Messages_Are__20260225_142554.mp3",
+  "script_length": 5159,
+  "message_source": "wmt-edw-prod.WW_SOA_DL_VM.STORE_OPS_APPLN_ACTV_MGMT_PLAN_MSG_EVENT"
+}

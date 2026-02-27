@@ -1,0 +1,118 @@
+# Zorro Video Generator - Local Development
+# Run with: docker-compose up
+
+version: '3.8'
+
+services:
+  # =============================================================================
+  # Main Application
+  # =============================================================================
+  zorro-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: zorro-app
+    ports:
+      - "8501:8501"
+    volumes:
+      # Mount source code for hot-reload
+      - .:/app
+      # Persist generated videos
+      - zorro-videos:/app/output/videos
+      # Persist design library (until PostgreSQL is implemented)
+      - zorro-data:/app/data
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - WALMART_SSL_VERIFY=false
+      - LOG_LEVEL=DEBUG
+      # Redis for caching (future use)
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    networks:
+      - zorro-network
+    restart: unless-stopped
+
+  # =============================================================================
+  # Redis - For caching and future job queue
+  # =============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: zorro-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - zorro-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================================================
+  # PostgreSQL - Future database (currently using JSON files)
+  # Uncomment when ready to migrate from JSON storage
+  # =============================================================================
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: zorro-postgres
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_USER=zorro
+  #     - POSTGRES_PASSWORD=zorro_dev_password
+  #     - POSTGRES_DB=zorro
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #     - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+  #   networks:
+  #     - zorro-network
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U zorro"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # =============================================================================
+  # Celery Worker - Future async job processing
+  # Uncomment when ready to implement async video generation
+  # =============================================================================
+  # celery-worker:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: production
+  #   container_name: zorro-celery
+  #   command: celery -A src.workers.celery_app worker --loglevel=info
+  #   volumes:
+  #     - zorro-videos:/app/output/videos
+  #   environment:
+  #     - CELERY_BROKER_URL=redis://redis:6379/0
+  #     - CELERY_RESULT_BACKEND=redis://redis:6379/0
+  #     - WALMART_SSL_VERIFY=false
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - zorro-network
+  #   restart: unless-stopped
+
+networks:
+  zorro-network:
+    driver: bridge
+
+volumes:
+  zorro-videos:
+    driver: local
+  zorro-data:
+    driver: local
+  redis-data:
+    driver: local
+  # postgres-data:
+  #   driver: local

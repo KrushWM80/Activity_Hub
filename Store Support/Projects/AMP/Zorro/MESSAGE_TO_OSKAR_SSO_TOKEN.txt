@@ -1,0 +1,40 @@
+Subject: SSO Token for Retina GenAI Backend API Testing
+
+Hi Oskar,
+
+I hope this message finds you well. I wanted to follow up on the SSO authentication you mentioned was in progress on December 1st.
+
+We're ready to begin testing the Retina GenAI Backend API (https://retina-ds-genai-backend.prod.k8s.walmart.net) and need the SSO token or authentication credentials to proceed.
+
+**What we need:**
+- SSO token or OAuth2 credentials for API authentication
+- Any documentation on token format or refresh procedures (if applicable)
+- Confirmation of the correct endpoint for obtaining the token if we need to refresh it
+
+**What we're testing:**
+- API connectivity and health check
+- Video generation with Google Veo (veo2/veo3)
+- All supported aspect ratios (16:9, 9:16, 1:1)
+- Prompt suggestion functionality
+- Error handling and edge cases
+
+**Timeline:**
+- We're targeting to start testing this week (Dec 2-6)
+- First pilot video generation planned for Dec 9-15
+- 2-week check-in with Stephanie scheduled for mid-December
+
+We have all the code and documentation ready - we're just waiting for the authentication piece to move forward.
+
+Could you let me know when you expect to have this ready? Or if there's anything we need to do on our end to get set up?
+
+Thanks for your help on this!
+
+Best regards,
+[Your name]
+
+---
+
+**For reference:**
+- API Documentation: https://retina-ds-genai-backend.prod.k8s.walmart.net/docs
+- OpenAPI Spec: https://retina-ds-genai-backend.prod.k8s.walmart.net/openapi.json
+- Support Channel: #help-genai-media-studio

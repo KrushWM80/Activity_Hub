@@ -1,0 +1,96 @@
+# Zorro Docker Ignore File
+# Exclude files not needed in the container
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+venv
+.venv
+ENV
+env
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings
+
+# Testing
+.tox
+.coverage
+.coverage.*
+htmlcov
+.pytest_cache
+.hypothesis
+nosetests.xml
+coverage.xml
+*.cover
+.nox
+
+# Documentation
+docs/_build
+*.md
+!README.md
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.docker
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+azure-pipelines.yml
+
+# Environment
+.env
+.env.*
+!.env.template
+!.env.example
+
+# Logs and data (will be mounted as volumes)
+logs/
+*.log
+output/
+data/
+
+# Test files
+tests/
+test_*.py
+conftest.py
+
+# Misc
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db
+*.ipynb_checkpoints

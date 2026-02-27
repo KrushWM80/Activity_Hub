@@ -1,0 +1,37 @@
+# Production Environment Configuration
+app:
+  environment: "production"
+  debug: false
+
+logging:
+  level: "WARNING"
+  output_dir: "/var/log/zorro"
+
+video:
+  generator:
+    device: "cuda"
+    num_inference_steps: 50  # Higher quality
+
+llm:
+  model: "gpt-4-turbo-preview"
+  temperature: 0.7
+
+performance:
+  max_concurrent_generations: 5
+  gpu_memory_limit: "16GB"
+
+error_handling:
+  notify_on_error: true
+  notification_channels: ["log", "email", "slack"]
+
+monitoring:
+  enable_metrics: true
+  health_check_interval: 30
+
+security:
+  sanitize_inputs: true
+  block_external_urls: true
+
+features:
+  enable_batch_processing: true
+  experimental_models: false

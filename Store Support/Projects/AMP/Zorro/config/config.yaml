@@ -1,0 +1,199 @@
+# Application Configuration
+app:
+  name: "Zorro Video Generator"
+  version: "0.1.0"
+  environment: "development"
+  debug: true
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  output_dir: "logs"
+  file_rotation: "1 day"
+  max_file_size: "100 MB"
+  retention_days: 30
+
+# Video Generation Settings
+video:
+  # Default video settings
+  default_duration: 5  # seconds (API supports 4-8 seconds)
+  default_fps: 24
+  default_resolution:
+    width: 1920
+    height: 1080
+  
+  # Demo mode: Use sample videos when API is unavailable
+  demo_mode: false  # Set to true only when API is unreachable
+  
+  # Video generation model
+  generator:
+    provider: "walmart_media_studio"  # Options: walmart_media_studio, modelscope, zeroscope, stability, runwayml
+    model_name: "veo"  # Google Veo model via Walmart Media Studio
+    device: "cloud"  # Walmart Media Studio is cloud-based
+    num_inference_steps: 25
+    guidance_scale: 9.0
+    
+    # Walmart Media Studio specific settings
+    walmart_media_studio:
+      api_endpoint: "https://mediagenai.walmart.com/api/v1"  # Update when API docs available
+      timeout: 300  # seconds
+      max_retries: 3
+      poll_interval: 5  # seconds for job status polling
+  
+  # Output settings
+  output:
+    directory: "output/videos"
+    format: "mp4"
+    codec: "h264"
+    quality: "high"  # Options: low, medium, high, ultra
+    bitrate: "5000k"
+
+# LLM Configuration for Prompt Generation
+llm:
+  provider: "openai"  # Options: openai, anthropic, azure, passthrough
+  model: "gpt-4-turbo-preview"
+  api_key_env: "OPENAI_API_KEY"
+  temperature: 0.7
+  max_tokens: 500
+  
+  # Passthrough mode: Skip external LLM, use Media Studio's built-in AI enhancement
+  # Enable this if external APIs (OpenAI/Anthropic) are blocked by firewall
+  # The Media Studio API has 'enhanced_prompt: true' which uses internal AI
+  passthrough_mode: true  # RECOMMENDED for Walmart network
+  
+  # Prompt engineering
+  system_prompt: |
+    You are an expert at converting business messages into vivid, cinematic video prompts.
+    Create prompts that are:
+    - Visually descriptive and engaging
+    - Appropriate for workplace/corporate settings
+    - Clear and actionable
+    - Inclusive and accessible
+    - 2-3 sentences maximum
+  
+  # Fallback settings
+  fallback_enabled: true
+  retry_attempts: 3
+  timeout: 30
+
+# Accessibility Configuration
+accessibility:
+  # Captions
+  captions:
+    enabled: true
+    format: "webvtt"  # Options: webvtt, srt, vtt
+    language: "en-US"
+    font_size: 24
+    font_family: "Arial"
+    background_opacity: 0.8
+    position: "bottom"
+  
+  # Audio descriptions
+  audio_description:
+    enabled: true
+    voice: "en-US-Neural2-J"  # Google Cloud TTS voice
+    speed: 1.0
+    volume: 0.8
+  
+  # Visual accessibility
+  visual:
+    high_contrast: true
+    color_blind_safe: true
+    minimum_contrast_ratio: 7.0  # WCAG AAA
+    text_overlay_background: true
+
+# Video Editing Settings
+editing:
+  # Trimming
+  auto_trim_silence: true
+  silence_threshold: -40  # dB
+  
+  # Transitions
+  default_transition: "fade"
+  transition_duration: 0.5  # seconds
+  
+  # Effects
+  enable_stabilization: true
+  enable_color_correction: true
+  
+  # Looping
+  seamless_loop: true
+  loop_blend_duration: 0.3  # seconds
+
+# Message Processing
+message:
+  # Validation
+  min_length: 10
+  max_length: 500
+  allowed_formats: ["plain_text", "markdown"]
+  
+  # Content filtering
+  enable_profanity_filter: true
+  enable_sensitive_content_check: true
+  
+  # Preprocessing
+  auto_correct: false
+  expand_abbreviations: true
+  walmart_specific_terms:
+    - "GWP": "Great Workplace"
+    - "OBW": "One Best Way"
+    - "CBL": "Computer Based Learning"
+
+# Performance & Resources
+performance:
+  max_concurrent_generations: 2
+  gpu_memory_limit: "8GB"
+  enable_model_caching: true
+  cache_directory: ".cache/models"
+  
+  # Rate limiting
+  rate_limit:
+    requests_per_minute: 10
+    requests_per_hour: 100
+
+# Error Handling
+error_handling:
+  retry_on_failure: true
+  max_retries: 3
+  retry_delay: 5  # seconds
+  exponential_backoff: true
+  
+  # Notifications
+  notify_on_error: true
+  notification_channels: ["log", "email"]
+
+# Security
+security:
+  # API keys (store in environment variables)
+  api_keys_required:
+    - "OPENAI_API_KEY"
+  
+  # Input sanitization
+  sanitize_inputs: true
+  max_upload_size: "10MB"
+  
+  # Content security
+  block_external_urls: true
+  validate_file_types: true
+
+# Monitoring & Telemetry
+monitoring:
+  enable_metrics: true
+  metrics_port: 9090
+  
+  # Health checks
+  health_check_interval: 60  # seconds
+  
+  # Tracking
+  track_generation_time: true
+  track_success_rate: true
+  track_error_types: true
+
+# Feature Flags
+features:
+  enable_batch_processing: false
+  enable_api_mode: true
+  enable_web_interface: false
+  enable_real_time_preview: false
+  experimental_models: false
