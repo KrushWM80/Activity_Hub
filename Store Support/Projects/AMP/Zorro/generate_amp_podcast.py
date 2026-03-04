@@ -1,20 +1,48 @@
 """
 AMP Activity Podcast Generator - Production Ready
 Generates professional podcasts from AMP activities with live delivery links
+Now integrated with unified audio synthesis pipeline (Windows.Media + SAPI5)
 """
 
 import json
+import sys
+import logging
 from datetime import datetime
 from pathlib import Path
 import hashlib
 import uuid
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Import audio synthesis pipeline
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+try:
+    from audio_pipeline import AudioPipeline
+    AUDIO_PIPELINE_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Audio pipeline not available: {e}. Will use test mode.")
+    AUDIO_PIPELINE_AVAILABLE = False
+
 # AMP Activity Data Structure
 class AMPActivityPodcastGenerator:
-    def __init__(self):
+    def __init__(self, voice: str = "jenny"):
         self.output_dir = Path("Store Support/Projects/AMP/Zorro/output/podcasts")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.server_url = "https://walmart-amp-content.azurewebsites.net/podcasts"
+        self.default_voice = voice
+        
+        # Initialize audio pipeline if available
+        if AUDIO_PIPELINE_AVAILABLE:
+            try:
+                self.audio_pipeline = AudioPipeline(voice=voice, fallback_enabled=True)
+                logger.info(f"Audio pipeline initialized with voice: {voice}")
+            except Exception as e:
+                logger.error(f"Failed to initialize audio pipeline: {e}")
+                self.audio_pipeline = None
+        else:
+            self.audio_pipeline = None
         
     def create_amp_podcast(
         self,
@@ -25,8 +53,27 @@ class AMPActivityPodcastGenerator:
         activity_type,
         store_array,
         priority_level=2,
+        voice: str = None,
     ):
-        """Create a production-ready podcast from AMP activity."""
+        """
+        Create a production-ready podcast from AMP activity.
+        
+        Args:
+            event_id: Unique activity event ID
+            message_title: Podcast title
+            message_description: Podcast content/description
+            business_area: Business area for categorization
+            activity_type: Type of activity
+            store_array: Array of affected store numbers
+            priority_level: Priority (1=high, 2=standard, 3=info)
+            voice: Voice to use (jenny, aria, guy, mark, david, zira)
+        
+        Returns:
+            Dictionary with podcast metadata and results
+        """
+        
+        # Use provided voice or default
+        target_voice = voice or self.default_voice
         
         # Generate podcast content from AMP activity
         podcast_script = self._generate_podcast_script(
@@ -41,11 +88,51 @@ class AMPActivityPodcastGenerator:
         # Create podcast metadata
         podcast_id = str(uuid.uuid4())
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"amp_podcast_{event_id[:8]}_{timestamp}.mp3"
+        filename = f"amp_podcast_{event_id[:8]}_{timestamp}.wav"  # Changed from .mp3 to .wav
         
-        # Simulate podcast generation
+        # Create output file path
         podcast_path = self.output_dir / filename
-        file_size_mb = self._estimate_file_size(len(podcast_script.split()))
+        
+        # Synthesize audio if pipeline available
+        voice_used = None
+        synthesis_status = "simulated"
+        synthesis_message = "Audio pipeline not available - using test mode"
+        
+        if self.audio_pipeline:
+            logger.info(f"Synthesizing podcast with voice: {target_voice}")
+            success, message, voice_used = self.audio_pipeline.synthesize(
+                text=podcast_script,
+                output_file=str(podcast_path),
+                voice=target_voice,
+                fallback=True
+            )
+            
+            if success:
+                synthesis_status = "completed"
+                synthesis_message = message
+                actual_file_size_mb = podcast_path.stat().st_size / (1024 * 1024)
+                logger.info(f"Synthesis completed: {message}")
+            else:
+                synthesis_status = "failed"
+                synthesis_message = message
+                logger.error(f"Synthesis failed: {message}")
+                return {
+                    "success": False,
+                    "error": synthesis_message,
+                    "event_id": event_id,
+                }
+        else:
+            # Test mode: create dummy file for testing
+            try:
+                podcast_path.write_bytes(b"RIFF" + b"\x00" * 1000)  # Minimal WAV header
+                actual_file_size_mb = podcast_path.stat().st_size / (1024 * 1024)
+                voice_used = target_voice
+            except Exception as e:
+                logger.error(f"Could not create test file: {e}")
+                actual_file_size_mb = 2.5
+        
+        # Estimate duration from script
+        file_size_mb = actual_file_size_mb if self.audio_pipeline else 2.5
         duration_seconds = self._estimate_duration(len(podcast_script.split()))
         
         # Generate production link
@@ -67,30 +154,52 @@ class AMPActivityPodcastGenerator:
             "duration_seconds": duration_seconds,
             "file_size_mb": file_size_mb,
             "bitrate": "128k",
-            "format": "mp3",
+            "format": "wav",  # Changed from mp3 to wav
+            "sample_rate": 16000,
+            "voice": voice_used or target_voice,
+            "voice_engine": self._get_voice_engine(voice_used or target_voice),
+            "synthesis_status": synthesis_status,
+            "synthesis_message": synthesis_message,
             "narrator": "professional",
             "script": podcast_script,
             "quality": "high",
-            "production_ready": True,
+            "production_ready": synthesis_status == "completed",
             "live_link": live_link,
             "download_url": f"{self.server_url}/{filename}",
             "tracking_id": self._generate_tracking_id(podcast_id),
         }
         
         return {
-            "success": True,
+            "success": synthesis_status == "completed",
             "podcast_id": podcast_id,
             "event_id": event_id,
             "filename": filename,
             "duration_seconds": duration_seconds,
             "file_size_mb": file_size_mb,
             "title": message_title,
+            "voice": voice_used or target_voice,
             "live_link": live_link,
             "download_url": metadata["download_url"],
-            "production_ready": True,
+            "production_ready": metadata["production_ready"],
             "metadata": metadata,
             "embed_code": self._generate_embed_code(live_link),
+            "synthesis_status": synthesis_status,
+            "synthesis_message": synthesis_message,
         }
+    
+    def _get_voice_engine(self, voice: str) -> str:
+        """Get the engine for a given voice"""
+        if not voice:
+            return "unknown"
+        
+        voice_lower = voice.lower()
+        
+        if voice_lower in ["jenny", "aria", "guy", "mark"]:
+            return "Windows.Media"
+        elif voice_lower in ["david", "zira"]:
+            return "SAPI5"
+        
+        return "unknown"
     
     def _generate_podcast_script(
         self,
@@ -180,12 +289,12 @@ def get_sample_amp_activity():
 
 
 # Generate Podcast
-def main():
+def main(voice: str = "jenny"):
     print("\n" + "="*80)
     print("🎙️  WALMART AMP ACTIVITY - PROFESSIONAL PODCAST GENERATOR")
     print("="*80 + "\n")
     
-    generator = AMPActivityPodcastGenerator()
+    generator = AMPActivityPodcastGenerator(voice=voice)
     
     # Get sample AMP activity
     activity = get_sample_amp_activity()
@@ -193,7 +302,8 @@ def main():
     print(f"📝 Processing AMP Activity")
     print(f"   Event ID: {activity['event_id']}")
     print(f"   Title: {activity['message_title']}")
-    print(f"   Business Area: {activity['business_area']}\n")
+    print(f"   Business Area: {activity['business_area']}")
+    print(f"   Voice Selected: {voice}\n")
     
     # Generate podcast
     result = generator.create_amp_podcast(
@@ -204,6 +314,7 @@ def main():
         activity_type=activity['activity_type'],
         store_array=activity['store_array'],
         priority_level=activity['priority_level'],
+        voice=voice,
     )
     
     if result['success']:
@@ -213,8 +324,11 @@ def main():
         print(f"   Event ID: {result['event_id']}")
         print(f"   Title: {result['title']}")
         print(f"   File: {result['filename']}")
+        print(f"   Voice Used: {result['voice']}")
+        print(f"   Engine: {result['metadata']['voice_engine']}")
         print(f"   Duration: {result['duration_seconds']} seconds")
         print(f"   File Size: {result['file_size_mb']} MB")
+        print(f"   Format: {result['metadata']['format'].upper()}")
         
         print(f"\n🔗 PRODUCTION-READY LINKS:")
         print(f"   🟢 LIVE LINK (Direct Play):")
@@ -223,12 +337,16 @@ def main():
         print(f"      {result['download_url']}")
         
         print(f"\n📊 TECHNICAL SPECIFICATIONS:")
-        print(f"   Format: MP3")
-        print(f"   Bitrate: 128k (optimized for mobile)")
-        print(f"   Sample Rate: 44,100 Hz")
-        print(f"   Narrator: Professional")
-        print(f"   Quality Level: High")
-        print(f"   Production Ready: ✅ YES")
+        print(f"   Format: {result['metadata']['format'].upper()}")
+        print(f"   Bitrate: {result['metadata']['bitrate']}")
+        print(f"   Sample Rate: {result['metadata']['sample_rate']} Hz")
+        print(f"   Narrator: {result['metadata']['voice']}")
+        print(f"   Voice Engine: {result['metadata']['voice_engine']}")
+        print(f"   Quality Level: {result['metadata']['quality']}")
+        print(f"   Synthesis Status: {result['synthesis_status']}")
+        if result['synthesis_message']:
+            print(f"   Synthesis Details: {result['synthesis_message']}")
+        print(f"   Production Ready: {'✅ YES' if result['production_ready'] else '⚠️  TESTING MODE'}")
         
         print(f"\n📈 TRACKING & ANALYTICS:")
         print(f"   Tracking ID: {result['metadata']['tracking_id']}")
@@ -245,6 +363,7 @@ def main():
         print(f"   ✓ Dashboard embed ready")
         print(f"   ✓ Tracking enabled")
         print(f"   ✓ Analytics ready")
+        print(f"   ✓ Voice synthesis: {'Complete' if result['synthesis_status'] == 'completed' else 'Testing'}")
         
         print(f"\n🎯 NEXT STEPS:")
         print(f"   1. Email link: {result['live_link']}")
@@ -261,13 +380,19 @@ def main():
         return result
     else:
         print("❌ Podcast generation failed")
+        print(f"   Error: {result.get('error', 'Unknown error')}")
         return None
 
 
 if __name__ == "__main__":
-    result = main()
+    # Default to Jenny voice, but can specify others: aria, guy, mark, david, zira
+    import sys
+    voice = sys.argv[1] if len(sys.argv) > 1 else "jenny"
+    
+    result = main(voice=voice)
     
     if result:
         print("\n" + "="*80)
         print("🚀 PODCAST READY FOR PRODUCTION DEPLOYMENT")
         print("="*80 + "\n")
+

@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
-TDA Insights Dashboard Backend - Pure Socket Version
-Uses only Python standard library, minimal dependencies
+TDA Insights Dashboard Backend - BigQuery Connected
+Connects to real BigQuery data from wmt-assetprotection-prod
+
+Authentication Setup:
+  Option 1: gcloud auth application-default login
+  Option 2: Set GOOGLE_APPLICATION_CREDENTIALS=path/to/service-account.json
 """
 
 import socket
@@ -9,11 +13,113 @@ import json
 import threading
 import time
 from pathlib import Path
+import zipfile
+import io
+from xml.etree import ElementTree as ET
+import os
+import base64
+
+# Try to load environment variables from .env file (optional)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).parent / '.env')
+except ImportError:
+    # dotenv not installed, use environment variables directly
+    pass
 
 PORT = 5000
 SCRIPT_DIR = Path(__file__).parent
 
-# Sample data (replace with BigQuery data if available)
+# Try to import BigQuery client
+try:
+    from google.cloud import bigquery
+    from google.oauth2 import service_account
+    BQ_AVAILABLE = True
+except ImportError:
+    BQ_AVAILABLE = False
+    print("[WARN] BigQuery libraries not available. Using sample data.")
+    print("[HINT] Install: pip install google-cloud-bigquery google-auth python-dotenv")
+
+# BigQuery configuration from environment variables
+BQ_PROJECT = os.getenv('GCP_PROJECT_ID', 'wmt-assetprotection-prod')
+BQ_DATASET = os.getenv('BIGQUERY_DATASET', 'Store_Support_Dev')
+BQ_TABLE = os.getenv('BIGQUERY_TABLE', 'Output_TDA Report')
+
+def get_bigquery_client():
+    """Initialize BigQuery client with Application Default Credentials"""
+    if not BQ_AVAILABLE:
+        return None
+    
+    try:
+        # BigQuery client will automatically use Application Default Credentials
+        # This includes: GOOGLE_APPLICATION_CREDENTIALS env var, gcloud auth, etc.
+        print(f"[OK] Initializing BigQuery client (using Application Default Credentials)")
+        client = bigquery.Client(project=BQ_PROJECT)
+        
+        print(f"[OK] BigQuery client initialized successfully")
+        print(f"   Project: {BQ_PROJECT}")
+        print(f"   Dataset: {BQ_DATASET}")
+        print(f"   Table: {BQ_TABLE}")
+        return client
+    except Exception as e:
+        print(f"[ERROR] Could not initialize BigQuery client: {e}")
+        print(f"[HINT] Make sure you ran: gcloud auth application-default login")
+        return None
+
+def get_bigquery_data():
+    """Fetch data from BigQuery"""
+    if not BQ_AVAILABLE:
+        return None
+    
+    try:
+        client = get_bigquery_client()
+        if not client:
+            return None
+        
+        # Query the actual BigQuery table with correct column names
+        # Table: Output- TDA Report
+        # Columns: Topic, Health_Update, Phase, Dallas_POC, Deployment, Intake_n_Testing, Facility
+        query = f"""
+        SELECT 
+            Topic as `Initiative - Project Title`,
+            Health_Update as `Health Status`,
+            Phase,
+            COUNT(DISTINCT Facility) as `# of Stores`,
+            Intake_n_Testing as `Intake & Testing`,
+            Dallas_POC as `Dallas POC`,
+            Deployment
+        FROM `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE}`
+        WHERE Topic IS NOT NULL
+        GROUP BY Topic, Health_Update, Phase, Intake_n_Testing, Dallas_POC, Deployment
+        ORDER BY Topic
+        LIMIT 100
+        """
+        
+        query_job = client.query(query)
+        results = query_job.result()
+        
+        # Convert results to list of dicts
+        data = []
+        for row in results:
+            data.append({
+                'Initiative - Project Title': row['Initiative - Project Title'] or 'Unknown',
+                'Health Status': row['Health Status'] or 'Unknown',
+                'Phase': row['Phase'] or 'Unknown',
+                '# of Stores': row['# of Stores'] or 0,
+                'Intake & Testing': row['Intake & Testing'] or 'N/A',
+                'Dallas POC': row['Dallas POC'] or 'N/A',
+                'Deployment': row['Deployment'] or 'N/A'
+            })
+        
+        print(f"[OK] Loaded {len(data)} projects from BigQuery")
+        return data
+    except Exception as e:
+        print(f"[ERROR] BigQuery query failed: {e}")
+        print(f"[HINT] Check that table '{BQ_TABLE}' exists and has required columns")
+        return None
+        return None
+
+# Sample data fallback
 SAMPLE_DATA = [
     {
         "Initiative - Project Title": "Sidekick Enhancement",
@@ -62,9 +168,387 @@ SAMPLE_DATA = [
     },
 ]
 
+# Load data at startup
+print("\n[*] Loading data from BigQuery...")
+BQ_DATA = get_bigquery_data()
+DATA = BQ_DATA if BQ_DATA else SAMPLE_DATA
+
+if BQ_DATA:
+    DATA_SOURCE = "BigQuery (wmt-assetprotection-prod)"
+else:
+    DATA_SOURCE = "Sample Data (local)"
+def generate_minimal_pptx(phase=None):
+    """Generate a PPTX file with data organized by phase"""
+    pptx_buffer = io.BytesIO()
+    
+    with zipfile.ZipFile(pptx_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+        # [Content_Types].xml
+        content_types = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>
+<Override PartName="/ppt/slides/slide1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>
+<Override PartName="/ppt/slides/slide2.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>
+<Override PartName="/ppt/slides/slide3.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>
+<Override PartName="/ppt/slides/slide4.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>
+<Override PartName="/ppt/slides/slide5.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>
+<Override PartName="/ppt/slides/slide6.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>
+</Types>'''
+        zf.writestr('[Content_Types].xml', content_types)
+        
+        # _rels/.rels
+        rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
+</Relationships>'''
+        zf.writestr('_rels/.rels', rels)
+        
+        # ppt/_rels/presentation.xml.rels
+        ppt_rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide1.xml"/>
+<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide2.xml"/>
+<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide3.xml"/>
+<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide4.xml"/>
+<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide5.xml"/>
+<Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide6.xml"/>
+</Relationships>'''
+        zf.writestr('ppt/_rels/presentation.xml.rels', ppt_rels)
+        
+        # ppt/presentation.xml
+        presentation = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<p:sldIdLst>
+<p:sldId id="256" r:id="rId1"/>
+<p:sldId id="257" r:id="rId2"/>
+<p:sldId id="258" r:id="rId3"/>
+<p:sldId id="259" r:id="rId4"/>
+<p:sldId id="260" r:id="rId5"/>
+<p:sldId id="261" r:id="rId6"/>
+</p:sldIdLst>
+</p:presentation>'''
+        zf.writestr('ppt/presentation.xml', presentation)
+        
+        # Create slides for each phase
+        phases_list = ['Pending', 'POC/POT', 'Test', 'Mkt Scale', 'Roll/Deploy', 'Summary']
+        
+        for slide_num, phase_name in enumerate(phases_list, 1):
+            # ppt/slides/_rels/slideN.xml.rels
+            slide_rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+</Relationships>'''
+            zf.writestr(f'ppt/slides/_rels/slide{slide_num}.xml.rels', slide_rels)
+            
+            # Get data for this phase
+            if phase_name == 'Summary':
+                phase_data = filter_data()
+                title = "TDA Initiatives Summary"
+                content = f"Total Projects: {len(phase_data)}\n"
+                content += f"Total Stores: {sum(int(p.get('# of Stores', 0) or 0) for p in phase_data)}\n\n"
+                
+                # Count by status
+                statuses = {}
+                for p in phase_data:
+                    status = p.get('Health Status', 'Unknown')
+                    statuses[status] = statuses.get(status, 0) + 1
+                
+                for status, count in statuses.items():
+                    content += f"{status}: {count}\n"
+            else:
+                phase_data = [p for p in filter_data() if p.get('Phase') == phase_name]
+                title = f"Phase: {phase_name} ({len(phase_data)} projects)"
+                content = ""
+                for idx, p in enumerate(phase_data[:10], 1):  # Limit to 10 per slide
+                    content += f"\n{idx}. {p['Initiative - Project Title']}\n"
+                    content += f"   Status: {p['Health Status']} | Stores: {p['# of Stores']}\n"
+            
+            slide_xml = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<p:cSld>
+<p:spTree>
+<p:nvGrpSpPr>
+<p:cNvPr id="1" name="Title"/>
+<p:cNvGrpSpPr/>
+<p:nvPr/>
+</p:nvGrpSpPr>
+<p:grpSpPr>
+<a:xfrm>
+<a:off x="0" y="0"/>
+<a:ext cx="9144000" cy="6858000"/>
+</a:xfrm>
+</p:grpSpPr>
+<p:sp>
+<p:nvSpPr>
+<p:cNvPr id="2" name="Title"/>
+<p:cNvSpPr/>
+<p:nvPr/>
+</p:nvSpPr>
+<p:spPr>
+<a:xfrm>
+<a:off x="457200" y="274638"/>
+<a:ext cx="8230200" cy="1476600"/>
+</a:xfrm>
+</p:spPr>
+<p:txBody>
+<a:bodyPr/>
+<a:lstStyle/>
+<a:p>
+<a:r>
+<a:rPr lang="en-US" sz="4400" bold="1"/>
+<a:t>{title}</a:t>
+</a:r>
+</a:p>
+</p:txBody>
+</p:sp>
+<p:sp>
+<p:nvSpPr>
+<p:cNvPr id="3" name="Content"/>
+<p:cNvSpPr/>
+<p:nvPr/>
+</p:nvSpPr>
+<p:spPr>
+<a:xfrm>
+<a:off x="457200" y="1905000"/>
+<a:ext cx="8230200" cy="4572000"/>
+</a:xfrm>
+</p:spPr>
+<p:txBody>
+<a:bodyPr/>
+<a:lstStyle/>
+<a:p>
+<a:r>
+<a:rPr lang="en-US" sz="2000"/>
+<a:t>{content.replace(chr(10), " ")}</a:t>
+</a:r>
+</a:p>
+</p:txBody>
+</p:sp>
+</p:spTree>
+</p:cSld>
+</p:sld>'''
+            zf.writestr(f'ppt/slides/slide{slide_num}.xml', slide_xml)
+    
+    pptx_buffer.seek(0)
+    return pptx_buffer.getvalue()
+
+def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
+    """Generate PPTX from base64 encoded screenshots using pure XML"""
+    try:
+        pptx_buffer = io.BytesIO()
+        image_id = 1
+        slide_num = 1
+        
+        with zipfile.ZipFile(pptx_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+            # Count total slides (title + screenshots)
+            total_slides = len(screenshots_data) + 1
+            
+            # [Content_Types].xml
+            content_types = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Default Extension="png" ContentType="image/png"/>
+<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>'''
+            
+            # Add slide overrides
+            for i in range(1, total_slides + 1):
+                content_types += f'\n<Override PartName="/ppt/slides/slide{i}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>'
+            
+            content_types += '\n</Types>'
+            zf.writestr('[Content_Types].xml', content_types)
+            
+            # _rels/.rels
+            rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
+</Relationships>'''
+            zf.writestr('_rels/.rels', rels)
+            
+            # ppt/_rels/presentation.xml.rels
+            ppt_rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'''
+            for i in range(1, total_slides + 1):
+                ppt_rels += f'\n<Relationship Id="rId{i}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide{i}.xml"/>'
+            ppt_rels += '\n</Relationships>'
+            zf.writestr('ppt/_rels/presentation.xml.rels', ppt_rels)
+            
+            # ppt/presentation.xml
+            presentation = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<p:sldIdLst>'''
+            for i in range(1, total_slides + 1):
+                presentation += f'\n<p:sldId id="{255+i}" r:id="rId{i}"/>'
+            presentation += '\n</p:sldIdLst>\n</p:presentation>'
+            zf.writestr('ppt/presentation.xml', presentation)
+            
+            # Add title slide
+            slide_rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+</Relationships>'''
+            zf.writestr(f'ppt/slides/_rels/slide{slide_num}.xml.rels', slide_rels)
+            
+            title_slide = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<p:cSld>
+<p:bg>
+<p:bgPr>
+<a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
+<a:effectLst/>
+</p:bgPr>
+</p:bg>
+<p:spTree>
+<p:nvGrpSpPr>
+<p:cNvPr id="1" name="Title"/>
+<p:cNvGrpSpPr/>
+<p:nvPr/>
+</p:nvGrpSpPr>
+<p:grpSpPr>
+<a:xfrm>
+<a:off x="0" y="0"/>
+<a:ext cx="9144000" cy="6858000"/>
+</a:xfrm>
+</p:grpSpPr>
+<p:sp>
+<p:nvSpPr>
+<p:cNvPr id="2" name="Title"/>
+<p:cNvSpPr/>
+<p:nvPr/>
+</p:nvSpPr>
+<p:spPr>
+<a:xfrm>
+<a:off x="457200" y="2000000"/>
+<a:ext cx="8230200" cy="1500000"/>
+</a:xfrm>
+</p:spPr>
+<p:txBody>
+<a:bodyPr/>
+<a:lstStyle/>
+<a:p>
+<a:r>
+<a:rPr lang="en-US" sz="5400" bold="1"/>
+<a:t>{title}</a:t>
+</a:r>
+</a:p>
+</p:txBody>
+</p:sp>
+<p:sp>
+<p:nvSpPr>
+<p:cNvPr id="3" name="Subtitle"/>
+<p:cNvSpPr/>
+<p:nvPr/>
+</p:nvSpPr>
+<p:spPr>
+<a:xfrm>
+<a:off x="457200" y="3700000"/>
+<a:ext cx="8230200" cy="1000000"/>
+</a:xfrm>
+</p:spPr>
+<p:txBody>
+<a:bodyPr/>
+<a:lstStyle/>
+<a:p>
+<a:r>
+<a:rPr lang="en-US" sz="3200"/>
+<a:t>Total Pages: {len(screenshots_data)}</a:t>
+</a:r>
+</a:p>
+</p:txBody>
+</p:sp>
+</p:spTree>
+</p:cSld>
+</p:sld>'''
+            zf.writestr(f'ppt/slides/slide{slide_num}.xml', title_slide)
+            slide_num += 1
+            
+            # Add screenshot slides
+            for idx, screenshot_info in enumerate(screenshots_data, 1):
+                try:
+                    image_data = screenshot_info.get('imageData', '')
+                    if ',' in image_data:
+                        image_data = image_data.split(',')[1]
+                    
+                    # Decode and store image
+                    image_bytes = base64.b64decode(image_data)
+                    image_filename = f'image{idx}.png'
+                    zf.writestr(f'ppt/media/{image_filename}', image_bytes)
+                    
+                    # Create slide with image
+                    slide_rels = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/{image_filename}"/>
+</Relationships>'''
+                    zf.writestr(f'ppt/slides/_rels/slide{slide_num}.xml.rels', slide_rels)
+                    
+                    # Image slide XML
+                    image_slide = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<p:cSld>
+<p:bg>
+<p:bgPr>
+<a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
+<a:effectLst/>
+</p:bgPr>
+</p:bg>
+<p:spTree>
+<p:nvGrpSpPr>
+<p:cNvPr id="1" name=""/>
+<p:cNvGrpSpPr/>
+<p:nvPr/>
+</p:nvGrpSpPr>
+<p:grpSpPr>
+<a:xfrm>
+<a:off x="0" y="0"/>
+<a:ext cx="9144000" cy="6858000"/>
+</a:xfrm>
+</p:grpSpPr>
+<p:pic>
+<p:nvPicPr>
+<p:cNvPr id="2" name="{image_filename}"/>
+<p:cNvPicPr>
+<a:picLocks noChangeAspect="1"/>
+</p:cNvPicPr>
+<p:nvPr/>
+</p:nvPicPr>
+<p:blipFill>
+<a:blip r:embed="rId1"/>
+<a:stretch>
+<a:fillRect/>
+</a:stretch>
+</p:blipFill>
+<p:spPr>
+<a:xfrm>
+<a:off x="0" y="0"/>
+<a:ext cx="9144000" cy="6858000"/>
+</a:xfrm>
+<a:prstGeom prst="rect">
+<a:avLst/>
+</a:prstGeom>
+</p:spPr>
+</p:pic>
+</p:spTree>
+</p:cSld>
+<p:clrMapOvr>
+<a:masterClrMapping/>
+</p:clrMapOvr>
+</p:sld>'''
+                    zf.writestr(f'ppt/slides/slide{slide_num}.xml', image_slide)
+                    slide_num += 1
+                    
+                except Exception as e:
+                    print(f"[WARN] Failed to process screenshot {idx}: {e}")
+                    continue
+        
+        pptx_buffer.seek(0)
+        return pptx_buffer.getvalue()
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to generate PPTX from screenshots: {e}")
+        raise
+
 def filter_data(phase=None, health_status=None):
-    """Filter sample data by phase and health status"""
-    data = SAMPLE_DATA
+    """Filter data by phase and health status"""
+    data = DATA
     if phase and phase != "All":
         data = [r for r in data if r.get("Phase") == phase]
     if health_status and health_status != "All":
@@ -85,7 +569,22 @@ def handle_request(client_socket, addr):
             return
         
         method = parts[0]
-        path = parts[1].split('?')[0]  # Remove query string
+        full_path = parts[1]
+        
+        # Parse path and query string
+        if '?' in full_path:
+            path, query_string = full_path.split('?', 1)
+        else:
+            path = full_path
+            query_string = ""
+        
+        # Parse query parameters
+        query_params = {}
+        if query_string:
+            for param in query_string.split('&'):
+                if '=' in param:
+                    key, value = param.split('=', 1)
+                    query_params[key] = value.replace('%20', ' ').replace('+', ' ')
         
         print(f"[{time.strftime('%H:%M:%S')}] {method} {path}")
         
@@ -100,7 +599,9 @@ def handle_request(client_socket, addr):
             client_socket.sendall(response.encode())
         
         elif path == '/api/data':
-            data = filter_data()
+            phase = query_params.get('phase', 'All')
+            health_status = query_params.get('health_status', 'All')
+            data = filter_data(phase=phase, health_status=health_status)
             response_json = json.dumps({
                 'success': True,
                 'count': len(data),
@@ -120,7 +621,7 @@ def handle_request(client_socket, addr):
             client_socket.sendall(response.encode())
         
         elif path == '/api/health-statuses':
-            statuses = sorted(set(r.get("Health Status", "Unknown") for r in SAMPLE_DATA))
+            statuses = sorted(set(r.get("Health Status", "Unknown") for r in DATA))
             response_json = json.dumps({
                 'success': True,
                 'health_statuses': statuses
@@ -165,15 +666,63 @@ def handle_request(client_socket, addr):
                 response = f"HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\n{error}"
                 client_socket.sendall(response.encode())
         
+        elif path == '/api/ppt/generate-from-screenshots':
+            try:
+                # Parse request body for screenshot data
+                body_start = request_data.find('\r\n\r\n')
+                if body_start == -1:
+                    raise ValueError("No request body")
+                
+                body_data = request_data[body_start+4:]
+                request_json = json.loads(body_data)
+                
+                screenshots = request_json.get('screenshots', [])
+                title = request_json.get('title', 'TDA Report')
+                
+                if not screenshots:
+                    raise ValueError("No screenshots provided")
+                
+                # Generate PPTX from screenshots
+                pptx_data = generate_pptx_from_screenshots(screenshots, title)
+                filename = f'TDA_Report_{int(time.time())}.pptx'
+                
+                # Send binary file with proper headers
+                response_headers = (
+                    f"HTTP/1.1 200 OK\r\n"
+                    f"Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation\r\n"
+                    f"Content-Disposition: attachment; filename=\"{filename}\"\r\n"
+                    f"Content-Length: {len(pptx_data)}\r\n"
+                    f"Access-Control-Allow-Origin: *\r\n"
+                    f"Connection: close\r\n\r\n"
+                )
+                client_socket.sendall(response_headers.encode())
+                client_socket.sendall(pptx_data)
+            except Exception as e:
+                print(f"[ERROR] Screenshot PPT generation failed: {e}")
+                error_response = f"HTTP/1.1 500 Server Error\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n" + json.dumps({'error': str(e)})
+                client_socket.sendall(error_response.encode())
+        
         elif path == '/api/ppt/generate':
-            # Simple PPT generation stub (no external dependencies)
-            response_json = json.dumps({
-                'success': True,
-                'file_name': f'TDA_Report_{int(time.time())}.pptx',
-                'message': 'PPT generation requires python-pptx. Install with: pip install python-pptx'
-            })
-            response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
-            client_socket.sendall(response.encode())
+            try:
+                # Generate PPTX file
+                pptx_data = generate_minimal_pptx()
+                filename = f'TDA_Report_{int(time.time())}.pptx'
+                
+                # Send binary file with proper headers
+                response_headers = (
+                    f"HTTP/1.1 200 OK\r\n"
+                    f"Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation\r\n"
+                    f"Content-Disposition: attachment; filename=\"{filename}\"\r\n"
+                    f"Content-Length: {len(pptx_data)}\r\n"
+                    f"Access-Control-Allow-Origin: *\r\n"
+                    f"Connection: close\r\n\r\n"
+                )
+                client_socket.sendall(response_headers.encode())
+                client_socket.sendall(pptx_data)
+            except Exception as e:
+                print(f"[ERROR] PPT generation failed: {e}")
+                error_response = f"HTTP/1.1 500 Server Error\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n" + json.dumps({'error': str(e)})
+                client_socket.sendall(error_response.encode())
         
         elif path == '/favicon.ico':
             response = "HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n"
@@ -207,9 +756,13 @@ def start_server():
         server_socket.bind(('127.0.0.1', PORT))
         server_socket.listen(5)
         
+        record_count = len(DATA)
+        
         print("\n" + "="*60)
-        print("[OK] TDA Insights Dashboard - Lightweight Backend")
+        print("[OK] TDA Insights Dashboard Backend")
         print("="*60)
+        print(f"[OK] Data Source: {DATA_SOURCE}")
+        print(f"[OK] Records Loaded: {record_count}")
         print(f"[OK] Server listening on http://127.0.0.1:{PORT}")
         print(f"[OK] Dashboard: http://localhost:{PORT}/dashboard.html")
         print(f"[OK] API: http://localhost:{PORT}/api/data")

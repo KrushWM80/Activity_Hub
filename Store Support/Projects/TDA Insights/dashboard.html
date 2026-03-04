@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TDA Initiatives Insights - Walmart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -194,6 +195,33 @@
             outline: none;
             border-color: var(--walmart-blue);
             box-shadow: 0 0 0 3px rgba(0, 113, 206, 0.1);
+        }
+
+        /* Checkbox Styling */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--walmart-blue);
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+            margin: 0;
         }
 
         .button-group {
@@ -409,6 +437,34 @@
             margin-top: var(--spacing-xl);
         }
 
+        /* Pagination Controls */
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-light);
+        }
+
+        .pagination-controls button {
+            padding: 8px 12px;
+            min-width: 40px;
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .pagination-controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header-content {
@@ -522,7 +578,7 @@
         <!-- Data Table -->
         <div class="table-section">
             <div class="table-header">
-                <h2>Initiatives Overview</h2>
+                <h2 id="table-title">TDA Initiatives Insights - All Phases</h2>
                 <div class="table-actions">
                     <span id="record-count" style="color: var(--text-secondary); font-size: var(--font-size-sm);">Loading...</span>
                 </div>
@@ -532,6 +588,13 @@
                     <div class="loader"></div>
                     <span>Loading TDA Initiatives...</span>
                 </div>
+            </div>
+            <div class="pagination-controls" id="pagination-controls" style="display: none;">
+                <button class="btn-secondary" id="prev-page-btn">← Previous</button>
+                <div class="pagination-info">
+                    <span>Page <span id="current-page">1</span> of <span id="total-pages">1</span></span>
+                </div>
+                <button class="btn-secondary" id="next-page-btn">Next →</button>
             </div>
         </div>
 
@@ -545,17 +608,20 @@
     <script>
         // Configuration
         const API_BASE = 'http://localhost:5000/api';
+        const ITEMS_PER_PAGE = 10; // Fits ~10 items per 960×720 screen
         
         // State
         let allData = [];
         let phases = [];
         let healthStatuses = [];
+        let currentPage = 1;
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async () => {
             await loadFilters();
             await loadData();
             setupEventListeners();
+            updatePageTitle();
         });
 
         // Setup event listeners
@@ -565,6 +631,13 @@
             document.getElementById('export-btn').addEventListener('click', exportCSV);
             document.getElementById('ppt-btn').addEventListener('click', generatePPT);
             
+            // Update title when phase filter changes
+            document.getElementById('phase-filter').addEventListener('change', updatePageTitle);
+            
+            // Pagination controls
+            document.getElementById('prev-page-btn').addEventListener('click', goToPreviousPage);
+            document.getElementById('next-page-btn').addEventListener('click', goToNextPage);
+            
             // Allow Enter key to apply filters
             document.getElementById('phase-filter').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') loadData();
@@ -572,6 +645,18 @@
             document.getElementById('health-filter').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') loadData();
             });
+        }
+
+        // Update page title based on selected phase
+        function updatePageTitle() {
+            const selectedPhase = document.getElementById('phase-filter').value;
+            const titleEl = document.getElementById('table-title');
+            
+            if (selectedPhase === 'All') {
+                titleEl.textContent = 'TDA Initiatives Insights - All Phases';
+            } else {
+                titleEl.textContent = `TDA Initiatives Insights - ${selectedPhase}`;
+            }
         }
 
         // Load filter options
@@ -634,6 +719,7 @@
                 
                 if (result.success) {
                     allData = result.data;
+                    currentPage = 1; // Reset to first page
                     renderTable(result.data);
                     updateSummary(result.data);
                     updateRecordCount(result.count);
@@ -649,9 +735,10 @@
             }
         }
 
-        // Render table
+        // Render table with pagination
         function renderTable(data) {
             const wrapper = document.getElementById('table-wrapper');
+            const paginationControls = document.getElementById('pagination-controls');
             
             if (!data || data.length === 0) {
                 wrapper.innerHTML = `
@@ -661,8 +748,15 @@
                         <p>Try adjusting your filters</p>
                     </div>
                 `;
+                paginationControls.style.display = 'none';
                 return;
             }
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+            const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIdx = startIdx + ITEMS_PER_PAGE;
+            const pageData = data.slice(startIdx, endIdx);
             
             const columns = [
                 'Initiative - Project Title',
@@ -680,7 +774,7 @@
             });
             html += '</tr></thead><tbody>';
             
-            data.forEach(row => {
+            pageData.forEach(row => {
                 html += '<tr>';
                 columns.forEach(col => {
                     let value = row[col] || '';
@@ -711,6 +805,39 @@
             
             html += '</tbody></table>';
             wrapper.innerHTML = html;
+            
+            // Show/update pagination controls
+            if (totalPages > 1) {
+                paginationControls.style.display = 'flex';
+                document.getElementById('current-page').textContent = currentPage;
+                document.getElementById('total-pages').textContent = totalPages;
+                document.getElementById('prev-page-btn').disabled = currentPage === 1;
+                document.getElementById('next-page-btn').disabled = currentPage === totalPages;
+            } else {
+                paginationControls.style.display = 'none';
+            }
+        }
+
+        // Pagination functions
+        function goToPreviousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable(allData);
+                scrollToTable();
+            }
+        }
+
+        function goToNextPage() {
+            const totalPages = Math.ceil(allData.length / ITEMS_PER_PAGE);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable(allData);
+                scrollToTable();
+            }
+        }
+
+        function scrollToTable() {
+            document.getElementById('table-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         // Update summary statistics
@@ -744,6 +871,7 @@
         function resetFilters() {
             document.getElementById('phase-filter').value = 'All';
             document.getElementById('health-filter').value = 'All';
+            updatePageTitle();
             loadData();
         }
 
@@ -774,9 +902,9 @@
             link.click();
         }
 
-        // Generate PPT (integrated with backend)
+        // Generate PPT with screenshots (integrated with backend)
         async function generatePPT() {
-            // Get current selected phases
+            // Get selected phase
             const selectedPhase = document.getElementById('phase-filter').value;
             const phases = selectedPhase === 'All' ? null : [selectedPhase];
             const btn = document.getElementById('ppt-btn');
@@ -784,41 +912,95 @@
             
             try {
                 // Show loading state
-                btn.textContent = '⏳ Generating...';
+                btn.textContent = '[Wait] Generating...';
                 btn.disabled = true;
                 
-                // Request report generation
-                const response = await fetch(`${API_BASE}/ppt/generate`, {
+                // Filter data to only selected phase
+                let dataToCapture = allData;
+                if (selectedPhase !== 'All') {
+                    dataToCapture = allData.filter(p => p.Phase === selectedPhase);
+                }
+                
+                if (dataToCapture.length === 0) {
+                    throw new Error('No data available for selected phase. Load data first.');
+                }
+                
+                // Generate screenshots for each page
+                const totalPages = Math.ceil(dataToCapture.length / ITEMS_PER_PAGE);
+                const screenshots = [];
+                
+                for (let page = 1; page <= totalPages; page++) {
+                    btn.textContent = `[Wait] Capturing page ${page}/${totalPages}...`;
+                    
+                    // Temporarily render the page with filtered data
+                    currentPage = page;
+                    renderTable(dataToCapture);
+                    
+                    // Wait for DOM to update
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Capture the table
+                    const tableWrapper = document.getElementById('table-wrapper');
+                    const canvas = await html2canvas(tableWrapper, {
+                        scale: 2,
+                        backgroundColor: '#ffffff',
+                        allowTaint: true,
+                        useCORS: true
+                    });
+                    
+                    screenshots.push({
+                        page: page,
+                        imageData: canvas.toDataURL('image/png')
+                    });
+                }
+                
+                // Send screenshots to backend to create PPT
+                btn.textContent = '[Wait] Creating presentation...';
+                
+                const response = await fetch(`${API_BASE}/ppt/generate-from-screenshots`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        phases: phases,
-                        force_regenerate: false
+                        screenshots: screenshots,
+                        selectedPhases: phases || [],
+                        title: document.getElementById('table-title').textContent
                     })
                 });
                 
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Show success message
-                    alert(`[OK] Report generated successfully!\n\nFile: ${result.file_name}\n\nYour download should start shortly...`);
-                    
-                    // Trigger download
-                    const downloadUrl = `${API_BASE}/ppt/download/${result.file_name}`;
-                    const link = document.createElement('a');
-                    link.href = downloadUrl;
-                    link.download = result.file_name;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } else {
-                    alert(`[ERROR] Report generation failed:\n\n${result.message}`);
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.statusText}`);
                 }
+                
+                // Download the PPT file
+                const contentDisposition = response.headers.get('content-disposition');
+                let filename = 'TDA_Report.pptx';
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename="([^"]+)"/);
+                    if (match) filename = match[1];
+                }
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                
+                // Show success message
+                alert(`[OK] Report generated and downloaded successfully!\n\nFile: ${filename}\nPages: ${totalPages}`);
+                
+                // Re-render current page with all data
+                currentPage = 1;
+                renderTable(allData);
+                
             } catch (error) {
-                logger.error('Error generating PPT:', error);
-                alert(`Error: ${error.message}\n\nMake sure the backend is running.`);
+                console.error('Error generating PPT:', error);
+                alert(`[ERROR] ${error.message}\n\nMake sure the backend is running.`);
             } finally {
                 btn.textContent = originalText;
                 btn.disabled = false;

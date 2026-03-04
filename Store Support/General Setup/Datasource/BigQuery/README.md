@@ -167,7 +167,100 @@ LIMIT 1000
 
 ---
 
-## 🔗 BigQuery Connection Details
+## � Job Code Lookup & Mapping
+
+### Overview
+Job Codes are critical identifiers that link employee positions across Walmart systems in multiple formats (SMART, Workday, CoreHR User IDs). They're essential for integrations like AMP Roles file population.
+
+**Resources:**
+- See [Complete Job Code Guide](../../../BigQueryProject/08-JobCodes/README.md) for comprehensive reference
+- See [Job Code Quick Start](../../../BigQueryProject/08-JobCodes/QUICKSTART.md) for 5-minute lookup guide
+- See [job_codes_master.json](../../../../job_codes_master.json) for master lookup database (44,934 lines)
+
+### Key Data Sources for Job Codes
+
+| Source | Format | Contains | Best For |
+|--------|--------|----------|----------|
+| **job_codes_master.json** | SMART → Workday | Job names, departments, salary levels | Looking up job codes, bridging formats |
+| **Polaris Schedule** | worker_id (User ID) | Current employee assignments, hours | Finding actual employees by job code |
+| **CoreHR Profile** | USER_ID + JOB_CODE | Master employee data, org hierarchy | Validating employee records |
+| **AMP_Data_Prep** | SMART codes | Role classifications, store assignments | AMP-specific analysis |
+
+### Common Queries
+
+**Find all employees with a job code:**
+```sql
+SELECT DISTINCT
+    worker_id,
+    employee_name,
+    job_code,
+    job_name,
+    store_number
+FROM `polaris-analytics-prod.us_walmart.vw_polaris_current_schedule`
+WHERE job_code = '1-993-1026'  -- Store Manager example
+    AND shift_date = CURRENT_DATE()
+```
+
+**Count employees by job code at a store:**
+```sql
+SELECT 
+    job_code,
+    job_name,
+    COUNT(DISTINCT worker_id) as employee_count
+FROM `polaris-analytics-prod.us_walmart.vw_polaris_current_schedule`
+WHERE store_number = 3456
+    AND shift_date = CURRENT_DATE()
+GROUP BY job_code, job_name
+ORDER BY employee_count DESC
+```
+
+**Get current job assignments for a worker:**
+```sql
+SELECT 
+    worker_id,
+    ARRAY_AGG(DISTINCT job_code) as job_codes,
+    ARRAY_AGG(DISTINCT job_name) as job_names,
+    COUNT(DISTINCT store_number) as stores_assigned
+FROM `polaris-analytics-prod.us_walmart.vw_polaris_current_schedule`
+WHERE shift_date = CURRENT_DATE()
+GROUP BY worker_id
+```
+
+### Bridging Job Codes Across Systems
+
+The complete workflow for job code mapping:
+
+```
+SMART Code (1-993-1026)
+    ↓
+[job_codes_master.json] → Workday Code (US-01-0202-002104)
+    ↓
+[Polaris vw_polaris_current_schedule] → worker_id / Employee Name
+    ↓
+[CoreHR UNIFIED_PROFILE] → USER_ID (e0c0l5x.s03935)
+    ↓
+Use in: AMP Roles, integration files, dashboards
+```
+
+### Popular Use Cases
+
+1. **Populate AMP Roles File** - Map job codes to User IDs for asset management plan roster
+2. **Find Job Code at Store** - Identify all open positions and staffing by role
+3. **Validate User ID Assignments** - Ensure job code to employee mappings are accurate
+4. **Cross-System Reconciliation** - Compare job codes across Polaris, CoreHR, and AMP
+5. **Department Analysis** - Group job codes by department for organizational charts
+
+### Success Example: AMP Roles File
+
+A recent project successfully populated AMP Roles file with User IDs:
+- **Coverage**: 191/195 rows (98%)
+- **Methodology**: 130 existing mappings + 61 role-based representative assignments
+- **Data Quality**: 100% valid CoreHR User IDs
+- **Lookup Table**: Created Job_Code_Master_Complete.xlsx for reuse
+
+---
+
+## �🔗 BigQuery Connection Details
 
 ### Authentication
 - **Method**: Google Cloud Service Account

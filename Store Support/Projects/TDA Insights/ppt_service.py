@@ -232,6 +232,108 @@ def delete_report(filename):
         }), 500
 
 
+@ppt_bp.route('/generate-from-screenshots', methods=['POST'])
+def generate_ppt_from_screenshots():
+    """
+    Generate a PowerPoint report from screenshots
+    
+    Request body:
+    {
+        "screenshots": [
+            {
+                "page": 1,
+                "imageData": "data:image/png;base64,..."
+            },
+            ...
+        ],
+        "selectedPhases": ["Test"],
+        "title": "TDA Initiatives Insights - Test"
+    }
+    """
+    try:
+        data = request.get_json() or {}
+        screenshots = data.get('screenshots', [])
+        selected_phases = data.get('selectedPhases', [])
+        title = data.get('title', 'TDA Report')
+        
+        if not screenshots:
+            return jsonify({
+                'success': False,
+                'error': 'No screenshots provided'
+            }), 400
+        
+        logger.info(f"PPT generation from screenshots requested. Pages: {len(screenshots)}, Phases: {selected_phases}")
+        
+        # Generate PowerPoint with screenshots
+        from pptx import Presentation
+        from pptx.util import Inches
+        from io import BytesIO
+        import base64
+        
+        prs = Presentation()
+        prs.slide_width = Inches(9.6)
+        prs.slide_height = Inches(7.2)
+        
+        for screenshot_data in screenshots:
+            page_num = screenshot_data.get('page', 1)
+            image_base64 = screenshot_data.get('imageData', '')
+            
+            if not image_base64:
+                continue
+            
+            try:
+                # Extract base64 data (remove data:image/png;base64, prefix if present)
+                if ',' in image_base64:
+                    image_base64 = image_base64.split(',')[1]
+                
+                # Decode base64 to bytes
+                image_bytes = base64.b64decode(image_base64)
+                image_stream = BytesIO(image_bytes)
+                
+                # Add blank slide
+                blank_slide_layout = prs.slide_layouts[6]  # Blank layout
+                slide = prs.slides.add_slide(blank_slide_layout)
+                
+                # Add image to slide (full width/height)
+                slide.shapes.add_picture(image_stream, Inches(0), Inches(0), width=prs.slide_width, height=prs.slide_height)
+                
+                logger.info(f"Added screenshot for page {page_num}")
+            except Exception as e:
+                logger.error(f"Error processing screenshot for page {page_num}: {e}")
+                continue
+        
+        # Save to BytesIO
+        ppt_stream = BytesIO()
+        prs.save(ppt_stream)
+        ppt_stream.seek(0)
+        
+        # Save file to disk
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'TDA_Report_{timestamp}.pptx'
+        file_path = OUTPUT_DIR / filename
+        
+        with open(file_path, 'wb') as f:
+            f.write(ppt_stream.getvalue())
+        
+        logger.info(f"PPT generated successfully: {filename}")
+        
+        # Send file as download
+        ppt_stream.seek(0)
+        return send_file(
+            ppt_stream,
+            mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            as_attachment=True,
+            download_name=filename
+        )
+        
+    except Exception as e:
+        logger.error(f"Error in /api/ppt/generate-from-screenshots: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to generate PPT: {str(e)}'
+        }), 500
+
+
 @ppt_bp.route('/status', methods=['GET'])
 def ppt_status():
     """Get status of PPT generation service"""

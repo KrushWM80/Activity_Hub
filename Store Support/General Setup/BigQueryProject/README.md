@@ -142,6 +142,34 @@
 
 ---
 
+### 📋 [08-JobCodes](./08-JobCodes/)
+**Job Code discovery, mapping, and multi-datasource bridging**
+- Complete job code lookup and mapping guides
+- SMART, Workday, and User ID format explanations
+- Multi-source reconciliation approaches
+- BigQuery query examples and Python scripts
+- AMP Roles file integration
+
+**Key Files:**
+- `README.md` - Complete Job Codes Discovery & Bridge Guide (comprehensive technical reference)
+- `QUICKSTART.md` - 5-minute job code lookup guide (start here)
+- **NEW:** Job code mapping for AMP Roles, AMP Insights, and integration projects
+
+**Key Learning Points:**
+- Three-tier Job Code System (SMART → Workday → User ID)
+- Data sources: job_codes_master.json (44,934 lines), Polaris tables, CoreHR
+- Finding employee job codes across Polaris + CoreHR
+- Reconciling mappings when sources disagree
+- Handling missing or invalid job codes
+
+**Success Story:**
+- ✅ AMP Roles file populated with 191/195 User IDs (98% coverage)
+- ✅ 130 existing mappings + 61 role-based assignments
+- ✅ Complete lookup table (Job_Code_Master_Complete.xlsx) created
+- ✅ Established pattern for future job code data integration
+
+---
+
 ## 🎯 Quick Start Guide
 
 ### For New BigQuery Projects
@@ -184,6 +212,16 @@
 
 ### **Setting Up Collaboration with Peers**
 → See `06-GCP-Setup/peer-collaboration-guide.md`
+
+### **Finding Job Codes and User IDs**
+→ Start with `08-JobCodes/QUICKSTART.md` (5 minutes)
+→ Deep dive: `08-JobCodes/README.md` (complete reference)
+
+### **Populating AMP Roles with User IDs**
+→ See `08-JobCodes/README.md#amp-roles-file` (job code mapping workflow)
+
+### **Bridging Multiple Job Code Datasources**
+→ See `08-JobCodes/` and [Job Code Master Complete](../../../../Job_Code_Master_Complete.xlsx)
 
 ---
 

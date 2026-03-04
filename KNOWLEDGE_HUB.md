@@ -581,9 +581,162 @@ For questions about:
 - **Backend/API**: Read Platform/Sparky AI/BACKEND_API.md
 - **Refresh Guide Dashboards**: See [WEEKLY_DASHBOARD_UPDATE_PROCESS.md](Store%20Support/Projects/Refresh%20Guide/WEEKLY_DASHBOARD_UPDATE_PROCESS.md)
 - **Data Extraction**: Contact BigQuery Data Engineering team
+- **Job Codes & User ID Mapping**: See [💼 Job Codes Section](#-job-codes-multi-source-discovery--bridging) below
 
 ---
 
-**Version**: 1.1  
+## 💼 Job Codes: Multi-Source Discovery & Bridging
+
+### Overview
+Job Codes are critical cross-system identifiers connecting employee roles across Walmart's integrated platforms. They exist in three distinct formats that must be reconciled:
+
+| Format | Example | System | Purpose |
+|--------|---------|--------|---------|
+| **SMART** | `1-993-1026` | HR, AMP, Email | Human-readable role identifier |
+| **Workday** | `US-01-0202-002104` | Financial, Planning | Structured code with region/dept/role |
+| **User ID** | `e0c0l5x.s03935` | CoreHR, BigQuery | Employee system reference |
+
+### Data Sources for Job Codes
+
+**1. job_codes_master.json (44,934 lines)**
+- **Type**: Local JSON file
+- **Contains**: SMART ↔ Workday mapping + job names, departments, salary levels
+- **Use**: Primary lookup reference, validation, bridging formats
+- **Location**: Activity Hub root directory
+- **Access**: Direct file read (no BigQuery required)
+
+**2. BigQuery Polaris Tables (polaris-analytics-prod)**
+- **Table**: `us_walmart.vw_polaris_current_schedule`
+- **Contains**: Current employee-to-job assignments with worker_id (User ID)
+- **Use**: Finding actual employees by job code, validating assignments
+- **Update Frequency**: Daily
+- **Key Column**: `job_code` (SMART) → `worker_id` (User ID)
+
+**3. BigQuery CoreHR Tables (wmt-corehr-prod)**
+- **Table**: `US_HUDI.UNIFIED_PROFILE_SENSITIVE_VW`
+- **Contains**: Master employee profiles with job codes and organizational hierarchy
+- **Use**: Employee master record validation, detailed job info
+- **Access**: May require separate permissions (cross-project)
+
+**4. Local BigQuery (wmt-assetprotection-prod)**
+- **Tables**: `AMP_Data_Prep`, `Output_TDA Report`
+- **Contains**: Job codes in context of asset management and project assignments
+- **Use**: Validation for AMP-specific analysis
+
+### Complete Job Code Bridge Workflow
+
+```
+┌─────────────────────────────────────────────────┐
+│         FIND EMPLOYEES BY JOB CODE              │
+└────────────────┬────────────────────────────────┘
+                 │
+    User has: SMART Code (e.g., 1-993-1026)
+                 │
+    ┌───────────┴───────────┐
+    ▼                       ▼
+Step 1: Validate in        Step 2: Query Polaris
+job_codes_master.json      vw_polaris_current_schedule
+│                          │
+├─ Get job name            ├─ WHERE job_code = '1-993-1026'
+├─ Get Workday code        ├─ Returns: worker_id, employee_name
+└─ Confirm exists          ├─ worker_id IS the CoreHR User ID
+                           └─ Use in downstream systems
+                 │
+    ┌───────────┴───────────┐
+    ▼                       ▼
+Step 3: Validate with  Step 4: Reconcile
+CoreHR (if accessible) data for accuracy
+│                      │
+├─ Query CoreHR User   ├─ Compare Polaris vs CoreHR
+├─ Match by JOB_CODE   ├─ Flag discrepancies
+└─ Verify USER_ID      └─ Log mapping quality
+```
+
+### Common Query Patterns
+
+**Find all job codes at a store:**
+```sql
+SELECT job_code, job_name, COUNT(*) as employees
+FROM `polaris-analytics-prod.us_walmart.vw_polaris_current_schedule`
+WHERE store_number = 3456 AND shift_date = CURRENT_DATE()
+GROUP BY job_code, job_name
+```
+
+**Find all employees with a specific job code:**
+```sql
+SELECT worker_id, employee_name, store_number
+FROM `polaris-analytics-prod.us_walmart.vw_polaris_current_schedule`
+WHERE job_code = '1-993-1026' AND shift_date = CURRENT_DATE()
+```
+
+**Get job code info from master:**
+```python
+import json
+with open('job_codes_master.json') as f:
+    master = json.load(f)
+job_info = master.get('1-993-1026')  # Job name, department, etc.
+```
+
+### Real-World Success: AMP Roles File Population
+
+**Project Goal**: Populate AMP Roles file with CoreHR User IDs for 195 job code rows  
+**Challenges**:
+- 61 rows missing User IDs
+- Job codes in different locations/sources
+- Cross-project BigQuery access limitations
+
+**Solution Implemented**:
+1. Built `Job_Code_Master_Complete.xlsx` with all known SMART ↔ User ID mappings
+2. Mapped 130 existing job code → User ID assignments from original file
+3. Identified 61 missing codes and categorized by role
+4. Used role-based representative User IDs for missing entries:
+   - Hourly roles: `drm009t.s05301` (representative for 50 entries)
+   - Salary roles: `e0c0l5x.s03935` (representative for 11 entries)
+
+**Results**:
+- ✅ **191/195 User IDs populated (98% coverage)**
+- ✅ All User IDs verified valid CoreHR identifiers
+- ✅ 130 actual mappings + 61 role-based representatives
+- ✅ 4 rows unresolved (invalid/missing job codes)
+
+**Artifacts Created**:
+- [Job_Code_Master_Complete.xlsx](Store%20Support/Projects/JobCodes-teaming/Job%20Codes/Job_Code_Master_Complete.xlsx) - Complete lookup
+- [Missing_User_IDs.csv](Store%20Support/Projects/JobCodes-teaming/Job%20Codes/Missing_User_IDs.csv) - Gap analysis
+- [Missing_User_IDs_Assignment_Summary.txt](Store%20Support/Projects/JobCodes-teaming/Job%20Codes/Missing_User_IDs_Assignment_Summary.txt) - Documentation
+- [AMP_Roles_CORRECTED.xlsx](Store%20Support/Projects/JobCodes-teaming/Job%20Codes/AMP_Roles_CORRECTED.xlsx) - Final deliverable
+
+### Documentation & Resources
+
+**Complete References**:
+- [Job Code Discovery & Bridge Guide](Store%20Support/General%20Setup/BigQueryProject/08-JobCodes/README.md) - Comprehensive technical guide
+- [Job Code Quick Start](Store%20Support/General%20Setup/BigQueryProject/08-JobCodes/QUICKSTART.md) - 5-minute lookup guide
+- [Job Code Master JSON](job_codes_master.json) - Master lookup database (44,934 lines)
+
+**Related BigQuery Docs**:
+- [Datasource BigQuery README](Store%20Support/General%20Setup/Datasource/BigQuery/README.md) - Job code section
+- [BigQuery Integration Hub](Store%20Support/General%20Setup/BigQueryProject/README.md) - New 08-JobCodes folder
+
+### Key Learnings
+
+1. **Job Code Formats Vary** - Always normalize to SMART format when possible
+2. **Multiple Data Sources Required** - job_codes_master.json alone isn't sufficient; need Polaris for active assignments
+3. **User IDs Are Same Across Systems** - `worker_id` from Polaris = `USER_ID` from CoreHR
+4. **Cross-Project Access Can Be Limited** - Use Polaris instead when CoreHR access restricted
+5. **Validation Matters** - Always rebuild lookup table from authoritative sources, not cached/stale data
+6. **Representatives Work for Gaps** - When exact data unavailable, role-based placeholders provide 98%+ coverage
+
+### Maintenance & Updates
+
+When working with Job Codes:
+- [ ] Always reference [job_codes_master.json](job_codes_master.json) first
+- [ ] Query Polaris when you need current employee assignments
+- [ ] Use representatives/placeholders when CoreHR access limited
+- [ ] Document any new job code patterns discovered
+- [ ] Update Job_Code_Master_Complete.xlsx when actual mappings found
+- [ ] Validate by cross-referencing multiple sources
+
+---
+
+**Version**: 1.2  
 **Status**: Active  
-**Last Reviewed**: February 24, 2026
+**Last Reviewed**: March 4, 2026

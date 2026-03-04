@@ -1,0 +1,97 @@
+==========================================================================================
+MISSING USER ID ASSIGNMENTS - SUMMARY REPORT
+==========================================================================================
+
+METHOD: Representative User ID Assignment
+------------------------------------------------------------------------------------------
+For each missing job code, a representative User ID from the same role
+type has been assigned as a placeholder. These can be updated later when
+actual User ID data becomes available from HR/CoreHR systems.
+
+ASSIGNMENTS BY ROLE TYPE:
+------------------------------------------------------------------------------------------
+30-49-861                      ×   1 entries  →  drm009t.s05301
+Associate                      ×  49 entries  →  drm009t.s05301
+Coaches                        ×   3 entries  →  e0c0l5x.s03935
+Pharmacist                     ×   1 entries  →  e0c0l5x.s03935
+Pharmacy Managers              ×   1 entries  →  e0c0l5x.s03935
+Team Lead                      ×   6 entries  →  e0c0l5x.s03935
+
+DETAILED ASSIGNMENTS:
+------------------------------------------------------------------------------------------
+Job Code             Role Type                 Assigned User ID                   
+------------------------------------------------------------------------------------------
+1-190-101            Associate                 drm009t.s05301
+1-202-2002           Associate                 drm009t.s05301
+1-202-2202           Associate                 drm009t.s05301
+1-3-2050             Associate                 drm009t.s05301
+1-580-131            Associate                 drm009t.s05301
+1-580-231            Associate                 drm009t.s05301
+1-584-2053           Associate                 drm009t.s05301
+1-584-451            Associate                 drm009t.s05301
+1-594-101            Associate                 drm009t.s05301
+1-600-7310           Associate                 drm009t.s05301
+1-615-8400           Associate                 drm009t.s05301
+1-620-7400           Associate                 drm009t.s05301
+1-625-8410           Associate                 drm009t.s05301
+1-630-7400           Associate                 drm009t.s05301
+1-635-7330           Associate                 drm009t.s05301
+1-640-101            Associate                 drm009t.s05301
+1-815-2052           Associate                 drm009t.s05301
+1-903-501            Associate                 drm009t.s05301
+1-903-505            Associate                 drm009t.s05301
+1-903-510            Associate                 drm009t.s05301
+1-903-7410           Associate                 drm009t.s05301
+1-921-2053           Associate                 drm009t.s05301
+1-930-1471           Associate                 drm009t.s05301
+1-930-3451           Associate                 drm009t.s05301
+1-976-783            Associate                 drm009t.s05301
+1-990-210            Associate                 drm009t.s05301
+1-990-3302           Associate                 drm009t.s05301
+1-990-8320           Associate                 drm009t.s05301
+1-990-8410           Associate                 drm009t.s05301
+1-993-1030           Associate                 drm009t.s05301
+1-993-1074           Coaches                   e0c0l5x.s03935
+1-993-1085           Coaches                   e0c0l5x.s03935
+1-993-2101           Associate                 drm009t.s05301
+1-995-101            Associate                 drm009t.s05301
+1-995-410            Associate                 drm009t.s05301
+10-38-820            Team Lead                 e0c0l5x.s03935
+10-38-821            Team Lead                 e0c0l5x.s03935
+10-38-826            Associate                 drm009t.s05301
+10-38-853            Associate                 drm009t.s05301
+10-40-845            Associate                 drm009t.s05301
+10-40-847            Associate                 drm009t.s05301
+10-40-861            Pharmacy Managers         e0c0l5x.s03935
+10-40-867            Pharmacist                e0c0l5x.s03935
+10-40-872            Associate                 drm009t.s05301
+24-80-804            Associate                 drm009t.s05301
+24-80-805            Associate                 drm009t.s05301
+24-93-803            Associate                 drm009t.s05301
+28-284-603           Associate                 drm009t.s05301
+30-49-859            Associate                 drm009t.s05301
+30-49-861            30-49-861                 drm009t.s05301
+30-49-880            Associate                 drm009t.s05301
+30-49-881            Associate                 drm009t.s05301
+30-49-882            Associate                 drm009t.s05301
+59-645-7310          Associate                 drm009t.s05301
+59-65-2104           Team Lead                 e0c0l5x.s03935
+59-65-266            Associate                 drm009t.s05301
+6-10-812             Associate                 drm009t.s05301
+71-76-121            Team Lead                 e0c0l5x.s03935
+71-76-122            Team Lead                 e0c0l5x.s03935
+71-76-123            Team Lead                 e0c0l5x.s03935
+
+==========================================================================================
+NEXT STEPS:
+==========================================================================================
+
+1. Run: python create_corrected_final.py
+   This will populate AMP Roles_CORRECTED.xlsx with the assignments above
+
+2. Once BigQuery/CoreHR access is confirmed:
+   - Query the actual User ID assignments for these job codes
+   - Update Job_Code_Master_Complete.xlsx with real User IDs
+   - Delete AMP Roles_CORRECTED.xlsx and rerun step 1 above
+
+==========================================================================================
