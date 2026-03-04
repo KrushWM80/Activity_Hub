@@ -493,24 +493,44 @@
                     <table class="activity-table">
                         <thead>
                             <tr>
+                                <th>Feedback ID</th>
+                                <th>Submitted By</th>
+                                <th>Category</th>
                                 <th>Timestamp</th>
                                 <th>Event Type</th>
                                 <th>Action</th>
-                                <th>Details</th>
-                                <th>Admin</th>
+                                <th>By Admin</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for activity in recent_activity %}
                             <tr>
+                                <td style="font-weight: 600;">
+                                    {% if activity.feedback_id %}
+                                        <a href="/admin/feedback/{{ activity.feedback_id }}" style="color: #3B82F6; text-decoration: none;">
+                                            FBK-{{ activity.feedback_id }}
+                                        </a>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>{{ activity.submitted_by or '—' }}</td>
+                                <td>
+                                    {% if activity.feedback_category %}
+                                        <span class="status-badge" style="background: #e0e7ff; color: #3730a3;">
+                                            {{ activity.feedback_category }}
+                                        </span>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
                                 <td class="timestamp">{{ activity.timestamp }}</td>
                                 <td>
                                     <span class="event-badge event-{{ activity.event_type|lower|replace('_', '-') }}">
                                         {{ activity.event_type }}
                                     </span>
                                 </td>
-                                <td>{{ activity.action }}</td>
-                                <td style="font-size: 12px; color: #666;">{{ activity.details }}</td>
+                                <td style="font-size: 12px; color: #666;">{{ activity.action }}</td>
                                 <td>{{ activity.admin_user or '—' }}</td>
                             </tr>
                             {% endfor %}

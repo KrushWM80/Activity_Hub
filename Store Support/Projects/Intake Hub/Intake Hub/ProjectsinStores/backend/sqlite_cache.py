@@ -4,6 +4,12 @@ SQLite Cache for Projects in Stores
 This module provides a local SQLite cache that syncs from BigQuery.
 Queries hit SQLite (milliseconds) instead of BigQuery (seconds).
 Background sync keeps data fresh every 15 minutes.
+
+VALIDATION STRATEGY:
+- Only updates cache if BigQuery sync produces valid data
+- Minimum expected records: 1,400,000 (based on ~1,420,167 historical average)
+- Sends email alerts if validation fails
+- Prevents bad data from overwriting good cache
 """
 
 import sqlite3
@@ -13,6 +19,20 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+# Email configuration for alerts
+SMTP_SERVER = "smtp-gw1.homeoffice.wal-mart.com"
+SMTP_PORT = 25
+NOTIFY_EMAIL = "kendall.rush@walmart.com"
+FROM_EMAIL = "ProjectsInStoresDashboard@walmart.com"
+
+# Cache validation thresholds
+MIN_EXPECTED_RECORDS = 1_400_000  # Based on ~1.4M historical average
+MIN_SYNC_DURATION = 60  # Seconds - sync taking <60s likely means error
+MAX_ALLOWED_VARIANCE = 50_000  # Allow variance for daily data changes
 
 class SQLiteCache:
     """Local SQLite cache for fast data access"""
@@ -114,6 +134,19 @@ class SQLiteCache:
             )
         """)
         
+        # Error log table for persistent error tracking
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS sync_error_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                error_message TEXT NOT NULL,
+                record_count INTEGER DEFAULT 0,
+                sync_duration_seconds FLOAT DEFAULT 0
+            )
+        """)
+        
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_sync_errors_timestamp ON sync_error_log(timestamp)")
+        
         # Project-Partner lookup table for fast partner filtering
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS project_partners (
@@ -178,6 +211,98 @@ class SQLiteCache:
         
         return has_data and age < max_age_minutes
     
+    def send_validation_failure_email(self, reason: str, record_count: int, sync_duration: float):
+        """Send email alert when cache validation fails"""
+        try:
+            last_sync_time = self.get_last_sync_time()
+            current_cache_count = self.get_record_count()
+            
+            if last_sync_time:
+                cache_age = datetime.now() - datetime.fromisoformat(last_sync_time.isoformat() if isinstance(last_sync_time, datetime) else last_sync_time)
+                age_str = f"{cache_age.days}d {cache_age.seconds//3600}h {(cache_age.seconds//60)%60}m"
+            else:
+                age_str = "No valid sync found"
+            
+            subject = "⚠️ [ALERT] Projects in Stores Cache Sync Failed"
+            
+            body = f"""
+CACHE VALIDATION FAILED
+
+Sync Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+Status: VALIDATION FAILED
+
+Data Received:
+- Records Synced: {record_count:,}
+- Expected Minimum: {MIN_EXPECTED_RECORDS:,}
+- Variance Allowed: ±{MAX_ALLOWED_VARIANCE:,}
+- Sync Duration: {sync_duration:.1f} seconds
+
+Failure Reason: {reason}
+
+Current Cache Status:
+- Last Valid Sync: {last_sync_time if last_sync_time else 'No valid sync on record'}
+- Records in Cache: {current_cache_count:,}
+- Cache Age: {age_str}
+- Cache File: {self.db_path}
+
+Action Required:
+1. Log in to Google Cloud Console
+2. Query: wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data
+3. Run: SELECT COUNT(*) FROM ... WHERE Status='Active'
+4. Verify result is ~1,420,167 records
+5. Check for schema changes or data quality issues
+6. If issue persists, manually trigger cache resync by:
+   - Deleting projects_cache.db
+   - Restarting backend server
+
+BigQuery Table: wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data
+Cache Location: {self.db_path}
+Monitor Dashboard: Run monitor_cache_health.py to check status
+
+This is an automated alert. Do not reply to this email.
+"""
+            
+            # Create email message
+            msg = MIMEMultipart()
+            msg['From'] = FROM_EMAIL
+            msg['To'] = NOTIFY_EMAIL
+            msg['Subject'] = subject
+            msg.attach(MIMEText(body, 'plain'))
+            
+            # Send email via Walmart SMTP
+            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+                server.send_message(msg)
+            
+            print(f"[Email] Alert sent to {NOTIFY_EMAIL}")
+            
+        except Exception as e:
+            print(f"[Email] Failed to send alert: {e}")
+    
+    def validate_bigquery_sync(self, record_count: int, sync_duration: float) -> tuple[bool, str]:
+        """
+        Validate if BigQuery sync data is valid before updating cache
+        
+        Returns: (is_valid, reason_if_invalid)
+        """
+        # Check 1: Record count within expected range
+        if record_count < MIN_EXPECTED_RECORDS:
+            reason = f"Record count too low ({record_count:,} < {MIN_EXPECTED_RECORDS:,})"
+            return False, reason
+        
+        if record_count > MIN_EXPECTED_RECORDS + MAX_ALLOWED_VARIANCE:
+            reason = f"Record count unexpectedly high ({record_count:,} > {MIN_EXPECTED_RECORDS + MAX_ALLOWED_VARIANCE:,})"
+            return False, reason
+        
+        # Check 2: Sync duration reasonable
+        if sync_duration < MIN_SYNC_DURATION:
+            reason = f"Sync completed too quickly ({sync_duration:.1f}s < {MIN_SYNC_DURATION}s) - likely incomplete"
+            return False, reason
+        
+        # Check 3: Not an error state
+        # (Additional checks can be added here)
+        
+        return True, ""
+    
     def sync_from_bigquery(self, bigquery_client, project_id: str, dataset: str, table: str) -> bool:
         """Sync all data from BigQuery to SQLite"""
         if self._sync_in_progress:
@@ -196,7 +321,6 @@ class SQLiteCache:
                     COALESCE(CAST(Intake_Card AS STRING), CONCAT('R-', CAST(Facility AS STRING))) as project_id,
                     CAST(Intake_Card AS STRING) as intake_card,
                     CASE
-                        WHEN Project_Title IS NOT NULL AND Project_Title != '' THEN Project_Title
                         WHEN Title IS NOT NULL AND Title != '' THEN Title
                         WHEN Project_Type IS NOT NULL AND Project_Type != 'None' AND Project_Type != '' 
                              AND Initiative_Type IS NOT NULL AND Initiative_Type != '' 
@@ -325,12 +449,48 @@ class SQLiteCache:
             except Exception as e:
                 print(f"[SQLite] Partner sync warning: {e} (continuing without partners)")
             
+            # VALIDATION: Check if sync data is valid before updating cache
+            elapsed = time.time() - start_time
+            is_valid, validation_reason = self.validate_bigquery_sync(len(rows), elapsed)
+            
+            if not is_valid:
+                # VALIDATION FAILED - Rollback and send alert
+                print(f"[SQLite] ❌ VALIDATION FAILED: {validation_reason}")
+                print(f"[SQLite] Rolling back transaction - cache will NOT be updated")
+                
+                # Rollback the transaction (don't update cache)
+                conn.rollback()
+                
+                # Log the failure
+                cursor.execute("""
+                    INSERT INTO sync_error_log (error_message, record_count, sync_duration_seconds)
+                    VALUES (?, ?, ?)
+                """, (f"VALIDATION FAILED: {validation_reason}", len(rows), elapsed))
+                conn.commit()
+                conn.close()
+                
+                # Send email alert
+                print(f"[SQLite] Sending validation failure alert...")
+                self.send_validation_failure_email(validation_reason, len(rows), elapsed)
+                
+                print(f"[SQLite] Cache NOT updated. Keeping previous valid data.")
+                return False
+            
+            # VALIDATION PASSED - Commit the cache update
+            print(f"[SQLite] ✓ Validation passed - updating cache with {len(rows):,} records")
+            
             # Update sync metadata
             now = datetime.now().isoformat()
             cursor.execute("""
                 INSERT OR REPLACE INTO sync_metadata (key, value, updated_at)
                 VALUES ('last_sync', ?, ?)
             """, (now, now))
+            
+            # Log successful sync with record count
+            cursor.execute("""
+                INSERT INTO sync_error_log (error_message, record_count, sync_duration_seconds)
+                VALUES (?, ?, ?)
+            """, (f"SUCCESS: {len(rows)} records synced from BigQuery", len(rows), elapsed))
             
             conn.commit()
             
@@ -354,7 +514,24 @@ class SQLiteCache:
             return True
             
         except Exception as e:
-            print(f"[SQLite] Sync error: {e}")
+            error_msg = str(e)
+            print(f"[SQLite] Sync error: {error_msg}")
+            
+            # Log error to database
+            try:
+                elapsed = time.time() - start_time
+                conn = self._get_connection()
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO sync_error_log (error_message, record_count, sync_duration_seconds)
+                    VALUES (?, ?, ?)
+                """, (error_msg, 0, elapsed))
+                conn.commit()
+                conn.close()
+                print(f"[SQLite] Error logged to database")
+            except Exception as log_error:
+                print(f"[SQLite] Failed to log error: {log_error}")
+            
             return False
         finally:
             self._sync_in_progress = False

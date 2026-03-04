@@ -223,25 +223,29 @@ class FeedbackHandler:
         conn.close()
     
     def get_activity_log(self, feedback_id=None, limit=500):
-        """Retrieve activity log"""
+        """Retrieve activity log with submitter information"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
         if feedback_id:
             cursor.execute("""
-                SELECT id, timestamp, event_type, feedback_id, admin_user, 
-                       action, details
-                FROM feedback_activity_log
-                WHERE feedback_id = ?
-                ORDER BY timestamp DESC
+                SELECT fal.id, fal.timestamp, fal.event_type, fal.feedback_id, 
+                       fal.admin_user, fal.action, fal.details,
+                       fs.user_email, fs.feedback_category, fs.status
+                FROM feedback_activity_log fal
+                LEFT JOIN feedback_submissions fs ON fal.feedback_id = fs.id
+                WHERE fal.feedback_id = ?
+                ORDER BY fal.timestamp DESC
                 LIMIT ?
             """, (feedback_id, limit))
         else:
             cursor.execute("""
-                SELECT id, timestamp, event_type, feedback_id, admin_user, 
-                       action, details
-                FROM feedback_activity_log
-                ORDER BY timestamp DESC
+                SELECT fal.id, fal.timestamp, fal.event_type, fal.feedback_id, 
+                       fal.admin_user, fal.action, fal.details,
+                       fs.user_email, fs.feedback_category, fs.status
+                FROM feedback_activity_log fal
+                LEFT JOIN feedback_submissions fs ON fal.feedback_id = fs.id
+                ORDER BY fal.timestamp DESC
                 LIMIT ?
             """, (limit,))
         
@@ -257,7 +261,10 @@ class FeedbackHandler:
                 "feedback_id": row[3],
                 "admin_user": row[4],
                 "action": row[5],
-                "details": row[6]
+                "details": row[6],
+                "submitted_by": row[7],  # User who submitted the feedback
+                "feedback_category": row[8],  # Category of the feedback
+                "feedback_status": row[9]  # Current status of the feedback
             })
         
         return activity

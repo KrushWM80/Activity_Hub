@@ -137,23 +137,60 @@ async def get_current_user():
     )
 
 @app.post("/api/auth/login")
-async def fallback_login(request: LoginRequest):
+async def fallback_login(request: LoginRequest, http_request: Request):
     """Fallback login using username and password"""
-    username = request.username.lower()
+    user_input = request.username.lower().strip()
     password = request.password
+    user_agent = http_request.headers.get("User-Agent", "")
+    
+    print(f"[AUTH] Login attempt: username={user_input}, password_provided={bool(password)}")
     
     # Check password
     if password != admin_config['fallback_password']:
+        print(f"[AUTH] Login failed - invalid password")
+        # Track failed login
+        track_login(user_input, "fallback_password", False, device_info=extract_device_info(user_agent), user_agent=user_agent, error_reason="Invalid password")
         raise HTTPException(status_code=401, detail="Invalid password")
     
-    # Convert username to email format
-    email = f"{username}@walmart.com"
+    # If input already has @, use it as-is; otherwise try multiple domain formats
+    email = None
+    possible_emails = []
     
-    # Check if user is in admin list
-    is_admin = email in admin_config['admins']
+    if '@' in user_input:
+        # User provided full email
+        email = user_input
+        possible_emails = [user_input]
+    else:
+        # User provided username - try multiple domain formats
+        possible_emails = [
+            f"{user_input}@homeoffice.wal-mart.com",
+            f"{user_input}@walmart.com",
+            f"{user_input}@wal-mart.com",
+        ]
+        # Find which one exists in admin list
+        for possible_email in possible_emails:
+            if possible_email.lower() in admin_config['admins']:
+                email = possible_email.lower()
+                print(f"[AUTH] Found matching email: {email}")
+                break
     
-    if not is_admin:
+    # If still no email found, raise error
+    if not email or email.lower() not in admin_config['admins']:
+        print(f"[AUTH] Login failed - user not in admin list")
+        print(f"[AUTH] Input: {user_input}")
+        print(f"[AUTH] Tried emails: {possible_emails}")
+        print(f"[AUTH] Admin list: {admin_config['admins']}")
+        # Track failed login
+        track_login(user_input, "fallback_password", False, device_info=extract_device_info(user_agent), user_agent=user_agent, error_reason="User not in admin list")
         raise HTTPException(status_code=403, detail="User is not authorized as admin")
+    
+    email = email.lower()
+    username = email.split('@')[0]
+    
+    print(f"[AUTH] Login successful for {email}")
+    
+    # Track successful login
+    track_login(email, "fallback_password", True, device_info=extract_device_info(user_agent), user_agent=user_agent)
     
     return AuthResponse(
         email=email,
@@ -818,6 +855,7 @@ class FeedbackRequest(BaseModel):
     comments: str
     timestamp: str
     user_context: Optional[dict] = None
+    submitted_by: Optional[str] = None  # User email who submitted
 
 def analyze_feedback_and_email_admin(feedback: FeedbackRequest):
     """
@@ -864,6 +902,7 @@ def analyze_feedback_and_email_admin(feedback: FeedbackRequest):
 <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
     <h3>📝 Feedback Summary</h3>
     <table style="width: 100%; border-collapse: collapse;">
+        <tr><td style="padding: 8px;"><strong>Submitted By:</strong></td><td>{feedback.submitted_by or 'Unknown'}</td></tr>
         <tr><td style="padding: 8px;"><strong>Category:</strong></td><td>{feedback.category}</td></tr>
         <tr><td style="padding: 8px;"><strong>Rating:</strong></td><td>{'⭐' * feedback.rating} ({feedback.rating}/5)</td></tr>
         <tr><td style="padding: 8px;"><strong>Timestamp:</strong></td><td>{feedback.timestamp}</td></tr>
@@ -950,6 +989,22 @@ This is an automated analysis from Copilot AI. Discovery was performed to identi
 async def submit_feedback(feedback: FeedbackRequest):
     """Submit user feedback"""
     try:
+        # If submitted_by not provided, get the most recent active user
+        if not feedback.submitted_by:
+            try:
+                active_users_data = load_active_users()
+                users = active_users_data.get("users", {})
+                if users:
+                    # Get the most recent active user by timestamp
+                    most_recent = max(users.values(), key=lambda x: x.get('timestamp', 0), default=None)
+                    if most_recent:
+                        feedback.submitted_by = most_recent.get('user_email') or most_recent.get('user', 'Unknown')
+            except:
+                pass
+        
+        if not feedback.submitted_by:
+            feedback.submitted_by = "Unknown"
+        
         # Log feedback to console (always works)
         print("=" * 80)
         print("NEW FEEDBACK RECEIVED")
@@ -958,6 +1013,7 @@ async def submit_feedback(feedback: FeedbackRequest):
         print(f"Rating: {feedback.rating}/5")
         print(f"Comments: {feedback.comments[:200]}")  # Truncate for console
         print(f"Timestamp: {feedback.timestamp}")
+        print(f"Submitted By: {feedback.submitted_by}")
         if feedback.user_context:
             print(f"User Context: {feedback.user_context}")
         print("=" * 80)
@@ -1014,6 +1070,10 @@ async def submit_feedback(feedback: FeedbackRequest):
             <body style="font-family: Arial, sans-serif;">
                 <h2 style="color: #0071ce;">New Feedback Received</h2>
                 <table style="border-collapse: collapse; width: 100%; max-width: 600px;">
+                    <tr>
+                        <td style="padding: 10px; background: #f0f0f0; font-weight: bold; width: 150px;">Submitted By:</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #ddd;">{feedback.submitted_by or 'Unknown'}</td>
+                    </tr>
                     <tr>
                         <td style="padding: 10px; background: #f0f0f0; font-weight: bold; width: 150px;">Category:</td>
                         <td style="padding: 10px; border-bottom: 1px solid #ddd;">{feedback.category}</td>
@@ -1084,6 +1144,7 @@ from collections import defaultdict
 PENDING_FIXES_FILE = os.path.join(os.path.dirname(__file__), "pending_fixes.json")
 ACTIVITY_LOG_FILE = os.path.join(os.path.dirname(__file__), "activity_log.json")
 ACTIVE_USERS_FILE = os.path.join(os.path.dirname(__file__), "active_users.json")
+LOGIN_HISTORY_FILE = os.path.join(os.path.dirname(__file__), "login_history.json")
 
 def load_activity_log():
     """Load activity log from JSON file"""
@@ -1228,14 +1289,104 @@ def track_user_activity(user_id: str, page: str = "dashboard", session_id: str =
     save_active_users(data)
     return data["users"]
 
+def load_login_history():
+    """Load login history from JSON file"""
+    try:
+        if os.path.exists(LOGIN_HISTORY_FILE):
+            with open(LOGIN_HISTORY_FILE, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"[LOGIN HISTORY] Error loading: {e}")
+    return {"logins": []}
+
+def save_login_history(data):
+    """Save login history to JSON file"""
+    try:
+        # Keep only last 1000 logins
+        if len(data.get("logins", [])) > 1000:
+            data["logins"] = data["logins"][-1000:]
+        with open(LOGIN_HISTORY_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"[LOGIN HISTORY] Error saving: {e}")
+        return False
+
+def track_login(user_email: str, auth_method: str, success: bool, device_info: str = None, user_agent: str = None, ip_address: str = None, error_reason: str = None):
+    """Track a login event with full details"""
+    data = load_login_history()
+    now = datetime.now()
+    
+    login_record = {
+        "id": str(uuid.uuid4())[:8],
+        "timestamp": now.strftime("%Y-%m-%d %H:%M:%S"),
+        "timestamp_unix": now.timestamp(),
+        "user_email": user_email.lower() if user_email else "unknown",
+        "auth_method": auth_method,  # 'fallback_password', 'windows_ad', etc.
+        "success": success,
+        "device_info": device_info or "Unknown",
+    }
+    
+    # Add optional fields
+    if user_agent:
+        login_record["user_agent"] = user_agent
+    if ip_address:
+        login_record["ip_address"] = ip_address
+    if error_reason:
+        login_record["error_reason"] = error_reason
+    
+    data["logins"].append(login_record)
+    save_login_history(data)
+    
+    # Log to activity log as well
+    log_activity(
+        action="User Login" if success else "Login Failed",
+        user=user_email or "unknown",
+        details=f"Auth method: {auth_method}" + (f", Error: {error_reason}" if error_reason else ""),
+        category="auth"
+    )
+    
+    return login_record
+
+def get_unique_users():
+    """Get list of unique users who have logged in"""
+    data = load_login_history()
+    logins = data.get("logins", [])
+    
+    # Group by email and get most recent login for each
+    unique_users = {}
+    for login in logins:
+        email = login.get("user_email", "unknown")
+        if email not in unique_users or login.get("timestamp_unix", 0) > unique_users[email].get("timestamp_unix", 0):
+            unique_users[email] = login
+    
+    # Sort by most recent
+    sorted_users = sorted(unique_users.items(), key=lambda x: x[1].get("timestamp_unix", 0), reverse=True)
+    
+    return [
+        {
+            "email": email,
+            "last_login": login.get("timestamp"),
+            "auth_method": login.get("auth_method"),
+            "device_info": login.get("device_info"),
+            "total_logins": sum(1 for l in logins if l.get("user_email") == email)
+        }
+        for email, login in sorted_users
+    ]
+
 def load_pending_fixes():
     """Load pending fixes from JSON file"""
     try:
+        print(f"[load_pending_fixes] Attempting to load from: {PENDING_FIXES_FILE}")
+        print(f"[load_pending_fixes] File exists: {os.path.exists(PENDING_FIXES_FILE)}")
         if os.path.exists(PENDING_FIXES_FILE):
             with open(PENDING_FIXES_FILE, 'r') as f:
-                return json.load(f)
+                data = json.load(f)
+                print(f"[load_pending_fixes] Loaded {len(data.get('fixes', []))} fixes and {len(data.get('history', []))} history items")
+                return data
     except Exception as e:
         print(f"Error loading pending fixes: {e}")
+    print(f"[load_pending_fixes] Returning empty data")
     return {"fixes": [], "history": []}
 
 def save_pending_fixes(data):
@@ -1324,6 +1475,29 @@ async def track_user(body: TrackUserRequest, http_request: Request):
     
     users = track_user_activity(body.user_id, body.page, session_id=session_id, device_info=device_info, user_agent=user_agent)
     return {"success": True, "active_users": len(users)}
+
+@app.get("/api/admin/login-history")
+async def get_login_history(limit: int = 100):
+    """Get login history - shows every login attempt (successful and failed)"""
+    data = load_login_history()
+    logins = data.get("logins", [])
+    # Return most recent first
+    recent_logins = list(reversed(logins[-limit:]))
+    return {
+        "logins": recent_logins,
+        "total": len(logins),
+        "returned": len(recent_logins)
+    }
+
+@app.get("/api/admin/unique-users")
+async def get_unique_users_endpoint():
+    """Get list of unique users who have logged in with their login statistics"""
+    users = get_unique_users()
+    return {
+        "users": users,
+        "total_unique": len(users),
+        "total_logins": len(load_login_history().get("logins", []))
+    }
 
 @app.delete("/api/admin/activity-log")
 async def clear_activity_log():
@@ -1440,12 +1614,17 @@ def create_pending_fix(feedback: FeedbackRequest, discovery_result: dict):
     """Create a new pending fix from feedback analysis with discovery"""
     fix_id = str(uuid.uuid4())[:8]
     
+    # Get submitted_by from feedback field (which was set in submit_feedback endpoint)
+    submitted_by = feedback.submitted_by or "Unknown"
+    
     fix = {
         "id": fix_id,
+        "feedback_id": f"FBK-{fix_id}",  # Add feedback ID for tracking
         "title": discovery_result.get("title", f"Feedback: {feedback.category}"),
         "feedback_category": feedback.category,
         "feedback_rating": feedback.rating,
         "feedback_comments": feedback.comments,
+        "submitted_by": submitted_by,  # Track who submitted
         "timestamp": feedback.timestamp,
         "priority": "high" if feedback.rating <= 2 else "medium" if feedback.rating <= 3 else "low",
         "root_cause": discovery_result.get("root_cause", "Analysis pending"),
@@ -1460,6 +1639,14 @@ def create_pending_fix(feedback: FeedbackRequest, discovery_result: dict):
     data = load_pending_fixes()
     data["fixes"].append(fix)
     save_pending_fixes(data)
+    
+    # Log the feedback submission to activity log with complete details
+    log_activity(
+        action="Feedback Submitted",
+        user=submitted_by,
+        details=f"Submitted feedback: {feedback.category} (Rating: {feedback.rating}/5) - FIX-{fix_id}",
+        category="feedback_submission"
+    )
     
     return fix
 

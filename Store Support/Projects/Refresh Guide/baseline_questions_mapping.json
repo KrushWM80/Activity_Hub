@@ -1,0 +1,472 @@
+{
+  "total_questions": 334,
+  "mapped": {
+    "Q_100": {
+      "area": "Fresh",
+      "topic": "Bakery"
+    },
+    "Q_148": {
+      "area": "Salesfloor",
+      "topic": "Modulars"
+    },
+    "Q_202": {
+      "area": "Store Fulfillment",
+      "topic": "InHome Equipment"
+    },
+    "Q_203": {
+      "area": "Store Fulfillment",
+      "topic": "Equipment Readiness"
+    },
+    "Q_220": {
+      "area": "Store Fulfillment",
+      "topic": "InHome Shift Guide"
+    },
+    "Q_221": {
+      "area": "Store Fulfillment",
+      "topic": "InHome Vehicle Guide"
+    },
+    "Q_222": {
+      "area": "Store Fulfillment",
+      "topic": "InHome Uniforms"
+    },
+    "Q_223": {
+      "area": "Store Fulfillment",
+      "topic": "InHome Pre-trip"
+    },
+    "Q_224": {
+      "area": "ACC",
+      "topic": "Exterior Service Writer Station"
+    },
+    "Q_225": {
+      "area": "ACC",
+      "topic": "Exterior Signing"
+    },
+    "Q_226": {
+      "area": "ACC",
+      "topic": "Exterior Signing"
+    },
+    "Q_227": {
+      "area": "ACC",
+      "topic": "Service Area"
+    },
+    "Q_228": {
+      "area": "ACC",
+      "topic": "Tools Boards/Wheel Weight"
+    },
+    "Q_229": {
+      "area": "ACC",
+      "topic": "Tools Boards/Wheel Weight"
+    },
+    "Q_230": {
+      "area": "ACC",
+      "topic": "Tools Boards/Wheel Weight"
+    },
+    "Q_231": {
+      "area": "ACC",
+      "topic": "Tools Boards/Wheel Weight"
+    },
+    "Q_232": {
+      "area": "ACC",
+      "topic": "Tools Boards/Wheel Weight"
+    },
+    "Q_233": {
+      "area": "ACC",
+      "topic": "Service Area Equipment"
+    },
+    "Q_234": {
+      "area": "ACC",
+      "topic": "Service Area Equipment"
+    },
+    "Q_238": {
+      "area": "ACC",
+      "topic": "Service Area Equipment"
+    },
+    "Q_239": {
+      "area": "ACC",
+      "topic": "Lower Bay/Upper Bay"
+    },
+    "Q_242": {
+      "area": "ACC",
+      "topic": "Lower Bay/Upper Bay"
+    },
+    "Q_243": {
+      "area": "ACC",
+      "topic": "Lower Bay/Upper Bay"
+    },
+    "Q_246": {
+      "area": "ACC",
+      "topic": "Backroom"
+    },
+    "Q_254": {
+      "area": "ACC",
+      "topic": "Oil Bay/Filter Modular"
+    },
+    "Q_255": {
+      "area": "ACC",
+      "topic": "Oil Bay/Filter Modular"
+    },
+    "Q_282": {
+      "area": "Front End",
+      "topic": "First Impressions"
+    },
+    "Q_307": {
+      "area": "Front End",
+      "topic": "Service Desk"
+    },
+    "Q_310": {
+      "area": "Front End",
+      "topic": "Marketplace Returns"
+    },
+    "Q_324": {
+      "area": "Front End",
+      "topic": "Automated Kiosks/Vending"
+    },
+    "Q_325": {
+      "area": "Front End",
+      "topic": "Automated Kiosks/Vending"
+    },
+    "Q_326": {
+      "area": "Front End",
+      "topic": "Automated Kiosks/Vending"
+    },
+    "Q_33": {
+      "area": "Backroom",
+      "topic": "California Baler Keys"
+    },
+    "Q_331": {
+      "area": "Front End",
+      "topic": "Tenant Services"
+    },
+    "Q_38": {
+      "area": "Backroom",
+      "topic": "FAST Unloader Equipment"
+    },
+    "Q_41": {
+      "area": "Backroom",
+      "topic": "Fixture Cage"
+    },
+    "Q_48": {
+      "area": "Backroom",
+      "topic": "Trailers"
+    },
+    "Q_67": {
+      "area": "Asset Protection",
+      "topic": "CCTV System"
+    },
+    "Q_68": {
+      "area": "Asset Protection",
+      "topic": "Security - Fuel Station"
+    },
+    "Q_70": {
+      "area": "Asset Protection",
+      "topic": "Call Boxes"
+    },
+    "Q_75": {
+      "area": "Asset Protection",
+      "topic": "DSL Blue Tote"
+    },
+    "Q_93": {
+      "area": "Fresh",
+      "topic": "Meat"
+    }
+  },
+  "unmapped": [
+    "Q_1",
+    "Q_10",
+    "Q_101",
+    "Q_102",
+    "Q_103",
+    "Q_104",
+    "Q_105",
+    "Q_106",
+    "Q_107",
+    "Q_108",
+    "Q_109",
+    "Q_11",
+    "Q_110",
+    "Q_111",
+    "Q_112",
+    "Q_113",
+    "Q_114",
+    "Q_115",
+    "Q_116",
+    "Q_117",
+    "Q_118",
+    "Q_119",
+    "Q_12",
+    "Q_120",
+    "Q_121",
+    "Q_122",
+    "Q_123",
+    "Q_124",
+    "Q_125",
+    "Q_126",
+    "Q_127",
+    "Q_128",
+    "Q_129",
+    "Q_13",
+    "Q_130",
+    "Q_131",
+    "Q_132",
+    "Q_133",
+    "Q_134",
+    "Q_135",
+    "Q_136",
+    "Q_137",
+    "Q_138",
+    "Q_139",
+    "Q_14",
+    "Q_140",
+    "Q_141",
+    "Q_142",
+    "Q_143",
+    "Q_144",
+    "Q_145",
+    "Q_146",
+    "Q_147",
+    "Q_149",
+    "Q_15",
+    "Q_150",
+    "Q_151",
+    "Q_152",
+    "Q_153",
+    "Q_154",
+    "Q_155",
+    "Q_156",
+    "Q_157",
+    "Q_158",
+    "Q_159",
+    "Q_16",
+    "Q_160",
+    "Q_161",
+    "Q_162",
+    "Q_163",
+    "Q_164",
+    "Q_165",
+    "Q_166",
+    "Q_167",
+    "Q_168",
+    "Q_169",
+    "Q_17",
+    "Q_170",
+    "Q_171",
+    "Q_172",
+    "Q_173",
+    "Q_174",
+    "Q_175",
+    "Q_176",
+    "Q_177",
+    "Q_178",
+    "Q_179",
+    "Q_18",
+    "Q_180",
+    "Q_181",
+    "Q_182",
+    "Q_183",
+    "Q_184",
+    "Q_185",
+    "Q_186",
+    "Q_187",
+    "Q_188",
+    "Q_189",
+    "Q_19",
+    "Q_190",
+    "Q_191",
+    "Q_192",
+    "Q_193",
+    "Q_194",
+    "Q_195",
+    "Q_196",
+    "Q_197",
+    "Q_198",
+    "Q_199",
+    "Q_2",
+    "Q_20",
+    "Q_200",
+    "Q_201",
+    "Q_204",
+    "Q_205",
+    "Q_206",
+    "Q_207",
+    "Q_208",
+    "Q_209",
+    "Q_21",
+    "Q_210",
+    "Q_211",
+    "Q_212",
+    "Q_213",
+    "Q_214",
+    "Q_215",
+    "Q_216",
+    "Q_217",
+    "Q_218",
+    "Q_219",
+    "Q_23",
+    "Q_235",
+    "Q_236",
+    "Q_237",
+    "Q_24",
+    "Q_240",
+    "Q_241",
+    "Q_244",
+    "Q_245",
+    "Q_247",
+    "Q_248",
+    "Q_249",
+    "Q_25",
+    "Q_250",
+    "Q_251",
+    "Q_252",
+    "Q_253",
+    "Q_256",
+    "Q_257",
+    "Q_258",
+    "Q_259",
+    "Q_26",
+    "Q_260",
+    "Q_261",
+    "Q_262",
+    "Q_263",
+    "Q_264",
+    "Q_265",
+    "Q_266",
+    "Q_267",
+    "Q_268",
+    "Q_269",
+    "Q_27",
+    "Q_270",
+    "Q_271",
+    "Q_272",
+    "Q_273",
+    "Q_274",
+    "Q_275",
+    "Q_276",
+    "Q_277",
+    "Q_278",
+    "Q_279",
+    "Q_28",
+    "Q_280",
+    "Q_281",
+    "Q_283",
+    "Q_284",
+    "Q_285",
+    "Q_286",
+    "Q_287",
+    "Q_288",
+    "Q_289",
+    "Q_29",
+    "Q_290",
+    "Q_291",
+    "Q_292",
+    "Q_293",
+    "Q_294",
+    "Q_295",
+    "Q_296",
+    "Q_297",
+    "Q_298",
+    "Q_299",
+    "Q_3",
+    "Q_30",
+    "Q_300",
+    "Q_301",
+    "Q_302",
+    "Q_303",
+    "Q_304",
+    "Q_305",
+    "Q_306",
+    "Q_308",
+    "Q_309",
+    "Q_31",
+    "Q_311",
+    "Q_312",
+    "Q_313",
+    "Q_314",
+    "Q_315",
+    "Q_316",
+    "Q_317",
+    "Q_318",
+    "Q_319",
+    "Q_32",
+    "Q_320",
+    "Q_321",
+    "Q_322",
+    "Q_323",
+    "Q_327",
+    "Q_328",
+    "Q_329",
+    "Q_330",
+    "Q_332",
+    "Q_333",
+    "Q_334",
+    "Q_335",
+    "Q_34",
+    "Q_35",
+    "Q_36",
+    "Q_37",
+    "Q_39",
+    "Q_4",
+    "Q_40",
+    "Q_42",
+    "Q_43",
+    "Q_44",
+    "Q_45",
+    "Q_46",
+    "Q_47",
+    "Q_49",
+    "Q_5",
+    "Q_50",
+    "Q_51",
+    "Q_52",
+    "Q_53",
+    "Q_54",
+    "Q_55",
+    "Q_56",
+    "Q_57",
+    "Q_58",
+    "Q_59",
+    "Q_6",
+    "Q_60",
+    "Q_61",
+    "Q_62",
+    "Q_63",
+    "Q_64",
+    "Q_65",
+    "Q_66",
+    "Q_69",
+    "Q_7",
+    "Q_71",
+    "Q_72",
+    "Q_73",
+    "Q_74",
+    "Q_76",
+    "Q_77",
+    "Q_78",
+    "Q_79",
+    "Q_8",
+    "Q_80",
+    "Q_81",
+    "Q_82",
+    "Q_83",
+    "Q_84",
+    "Q_85",
+    "Q_86",
+    "Q_87",
+    "Q_88",
+    "Q_89",
+    "Q_9",
+    "Q_90",
+    "Q_91",
+    "Q_92",
+    "Q_94",
+    "Q_95",
+    "Q_96",
+    "Q_97",
+    "Q_98",
+    "Q_99"
+  ],
+  "summary": {
+    "total": 334,
+    "mapped_count": 42,
+    "unmapped_count": 292
+  }
+}

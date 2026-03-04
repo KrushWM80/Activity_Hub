@@ -1,0 +1,38 @@
+{
+  "SC": {
+    "Backroom": 54,
+    "Asset Protection": 19,
+    "Fresh": 49,
+    "Salesfloor": 27,
+    "Fashion": 44,
+    "Store Fulfillment": 24,
+    "ACC": 55,
+    "Front End": 56
+  },
+  "DIV1": {
+    "Backroom": 54,
+    "Asset Protection": 19,
+    "Fresh": 49,
+    "Salesfloor": 27,
+    "Fashion": 44,
+    "Store Fulfillment": 23,
+    "ACC": 55,
+    "Front End": 56
+  },
+  "NHM": {
+    "Backroom": 51,
+    "Asset Protection": 15,
+    "Fresh": 47,
+    "Salesfloor": 18,
+    "Store Fulfillment": 24,
+    "Front End": 54
+  },
+  "summary": {
+    "total_sc": 328,
+    "total_div1": 327,
+    "total_nhm": 209,
+    "total_baseline": 864,
+    "actual_questions_on_2_23": 334,
+    "extra_questions": -530
+  }
+}

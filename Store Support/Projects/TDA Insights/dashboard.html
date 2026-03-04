@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDA Initiatives Insights - Walmart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Walmart Living Design Colors */
+            --walmart-blue-dark: #1E3A8A;
+            --walmart-blue: #0071CE;
+            --walmart-blue-light: #DBEAFE;
+            --walmart-yellow: #FFCC00;
+            --walmart-yellow-dark: #FFA500;
+            --text-primary: #212121;
+            --text-secondary: #666666;
+            --border-color: #E5E5E5;
+            --bg-light: #F5F5F5;
+            --success: #107C10;
+            --warning: #F7630C;
+            --error: #DC3545;
+            --on-track: #107C10;
+            --at-risk: #F7630C;
+            --off-track: #DC3545;
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            /* Typography */
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            --font-size-sm: 12px;
+            --font-size-base: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 18px;
+            --font-size-2xl: 24px;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--walmart-blue-dark) 0%, var(--walmart-blue) 100%);
+            color: white;
+            padding: var(--spacing-xl);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .header-logo {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-title {
+            border-left: 3px solid var(--walmart-yellow);
+            padding-left: var(--spacing-lg);
+        }
+
+        .header-title h1 {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .header-title p {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            font-size: var(--font-size-sm);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #107C10;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: white;
+            border-radius: 8px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .filters-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            font-weight: 600;
+            color: var(--walmart-blue-dark);
+        }
+
+        .filters-header::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background-color: var(--walmart-yellow);
+            border-radius: 2px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            font-size: var(--font-size-base);
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        select {
+            padding: 10px var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            font-size: var(--font-size-base);
+            font-family: var(--font-family);
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            border-color: var(--walmart-blue);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 3px rgba(0, 113, 206, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        button {
+            padding: 10px var(--spacing-lg);
+            border: none;
+            border-radius: 4px;
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-family);
+        }
+
+        .btn-primary {
+            background-color: var(--walmart-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--walmart-blue-dark);
+            box-shadow: 0 4px 12px rgba(0, 113, 206, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--walmart-blue);
+            border: 2px solid var(--walmart-blue);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--walmart-blue-light);
+        }
+
+        /* Summary Stats */
+        .summary-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stat-card {
+            background: white;
+            padding: var(--spacing-lg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid var(--walmart-yellow);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--walmart-blue-dark);
+        }
+
+        .stat-detail {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-top: var(--spacing-sm);
+        }
+
+        /* Data Table */
+        .table-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: var(--spacing-lg);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h2 {
+            font-size: var(--font-size-xl);
+            color: var(--walmart-blue-dark);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--font-size-base);
+        }
+
+        thead {
+            background-color: var(--bg-light);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        th {
+            padding: var(--spacing-md) var(--spacing-lg);
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background-color: var(--walmart-blue-light);
+        }
+
+        /* Health Status Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-on-track {
+            background-color: rgba(16, 124, 16, 0.2);
+            color: var(--on-track);
+        }
+
+        .badge-at-risk {
+            background-color: rgba(247, 99, 12, 0.2);
+            color: var(--at-risk);
+        }
+
+        .badge-off-track {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--off-track);
+        }
+
+        /* Phase Badge */
+        .phase-tag {
+            background-color: var(--walmart-blue-light);
+            color: var(--walmart-blue-dark);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl);
+            gap: var(--spacing-md);
+            color: var(--text-secondary);
+        }
+
+        .loader {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--walmart-blue);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: var(--spacing-lg);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            border-top: 1px solid var(--border-color);
+            margin-top: var(--spacing-xl);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-section {
+                grid-template-columns: 1fr;
+            }
+
+            .table-wrapper {
+                font-size: var(--font-size-sm);
+            }
+
+            th, td {
+                padding: var(--spacing-md);
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-logo">💼</div>
+                <div class="header-title">
+                    <h1>TDA Initiatives Insights</h1>
+                    <p>Initiative Health & Deployment Status Dashboard</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span id="connection-status">Connecting...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-header">Filter by</div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Phase</label>
+                    <select id="phase-filter">
+                        <option value="All">All Phases</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Health Status</label>
+                    <select id="health-filter">
+                        <option value="All">All Statuses</option>
+                    </select>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" id="apply-filters">Apply Filters</button>
+                <button class="btn-secondary" id="reset-filters">Reset</button>
+                <button class="btn-secondary" id="export-btn">📥 Export CSV</button>
+                <button class="btn-secondary" id="ppt-btn">📊 Generate PPT</button>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="summary-section" id="summary-section">
+            <div class="stat-card">
+                <div class="stat-label">Total Projects</div>
+                <div class="stat-value" id="stat-projects">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Stores Impacted</div>
+                <div class="stat-value" id="stat-stores">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">On Track</div>
+                <div class="stat-value" id="stat-on-track" style="color: var(--on-track);">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">At Risk</div>
+                <div class="stat-value" id="stat-at-risk" style="color: var(--at-risk);">0</div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-section">
+            <div class="table-header">
+                <h2>Initiatives Overview</h2>
+                <div class="table-actions">
+                    <span id="record-count" style="color: var(--text-secondary); font-size: var(--font-size-sm);">Loading...</span>
+                </div>
+            </div>
+            <div class="table-wrapper" id="table-wrapper">
+                <div class="loading">
+                    <div class="loader"></div>
+                    <span>Loading TDA Initiatives...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>TDA Initiatives Insights Dashboard | Data Source: wmt-assetprotection-prod.Store_Support_Dev.Output_TDA Report</p>
+            <p id="last-updated">Last updated: Never</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'http://localhost:5000/api';
+        
+        // State
+        let allData = [];
+        let phases = [];
+        let healthStatuses = [];
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadFilters();
+            await loadData();
+            setupEventListeners();
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('apply-filters').addEventListener('click', loadData);
+            document.getElementById('reset-filters').addEventListener('click', resetFilters);
+            document.getElementById('export-btn').addEventListener('click', exportCSV);
+            document.getElementById('ppt-btn').addEventListener('click', generatePPT);
+            
+            // Allow Enter key to apply filters
+            document.getElementById('phase-filter').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') loadData();
+            });
+            document.getElementById('health-filter').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') loadData();
+            });
+        }
+
+        // Load filter options
+        async function loadFilters() {
+            try {
+                // Load phases
+                const phasesRes = await fetch(`${API_BASE}/phases`);
+                const phasesData = await phasesRes.json();
+                phases = phasesData.phases || [];
+                
+                // Load health statuses
+                const statusesRes = await fetch(`${API_BASE}/health-statuses`);
+                const statusesData = await statusesRes.json();
+                healthStatuses = statusesData.health_statuses || [];
+                
+                // Populate dropdowns
+                populateDropdown('phase-filter', phases);
+                populateDropdown('health-filter', healthStatuses);
+                
+                updateConnectionStatus(true);
+            } catch (error) {
+                console.error('Error loading filters:', error);
+                updateConnectionStatus(false);
+            }
+        }
+
+        // Populate dropdown
+        function populateDropdown(elementId, options) {
+            const select = document.getElementById(elementId);
+            const currentValue = select.value;
+            
+            // Clear existing options except first
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            // Add options
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+            
+            select.value = currentValue;
+        }
+
+        // Load and display data
+        async function loadData() {
+            try {
+                const phase = document.getElementById('phase-filter').value;
+                const healthStatus = document.getElementById('health-filter').value;
+                
+                const url = new URL(`${API_BASE}/data`);
+                url.searchParams.append('phase', phase);
+                url.searchParams.append('health_status', healthStatus);
+                
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.success) {
+                    allData = result.data;
+                    renderTable(result.data);
+                    updateSummary(result.data);
+                    updateRecordCount(result.count);
+                    updateLastUpdated();
+                    updateConnectionStatus(true);
+                } else {
+                    showError(result.error || 'Failed to load data');
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError('Connection error. Make sure the backend is running.');
+                updateConnectionStatus(false);
+            }
+        }
+
+        // Render table
+        function renderTable(data) {
+            const wrapper = document.getElementById('table-wrapper');
+            
+            if (!data || data.length === 0) {
+                wrapper.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No initiatives found</h3>
+                        <p>Try adjusting your filters</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const columns = [
+                'Initiative - Project Title',
+                'Health Status',
+                'Phase',
+                '# of Stores',
+                'Intake & Testing',
+                'Dallas POC',
+                'Deployment'
+            ];
+            
+            let html = '<table><thead><tr>';
+            columns.forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            data.forEach(row => {
+                html += '<tr>';
+                columns.forEach(col => {
+                    let value = row[col] || '';
+                    let cellClass = '';
+                    
+                    if (col === 'Health Status') {
+                        const status = String(value).toLowerCase();
+                        if (status.includes('on track')) {
+                            cellClass = 'badge badge-on-track';
+                        } else if (status.includes('at risk')) {
+                            cellClass = 'badge badge-at-risk';
+                        } else if (status.includes('off track')) {
+                            cellClass = 'badge badge-off-track';
+                        } else {
+                            cellClass = 'badge';
+                        }
+                        html += `<td><span class="${cellClass}">${value}</span></td>`;
+                    } else if (col === 'Phase') {
+                        html += `<td><span class="phase-tag">${value}</span></td>`;
+                    } else if (col === '# of Stores') {
+                        html += `<td style="font-weight: 600; color: var(--walmart-blue);">${value}</td>`;
+                    } else {
+                        html += `<td>${value}</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            wrapper.innerHTML = html;
+        }
+
+        // Update summary statistics
+        function updateSummary(data) {
+            document.getElementById('stat-projects').textContent = data.length;
+            
+            const totalStores = data.reduce((sum, row) => {
+                return sum + (parseInt(row['# of Stores']) || 0);
+            }, 0);
+            document.getElementById('stat-stores').textContent = totalStores.toLocaleString();
+            
+            let onTrack = 0;
+            let atRisk = 0;
+            
+            data.forEach(row => {
+                const status = String(row['Health Status']).toLowerCase();
+                if (status.includes('on track')) onTrack++;
+                else if (status.includes('at risk')) atRisk++;
+            });
+            
+            document.getElementById('stat-on-track').textContent = onTrack;
+            document.getElementById('stat-at-risk').textContent = atRisk;
+        }
+
+        // Update record count
+        function updateRecordCount(count) {
+            document.getElementById('record-count').textContent = `${count} initiative${count !== 1 ? 's' : ''}`;
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('phase-filter').value = 'All';
+            document.getElementById('health-filter').value = 'All';
+            loadData();
+        }
+
+        // Export CSV
+        function exportCSV() {
+            if (!allData || allData.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            const columns = Object.keys(allData[0]);
+            let csv = columns.join(',') + '\n';
+            
+            allData.forEach(row => {
+                csv += columns.map(col => {
+                    const value = row[col] || '';
+                    // Escape quotes and wrap in quotes if contains comma
+                    const escaped = String(value).replace(/"/g, '""');
+                    return escaped.includes(',') ? `"${escaped}"` : escaped;
+                }).join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `tda-initiatives-${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // Generate PPT (integrated with backend)
+        async function generatePPT() {
+            // Get current selected phases
+            const selectedPhase = document.getElementById('phase-filter').value;
+            const phases = selectedPhase === 'All' ? null : [selectedPhase];
+            const btn = document.getElementById('ppt-btn');
+            const originalText = btn.textContent;
+            
+            try {
+                // Show loading state
+                btn.textContent = '⏳ Generating...';
+                btn.disabled = true;
+                
+                // Request report generation
+                const response = await fetch(`${API_BASE}/ppt/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phases: phases,
+                        force_regenerate: false
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Show success message
+                    alert(`[OK] Report generated successfully!\n\nFile: ${result.file_name}\n\nYour download should start shortly...`);
+                    
+                    // Trigger download
+                    const downloadUrl = `${API_BASE}/ppt/download/${result.file_name}`;
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = result.file_name;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert(`[ERROR] Report generation failed:\n\n${result.message}`);
+                }
+            } catch (error) {
+                logger.error('Error generating PPT:', error);
+                alert(`Error: ${error.message}\n\nMake sure the backend is running.`);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const indicator = document.querySelector('.status-dot');
+            const statusText = document.getElementById('connection-status');
+            
+            if (connected) {
+                indicator.style.backgroundColor = '#107C10';
+                statusText.textContent = 'Connected';
+            } else {
+                indicator.style.backgroundColor = '#DC3545';
+                statusText.textContent = 'Disconnected';
+            }
+        }
+
+        // Update last updated timestamp
+        function updateLastUpdated() {
+            const now = new Date();
+            const formatted = now.toLocaleString();
+            document.getElementById('last-updated').textContent = `Last updated: ${formatted}`;
+        }
+
+        // Show error message
+        function showError(message) {
+            const wrapper = document.getElementById('table-wrapper');
+            wrapper.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <h3>Error loading data</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

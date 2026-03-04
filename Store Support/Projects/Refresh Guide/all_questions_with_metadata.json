@@ -1,0 +1,1338 @@
+[
+  {
+    "id": "Q_1",
+    "description": "Check each department's bin locations to ensure they're accessible all day for VizPicking."
+  },
+  {
+    "id": "Q_2",
+    "description": "Place bins in the backroom for easy access, as some departments need VizPick several times daily."
+  },
+  {
+    "id": "Q_3",
+    "description": "Locate backroom huddle board, replace if missing or damaged."
+  },
+  {
+    "id": "Q_4",
+    "description": "Refresh 99 Supply Modular."
+  },
+  {
+    "id": "Q_5",
+    "description": "Use the Device Management Tool (DMT) to manage mobile devices for associates."
+  },
+  {
+    "id": "Q_6",
+    "description": "Complete roundup of all devices including mobile phones, TC's and printers. TC's should be used by Fulfillment, Pharmacy(RX), Receiving & Claims. All other work groups should use Pixel or Xcover devices."
+  },
+  {
+    "id": "Q_7",
+    "description": "Validate store device inventory with the Connected Associate Asset report in DMT."
+  },
+  {
+    "id": "Q_8",
+    "description": "Inspect VizPick Location labels and replace any missing or damaged labels"
+  },
+  {
+    "id": "Q_9",
+    "description": "Check Compliance signing on Baler and Compactors replace any damaged or missing signs"
+  },
+  {
+    "id": "Q_10",
+    "description": "Ensure all aisle location lables are available and scannable and visible per section."
+  },
+  {
+    "id": "Q_11",
+    "description": "Ensure all feature location labels are in sequential order and visible."
+  },
+  {
+    "id": "Q_12",
+    "description": "Order extra signage/flags through Signing Catalog as needed."
+  },
+  {
+    "id": "Q_13",
+    "description": "Ensure all action alley features are located properly as an action alley zone and signing matches the location label."
+  },
+  {
+    "id": "Q_14",
+    "description": "Ensure all endcaps are located as feature, assigned correctly and in order."
+  },
+  {
+    "id": "Q_15",
+    "description": "Refresh Claims workplace set up. Replace any missing or damaged labels"
+  },
+  {
+    "id": "Q_16",
+    "description": "Refresh Claims workplace set up. Replace any missing or damaged labels"
+  },
+  {
+    "id": "Q_17",
+    "description": "DSL STORES ONLY: Verify Blue Claims tote is present and maintained for defective DSL hardware."
+  },
+  {
+    "id": "Q_18",
+    "description": "Refresh the Claims workplace setup. Replace missing or damaged labels; see work area setup for details."
+  },
+  {
+    "id": "Q_19",
+    "description": "Refresh the Claims workplace setup. Replace missing or damaged labels; see work area setup for details."
+  },
+  {
+    "id": "Q_20",
+    "description": "Ensure digital temping equipment and Cold Chain Receiving logs are present and easily accessible and ready to use."
+  },
+  {
+    "id": "Q_21",
+    "description": "Check all docks and doors; if issues arise, submit a detailed work order in MyWalmart app>Facilities Management"
+  },
+  {
+    "id": "Q_23",
+    "description": "Ensure vendor bins are accessible for merchandisers and relocate DSD backstock area if needed."
+  },
+  {
+    "id": "Q_24",
+    "description": "Refresh DSD Audit areas: have multiple audit areas marked in the receiving space."
+  },
+  {
+    "id": "Q_25",
+    "description": "Reset DSD Vendor Claim area and ensure labels and tote(s) are in good condition."
+  },
+  {
+    "id": "Q_26",
+    "description": "Replace any faded, damaged or missing backroom location markers."
+  },
+  {
+    "id": "Q_27",
+    "description": "Using the Vizpick Implementation Guide, review the locating freight section to make sure case lables are located correctly in the backroom"
+  },
+  {
+    "id": "Q_28",
+    "description": "Refresh Dairy Cooler and organize by category, check the scanability of location markers and case labels."
+  },
+  {
+    "id": "Q_29",
+    "description": "Refresh Freezer backroom by aisle and check the scanability of location labels and case labels."
+  },
+  {
+    "id": "Q_30",
+    "description": "Verify deodorizer and hoses are present and working."
+  },
+  {
+    "id": "Q_31",
+    "description": "Keep compactor and baler area clean and free of merchandise/trash; disconnect boxes must be clear."
+  },
+  {
+    "id": "Q_32",
+    "description": "Ensure interlock devices for the compactor and baler are working properly.  Make sure the baler has the personal protective equipment (PPE) baler kit. (GNFR Item # 100707705)"
+  },
+  {
+    "id": "Q_33",
+    "description": "California stores: Verify baler keys are kept in the baler lockbox while not in use including combination updating if needed."
+  },
+  {
+    "id": "Q_34",
+    "description": "Inspect equipment using the PLE Pre-Operational Checklist Job Aid and refresh your PLE binder."
+  },
+  {
+    "id": "Q_35",
+    "description": "Deep clean and maintain Floor Scrubbers"
+  },
+  {
+    "id": "Q_36",
+    "description": "Replace or repair any wearable parts on the Floor Scrubber, otherwise submit a ticket in MyWalmart app >Facilities Management>report an Issue>Backroom>Floor Cleaning Equipment for service"
+  },
+  {
+    "id": "Q_37",
+    "description": "Train associates on all shifts to operate equipment (power lifting, FAST unloader, etc.) Keep licensing renewals up to date."
+  },
+  {
+    "id": "Q_38",
+    "description": "Deep Clean FAST Unloader and replace missing parts/bands."
+  },
+  {
+    "id": "Q_39",
+    "description": "Verify that the store's fixture areas are reorganized, and that damaged or unneeded fixtures are returned through the CARP process."
+  },
+  {
+    "id": "Q_40",
+    "description": "Review the layout for all supply areas in the backroom, resetting and resigning if needed."
+  },
+  {
+    "id": "Q_41",
+    "description": "DSL STORES ONLY: Verify the DSL Backroom modular is set/signed correctly and maintained."
+  },
+  {
+    "id": "Q_42",
+    "description": "Topstock Cart Label placement instructions."
+  },
+  {
+    "id": "Q_43",
+    "description": "Validate the One Touch sort area is set up correctly and labels are readable."
+  },
+  {
+    "id": "Q_44",
+    "description": "Refresh tote color coding as needed."
+  },
+  {
+    "id": "Q_45",
+    "description": "Use the Trailer Planning Tool to evaluate which trailers need to be extended and which trailers are empty and can be requested for Pick Up in the Trailer Planning Tool."
+  },
+  {
+    "id": "Q_46",
+    "description": "For pickups, ensure units are empty, swept, zip-tied and locks removed."
+  },
+  {
+    "id": "Q_47",
+    "description": "Pick Up requests must be submitted in the Trailer Planning Tool"
+  },
+  {
+    "id": "Q_48",
+    "description": "For units that are going to be extended for store projects or remodels, update the business reason in the Trailer Planning Tool."
+  },
+  {
+    "id": "Q_49",
+    "description": "Use the Assembly Planning Tool to reset schedules for volume demands after holiday. This will limit unnecessary charges to the store for techs showing up with no work."
+  },
+  {
+    "id": "Q_50",
+    "description": "Clean around the eye wash stations and make sure keep clear area is visible."
+  },
+  {
+    "id": "Q_51",
+    "description": "Keep the associate lounge on a regular cleaning schedule.  See Lounge Design Ideas & Resources"
+  },
+  {
+    "id": "Q_52",
+    "description": "Ensure Associate Snack Center is clean; food is fresh."
+  },
+  {
+    "id": "Q_53",
+    "description": "Remove and dispose of old or spoiled food from the refrigerator."
+  },
+  {
+    "id": "Q_54",
+    "description": "Refresh the lounge floors."
+  },
+  {
+    "id": "Q_55",
+    "description": "Assess associate vest needs and place orders in GNFR if necessary."
+  },
+  {
+    "id": "Q_56",
+    "description": "Refresh building exteriors signing: fire extinguisher, fire exitinguishers, fire extit door"
+  },
+  {
+    "id": "Q_57",
+    "description": "Clean around bale areas, docks, organics, and rentention pond."
+  },
+  {
+    "id": "Q_58",
+    "description": "Extra bale pickups can be requested in the MyWalmart app if needed."
+  },
+  {
+    "id": "Q_59",
+    "description": "Request pooled asset pickups by calling your DC as needed."
+  },
+  {
+    "id": "Q_60",
+    "description": "Check that the Safety Celebration board is up to date in the back hallway."
+  },
+  {
+    "id": "Q_61",
+    "description": "Check the inclement weather plan page and make sure that owners are assigned. Communicate the expectations with the task owners."
+  },
+  {
+    "id": "Q_62",
+    "description": "Review the Floor Mat Program and inspect all\u202ffloor mats\u202f(carpeted, food prep, anti-fatigue and ACC rubber scraper mats) to make sure they're properly placed and in good condition."
+  },
+  {
+    "id": "Q_63",
+    "description": "Make sure all spill stations are in their required locations and have the necessary supplies."
+  },
+  {
+    "id": "Q_64",
+    "description": "Check that AED signage is located above your AED cabinet and is seven feet above the floor. If new signs are needed order in GNFR Item # 100647737."
+  },
+  {
+    "id": "Q_65",
+    "description": "Check extension cords for tags with a start date of use (90 days max) and are not permanently attached to fixtures, piping or conduit or routed through walls, doorways or the ceiling."
+  },
+  {
+    "id": "Q_66",
+    "description": "Check electrical plugs, junction boxes and the knockouts from the junction boxes for good condition with no exposed wiring. Check cover plates are not missing or loose."
+  },
+  {
+    "id": "Q_67",
+    "description": "Complete a total review of your\u202f CCTV system.\u202fSubmit a service ticket for any cameras not functioning properly in the Me@Walmart app, selecting AP Compliance and CCTV.\u202f\u202f\u00a0"
+  },
+  {
+    "id": "Q_68",
+    "description": "If your store has a Fuel Station, verify the use and functionality of the panic buttons and the door chimes are functioning.\u00a0"
+  },
+  {
+    "id": "Q_69",
+    "description": "Check emergency charts and validate all store specific information is correct. Updated emergency charts will contain code green information.\u00a0"
+  },
+  {
+    "id": "Q_70",
+    "description": "Check call boxes, clean and replace faceplates as needed. Order addition using GNFR Item # 100685345\u00a0"
+  },
+  {
+    "id": "Q_71",
+    "description": "Inspect the DEX equipment and order any repairs, replacements or backups through GNFR.\u202f\u202f\u202f\u00a0"
+  },
+  {
+    "id": "Q_72",
+    "description": "Refresh the vendor logbook, vendor contact book and cold chain receiving log.\u202f\u202f\u00a0"
+  },
+  {
+    "id": "Q_73",
+    "description": "Check epuipment like the DSD laser printer, doors, locks and material handling tools. Repair or replace as needed.\u202f\u00a0"
+  },
+  {
+    "id": "Q_74",
+    "description": "Replace the audit area floor graphics, if needed (Sign order catalog item #567989676.)\u202f\u00a0"
+  },
+  {
+    "id": "Q_75",
+    "description": "DSL STORES: Go through the BLUE DSL Defective tote and take correct action for each item in the tote."
+  },
+  {
+    "id": "Q_76",
+    "description": "Verify that all members of management and TLs have downloaded the ACT app to complete product removals. The ACT app is available in the HUB to download for BYOD and is automatically downloaded to all store devices."
+  },
+  {
+    "id": "Q_77",
+    "description": "Finish all product removals in AegisOne (desktop or ACT App). Check the landing page for any pending removals. Enter counts and follow the step to complete each one. If a removal is over four weeks old, open a store support ticket with the removal ID, item numbers, counts and the associates name and title confirming it's done."
+  },
+  {
+    "id": "Q_78",
+    "description": "Verify that all product removals have been processed in the Claims app according to the product removal notice."
+  },
+  {
+    "id": "Q_79",
+    "description": "Validate the Produce floorplan is set using the space excellence tool."
+  },
+  {
+    "id": "Q_80",
+    "description": "Verify farmers market orchard bin modulars are set and priced correctly."
+  },
+  {
+    "id": "Q_81",
+    "description": "Tour the wet wall and verify modulars are accurate and have no missing labels."
+  },
+  {
+    "id": "Q_82",
+    "description": "Refresh all labels in the cooking vegetable misting section."
+  },
+  {
+    "id": "Q_83",
+    "description": "Verify misters are working properly and are set to run every seven minutes for seven seconds."
+  },
+  {
+    "id": "Q_84",
+    "description": "Clean all digital produce scales."
+  },
+  {
+    "id": "Q_85",
+    "description": "Verify bag stands are in working order and bags are available.  GNFR - Stand - 100019621 / Bag Dispenser - 100582969"
+  },
+  {
+    "id": "Q_86",
+    "description": "Tour the produce cooler for first in first out, quality and dwell dates."
+  },
+  {
+    "id": "Q_87",
+    "description": "Organize bulk fruit, vegetables and boxed stock within the cooler. Verify organics are stored above non-organic."
+  },
+  {
+    "id": "Q_88",
+    "description": "Tour the fresh meat wall and verify modulars are accurate and have no missing labels."
+  },
+  {
+    "id": "Q_89",
+    "description": "Tour the frozen turkey and ham bunkers and verify modulars are accurate and have no missing labels."
+  },
+  {
+    "id": "Q_90",
+    "description": "Verify the fresh meat wall signing and protein dividers are set and in good condition."
+  },
+  {
+    "id": "Q_91",
+    "description": "Verify meat case lights are working properly."
+  },
+  {
+    "id": "Q_92",
+    "description": "Verify meat wall vents are clear from obstruction for proper airflow."
+  },
+  {
+    "id": "Q_93",
+    "description": "Verify meat sanitization stations are set up properly."
+  },
+  {
+    "id": "Q_94",
+    "description": "Tour the fresh meat cooler for first in first out and organize product by type within their sections of steel."
+  },
+  {
+    "id": "Q_95",
+    "description": "Verifythe meat cooler and salesfloor has ready to eat above raw items to prevent cross contamination."
+  },
+  {
+    "id": "Q_96",
+    "description": "Tour the Bakery salesfloor and verify modulars are accurate and have no missing labels."
+  },
+  {
+    "id": "Q_97",
+    "description": "Clean the air grates in the cake case."
+  },
+  {
+    "id": "Q_98",
+    "description": "Remove any non-modularized items from the top of the cake case."
+  },
+  {
+    "id": "Q_99",
+    "description": "Remove any boxes from the cake/cupcake production area and deep clean."
+  },
+  {
+    "id": "Q_100",
+    "description": "Deep clean the donut glaze table."
+  },
+  {
+    "id": "Q_101",
+    "description": "Clear off any boxes on production tables and deep clean."
+  },
+  {
+    "id": "Q_102",
+    "description": "Clean the dishwasher by wiping down all sides."
+  },
+  {
+    "id": "Q_103",
+    "description": "Organize the freezer by box color and non-production (Vizpick) from production items."
+  },
+  {
+    "id": "Q_104",
+    "description": "Tour the Deli salesfloor and verify modulars are accurate and have no missing labels."
+  },
+  {
+    "id": "Q_105",
+    "description": "Clean all air grates on the pizza wall and deli island."
+  },
+  {
+    "id": "Q_106",
+    "description": "All cases and knee knockers cleaned and free of buildup."
+  },
+  {
+    "id": "Q_107",
+    "description": "Clean the hot case and remote warmer and verify all lights are working and in good condition."
+  },
+  {
+    "id": "Q_108",
+    "description": "Clean the bulk service case while also checking that all debris are cleaned from the door jams."
+  },
+  {
+    "id": "Q_109",
+    "description": "Clean oil residue off of the vent hoods and surfaces of fryer/rotisserie equipment."
+  },
+  {
+    "id": "Q_110",
+    "description": "Organize Deli Cooler by Box Color; separate bulk and pre-sliced meat and cheese (Vizpick) from production items."
+  },
+  {
+    "id": "Q_111",
+    "description": "Make sure spark TMD device is located and working properly for temperature checks. GNFR Item # 100660958"
+  },
+  {
+    "id": "Q_112",
+    "description": "Audit aisle location markers \u2013 verify they are present, complete and appropriately placed on each fixture."
+  },
+  {
+    "id": "Q_113",
+    "description": "Validate Aisle Location matches floorplan in SET"
+  },
+  {
+    "id": "Q_114",
+    "description": "Make sure new Fresh locations are set according to floorplan SET."
+  },
+  {
+    "id": "Q_115",
+    "description": "Walk all Fresh features and make sure signing is set accurately."
+  },
+  {
+    "id": "Q_116",
+    "description": "Update all backroom location marker labels on all backroom steel uprights."
+  },
+  {
+    "id": "Q_117",
+    "description": "Review your Food Recyling program for compliance"
+  },
+  {
+    "id": "Q_118",
+    "description": "Review your Food Recyling program for compliance"
+  },
+  {
+    "id": "Q_119",
+    "description": "Sweep backroom areas including under steel and sinks."
+  },
+  {
+    "id": "Q_120",
+    "description": "Sweep under steel and scrub cooler floors."
+  },
+  {
+    "id": "Q_121",
+    "description": "Sweep under steel and remove any ice buildup on fans, floors and steel in the freezer."
+  },
+  {
+    "id": "Q_122",
+    "description": "Schedule and complete daily and overnight cleaning schedule by area."
+  },
+  {
+    "id": "Q_123",
+    "description": "Designate a secure space for RPCs. Verify they are kept at 52\" high."
+  },
+  {
+    "id": "Q_124",
+    "description": "Make sure each department has the proper Fresh department cleaning tools for daily sanitation tasks."
+  },
+  {
+    "id": "Q_125",
+    "description": "Make sure the cleaning chemicals in the Fresh areas follow the\u202fchemical storage guidelines.\u202f"
+  },
+  {
+    "id": "Q_126",
+    "description": "Confirm all handwashing sinks are set and maintained."
+  },
+  {
+    "id": "Q_127",
+    "description": "Be sure your Kaivac cart (green cleaning machine) is working to clean your cases daily."
+  },
+  {
+    "id": "Q_128",
+    "description": "Reset all 99 supplies modulars."
+  },
+  {
+    "id": "Q_129",
+    "description": "Make sure SWAS plans are in place for merchandise transitions (Clearance, Cough and Cold, Weight Loss, OPP). These require very strategic planning and followup across the store."
+  },
+  {
+    "id": "Q_130",
+    "description": "Merchandise should be built to the bottom of the sign mold across all features."
+  },
+  {
+    "id": "Q_131",
+    "description": "Refresh all display units across the store: make sure they are clean, in working order (if needed) and properly signed."
+  },
+  {
+    "id": "Q_132",
+    "description": "Check for Out of Date (OOD) Cosmetics, Baby and Pharmacy items. Pull items 30 days or less from their expiration date, and process them through the Claims app."
+  },
+  {
+    "id": "Q_133",
+    "description": "Work with Asset Protection to make sure locked cases are clean and working."
+  },
+  {
+    "id": "Q_134",
+    "description": "Identify, mark and seperate empty helium tanks for pickup. GNFR Item # 100693914. Stores must initiate pickup."
+  },
+  {
+    "id": "Q_135",
+    "description": "Meet with third-party vendors to review level of service and expectations for 2026."
+  },
+  {
+    "id": "Q_136",
+    "description": "Refresh bike rack modular (Clean, signing and fact tag inserts and modular integrity)."
+  },
+  {
+    "id": "Q_137",
+    "description": "Partner with the third-party vendor to make sure bike rack assembly plans are in place for the year."
+  },
+  {
+    "id": "Q_138",
+    "description": "Make sure all aisle signs, including Fresh, endcaps and action alleys, are correct."
+  },
+  {
+    "id": "Q_139",
+    "description": "Work with Winston to make sure vignettes are clean and maintained if applicable."
+  },
+  {
+    "id": "Q_140",
+    "description": "Re-establish availability processes like weekly deep out scan and daily Pinpoints."
+  },
+  {
+    "id": "Q_141",
+    "description": "Use VizPick and/or Backroom-locate processes to find any deleted, Christmas or clearance items in all locations, including security lockup, so they can be moved to the salesfloor as needed."
+  },
+  {
+    "id": "Q_142",
+    "description": "Do a device roundup.\u00a0Check store and offices for devices that are not in use and take them to the People Leads' office so they can be assigned to associates as needed."
+  },
+  {
+    "id": "Q_143",
+    "description": "Sweep under and behind all counters to look for loose merchandise."
+  },
+  {
+    "id": "Q_144",
+    "description": "Replace missing\u202flabels and fast track, as needed."
+  },
+  {
+    "id": "Q_145",
+    "description": "Make sure\u202fflagging program\u202fis set according to standards."
+  },
+  {
+    "id": "Q_146",
+    "description": "Make sure Fact Tags (walmart.com) are set according to standards."
+  },
+  {
+    "id": "Q_147",
+    "description": "For\u202fSwipe Up stores, make sure signing is according to standards. Order as needed."
+  },
+  {
+    "id": "Q_148",
+    "description": "DSL Stores: Replace any missing or damaged labels"
+  },
+  {
+    "id": "Q_149",
+    "description": "Deep clean and zone all topstock\u202fsections.\u202f\u00a0"
+  },
+  {
+    "id": "Q_150",
+    "description": "Refer to Process Guides for Topstock specific standards and safety guidelines"
+  },
+  {
+    "id": "Q_151",
+    "description": "Verify all hunting/fishing license terminals are operational. Report any equipment issues in Me@Walmart > Facilities Management."
+  },
+  {
+    "id": "Q_152",
+    "description": "Verify all paint mixing equipment is operational. Report any issues in Me@Walmart > Facilities Management."
+  },
+  {
+    "id": "Q_153",
+    "description": "Remove any debris/clutter from the top of counters so that they are inviting to our customers."
+  },
+  {
+    "id": "Q_154",
+    "description": "Clean and organize service counters/areas and cash wraps. Organize drawers, cabinets and shelves."
+  },
+  {
+    "id": "Q_155",
+    "description": "There should be no hand written signs at the counters."
+  },
+  {
+    "id": "Q_156",
+    "description": "Walk the entire Fashion floor and confirm floorplans follow SET guidelines."
+  },
+  {
+    "id": "Q_157",
+    "description": "Check fixture counts and types match the floorplan and SET standards. Ensure all placements align with the floorplan and SET guidelines."
+  },
+  {
+    "id": "Q_158",
+    "description": "Deep clean folded tables, dust interior sections and clean shelves. Replace pushers and fixtures as needed."
+  },
+  {
+    "id": "Q_159",
+    "description": "Verify shelf cap accuracy in all departments."
+  },
+  {
+    "id": "Q_160",
+    "description": "Check rack heights are following standards, sweep under racks and aisles."
+  },
+  {
+    "id": "Q_161",
+    "description": "Replace or order broken fixtures, mirrors, benches and DSL fixtures."
+  },
+  {
+    "id": "Q_162",
+    "description": "Clean shoe benches including the underneath mirrors."
+  },
+  {
+    "id": "Q_163",
+    "description": "Ensure all signs (marketing, navigational and price) are in good condition. Replace as needed. Remove any handwritten signage."
+  },
+  {
+    "id": "Q_164",
+    "description": "Remove expired or flexed in merchandise in MyWalmart."
+  },
+  {
+    "id": "Q_165",
+    "description": "Confirm all aisle locations are set to standards and updated throughout salesfloor."
+  },
+  {
+    "id": "Q_166",
+    "description": "Verify all departments light fixtures and ad screens work. Submit a ticket if needed."
+  },
+  {
+    "id": "Q_167",
+    "description": "Clean fashion MPP storage area, reorder any needed MPP items. (e.g., needle locks)."
+  },
+  {
+    "id": "Q_168",
+    "description": "Start detailed SWAS planning for Season 1 (S1) modular transitions in all fashion departments."
+  },
+  {
+    "id": "Q_169",
+    "description": "Partner with digital coach to confirm floorplan matches Mappit and includes all fixtures and spinners in every department."
+  },
+  {
+    "id": "Q_170",
+    "description": "Verify fixture counts and types are correct. Ensure placements align with floorplan and SET guidelines."
+  },
+  {
+    "id": "Q_171",
+    "description": "Deep clean fitting rooms: behind mirrors, under benches, ceiling grids and workstation. Restock fitting room suppliesand post sanitation signs."
+  },
+  {
+    "id": "Q_172",
+    "description": "Keep the Fitting room standards checklist and safety items (i.e.. Bomb checklist, emergency procedures) in the fitting room drawer or workstation."
+  },
+  {
+    "id": "Q_173",
+    "description": "Deep clean folded tables, dust interior sections, clean shelves and replace pushers and fixtures as needed."
+  },
+  {
+    "id": "Q_174",
+    "description": "Deep clean jewelry counter. Removing any unneeded items. Restock supplies as needed."
+  },
+  {
+    "id": "Q_175",
+    "description": "Verify shelf cap accuracy throughout the departments"
+  },
+  {
+    "id": "Q_176",
+    "description": "Check rack heights meet standards and sweep under racks and aisles."
+  },
+  {
+    "id": "Q_177",
+    "description": "Replace or order broken fixtures on the salesfloor including mirrors, benches, and DSL Fixtures."
+  },
+  {
+    "id": "Q_178",
+    "description": "Ensure all signs (marketing, navigational and price) are in good condition. Replace as needed. Remove any handwritten signage."
+  },
+  {
+    "id": "Q_179",
+    "description": "Clear out expired/ flexed in merchandise in MyWalmart."
+  },
+  {
+    "id": "Q_180",
+    "description": "Confirm all aisle locations are set to standards and updated throughout salesfloor."
+  },
+  {
+    "id": "Q_181",
+    "description": "Verify that all departments light fixtures and ad screens work. Submit a ticket through facilities management if needed."
+  },
+  {
+    "id": "Q_182",
+    "description": "Ensure current features are properly placed, including Valentine\u2019s day pallet in Action Alley."
+  },
+  {
+    "id": "Q_183",
+    "description": "Make sure all RFID wands, Printers and hip printers are in working order. Order replacement if needed."
+  },
+  {
+    "id": "Q_184",
+    "description": "Remove all clearance/deleted items from the backroom and place them on the salesfloor."
+  },
+  {
+    "id": "Q_185",
+    "description": "Sweep under steel and rolling racks; throw away any fallen RFID tags."
+  },
+  {
+    "id": "Q_186",
+    "description": "Replace broken or damaged backroom fixtures, equipment, signs, WACO boxes, bin labels, and VizPick labels. Order replacements as needed."
+  },
+  {
+    "id": "Q_187",
+    "description": "Zone and tidy WACOs. Organize by department, folded vs. basics, brand, color and keep in sequential order."
+  },
+  {
+    "id": "Q_188",
+    "description": "Refresh rolling racks. Organize by department, brand, fineline/style, and color and are in sequential order."
+  },
+  {
+    "id": "Q_189",
+    "description": "Ensure all department and brand magnets on the correct racks and bin spaces. Post backroom organization standards if needed."
+  },
+  {
+    "id": "Q_190",
+    "description": "Clean and restock the Fashion workstation and quality cart according to Better Way standards. Ensure you have a dedicated space for Fashion signage & supplies."
+  },
+  {
+    "id": "Q_191",
+    "description": "Clean the shoe mismate area in the backroom; replace shoe holder if needed."
+  },
+  {
+    "id": "Q_192",
+    "description": "Verify all RFID tags are removed; check the RFID metal lock box and ensure process compliance."
+  },
+  {
+    "id": "Q_193",
+    "description": "Purge unnecessary fixtures and supplies from backroom fashion workstation."
+  },
+  {
+    "id": "Q_194",
+    "description": "Find the backroom huddle board, replace if missing or damaged."
+  },
+  {
+    "id": "Q_195",
+    "description": "Confirm that shoes and new MOD have case labels."
+  },
+  {
+    "id": "Q_196",
+    "description": "Make sure the Fashion processing area is clean and stocked with supplies. Re-locate space if needed, without disrupting CAP 2."
+  },
+  {
+    "id": "Q_197",
+    "description": "Keep a lookout for the S1 floorplan updates that will be visible in SET. Verify the floor is set correctly. \n- Dept. 23 drops in WK44.\n- Dept. 24/33 drops in WK45.\n- Dept. 25 drops on WK47.\n- Dept. 26 drops in WK46.\n- Dept. 29 drops in WK01.\n- Dept. 31/32 drops in WK52.\n- Dept. 34 drops in WK44."
+  },
+  {
+    "id": "Q_198",
+    "description": "Verify fixture counts and types and make sure placements align with your floor plan in SET for all departments."
+  },
+  {
+    "id": "Q_199",
+    "description": "Submit a ticket in SET if your floor plan does not match."
+  },
+  {
+    "id": "Q_200",
+    "description": "Reset the backroom following standard protocol."
+  },
+  {
+    "id": "Q_201",
+    "description": "Review the Store Fulfilment Sanitation Guide and complete necessary actions."
+  },
+  {
+    "id": "Q_202",
+    "description": "Inspect inHome equipment and parts for damage. Order replacements as needed."
+  },
+  {
+    "id": "Q_203",
+    "description": "Confirm the pick path is set correctly per the\u00a0Pick Path Creation and Maintenance"
+  },
+  {
+    "id": "Q_204",
+    "description": "Review the Pick & State Process."
+  },
+  {
+    "id": "Q_205",
+    "description": "Use MappIt edit and the GIF App to make edits and validate locations"
+  },
+  {
+    "id": "Q_206",
+    "description": "Update parking and directional signing if needed."
+  },
+  {
+    "id": "Q_207",
+    "description": "Partner with your MFL to confirm the parking bays and check-in locations are set up correctly\n-MFL will complete updates in Calibrate as needed"
+  },
+  {
+    "id": "Q_208",
+    "description": "Verify all key cards are accounted for and in the electronic key box per the Keycard Process"
+  },
+  {
+    "id": "Q_209",
+    "description": "Accompany associates dispensing alcohol orders to ensure orders are being dispensed following the ID Compliance guidelines"
+  },
+  {
+    "id": "Q_210",
+    "description": "Review the\u00a0Quality Checks - Tote Consolidation Better Way and verify proper execution"
+  },
+  {
+    "id": "Q_211",
+    "description": "Ensure associates are familiar with the Returns and Reporting Issues processes"
+  },
+  {
+    "id": "Q_212",
+    "description": "Verify items to order are stocked. This includes WIBI guides, mailer bags and tote labels. ( You can find the full list in the Resource section.)"
+  },
+  {
+    "id": "Q_213",
+    "description": "Review the accident prevention guidelines during team huddles."
+  },
+  {
+    "id": "Q_214",
+    "description": "Inspect safety vests for condition and reflective markings, reorder as needed"
+  },
+  {
+    "id": "Q_215",
+    "description": "Associates must wear a safety vest at all times in the parking lot when dispensing orders.Vests must be worn correctly and be visible."
+  },
+  {
+    "id": "Q_216",
+    "description": "Remind associates to maintain situational awareness by recognizing possible concerns and being aware of surroundings."
+  },
+  {
+    "id": "Q_217",
+    "description": "Have assoicates complete any outstanding Badging and Credentialing in the Academy app as well as any required ULearn training(s)."
+  },
+  {
+    "id": "Q_218",
+    "description": "Review Emergency & 911 Procedures"
+  },
+  {
+    "id": "Q_219",
+    "description": "Confirm associates know how to escelate issues via Store Fulfillment Issue Support"
+  },
+  {
+    "id": "Q_220",
+    "description": "Review Start of Shift and Van Loading Better Way guides"
+  },
+  {
+    "id": "Q_221",
+    "description": "Review Vehicle Management Guide and verify all maintenance is up to date"
+  },
+  {
+    "id": "Q_222",
+    "description": "Check uniform and safety vest conditions, replace as needed"
+  },
+  {
+    "id": "Q_223",
+    "description": "Conduct the pre-trip inspection with each InHome associate to ensure it is being completed accurately and thoroughly"
+  },
+  {
+    "id": "Q_224",
+    "description": "Ensure the signing and check-in stand is set up, working and stocked with an iPad and supplies."
+  },
+  {
+    "id": "Q_225",
+    "description": "Verify Bay\u00a0Chains are in place\u00a0with\u00a0For\u00a0Your\u00a0Safety\u00a0signage. Use GNFR\u00a0Item # 100733364\u200b to order more."
+  },
+  {
+    "id": "Q_226",
+    "description": "Make sure the driveway is clean,  clutter-free and has the correct hours of operation posted."
+  },
+  {
+    "id": "Q_227",
+    "description": "Clean the Bay\u00a0area. Remove all clutter, debris and merchandise. Ensure all bays work  and follow up on open work orders."
+  },
+  {
+    "id": "Q_228",
+    "description": "Check that all toos boards are fully stocked and organized. Replace any missing tools or broken boards."
+  },
+  {
+    "id": "Q_229",
+    "description": "Keep the A-Frame clear and organized with no clutter."
+  },
+  {
+    "id": "Q_230",
+    "description": "Ensure the Torque Chart is updated for 2025. Order a new board if needed. Use ACC TBC Torque Usage Chart GNFR number 100017224."
+  },
+  {
+    "id": "Q_231",
+    "description": "Send used wheel weights signage and order more wheel weights to keep them in stock."
+  },
+  {
+    "id": "Q_232",
+    "description": "Replace wheel weight signing and order wheel\u00a0weights to make sure they are\u00a0instock."
+  },
+  {
+    "id": "Q_233",
+    "description": "Make sure all\u00a0machines\u00a0are clean\u00a0and\u00a0free\u00a0of\u00a0clutter\u200b."
+  },
+  {
+    "id": "Q_234",
+    "description": "Check that all tire machines/balancers are fully operational. Every store should have two balancers and two tire machines."
+  },
+  {
+    "id": "Q_235",
+    "description": "Check air lines\u00a0to for leaks\u00a0and\u00a0hose ends\u00a0are in\u00a0good\u00a0condition\u200b."
+  },
+  {
+    "id": "Q_236",
+    "description": "Make sure iPads, printers and scanners are updated and working."
+  },
+  {
+    "id": "Q_237",
+    "description": "Ensure new maintenance logs are printed for all ACC Equipment for One Walmart"
+  },
+  {
+    "id": "Q_238",
+    "description": "Retired assets should be returned following Return Center/CARP processes."
+  },
+  {
+    "id": "Q_239",
+    "description": "Place the\u00a0Oil\u00a0Drain\u00a0Torque\u00a0Chart (dated 2025) in the lower bay at each workstation."
+  },
+  {
+    "id": "Q_240",
+    "description": "Ensure all Lube and Filter Guides show 2025."
+  },
+  {
+    "id": "Q_241",
+    "description": "Keep three fender\u00a0covers\u00a0per\u00a0oil\u00a0bay\u200b in stock or on order."
+  },
+  {
+    "id": "Q_242",
+    "description": "Mark all yellow grates with a \"No Step\" sign. Bolt down all red grates(not for Zip Pit Stores)."
+  },
+  {
+    "id": "Q_243",
+    "description": "Keep the lower bay clutter-free, floors clean and all lights working."
+  },
+  {
+    "id": "Q_244",
+    "description": "Refresh the OPD tire area (3700 bin). Update all labels and signage."
+  },
+  {
+    "id": "Q_245",
+    "description": "Use the stockroom only for Dept. 10 items like tires and batteries."
+  },
+  {
+    "id": "Q_246",
+    "description": "Place Vizpick markers on the first upright of each tire aisle. Attach RFID asset tags at the start and end of each tire aisle."
+  },
+  {
+    "id": "Q_247",
+    "description": "Keep the area behind the counter and the waiting area clutter-free."
+  },
+  {
+    "id": "Q_248",
+    "description": "Check that all counter iPads, door buzzers and ACC phones work."
+  },
+  {
+    "id": "Q_249",
+    "description": "Confirm cancelled dotcom tires are properly processed and returned daily."
+  },
+  {
+    "id": "Q_250",
+    "description": "Confirm there is a FEDeX tire return designated location."
+  },
+  {
+    "id": "Q_251",
+    "description": "Check tire side counters for correct clearance and Rollback flags."
+  },
+  {
+    "id": "Q_252",
+    "description": "Make sure the tire modular is complete with no missing fixtures or signs."
+  },
+  {
+    "id": "Q_253",
+    "description": "Print\u00a0updated pricing\u00a0sheets\u00a0in color and with\u00a0most\u00a0recent\u00a0date\u200bs."
+  },
+  {
+    "id": "Q_254",
+    "description": "In Lower\u00a0Bay\u00a0stores, reset the\u00a08\u00a0foot\u00a0oil\u00a0modular\u00a0and the separate\u00a0filter\u00a0modular\u00a0in\u00a0the\u00a0lower\u00a0bay.\u00a0These\u00a0shelves\u00a0should\u00a0be\u00a014 inches.\u200b"
+  },
+  {
+    "id": "Q_255",
+    "description": "In lift stores, reset the filter modular within the oil modular."
+  },
+  {
+    "id": "Q_256",
+    "description": "Keep the oil modular fully stocked with shelf labels under every Ecobox."
+  },
+  {
+    "id": "Q_257",
+    "description": "Assign a dedicated jug to each Ecobox to prevent oil mixing. Order more as needed."
+  },
+  {
+    "id": "Q_258",
+    "description": "Reset supply modular and order as needed."
+  },
+  {
+    "id": "Q_259",
+    "description": "Update and replace worn out labels.\u00a0"
+  },
+  {
+    "id": "Q_260",
+    "description": "Confirm\u00a0Top\u00a0Treat,\u00a0Fuel\u00a0injection\u00a0and\u00a0Headlight\u00a0Restore\u00a0kits\u00a0are\u00a0instock\u200b."
+  },
+  {
+    "id": "Q_261",
+    "description": "Place the TPMS cabinet in the service area with a label and modular images on the door."
+  },
+  {
+    "id": "Q_262",
+    "description": "Keep all\u00a0TPMS\u00a0sensors\u00a0and\u00a0service packs\u00a0in\u00a0stock,\u00a0organized\u00a0and\u00a0set\u00a0to\u00a0modular."
+  },
+  {
+    "id": "Q_263",
+    "description": "Ensure\u00a0the\u00a0TPMS\u00a0tool\u00a0is updated and working\u200b."
+  },
+  {
+    "id": "Q_264",
+    "description": "Keep the wiper rack full, set to modular and positioned by the service writer."
+  },
+  {
+    "id": "Q_265",
+    "description": "Ensure all battery equipment (JDT-1, DCA 8000) is current and working."
+  },
+  {
+    "id": "Q_266",
+    "description": "Check battery type labels are present for each battery."
+  },
+  {
+    "id": "Q_267",
+    "description": "Deep clean restroom and verify standards are maintained and supplies stocked."
+  },
+  {
+    "id": "Q_268",
+    "description": "Check fans and heaters to make sure they are in working condition, submit work orders as needed."
+  },
+  {
+    "id": "Q_269",
+    "description": "File old records into retention and refresh office to standard\u200b."
+  },
+  {
+    "id": "Q_270",
+    "description": "Make sure all service area lights are working."
+  },
+  {
+    "id": "Q_271",
+    "description": "Confirm all associates have uniforms and manifests are current."
+  },
+  {
+    "id": "Q_272",
+    "description": "Update photos on the Associate\u00a0board where needed."
+  },
+  {
+    "id": "Q_273",
+    "description": "Replace worn or damaged posters: Tire Life, 2 Tire Install, Tire Wear and Tire Repair."
+  },
+  {
+    "id": "Q_274",
+    "description": "Keep the waiting area clean, organized and inviting."
+  },
+  {
+    "id": "Q_275",
+    "description": "Verify each\u00a0associate has\u00a0their\u00a0own\u00a0bump\u00a0cap\u00a0and\u00a0burn\u00a0sleeves\u200b.\n- New bump cap insert - 100730499\n- New ACC Cap - 100730402"
+  },
+  {
+    "id": "Q_276",
+    "description": "Inspect the PPE in the battery cage and replace as needed."
+  },
+  {
+    "id": "Q_277",
+    "description": "Clean around the eye wash stations and keep them visible."
+  },
+  {
+    "id": "Q_278",
+    "description": "Make sure each associate has safety glasses issued (Prescription program is available)"
+  },
+  {
+    "id": "Q_279",
+    "description": "Replace the American flag as needed, following care guidelines. Use GNFR number 100552040 if a new flag is needed. Confirm the flag is lit at night."
+  },
+  {
+    "id": "Q_280",
+    "description": "Ensure cart corrals are correctly placed in the parkinglot and in good clean and working condition."
+  },
+  {
+    "id": "Q_281",
+    "description": "Enter work orders for any parking lot repairs (signs, cart corrals, lights, landscaping, etc.)."
+  },
+  {
+    "id": "Q_282",
+    "description": "Ensure the associate smoking area canopy is in good condition and free of debris."
+  },
+  {
+    "id": "Q_283",
+    "description": "Review Front End standards at the store entrance."
+  },
+  {
+    "id": "Q_284",
+    "description": "Verify vestibule signage for hours of operation and compliance."
+  },
+  {
+    "id": "Q_285",
+    "description": "Place work orders for any needed restroom repairs (stalls, baby changing stations, trash cans, lighting, etc.)."
+  },
+  {
+    "id": "Q_286",
+    "description": "Clean all staffed lanes and self checkout registers. Remove any clutter and set to standards."
+  },
+  {
+    "id": "Q_287",
+    "description": "Clean/dust Front End fixtures and features."
+  },
+  {
+    "id": "Q_288",
+    "description": "Make sure all register lights are working. Replace lightbulbs as needed."
+  },
+  {
+    "id": "Q_289",
+    "description": "Confirm approved register signage matches Front End standards."
+  },
+  {
+    "id": "Q_290",
+    "description": "Ensure every staffed lane has an alpha key on the register."
+  },
+  {
+    "id": "Q_291",
+    "description": "Open self-checkout panels and remove any currency or coins."
+  },
+  {
+    "id": "Q_292",
+    "description": "Verify all registers have BOB mirrors and lane blockers as needed."
+  },
+  {
+    "id": "Q_293",
+    "description": "Clean card readers with Debit Reader Cleaning Cards. Order more cleaning cards with GNFR  number 100526219 as needed."
+  },
+  {
+    "id": "Q_294",
+    "description": "Complete scale checks and calibrations."
+  },
+  {
+    "id": "Q_295",
+    "description": "Confirm each store has a 1lb weight for monthly scale checks and supplies to clean scales."
+  },
+  {
+    "id": "Q_296",
+    "description": "Confirm the Cash Office is set-up properly and free of clutter"
+  },
+  {
+    "id": "Q_297",
+    "description": "Follow the Clean Register Equipment process to clean all service register desks and equipment, order debit reader cleaning cards via GNFR Item # 100526219, and review the debit reader cleaning video."
+  },
+  {
+    "id": "Q_298",
+    "description": "Refresh drawers and shelves under Service Desk registers. Use the Front End Standards: Customer Service Desk guide to organize counters."
+  },
+  {
+    "id": "Q_299",
+    "description": "Ensure each Service Desk register has a return policy counter mat. Need new mats? Order from Signing Catalog. Item number: 578325489."
+  },
+  {
+    "id": "Q_300",
+    "description": "Refresh your returns totes for sorting returned merchandise; label a tote for each department. Find labels and the process overview in the Sorting and Processing Returned Merchandise Guide."
+  },
+  {
+    "id": "Q_301",
+    "description": "Refresh your returns totes for sorting returned merchandise; label a tote for each department. Find labels and the process overview in the Sorting and Processing Returned Merchandise Guide."
+  },
+  {
+    "id": "Q_302",
+    "description": "Set up a tote for Marketplace returns at the Service Desk, labeled with the FedEx label."
+  },
+  {
+    "id": "Q_303",
+    "description": "Set up a tote for Fresh return items, labeled with the Fresh Auto Markdown label."
+  },
+  {
+    "id": "Q_304",
+    "description": "Set up a tote for Fresh return items, labeled with the Fresh Auto Markdown label."
+  },
+  {
+    "id": "Q_305",
+    "description": "Review your permits and licenses board and make sure they are up to date. Use the\u202fGlobal License Lookup Tool\u202fto review your store's state specific requirements.\u202f"
+  },
+  {
+    "id": "Q_306",
+    "description": "Verify your store has the required Magnuson Moss Warranty Act sign in place and it is visible to customers. If a new sign needs to be ordered this can be done through the Signing Catalog Item # 551087929 (8.5\u201dx11\u201d)"
+  },
+  {
+    "id": "Q_307",
+    "description": "Review the NHM Service Desk Layout if applicable."
+  },
+  {
+    "id": "Q_308",
+    "description": "Review the Supercenter Service Desk Layout if applicable."
+  },
+  {
+    "id": "Q_309",
+    "description": "Verify your Marketplace returns printer works. For repairs, call Zebra at 855-651-1444, option 2."
+  },
+  {
+    "id": "Q_310",
+    "description": "If you don\u2019t have a Marketplace printer, use the Troubleshooting Guide to request one."
+  },
+  {
+    "id": "Q_311",
+    "description": "Order Marketplace printer labels through GNFR number 100637205. Look for \"Zebra\" on the label core."
+  },
+  {
+    "id": "Q_312",
+    "description": "Review the Front End Services Baseline Operating Structure and ensure daily routines are followed."
+  },
+  {
+    "id": "Q_313",
+    "description": "Use the Weekly Scheduler Tool to verify schedules match demand hours. Assign dedicated associates to Money Centers for better service."
+  },
+  {
+    "id": "Q_314",
+    "description": "Make sure all Services TA and money service secondary job coded associates are aware of Phone Fraud and must never process any Money Services or Card Services transactions over the phone."
+  },
+  {
+    "id": "Q_315",
+    "description": "Confirm all associates know how to use the Stop Scam Fraud/Fraud and Refer Questionable Behavior buttons."
+  },
+  {
+    "id": "Q_316",
+    "description": "Verify all state0required licenses are current and posted"
+  },
+  {
+    "id": "Q_317",
+    "description": "Review Reccord Retention and Digital MSBB requirements"
+  },
+  {
+    "id": "Q_318",
+    "description": "Review Anti-Fraud and Consumer Protection: Watch scam videos."
+  },
+  {
+    "id": "Q_319",
+    "description": "Review Money Sercices Training: daily questions and financial services requirments"
+  },
+  {
+    "id": "Q_320",
+    "description": "Ensure kiosks, vending and lottery services are plugged in and operational."
+  },
+  {
+    "id": "Q_321",
+    "description": "Inspect the propane kiosk for cleanliness, signage and functionality."
+  },
+  {
+    "id": "Q_322",
+    "description": "For issues, contact the vendor or email FrontEndSupport@Walmart.com. Submit work orders for outlet repairs."
+  },
+  {
+    "id": "Q_323",
+    "description": "Keep kiosks and vending areas clear of carts, pallets, or merchandise."
+  },
+  {
+    "id": "Q_324",
+    "description": "Confirm the lottery machine is stocked to planogram and procedures are followed."
+  },
+  {
+    "id": "Q_325",
+    "description": "Complete lottery reconciliation by 3:00 p.m. and the end-of-day process between 10:00 p.m. and 11:59 p.m."
+  },
+  {
+    "id": "Q_326",
+    "description": "Check for lottery ticket deliveries and confirm receipt on the terminal."
+  },
+  {
+    "id": "Q_327",
+    "description": "Ensure the sensory-friendly hours cling is at each entrance."
+  },
+  {
+    "id": "Q_328",
+    "description": "Make sure you are familiar with the\u00a0Sensory-Friendly Hours page, FAQs. You can also extend your hours with the information here."
+  },
+  {
+    "id": "Q_329",
+    "description": "Refresh the floors in the associate lounge area."
+  },
+  {
+    "id": "Q_330",
+    "description": "If you feel your community needs additional Caroline's Carts let us know using the\u00a0Caroline's Cart Survey."
+  },
+  {
+    "id": "Q_331",
+    "description": "Review with all tenant operators their hours of operation, lease line compliance, Independent Service Operators (ISO) responsibilities and space maintenance."
+  },
+  {
+    "id": "Q_332",
+    "description": "For WIC stores, verify compliance with Agency requirements (minimum stock, shelf labels, training and inspection documents) on OneWalmart. Know how to print infant formula invoices and find your store\u2019s WIC vendor number."
+  },
+  {
+    "id": "Q_333",
+    "description": "Ensure SNAP and WIC signs are posted per frontend standards."
+  },
+  {
+    "id": "Q_334",
+    "description": "Review your agency\u2019s requirements for signing on the WIC/SNAP agency page. If the WIC door cling is worn, do not remove it before the replacement arrives."
+  },
+  {
+    "id": "Q_335",
+    "description": "Do NOT display your SNAP permit publicly. Keep it secure but accessible for regulators."
+  }
+]

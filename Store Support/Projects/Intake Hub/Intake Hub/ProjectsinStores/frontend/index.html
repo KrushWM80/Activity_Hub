@@ -2077,6 +2077,23 @@
                 return;
             }
 
+            // Get current user from active_users endpoint (real-time tracking)
+            let currentUser = 'Unknown';
+            try {
+                const userRes = await fetch(`/api/active-users`);
+                const userData = await userRes.json();
+                const users = userData.users || {};
+                if (Object.keys(users).length > 0) {
+                    // Get most recent user by timestamp
+                    const mostRecent = Object.values(users).reduce((max, user) => 
+                        (user.timestamp > max.timestamp) ? user : max
+                    );
+                    currentUser = mostRecent.user_email || 'Unknown';
+                }
+            } catch (e) {
+                console.warn('Could not fetch current user:', e);
+            }
+
             try {
                 const response = await fetch(`/api/feedback`, {
                     method: 'POST',
@@ -2086,9 +2103,11 @@
                         rating: parseInt(rating),
                         comments: comments,
                         timestamp: new Date().toISOString(),
+                        submitted_by: currentUser,
                         user_context: {
                             current_filters: selectedFilters,
-                            projects_displayed: allProjects.length
+                            projects_displayed: allProjects.length,
+                            current_page: 'Main Dashboard'
                         }
                     })
                 });

@@ -11,6 +11,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import uvicorn
 import os
 import json
+import sys
 import pandas as pd
 from datetime import datetime
 from typing import Optional
@@ -20,6 +21,13 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import threading
+
+# Fix Unicode encoding for Windows console output
+import io
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+else:
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
 # ============================================================
 # CONFIGURATION

@@ -277,6 +277,9 @@
         <div class="section">
             <div class="feedback-header">
                 <div class="feedback-info">
+                    <div style="font-size: 14px; color: #666; font-weight: 600; margin-bottom: 8px;">
+                        🔑 Feedback ID: <span style="color: #1E3A8A; font-family: monospace;">FBK-{{ feedback.id }}</span>
+                    </div>
                     <div class="feedback-email">{{ feedback.user_email }}</div>
                     <div class="feedback-meta">
                         Submitted: {{ feedback.timestamp }}
@@ -346,8 +349,8 @@
                     <div class="activity-time">{{ item.timestamp }}</div>
                     <div class="activity-action">
                         <strong>{{ item.event_type }}</strong> - {{ item.action }}
-                        {% if item.admin_user %}<br><small>By: {{ item.admin_user }}</small>{% endif %}
-                        {% if item.details %}<br><small>{{ item.details }}</small>{% endif %}
+                        {% if item.admin_user %}<br><small>🔧 Admin: {{ item.admin_user }}</small>{% endif %}
+                        {% if item.details %}<br><small>📝 {{ item.details }}</small>{% endif %}
                     </div>
                 </div>
                 {% endfor %}
