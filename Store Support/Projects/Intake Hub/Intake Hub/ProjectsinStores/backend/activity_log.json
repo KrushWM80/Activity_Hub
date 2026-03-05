@@ -1223,6 +1223,69 @@
       "user_email": "krush@homeoffice.wal-mart.com",
       "details": "Logged in via windows_ad",
       "category": "dashboard_main"
+    },
+    {
+      "id": "5449666e",
+      "timestamp": "2026-03-04 14:08:13",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "070f96cf",
+      "timestamp": "2026-03-05 06:52:49",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "a7da36f6",
+      "timestamp": "2026-03-05 08:20:45",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "6bc1e00a",
+      "timestamp": "2026-03-05 08:20:55",
+      "action": "Accessed Login Tracking",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed login history and unique users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "7294519d",
+      "timestamp": "2026-03-05 08:23:50",
+      "action": "Accessed Fix Management",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Opened pending fixes dashboard",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "b9ab33e5",
+      "timestamp": "2026-03-05 09:19:30",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "ee2b207c",
+      "timestamp": "2026-03-05 09:23:59",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
     }
   ]
 }

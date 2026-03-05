@@ -32,7 +32,9 @@ FROM_EMAIL = "ProjectsInStoresDashboard@walmart.com"
 # Cache validation thresholds
 MIN_EXPECTED_RECORDS = 1_400_000  # Based on ~1.4M historical average
 MIN_SYNC_DURATION = 60  # Seconds - sync taking <60s likely means error
-MAX_ALLOWED_VARIANCE = 50_000  # Allow variance for daily data changes
+MAX_ALLOWED_VARIANCE = 50_000  # Allow ±50k variance for daily data changes
+ZERO_RECORD_RETRY_COUNT = 2  # Retry this many times before sending email
+ZERO_RECORD_RETRY_TIMEOUT = 2700  # 45 minutes - sync window is 15-35 min, give buffer
 
 class SQLiteCache:
     """Local SQLite cache for fast data access"""
@@ -52,6 +54,9 @@ class SQLiteCache:
         self._stop_sync = threading.Event()
         self._last_sync = None
         self._sync_in_progress = False
+        
+        # Track zero-record failures for smart retry logic
+        self._zero_record_failures = []  # List of timestamps when 0 records synced
         
         # Initialize database
         self._init_db()
@@ -221,43 +226,58 @@ class SQLiteCache:
                 cache_age = datetime.now() - datetime.fromisoformat(last_sync_time.isoformat() if isinstance(last_sync_time, datetime) else last_sync_time)
                 age_str = f"{cache_age.days}d {cache_age.seconds//3600}h {(cache_age.seconds//60)%60}m"
             else:
-                age_str = "No valid sync found"
+                age_str = "No valid sync on record"
             
             subject = "⚠️ [ALERT] Projects in Stores Cache Sync Failed"
             
+            variance = abs(record_count - MIN_EXPECTED_RECORDS) if record_count > 0 else 0
+            
             body = f"""
-CACHE VALIDATION FAILED
+CACHE VALIDATION FAILED - INVESTIGATION REQUIRED
 
 Sync Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 Status: VALIDATION FAILED
 
-Data Received:
+Data Quality Check:
 - Records Synced: {record_count:,}
-- Expected Minimum: {MIN_EXPECTED_RECORDS:,}
-- Variance Allowed: ±{MAX_ALLOWED_VARIANCE:,}
+- Expected: ~{MIN_EXPECTED_RECORDS:,}
+- Variance: ±{variance:,} (threshold: ±{MAX_ALLOWED_VARIANCE:,})
 - Sync Duration: {sync_duration:.1f} seconds
 
 Failure Reason: {reason}
 
-Current Cache Status:
-- Last Valid Sync: {last_sync_time if last_sync_time else 'No valid sync on record'}
-- Records in Cache: {current_cache_count:,}
-- Cache Age: {age_str}
-- Cache File: {self.db_path}
+System Protection:
+✓ Cache NOT updated - using last valid version
+✓ Previous data preserved and serving
+✓ Cache Age: {age_str}
+✓ Records in Cache: {current_cache_count:,}
+
+Validation Rules:
+1. Variance within ±50k is normal (acceptable)
+2. 0 records: Retried 2 times (15-35 min sync window)
+3. Sync < 60 seconds: Incomplete (data error)
+4. Duration & variance: Validates data quality
 
 Action Required:
-1. Log in to Google Cloud Console
-2. Query: wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data
-3. Run: SELECT COUNT(*) FROM ... WHERE Status='Active'
-4. Verify result is ~1,420,167 records
-5. Check for schema changes or data quality issues
-6. If issue persists, manually trigger cache resync by:
-   - Deleting projects_cache.db
-   - Restarting backend server
+1. Check if data sync is still running (check timestamps: started 8:36am, runs 15-35 min)
+2. If still running: System will retry, no action needed
+3. If stuck past 45 minutes:
+   a) Log in to Google Cloud Console
+   b) Query: wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data
+   c) Check: SELECT COUNT(*) FROM ... WHERE Status='Active'
+   d) Verify result is ~1,420,000 records
+   e) Check for schema changes or BigQuery errors
 
-BigQuery Table: wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data
-Cache Location: {self.db_path}
-Monitor Dashboard: Run monitor_cache_health.py to check status
+Resources:
+- BigQuery Table: wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data
+- Cache Location: {self.db_path}
+- Monitor: Run monitor_cache_health.py to check full status
+- Last Sync Log: Check sync_error_log table in projects_cache.db
+
+Current Protection:
+- Dashboard continues working with valid cached data
+- System will attempt recovery on next sync cycle
+- You will receive another email only if issue persists
 
 This is an automated alert. Do not reply to this email.
 """
@@ -282,26 +302,75 @@ This is an automated alert. Do not reply to this email.
         """
         Validate if BigQuery sync data is valid before updating cache
         
+        Smart validation with retry logic:
+        - Variance within ±50k is acceptable (no email)
+        - 0 records: Likely mid-sync (15-35 min), retry before emailing
+        - Uses last good cache version until issue resolves
+        
         Returns: (is_valid, reason_if_invalid)
         """
-        # Check 1: Record count within expected range
-        if record_count < MIN_EXPECTED_RECORDS:
-            reason = f"Record count too low ({record_count:,} < {MIN_EXPECTED_RECORDS:,})"
+        # Check 1: Handle 0 records (mid-sync scenario)
+        if record_count == 0:
+            current_time = datetime.now()
+            self._zero_record_failures.append(current_time)
+            
+            # Clean up old failures outside the retry window
+            self._zero_record_failures = [
+                t for t in self._zero_record_failures 
+                if (current_time - t).total_seconds() < ZERO_RECORD_RETRY_TIMEOUT
+            ]
+            
+            # Count recent failures in retry window
+            recent_failures = len(self._zero_record_failures)
+            
+            if recent_failures <= ZERO_RECORD_RETRY_COUNT:
+                # Still within retry attempts - don't email yet
+                reason = f"0 records received (retry {recent_failures}/{ZERO_RECORD_RETRY_COUNT}) - likely mid-sync"
+                print(f"[SQLite] ⏳ {reason} - will retry")
+                return False, reason
+            else:
+                # Exceeded retries - this is a real failure
+                reason = f"0 records after {recent_failures} retry attempts (45+ minutes) - data sync appears stuck"
+                print(f"[SQLite] ❌ {reason}")
+                return False, reason
+        
+        # Check 2: Validate record count is within acceptable variance (±50k)
+        variance = abs(record_count - MIN_EXPECTED_RECORDS)
+        
+        if variance > MAX_ALLOWED_VARIANCE:
+            reason = f"Record count variance too high ({record_count:,} vs {MIN_EXPECTED_RECORDS:,}, variance: ±{variance:,} > ±{MAX_ALLOWED_VARIANCE:,})"
             return False, reason
         
-        if record_count > MIN_EXPECTED_RECORDS + MAX_ALLOWED_VARIANCE:
-            reason = f"Record count unexpectedly high ({record_count:,} > {MIN_EXPECTED_RECORDS + MAX_ALLOWED_VARIANCE:,})"
-            return False, reason
-        
-        # Check 2: Sync duration reasonable
+        # Check 3: Sync duration reasonable
         if sync_duration < MIN_SYNC_DURATION:
             reason = f"Sync completed too quickly ({sync_duration:.1f}s < {MIN_SYNC_DURATION}s) - likely incomplete"
             return False, reason
         
-        # Check 3: Not an error state
-        # (Additional checks can be added here)
-        
+        # All checks passed
+        if variance > 0:
+            print(f"[SQLite] ✓ Valid sync (variance: ±{variance:,} within ±{MAX_ALLOWED_VARIANCE:,})")
         return True, ""
+    
+    def _should_send_email(self, record_count: int, validation_reason: str) -> bool:
+        """
+        Determine if an email alert should be sent
+        
+        Don't email if:
+        - 0 records and within retry attempts window
+        - Variance within ±50k (acceptable normal variation)
+        
+        Do email if:
+        - 0 records exceeded retry attempts
+        - Variance significantly outside threshold
+        - Other critical issues
+        """
+        # If 0 records and we have some failures but haven't exceeded retry limit
+        if record_count == 0:
+            recent_failures = len(self._zero_record_failures)
+            if recent_failures <= ZERO_RECORD_RETRY_COUNT:
+                return False  # Still retrying, don't email
+        
+        return True  # Email for all other failures
     
     def sync_from_bigquery(self, bigquery_client, project_id: str, dataset: str, table: str) -> bool:
         """Sync all data from BigQuery to SQLite"""
@@ -454,7 +523,7 @@ This is an automated alert. Do not reply to this email.
             is_valid, validation_reason = self.validate_bigquery_sync(len(rows), elapsed)
             
             if not is_valid:
-                # VALIDATION FAILED - Rollback and send alert
+                # VALIDATION FAILED - Rollback transaction (preserve old cache)
                 print(f"[SQLite] ❌ VALIDATION FAILED: {validation_reason}")
                 print(f"[SQLite] Rolling back transaction - cache will NOT be updated")
                 
@@ -469,15 +538,24 @@ This is an automated alert. Do not reply to this email.
                 conn.commit()
                 conn.close()
                 
-                # Send email alert
-                print(f"[SQLite] Sending validation failure alert...")
-                self.send_validation_failure_email(validation_reason, len(rows), elapsed)
+                # Determine if we should send email
+                should_email = self._should_send_email(len(rows), validation_reason)
+                
+                if should_email:
+                    # Send email alert only if not a retry scenario
+                    print(f"[SQLite] Sending validation failure alert...")
+                    self.send_validation_failure_email(validation_reason, len(rows), elapsed)
+                else:
+                    print(f"[SQLite] Retry scenario detected - not emailing yet. {validation_reason}")
                 
                 print(f"[SQLite] Cache NOT updated. Keeping previous valid data.")
                 return False
             
             # VALIDATION PASSED - Commit the cache update
             print(f"[SQLite] ✓ Validation passed - updating cache with {len(rows):,} records")
+            
+            # Clear zero-record failures on successful sync
+            self._zero_record_failures = []
             
             # Update sync metadata
             now = datetime.now().isoformat()

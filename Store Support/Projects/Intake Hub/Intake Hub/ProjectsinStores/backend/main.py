@@ -121,6 +121,22 @@ async def get_current_user():
     
     if windows_user:
         is_admin = windows_user in admin_config['admins']
+        
+        # LOG LOGIN ACTIVITY (FIX #1: Windows AD Login Tracking)
+        log_activity(
+            action="User Login",
+            user=windows_user,
+            details="Logged in via Windows AD",
+            category="user_login"
+        )
+        
+        # TRACK USER ACTIVITY (FIX #1: Add to active users)
+        track_user_activity(
+            user_id=windows_user,
+            page="Main Dashboard",
+            device_info="Windows AD Login"
+        )
+        
         return AuthResponse(
             email=windows_user,
             username=windows_user.split('@')[0],
@@ -191,6 +207,22 @@ async def fallback_login(request: LoginRequest, http_request: Request):
     
     # Track successful login
     track_login(email, "fallback_password", True, device_info=extract_device_info(user_agent), user_agent=user_agent)
+    
+    # LOG LOGIN ACTIVITY (FIX #2: Fallback Password Login Tracking)
+    log_activity(
+        action="User Login",
+        user=email,
+        details="Logged in via fallback password",
+        category="user_login"
+    )
+    
+    # TRACK USER ACTIVITY (FIX #2: Add to active users)
+    track_user_activity(
+        user_id=email,
+        page="Main Dashboard",
+        device_info=extract_device_info(user_agent),
+        user_agent=user_agent
+    )
     
     return AuthResponse(
         email=email,
@@ -1641,12 +1673,26 @@ def create_pending_fix(feedback: FeedbackRequest, discovery_result: dict):
     save_pending_fixes(data)
     
     # Log the feedback submission to activity log with complete details
+    # FIX #4: Improve activity log entry with better user identification
+    log_user = submitted_by if submitted_by and submitted_by != "Unknown" else "Unknown"
+    
     log_activity(
         action="Feedback Submitted",
-        user=submitted_by,
+        user=log_user,
         details=f"Submitted feedback: {feedback.category} (Rating: {feedback.rating}/5) - FIX-{fix_id}",
         category="feedback_submission"
     )
+    
+    # Also track in activity log if user is identifiable (for non-admin users)
+    if log_user != "Unknown":
+        try:
+            track_user_activity(
+                user_id=log_user,
+                page="Feedback Submission",
+                device_info="Dashboard User"
+            )
+        except:
+            pass  # Don't fail if tracking fails
     
     return fix
 

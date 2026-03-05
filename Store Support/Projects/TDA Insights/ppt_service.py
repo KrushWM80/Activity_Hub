@@ -10,6 +10,10 @@ import logging
 from datetime import datetime
 from pathlib import Path
 import os
+import base64
+from io import BytesIO
+from pptx import Presentation
+from pptx.util import Inches
 
 logger = logging.getLogger(__name__)
 
@@ -265,20 +269,17 @@ def generate_ppt_from_screenshots():
         logger.info(f"PPT generation from screenshots requested. Pages: {len(screenshots)}, Phases: {selected_phases}")
         
         # Generate PowerPoint with screenshots
-        from pptx import Presentation
-        from pptx.util import Inches
-        from io import BytesIO
-        import base64
-        
         prs = Presentation()
         prs.slide_width = Inches(9.6)
         prs.slide_height = Inches(7.2)
         
+        slides_added = 0
         for screenshot_data in screenshots:
             page_num = screenshot_data.get('page', 1)
             image_base64 = screenshot_data.get('imageData', '')
             
             if not image_base64:
+                logger.warning(f"Skipping page {page_num} - no image data")
                 continue
             
             try:
@@ -296,38 +297,39 @@ def generate_ppt_from_screenshots():
                 
                 # Add image to slide (full width/height)
                 slide.shapes.add_picture(image_stream, Inches(0), Inches(0), width=prs.slide_width, height=prs.slide_height)
-                
+                slides_added += 1
                 logger.info(f"Added screenshot for page {page_num}")
             except Exception as e:
                 logger.error(f"Error processing screenshot for page {page_num}: {e}")
                 continue
         
-        # Save to BytesIO
-        ppt_stream = BytesIO()
-        prs.save(ppt_stream)
-        ppt_stream.seek(0)
+        if slides_added == 0:
+            return jsonify({
+                'success': False,
+                'error': 'No screenshots could be processed'
+            }), 400
         
         # Save file to disk
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f'TDA_Report_{timestamp}.pptx'
         file_path = OUTPUT_DIR / filename
         
+        # Save to file
         with open(file_path, 'wb') as f:
-            f.write(ppt_stream.getvalue())
+            prs.save(f)
         
-        logger.info(f"PPT generated successfully: {filename}")
+        logger.info(f"PPT generated successfully: {filename} with {slides_added} slides")
         
         # Send file as download
-        ppt_stream.seek(0)
         return send_file(
-            ppt_stream,
+            str(file_path),
             mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation',
             as_attachment=True,
             download_name=filename
         )
         
     except Exception as e:
-        logger.error(f"Error in /api/ppt/generate-from-screenshots: {e}")
+        logger.error(f"Error in /api/ppt/generate-from-screenshots: {e}", exc_info=True)
         return jsonify({
             'success': False,
             'error': f'Failed to generate PPT: {str(e)}'

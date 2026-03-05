@@ -906,7 +906,6 @@
         async function generatePPT() {
             // Get selected phase
             const selectedPhase = document.getElementById('phase-filter').value;
-            const phases = selectedPhase === 'All' ? null : [selectedPhase];
             const btn = document.getElementById('ppt-btn');
             const originalText = btn.textContent;
             
@@ -925,33 +924,89 @@
                     throw new Error('No data available for selected phase. Load data first.');
                 }
                 
-                // Generate screenshots for each page
-                const totalPages = Math.ceil(dataToCapture.length / ITEMS_PER_PAGE);
+                // Dynamically pack rows into pages based on actual heights
+                const pages = packRowsIntoPages(dataToCapture);
                 const screenshots = [];
                 
-                for (let page = 1; page <= totalPages; page++) {
-                    btn.textContent = `[Wait] Capturing page ${page}/${totalPages}...`;
+                for (let pageIdx = 0; pageIdx < pages.length; pageIdx++) {
+                    const pageData = pages[pageIdx];
+                    const currentPageNum = pageIdx + 1;
+                    const totalPages = pages.length;
                     
-                    // Temporarily render the page with filtered data
-                    currentPage = page;
-                    renderTable(dataToCapture);
+                    btn.textContent = `[Wait] Capturing page ${currentPageNum}/${totalPages}...`;
                     
-                    // Wait for DOM to update
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    // Zoom in temporarily to get high-quality capture
+                    document.body.style.zoom = '1.5';
+                    
+                    // Render table with this page's data
+                    const wrapper = document.getElementById('table-wrapper');
+                    const paginationControls = document.getElementById('pagination-controls');
+                    
+                    // Render just the table rows without pagination
+                    const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Intake & Testing', 'Dallas POC', 'Deployment'];
+                    let html = '<table><thead><tr>';
+                    columns.forEach(col => {
+                        html += `<th>${col}</th>`;
+                    });
+                    html += '</tr></thead><tbody>';
+                    
+                    pageData.forEach(row => {
+                        html += '<tr>';
+                        columns.forEach(col => {
+                            let value = row[col] || '';
+                            let cellClass = '';
+                            
+                            if (col === 'Health Status') {
+                                const status = String(value).toLowerCase();
+                                if (status.includes('on track')) {
+                                    cellClass = 'badge badge-on-track';
+                                } else if (status.includes('at risk')) {
+                                    cellClass = 'badge badge-at-risk';
+                                } else if (status.includes('off track')) {
+                                    cellClass = 'badge badge-off-track';
+                                } else {
+                                    cellClass = 'badge';
+                                }
+                                html += `<td><span class="${cellClass}">${value}</span></td>`;
+                            } else if (col === 'Phase') {
+                                html += `<td><span class="phase-tag">${value}</span></td>`;
+                            } else if (col === '# of Stores') {
+                                html += `<td style="font-weight: 600; color: var(--walmart-blue);">${value}</td>`;
+                            } else {
+                                html += `<td>${value}</td>`;
+                            }
+                        });
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table>';
+                    wrapper.innerHTML = html;
+                    paginationControls.style.display = 'none';
+                    
+                    // Wait for DOM to update and render
+                    await new Promise(resolve => setTimeout(resolve, 600));
                     
                     // Capture the table
-                    const tableWrapper = document.getElementById('table-wrapper');
-                    const canvas = await html2canvas(tableWrapper, {
-                        scale: 2,
+                    const canvas = await html2canvas(wrapper, {
+                        scale: 1,
                         backgroundColor: '#ffffff',
                         allowTaint: true,
                         useCORS: true
                     });
                     
+                    // Reset zoom
+                    document.body.style.zoom = '1';
+                    
+                    const headerText = `TDA Initiatives Insights - ${selectedPhase}`;
+                    
                     screenshots.push({
-                        page: page,
+                        page: currentPageNum,
+                        header: headerText,
                         imageData: canvas.toDataURL('image/png')
                     });
+                    
+                    // Small delay between pages
+                    await new Promise(resolve => setTimeout(resolve, 200));
                 }
                 
                 // Send screenshots to backend to create PPT
@@ -964,7 +1019,7 @@
                     },
                     body: JSON.stringify({
                         screenshots: screenshots,
-                        selectedPhases: phases || [],
+                        selectedPhases: selectedPhase === 'All' ? [] : [selectedPhase],
                         title: document.getElementById('table-title').textContent
                     })
                 });
@@ -992,7 +1047,7 @@
                 window.URL.revokeObjectURL(url);
                 
                 // Show success message
-                alert(`[OK] Report generated and downloaded successfully!\n\nFile: ${filename}\nPages: ${totalPages}`);
+                alert(`[OK] Report generated and downloaded successfully!\n\nFile: ${filename}\nPages: ${pages.length}`);
                 
                 // Re-render current page with all data
                 currentPage = 1;
@@ -1001,10 +1056,73 @@
             } catch (error) {
                 console.error('Error generating PPT:', error);
                 alert(`[ERROR] ${error.message}\n\nMake sure the backend is running.`);
+                // Re-render in case of error
+                currentPage = 1;
+                renderTable(allData);
             } finally {
+                document.body.style.zoom = '1';
                 btn.textContent = originalText;
                 btn.disabled = false;
             }
+        }
+
+        /**
+         * Pack rows into pages based on dynamic height calculation
+         * This prevents long rows from being cut off and ensures optimal use of slide space
+         */
+        function packRowsIntoPages(dataToCapture) {
+            const pages = [];
+            const MAX_PAGE_HEIGHT = 5800; // EMUs converted to approximate pixels (leaves room for header)
+            const ROW_HEIGHT_ESTIMATES = {
+                'short': 60,      // Rows with short text
+                'medium': 80,     // Rows with moderate text
+                'long': 120       // Rows with long notes/text
+            };
+            
+            let currentPage = [];
+            let currentPageHeight = 0;
+            
+            for (let i = 0; i < dataToCapture.length; i++) {
+                const row = dataToCapture[i];
+                
+                // Estimate row height based on content length
+                let estimatedHeight = ROW_HEIGHT_ESTIMATES.short;
+                const dallaspoc = String(row['Dallas POC'] || '').length;
+                const deployment = String(row['Deployment'] || '').length;
+                const intakeTesting = String(row['Intake & Testing'] || '').length;
+                const totalContentLength = dallaspoc + deployment + intakeTesting;
+                
+                if (totalContentLength > 200) {
+                    estimatedHeight = ROW_HEIGHT_ESTIMATES.long;
+                } else if (totalContentLength > 100) {
+                    estimatedHeight = ROW_HEIGHT_ESTIMATES.medium;
+                }
+                
+                // Add header height on first row of page
+                let requiredHeight = estimatedHeight;
+                if (currentPage.length === 0) {
+                    requiredHeight += 80; // Header space
+                }
+                
+                // Check if row fits on current page
+                if (currentPageHeight + requiredHeight > MAX_PAGE_HEIGHT && currentPage.length > 0) {
+                    // Start new page
+                    pages.push([...currentPage]);
+                    currentPage = [row];
+                    currentPageHeight = estimatedHeight + 80; // Reset with header
+                } else {
+                    // Add to current page
+                    currentPage.push(row);
+                    currentPageHeight += requiredHeight;
+                }
+            }
+            
+            // Add last page if it has content
+            if (currentPage.length > 0) {
+                pages.push(currentPage);
+            }
+            
+            return pages;
         }
 
         // Update connection status

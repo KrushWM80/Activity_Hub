@@ -2077,22 +2077,28 @@
                 return;
             }
 
-            // Get current user from active_users endpoint (real-time tracking)
-            let currentUser = 'Unknown';
-            try {
-                const userRes = await fetch(`/api/active-users`);
-                const userData = await userRes.json();
-                const users = userData.users || {};
-                if (Object.keys(users).length > 0) {
-                    // Get most recent user by timestamp
-                    const mostRecent = Object.values(users).reduce((max, user) => 
-                        (user.timestamp > max.timestamp) ? user : max
-                    );
-                    currentUser = mostRecent.user_email || 'Unknown';
+            // FIX #3: Get current user from sessionStorage (PRIMARY SOURCE)
+            let currentUser = sessionStorage.getItem('adminUser') || 'Unknown';
+            
+            // FALLBACK: Try to get from active_users endpoint if sessionStorage fails
+            if (currentUser === 'Unknown') {
+                try {
+                    const userRes = await fetch(`/api/active-users`);
+                    const userData = await userRes.json();
+                    const users = userData.users || {};
+                    if (Object.keys(users).length > 0) {
+                        // Get most recent user by timestamp
+                        const mostRecent = Object.values(users).reduce((max, user) => 
+                            (user.timestamp > max.timestamp) ? user : max
+                        );
+                        currentUser = mostRecent.user_email || 'Unknown';
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch current user:', e);
                 }
-            } catch (e) {
-                console.warn('Could not fetch current user:', e);
             }
+            
+            console.log(`[FEEDBACK] Submitting with user: ${currentUser}`);
 
             try {
                 const response = await fetch(`/api/feedback`, {

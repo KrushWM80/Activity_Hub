@@ -333,23 +333,26 @@ def generate_minimal_pptx(phase=None):
     return pptx_buffer.getvalue()
 
 def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
-    """Generate PPTX from base64 encoded screenshots using pure XML"""
+    """Generate PPTX from base64 encoded screenshots with proper structure and headers"""
     try:
         pptx_buffer = io.BytesIO()
-        image_id = 1
         slide_num = 1
         
         with zipfile.ZipFile(pptx_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
             # Count total slides (title + screenshots)
             total_slides = len(screenshots_data) + 1
             
-            # [Content_Types].xml
+            # [Content_Types].xml - Complete with all required types
             content_types = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
 <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
 <Default Extension="xml" ContentType="application/xml"/>
 <Default Extension="png" ContentType="image/png"/>
-<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>'''
+<Default Extension="jpeg" ContentType="image/jpeg"/>
+<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>
+<Override PartName="/ppt/presProps.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presProps+xml"/>
+<Override PartName="/ppt/viewProps.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml"/>
+<Override PartName="/ppt/tableStyles.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml"/>'''
             
             # Add slide overrides
             for i in range(1, total_slides + 1):
@@ -367,22 +370,47 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
             
             # ppt/_rels/presentation.xml.rels
             ppt_rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'''
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps" Target="presProps.xml"/>
+<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps" Target="viewProps.xml"/>
+<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableStyles" Target="tableStyles.xml"/>'''
             for i in range(1, total_slides + 1):
-                ppt_rels += f'\n<Relationship Id="rId{i}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide{i}.xml"/>'
+                ppt_rels += f'\n<Relationship Id="rId{i+3}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide{i}.xml"/>'
             ppt_rels += '\n</Relationships>'
             zf.writestr('ppt/_rels/presentation.xml.rels', ppt_rels)
             
-            # ppt/presentation.xml
+            # ppt/presentation.xml - with proper slide size for 960x720 (converted to EMUs)
+            # 960px = 914400 EMUs, 720px = 685800 EMUs at 96 DPI
             presentation = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<p:sldSz cx="9144000" cy="6858000"/>
+<p:notesSz cx="12700000" cy="9525000"/>
 <p:sldIdLst>'''
             for i in range(1, total_slides + 1):
-                presentation += f'\n<p:sldId id="{255+i}" r:id="rId{i}"/>'
-            presentation += '\n</p:sldIdLst>\n</p:presentation>'
+                presentation += f'\n<p:sldId id="{255+i}" r:id="rId{i+3}"/>'
+            presentation += '''
+</p:sldIdLst>
+</p:presentation>'''
             zf.writestr('ppt/presentation.xml', presentation)
             
-            # Add title slide
+            # ppt/presProps.xml
+            pres_props = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:presProps xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>'''
+            zf.writestr('ppt/presProps.xml', pres_props)
+            
+            # ppt/viewProps.xml
+            view_props = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:viewPr xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<p:normalViewPr><p:restoredLeft sz="15000"/><p:restoredTop sz="94611"/></p:normalViewPr>
+<p:slideViewPr/><p:outlineViewPr/><p:notesViewPr/><p:handoutViewPr/></p:viewPr>'''
+            zf.writestr('ppt/viewProps.xml', view_props)
+            
+            # ppt/tableStyles.xml
+            table_styles = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<a:tblStyleLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" def="0"/>'''
+            zf.writestr('ppt/tableStyles.xml', table_styles)
+            
+            # Create title slide (Walmart blue background)
             slide_rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 </Relationships>'''
@@ -393,7 +421,7 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
 <p:cSld>
 <p:bg>
 <p:bgPr>
-<a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
+<a:solidFill><a:srgbClr val="0063B1"/></a:solidFill>
 <a:effectLst/>
 </p:bgPr>
 </p:bg>
@@ -417,7 +445,7 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
 </p:nvSpPr>
 <p:spPr>
 <a:xfrm>
-<a:off x="457200" y="2000000"/>
+<a:off x="457200" y="2400000"/>
 <a:ext cx="8230200" cy="1500000"/>
 </a:xfrm>
 </p:spPr>
@@ -425,9 +453,10 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
 <a:bodyPr/>
 <a:lstStyle/>
 <a:p>
+<a:pPr algn="ctr"/>
 <a:r>
-<a:rPr lang="en-US" sz="5400" bold="1"/>
-<a:t>{title}</a:t>
+<a:rPr lang="en-US" sz="6000" bold="1" latin="1"/>
+<a:t>Initiative Status Insights</a:t>
 </a:r>
 </a:p>
 </p:txBody>
@@ -440,31 +469,38 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
 </p:nvSpPr>
 <p:spPr>
 <a:xfrm>
-<a:off x="457200" y="3700000"/>
-<a:ext cx="8230200" cy="1000000"/>
+<a:off x="457200" y="4200000"/>
+<a:ext cx="8230200" cy="800000"/>
 </a:xfrm>
 </p:spPr>
 <p:txBody>
 <a:bodyPr/>
 <a:lstStyle/>
 <a:p>
+<a:pPr algn="ctr"/>
 <a:r>
-<a:rPr lang="en-US" sz="3200"/>
-<a:t>Total Pages: {len(screenshots_data)}</a:t>
+<a:rPr lang="en-US" sz="3600" latin="1"/>
+<a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
+<a:t>Walmart Inc.</a:t>
 </a:r>
 </a:p>
 </p:txBody>
 </p:sp>
 </p:spTree>
 </p:cSld>
+<p:clrMapOvr>
+<a:masterClrMapping/>
+</p:clrMapOvr>
 </p:sld>'''
             zf.writestr(f'ppt/slides/slide{slide_num}.xml', title_slide)
             slide_num += 1
             
-            # Add screenshot slides
+            # Add screenshot slides with headers
             for idx, screenshot_info in enumerate(screenshots_data, 1):
                 try:
                     image_data = screenshot_info.get('imageData', '')
+                    header_text = screenshot_info.get('header', f'Page {idx}')
+                    
                     if ',' in image_data:
                         image_data = image_data.split(',')[1]
                     
@@ -473,14 +509,14 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
                     image_filename = f'image{idx}.png'
                     zf.writestr(f'ppt/media/{image_filename}', image_bytes)
                     
-                    # Create slide with image
+                    # Create slide with image and header
                     slide_rels = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/{image_filename}"/>
 </Relationships>'''
                     zf.writestr(f'ppt/slides/_rels/slide{slide_num}.xml.rels', slide_rels)
                     
-                    # Image slide XML
+                    # Image slide XML with header bar
                     image_slide = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 <p:cSld>
@@ -502,9 +538,34 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
 <a:ext cx="9144000" cy="6858000"/>
 </a:xfrm>
 </p:grpSpPr>
+<p:sp>
+<p:nvSpPr>
+<p:cNvPr id="2" name="Header"/>
+<p:cNvSpPr/>
+<p:nvPr/>
+</p:nvSpPr>
+<p:spPr>
+<a:xfrm>
+<a:off x="0" y="0"/>
+<a:ext cx="9144000" cy="457200"/>
+</a:xfrm>
+</p:spPr>
+<p:txBody>
+<a:bodyPr/>
+<a:lstStyle/>
+<a:p>
+<a:pPr algn="l"/>
+<a:r>
+<a:rPr lang="en-US" sz="2800" bold="1" latin="1"/>
+<a:solidFill><a:srgbClr val="0063B1"/></a:solidFill>
+<a:t>{header_text}</a:t>
+</a:r>
+</a:p>
+</p:txBody>
+</p:sp>
 <p:pic>
 <p:nvPicPr>
-<p:cNvPr id="2" name="{image_filename}"/>
+<p:cNvPr id="3" name="{image_filename}"/>
 <p:cNvPicPr>
 <a:picLocks noChangeAspect="1"/>
 </p:cNvPicPr>
@@ -518,8 +579,8 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
 </p:blipFill>
 <p:spPr>
 <a:xfrm>
-<a:off x="0" y="0"/>
-<a:ext cx="9144000" cy="6858000"/>
+<a:off x="0" y="457200"/>
+<a:ext cx="9144000" cy="6400800"/>
 </a:xfrm>
 <a:prstGeom prst="rect">
 <a:avLst/>
@@ -558,9 +619,37 @@ def filter_data(phase=None, health_status=None):
 def handle_request(client_socket, addr):
     """Handle a single HTTP request"""
     try:
-        # Receive request
-        request_data = client_socket.recv(4096).decode('utf-8', errors='ignore')
-        request_lines = request_data.split('\r\n')
+        # Receive request headers first
+        request_data = b''
+        while b'\r\n\r\n' not in request_data:
+            chunk = client_socket.recv(4096)
+            if not chunk:
+                return
+            request_data += chunk
+        
+        # Extract headers and body separator
+        header_end = request_data.find(b'\r\n\r\n')
+        headers_raw = request_data[:header_end].decode('utf-8', errors='ignore')
+        body_data = request_data[header_end + 4:]
+        
+        # If Content-Length is set, read remaining body
+        content_length = 0
+        for line in headers_raw.split('\r\n'):
+            if line.lower().startswith('content-length:'):
+                content_length = int(line.split(':')[1].strip())
+                break
+        
+        # Read remaining body if Content-Length indicates more data
+        while len(body_data) < content_length:
+            chunk = client_socket.recv(4096)
+            if not chunk:
+                break
+            body_data += chunk
+        
+        # Decode body
+        body_str = body_data.decode('utf-8', errors='ignore')
+        
+        request_lines = headers_raw.split('\r\n')
         request_line = request_lines[0] if request_lines else ""
         
         # Parse request
@@ -587,6 +676,9 @@ def handle_request(client_socket, addr):
                     query_params[key] = value.replace('%20', ' ').replace('+', ' ')
         
         print(f"[{time.strftime('%H:%M:%S')}] {method} {path}")
+        
+        # Store request_data for later use
+        request_data_str = body_str
         
         # Handle routes
         if path == '/api/health':
@@ -668,13 +760,11 @@ def handle_request(client_socket, addr):
         
         elif path == '/api/ppt/generate-from-screenshots':
             try:
-                # Parse request body for screenshot data
-                body_start = request_data.find('\r\n\r\n')
-                if body_start == -1:
+                # Parse JSON from request body
+                if not request_data_str:
                     raise ValueError("No request body")
                 
-                body_data = request_data[body_start+4:]
-                request_json = json.loads(body_data)
+                request_json = json.loads(request_data_str)
                 
                 screenshots = request_json.get('screenshots', [])
                 title = request_json.get('title', 'TDA Report')
