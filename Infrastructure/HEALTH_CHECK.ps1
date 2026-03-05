@@ -150,73 +150,79 @@ if (Test-Path $pythonExe) {
 }
 Write-Host ""
 
-# 5. Database Files
-Write-Host "━━━ DATABASE & CACHE FILES ━━━" -ForegroundColor Yellow
+# 5. Key Folders
+Write-Host "━━━ FOLDER STRUCTURE ━━━" -ForegroundColor Yellow
 
-$cacheDb = Test-Path "Store Support\Projects\Intake Hub\Intake Hub\ProjectsinStores\backend\projects_cache.db"
-if ($cacheDb) {
-    Write-StatusLine "OK" "Projects Cache DB Exists" "Green"
-    $dbSize = (Get-Item "Store Support\Projects\Intake Hub\Intake Hub\ProjectsinStores\backend\projects_cache.db").Length / 1MB
-    Write-Host "          Size: $([math]::Round($dbSize, 2)) MB" -ForegroundColor Gray
-} else {
-    Write-StatusLine "WARN" "Projects Cache DB Not Found (will be created)" "Yellow"
-}
+$keyFolders = @(
+    @{Path = "Documentation"; Description = "Documentation files"},
+    @{Path = "Infrastructure"; Description = "Infrastructure & deployment"},
+    @{Path = "Projects"; Description = "Project-organized scripts"},
+    @{Path = "Platform"; Description = "Platform utilities"},
+    @{Path = "Automation"; Description = "Automation scripts"}
+)
 
-$usersDb = "Store Support\Projects\Intake Hub\Intake Hub\ProjectsinStores\backend\active_users.json"
-if (Test-Path $usersDb) {
-    Write-StatusLine "OK" "Active Users Log Exists" "Green"
+foreach ($folder in $keyFolders) {
+    if (Test-Path $folder.Path) {
+        $fileCount = (Get-ChildItem -Path $folder.Path -File -Recurse -ErrorAction SilentlyContinue | Measure-Object).Count
+        Write-StatusLine "OK" "$($folder.Path)/ ($fileCount files)" "Green"
+    } else {
+        Write-StatusLine "WARN" "$($folder.Path)/ (not found)" "Yellow"
+    }
 }
 Write-Host ""
 
-# 6. Log Files
-Write-Host "━━━ LOG FILES ━━━" -ForegroundColor Yellow
+# 6. Workspace Config
+Write-Host "━━━ WORKSPACE CONFIGURATION ━━━" -ForegroundColor Yellow
 
-$tdaLog = "Store Support\Projects\TDA Insights\tda_insights.log"
-if (Test-Path $tdaLog) {
-    $logSize = (Get-Item $tdaLog).Length / 1KB
-    $lastWrite = (Get-Item $tdaLog).LastWriteTime
-    Write-StatusLine "OK" "TDA Insights Log ($(([math]::Round($logSize, 2))) KB, last: $lastWrite)" "Green"
-    
+# Check .venv
+$venvActivate = Test-Path ".venv\Scripts\Activate.ps1"
+if ($venvActivate) {
+    Write-StatusLine "OK" "Virtual Environment (.venv) configured" "Green"
+} else {
+    Write-StatusLine "WARN" "Virtual Environment (.venv) not found" "Yellow"
+    Write-Host "          Run: python -m venv .venv" -ForegroundColor Gray
+}
+
+# Check .gitignore
+$gitignore = Test-Path ".gitignore"
+if ($gitignore) {
+    Write-StatusLine "OK" "Git repository initialized" "Green"
+} else {
+    Write-StatusLine "INFO" "Not a git repository" "Gray"
+}
+Write-Host ""
+
+# 7. Environment Setup
+Write-Host "━━━ ENVIRONMENT SETUP ━━━" -ForegroundColor Yellow
+
+if ($env:GOOGLE_APPLICATION_CREDENTIALS) {
+    Write-StatusLine "OK" "GOOGLE_APPLICATION_CREDENTIALS set" "Green"
+    Write-Host "          Path: $env:GOOGLE_APPLICATION_CREDENTIALS" -ForegroundColor Gray
+} else {
+    Write-StatusLine "INFO" "GOOGLE_APPLICATION_CREDENTIALS not set (will use gcloud default)" "Gray"
+}
+
+# Check timezone
+$tz = [System.TimeZone]::CurrentTimeZone.StandardName
+Write-StatusLine "INFO" "Timezone: $tz" "Gray"
+Write-Host ""
+
+# 8. Documentation
+Write-Host "━━━ AVAILABLE DOCUMENTATION ━━━" -ForegroundColor Yellow
+
+$docs = Get-ChildItem -Path "Documentation" -Filter "*.md" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
+if ($docs) {
+    Write-StatusLine "OK" "Documentation available ($($docs.Count) files)" "Green"
     if ($Verbose) {
-        Write-Host "          Last 10 lines:" -ForegroundColor Gray
-        Get-Content $tdaLog -Tail 10 | ForEach-Object { Write-Host "            $_" -ForegroundColor Gray }
+        foreach ($doc in $docs | Select-Object -First 5) {
+            Write-Host "          - $doc" -ForegroundColor Gray
+        }
+        if ($docs.Count -gt 5) {
+            Write-Host "          ... and $($docs.Count - 5) more" -ForegroundColor Gray
+        }
     }
 } else {
-    Write-StatusLine "INFO" "TDA Insights Log Not Created Yet" "Gray"
-}
-Write-Host ""
-
-# 7. Scheduled Tasks
-Write-Host "━━━ SCHEDULED TASKS ━━━" -ForegroundColor Yellow
-
-$taskName1 = "Activity Hub - Projects in Stores Server"
-$task1 = Get-ScheduledTask -TaskName $taskName1 -ErrorAction SilentlyContinue
-if ($task1) {
-    $status = if ($task1.State -eq "Ready") { "Enabled"; "Green" } else { "$($task1.State)"; "Yellow" }
-    Write-StatusLine "OK" "Scheduled Task: '$taskName1'" $status[1]
-    Write-Host "          State: $($task1.State) | Last Run: $($task1 | Get-ScheduledTaskInfo | Select-Object -ExpandProperty LastRunTime)" -ForegroundColor Gray
-} else {
-    Write-StatusLine "WARN" "Scheduled Task Not Configured: '$taskName1'" "Yellow"
-}
-
-$taskName2 = "Activity Hub - TDA Insights Server"
-$task2 = Get-ScheduledTask -TaskName $taskName2 -ErrorAction SilentlyContinue
-if ($task2) {
-    Write-StatusLine "OK" "Scheduled Task: '$taskName2'" "Green"
-} else {
-    Write-StatusLine "INFO" "Scheduled Task Not Configured: '$taskName2'" "Gray"
-}
-Write-Host ""
-
-# 8. File Organization
-Write-Host "━━━ FILE ORGANIZATION ━━━" -ForegroundColor Yellow
-
-$rootPyFiles = Get-ChildItem -Path "." -File -Filter "*.py" | Measure-Object | Select-Object -ExpandProperty Count
-if ($rootPyFiles -gt 10) {
-    Write-StatusLine "WARN" "Root folder contains $rootPyFiles .py files (should be reorganized)" "Yellow"
-    Write-Host "          See FILE_ORGANIZATION_PLAN.md for details" -ForegroundColor Gray
-} else {
-    Write-StatusLine "OK" "Root folder is organized" "Green"
+    Write-StatusLine "INFO" "Documentation folder empty" "Gray"
 }
 Write-Host ""
 
@@ -237,13 +243,11 @@ if ($activeServices -eq 2) {
 }
 
 Write-Host ""
-Write-Host "━━━ NEXT STEPS ━━━" -ForegroundColor Yellow
-if ($activeServices -lt 2) {
-    Write-Host "1. Run OPERATIONS_DASHBOARD.md - Startup Guide section" -ForegroundColor Gray
-    Write-Host "2. Check error logs for details" -ForegroundColor Gray
-    Write-Host "3. Verify authentication is configured" -ForegroundColor Gray
-}
-Write-Host "4. Review OPERATIONS_DASHBOARD.md for full service info" -ForegroundColor Gray
+Write-Host "━━━ QUICK REFERENCE ━━━" -ForegroundColor Yellow
+Write-Host "Documentation Location: Documentation/" -ForegroundColor Gray
+Write-Host "Key Scripts: Automation/" -ForegroundColor Gray
+Write-Host "Project Files: Projects/" -ForegroundColor Gray
+Write-Host "Infrastructure Info: Infrastructure/" -ForegroundColor Gray
 Write-Host ""
 
 # Footer
