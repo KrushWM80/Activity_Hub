@@ -14,13 +14,13 @@ $WarningPreference = "SilentlyContinue"
 function Write-StatusLine {
     param([string]$Status, [string]$Message, [string]$Color = "Gray")
     $icon = switch($Status) {
-        "OK" { "✓" }
-        "FAIL" { "✗" }
-        "INFO" { "ℹ" }
-        "WARN" { "⚠" }
-        default { "?" }
+        "OK" { "[+]" }
+        "FAIL" { "[-]" }
+        "INFO" { "[*]" }
+        "WARN" { "[!]" }
+        default { "[?]" }
     }
-    Write-Host "[$icon] $Message" -ForegroundColor $Color
+    Write-Host "$icon $Message" -ForegroundColor $Color
 }
 
 function Test-Port {
@@ -52,14 +52,14 @@ function Get-ProcessOnPort {
 
 # Header
 Clear-Host
-Write-Host "╔════════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║         ACTIVITY HUB - SERVICE HEALTH CHECK                    ║" -ForegroundColor Cyan
-Write-Host "║         $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')                    ║" -ForegroundColor Cyan
-Write-Host "╚════════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "=====================================================================" -ForegroundColor Cyan
+Write-Host "         ACTIVITY HUB - SERVICE HEALTH CHECK                    " -ForegroundColor Cyan
+Write-Host "         $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')                    " -ForegroundColor Cyan
+Write-Host "=====================================================================" -ForegroundColor Cyan
 Write-Host ""
 
 # 1. Port Status
-Write-Host "━━━ PORT STATUS ━━━" -ForegroundColor Yellow
+Write-Host "------- PORT STATUS -------" -ForegroundColor Yellow
 $ports = @(
     @{Port = 5000; Service = "TDA Insights Backend"; Color = "Green"}
     @{Port = 8001; Service = "Projects in Stores Backend"; Color = "Green"}
@@ -85,7 +85,7 @@ foreach ($p in $ports) {
 Write-Host ""
 
 # 2. Authentication
-Write-Host "━━━ AUTHENTICATION ━━━" -ForegroundColor Yellow
+Write-Host "------- AUTHENTICATION -------" -ForegroundColor Yellow
 $gcloudAuth = Test-Path "C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json" -PathType Leaf
 if ($gcloudAuth) {
     Write-StatusLine "OK" "Google Cloud Credentials Found" "Green"
@@ -105,7 +105,7 @@ if ($gcloud) {
 Write-Host ""
 
 # 3. Python Environments
-Write-Host "━━━ PYTHON ENVIRONMENTS ━━━" -ForegroundColor Yellow
+Write-Host "------- PYTHON ENVIRONMENTS -------" -ForegroundColor Yellow
 
 # System Python
 $sysPython = Get-Command python -ErrorAction SilentlyContinue
@@ -134,7 +134,7 @@ if ($appPython) {
 Write-Host ""
 
 # 4. Critical Dependencies
-Write-Host "━━━ CRITICAL DEPENDENCIES ━━━" -ForegroundColor Yellow
+Write-Host "------- CRITICAL DEPENDENCIES -------" -ForegroundColor Yellow
 $pythonExe = "C:\Users\krush\AppData\Local\Python\bin\python.exe"
 
 if (Test-Path $pythonExe) {
@@ -151,11 +151,11 @@ if (Test-Path $pythonExe) {
 Write-Host ""
 
 # 5. Key Folders
-Write-Host "━━━ FOLDER STRUCTURE ━━━" -ForegroundColor Yellow
+Write-Host "------- FOLDER STRUCTURE -------" -ForegroundColor Yellow
 
 $keyFolders = @(
     @{Path = "Documentation"; Description = "Documentation files"},
-    @{Path = "Infrastructure"; Description = "Infrastructure & deployment"},
+    @{Path = "Infrastructure"; Description = "Infrastructure and deployment"},
     @{Path = "Projects"; Description = "Project-organized scripts"},
     @{Path = "Platform"; Description = "Platform utilities"},
     @{Path = "Automation"; Description = "Automation scripts"}
@@ -164,15 +164,15 @@ $keyFolders = @(
 foreach ($folder in $keyFolders) {
     if (Test-Path $folder.Path) {
         $fileCount = (Get-ChildItem -Path $folder.Path -File -Recurse -ErrorAction SilentlyContinue | Measure-Object).Count
-        Write-StatusLine "OK" "$($folder.Path)/ ($fileCount files)" "Green"
+        Write-StatusLine "OK" "$($folder.Path) - $fileCount files" "Green"
     } else {
-        Write-StatusLine "WARN" "$($folder.Path)/ (not found)" "Yellow"
+        Write-StatusLine "WARN" "$($folder.Path) - not found" "Yellow"
     }
 }
 Write-Host ""
 
 # 6. Workspace Config
-Write-Host "━━━ WORKSPACE CONFIGURATION ━━━" -ForegroundColor Yellow
+Write-Host "------- WORKSPACE CONFIGURATION -------" -ForegroundColor Yellow
 
 # Check .venv
 $venvActivate = Test-Path ".venv\Scripts\Activate.ps1"
@@ -193,7 +193,7 @@ if ($gitignore) {
 Write-Host ""
 
 # 7. Environment Setup
-Write-Host "━━━ ENVIRONMENT SETUP ━━━" -ForegroundColor Yellow
+Write-Host "------- ENVIRONMENT SETUP -------" -ForegroundColor Yellow
 
 if ($env:GOOGLE_APPLICATION_CREDENTIALS) {
     Write-StatusLine "OK" "GOOGLE_APPLICATION_CREDENTIALS set" "Green"
@@ -208,11 +208,11 @@ Write-StatusLine "INFO" "Timezone: $tz" "Gray"
 Write-Host ""
 
 # 8. Documentation
-Write-Host "━━━ AVAILABLE DOCUMENTATION ━━━" -ForegroundColor Yellow
+Write-Host "------- AVAILABLE DOCUMENTATION -------" -ForegroundColor Yellow
 
 $docs = Get-ChildItem -Path "Documentation" -Filter "*.md" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
 if ($docs) {
-    Write-StatusLine "OK" "Documentation available ($($docs.Count) files)" "Green"
+    Write-StatusLine "OK" "Documentation available - $($docs.Count) items" "Green"
     if ($Verbose) {
         foreach ($doc in $docs | Select-Object -First 5) {
             Write-Host "          - $doc" -ForegroundColor Gray
@@ -227,15 +227,15 @@ if ($docs) {
 Write-Host ""
 
 # 9. Summary
-Write-Host "━━━ SUMMARY ━━━" -ForegroundColor Yellow
+Write-Host "------- SUMMARY -------" -ForegroundColor Yellow
 Write-Host "Active Services: $activeServices / 2" -ForegroundColor $(if ($activeServices -eq 2) { "Green" } else { "Red" })
 
 if ($activeServices -eq 2) {
-    Write-Host "Status: All systems operational ✓" -ForegroundColor Green
+    Write-Host "Status: All systems operational [OK]" -ForegroundColor Green
 } elseif ($activeServices -eq 1) {
-    Write-Host "Status: Partial service outage ⚠" -ForegroundColor Yellow
+    Write-Host "Status: Partial service outage [WARN]" -ForegroundColor Yellow
 } else {
-    Write-Host "Status: Service down ✗" -ForegroundColor Red
+    Write-Host "Status: Service down [ERROR]" -ForegroundColor Red
     if ($Auto) {
         Write-Host "`nAttempting auto-start..." -ForegroundColor Cyan
         # Auto-start logic would go here
@@ -243,7 +243,7 @@ if ($activeServices -eq 2) {
 }
 
 Write-Host ""
-Write-Host "━━━ QUICK REFERENCE ━━━" -ForegroundColor Yellow
+Write-Host "------- QUICK REFERENCE -------" -ForegroundColor Yellow
 Write-Host "Documentation Location: Documentation/" -ForegroundColor Gray
 Write-Host "Key Scripts: Automation/" -ForegroundColor Gray
 Write-Host "Project Files: Projects/" -ForegroundColor Gray
@@ -251,4 +251,4 @@ Write-Host "Infrastructure Info: Infrastructure/" -ForegroundColor Gray
 Write-Host ""
 
 # Footer
-Write-Host "╚════════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "=====================================================================" -ForegroundColor Cyan

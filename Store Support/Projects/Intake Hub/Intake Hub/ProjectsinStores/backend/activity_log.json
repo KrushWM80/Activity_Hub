@@ -1286,6 +1286,114 @@
       "user_email": "krush@homeoffice.wal-mart.com",
       "details": "Logged in via Windows AD",
       "category": "user_login"
+    },
+    {
+      "id": "87d815f5",
+      "timestamp": "2026-03-05 10:58:54",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "1eed518f",
+      "timestamp": "2026-03-05 10:59:43",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "4fc97e15",
+      "timestamp": "2026-03-05 10:59:43",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "c306e6b8",
+      "timestamp": "2026-03-05 11:00:51",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "ed7ac3e0",
+      "timestamp": "2026-03-05 11:00:54",
+      "action": "Accessed Login Tracking",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed login history and unique users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "b8c07213",
+      "timestamp": "2026-03-05 14:21:39",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "2b6a1ae8",
+      "timestamp": "2026-03-05 14:21:39",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "37ac91de",
+      "timestamp": "2026-03-05 14:21:43",
+      "action": "Accessed Email Reports",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Opened Email Reports dashboard",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "c4fe208d",
+      "timestamp": "2026-03-05 14:21:43",
+      "action": "Loaded Reports List",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed 0 total reports (filtered by user), 0 active",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "00cddbeb",
+      "timestamp": "2026-03-05 14:21:44",
+      "action": "Accessed Login Tracking",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed login history and unique users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "0c358a8c",
+      "timestamp": "2026-03-05 14:21:46",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "478280a4",
+      "timestamp": "2026-03-05 14:21:46",
+      "action": "Accessed Fix Management",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Opened pending fixes dashboard",
+      "category": "dashboard_admin"
     }
   ]
 }

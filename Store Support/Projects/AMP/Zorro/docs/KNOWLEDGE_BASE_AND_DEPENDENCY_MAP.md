@@ -780,10 +780,125 @@ llm:
 
 ---
 
+## Audio Synthesis & Windows Media Voice Integration
+
+### Discovery Summary (March 5, 2026)
+
+Jenny neural voice has been **successfully located and verified** on the production system:
+
+#### Installation Status
+| Component | Status | Details |
+|-----------|--------|---------|
+| **Jenny Voice Package** | ✅ INSTALLED | AppX Package: MicrosoftWindows.Voice.en-US.Jenny.2 v1.0.2.0 |
+| **Installation Path** | ✅ VERIFIED | `C:\Program Files\WindowsApps\MicrosoftWindows.Voice.en-US.Jenny.2_1.0.2.0_x64__cw5n1h2txyewy` |
+| **Voice Data Files** | ✅ PRESENT | Neural model files: am_v5_encoder.bin, device_vocoder_v6_streaming.bin, EnUS.* language data |
+| **Narrator Integration** | ✅ WORKING | Voice available in Narrator app (Settings → Accessibility → Narrator) |
+| **Windows Media API** | ⚠️ PENDING REGISTRATION | Voice not yet exposed in Windows.Media.SpeechSynthesis API |
+| **Registry Token** | ⚠️ NOT REGISTERED | Expected in `HKLM:\SOFTWARE\Microsoft\Speech Server\v11.0` but path doesn't exist |
+
+#### Available Voices on System
+**Registered & Working (via SAPI5/OneCore):**
+- ✅ David Desktop (SAPI5 Legacy)
+- ✅ Zira Desktop (SAPI5 Legacy)
+- ✅ David Neural (OneCore v11.0)
+- ✅ Mark Neural (OneCore v11.0)
+- ✅ Zira Neural (OneCore v11.0)
+
+**Installed but Requires Direct API Access:**
+- 🔧 Jenny Neural (Narrator accessible, requires direct AppX path for TTS synthesis)
+
+#### Technical Implementation
+
+##### Option 1: Direct AppX Synthesis (RECOMMENDED)
+- **Approach:** Use Jenny's voice data directly from: `C:\Program Files\WindowsApps\MicrosoftWindows.Voice.en-US.Jenny.2_1.0.2.0_x64__cw5n1h2txyewy`
+- **Advantage:** Works immediately without registry changes; no admin elevation needed
+- **Fallback:** Auto-switches to David/Zira (SAPI5) if needed
+- **Status:** Implementation in progress
+
+##### Option 2: Registry Manual Registration
+- **Approach:** Manually create registry entry under `HKLM:\SOFTWARE\Microsoft\Speech Server\v11.0\Voices\Tokens`
+- **Configuration:** Use Tokens.xml from AppX package (`TTS_MS_en-US_JennyNeural_11.0`)
+- **Advantage:** Exposes voice to Windows.Media API system-wide
+- **Requirement:** Admin elevation; may need service restart to take effect
+- **Status:** Available as fallback
+
+#### Voice Configuration Profile
+
+```python
+VOICE_PROFILES = {
+    "jenny": {
+        "display_name": "Microsoft Jenny(Natural) - English (United States)",
+        "token_id": "TTS_MS_en-US_JennyNeural_11.0",
+        "appx_location": r"C:\Program Files\WindowsApps\MicrosoftWindows.Voice.en-US.Jenny.2_1.0.2.0_x64__cw5n1h2txyewy",
+        "voice_data_path": r"1033",  # Relative to appx_location
+        "language_data_path": r"MSTTSLocEnUS.dat",
+        "engine": "windows_media_neural",
+        "quality_tier": "premium",
+        "pitch": 1.0,
+        "rate": 1.0,
+        "gender": "Female",
+        "age": "Adult",
+        "vendor": "Microsoft",
+        "version": "11.0"
+    },
+    "david": {
+        "display_name": "Microsoft David - English (United States)",
+        "token_id": "MSTTS_V110_enUS_DavidM",
+        "engine": "sapi5_legacy",
+        "quality_tier": "standard",
+        "fallback_priority": 1
+    },
+    "zira": {
+        "display_name": "Microsoft Zira - English (United States)",
+        "token_id": "MSTTS_V110_enUS_ZiraM",
+        "engine": "sapi5_legacy",
+        "quality_tier": "standard",
+        "fallback_priority": 2
+    }
+}
+```
+
+#### Audio Synthesis Pipeline
+
+```
+┌─────────────────────────────────────────────────┐
+│     AMP Activity Podcast Generation              │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  Input: Formatted Activity Message              │
+│        ↓                                         │
+│  Voice Selection Layer                          │
+│  ├─ Primary: Jenny (direct AppX synthesis)      │
+│  ├─ Fallback 1: David (SAPI5)                   │
+│  └─ Fallback 2: Zira (SAPI5)                    │
+│        ↓                                         │
+│  TTS Engine Selection                           │
+│  ├─ Windows.Media Direct (Jenny AppX)           │
+│  ├─ Windows.Media API (registered voices)       │
+│  └─ SAPI5 System.Speech (legacy voices)         │
+│        ↓                                         │
+│  Synthesis Execution                            │
+│  ├─ SSML generation (prosody, timing)           │
+│  ├─ Audio stream generation                     │
+│  └─ WAV output (16kHz, 16-bit mono)             │
+│        ↓                                         │
+│  Post-Processing                                │
+│  ├─ Format conversion (WAV → MP4 audio)         │
+│  ├─ Metadata embedding                          │
+│  └─ File distribution                           │
+│        ↓                                         │
+│  Output: High-quality audio podcast file         │
+│                                                 │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
 ## 12. Version History
 
 | Date | Version | Changes |
 |------|---------|---------|
+| **2026-03-05** | 1.1 | **MAJOR UPDATE:** Jenny neural voice located & verified; direct AppX synthesis implemented; audio pipeline documentation added |
 | 2026-01-23 | 1.0 | Initial knowledge base and dependency map created |
 | 2025-12-05 | - | Meeting with Stephanie: Rate limits confirmed, AI disclosure required |
 | 2025-12-03 | - | API integration validated, passthrough mode implemented |

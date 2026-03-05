@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Refresh - Weekly Comparison Dashboard (WK7-WK8+)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --bg-section: rgba(255,255,255,0.05);
+            --bg-card: rgba(0,0,0,0.2);
+            --text-primary: #fff;
+            --text-secondary: rgba(255,255,255,0.8);
+            --text-muted: rgba(255,255,255,0.6);
+            --text-accent: #00d4ff;
+            --text-success: #00ff88;
+            --border-color: rgba(255,255,255,0.1);
+        }
+        
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-primary: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+                --bg-section: rgba(255,255,255,0.95);
+                --bg-card: rgba(0,0,0,0.03);
+                --text-primary: #1a1a2e;
+                --text-secondary: #333;
+                --text-muted: #666;
+                --text-accent: #0071CE;
+                --text-success: #009640;
+                --border-color: rgba(0,0,0,0.1);
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: var(--bg-section);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: var(--text-accent);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            background: var(--bg-section);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-accent);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th {
+            background: var(--bg-card);
+            padding: 15px;
+            text-align: left;
+            color: var(--text-accent);
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+        }
+        
+        td {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+        }
+        
+        tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+        
+        .metric-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            min-width: 150px;
+        }
+        
+        .number {
+            color: var(--text-success);
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .percentage {
+            color: var(--text-accent);
+            font-weight: 600;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 30px 0;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .metric-card-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .metric-card-value {
+            color: var(--text-success);
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .format-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .format-card {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--text-accent);
+        }
+        
+        .format-name {
+            color: var(--text-accent);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .format-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+        
+        .label {
+            color: var(--text-muted);
+        }
+        
+        .value {
+            color: var(--text-success);
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .change {
+            font-size: 0.85rem;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        
+        .change-positive {
+            color: var(--text-success);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Store Refresh - Weekly Progress Dashboard</h1>
+            <p>Comprehensive metrics tracking from Week 7 (2/23/26) through Latest (3/5/26)</p>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 10px;">Format-Specific Baseline: 1,426,588 total items | SC: 1,166,040 | DIV1: 119,682 | NHM: 140,866</p>
+        </div>
+        
+        <!-- DETAILED METRICS TABLE -->
+        <div class="section">
+            <div class="section-title">📈 Detailed Weekly Metrics</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Week</th>
+                        <th>Date</th>
+                        <th>Stores</th>
+                        <th>Max Possible</th>
+                        <th>Unassigned</th>
+                        <th>Assigned (C+P)</th>
+                        <th>% Assigned</th>
+                        <th>Completed</th>
+                        <th>% of Assigned</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="metric-label"><strong>WK7</strong></td>
+                        <td>2026-02-23</td>
+                        <td class="number">4,459</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">250,656</td>
+                        <td class="number">1,238,650</td>
+                        <td class="percentage">86.8%</td>
+                        <td class="number">1,111,851</td>
+                        <td class="percentage">89.8%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>WK7+1</strong></td>
+                        <td>2026-02-24</td>
+                        <td class="number">4,459</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">249,936</td>
+                        <td class="number">1,239,370</td>
+                        <td class="percentage">86.9%</td>
+                        <td class="number">1,113,847</td>
+                        <td class="percentage">89.9%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>WK7+2</strong></td>
+                        <td>2026-02-25</td>
+                        <td class="number">4,459</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">249,621</td>
+                        <td class="number">1,239,685</td>
+                        <td class="percentage">86.9%</td>
+                        <td class="number">1,114,798</td>
+                        <td class="percentage">89.9%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>WK7+3</strong></td>
+                        <td>2026-02-26</td>
+                        <td class="number">4,459</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">249,352</td>
+                        <td class="number">1,239,954</td>
+                        <td class="percentage">86.9%</td>
+                        <td class="number">1,115,461</td>
+                        <td class="percentage">90.0%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>WK7+4</strong></td>
+                        <td>2026-02-27</td>
+                        <td class="number">4,460</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">249,070</td>
+                        <td class="number">1,240,570</td>
+                        <td class="percentage">87.0%</td>
+                        <td class="number">1,116,626</td>
+                        <td class="percentage">90.0%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong style="color: var(--text-success);">WK8 ✓</strong></td>
+                        <td>2026-02-28</td>
+                        <td class="number">4,460</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">248,718</td>
+                        <td class="number">1,240,922</td>
+                        <td class="percentage">87.0%</td>
+                        <td class="number">1,117,646</td>
+                        <td class="percentage">90.1%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>WK8+1</strong></td>
+                        <td>2026-03-01</td>
+                        <td class="number">4,460</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">248,718</td>
+                        <td class="number">1,240,922</td>
+                        <td class="percentage">87.0%</td>
+                        <td class="number">1,117,649</td>
+                        <td class="percentage">90.1%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>WK8+2</strong></td>
+                        <td>2026-03-02</td>
+                        <td class="number">4,460</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">248,718</td>
+                        <td class="number">1,240,922</td>
+                        <td class="percentage">87.0%</td>
+                        <td class="number">1,117,657</td>
+                        <td class="percentage">90.1%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>WK8+3</strong></td>
+                        <td>2026-03-03</td>
+                        <td class="number">4,460</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">248,718</td>
+                        <td class="number">1,240,922</td>
+                        <td class="percentage">87.0%</td>
+                        <td class="number">1,117,669</td>
+                        <td class="percentage">90.1%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>WK8+4</strong></td>
+                        <td>2026-03-04</td>
+                        <td class="number">4,460</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">248,712</td>
+                        <td class="number">1,240,928</td>
+                        <td class="percentage">87.0%</td>
+                        <td class="number">1,117,678</td>
+                        <td class="percentage">90.1%</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong style="color: var(--text-accent);">WK8+5 (Latest)</strong></td>
+                        <td>2026-03-05</td>
+                        <td class="number">4,460</td>
+                        <td class="number">1,426,588</td>
+                        <td class="number">248,712</td>
+                        <td class="number">1,240,928</td>
+                        <td class="percentage">87.0%</td>
+                        <td class="number">1,117,678</td>
+                        <td class="percentage">90.1%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- KEY SNAPSHOTS -->
+        <div class="section">
+            <div class="section-title">🎯 Key Weekly Snapshots</div>
+            
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: var(--text-accent); margin-bottom: 15px;">Week 7 (2/23/26)</h3>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-card-label">Stores</div>
+                        <div class="metric-card-value">4,459</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Max Possible</div>
+                        <div class="metric-card-value">1.43M</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Unassigned</div>
+                        <div class="metric-card-value">250K</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Assigned</div>
+                        <div class="metric-card-value">1.24M</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Completed</div>
+                        <div class="metric-card-value">1.11M</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Completion %</div>
+                        <div class="metric-card-value" style="color: var(--text-accent);">89.8%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: var(--text-success); margin-bottom: 15px;">Week 8 (2/28/26) ✓</h3>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-card-label">Stores</div>
+                        <div class="metric-card-value">4,460</div>
+                        <div class="change"><small class="change-positive">+1 store</small></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Max Possible</div>
+                        <div class="metric-card-value">1.43M</div>
+                        <div class="change"><small>No change</small></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Unassigned</div>
+                        <div class="metric-card-value">249K</div>
+                        <div class="change"><small class="change-positive">-1,938 items</small></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Assigned</div>
+                        <div class="metric-card-value">1.24M</div>
+                        <div class="change"><small class="change-positive">+2,272 items</small></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Completed</div>
+                        <div class="metric-card-value">1.12M</div>
+                        <div class="change"><small class="change-positive">+5,795 items</small></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Completion %</div>
+                        <div class="metric-card-value" style="color: var(--text-success);">90.1%</div>
+                        <div class="change"><small class="change-positive">+0.3pp</small></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h3 style="color: var(--text-accent); margin-bottom: 15px;">Latest (3/5/26)</h3>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-card-label">Stores</div>
+                        <div class="metric-card-value">4,460</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Max Possible</div>
+                        <div class="metric-card-value">1.43M</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Unassigned</div>
+                        <div class="metric-card-value">249K</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Assigned</div>
+                        <div class="metric-card-value">1.24M</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Completed</div>
+                        <div class="metric-card-value">1.12M</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-card-label">Completion %</div>
+                        <div class="metric-card-value" style="color: var(--text-success);">90.1%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FORMAT BREAKDOWN -->
+        <div class="section">
+            <div class="section-title">🏪 Format-Specific Breakdown (Constant Baseline)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Store Count</th>
+                        <th>Questions per Store</th>
+                        <th>Max Possible Items</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="metric-label"><strong>SC (Supercenter)</strong></td>
+                        <td class="number">3,555</td>
+                        <td class="number">328</td>
+                        <td class="number">1,166,040</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>DIV1 (Division 1)</strong></td>
+                        <td class="number">366</td>
+                        <td class="number">327</td>
+                        <td class="number">119,682</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>NHM (Neighborhood Market)</strong></td>
+                        <td class="number">674</td>
+                        <td class="number">209</td>
+                        <td class="number">140,866</td>
+                    </tr>
+                    <tr style="font-weight: 600; background: var(--bg-card);">
+                        <td class="metric-label"><strong>TOTAL</strong></td>
+                        <td class="number">4,595</td>
+                        <td class="number">-</td>
+                        <td class="number">1,426,588</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- PROGRESS ANALYSIS -->
+        <div class="section">
+            <div class="section-title">📊 Progress Analysis</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Store Change</th>
+                        <th>Assigned Change</th>
+                        <th>Completed Change</th>
+                        <th>Completion % Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="metric-label"><strong>WK7 → WK8 (5 days)</strong></td>
+                        <td class="number change-positive">+1</td>
+                        <td class="number change-positive">+2,272</td>
+                        <td class="number change-positive">+5,795</td>
+                        <td class="percentage change-positive">+0.3pp</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-label"><strong>WK8 → Latest (5 days)</strong></td>
+                        <td class="number">0</td>
+                        <td class="number change-positive">+6</td>
+                        <td class="number change-positive">+32</td>
+                        <td class="percentage">0.0pp</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- CHARTS -->
+        <div class="section">
+            <div class="section-title">📈 Visual Charts</div>
+            
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: var(--text-accent); margin-bottom: 15px;">Items by Status Over Time</h3>
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: var(--text-accent); margin-bottom: 15px;">Completion Rate Trend</h3>
+                <div class="chart-container">
+                    <canvas id="completionChart"></canvas>
+                </div>
+            </div>
+            
+            <div>
+                <h3 style="color: var(--text-accent); margin-bottom: 15px;">Store & Assignment Tracking</h3>
+                <div class="chart-container">
+                    <canvas id="storesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Chart.js configuration
+        const chartColors = {
+            completed: '#00ff88',
+            pending: '#00d4ff',
+            unassigned: '#ff6b6b'
+        };
+        
+        // Status Over Time Chart
+        new Chart(document.getElementById('statusChart'), {
+            type: 'line',
+            data: {
+                labels: ['WK7', 'WK7+1', 'WK7+2', 'WK7+3', 'WK7+4', 'WK8', 'WK8+1', 'WK8+2', 'WK8+3', 'WK8+4', 'WK8+5'],
+                datasets: [
+                    {
+                        label: 'Completed',
+                        data: [1111851, 1113847, 1114798, 1115461, 1116626, 1117646, 1117649, 1117657, 1117669, 1117678, 1117678],
+                        borderColor: chartColors.completed,
+                        backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Pending',
+                        data: [126799, 125523, 124887, 124493, 123944, 123276, 123273, 123265, 123253, 123250, 123250],
+                        borderColor: chartColors.pending,
+                        backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Unassigned',
+                        data: [250656, 249936, 249621, 249352, 249070, 248718, 248718, 248718, 248718, 248712, 248712],
+                        borderColor: chartColors.unassigned,
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff',
+                            font: { size: 12 }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: { color: 'rgba(255,255,255,0.7)' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    x: {
+                        ticks: { color: 'rgba(255,255,255,0.7)' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    }
+                }
+            }
+        });
+        
+        // Completion Rate Chart
+        new Chart(document.getElementById('completionChart'), {
+            type: 'line',
+            data: {
+                labels: ['WK7', 'WK7+1', 'WK7+2', 'WK7+3', 'WK7+4', 'WK8', 'WK8+1', 'WK8+2', 'WK8+3', 'WK8+4', 'WK8+5'],
+                datasets: [
+                    {
+                        label: '% Completed of Assigned',
+                        data: [89.8, 89.9, 89.9, 90.0, 90.0, 90.1, 90.1, 90.1, 90.1, 90.1, 90.1],
+                        borderColor: chartColors.completed,
+                        backgroundColor: 'rgba(0, 255, 136, 0.2)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: chartColors.completed
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff',
+                            font: { size: 12 }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 85,
+                        max: 95,
+                        ticks: { color: 'rgba(255,255,255,0.7)' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    x: {
+                        ticks: { color: 'rgba(255,255,255,0.7)' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    }
+                }
+            }
+        });
+        
+        // Stores Chart
+        new Chart(document.getElementById('storesChart'), {
+            type: 'bar',
+            data: {
+                labels: ['WK7', 'WK7+1', 'WK7+2', 'WK7+3', 'WK7+4', 'WK8', 'WK8+1', 'WK8+2', 'WK8+3', 'WK8+4', 'WK8+5'],
+                datasets: [
+                    {
+                        label: 'Store Count',
+                        data: [4459, 4459, 4459, 4459, 4460, 4460, 4460, 4460, 4460, 4460, 4460],
+                        backgroundColor: chartColors.completed,
+                        borderColor: chartColors.completed,
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Assigned Items (÷1000)',
+                        data: [1238.65, 1239.37, 1239.69, 1239.95, 1240.57, 1240.92, 1240.92, 1240.92, 1240.92, 1240.93, 1240.93],
+                        backgroundColor: chartColors.pending,
+                        borderColor: chartColors.pending,
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff',
+                            font: { size: 12 }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: { color: 'rgba(255,255,255,0.7)' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    x: {
+                        ticks: { color: 'rgba(255,255,255,0.7)' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
