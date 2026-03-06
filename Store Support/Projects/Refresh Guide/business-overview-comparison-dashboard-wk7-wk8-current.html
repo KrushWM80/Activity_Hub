@@ -3,32 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Refresh - Weekly Comparison Dashboard (WK7-WK8+)</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <title>Store Refresh - 8-Week Comparison Dashboard</title>
     <style>
+        /* CSS Custom Properties for Theme Support */
         :root {
+            /* Dark mode (default) */
             --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             --bg-section: rgba(255,255,255,0.05);
             --bg-card: rgba(0,0,0,0.2);
+            --bg-week-column: linear-gradient(180deg, rgba(0,212,255,0.15) 0%, rgba(0,255,136,0.05) 100%);
+            --bg-header-row: rgba(0,212,255,0.1);
+            --bg-highlight: rgba(0, 212, 255, 0.1);
+            --bg-format-week: rgba(255,255,255,0.05);
+            --bg-growth-badge: rgba(0, 255, 136, 0.2);
+            --bg-progress-bar: rgba(255,255,255,0.1);
+            
             --text-primary: #fff;
             --text-secondary: rgba(255,255,255,0.8);
-            --text-muted: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.7);
             --text-accent: #00d4ff;
             --text-success: #00ff88;
+            
             --border-color: rgba(255,255,255,0.1);
+            --border-accent: rgba(0, 212, 255, 0.3);
+            
+            --gradient-accent: linear-gradient(135deg, #00d4ff, #00ff88);
+            --gradient-progress: linear-gradient(90deg, #00d4ff, #00ff88);
         }
         
+        /* Light mode overrides */
         @media (prefers-color-scheme: light) {
             :root {
                 --bg-primary: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
                 --bg-section: rgba(255,255,255,0.95);
                 --bg-card: rgba(0,0,0,0.03);
+                --bg-week-column: linear-gradient(180deg, rgba(0,113,206,0.08) 0%, rgba(0,76,151,0.03) 100%);
+                --bg-header-row: rgba(0,113,206,0.1);
+                --bg-highlight: rgba(0, 113, 206, 0.08);
+                --bg-format-week: rgba(0,0,0,0.03);
+                --bg-growth-badge: rgba(0, 150, 64, 0.15);
+                --bg-progress-bar: rgba(0,0,0,0.1);
+                
                 --text-primary: #1a1a2e;
                 --text-secondary: #333;
                 --text-muted: #666;
                 --text-accent: #0071CE;
                 --text-success: #009640;
+                
                 --border-color: rgba(0,0,0,0.1);
+                --border-accent: rgba(0, 113, 206, 0.3);
+                
+                --gradient-accent: linear-gradient(135deg, #0071CE, #004C97);
+                --gradient-progress: linear-gradient(90deg, #0071CE, #009640);
             }
         }
         
@@ -53,24 +79,20 @@
             border-radius: 20px;
             margin-bottom: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-color);
         }
         
         .header h1 {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             margin-bottom: 10px;
-            color: var(--text-accent);
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .header p {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: var(--text-muted);
-            margin-bottom: 5px;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
         }
         
         .section {
@@ -78,651 +100,940 @@
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 25px;
-            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .section-title {
             font-size: 1.5rem;
             margin-bottom: 20px;
-            color: var(--text-accent);
-            font-weight: 600;
-            border-bottom: 2px solid var(--border-color);
             padding-bottom: 10px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        
-        th {
-            background: var(--bg-card);
-            padding: 15px;
-            text-align: left;
+            border-bottom: 2px solid var(--border-accent);
             color: var(--text-accent);
-            font-weight: 600;
-            border: 1px solid var(--border-color);
         }
         
-        td {
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-top: none;
-        }
-        
-        tr:hover {
-            background: rgba(0, 212, 255, 0.05);
-        }
-        
-        .metric-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-            min-width: 150px;
-        }
-        
-        .number {
-            color: var(--text-success);
-            font-weight: 600;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .percentage {
-            color: var(--text-accent);
-            font-weight: 600;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 400px;
-            margin: 30px 0;
-        }
-        
-        .metric-grid {
+        #trendChart {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
-            margin: 20px 0;
         }
         
-        .metric-card {
-            background: var(--bg-card);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+        .week-column {
+            background: var(--bg-week-column);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            border: 1px solid var(--border-accent);
+        }
+        
+        .week-column-header {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .week-column-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        
+        .trend-percent {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .week-metrics {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
+        }
+        
+        .metric-item {
             text-align: center;
         }
         
-        .metric-card-label {
-            color: var(--text-muted);
+        .metric-item-value {
             font-size: 0.9rem;
-            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
         
-        .metric-card-value {
+        .metric-item-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        
+        .week-change {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .change-value {
+            font-size: 0.95rem;
+            font-weight: 600;
             color: var(--text-success);
-            font-size: 1.8rem;
-            font-weight: 700;
-            font-family: 'Courier New', monospace;
         }
         
-        .format-breakdown {
+        .change-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        
+        /* Division comparison */
+        .division-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+            grid-template-columns: 1.2fr repeat(8, 0.8fr);
+            gap: 8px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        
+        .division-row.header {
+            font-weight: 600;
+            background: var(--bg-header-row);
+            padding: 12px 8px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .division-name {
+            font-weight: 500;
+            padding-left: 10px;
+        }
+        
+        .division-value {
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-progress-bar);
+            border-radius: 2px;
+            margin-top: 4px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-progress);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Format cards */
+        #formatComparison {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
         }
         
         .format-card {
             background: var(--bg-card);
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid var(--text-accent);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
         }
         
         .format-name {
-            color: var(--text-accent);
+            font-size: 1.4rem;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            color: var(--text-accent);
         }
         
-        .format-row {
+        .format-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .format-stat-row {
+            padding: 10px;
+            background: var(--bg-format-week);
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
-            margin: 5px 0;
+            align-items: center;
+        }
+        
+        .format-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: left;
+        }
+        
+        .format-stat-value {
+            font-weight: 600;
+            color: var(--text-success);
+        }
+        
+        /* User Engagement Grid */
+        #userEngagement {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .engagement-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .engagement-header {
+            font-weight: 600;
+            text-align: center;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-accent);
+            font-size: 1.1rem;
+        }
+        
+        .engagement-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        
+        .engagement-metric {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-highlight);
+            border-radius: 8px;
+        }
+        
+        .engagement-metric-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .growth-badge {
+            background: var(--bg-growth-badge);
+            color: var(--text-success);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .engagement-metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-success);
+        }
+        
+        /* Insights */
+        .insights-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--text-accent);
+        }
+        
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .insight-icon {
+            color: var(--text-success);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .insight-text {
+            flex: 1;
+            line-height: 1.5;
             font-size: 0.95rem;
         }
         
-        .label {
-            color: var(--text-muted);
+        /* Responsive */
+        @media (max-width: 1400px) {
+            #trendChart {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            #formatComparison {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .division-row {
+                grid-template-columns: 1.4fr repeat(6, 0.9fr);
+            }
         }
         
-        .value {
-            color: var(--text-success);
-            font-weight: 600;
-            font-family: 'Courier New', monospace;
+        @media (max-width: 1200px) {
+            #trendChart {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            #formatComparison {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .week-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .division-row {
+                grid-template-columns: 1.4fr repeat(4, 1fr);
+                font-size: 0.8rem;
+            }
         }
         
-        .change {
-            font-size: 0.85rem;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-secondary);
-        }
-        
-        .change-positive {
-            color: var(--text-success);
+        @media (max-width: 768px) {
+            #trendChart {
+                grid-template-columns: 1fr;
+            }
+            #formatComparison {
+                grid-template-columns: 1fr;
+            }
+            .week-metrics {
+                grid-template-columns: 1fr;
+            }
+            .division-row {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .division-row > div {
+                padding: 5px 0;
+            }
+            .engagement-metrics {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 Store Refresh - Weekly Progress Dashboard</h1>
-            <p>Comprehensive metrics tracking from Week 7 (2/23/26) through Latest (3/5/26)</p>
-            <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 10px;">Format-Specific Baseline: 1,426,588 total items | SC: 1,166,040 | DIV1: 119,682 | NHM: 140,866</p>
-        </div>
-        
-        <!-- DETAILED METRICS TABLE -->
-        <div class="section">
-            <div class="section-title">📈 Detailed Weekly Metrics</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Week</th>
-                        <th>Date</th>
-                        <th>Stores</th>
-                        <th>Max Possible</th>
-                        <th>Unassigned</th>
-                        <th>Assigned (C+P)</th>
-                        <th>% Assigned</th>
-                        <th>Completed</th>
-                        <th>% of Assigned</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="metric-label"><strong>WK7</strong></td>
-                        <td>2026-02-23</td>
-                        <td class="number">4,459</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">250,656</td>
-                        <td class="number">1,238,650</td>
-                        <td class="percentage">86.8%</td>
-                        <td class="number">1,111,851</td>
-                        <td class="percentage">89.8%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>WK7+1</strong></td>
-                        <td>2026-02-24</td>
-                        <td class="number">4,459</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">249,936</td>
-                        <td class="number">1,239,370</td>
-                        <td class="percentage">86.9%</td>
-                        <td class="number">1,113,847</td>
-                        <td class="percentage">89.9%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>WK7+2</strong></td>
-                        <td>2026-02-25</td>
-                        <td class="number">4,459</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">249,621</td>
-                        <td class="number">1,239,685</td>
-                        <td class="percentage">86.9%</td>
-                        <td class="number">1,114,798</td>
-                        <td class="percentage">89.9%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>WK7+3</strong></td>
-                        <td>2026-02-26</td>
-                        <td class="number">4,459</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">249,352</td>
-                        <td class="number">1,239,954</td>
-                        <td class="percentage">86.9%</td>
-                        <td class="number">1,115,461</td>
-                        <td class="percentage">90.0%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>WK7+4</strong></td>
-                        <td>2026-02-27</td>
-                        <td class="number">4,460</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">249,070</td>
-                        <td class="number">1,240,570</td>
-                        <td class="percentage">87.0%</td>
-                        <td class="number">1,116,626</td>
-                        <td class="percentage">90.0%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong style="color: var(--text-success);">WK8 ✓</strong></td>
-                        <td>2026-02-28</td>
-                        <td class="number">4,460</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">248,718</td>
-                        <td class="number">1,240,922</td>
-                        <td class="percentage">87.0%</td>
-                        <td class="number">1,117,646</td>
-                        <td class="percentage">90.1%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>WK8+1</strong></td>
-                        <td>2026-03-01</td>
-                        <td class="number">4,460</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">248,718</td>
-                        <td class="number">1,240,922</td>
-                        <td class="percentage">87.0%</td>
-                        <td class="number">1,117,649</td>
-                        <td class="percentage">90.1%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>WK8+2</strong></td>
-                        <td>2026-03-02</td>
-                        <td class="number">4,460</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">248,718</td>
-                        <td class="number">1,240,922</td>
-                        <td class="percentage">87.0%</td>
-                        <td class="number">1,117,657</td>
-                        <td class="percentage">90.1%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>WK8+3</strong></td>
-                        <td>2026-03-03</td>
-                        <td class="number">4,460</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">248,718</td>
-                        <td class="number">1,240,922</td>
-                        <td class="percentage">87.0%</td>
-                        <td class="number">1,117,669</td>
-                        <td class="percentage">90.1%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>WK8+4</strong></td>
-                        <td>2026-03-04</td>
-                        <td class="number">4,460</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">248,712</td>
-                        <td class="number">1,240,928</td>
-                        <td class="percentage">87.0%</td>
-                        <td class="number">1,117,678</td>
-                        <td class="percentage">90.1%</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong style="color: var(--text-accent);">WK8+5 (Latest)</strong></td>
-                        <td>2026-03-05</td>
-                        <td class="number">4,460</td>
-                        <td class="number">1,426,588</td>
-                        <td class="number">248,712</td>
-                        <td class="number">1,240,928</td>
-                        <td class="percentage">87.0%</td>
-                        <td class="number">1,117,678</td>
-                        <td class="percentage">90.1%</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- KEY SNAPSHOTS -->
-        <div class="section">
-            <div class="section-title">🎯 Key Weekly Snapshots</div>
-            
-            <div style="margin-bottom: 30px;">
-                <h3 style="color: var(--text-accent); margin-bottom: 15px;">Week 7 (2/23/26)</h3>
-                <div class="metric-grid">
-                    <div class="metric-card">
-                        <div class="metric-card-label">Stores</div>
-                        <div class="metric-card-value">4,459</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Max Possible</div>
-                        <div class="metric-card-value">1.43M</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Unassigned</div>
-                        <div class="metric-card-value">250K</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Assigned</div>
-                        <div class="metric-card-value">1.24M</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Completed</div>
-                        <div class="metric-card-value">1.11M</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Completion %</div>
-                        <div class="metric-card-value" style="color: var(--text-accent);">89.8%</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="margin-bottom: 30px;">
-                <h3 style="color: var(--text-success); margin-bottom: 15px;">Week 8 (2/28/26) ✓</h3>
-                <div class="metric-grid">
-                    <div class="metric-card">
-                        <div class="metric-card-label">Stores</div>
-                        <div class="metric-card-value">4,460</div>
-                        <div class="change"><small class="change-positive">+1 store</small></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Max Possible</div>
-                        <div class="metric-card-value">1.43M</div>
-                        <div class="change"><small>No change</small></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Unassigned</div>
-                        <div class="metric-card-value">249K</div>
-                        <div class="change"><small class="change-positive">-1,938 items</small></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Assigned</div>
-                        <div class="metric-card-value">1.24M</div>
-                        <div class="change"><small class="change-positive">+2,272 items</small></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Completed</div>
-                        <div class="metric-card-value">1.12M</div>
-                        <div class="change"><small class="change-positive">+5,795 items</small></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Completion %</div>
-                        <div class="metric-card-value" style="color: var(--text-success);">90.1%</div>
-                        <div class="change"><small class="change-positive">+0.3pp</small></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div>
-                <h3 style="color: var(--text-accent); margin-bottom: 15px;">Latest (3/5/26)</h3>
-                <div class="metric-grid">
-                    <div class="metric-card">
-                        <div class="metric-card-label">Stores</div>
-                        <div class="metric-card-value">4,460</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Max Possible</div>
-                        <div class="metric-card-value">1.43M</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Unassigned</div>
-                        <div class="metric-card-value">249K</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Assigned</div>
-                        <div class="metric-card-value">1.24M</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Completed</div>
-                        <div class="metric-card-value">1.12M</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-card-label">Completion %</div>
-                        <div class="metric-card-value" style="color: var(--text-success);">90.1%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- FORMAT BREAKDOWN -->
-        <div class="section">
-            <div class="section-title">🏪 Format-Specific Breakdown (Constant Baseline)</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Format</th>
-                        <th>Store Count</th>
-                        <th>Questions per Store</th>
-                        <th>Max Possible Items</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="metric-label"><strong>SC (Supercenter)</strong></td>
-                        <td class="number">3,555</td>
-                        <td class="number">328</td>
-                        <td class="number">1,166,040</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>DIV1 (Division 1)</strong></td>
-                        <td class="number">366</td>
-                        <td class="number">327</td>
-                        <td class="number">119,682</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>NHM (Neighborhood Market)</strong></td>
-                        <td class="number">674</td>
-                        <td class="number">209</td>
-                        <td class="number">140,866</td>
-                    </tr>
-                    <tr style="font-weight: 600; background: var(--bg-card);">
-                        <td class="metric-label"><strong>TOTAL</strong></td>
-                        <td class="number">4,595</td>
-                        <td class="number">-</td>
-                        <td class="number">1,426,588</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- PROGRESS ANALYSIS -->
-        <div class="section">
-            <div class="section-title">📊 Progress Analysis</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Period</th>
-                        <th>Store Change</th>
-                        <th>Assigned Change</th>
-                        <th>Completed Change</th>
-                        <th>Completion % Change</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="metric-label"><strong>WK7 → WK8 (5 days)</strong></td>
-                        <td class="number change-positive">+1</td>
-                        <td class="number change-positive">+2,272</td>
-                        <td class="number change-positive">+5,795</td>
-                        <td class="percentage change-positive">+0.3pp</td>
-                    </tr>
-                    <tr>
-                        <td class="metric-label"><strong>WK8 → Latest (5 days)</strong></td>
-                        <td class="number">0</td>
-                        <td class="number change-positive">+6</td>
-                        <td class="number change-positive">+32</td>
-                        <td class="percentage">0.0pp</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- CHARTS -->
-        <div class="section">
-            <div class="section-title">📈 Visual Charts</div>
-            
-            <div style="margin-bottom: 40px;">
-                <h3 style="color: var(--text-accent); margin-bottom: 15px;">Items by Status Over Time</h3>
-                <div class="chart-container">
-                    <canvas id="statusChart"></canvas>
-                </div>
-            </div>
-            
-            <div style="margin-bottom: 40px;">
-                <h3 style="color: var(--text-accent); margin-bottom: 15px;">Completion Rate Trend</h3>
-                <div class="chart-container">
-                    <canvas id="completionChart"></canvas>
-                </div>
-            </div>
-            
-            <div>
-                <h3 style="color: var(--text-accent); margin-bottom: 15px;">Store & Assignment Tracking</h3>
-                <div class="chart-container">
-                    <canvas id="storesChart"></canvas>
-                </div>
-            </div>
-        </div>
+    <div class="header">
+        <h1>Store Refresh - 8-Week Comparison</h1>
+        <p>Tracking Progress from Week 1 (1/19/26) through Week 8 (2/28/26)</p>
     </div>
     
+    <div class="section">
+        <div class="section-title">Overall Completion Status</div>
+        <div id="trendChart"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Key Insights</div>
+        <div id="insights"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Format Performance (SC, DIV1, NHM)</div>
+        <div id="formatComparison"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Division Performance</div>
+        <div id="divisionComparison"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Area Performance</div>
+        <div id="areaComparison"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">User Engagement</div>
+        <div id="userEngagement"></div>
+    </div>
+
+
     <script>
-        // Chart.js configuration
-        const chartColors = {
-            completed: '#00ff88',
-            pending: '#00d4ff',
-            unassigned: '#ff6b6b'
+        // 8-Week Comparison Data (Week 1-8)
+        const COMPARISON_DATA = {
+            weeks: [
+                {
+                    week: 1,
+                    date: "1/19/26",
+                    label: "Week 1",
+                    summary: {
+                        totalStores: 4595,
+                        storesWithAssignments: 4278,
+                        totalPossibleItems: 1677600,
+                        totalAssignedItems: 1183740,
+                        totalCompletedItems: 654855,
+                        overallCompletionOfMax: "39.0"
+                    },
+                    divisionStats: [
+                        { divisionId: "SOUTHEAST BU", completionPercentage: 54.1 },
+                        { divisionId: "NORTH BU", completionPercentage: 37.4 },
+                        { divisionId: "SOUTHWEST BU", completionPercentage: 44.8 },
+                        { divisionId: "WEST BU", completionPercentage: 40.1 },
+                        { divisionId: "NHM BU", completionPercentage: 55.7 },
+                        { divisionId: "EAST BU", completionPercentage: 47.4 },
+                        { divisionId: "PR", completionPercentage: 71.5 }
+                    ],
+                    formatStats: [
+                        { format: "SC", completionPercentage: 43.9 },
+                        { format: "DIV1", completionPercentage: 53.8 },
+                        { format: "NHM", completionPercentage: 55.7 }
+                    ],
+                    areaStats: [
+                        { area: "ACC", completionPercentage: "45.0" },
+                        { area: "Asset Protection", completionPercentage: "48.5" },
+                        { area: "Backroom", completionPercentage: "41.8" },
+                        { area: "Fashion", completionPercentage: "35.9" },
+                        { area: "Fresh", completionPercentage: "47.4" },
+                        { area: "Front End", completionPercentage: "50.4" },
+                        { area: "Salesfloor", completionPercentage: "32.2" },
+                        { area: "Store Fulfillment", completionPercentage: "50.0" }
+                    ],
+                    userEngagement: {
+                        workers: 47280,
+                        managers: 32870,
+                        totalUsers: 80150,
+                        totalActions: 1838595
+                    }
+                },
+                {
+                    week: 2,
+                    date: "1/26/26",
+                    label: "Week 2",
+                    summary: {
+                        totalStores: 4595,
+                        storesWithAssignments: 4400,
+                        totalPossibleItems: 1677600,
+                        totalAssignedItems: 1325000,
+                        totalCompletedItems: 868127,
+                        overallCompletionOfMax: "51.7"
+                    },
+                    divisionStats: [
+                        { divisionId: "SOUTHEAST BU", completionPercentage: 63.1 },
+                        { divisionId: "NORTH BU", completionPercentage: 56.1 },
+                        { divisionId: "SOUTHWEST BU", completionPercentage: 62.4 },
+                        { divisionId: "WEST BU", completionPercentage: 58.1 },
+                        { divisionId: "NHM BU", completionPercentage: 72.2 },
+                        { divisionId: "EAST BU", completionPercentage: 58.2 },
+                        { divisionId: "PR", completionPercentage: 87.1 }
+                    ],
+                    formatStats: [
+                        { format: "SC", completionPercentage: 59.9 },
+                        { format: "DIV1", completionPercentage: 57.7 },
+                        { format: "NHM", completionPercentage: 71.8 }
+                    ],
+                    areaStats: [
+                        { area: "ACC", completionPercentage: "64.9" },
+                        { area: "Asset Protection", completionPercentage: "65.0" },
+                        { area: "Backroom", completionPercentage: "56.9" },
+                        { area: "Fashion", completionPercentage: "51.0" },
+                        { area: "Fresh", completionPercentage: "64.8" },
+                        { area: "Front End", completionPercentage: "64.5" },
+                        { area: "Salesfloor", completionPercentage: "42.4" },
+                        { area: "Store Fulfillment", completionPercentage: "63.7" }
+                    ],
+                    userEngagement: {
+                        workers: 77523,
+                        managers: 47960,
+                        totalUsers: 125483,
+                        totalActions: 2193127
+                    }
+                },
+                {
+                    week: 3,
+                    date: "2/1/26",
+                    label: "Week 3",
+                    summary: {
+                        totalStores: 4595,
+                        storesWithAssignments: 4378,
+                        totalPossibleItems: 1677600,
+                        totalAssignedItems: 1339668,
+                        totalCompletedItems: 934768,
+                        overallCompletionOfMax: "55.7"
+                    },
+                    divisionStats: [
+                        { divisionId: "SOUTHEAST BU", completionPercentage: 69.4 },
+                        { divisionId: "NORTH BU", completionPercentage: 63.3 },
+                        { divisionId: "SOUTHWEST BU", completionPercentage: 69.2 },
+                        { divisionId: "WEST BU", completionPercentage: 66.3 },
+                        { divisionId: "NHM BU", completionPercentage: 77.9 },
+                        { divisionId: "EAST BU", completionPercentage: 64.6 },
+                        { divisionId: "PR", completionPercentage: 90.1 }
+                    ],
+                    formatStats: [
+                        { format: "SC", completionPercentage: 64.7 },
+                        { format: "DIV1", completionPercentage: 62.7 },
+                        { format: "NHM", completionPercentage: 77.9 }
+                    ],
+                    areaStats: [
+                        { area: "ACC", completionPercentage: "74.7" },
+                        { area: "Asset Protection", completionPercentage: "74.5" },
+                        { area: "Backroom", completionPercentage: "61.8" },
+                        { area: "Fashion", completionPercentage: "57.4" },
+                        { area: "Fresh", completionPercentage: "71.5" },
+                        { area: "Front End", completionPercentage: "70.7" },
+                        { area: "Salesfloor", completionPercentage: "49.2" },
+                        { area: "Store Fulfillment", completionPercentage: "72.8" }
+                    ],
+                    userEngagement: {
+                        workers: 91542,
+                        managers: 55831,
+                        totalUsers: 147373,
+                        totalActions: 2334436
+                    }
+                },
+                {
+                    week: 4,
+                    date: "2/2/26",
+                    label: "Week 4",
+                    summary: {
+                        totalStores: 4595,
+                        storesWithAssignments: 4418,
+                        totalPossibleItems: 1677600,
+                        totalAssignedItems: 1361580,
+                        totalCompletedItems: 1003904,
+                        overallCompletionOfMax: "59.8"
+                    },
+                    divisionStats: [
+                        { divisionId: "SOUTHEAST BU", completionPercentage: 71.7 },
+                        { divisionId: "NORTH BU", completionPercentage: 67.7 },
+                        { divisionId: "SOUTHWEST BU", completionPercentage: 75.2 },
+                        { divisionId: "WEST BU", completionPercentage: 70.3 },
+                        { divisionId: "NHM BU", completionPercentage: 81.4 },
+                        { divisionId: "EAST BU", completionPercentage: 67.5 },
+                        { divisionId: "PR", completionPercentage: 92.6 }
+                    ],
+                    formatStats: [
+                        { format: "SC", completionPercentage: 69.5 },
+                        { format: "DIV1", completionPercentage: 66.8 },
+                        { format: "NHM", completionPercentage: 80.9 }
+                    ],
+                    areaStats: [
+                        { area: "ACC", completionPercentage: "79.3" },
+                        { area: "Asset Protection", completionPercentage: "79.4" },
+                        { area: "Backroom", completionPercentage: "65.9" },
+                        { area: "Fashion", completionPercentage: "62.1" },
+                        { area: "Fresh", completionPercentage: "74.2" },
+                        { area: "Front End", completionPercentage: "73.3" },
+                        { area: "Salesfloor", completionPercentage: "52.5" },
+                        { area: "Store Fulfillment", completionPercentage: "76.0" }
+                    ],
+                    userEngagement: {
+                        workers: 102784,
+                        managers: 62661,
+                        totalUsers: 165445,
+                        totalActions: 2480852
+                    }
+                },
+                {
+                    week: 5,
+                    date: "2/9/26",
+                    label: "Week 5",
+                    summary: {
+                        totalStores: 4595,
+                        storesWithAssignments: 4448,
+                        totalPossibleItems: 1677600,
+                        totalAssignedItems: 1381605,
+                        totalCompletedItems: 1075566,
+                        overallCompletionOfMax: "64.1"
+                    },
+                    divisionStats: [
+                        { divisionId: "SOUTHEAST BU", completionPercentage: 75.8 },
+                        { divisionId: "NORTH BU", completionPercentage: 72.2 },
+                        { divisionId: "SOUTHWEST BU", completionPercentage: 78.6 },
+                        { divisionId: "WEST BU", completionPercentage: 74.7 },
+                        { divisionId: "NHM BU", completionPercentage: 84.0 },
+                        { divisionId: "EAST BU", completionPercentage: 71.1 },
+                        { divisionId: "PR", completionPercentage: 93.9 }
+                    ],
+                    formatStats: [
+                        { format: "SC", completionPercentage: 74.7 },
+                        { format: "DIV1", completionPercentage: 72.0 },
+                        { format: "NHM", completionPercentage: 84.0 }
+                    ],
+                    areaStats: [
+                        { area: "ACC", completionPercentage: "83.0" },
+                        { area: "Asset Protection", completionPercentage: "83.9" },
+                        { area: "Backroom", completionPercentage: "71.1" },
+                        { area: "Fashion", completionPercentage: "68.4" },
+                        { area: "Fresh", completionPercentage: "79.5" },
+                        { area: "Front End", completionPercentage: "78.1" },
+                        { area: "Salesfloor", completionPercentage: "61.0" },
+                        { area: "Store Fulfillment", completionPercentage: "80.1" }
+                    ],
+                    userEngagement: {
+                        workers: 108500,
+                        managers: 68000,
+                        totalUsers: 176500,
+                        totalActions: 2595566
+                    }
+                },
+                {
+                    week: 6,
+                    date: "2/16/26",
+                    label: "Week 6",
+                    summary: {
+                        totalStores: 4595,
+                        storesWithAssignments: 4457,
+                        totalPossibleItems: 1677600,
+                        totalAssignedItems: 1421900,
+                        totalCompletedItems: 1100127,
+                        overallCompletionOfMax: "65.6"
+                    },
+                    divisionStats: [
+                        { divisionId: "SOUTHEAST BU", completionPercentage: 78.6 },
+                        { divisionId: "NORTH BU", completionPercentage: 73.8 },
+                        { divisionId: "SOUTHWEST BU", completionPercentage: 80.1 },
+                        { divisionId: "WEST BU", completionPercentage: 76.1 },
+                        { divisionId: "NHM BU", completionPercentage: 86.1 },
+                        { divisionId: "EAST BU", completionPercentage: 72.3 },
+                        { divisionId: "PR", completionPercentage: 96.6 }
+                    ],
+                    formatStats: [
+                        { format: "SC", completionPercentage: 76.5 },
+                        { format: "DIV1", completionPercentage: 73.0 },
+                        { format: "NHM", completionPercentage: 86.0 }
+                    ],
+                    areaStats: [
+                        { area: "ACC", completionPercentage: "84.8" },
+                        { area: "Asset Protection", completionPercentage: "85.7" },
+                        { area: "Backroom", completionPercentage: "74.4" },
+                        { area: "Fashion", completionPercentage: "71.3" },
+                        { area: "Fresh", completionPercentage: "81.3" },
+                        { area: "Front End", completionPercentage: "80.5" },
+                        { area: "Salesfloor", completionPercentage: "64.4" },
+                        { area: "Store Fulfillment", completionPercentage: "82.8" }
+                    ],
+                    userEngagement: {
+                        workers: 113500,
+                        managers: 72000,
+                        totalUsers: 185500,
+                        totalActions: 2660127
+                    }
+                },
+                {
+                    week: 7,
+                    date: "2/23/26",
+                    label: "Week 7",
+                    summary: {
+                        totalStores: 4595,
+                        storesWithAssignments: 4510,
+                        totalPossibleItems: 1677600,
+                        totalAssignedItems: 1680900,
+                        totalCompletedItems: 1111851,
+                        overallCompletionOfMax: "66.3"
+                    },
+                    divisionStats: [
+                        { divisionId: "SOUTHEAST BU", completionPercentage: 79.5 },
+                        { divisionId: "NORTH BU", completionPercentage: 74.6 },
+                        { divisionId: "SOUTHWEST BU", completionPercentage: 81.0 },
+                        { divisionId: "WEST BU", completionPercentage: 76.9 },
+                        { divisionId: "NHM BU", completionPercentage: 87.0 },
+                        { divisionId: "EAST BU", completionPercentage: 73.0 },
+                        { divisionId: "PR", completionPercentage: 97.6 }
+                    ],
+                    formatStats: [
+                        { format: "SC", completionPercentage: 77.3 },
+                        { format: "DIV1", completionPercentage: 73.8 },
+                        { format: "NHM", completionPercentage: 86.8 }
+                    ],
+                    areaStats: [
+                        { area: "ACC", completionPercentage: "85.7" },
+                        { area: "Asset Protection", completionPercentage: "86.6" },
+                        { area: "Backroom", completionPercentage: "75.1" },
+                        { area: "Fashion", completionPercentage: "72.1" },
+                        { area: "Fresh", completionPercentage: "82.1" },
+                        { area: "Front End", completionPercentage: "81.3" },
+                        { area: "Salesfloor", completionPercentage: "65.1" },
+                        { area: "Store Fulfillment", completionPercentage: "83.6" }
+                    ],
+                    userEngagement: {
+                        workers: 105378,
+                        managers: 65399,
+                        totalUsers: 170777,
+                        totalActions: 7445862
+                    }
+                },
+                {
+                    week: 8,
+                    date: "2/28/26",
+                    label: "Week 8",
+                    summary: {
+                        totalStores: 4460,
+                        storesWithAssignments: 4460,
+                        totalPossibleItems: 1426588,
+                        totalAssignedItems: 1240922,
+                        totalCompletedItems: 1117646,
+                        overallCompletionOfMax: "78.3"
+                    },
+                    divisionStats: [
+                        { divisionId: "SOUTHEAST BU", completionPercentage: 80.3 },
+                        { divisionId: "NORTH BU", completionPercentage: 76.0 },
+                        { divisionId: "SOUTHWEST BU", completionPercentage: 82.8 },
+                        { divisionId: "WEST BU", completionPercentage: 78.5 },
+                        { divisionId: "NHM BU", completionPercentage: 88.6 },
+                        { divisionId: "EAST BU", completionPercentage: 74.7 },
+                        { divisionId: "PR", completionPercentage: 112.9 }
+                    ],
+                    formatStats: [
+                        { format: "SC", completionPercentage: 77.2 },
+                        { format: "DIV1", completionPercentage: 73.5 },
+                        { format: "NHM", completionPercentage: 88.7 }
+                    ],
+                    areaStats: [
+                        { area: "ACC", completionPercentage: "87.2" },
+                        { area: "Asset Protection", completionPercentage: "88.6" },
+                        { area: "Backroom", completionPercentage: "77.2" },
+                        { area: "Fashion", completionPercentage: "72.5" },
+                        { area: "Fresh", completionPercentage: "84.9" },
+                        { area: "Front End", completionPercentage: "84.0" },
+                        { area: "Salesfloor", completionPercentage: "67.8" },
+                        { area: "Store Fulfillment", completionPercentage: "90.9" }
+                    ],
+                    userEngagement: {
+                        workers: 115000,
+                        managers: 75000,
+                        totalUsers: 190000,
+                        totalActions: 2358568
+                    }
+                }
+            ]
         };
-        
-        // Status Over Time Chart
-        new Chart(document.getElementById('statusChart'), {
-            type: 'line',
-            data: {
-                labels: ['WK7', 'WK7+1', 'WK7+2', 'WK7+3', 'WK7+4', 'WK8', 'WK8+1', 'WK8+2', 'WK8+3', 'WK8+4', 'WK8+5'],
-                datasets: [
-                    {
-                        label: 'Completed',
-                        data: [1111851, 1113847, 1114798, 1115461, 1116626, 1117646, 1117649, 1117657, 1117669, 1117678, 1117678],
-                        borderColor: chartColors.completed,
-                        backgroundColor: 'rgba(0, 255, 136, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Pending',
-                        data: [126799, 125523, 124887, 124493, 123944, 123276, 123273, 123265, 123253, 123250, 123250],
-                        borderColor: chartColors.pending,
-                        backgroundColor: 'rgba(0, 212, 255, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Unassigned',
-                        data: [250656, 249936, 249621, 249352, 249070, 248718, 248718, 248718, 248718, 248712, 248712],
-                        borderColor: chartColors.unassigned,
-                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#fff',
-                            font: { size: 12 }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        ticks: { color: 'rgba(255,255,255,0.7)' },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
-                    },
-                    x: {
-                        ticks: { color: 'rgba(255,255,255,0.7)' },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
-                    }
+
+        // Render main trend chart with all weeks
+        function renderTrendChart() {
+            const container = document.getElementById("trendChart");
+            
+            COMPARISON_DATA.weeks.forEach((week, index) => {
+                const prevWeek = index > 0 ? COMPARISON_DATA.weeks[index - 1] : null;
+                const completion = parseFloat(week.summary.overallCompletionOfMax);
+                const prevCompletion = prevWeek ? parseFloat(prevWeek.summary.overallCompletionOfMax) : 0;
+                const change = prevWeek ? (completion - prevCompletion).toFixed(1) : completion.toFixed(1);
+                const isWeek1 = index === 0;
+                
+                const column = document.createElement("div");
+                column.className = "week-column";
+                
+                let changeHTML = "";
+                if (isWeek1) {
+                    changeHTML = `<div class="week-change"><div class="change-value">+${change}%</div><div class="change-label">from 1/3/26</div></div>`;
+                } else {
+                    changeHTML = `<div class="week-change"><div class="change-value">${change >= 0 ? '+' : ''}${change}%</div><div class="change-label">vs Previous Week</div></div>`;
                 }
+                
+                column.innerHTML = `
+                    <div class="week-column-header">${week.label}</div>
+                    <div class="week-column-date">${week.date}</div>
+                    <div class="trend-percent">${week.summary.overallCompletionOfMax}%</div>
+                    <div class="week-metrics">
+                        <div class="metric-item">
+                            <div class="metric-item-value">${(week.summary.totalCompletedItems / 1000).toFixed(0)}k</div>
+                            <div class="metric-item-label">Completed</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-item-value">${(week.summary.storesWithAssignments / 1000).toFixed(1)}k</div>
+                            <div class="metric-item-label">Stores Active</div>
+                        </div>
+                    </div>
+                    ${changeHTML}
+                `;
+                
+                container.appendChild(column);
+            });
+        }
+
+        // Generate insights across all weeks
+        function renderInsights() {
+            const container = document.getElementById("insights");
+            const weeks = COMPARISON_DATA.weeks;
+            
+            // Calculate week-by-week changes
+            const changes = [];
+            for (let i = 1; i < weeks.length; i++) {
+                const change = (parseFloat(weeks[i].summary.overallCompletionOfMax) - parseFloat(weeks[i-1].summary.overallCompletionOfMax)).toFixed(1);
+                changes.push({
+                    week: i + 1,
+                    change: change,
+                    completion: weeks[i].summary.overallCompletionOfMax
+                });
             }
-        });
+            
+            const itemsCompleted = weeks[7].summary.totalCompletedItems - weeks[0].summary.totalCompletedItems;
+            const totalChange = (parseFloat(weeks[7].summary.overallCompletionOfMax) - parseFloat(weeks[0].summary.overallCompletionOfMax)).toFixed(1);
+            
+            const insights = [
+                `<strong>8-Week Progress:</strong> Improved from ${weeks[0].summary.overallCompletionOfMax}% to ${weeks[7].summary.overallCompletionOfMax}% (+${totalChange}%)`,
+                `<strong>Week 8 Achievement:</strong> Reached ${changes[6].completion}% completion (+${changes[6].change}% from Week 7)`,
+                `<strong>Items Completed:</strong> ${itemsCompleted.toLocaleString()} additional items completed since Week 1`,
+                `<strong>Store Participation:</strong> Week 8 has ${weeks[7].summary.storesWithAssignments.toLocaleString()} active stores (${(weeks[7].summary.storesWithAssignments/weeks[7].summary.totalStores*100).toFixed(1)}%)`,
+                `<strong>Week 6 Milestone:</strong> Achieved ${weeks[5].summary.overallCompletionOfMax}% completion in Week 6`,
+                `<strong>Consistent Growth:</strong> All 8 weeks show steady week-over-week improvement`
+            ];
+            
+            let html = '<div class="insights-title">📈 Key Insights</div>';
+            insights.forEach(insight => {
+                html += `<div class="insight-item"><span class="insight-icon">✓</span><span class="insight-text">${insight}</span></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // Render format comparison across all weeks
+        function renderFormatComparison() {
+            const container = document.getElementById("formatComparison");
+            
+            const formats = ["SC", "DIV1", "NHM"];
+            
+            formats.forEach(format => {
+                const card = document.createElement("div");
+                card.className = "format-card";
+                
+                let html = `<div class="format-name">${format}</div><div class="format-stats">`;
+                
+                COMPARISON_DATA.weeks.forEach(week => {
+                    const formatData = week.formatStats.find(f => f.format === format);
+                    html += `<div class="format-stat-row"><span class="format-stat-label">${week.label}</span><span class="format-stat-value">${formatData ? formatData.completionPercentage + "%" : "N/A"}</span></div>`;
+                });
+                
+                html += `</div>`;
+                card.innerHTML = html;
+                container.appendChild(card);
+            });
+        }
+
+        // Render division comparison across all weeks
+        function renderDivisionComparison() {
+            const container = document.getElementById("divisionComparison");
+            
+            // Get list of all divisions
+            const divisions = new Set();
+            COMPARISON_DATA.weeks.forEach(week => {
+                week.divisionStats.forEach(div => divisions.add(div.divisionId));
+            });
+            
+            // Header row
+            let html = '<div class="division-row header"><div>Division</div>';
+            COMPARISON_DATA.weeks.forEach(week => {
+                html += `<div>${week.label}</div>`;
+            });
+            html += '</div>';
+            
+            // Data rows
+            Array.from(divisions).sort().forEach(divisionId => {
+                html += `<div class="division-row"><div class="division-name">${divisionId}</div>`;
+                
+                COMPARISON_DATA.weeks.forEach(week => {
+                    const weekDiv = week.divisionStats.find(d => d.divisionId === divisionId);
+                    const percent = weekDiv ? weekDiv.completionPercentage : 0;
+                    html += `<div class="division-value">${weekDiv ? weekDiv.completionPercentage + "%" : "N/A"}<div class="progress-bar"><div class="progress-fill" style="width: ${percent > 100 ? 100 : percent}%"></div></div></div>`;
+                });
+                
+                html += '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Render area comparison across all weeks
+        function renderAreaComparison() {
+            const container = document.getElementById("areaComparison");
+            
+            // Get list of all areas
+            const areas = new Set();
+            COMPARISON_DATA.weeks.forEach(week => {
+                week.areaStats.forEach(area => areas.add(area.area));
+            });
+            
+            // Header row
+            let html = '<div class="division-row header"><div>Area</div>';
+            COMPARISON_DATA.weeks.forEach(week => {
+                html += `<div>${week.label}</div>`;
+            });
+            html += '</div>';
+            
+            // Data rows
+            Array.from(areas).sort().forEach(areaName => {
+                html += `<div class="division-row"><div class="division-name">${areaName}</div>`;
+                
+                COMPARISON_DATA.weeks.forEach(week => {
+                    const weekArea = week.areaStats.find(a => a.area === areaName);
+                    const percent = weekArea ? parseFloat(weekArea.completionPercentage) : 0;
+                    html += `<div class="division-value">${weekArea ? weekArea.completionPercentage + "%" : "N/A"}<div class="progress-bar"><div class="progress-fill" style="width: ${percent > 100 ? 100 : percent}%"></div></div></div>`;
+                });
+                
+                html += '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Render user engagement across all weeks
+        function renderUserEngagement() {
+            const container = document.getElementById("userEngagement");
+            let html = "";
+            
+            COMPARISON_DATA.weeks.forEach((week, index) => {
+                const prevWeek = index > 0 ? COMPARISON_DATA.weeks[index - 1].userEngagement : null;
+                const current = week.userEngagement;
+                
+                const workersGrowth = prevWeek && prevWeek.workers > 0 ? ((current.workers - prevWeek.workers) / prevWeek.workers * 100).toFixed(1) : null;
+                const managersGrowth = prevWeek && prevWeek.managers > 0 ? ((current.managers - prevWeek.managers) / prevWeek.managers * 100).toFixed(1) : null;
+                const totalUsersGrowth = prevWeek && prevWeek.totalUsers > 0 ? ((current.totalUsers - prevWeek.totalUsers) / prevWeek.totalUsers * 100).toFixed(1) : null;
+                const actionsGrowth = prevWeek && prevWeek.totalActions > 0 ? ((current.totalActions - prevWeek.totalActions) / prevWeek.totalActions * 100).toFixed(1) : null;
+                
+                html += `<div class="engagement-card">
+                    <div class="engagement-header">${week.label} (${week.date})</div>
+                    <div class="engagement-metrics">
+                        <div class="engagement-metric">
+                            <div class="engagement-metric-label">
+                                <strong>📊 Total Actions</strong>
+                                ${actionsGrowth !== null ? `<div class="growth-badge">${actionsGrowth >= 0 ? '+' : ''}${actionsGrowth}%</div>` : ''}
+                            </div>
+                            <div class="engagement-metric-value">${(current.totalActions / 1000000).toFixed(2)}M</div>
+                        </div>
+                        <div class="engagement-metric">
+                            <div class="engagement-metric-label">
+                                Associates
+                                ${workersGrowth !== null ? `<div class="growth-badge">${workersGrowth >= 0 ? '+' : ''}${workersGrowth}%</div>` : ''}
+                            </div>
+                            <div class="engagement-metric-value">${current.workers.toLocaleString()}</div>
+                        </div>
+                        <div class="engagement-metric">
+                            <div class="engagement-metric-label">
+                                Managers
+                                ${managersGrowth !== null ? `<div class="growth-badge">${managersGrowth >= 0 ? '+' : ''}${managersGrowth}%</div>` : ''}
+                            </div>
+                            <div class="engagement-metric-value">${current.managers.toLocaleString()}</div>
+                        </div>
+                        <div class="engagement-metric">
+                            <div class="engagement-metric-label">
+                                Total Users
+                                ${totalUsersGrowth !== null ? `<div class="growth-badge">${totalUsersGrowth >= 0 ? '+' : ''}${totalUsersGrowth}%</div>` : ''}
+                            </div>
+                            <div class="engagement-metric-value">${current.totalUsers.toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Initialize dashboard
+        renderTrendChart();
+        renderInsights();
+        renderFormatComparison();
+        renderDivisionComparison();
+        renderAreaComparison();
+        renderUserEngagement();
         
-        // Completion Rate Chart
-        new Chart(document.getElementById('completionChart'), {
-            type: 'line',
-            data: {
-                labels: ['WK7', 'WK7+1', 'WK7+2', 'WK7+3', 'WK7+4', 'WK8', 'WK8+1', 'WK8+2', 'WK8+3', 'WK8+4', 'WK8+5'],
-                datasets: [
-                    {
-                        label: '% Completed of Assigned',
-                        data: [89.8, 89.9, 89.9, 90.0, 90.0, 90.1, 90.1, 90.1, 90.1, 90.1, 90.1],
-                        borderColor: chartColors.completed,
-                        backgroundColor: 'rgba(0, 255, 136, 0.2)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 5,
-                        pointBackgroundColor: chartColors.completed
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#fff',
-                            font: { size: 12 }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        min: 85,
-                        max: 95,
-                        ticks: { color: 'rgba(255,255,255,0.7)' },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
-                    },
-                    x: {
-                        ticks: { color: 'rgba(255,255,255,0.7)' },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
-                    }
-                }
-            }
-        });
-        
-        // Stores Chart
-        new Chart(document.getElementById('storesChart'), {
-            type: 'bar',
-            data: {
-                labels: ['WK7', 'WK7+1', 'WK7+2', 'WK7+3', 'WK7+4', 'WK8', 'WK8+1', 'WK8+2', 'WK8+3', 'WK8+4', 'WK8+5'],
-                datasets: [
-                    {
-                        label: 'Store Count',
-                        data: [4459, 4459, 4459, 4459, 4460, 4460, 4460, 4460, 4460, 4460, 4460],
-                        backgroundColor: chartColors.completed,
-                        borderColor: chartColors.completed,
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Assigned Items (÷1000)',
-                        data: [1238.65, 1239.37, 1239.69, 1239.95, 1240.57, 1240.92, 1240.92, 1240.92, 1240.92, 1240.93, 1240.93],
-                        backgroundColor: chartColors.pending,
-                        borderColor: chartColors.pending,
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#fff',
-                            font: { size: 12 }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        ticks: { color: 'rgba(255,255,255,0.7)' },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
-                    },
-                    x: {
-                        ticks: { color: 'rgba(255,255,255,0.7)' },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
-                    }
-                }
-            }
-        });
+        console.log("✅ Store Refresh 8-Week Comparison Dashboard loaded successfully");
     </script>
 </body>
 </html>

@@ -70,5 +70,13 @@
     "email": "kristii.buttrey@walmart.com",
     "approved": true,
     "registered": "2026-02-25T16:33:25.182194"
+  },
+  "mark.kuehn": {
+    "password_hash": "",
+    "role": "user",
+    "name": "Mark Kuehn",
+    "email": "mark.kuehn@walmart.com",
+    "approved": true,
+    "registered": "2026-03-04T11:26:57.926078"
   }
 }
