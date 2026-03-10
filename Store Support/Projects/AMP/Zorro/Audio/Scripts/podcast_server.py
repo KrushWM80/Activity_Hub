@@ -167,13 +167,25 @@ class PodcastHandler(SimpleHTTPRequestHandler):
         }
         .voice-badge {
             display: inline-block;
-            background: #667eea;
+            background: #999;
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
+        }
+        .voice-badge.jenny {
+            background: #FF6B9D;
+        }
+        .voice-badge.david {
+            background: #667eea;
+        }
+        .voice-badge.zira {
+            background: #26D0CE;
+        }
+        .voice-badge.unknown {
+            background: #999;
         }
         .podcast-info {
             display: flex;
@@ -250,7 +262,7 @@ class PodcastHandler(SimpleHTTPRequestHandler):
         <div class="breadcrumb">📍 Zorro Activity Hub</div>
         <h1>Week 4 Summarized Messages</h1>
         <div class="product-type">🔊 Audio Format</div>
-        <div class="subtitle">Narrated by: David, Zira</div>
+        <div class="subtitle">Narrated by: Jenny, David, Zira</div>
         <div id="audio-list" class="podcast-list">
             <div class="loading">Loading audio files...</div>
         </div>
@@ -270,10 +282,11 @@ class PodcastHandler(SimpleHTTPRequestHandler):
                 
                 container.innerHTML = podcasts.map(podcast => {
                     // Extract voice name and format from filename
-                    const voiceName = podcast.filename.includes("David") ? "David" : podcast.filename.includes("Zira") ? "Zira" : "Unknown";
+                    const voiceName = podcast.filename.includes("Jenny") ? "Jenny" : podcast.filename.includes("David") ? "David" : podcast.filename.includes("Zira") ? "Zira" : "Unknown";
+                    const voiceClass = voiceName.toLowerCase();
                     const fileExt = podcast.filename.split(".").pop().toUpperCase();
                     const audioType = fileExt === "MP4" ? "audio/mp4" : "audio/wav";
-                    const voiceBadge = `<span class="voice-badge">${voiceName}</span>`;
+                    const voiceBadge = `<span class="voice-badge ${voiceClass}">${voiceName}</span>`;
                     
                     // Use filename as title to show clear differences
                     const displayTitle = podcast.filename.replace(/\\.(wav|mp4|mp3)$/i, '');
