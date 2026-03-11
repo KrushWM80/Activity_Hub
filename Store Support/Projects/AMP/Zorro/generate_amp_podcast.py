@@ -16,14 +16,14 @@ import uuid
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Import audio synthesis pipeline
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+# Import MP4 pipeline (direct text-to-MP4 synthesis)
+sys.path.insert(0, str(Path(__file__).parent / "Audio"))
 try:
-    from audio_pipeline import AudioPipeline
-    AUDIO_PIPELINE_AVAILABLE = True
+    from mp4_pipeline import MP4Pipeline, Voice
+    MP4_PIPELINE_AVAILABLE = True
 except ImportError as e:
-    logger.warning(f"Audio pipeline not available: {e}. Will use test mode.")
-    AUDIO_PIPELINE_AVAILABLE = False
+    logger.warning(f"MP4 pipeline not available: {e}. Will use test mode.")
+    MP4_PIPELINE_AVAILABLE = False
 
 # AMP Activity Data Structure
 class AMPActivityPodcastGenerator:
@@ -33,16 +33,16 @@ class AMPActivityPodcastGenerator:
         self.server_url = "https://walmart-amp-content.azurewebsites.net/podcasts"
         self.default_voice = voice
         
-        # Initialize audio pipeline if available
-        if AUDIO_PIPELINE_AVAILABLE:
+        # Initialize MP4 pipeline if available
+        if MP4_PIPELINE_AVAILABLE:
             try:
-                self.audio_pipeline = AudioPipeline(voice=voice, fallback_enabled=True)
-                logger.info(f"Audio pipeline initialized with voice: {voice}")
+                self.mp4_pipeline = MP4Pipeline()
+                logger.info(f"MP4 pipeline initialized with voice: {voice}")
             except Exception as e:
-                logger.error(f"Failed to initialize audio pipeline: {e}")
-                self.audio_pipeline = None
+                logger.error(f"Failed to initialize MP4 pipeline: {e}")
+                self.mp4_pipeline = None
         else:
-            self.audio_pipeline = None
+            self.mp4_pipeline = None
         
     def create_amp_podcast(
         self,
@@ -88,51 +88,59 @@ class AMPActivityPodcastGenerator:
         # Create podcast metadata
         podcast_id = str(uuid.uuid4())
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"amp_podcast_{event_id[:8]}_{timestamp}.wav"  # Changed from .mp3 to .wav
+        filename = f"amp_podcast_{event_id[:8]}_{timestamp}.mp4"
         
         # Create output file path
         podcast_path = self.output_dir / filename
         
-        # Synthesize audio if pipeline available
-        voice_used = None
+        # Synthesize audio to MP4 if pipeline available
+        voice_used = target_voice
         synthesis_status = "simulated"
-        synthesis_message = "Audio pipeline not available - using test mode"
+        synthesis_message = "MP4 pipeline not available - using test mode"
         
-        if self.audio_pipeline:
-            logger.info(f"Synthesizing podcast with voice: {target_voice}")
-            success, message, voice_used = self.audio_pipeline.synthesize(
+        if self.mp4_pipeline:
+            logger.info(f"Synthesizing MP4 podcast with voice: {target_voice}")
+            
+            # Map voice names to MP4Pipeline voices
+            voice_map = {
+                "jenny": Voice.JENNY,
+                "david": Voice.DAVID,
+                "zira": Voice.ZIRA,
+            }
+            mp4_voice = voice_map.get(target_voice.lower(), Voice.JENNY)
+            
+            success, output_file = self.mp4_pipeline.synthesize(
                 text=podcast_script,
                 output_file=str(podcast_path),
-                voice=target_voice,
-                fallback=True
+                voice=mp4_voice
             )
             
             if success:
                 synthesis_status = "completed"
-                synthesis_message = message
-                actual_file_size_mb = podcast_path.stat().st_size / (1024 * 1024)
-                logger.info(f"Synthesis completed: {message}")
+                synthesis_message = f"MP4 synthesis successful using {target_voice}"
+                actual_file_size_mb = Path(output_file).stat().st_size / (1024 * 1024)
+                logger.info(f"MP4 synthesis completed: {synthesis_message}")
             else:
                 synthesis_status = "failed"
-                synthesis_message = message
-                logger.error(f"Synthesis failed: {message}")
+                synthesis_message = f"MP4 synthesis failed for voice: {target_voice}"
+                logger.error(f"MP4 synthesis failed: {synthesis_message}")
                 return {
                     "success": False,
                     "error": synthesis_message,
                     "event_id": event_id,
                 }
         else:
-            # Test mode: create dummy file for testing
+            # Test mode: create dummy MP4 file for testing
             try:
-                podcast_path.write_bytes(b"RIFF" + b"\x00" * 1000)  # Minimal WAV header
+                # Create minimal valid MP4 header for testing
+                podcast_path.write_bytes(b"\x00\x00\x00\x20ftypisom" + b"\x00" * 500)
                 actual_file_size_mb = podcast_path.stat().st_size / (1024 * 1024)
-                voice_used = target_voice
             except Exception as e:
                 logger.error(f"Could not create test file: {e}")
-                actual_file_size_mb = 2.5
+                actual_file_size_mb = 0.5
         
         # Estimate duration from script
-        file_size_mb = actual_file_size_mb if self.audio_pipeline else 2.5
+        file_size_mb = actual_file_size_mb
         duration_seconds = self._estimate_duration(len(podcast_script.split()))
         
         # Generate production link
@@ -153,9 +161,10 @@ class AMPActivityPodcastGenerator:
             "priority": priority_level,
             "duration_seconds": duration_seconds,
             "file_size_mb": file_size_mb,
-            "bitrate": "128k",
-            "format": "wav",  # Changed from mp3 to wav
-            "sample_rate": 16000,
+            "bitrate": "256k",
+            "format": "mp4",
+            "codec": "aac",
+            "sample_rate": 22050,
             "voice": voice_used or target_voice,
             "voice_engine": self._get_voice_engine(voice_used or target_voice),
             "synthesis_status": synthesis_status,
@@ -325,10 +334,10 @@ def main(voice: str = "jenny"):
         print(f"   Title: {result['title']}")
         print(f"   File: {result['filename']}")
         print(f"   Voice Used: {result['voice']}")
-        print(f"   Engine: {result['metadata']['voice_engine']}")
+        print(f"   Engine: MP4 Pipeline (Direct)")
         print(f"   Duration: {result['duration_seconds']} seconds")
-        print(f"   File Size: {result['file_size_mb']} MB")
-        print(f"   Format: {result['metadata']['format'].upper()}")
+        print(f"   File Size: {result['file_size_mb']:.2f} MB")
+        print(f"   Format: {result['metadata']['format'].upper()} (AAC Audio)")
         
         print(f"\n🔗 PRODUCTION-READY LINKS:")
         print(f"   🟢 LIVE LINK (Direct Play):")
@@ -338,10 +347,11 @@ def main(voice: str = "jenny"):
         
         print(f"\n📊 TECHNICAL SPECIFICATIONS:")
         print(f"   Format: {result['metadata']['format'].upper()}")
+        print(f"   Codec: {result['metadata'].get('codec', 'AAC').upper()}")
         print(f"   Bitrate: {result['metadata']['bitrate']}")
         print(f"   Sample Rate: {result['metadata']['sample_rate']} Hz")
         print(f"   Narrator: {result['metadata']['voice']}")
-        print(f"   Voice Engine: {result['metadata']['voice_engine']}")
+        print(f"   Voice Engine: MP4 Direct Synthesis")
         print(f"   Quality Level: {result['metadata']['quality']}")
         print(f"   Synthesis Status: {result['synthesis_status']}")
         if result['synthesis_message']:

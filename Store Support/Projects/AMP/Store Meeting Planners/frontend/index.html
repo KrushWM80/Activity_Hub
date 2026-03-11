@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Meeting Planner | Activity Hub</title>
+    <style>
+        /* ================================= */
+        /* WALMART DESIGN SYSTEM VARIABLES   */
+        /* ================================= */
+        :root {
+            --walmart-navy: #1E3A8A;
+            --walmart-blue-dark: #1D4ED8;
+            --walmart-blue: #3B82F6;
+            --walmart-blue-light: #60A5FA;
+            --walmart-blue-lightest: #DBEAFE;
+            --walmart-yellow: #FFCC00;
+            --walmart-yellow-dark: #E6B800;
+            --font-primary: 'Everyday Sans', 'Helvetica Neue', Arial, sans-serif;
+            --gray-900: #1A202C;
+            --gray-700: #4A5568;
+            --gray-600: #718096;
+            --gray-500: #A0AEC0;
+            --gray-400: #CBD5E0;
+            --gray-300: #E2E8F0;
+            --gray-200: #EDF2F7;
+            --gray-100: #F7FAFC;
+            --white: #FFFFFF;
+            --success: #38A169;
+            --success-bg: #F0FFF4;
+            --warning: #D69E2E;
+            --warning-bg: #FFFBEB;
+            --error: #E53E3E;
+            --error-bg: #FED7D7;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-primary);
+            background: var(--gray-100);
+            color: var(--gray-900);
+            min-height: 100vh;
+        }
+
+        /* ================================= */
+        /* HEADER                            */
+        /* ================================= */
+        .header {
+            background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue-dark) 100%);
+            color: var(--white);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .spark-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spark-icon svg {
+            width: 32px;
+            height: 32px;
+        }
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.875rem;
+        }
+        .user-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .admin-badge {
+            background: var(--walmart-yellow);
+            color: var(--walmart-navy);
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        /* ================================= */
+        /* TAB NAVIGATION                    */
+        /* ================================= */
+        .tab-nav {
+            background: var(--white);
+            border-bottom: 2px solid var(--gray-300);
+            display: flex;
+            padding: 0 2rem;
+            gap: 0;
+        }
+        .tab-btn {
+            padding: 14px 24px;
+            font-size: 0.925rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover {
+            color: var(--walmart-blue);
+            background: var(--gray-100);
+        }
+        .tab-btn.active {
+            color: var(--walmart-blue);
+            border-bottom-color: var(--walmart-blue);
+            font-weight: 600;
+        }
+        .tab-btn.hidden { display: none; }
+
+        /* ================================= */
+        /* MAIN CONTENT                      */
+        /* ================================= */
+        .tab-content {
+            display: none;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .tab-content.active { display: block; }
+
+        /* ================================= */
+        /* CARDS & PANELS                    */
+        /* ================================= */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gray-900);
+        }
+
+        /* ================================= */
+        /* CALENDAR                          */
+        /* ================================= */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .calendar-header h2 { font-size: 1.3rem; font-weight: 600; }
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+        .calendar-nav button {
+            padding: 6px 14px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            background: var(--white);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.15s;
+        }
+        .calendar-nav button:hover { background: var(--gray-200); }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .cal-dow {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            padding: 8px 0;
+            text-transform: uppercase;
+        }
+        .cal-day {
+            min-height: 100px;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            padding: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+        }
+        .cal-day:hover { border-color: var(--walmart-blue-light); box-shadow: var(--shadow-sm); }
+        .cal-day.empty { border: none; cursor: default; }
+        .cal-day.empty:hover { box-shadow: none; }
+        .cal-day .day-number {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        .cal-day.today .day-number { color: var(--walmart-blue); }
+        .cal-day.protected {
+            background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+            border-color: var(--walmart-yellow);
+        }
+        .slot-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .slot-badge.green { background: var(--success-bg); color: var(--success); }
+        .slot-badge.yellow { background: var(--warning-bg); color: var(--warning); }
+        .slot-badge.red { background: var(--error-bg); color: var(--error); }
+        .event-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin: 1px;
+        }
+        .event-dot.calendar-event { background: var(--walmart-blue); }
+        .event-dot.protected-week { background: var(--walmart-yellow); }
+        .legend {
+            display: flex;
+            gap: 16px;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: var(--gray-600);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        /* ================================= */
+        /* FORMS                             */
+        /* ================================= */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+        .form-group label .required { color: var(--error); }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 0.9rem;
+            transition: border-color 0.15s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 3px var(--walmart-blue-lightest);
+        }
+        select.form-control { cursor: pointer; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-hint {
+            font-size: 0.78rem;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--walmart-blue);
+        }
+
+        /* ================================= */
+        /* BUTTONS                           */
+        /* ================================= */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: var(--walmart-blue);
+            color: var(--white);
+        }
+        .btn-primary:hover { background: var(--walmart-blue-dark); }
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+        .btn-success:hover { background: #2f8a5a; }
+        .btn-warning {
+            background: var(--warning);
+            color: var(--white);
+        }
+        .btn-danger {
+            background: var(--error);
+            color: var(--white);
+        }
+        .btn-danger:hover { background: #c53030; }
+        .btn-outline {
+            background: none;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        .btn-outline:hover { background: var(--gray-100); }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ================================= */
+        /* STATUS BADGES                     */
+        /* ================================= */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .status-Pending { background: var(--gray-200); color: var(--gray-600); }
+        .status-Review { background: var(--walmart-blue-lightest); color: var(--walmart-blue-dark); }
+        .status-Approved { background: var(--success-bg); color: var(--success); }
+        .status-Needs\ Changes, .status-NeedsChanges { background: var(--warning-bg); color: var(--warning); }
+        .status-Rejected { background: var(--error-bg); color: var(--error); }
+
+        /* ================================= */
+        /* TABLE                             */
+        /* ================================= */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        .data-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-weight: 600;
+            color: var(--gray-600);
+            border-bottom: 2px solid var(--gray-300);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .data-table tr:hover { background: var(--gray-100); }
+        .data-table tr { cursor: pointer; }
+
+        /* ================================= */
+        /* FILTERS BAR                       */
+        /* ================================= */
+        .filters-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+        .filters-bar select, .filters-bar input {
+            padding: 8px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 0.85rem;
+        }
+
+        /* ================================= */
+        /* MODAL                             */
+        /* ================================= */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .modal-header h3 { font-size: 1.1rem; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-500);
+            padding: 4px;
+        }
+        .modal-close:hover { color: var(--gray-900); }
+
+        /* ================================= */
+        /* ALERTS                            */
+        /* ================================= */
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
+        .alert-warning { background: var(--warning-bg); color: #92600a; border: 1px solid var(--warning); }
+        .alert-error { background: var(--error-bg); color: var(--error); border: 1px solid var(--error); }
+        .alert-info { background: var(--walmart-blue-lightest); color: var(--walmart-blue-dark); border: 1px solid var(--walmart-blue); }
+
+        /* ================================= */
+        /* LOADING SPINNER                   */
+        /* ================================= */
+        .spinner {
+            width: 28px; height: 28px;
+            border: 3px solid var(--gray-300);
+            border-top-color: var(--walmart-blue);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 2rem auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { text-align: center; color: var(--gray-500); font-size: 0.9rem; margin-top: 8px; }
+
+        /* ================================= */
+        /* AMP SYNC INDICATOR                */
+        /* ================================= */
+        .sync-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            padding: 6px 12px;
+            background: var(--gray-100);
+            border-radius: var(--radius-md);
+        }
+        .sync-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        /* ================================= */
+        /* REPORT TABLE                      */
+        /* ================================= */
+        .report-section h3 {
+            font-size: 1rem;
+            margin: 1rem 0 0.5rem;
+            padding: 8px 12px;
+            background: var(--walmart-navy);
+            color: var(--white);
+            border-radius: 4px;
+        }
+
+        /* ================================= */
+        /* RESPONSIVE                        */
+        /* ================================= */
+        @media (max-width: 768px) {
+            .form-row { grid-template-columns: 1fr; }
+            .tab-btn { padding: 12px 14px; font-size: 0.8rem; }
+            .calendar-grid { font-size: 0.7rem; }
+            .cal-day { min-height: 70px; }
+            .filters-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ======================================= -->
+<!-- HEADER                                  -->
+<!-- ======================================= -->
+<header class="header">
+    <div class="header-left">
+        <div class="spark-icon">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M16 2l3.5 10.5L30 16l-10.5 3.5L16 30l-3.5-10.5L2 16l10.5-3.5z" fill="#FFCC00"/></svg>
+        </div>
+        <span class="header-title">Store Meeting Planner</span>
+    </div>
+    <div class="header-right">
+        <span id="userDisplay" class="user-badge">Loading...</span>
+        <span id="adminBadge" class="admin-badge" style="display:none">ADMIN</span>
+    </div>
+</header>
+
+<!-- ======================================= -->
+<!-- TAB NAVIGATION                          -->
+<!-- ======================================= -->
+<nav class="tab-nav">
+    <button class="tab-btn active" data-tab="calendar">📅 Calendar</button>
+    <button class="tab-btn" data-tab="submit">📝 Submit Request</button>
+    <button class="tab-btn" data-tab="myrequests">📋 My Requests</button>
+    <button class="tab-btn hidden" data-tab="admin" id="adminTab">⚙️ Admin</button>
+</nav>
+
+<!-- ======================================= -->
+<!-- TAB: CALENDAR                           -->
+<!-- ======================================= -->
+<div class="tab-content active" id="tab-calendar">
+    <div class="card">
+        <div class="calendar-header">
+            <h2 id="calendarMonthTitle">January 2026</h2>
+            <div class="calendar-nav">
+                <button onclick="calendarPrev()">◀ Prev</button>
+                <button onclick="calendarToday()">Today</button>
+                <button onclick="calendarNext()">Next ▶</button>
+            </div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background:var(--success-bg);border:1px solid var(--success)"></div> Available</div>
+            <div class="legend-item"><div class="legend-color" style="background:var(--warning-bg);border:1px solid var(--warning)"></div> Filling Up</div>
+            <div class="legend-item"><div class="legend-color" style="background:var(--error-bg);border:1px solid var(--error)"></div> Full</div>
+            <div class="legend-item"><div class="legend-color" style="background:var(--walmart-yellow);border:1px solid var(--walmart-yellow-dark)"></div> Protected Week (10 slots)</div>
+            <div class="legend-item"><div class="event-dot calendar-event" style="width:10px;height:10px"></div> AMP Calendar Event</div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================= -->
+<!-- TAB: SUBMIT REQUEST                     -->
+<!-- ======================================= -->
+<div class="tab-content" id="tab-submit">
+    <div class="card" style="max-width: 800px;">
+        <h2 class="card-title">Submit Meeting Request</h2>
+        <p style="color:var(--gray-600);font-size:0.9rem;margin-bottom:1.5rem;">
+            Complete the form below to request a meeting time slot. An admin will review and assign a start time.
+        </p>
+        <div id="submitAlert" style="display:none"></div>
+        <form id="submitForm" onsubmit="return submitRequest(event)">
+            <!-- AMP Activity -->
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="ampCheckbox" onchange="toggleAmpUrl()">
+                    Have you created an AMP Activity for this meeting?
+                </label>
+            </div>
+            <div class="form-group" id="ampUrlGroup" style="display:none">
+                <label>AMP Activity URL</label>
+                <input type="url" class="form-control" id="ampUrl" placeholder="https://amp2-cms.prod.walmart.com/...">
+            </div>
+
+            <!-- Title -->
+            <div class="form-group">
+                <label>Meeting Planner Title <span class="required">*</span></label>
+                <input type="text" class="form-control" id="titleInput" required placeholder="e.g., Q1 Launch Call - SC Division">
+            </div>
+
+            <!-- Dates -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Start Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" id="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label>End Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" id="endDate" required>
+                    <span class="form-hint">Same as Start Date for single-day meetings</span>
+                </div>
+            </div>
+
+            <!-- Duration & Reoccurrence -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Meeting Duration <span class="required">*</span></label>
+                    <select class="form-control" id="duration" required>
+                        <option value="">Select duration</option>
+                        <option value="30">30 minutes</option>
+                        <option value="60">60 minutes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reoccurrence</label>
+                    <select class="form-control" id="reoccurrence">
+                        <option value="None">None (one-time)</option>
+                        <option value="Bi-Weekly">Bi-Weekly</option>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
+                        <option value="Yearly">Yearly</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Meeting Type & Shift -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Meeting Type <span class="required">*</span></label>
+                    <select class="form-control" id="meetingType" required>
+                        <option value="">Select type</option>
+                        <option value="Training">Training</option>
+                        <option value="Launch">Launch</option>
+                        <option value="Open Office Hours">Open Office Hours</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Impacted Shift <span class="required">*</span></label>
+                    <select class="form-control" id="shift" required>
+                        <option value="">Select shift</option>
+                        <option value="1">Shift 1</option>
+                        <option value="2">Shift 2</option>
+                        <option value="3">Shift 3</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Store Selection -->
+            <div class="form-group">
+                <label>Store Selection <span class="required">*</span></label>
+                <select class="form-control" id="storeSelection" required onchange="toggleCustomStores()">
+                    <option value="">Select store audience</option>
+                    <option value="All Stores">All Stores</option>
+                    <option value="SC">Supercenters (SC)</option>
+                    <option value="NHM">Neighborhood Markets (NHM)</option>
+                    <option value="Custom List">Custom List (upload file)</option>
+                </select>
+            </div>
+            <div class="form-group" id="customStoreGroup" style="display:none">
+                <label>Upload Store List</label>
+                <input type="file" class="form-control" id="storeFile" accept=".csv,.xlsx,.xls,.txt">
+                <span class="form-hint">CSV, Excel, or TXT file with store numbers (max 10 MB)</span>
+            </div>
+
+            <div style="margin-top:1.5rem; display:flex; gap:12px; align-items:center;">
+                <button type="submit" class="btn btn-primary" id="submitBtn">Submit Request</button>
+                <a href="#" onclick="switchTab('calendar');return false;" style="font-size:0.85rem;color:var(--walmart-blue);">Review available calendar slots →</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ======================================= -->
+<!-- TAB: MY REQUESTS                        -->
+<!-- ======================================= -->
+<div class="tab-content" id="tab-myrequests">
+    <div class="card">
+        <h2 class="card-title">My Requests</h2>
+        <div id="myRequestsLoading"><div class="spinner"></div><p class="loading-text">Loading your requests...</p></div>
+        <div id="myRequestsEmpty" style="display:none;text-align:center;padding:2rem;color:var(--gray-500);">
+            No requests found. <a href="#" onclick="switchTab('submit');return false;" style="color:var(--walmart-blue)">Submit your first request →</a>
+        </div>
+        <table class="data-table" id="myRequestsTable" style="display:none">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Duration</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Source</th>
+                    <th>Submitted</th>
+                </tr>
+            </thead>
+            <tbody id="myRequestsBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ======================================= -->
+<!-- TAB: ADMIN                              -->
+<!-- ======================================= -->
+<div class="tab-content" id="tab-admin">
+    <!-- AMP Sync Indicator -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h2 style="font-size:1.3rem;font-weight:600;">Admin Dashboard</h2>
+        <div style="display:flex;gap:12px;align-items:center;">
+            <div class="sync-indicator">
+                <div class="sync-dot"></div>
+                <span>AMP Auto-Sync Active</span>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="triggerAmpSync()">🔄 Sync Now</button>
+        </div>
+    </div>
+
+    <!-- Admin Sub-tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:1.5rem;">
+        <button class="btn btn-sm" id="adminSubQueue" onclick="showAdminSub('queue')" style="background:var(--walmart-blue);color:#fff;">Request Queue</button>
+        <button class="btn btn-sm btn-outline" id="adminSubReport" onclick="showAdminSub('report')">Meeting Tracker Report</button>
+    </div>
+
+    <!-- Sub: Request Queue -->
+    <div id="adminSubContent-queue">
+        <div class="filters-bar">
+            <select id="adminFilterStatus" onchange="loadAdminRequests()">
+                <option value="">All Statuses</option>
+                <option value="Review" selected>Review</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Needs Changes">Needs Changes</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+            <select id="adminFilterType" onchange="loadAdminRequests()">
+                <option value="">All Types</option>
+                <option value="Training">Training</option>
+                <option value="Launch">Launch</option>
+                <option value="Open Office Hours">Open Office Hours</option>
+            </select>
+            <input type="date" id="adminFilterStart" onchange="loadAdminRequests()" title="Start date">
+            <input type="date" id="adminFilterEnd" onchange="loadAdminRequests()" title="End date">
+        </div>
+        <div class="card">
+            <div id="adminRequestsLoading"><div class="spinner"></div></div>
+            <table class="data-table" id="adminRequestsTable" style="display:none">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Submitter</th>
+                        <th>Date</th>
+                        <th>Duration</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody id="adminRequestsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Sub: Meeting Tracker Report -->
+    <div id="adminSubContent-report" style="display:none">
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h3 class="card-title" style="margin:0">Calls to Stores — Meeting Tracker</h3>
+                <button class="btn btn-outline btn-sm" onclick="exportReport()">📥 Export CSV</button>
+            </div>
+            <div class="filters-bar">
+                <input type="date" id="reportStart" placeholder="Start date">
+                <input type="date" id="reportEnd" placeholder="End date">
+                <button class="btn btn-primary btn-sm" onclick="loadReport()">Generate</button>
+            </div>
+            <div id="reportContent"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================= -->
+<!-- MODAL: Request Detail                   -->
+<!-- ======================================= -->
+<div class="modal-overlay" id="requestModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalTitle">Request Details</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+
+<!-- ======================================= -->
+<!-- JAVASCRIPT                              -->
+<!-- ======================================= -->
+<script>
+const API = '';
+let currentUser = { username: '', email: '', is_admin: false };
+let calendarYear = new Date().getFullYear();
+let calendarMonth = new Date().getMonth(); // 0-indexed
+let calendarData = { events: [], slots: [] };
+
+// =============================================
+// INIT
+// =============================================
+async function init() {
+    await loadUser();
+    setupTabs();
+    renderCalendar();
+    loadCalendarData();
+}
+
+async function loadUser() {
+    try {
+        const res = await fetch(API + '/api/user');
+        currentUser = await res.json();
+        document.getElementById('userDisplay').textContent = currentUser.email || currentUser.username;
+        if (currentUser.is_admin) {
+            document.getElementById('adminBadge').style.display = '';
+            document.getElementById('adminTab').classList.remove('hidden');
+        }
+    } catch (e) {
+        document.getElementById('userDisplay').textContent = 'Not connected';
+    }
+}
+
+// =============================================
+// TABS
+// =============================================
+function setupTabs() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+}
+
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    if (btn) btn.classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+
+    // Lazy-load data
+    if (tabId === 'myrequests') loadMyRequests();
+    if (tabId === 'admin') loadAdminRequests();
+}
+
+// =============================================
+// CALENDAR
+// =============================================
+function renderCalendar() {
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('calendarMonthTitle').textContent = `${months[calendarMonth]} ${calendarYear}`;
+
+    const grid = document.getElementById('calendarGrid');
+    // Walmart fiscal week: Sat–Fri, but we'll show Sun-Sat for readability
+    const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+    const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const today = new Date();
+
+    // Empty cells before first day
+    for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${calendarYear}-${String(calendarMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const isToday = (today.getFullYear() === calendarYear && today.getMonth() === calendarMonth && today.getDate() === d);
+        const slotInfo = calendarData.slots.find(s => s.date === dateStr);
+
+        let classes = 'cal-day';
+        if (isToday) classes += ' today';
+        if (slotInfo && slotInfo.is_protected_week) classes += ' protected';
+
+        let inner = `<div class="day-number">${d}</div>`;
+        if (slotInfo) {
+            const used = slotInfo.approved_count;
+            const max = slotInfo.max_slots;
+            const pct = max > 0 ? used / max : 0;
+            let badgeClass = 'green';
+            if (pct >= 1) badgeClass = 'red';
+            else if (pct >= 0.7) badgeClass = 'yellow';
+            inner += `<span class="slot-badge ${badgeClass}">${used}/${max}</span>`;
+            if (slotInfo.is_protected_week) inner += '<br><span style="font-size:0.65rem;color:var(--walmart-yellow-dark)">Protected</span>';
+        }
+
+        // Event dots
+        const dayEvents = calendarData.events.filter(e => {
+            const eStart = e.start_date ? e.start_date.substring(0, 10) : '';
+            const eEnd = e.end_date ? e.end_date.substring(0, 10) : '';
+            return dateStr >= eStart && dateStr <= eEnd;
+        });
+        if (dayEvents.length > 0) {
+            inner += '<div style="margin-top:2px">';
+            dayEvents.slice(0, 5).forEach(ev => {
+                const dotClass = ev.is_protected_week ? 'protected-week' : 'calendar-event';
+                inner += `<span class="event-dot ${dotClass}" title="${ev.title || ''}"></span>`;
+            });
+            if (dayEvents.length > 5) inner += `<span style="font-size:0.6rem;color:var(--gray-500)">+${dayEvents.length - 5}</span>`;
+            inner += '</div>';
+        }
+
+        html += `<div class="${classes}" onclick="calendarDayClick('${dateStr}')">${inner}</div>`;
+    }
+
+    grid.innerHTML = html;
+}
+
+async function loadCalendarData() {
+    const startDate = `${calendarYear}-${String(calendarMonth+1).padStart(2,'0')}-01`;
+    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const endDate = `${calendarYear}-${String(calendarMonth+1).padStart(2,'0')}-${String(daysInMonth).padStart(2,'0')}`;
+
+    try {
+        const res = await fetch(`${API}/api/calendar?start_date=${startDate}&end_date=${endDate}`);
+        calendarData = await res.json();
+    } catch { calendarData = { events: [], slots: [] }; }
+    renderCalendar();
+}
+
+function calendarPrev() { calendarMonth--; if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; } loadCalendarData(); }
+function calendarNext() { calendarMonth++; if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; } loadCalendarData(); }
+function calendarToday() { const t = new Date(); calendarYear = t.getFullYear(); calendarMonth = t.getMonth(); loadCalendarData(); }
+
+function calendarDayClick(dateStr) {
+    const slotInfo = calendarData.slots.find(s => s.date === dateStr);
+    const dayEvents = calendarData.events.filter(e => {
+        const eStart = e.start_date ? e.start_date.substring(0, 10) : '';
+        const eEnd = e.end_date ? e.end_date.substring(0, 10) : '';
+        return dateStr >= eStart && dateStr <= eEnd;
+    });
+    let html = `<h3 style="margin-bottom:1rem">${dateStr}</h3>`;
+    if (slotInfo) {
+        html += `<p><strong>Slots:</strong> ${slotInfo.approved_count} of ${slotInfo.max_slots} used`;
+        if (slotInfo.is_protected_week) html += ' <span class="status-badge status-Pending">Protected Week</span>';
+        html += '</p>';
+    }
+    if (dayEvents.length) {
+        html += '<h4 style="margin:1rem 0 0.5rem">AMP Calendar Events</h4><ul>';
+        dayEvents.forEach(e => {
+            html += `<li style="margin-bottom:6px"><strong>${e.title || 'Untitled'}</strong>`;
+            if (e.preview_url) html += ` <a href="${e.preview_url}" target="_blank" style="font-size:0.8rem;color:var(--walmart-blue)">Preview</a>`;
+            html += `</li>`;
+        });
+        html += '</ul>';
+    }
+    document.getElementById('modalTitle').textContent = 'Day Details';
+    document.getElementById('modalBody').innerHTML = html;
+    openModal();
+}
+
+// =============================================
+// SUBMIT REQUEST
+// =============================================
+function toggleAmpUrl() {
+    document.getElementById('ampUrlGroup').style.display = document.getElementById('ampCheckbox').checked ? '' : 'none';
+}
+function toggleCustomStores() {
+    document.getElementById('customStoreGroup').style.display = document.getElementById('storeSelection').value === 'Custom List' ? '' : 'none';
+}
+
+async function submitRequest(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    const form = new FormData();
+    form.append('Title', document.getElementById('titleInput').value);
+    form.append('Start_Date', document.getElementById('startDate').value);
+    form.append('End_Date', document.getElementById('endDate').value);
+    form.append('Meeting_Duration', document.getElementById('duration').value);
+    form.append('Meeting_Type', document.getElementById('meetingType').value);
+    form.append('Impacted_Shift', document.getElementById('shift').value);
+    form.append('Store_Selection', document.getElementById('storeSelection').value);
+    form.append('Meeting_Reoccurrence', document.getElementById('reoccurrence').value);
+    form.append('AMP_Activity', document.getElementById('ampCheckbox').checked);
+    form.append('AMP_Activity_URL', document.getElementById('ampUrl').value || '');
+
+    const fileInput = document.getElementById('storeFile');
+    if (fileInput.files.length > 0) form.append('store_file', fileInput.files[0]);
+
+    try {
+        const res = await fetch(API + '/api/requests', { method: 'POST', body: form });
+        const data = await res.json();
+        if (res.ok) {
+            showAlert('submitAlert', 'success', `Request submitted! ID: <strong>${data.id}</strong> — Status: ${data.status}. An admin will review your request.`);
+            document.getElementById('submitForm').reset();
+            document.getElementById('ampUrlGroup').style.display = 'none';
+            document.getElementById('customStoreGroup').style.display = 'none';
+        } else {
+            showAlert('submitAlert', 'error', data.detail || 'Error submitting request.');
+        }
+    } catch (err) {
+        showAlert('submitAlert', 'error', 'Network error. Is the server running?');
+    }
+    btn.disabled = false;
+    btn.textContent = 'Submit Request';
+}
+
+// =============================================
+// MY REQUESTS
+// =============================================
+async function loadMyRequests() {
+    document.getElementById('myRequestsLoading').style.display = '';
+    document.getElementById('myRequestsTable').style.display = 'none';
+    document.getElementById('myRequestsEmpty').style.display = 'none';
+    try {
+        const res = await fetch(API + '/api/requests/mine');
+        const data = await res.json();
+        const rows = data.requests || [];
+        if (rows.length === 0) {
+            document.getElementById('myRequestsEmpty').style.display = '';
+        } else {
+            const tbody = document.getElementById('myRequestsBody');
+            tbody.innerHTML = rows.map(r => `
+                <tr onclick="showRequestDetail(${JSON.stringify(r).replace(/"/g,'&quot;')})">
+                    <td>${esc(r.Title)}</td>
+                    <td>${formatDate(r.Start_Date)}</td>
+                    <td>${r.Meeting_Duration || '—'}m</td>
+                    <td>${esc(r.Meeting_Type) || '—'}</td>
+                    <td><span class="status-badge status-${(r.Status||'').replace(/\s/g,'')}">${esc(r.Status)}</span></td>
+                    <td>${r.source || '—'}</td>
+                    <td>${formatDate(r.Submission_Start_time)}</td>
+                </tr>
+            `).join('');
+            document.getElementById('myRequestsTable').style.display = '';
+        }
+    } catch { document.getElementById('myRequestsEmpty').style.display = ''; }
+    document.getElementById('myRequestsLoading').style.display = 'none';
+}
+
+// =============================================
+// ADMIN: REQUEST QUEUE
+// =============================================
+async function loadAdminRequests() {
+    const status = document.getElementById('adminFilterStatus').value;
+    const type = document.getElementById('adminFilterType').value;
+    const start = document.getElementById('adminFilterStart').value;
+    const end = document.getElementById('adminFilterEnd').value;
+    document.getElementById('adminRequestsLoading').style.display = '';
+    document.getElementById('adminRequestsTable').style.display = 'none';
+
+    let url = `${API}/api/requests?`;
+    if (status) url += `status=${encodeURIComponent(status)}&`;
+    if (type) url += `meeting_type=${encodeURIComponent(type)}&`;
+    if (start) url += `start_date=${start}&`;
+    if (end) url += `end_date=${end}&`;
+
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const rows = data.requests || [];
+        const tbody = document.getElementById('adminRequestsBody');
+        tbody.innerHTML = rows.map(r => `
+            <tr onclick="showAdminRequestDetail(${JSON.stringify(r).replace(/"/g,'&quot;')})">
+                <td>${esc(r.Title)}</td>
+                <td>${esc(r.Name || r.Email)}</td>
+                <td>${formatDate(r.Start_Date)}</td>
+                <td>${r.Meeting_Duration || '—'}m</td>
+                <td>${esc(r.Meeting_Type) || '—'}</td>
+                <td><span class="status-badge status-${(r.Status||'').replace(/\s/g,'')}">${esc(r.Status)}</span></td>
+                <td>${r.source || '—'}</td>
+            </tr>
+        `).join('');
+        document.getElementById('adminRequestsTable').style.display = '';
+    } catch {}
+    document.getElementById('adminRequestsLoading').style.display = 'none';
+}
+
+function showAdminSub(sub) {
+    document.querySelectorAll('[id^="adminSubContent-"]').forEach(el => el.style.display = 'none');
+    document.getElementById('adminSubContent-' + sub).style.display = '';
+    document.getElementById('adminSubQueue').className = sub === 'queue' ? 'btn btn-sm' : 'btn btn-sm btn-outline';
+    document.getElementById('adminSubQueue').style.cssText = sub === 'queue' ? 'background:var(--walmart-blue);color:#fff' : '';
+    document.getElementById('adminSubReport').className = sub === 'report' ? 'btn btn-sm' : 'btn btn-sm btn-outline';
+    document.getElementById('adminSubReport').style.cssText = sub === 'report' ? 'background:var(--walmart-blue);color:#fff' : '';
+    if (sub === 'report') loadReport();
+}
+
+// =============================================
+// ADMIN: REVIEW MODAL
+// =============================================
+function showAdminRequestDetail(r) {
+    let html = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
+            <div><strong>ID:</strong> ${esc(r.ID)}</div>
+            <div><strong>Status:</strong> <span class="status-badge status-${(r.Status||'').replace(/\s/g,'')}">${esc(r.Status)}</span></div>
+            <div><strong>Title:</strong> ${esc(r.Title)}</div>
+            <div><strong>Source:</strong> ${r.source || '—'}${r.source === 'AMP' && r.preview_url ? ` <a href="${r.preview_url}" target="_blank" style="color:var(--walmart-blue);font-size:0.8rem">View in AMP</a>` : ''}</div>
+            <div><strong>Submitter:</strong> ${esc(r.Name)} (${esc(r.Email)})</div>
+            <div><strong>Date:</strong> ${formatDate(r.Start_Date)} — ${formatDate(r.End_Date)}</div>
+            <div><strong>Duration:</strong> ${r.Meeting_Duration || '—'} min</div>
+            <div><strong>Type:</strong> ${esc(r.Meeting_Type) || '<span style="color:var(--error)">Missing</span>'}</div>
+            <div><strong>Shift:</strong> ${r.Impacted_Shift || '<span style="color:var(--error)">Missing</span>'}</div>
+            <div><strong>Stores:</strong> ${esc(r.Store_Selection) || '<span style="color:var(--error)">Missing</span>'}</div>
+            <div><strong>Reoccurrence:</strong> ${esc(r.Meeting_Reoccurrence) || 'None'}</div>
+            <div><strong>Start Time:</strong> ${esc(r.Start_Time) || 'Not assigned'}</div>
+            <div><strong>Meeting Link:</strong> ${r.Meeting_Link ? `<a href="${r.Meeting_Link}" target="_blank">${esc(r.Meeting_Link)}</a>` : 'None'}</div>
+        </div>
+    `;
+
+    // Missing fields warning
+    if (r.Status === 'Pending' && r.AMP_Input) {
+        html += `<div class="alert alert-warning">${esc(r.AMP_Input)}</div>`;
+    }
+
+    // Admin comment history
+    if (r.AMP_Input && r.AMP_Input.includes('[')) {
+        html += `<div style="margin-bottom:1rem;"><strong>Comment History:</strong><pre style="font-size:0.8rem;background:var(--gray-100);padding:8px;border-radius:4px;white-space:pre-wrap">${esc(r.AMP_Input)}</pre></div>`;
+    }
+
+    // Admin actions
+    html += `
+        <hr style="margin:1rem 0;border:none;border-top:1px solid var(--gray-200)">
+        <h4 style="margin-bottom:0.75rem">Admin Actions</h4>
+        <div class="form-group">
+            <label>Assign Start Time</label>
+            <input type="time" class="form-control" id="adminStartTime" value="${r.Start_Time || ''}" style="max-width:200px">
+        </div>
+        <div class="form-group">
+            <label>Meeting Link</label>
+            <input type="url" class="form-control" id="adminMeetingLink" value="${r.Meeting_Link || ''}" placeholder="https://...">
+        </div>
+        <div class="form-group">
+            <label>Comment</label>
+            <textarea class="form-control" id="adminComment" rows="2" placeholder="Optional note to submitter..."></textarea>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:1rem;">
+            <button class="btn btn-success btn-sm" onclick="adminAction('${r.ID}','Approved')">✓ Approve</button>
+            <button class="btn btn-warning btn-sm" onclick="adminAction('${r.ID}','Needs Changes')">↩ Request Changes</button>
+            <button class="btn btn-danger btn-sm" onclick="adminAction('${r.ID}','Rejected')">✗ Reject</button>
+        </div>
+    `;
+
+    document.getElementById('modalTitle').textContent = 'Review Request';
+    document.getElementById('modalBody').innerHTML = html;
+    openModal();
+}
+
+async function adminAction(requestId, status) {
+    const body = {
+        status: status,
+        start_time: document.getElementById('adminStartTime').value || '',
+        meeting_link: document.getElementById('adminMeetingLink').value || '',
+        comment: document.getElementById('adminComment').value || '',
+    };
+    try {
+        const res = await fetch(`${API}/api/requests/${requestId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if (res.ok) {
+            closeModal();
+            loadAdminRequests();
+        } else {
+            const err = await res.json();
+            alert(err.detail || 'Error updating request');
+        }
+    } catch { alert('Network error'); }
+}
+
+// =============================================
+// USER: REQUEST DETAIL (My Requests)
+// =============================================
+function showRequestDetail(r) {
+    let html = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
+            <div><strong>ID:</strong> ${esc(r.ID)}</div>
+            <div><strong>Status:</strong> <span class="status-badge status-${(r.Status||'').replace(/\s/g,'')}">${esc(r.Status)}</span></div>
+            <div><strong>Title:</strong> ${esc(r.Title)}</div>
+            <div><strong>Source:</strong> ${r.source || '—'}</div>
+            <div><strong>Date:</strong> ${formatDate(r.Start_Date)} — ${formatDate(r.End_Date)}</div>
+            <div><strong>Duration:</strong> ${r.Meeting_Duration || '—'} min</div>
+            <div><strong>Type:</strong> ${esc(r.Meeting_Type) || '—'}</div>
+            <div><strong>Shift:</strong> ${r.Impacted_Shift || '—'}</div>
+            <div><strong>Stores:</strong> ${esc(r.Store_Selection) || '—'}</div>
+            <div><strong>Start Time:</strong> ${esc(r.Start_Time) || 'Pending admin assignment'}</div>
+            <div><strong>Meeting Link:</strong> ${r.Meeting_Link ? `<a href="${r.Meeting_Link}" target="_blank">${esc(r.Meeting_Link)}</a>` : 'Pending'}</div>
+        </div>
+    `;
+
+    // Admin comments
+    if (r.AMP_Input && r.AMP_Input.includes('[')) {
+        html += `<div style="margin-bottom:1rem"><strong>Admin Comments:</strong><pre style="font-size:0.8rem;background:var(--gray-100);padding:8px;border-radius:4px;white-space:pre-wrap">${esc(r.AMP_Input)}</pre></div>`;
+    }
+
+    // Pending: show editable form for missing fields
+    if (r.Status === 'Pending') {
+        html += `
+            <div class="alert alert-info">
+                This request was auto-created from AMP. Please complete the missing fields below and submit for review.
+            </div>
+            <div class="form-group">
+                <label>Meeting Type <span class="required">*</span></label>
+                <select class="form-control" id="completeMeetingType">
+                    <option value="">Select type</option>
+                    <option value="Training" ${r.Meeting_Type==='Training'?'selected':''}>Training</option>
+                    <option value="Launch" ${r.Meeting_Type==='Launch'?'selected':''}>Launch</option>
+                    <option value="Open Office Hours" ${r.Meeting_Type==='Open Office Hours'?'selected':''}>Open Office Hours</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Impacted Shift <span class="required">*</span></label>
+                <select class="form-control" id="completeShift">
+                    <option value="">Select shift</option>
+                    <option value="1" ${r.Impacted_Shift==1?'selected':''}>Shift 1</option>
+                    <option value="2" ${r.Impacted_Shift==2?'selected':''}>Shift 2</option>
+                    <option value="3" ${r.Impacted_Shift==3?'selected':''}>Shift 3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Store Selection <span class="required">*</span></label>
+                <select class="form-control" id="completeStores">
+                    <option value="">Select store audience</option>
+                    <option value="All Stores" ${r.Store_Selection==='All Stores'?'selected':''}>All Stores</option>
+                    <option value="SC" ${r.Store_Selection==='SC'?'selected':''}>Supercenters (SC)</option>
+                    <option value="NHM" ${r.Store_Selection==='NHM'?'selected':''}>Neighborhood Markets (NHM)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="completeRequest('${r.ID}')">Submit for Review</button>
+        `;
+    }
+
+    // Needs Changes: also allow editing
+    if (r.Status === 'Needs Changes') {
+        html += `
+            <div class="alert alert-warning">Admin has requested changes. Please update the fields and resubmit.</div>
+            <div class="form-group">
+                <label>Meeting Type</label>
+                <select class="form-control" id="completeMeetingType">
+                    <option value="Training" ${r.Meeting_Type==='Training'?'selected':''}>Training</option>
+                    <option value="Launch" ${r.Meeting_Type==='Launch'?'selected':''}>Launch</option>
+                    <option value="Open Office Hours" ${r.Meeting_Type==='Open Office Hours'?'selected':''}>Open Office Hours</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Impacted Shift</label>
+                <select class="form-control" id="completeShift">
+                    <option value="1" ${r.Impacted_Shift==1?'selected':''}>Shift 1</option>
+                    <option value="2" ${r.Impacted_Shift==2?'selected':''}>Shift 2</option>
+                    <option value="3" ${r.Impacted_Shift==3?'selected':''}>Shift 3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Store Selection</label>
+                <select class="form-control" id="completeStores">
+                    <option value="All Stores" ${r.Store_Selection==='All Stores'?'selected':''}>All Stores</option>
+                    <option value="SC" ${r.Store_Selection==='SC'?'selected':''}>Supercenters (SC)</option>
+                    <option value="NHM" ${r.Store_Selection==='NHM'?'selected':''}>Neighborhood Markets (NHM)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="completeRequest('${r.ID}')">Resubmit for Review</button>
+        `;
+    }
+
+    document.getElementById('modalTitle').textContent = 'Request Details';
+    document.getElementById('modalBody').innerHTML = html;
+    openModal();
+}
+
+async function completeRequest(requestId) {
+    const body = {
+        Meeting_Type: document.getElementById('completeMeetingType')?.value || '',
+        Impacted_Shift: parseInt(document.getElementById('completeShift')?.value) || null,
+        Store_Selection: document.getElementById('completeStores')?.value || '',
+    };
+    try {
+        const res = await fetch(`${API}/api/requests/${requestId}/complete`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if (res.ok) {
+            closeModal();
+            loadMyRequests();
+        } else {
+            const err = await res.json();
+            alert(err.detail || 'Error');
+        }
+    } catch { alert('Network error'); }
+}
+
+// =============================================
+// AMP SYNC
+// =============================================
+async function triggerAmpSync() {
+    try {
+        const res = await fetch(API + '/api/amp-sync', { method: 'POST' });
+        const data = await res.json();
+        alert(`AMP Sync Complete!\nNew: ${data.stats.new}, Skipped: ${data.stats.skipped}, Errors: ${data.stats.errors}`);
+        loadAdminRequests();
+    } catch { alert('Sync failed — check server logs.'); }
+}
+
+// =============================================
+// REPORT
+// =============================================
+let reportData = [];
+async function loadReport() {
+    const start = document.getElementById('reportStart').value;
+    const end = document.getElementById('reportEnd').value;
+    let url = `${API}/api/reports/meeting-tracker?`;
+    if (start) url += `start_date=${start}&`;
+    if (end) url += `end_date=${end}&`;
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        reportData = data.report || [];
+        renderReport(reportData);
+    } catch {
+        document.getElementById('reportContent').innerHTML = '<p style="color:var(--error)">Error loading report</p>';
+    }
+}
+
+function renderReport(rows) {
+    if (!rows.length) {
+        document.getElementById('reportContent').innerHTML = '<p style="color:var(--gray-500);padding:1rem">No approved meetings found for this date range.</p>';
+        return;
+    }
+    // Group by WM week
+    const grouped = {};
+    rows.forEach(r => {
+        const week = `Week ${r.wm_week || '?'}`;
+        if (!grouped[week]) grouped[week] = [];
+        grouped[week].push(r);
+    });
+
+    let html = '';
+    for (const [week, items] of Object.entries(grouped)) {
+        html += `<div class="report-section"><h3>${week}</h3>`;
+        html += `<table class="data-table"><thead><tr>
+            <th>Description</th><th>Type</th><th>Date</th><th>Day</th><th>Time</th><th>Store Audience</th><th>Author</th>
+        </tr></thead><tbody>`;
+        items.forEach(r => {
+            html += `<tr style="cursor:default">
+                <td>${esc(r.description)}</td>
+                <td>${esc(r.type_of_meeting)}</td>
+                <td>${formatDate(r.date)}</td>
+                <td>${esc(r.day)}</td>
+                <td>${esc(r.time) || '—'}</td>
+                <td>${esc(r.store_audience)}</td>
+                <td>${esc(r.author)}</td>
+            </tr>`;
+        });
+        html += '</tbody></table></div>';
+    }
+    document.getElementById('reportContent').innerHTML = html;
+}
+
+function exportReport() {
+    if (!reportData.length) return alert('No data to export. Generate a report first.');
+    const headers = ['Description','Type of Meeting','Date','Day','Time','Store Audience','Author','WM Week'];
+    const csvRows = [headers.join(',')];
+    reportData.forEach(r => {
+        csvRows.push([
+            `"${(r.description||'').replace(/"/g,'""')}"`,
+            `"${r.type_of_meeting||''}"`,
+            `"${r.date||''}"`,
+            `"${r.day||''}"`,
+            `"${r.time||''}"`,
+            `"${(r.store_audience||'').replace(/"/g,'""')}"`,
+            `"${r.author||''}"`,
+            r.wm_week||''
+        ].join(','));
+    });
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `meeting_tracker_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// =============================================
+// MODAL HELPERS
+// =============================================
+function openModal() { document.getElementById('requestModal').classList.add('open'); }
+function closeModal() { document.getElementById('requestModal').classList.remove('open'); }
+document.getElementById('requestModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+// =============================================
+// UTILITIES
+// =============================================
+function esc(s) {
+    if (!s) return '';
+    const d = document.createElement('div');
+    d.textContent = String(s);
+    return d.innerHTML;
+}
+function formatDate(d) {
+    if (!d) return '—';
+    const s = String(d).substring(0, 10);
+    return s;
+}
+function showAlert(id, type, msg) {
+    const el = document.getElementById(id);
+    el.className = `alert alert-${type}`;
+    el.innerHTML = msg;
+    el.style.display = '';
+    setTimeout(() => el.style.display = 'none', 8000);
+}
+
+// =============================================
+// BOOT
+// =============================================
+init();
+</script>
+</body>
+</html>

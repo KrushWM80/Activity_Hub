@@ -56,7 +56,7 @@ Satin cami and shorts sets. Markdown: Week 14, May 2 through 8.
 That's your Week 4 Weekly Messages, Have a Great Week!"""
     
     # Output folder
-    output_folder = Path("../output/podcasts")
+    output_folder = Path("../../output/Audio")
     output_folder.mkdir(parents=True, exist_ok=True)
     
     print("\n" + "=" * 100)

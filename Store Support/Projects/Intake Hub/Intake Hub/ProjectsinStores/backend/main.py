@@ -450,6 +450,36 @@ async def force_cache_sync():
     else:
         raise HTTPException(status_code=500, detail="Sync failed")
 
+@app.get("/api/cache/usage")
+async def cache_usage_status():
+    """Get detailed cache usage and fallback status - shows which data source is being used"""
+    last_sync = sqlite_cache.get_last_sync_time()
+    record_count = sqlite_cache.get_record_count()
+    has_data = record_count > 0
+    
+    if last_sync:
+        cache_age_seconds = (datetime.now() - last_sync).total_seconds()
+        cache_age_minutes = int(cache_age_seconds // 60)
+    else:
+        cache_age_seconds = None
+        cache_age_minutes = None
+    
+    return {
+        "data_source": "SQLite Cache (LOCAL)" if has_data else "BigQuery (CLOUD)",
+        "reason": "Cache has valid data" if has_data else "Cache is empty, using BigQuery",
+        "cache_populated": has_data,
+        "record_count": record_count,
+        "last_sync_time": last_sync.isoformat() if last_sync else "Never",
+        "cache_age_minutes": cache_age_minutes,
+        "cache_age_seconds": int(cache_age_seconds) if cache_age_seconds else None,
+        "cache_location": sqlite_cache.db_path,
+        "notes": [
+            "✓ Fallback logic uses DATA presence, not age" if has_data else "⚠ Cache empty - falling back to BigQuery",
+            "✓ Smart validation prevents bad data in cache" if has_data else "ℹ Cache will be repopulated on next successful sync",
+            f"Cache created {cache_age_minutes} minutes ago" if cache_age_minutes is not None else "Cache status unknown"
+        ]
+    }
+
 @app.get("/api/project-titles")
 async def get_project_titles():
     """Get all unique project titles with store counts for Quick Preview"""
@@ -521,7 +551,8 @@ async def get_projects(
     """Get filtered list of projects. Uses SQLite cache for fast response. Set include_location=true to fetch store lat/long data (slower). Use limit to cap results (default: 50000 to capture all unique projects across sources)."""
     try:
         # Try SQLite cache first (fast - milliseconds)
-        if sqlite_cache.is_cache_valid() and not include_location:
+        # Use cache if it has data (protection by smart validation prevents bad data contamination)
+        if sqlite_cache.get_record_count() > 0 and not include_location:
             try:
                 print("[API] Using SQLite cache for /api/projects")
                 cache_filters = {
@@ -680,8 +711,8 @@ async def get_summary(
 ):
     """Get dashboard summary statistics. Uses SQLite cache for fast response."""
     try:
-        # Use cache if valid and no specific filters
-        if sqlite_cache.is_cache_valid() and not tribe and not division and not region:
+        # Use cache if it has data (protection by smart validation prevents bad data contamination)
+        if sqlite_cache.get_record_count() > 0 and not tribe and not division and not region:
             print("[API] Using SQLite cache for /api/summary")
             cached_summary = sqlite_cache.get_summary()
             return ProjectSummaryResponse(

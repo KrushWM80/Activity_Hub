@@ -197,31 +197,85 @@
             box-shadow: 0 0 0 3px rgba(0, 113, 206, 0.1);
         }
 
-        /* Checkbox Styling */
-        .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-sm);
+        /* Custom Dropdown with Checkboxes */
+        .dropdown-multi {
+            position: relative;
+            width: 100%;
         }
 
-        .checkbox-item {
+        .dropdown-multi-btn {
+            width: 100%;
+            padding: 10px 36px 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+            text-align: left;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+        }
+
+        .dropdown-multi-btn::after {
+            content: '\25BC';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .dropdown-multi-btn:hover {
+            border-color: var(--walmart-blue);
+        }
+
+        .dropdown-multi-panel {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+
+        .dropdown-multi-panel.open {
+            display: block;
+        }
+
+        .dropdown-multi-panel label {
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            cursor: pointer;
-            width: 18px;
-            height: 18px;
-            accent-color: var(--walmart-blue);
-        }
-
-        .checkbox-item label {
+            gap: 8px;
+            padding: 8px 12px;
             cursor: pointer;
             font-size: var(--font-size-base);
             color: var(--text-primary);
-            margin: 0;
+            transition: background 0.15s;
+        }
+
+        .dropdown-multi-panel label:hover {
+            background: var(--bg-light);
+        }
+
+        .dropdown-multi-panel input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--walmart-blue);
+            cursor: pointer;
+            flex-shrink: 0;
         }
 
         .button-group {
@@ -513,7 +567,7 @@
     <div class="header">
         <div class="header-content">
             <div class="header-left">
-                <div class="header-logo">💼</div>
+                <div class="header-logo"><img src="http://localhost:5000/spark-logo.png" alt="Walmart Spark" style="height: 40px; width: auto;"></div>
                 <div class="header-title">
                     <h1>TDA Initiatives Insights</h1>
                     <p>Initiative Health & Deployment Status Dashboard</p>
@@ -536,15 +590,30 @@
             <div class="filters-grid">
                 <div class="filter-group">
                     <label class="filter-label">Phase</label>
-                    <select id="phase-filter">
-                        <option value="All">All Phases</option>
-                    </select>
+                    <div class="dropdown-multi" id="phase-dropdown">
+                        <button type="button" class="dropdown-multi-btn" id="phase-dropdown-btn">All Selected</button>
+                        <div class="dropdown-multi-panel" id="phase-dropdown-panel">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Health Status</label>
-                    <select id="health-filter">
-                        <option value="All">All Statuses</option>
-                    </select>
+                    <div class="dropdown-multi" id="health-dropdown">
+                        <button type="button" class="dropdown-multi-btn" id="health-dropdown-btn">All Selected</button>
+                        <div class="dropdown-multi-panel" id="health-dropdown-panel">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Project Title</label>
+                    <div class="dropdown-multi" id="title-dropdown">
+                        <button type="button" class="dropdown-multi-btn" id="title-dropdown-btn">All Selected</button>
+                        <div class="dropdown-multi-panel" id="title-dropdown-panel">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="button-group">
@@ -610,7 +679,7 @@
         const API_BASE = 'http://localhost:5000/api';
         
         /**
-         * Dynamic pagination based on PPT slide dimensions (960x720px)
+         * Dynamic pagination based on PPT slide dimensions (1280x720px)
          * Slide Height: 720px
          * - Title Banner: 60px
          * - Table Header: 35px
@@ -629,8 +698,10 @@
         
         // State
         let allData = [];
+        let currentSelectedPhases = [];
         let phases = [];
         let healthStatuses = [];
+        let projectTitles = [];
         let currentPage = 1;
 
         // Initialize on page load
@@ -648,31 +719,22 @@
             document.getElementById('export-btn').addEventListener('click', exportCSV);
             document.getElementById('ppt-btn').addEventListener('click', generatePPT);
             
-            // Update title when phase filter changes
-            document.getElementById('phase-filter').addEventListener('change', updatePageTitle);
-            
             // Pagination controls
             document.getElementById('prev-page-btn').addEventListener('click', goToPreviousPage);
             document.getElementById('next-page-btn').addEventListener('click', goToNextPage);
-            
-            // Allow Enter key to apply filters
-            document.getElementById('phase-filter').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') loadData();
-            });
-            document.getElementById('health-filter').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') loadData();
-            });
         }
 
         // Update page title based on selected phase
         function updatePageTitle() {
-            const selectedPhase = document.getElementById('phase-filter').value;
+            const selectedPhases = getSelectedValues('phase-dropdown');
             const titleEl = document.getElementById('table-title');
             
-            if (selectedPhase === 'All') {
+            if (selectedPhases.length === 0) {
                 titleEl.textContent = 'TDA Initiatives Insights - All Phases';
+            } else if (selectedPhases.length === 1) {
+                titleEl.textContent = `TDA Initiatives Insights - ${selectedPhases[0]}`;
             } else {
-                titleEl.textContent = `TDA Initiatives Insights - ${selectedPhase}`;
+                titleEl.textContent = `TDA Initiatives Insights - Multiple Phases (${selectedPhases.length})`;
             }
         }
 
@@ -689,9 +751,15 @@
                 const statusesData = await statusesRes.json();
                 healthStatuses = statusesData.health_statuses || [];
                 
+                // Load project titles
+                const titlesRes = await fetch(`${API_BASE}/titles`);
+                const titlesData = await titlesRes.json();
+                projectTitles = titlesData.titles || [];
+                
                 // Populate dropdowns
-                populateDropdown('phase-filter', phases);
-                populateDropdown('health-filter', healthStatuses);
+                populateDropdown('phase-dropdown', phases);
+                populateDropdown('health-dropdown', healthStatuses);
+                populateDropdown('title-dropdown', projectTitles);
                 
                 updateConnectionStatus(true);
             } catch (error) {
@@ -700,44 +768,126 @@
             }
         }
 
-        // Populate dropdown
-        function populateDropdown(elementId, options) {
-            const select = document.getElementById(elementId);
-            const currentValue = select.value;
+        // Populate dropdown with checkboxes
+        function populateDropdown(dropdownId, options) {
+            const panel = document.getElementById(dropdownId + '-panel');
+            const btn = document.getElementById(dropdownId + '-btn');
+            panel.innerHTML = '';
             
-            // Clear existing options except first
-            while (select.options.length > 1) {
-                select.remove(1);
-            }
+            // Add "All" toggle at top
+            const allLabel = document.createElement('label');
+            allLabel.style.borderBottom = '1px solid #ddd';
+            allLabel.style.paddingBottom = '6px';
+            allLabel.style.marginBottom = '4px';
+            allLabel.style.fontWeight = '600';
+            const allCb = document.createElement('input');
+            allCb.type = 'checkbox';
+            allCb.checked = true;
+            allCb.dataset.selectAll = 'true';
+            allCb.addEventListener('change', () => {
+                const checked = allCb.checked;
+                panel.querySelectorAll('input[type="checkbox"]:not([data-select-all])').forEach(cb => cb.checked = checked);
+                updateDropdownLabel(dropdownId, options.length);
+            });
+            allLabel.appendChild(allCb);
+            allLabel.appendChild(document.createTextNode('All'));
+            panel.appendChild(allLabel);
             
-            // Add options
-            options.forEach(option => {
-                const opt = document.createElement('option');
-                opt.value = option;
-                opt.textContent = option;
-                select.appendChild(opt);
+            options.forEach((option, idx) => {
+                const label = document.createElement('label');
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = option;
+                cb.checked = true;
+                cb.addEventListener('change', () => {
+                    // Update "All" checkbox state
+                    const allCheckboxes = panel.querySelectorAll('input[type="checkbox"]:not([data-select-all])');
+                    const allChecked = Array.from(allCheckboxes).every(c => c.checked);
+                    panel.querySelector('input[data-select-all]').checked = allChecked;
+                    updateDropdownLabel(dropdownId, options.length);
+                });
+                label.appendChild(cb);
+                label.appendChild(document.createTextNode(option));
+                panel.appendChild(label);
             });
             
-            select.value = currentValue;
+            // Toggle panel on button click
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close other dropdowns
+                document.querySelectorAll('.dropdown-multi-panel.open').forEach(p => {
+                    if (p !== panel) p.classList.remove('open');
+                });
+                panel.classList.toggle('open');
+            });
+            
+            // Prevent panel clicks from closing it
+            panel.addEventListener('click', (e) => e.stopPropagation());
+            
+            updateDropdownLabel(dropdownId, options.length);
+        }
+
+        // Update dropdown button text based on selections
+        function updateDropdownLabel(dropdownId, totalCount) {
+            const panel = document.getElementById(dropdownId + '-panel');
+            const btn = document.getElementById(dropdownId + '-btn');
+            const checked = panel.querySelectorAll('input[type="checkbox"]:checked:not([data-select-all])');
+            
+            if (checked.length === 0) {
+                btn.textContent = 'None selected';
+            } else if (checked.length === totalCount) {
+                btn.textContent = 'All Selected';
+            } else if (checked.length <= 2) {
+                btn.textContent = Array.from(checked).map(cb => cb.value).join(', ');
+            } else {
+                btn.textContent = `${checked.length} of ${totalCount} selected`;
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-multi-panel.open').forEach(p => p.classList.remove('open'));
+        });
+
+        // Get selected filter values (array)
+        function getSelectedValues(dropdownId) {
+            const panel = document.getElementById(dropdownId + '-panel');
+            const checked = panel.querySelectorAll('input[type="checkbox"]:checked:not([data-select-all])');
+            return Array.from(checked).map(cb => cb.value);
         }
 
         // Load and display data
         async function loadData() {
             try {
-                const phase = document.getElementById('phase-filter').value;
-                const healthStatus = document.getElementById('health-filter').value;
+                const selectedPhases = getSelectedValues('phase-dropdown');
+                const selectedStatuses = getSelectedValues('health-dropdown');
+                const selectedTitles = getSelectedValues('title-dropdown');
+                
+                if (selectedPhases.length === 0) {
+                    showError('Please select at least one phase');
+                    return;
+                }
+                if (selectedStatuses.length === 0) {
+                    showError('Please select at least one health status');
+                    return;
+                }
                 
                 const url = new URL(`${API_BASE}/data`);
-                url.searchParams.append('phase', phase);
-                url.searchParams.append('health_status', healthStatus);
+                selectedPhases.forEach(p => url.searchParams.append('phases', p));
+                selectedStatuses.forEach(s => url.searchParams.append('health_statuses', s));
+                // Only send titles filter if not all are selected
+                if (selectedTitles.length < projectTitles.length) {
+                    selectedTitles.forEach(t => url.searchParams.append('titles', t));
+                }
                 
                 const response = await fetch(url);
                 const result = await response.json();
                 
                 if (result.success) {
                     allData = result.data;
+                    currentSelectedPhases = selectedPhases;
                     currentPage = 1; // Reset to first page
-                    renderTable(result.data);
+                    renderTable(allData, currentSelectedPhases);
                     updateSummary(result.data);
                     updateRecordCount(result.count);
                     updateLastUpdated();
@@ -752,8 +902,8 @@
             }
         }
 
-        // Render table with pagination
-        function renderTable(data) {
+        // Render table with pagination (organized by phase)
+        function renderTable(data, selectedPhases) {
             const wrapper = document.getElementById('table-wrapper');
             const paginationControls = document.getElementById('pagination-controls');
             
@@ -769,11 +919,21 @@
                 return;
             }
             
-            // Calculate pagination
-            const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
-            const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
-            const endIdx = startIdx + ITEMS_PER_PAGE;
-            const pageData = data.slice(startIdx, endIdx);
+            // Organize data by phase in dropdown order
+            const phaseOrder = selectedPhases || phases;
+            const dataByPhase = {};
+            phaseOrder.forEach(phase => {
+                dataByPhase[phase] = data.filter(item => item.Phase === phase);
+            });
+            
+            // Pack rows by phase, building pages with phase headers
+            const pages = packRowsIntoPagesByPhase(dataByPhase, phaseOrder);
+            
+            if (currentPage > pages.length) {
+                currentPage = 1;
+            }
+            
+            const pageData = pages[currentPage - 1] || { phase: 'N/A', rows: [] };
             
             const columns = [
                 'Initiative - Project Title',
@@ -785,13 +945,14 @@
                 'Deployment'
             ];
             
-            let html = '<table><thead><tr>';
+            let html = `<div style="background: #3B82F6; color: white; padding: 15px 20px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px 4px 0 0;">TDA Initiatives Insights - ${pageData.phase}</div>`;
+            html += '<table><thead><tr>';
             columns.forEach(col => {
                 html += `<th>${col}</th>`;
             });
             html += '</tr></thead><tbody>';
             
-            pageData.forEach(row => {
+            pageData.rows.forEach(row => {
                 html += '<tr>';
                 columns.forEach(col => {
                     let value = row[col] || '';
@@ -824,12 +985,14 @@
             wrapper.innerHTML = html;
             
             // Show/update pagination controls
-            if (totalPages > 1) {
+            if (pages.length > 1) {
                 paginationControls.style.display = 'flex';
                 document.getElementById('current-page').textContent = currentPage;
-                document.getElementById('total-pages').textContent = totalPages;
+                document.getElementById('total-pages').textContent = pages.length;
                 document.getElementById('prev-page-btn').disabled = currentPage === 1;
-                document.getElementById('next-page-btn').disabled = currentPage === totalPages;
+                document.getElementById('next-page-btn').disabled = currentPage === pages.length;
+                
+                console.log(`[Page ${currentPage}] Phase ${pageData.phase}: ${pageData.rows.length} items`);
             } else {
                 paginationControls.style.display = 'none';
             }
@@ -839,16 +1002,21 @@
         function goToPreviousPage() {
             if (currentPage > 1) {
                 currentPage--;
-                renderTable(allData);
+                renderTable(allData, currentSelectedPhases);
                 scrollToTable();
             }
         }
 
         function goToNextPage() {
-            const totalPages = Math.ceil(allData.length / ITEMS_PER_PAGE);
-            if (currentPage < totalPages) {
+            const phaseOrder = currentSelectedPhases || phases;
+            const dataByPhase = {};
+            phaseOrder.forEach(phase => {
+                dataByPhase[phase] = allData.filter(item => item.Phase === phase);
+            });
+            const pages = packRowsIntoPagesByPhase(dataByPhase, phaseOrder);
+            if (currentPage < pages.length) {
                 currentPage++;
-                renderTable(allData);
+                renderTable(allData, currentSelectedPhases);
                 scrollToTable();
             }
         }
@@ -878,16 +1046,20 @@
             document.getElementById('stat-on-track').textContent = onTrack;
             document.getElementById('stat-at-risk').textContent = atRisk;
         }
-
-        // Update record count
+// Update record count
         function updateRecordCount(count) {
             document.getElementById('record-count').textContent = `${count} initiative${count !== 1 ? 's' : ''}`;
         }
 
         // Reset filters
         function resetFilters() {
-            document.getElementById('phase-filter').value = 'All';
-            document.getElementById('health-filter').value = 'All';
+            // Re-check all checkboxes in all dropdowns
+            document.querySelectorAll('#phase-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#health-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#title-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
+            updateDropdownLabel('phase-dropdown', phases.length);
+            updateDropdownLabel('health-dropdown', healthStatuses.length);
+            updateDropdownLabel('title-dropdown', projectTitles.length);
             updatePageTitle();
             loadData();
         }
@@ -927,129 +1099,189 @@
                 return;
             }
             
-            // Get selected phase
-            const selectedPhase = document.getElementById('phase-filter').value;
+            // Get selected phases
+            const selectedPhases = getSelectedValues('phase-dropdown');
             const btn = document.getElementById('ppt-btn');
             const originalText = btn.textContent;
+            
+            if (selectedPhases.length === 0) {
+                showError('Please select at least one phase');
+                return;
+            }
             
             try {
                 // Show loading state
                 btn.textContent = '[Wait] Generating...';
                 btn.disabled = true;
                 
-                // Filter data to only selected phase
-                let dataToCapture = allData;
-                if (selectedPhase !== 'All') {
-                    dataToCapture = allData.filter(p => p.Phase === selectedPhase);
-                }
+                // Organize data by phase in dropdown order
+                const phaseOrder = selectedPhases;
+                const dataByPhase = {};
+                phaseOrder.forEach(phase => {
+                    dataByPhase[phase] = allData.filter(item => item.Phase === phase);
+                });
                 
-                if (dataToCapture.length === 0) {
-                    throw new Error('No data available for selected phase. Load data first.');
-                }
+                console.log(`[PPT] Starting generation for phases:`, selectedPhases);
+                console.log(`[PPT] Data by phase:`, dataByPhase);
                 
-                // Dynamically pack rows into pages based on actual heights
-                const pages = packRowsIntoPages(dataToCapture);
                 const screenshots = [];
                 const wrapper = document.getElementById('table-wrapper');
                 const paginationControls = document.getElementById('pagination-controls');
+                let totalPages = 0;
                 
-                for (let pageIdx = 0; pageIdx < pages.length; pageIdx++) {
-                    const pageData = pages[pageIdx];
-                    const currentPageNum = pageIdx + 1;
-                    const totalPages = pages.length;
+                // Hide all other page elements
+                const header = document.querySelector('.header');
+                const sidebar = document.querySelector('.sidebar');
+                const filterSection = document.querySelector('.filter-section');
+                const statsSection = document.querySelector('.stats-section');
+                const footer = document.querySelector('.footer');
+                
+                if (header) header.style.display = 'none';
+                if (sidebar) sidebar.style.display = 'none';
+                if (filterSection) filterSection.style.display = 'none';
+                if (statsSection) statsSection.style.display = 'none';
+                if (footer) footer.style.display = 'none';
+                
+                // Process each phase
+                for (const phase of phaseOrder) {
+                    const phaseData = dataByPhase[phase] || [];
+                    console.log(`[PPT] Processing phase: ${phase}, items: ${phaseData.length}`);
+                    if (phaseData.length === 0) {
+                        console.log(`[PPT] Skipping ${phase} - no data`);
+                        continue;
+                    }
                     
-                    btn.textContent = `[Wait] Capturing page ${currentPageNum}/${totalPages}...`;
+                    // Pack rows for this phase
+                    const pages = packRowsIntoPages(phaseData);
+                    console.log(`[PPT] Packed ${phase} into ${pages.length} pages`);
                     
-                    // Render this page's table using ACTUAL dashboard styling
-                    const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Intake & Testing', 'Dallas POC', 'Deployment'];
-                    let html = '<table><thead><tr>';
-                    columns.forEach(col => {
-                        html += `<th>${col}</th>`;
-                    });
-                    html += '</tr></thead><tbody>';
-                    
-                    pageData.forEach(row => {
-                        html += '<tr>';
+                    for (let pageIdx = 0; pageIdx < pages.length; pageIdx++) {
+                        const pageRows = pages[pageIdx];
+                        const pageNum = screenshots.length + 1;
+                        totalPages++;
+                        
+                        btn.textContent = `[Wait] Capturing ${phase} page ${pageIdx + 1}/${pages.length}...`;
+                        
+                        // Render this phase/page's table with inline styles matching dashboard
+                        const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Intake & Testing', 'Dallas POC', 'Deployment'];
+                        let html = `<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
+                                    <thead style="background-color: #F5F5F5; border-bottom: 2px solid #E5E5E5;">
+                                    <tr>`;
                         columns.forEach(col => {
-                            let value = row[col] || '';
-                            let cellClass = '';
-                            
-                            if (col === 'Health Status') {
-                                const status = String(value).toLowerCase();
-                                if (status.includes('on track')) {
-                                    cellClass = 'badge badge-on-track';
-                                } else if (status.includes('at risk')) {
-                                    cellClass = 'badge badge-at-risk';
-                                } else if (status.includes('off track')) {
-                                    cellClass = 'badge badge-off-track';
-                                } else {
-                                    cellClass = 'badge';
-                                }
-                                html += `<td><span class="${cellClass}">${value}</span></td>`;
-                            } else if (col === 'Phase') {
-                                html += `<td><span class="phase-tag">${value}</span></td>`;
-                            } else if (col === '# of Stores') {
-                                html += `<td style="font-weight: 600; color: var(--walmart-blue);">${value}</td>`;
-                            } else {
-                                html += `<td>${value}</td>`;
-                            }
+                            html += `<th style="padding: 16px 24px; text-align: left; font-weight: 600; color: #212121; white-space: nowrap;">${col}</th>`;
                         });
-                        html += '</tr>';
-                    });
-                    
-                    html += '</tbody></table>';
-                    wrapper.innerHTML = html;
-                    paginationControls.style.display = 'none';
-                    
-                    // Add title to the wrapper for screenshot
-                    const titleHtml = `<div style="background: #3B82F6; color: white; padding: 15px 20px; margin-bottom: 15px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px; margin: -20px -20px 15px -20px;">TDA Initiatives Insights - ${selectedPhase}</div>`;
-                    wrapper.innerHTML = titleHtml + wrapper.innerHTML;
-                    
-                    // Hide all other page elements
-                    const header = document.querySelector('.header');
-                    const sidebar = document.querySelector('.sidebar');
-                    const filterSection = document.querySelector('.filter-section');
-                    const statsSection = document.querySelector('.stats-section');
-                    const footer = document.querySelector('.footer');
-                    
-                    if (header) header.style.display = 'none';
-                    if (sidebar) sidebar.style.display = 'none';
-                    if (filterSection) filterSection.style.display = 'none';
-                    if (statsSection) statsSection.style.display = 'none';
-                    if (footer) footer.style.display = 'none';
-                    
-                    // Zoom in for better quality
-                    document.body.style.zoom = '1.3';
-                    
-                    // Wait for DOM to fully render
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    
-                    // Capture JUST the table wrapper (true screenshot of what's on screen)
-                    const canvas = await html2canvas(wrapper, {
-                        scale: 2,
-                        backgroundColor: '#ffffff',
-                        allowTaint: true,
-                        useCORS: true
-                    });
-                    
-                    // Reset zoom
-                    document.body.style.zoom = '1';
-                    
-                    // Restore hidden elements
-                    if (header) header.style.display = '';
-                    if (sidebar) sidebar.style.display = '';
-                    if (filterSection) filterSection.style.display = '';
-                    if (statsSection) statsSection.style.display = '';
-                    if (footer) footer.style.display = '';
-                    
-                    screenshots.push({
-                        page: currentPageNum,
-                        header: `TDA Initiatives Insights - ${selectedPhase}`,
-                        imageData: canvas.toDataURL('image/png')
-                    });
-                    
-                    // Small delay between pages
-                    await new Promise(resolve => setTimeout(resolve, 200));
+                        html += '</tr></thead><tbody>';
+                        
+                        pageRows.forEach(row => {
+                            html += '<tr>';
+                            columns.forEach(col => {
+                                let value = row[col] || '';
+                                let cellStyle = 'padding: 16px 24px; border-bottom: 1px solid #E5E5E5; text-align: left;';
+                                
+                                if (col === 'Health Status') {
+                                    const status = String(value).toLowerCase();
+                                    let badgeBg = '#f0f0f0';
+                                    let badgeColor = '#333';
+                                    if (status.includes('on track')) {
+                                        badgeBg = 'rgba(16, 124, 16, 0.2)';
+                                        badgeColor = '#107C10';
+                                    } else if (status.includes('at risk')) {
+                                        badgeBg = 'rgba(247, 99, 12, 0.2)';
+                                        badgeColor = '#F7630C';
+                                    } else if (status.includes('off track')) {
+                                        badgeBg = 'rgba(220, 53, 69, 0.2)';
+                                        badgeColor = '#DC3545';
+                                    }
+                                    html += `<td style="${cellStyle}"><span style="display: inline-block; padding: 4px 10px; background-color: ${badgeBg}; color: ${badgeColor}; border-radius: 12px; font-weight: 600; font-size: 12px; white-space: nowrap;">${value}</span></td>`;
+                                } else if (col === 'Phase') {
+                                    html += `<td style="${cellStyle}"><span style="display: inline-block; padding: 4px 10px; background-color: #DBEAFE; color: #1E3A8A; border-radius: 4px; font-weight: 500; font-size: 12px;">${value}</span></td>`;
+                                } else if (col === '# of Stores') {
+                                    html += `<td style="${cellStyle} font-weight: 600; color: #0071CE;">${value}</td>`;
+                                } else {
+                                    html += `<td style="${cellStyle}">${value}</td>`;
+                                }
+                            });
+                            html += '</tr>';
+                        });
+                        
+                        
+                        html += '</tbody></table>';
+                        
+                        console.log(`[PPT] Phase: ${phase}, Page: ${pageIdx + 1}, Rows: ${pageRows.length}, HTML length: ${html.length}`);
+                        
+                        wrapper.innerHTML = html;
+                        paginationControls.style.display = 'none';
+                        
+                        // Add title showing phase (matches dashboard blue banner)
+                        const titleHtml = `<div style="background: #3B82F6; color: white; padding: 15px 20px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px 4px 0 0;">TDA Initiatives Insights - ${phase}</div>`;
+                        wrapper.innerHTML = titleHtml + wrapper.innerHTML;
+                        wrapper.style.display = 'block';
+                        wrapper.style.visibility = 'visible';
+                        wrapper.style.opacity = '1';
+                        
+                        // Ensure wrapper is visible and has layout
+                        console.log(`[PPT] Wrapper element:`, wrapper, `offsetHeight: ${wrapper.offsetHeight}, innerHTML length: ${wrapper.innerHTML.length}`);
+                        
+                        // Don't zoom - it can break html2canvas
+                        // document.body.style.zoom = '1.3';
+                        
+                        // Wait for DOM to fully render
+                        await new Promise(resolve => setTimeout(resolve, 800));
+                        
+                        // Verify wrapper has content before capture
+                        const tableElement = wrapper.querySelector('table');
+                        if (!tableElement) {
+                            console.error(`[PPT ERROR] No table element found in wrapper!`);
+                            throw new Error(`No table element found for ${phase} page ${pageIdx + 1}`);
+                        }
+                        console.log(`[PPT] Table element found, rows in tbody: ${tableElement.querySelectorAll('tbody tr').length}`);
+                        
+                        // Capture the wrapper with specific options
+                        let canvas;
+                        try {
+                            canvas = await html2canvas(wrapper, {
+                                scale: 1.5,
+                                backgroundColor: '#ffffff',
+                                allowTaint: true,
+                                useCORS: true,
+                                scrollY: 0,
+                                scrollX: 0
+                            });
+                            console.log(`[PPT] Screenshot captured successfully, canvas size: ${canvas.width}x${canvas.height}`);
+                        } catch (captureError) {
+                            console.error(`[PPT ERROR] html2canvas failed:`, captureError);
+                            throw new Error(`Screenshot capture failed for ${phase}: ${captureError.message}`);
+                        }
+                        
+                        // Reset zoom
+                        document.body.style.zoom = '1';
+                        
+                        screenshots.push({
+                            phase: phase,
+                            page: pageIdx + 1,
+                            header: `TDA Initiatives Insights - ${phase}`,
+                            imageData: canvas.toDataURL('image/png')
+                        });
+                        
+                        // Small delay between pages
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    }
+                }
+                
+                // Restore hidden elements
+                if (header) header.style.display = '';
+                if (sidebar) sidebar.style.display = '';
+                if (filterSection) filterSection.style.display = '';
+                if (statsSection) statsSection.style.display = '';
+                if (footer) footer.style.display = '';
+                
+                console.log(`[PPT] Capture complete. Total screenshots: ${screenshots.length}, Total pages: ${totalPages}`);
+                
+                if (screenshots.length === 0) {
+                    console.error(`[PPT ERROR] No screenshots captured!`);
+                    console.error(`[PPT ERROR] Selected phases: ${selectedPhases.join(', ')}`);
+                    console.error(`[PPT ERROR] Data by phase:`, dataByPhase);
+                    throw new Error(`No screenshots captured. Selected phases: ${selectedPhases.join(', ')}. Check console for details.`);
                 }
                 
                 // Send screenshots to backend to create PPT
@@ -1062,13 +1294,14 @@
                     },
                     body: JSON.stringify({
                         screenshots: screenshots,
-                        selectedPhases: selectedPhase === 'All' ? [] : [selectedPhase],
-                        title: document.getElementById('table-title').textContent
+                        selectedPhases: selectedPhases,
+                        title: 'TDA Initiatives Insights'
                     })
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`Server error: ${response.statusText}`);
+                    const errorText = await response.text();
+                    throw new Error(`Backend error: ${response.status} - ${errorText.substring(0, 200)}`);
                 }
                 
                 // Download the PPT file
@@ -1090,11 +1323,11 @@
                 window.URL.revokeObjectURL(url);
                 
                 // Show success message
-                alert(`[OK] Report generated and downloaded successfully!\n\nFile: ${filename}\nPages: ${pages.length}`);
+                alert(`[OK] Report generated and downloaded successfully!\n\nFile: ${filename}\nPages: ${totalPages}\nPhases: ${selectedPhases.join(', ')}`);
                 
                 // Re-render current page with all data
                 currentPage = 1;
-                renderTable(allData);
+                renderTable(allData, currentSelectedPhases);
                 
             } catch (error) {
                 console.error('Error generating PPT:', error);
@@ -1102,7 +1335,7 @@
                 alert(`[ERROR] ${errorMsg}\n\nMake sure:\n- Backend is running\n- html2canvas library loaded (check browser console)\n- Browser allows screenshots`);
                 // Re-render in case of error
                 currentPage = 1;
-                renderTable(allData);
+                renderTable(allData, currentSelectedPhases);
             } finally {
                 document.body.style.zoom = '1';
                 btn.textContent = originalText;
@@ -1126,7 +1359,7 @@
             const container = document.createElement('div');
             container.style.position = 'absolute';
             container.style.visibility = 'hidden';
-            container.style.width = '960px';
+            container.style.width = '1280px';
             container.style.top = '0';
             container.style.left = '0';
             
@@ -1213,6 +1446,27 @@
             
             // Cleanup
             document.body.removeChild(container);
+            
+            return pages;
+        }
+
+        // Pack rows into pages organized by phase
+        function packRowsIntoPagesByPhase(dataByPhase, phaseOrder) {
+            const pages = [];
+            
+            // For each phase in order, pack its rows and create pages with phase info
+            phaseOrder.forEach(phase => {
+                const phaseData = dataByPhase[phase] || [];
+                if (phaseData.length === 0) return;
+                
+                const phasePages = packRowsIntoPages(phaseData);
+                phasePages.forEach(pageRows => {
+                    pages.push({
+                        phase: phase,
+                        rows: pageRows
+                    });
+                });
+            });
             
             return pages;
         }

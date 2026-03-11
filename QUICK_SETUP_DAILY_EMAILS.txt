@@ -1,0 +1,21 @@
+# Quick Setup for Daily Status Emails
+# Copy and paste all of this into Administrator PowerShell and press Enter
+
+$ScriptPath = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\MONITOR_AND_REPORT.ps1"
+
+# Daily 6 AM Email - Copy paste this in admin PowerShell:
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$ScriptPath`""
+$trigger = New-ScheduledTaskTrigger -Daily -At 6:00am
+$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount
+$settings = New-ScheduledTaskSettingsSet -DontStopOnIdleEnd -RunOnlyIfNetworkAvailable
+Register-ScheduledTask -TaskName "ActivityHub-DailyStatus-6AM" -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force
+
+# System Startup Email - Copy paste this in admin PowerShell:
+$actionStartup = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$ScriptPath`""
+$triggerStartup = New-ScheduledTaskTrigger -AtStartup -RandomDelay (New-TimeSpan -Seconds 30)
+$settingsStartup = New-ScheduledTaskSettingsSet -DontStopOnIdleEnd
+Register-ScheduledTask -TaskName "ActivityHub-Startup-Report" -Action $actionStartup -Trigger $triggerStartup -Principal $principal -Settings $settingsStartup -Force
+
+# Verify:
+Get-ScheduledTask -TaskName "ActivityHub-DailyStatus-6AM" | Select-Object TaskName, State
+Get-ScheduledTask -TaskName "ActivityHub-Startup-Report" | Select-Object TaskName, State

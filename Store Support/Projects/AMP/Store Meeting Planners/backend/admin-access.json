@@ -1,0 +1,13 @@
+{
+    "authorized_admins": [
+        "tammy.claunch@walmart.com",
+        "matthew.farnworth@walmart.com",
+        "kendall.rush@walmart.com"
+    ],
+    "admin_usernames": [
+        "tclaunc",
+        "mnf000x",
+        "krush"
+    ],
+    "fallback_password": "MPAdmin2026"
+}

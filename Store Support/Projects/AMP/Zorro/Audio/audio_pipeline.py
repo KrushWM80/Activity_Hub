@@ -296,6 +296,7 @@ def synthesize_activity_message(
     message_text: str,
     voice: Voice = Voice.JENNY,
     output_dir: Optional[str] = None,
+    format: str = "mp4"
 ) -> tuple[bool, Optional[str]]:
     """
     Convenience function for AMP podcast generation.
@@ -304,6 +305,7 @@ def synthesize_activity_message(
         message_text: Activity message to convert to audio
         voice: Preferred voice (default: Jenny)
         output_dir: Output directory (default: temp)
+        format: Output format - "wav" or "mp4" (default: mp4)
 
     Returns:
         Tuple of (success, audio_file_path)
@@ -311,7 +313,8 @@ def synthesize_activity_message(
     Example:
         >>> success, audio_file = synthesize_activity_message(
         ...     "Welcome to Walmart Activity Hub",
-        ...     voice=Voice.JENNY
+        ...     voice=Voice.JENNY,
+        ...     format="mp4"
         ... )
     """
     pipeline = AudioPipeline(preferred_voice=voice)
@@ -327,6 +330,43 @@ def synthesize_activity_message(
         add_ssml=True
     )
 
+    if not result.success or not result.audio_file:
+        return (False, None)
+
+    # Convert WAV to MP4 if requested
+    if format.lower() == "mp4":
+        import subprocess
+        mp4_file = str(Path(result.audio_file).with_suffix('.mp4'))
+        
+        try:
+            cmd = [
+                'C:\\ffmpeg\\bin\\ffmpeg.exe',
+                '-i', result.audio_file,
+                '-c:a', 'aac',
+                '-b:a', '192k',
+                '-y',
+                mp4_file
+            ]
+            
+            logger.info(f"Converting to MP4: {' '.join(cmd)}")
+            process = subprocess.run(cmd, capture_output=True, text=True, timeout=30, check=False)
+            
+            if process.returncode == 0 and Path(mp4_file).exists():
+                logger.info(f"MP4 conversion successful: {mp4_file}")
+                # Clean up WAV file
+                try:
+                    Path(result.audio_file).unlink()
+                except:
+                    pass
+                return (True, mp4_file)
+            else:
+                logger.warning(f"MP4 conversion returned code {process.returncode}")
+                if process.stderr:
+                    logger.warning(f"FFmpeg stderr: {process.stderr[:200]}")
+                logger.warning("Returning WAV file as fallback")
+        except Exception as e:
+            logger.warning(f"MP4 conversion failed: {e}, returning WAV")
+    
     return (result.success, result.audio_file)
 
 

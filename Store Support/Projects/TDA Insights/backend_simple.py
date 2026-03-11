@@ -15,6 +15,7 @@ import time
 from pathlib import Path
 import zipfile
 import io
+import struct
 from xml.etree import ElementTree as ET
 import os
 import base64
@@ -92,7 +93,6 @@ def get_bigquery_data():
         WHERE Topic IS NOT NULL
         GROUP BY Topic, Health_Update, Phase, Intake_n_Testing, Dallas_POC, Deployment
         ORDER BY Topic
-        LIMIT 100
         """
         
         query_job = client.query(query)
@@ -227,6 +227,8 @@ def generate_minimal_pptx(phase=None):
 <p:sldId id="260" r:id="rId5"/>
 <p:sldId id="261" r:id="rId6"/>
 </p:sldIdLst>
+<p:sldSz cx="9144000" cy="6858000" type="custom"/>
+<p:notesSz cx="6858000" cy="9144000"/>
 </p:presentation>'''
         zf.writestr('ppt/presentation.xml', presentation)
         
@@ -379,7 +381,7 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
 <p:sldIdLst>'''
             for i in range(1, total_slides + 1):
                 presentation += f'\n<p:sldId id="{255+i}" r:id="rId{i}"/>'
-            presentation += '\n</p:sldIdLst>\n</p:presentation>'
+            presentation += '\n</p:sldIdLst>\n<p:sldSz cx="9144000" cy="6858000" type="custom"/>\n<p:notesSz cx="6858000" cy="9144000"/>\n</p:presentation>'
             zf.writestr('ppt/presentation.xml', presentation)
             
             # Add title slide
@@ -488,6 +490,28 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
                     image_filename = f'image{idx}.png'
                     zf.writestr(f'ppt/media/{image_filename}', image_bytes)
                     
+                    # Read PNG dimensions from IHDR chunk
+                    img_width_px, img_height_px = 1280, 720  # defaults
+                    if len(image_bytes) > 24 and image_bytes[1:4] == b'PNG':
+                        img_width_px, img_height_px = struct.unpack('>II', image_bytes[16:24])
+                    
+                    # Slide dimensions in EMU
+                    SLIDE_W = 9144000   # 10in * 914400 EMU/in
+                    SLIDE_H = 6858000   # 7.5in * 914400 EMU/in
+                    
+                    # Always fill full slide width, scale height proportionally
+                    aspect = img_height_px / img_width_px if img_width_px > 0 else 0.5625
+                    final_w = SLIDE_W
+                    final_h = int(SLIDE_W * aspect)
+                    
+                    # If height exceeds slide, cap at slide height (still full width)
+                    if final_h > SLIDE_H:
+                        final_h = SLIDE_H
+                    
+                    # Always top-left: x=0, y=0
+                    off_x = 0
+                    off_y = 0
+                    
                     # Create slide with image
                     slide_rels = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
@@ -533,8 +557,8 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
 </p:blipFill>
 <p:spPr>
 <a:xfrm>
-<a:off x="0" y="0"/>
-<a:ext cx="9144000" cy="6858000"/>
+<a:off x="{off_x}" y="{off_y}"/>
+<a:ext cx="{final_w}" cy="{final_h}"/>
 </a:xfrm>
 <a:prstGeom prst="rect">
 <a:avLst/>
@@ -561,13 +585,21 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
         print(f"[ERROR] Failed to generate PPTX from screenshots: {e}")
         raise
 
-def filter_data(phase=None, health_status=None):
-    """Filter data by phase and health status"""
-    data = DATA
-    if phase and phase != "All":
-        data = [r for r in data if r.get("Phase") == phase]
-    if health_status and health_status != "All":
-        data = [r for r in data if r.get("Health Status") == health_status]
+def filter_data(phases=None, health_statuses=None, titles=None):
+    """Filter data by phases (list), health statuses (list), and titles (list)"""
+    # Always exclude "Complete" phase from dashboard
+    EXCLUDED_PHASES = {'Complete'}
+    data = [r for r in DATA if r.get("Phase") not in EXCLUDED_PHASES]
+    # Handle phases - if specified, further filter
+    if phases and len(phases) > 0:
+        data = [r for r in data if r.get("Phase") in phases]
+    # Handle health statuses - if not specified or empty, return all
+    if health_statuses and len(health_statuses) > 0:
+        data = [r for r in data if r.get("Health Status") in health_statuses]
+    # Handle titles - if specified, filter by project title
+    if titles and len(titles) > 0:
+        titles_set = set(titles)
+        data = [r for r in data if r.get("Initiative - Project Title") in titles_set]
     return data
 
 def handle_request(client_socket, addr):
@@ -621,13 +653,21 @@ def handle_request(client_socket, addr):
             path = full_path
             query_string = ""
         
-        # Parse query parameters
+        # Parse query parameters (with support for multiple values)
         query_params = {}
+        query_params_multi = {}  # Store lists of values for multi-select
         if query_string:
             for param in query_string.split('&'):
                 if '=' in param:
                     key, value = param.split('=', 1)
-                    query_params[key] = value.replace('%20', ' ').replace('+', ' ')
+                    # Proper URL decoding
+                    from urllib.parse import unquote_plus
+                    value = unquote_plus(value)
+                    query_params[key] = value  # Last value wins for backward compat
+                    # Also collect all values in a list
+                    if key not in query_params_multi:
+                        query_params_multi[key] = []
+                    query_params_multi[key].append(value)
         
         print(f"[{time.strftime('%H:%M:%S')}] {method} {path}")
         
@@ -639,15 +679,16 @@ def handle_request(client_socket, addr):
             response_json = json.dumps({
                 'status': 'healthy',
                 'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
-                'server': 'TDA Insights Lightweight'
             })
             response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
             client_socket.sendall(response.encode())
         
         elif path == '/api/data':
-            phase = query_params.get('phase', 'All')
-            health_status = query_params.get('health_status', 'All')
-            data = filter_data(phase=phase, health_status=health_status)
+            # Get multi-select values for phases and health statuses
+            phases = query_params_multi.get('phases', [])
+            health_statuses = query_params_multi.get('health_statuses', [])
+            titles = query_params_multi.get('titles', [])
+            data = filter_data(phases=phases if phases else None, health_statuses=health_statuses if health_statuses else None, titles=titles if titles else None)
             response_json = json.dumps({
                 'success': True,
                 'count': len(data),
@@ -675,6 +716,17 @@ def handle_request(client_socket, addr):
             response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
             client_socket.sendall(response.encode())
         
+        elif path == '/api/titles':
+            # Return sorted unique project titles (excluding Complete phase)
+            excluded = {'Complete'}
+            titles = sorted(set(r.get("Initiative - Project Title", "Unknown") for r in DATA if r.get("Phase") not in excluded))
+            response_json = json.dumps({
+                'success': True,
+                'titles': titles
+            })
+            response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
+            client_socket.sendall(response.encode())
+        
         elif path == '/api/summary':
             data = filter_data()
             summary = {
@@ -694,45 +746,21 @@ def handle_request(client_socket, addr):
             client_socket.sendall(response.encode())
         
         elif path == '/lib/html2canvas.min.js':
-            # Serve html2canvas library locally to avoid Firefox tracking protection
-            # Cache it in memory after first fetch
-            if not hasattr(handle_request, 'html2canvas_cache'):
-                try:
-                    import urllib.request
-                    print("[*] Fetching html2canvas from jsDelivr CDN (first access)...")
-                    url = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"
-                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-                    with urllib.request.urlopen(req, timeout=15) as response:
-                        lib_data = response.read()
-                    handle_request.html2canvas_cache = lib_data
-                    print(f"[OK] Cached html2canvas library ({len(lib_data)} bytes)")
-                except Exception as e:
-                    print(f"[ERROR] Failed to fetch html2canvas: {e}")
-                    print("[WARN] Serving fallback html2canvas stub...")
-                    # Serve a minimal fallback stub
-                    stub = """
-window.html2canvas = function(element, options) {
-    return new Promise(function(resolve, reject) {
-        try {
-            var canvas = document.createElement('canvas');
-            canvas.width = (element.offsetWidth || 960);
-            canvas.height = (element.offsetHeight || 720);
-            var ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#333333';
-            ctx.font = '14px Arial';
-            ctx.fillText('Screenshot not available (check console)', 10, 30);
-            resolve(canvas);
-        } catch(e) {
-            reject(e);
-        }
-    });
-};
-""".encode('utf-8')
-                    handle_request.html2canvas_cache = stub
+            # Serve html2canvas library from local disk (avoids CDN blocks)
+            lib_file = SCRIPT_DIR / 'html2canvas.min.js'
+            try:
+                if lib_file.exists():
+                    with open(lib_file, 'rb') as f:
+                        lib_data = f.read()
+                    print(f"[OK] Serving html2canvas from local disk ({len(lib_data)} bytes)")
+                else:
+                    raise FileNotFoundError(f"html2canvas.min.js not found in {SCRIPT_DIR}")
+            except Exception as e:
+                print(f"[ERROR] Failed to load html2canvas: {e}")
+                error_response = f"HTTP/1.1 500 Server Error\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\nFailed to load html2canvas library"
+                client_socket.sendall(error_response.encode())
+                return
             
-            lib_data = handle_request.html2canvas_cache
             response = (
                 f"HTTP/1.1 200 OK\r\n"
                 f"Content-Type: application/javascript; charset=utf-8\r\n"
@@ -743,6 +771,29 @@ window.html2canvas = function(element, options) {
             )
             client_socket.sendall(response.encode())
             client_socket.sendall(lib_data)
+        
+        elif path == '/spark-logo.png':
+            logo_file = Path(r'C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\General Setup\Design\Spark Blank.png')
+            try:
+                if logo_file.exists():
+                    with open(logo_file, 'rb') as f:
+                        logo_data = f.read()
+                    response = (
+                        f"HTTP/1.1 200 OK\r\n"
+                        f"Content-Type: image/png\r\n"
+                        f"Access-Control-Allow-Origin: *\r\n"
+                        f"Cache-Control: public, max-age=31536000\r\n"
+                        f"Content-Length: {len(logo_data)}\r\n"
+                        f"Connection: close\r\n\r\n"
+                    )
+                    client_socket.sendall(response.encode())
+                    client_socket.sendall(logo_data)
+                else:
+                    raise FileNotFoundError("Spark logo not found")
+            except Exception as e:
+                print(f"[ERROR] Failed to load spark logo: {e}")
+                error_response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\nLogo not found"
+                client_socket.sendall(error_response.encode())
         
         elif path == '/dashboard.html' or path == '/':
             html_file = SCRIPT_DIR / 'dashboard.html'
@@ -820,7 +871,7 @@ window.html2canvas = function(element, options) {
                 client_socket.sendall(error_response.encode())
         
         elif path == '/favicon.ico':
-            response = "HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n"
+            response = "HTTP/1.1 204 No Content\r\nConnection: close\r\n\r\n"
             client_socket.sendall(response.encode())
         
         else:

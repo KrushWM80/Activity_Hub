@@ -3,18 +3,38 @@
 AMP Dashboard Backend Server
 Provides secure BigQuery data access using existing gcloud credentials
 No OAuth2 needed - uses application default credentials
+
+Audio Features:
+- Summarized MP4 audio generation using Jenny neural voice
+- Direct text-to-MP4 synthesis with FFmpeg
 """
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from google.cloud import bigquery
 import logging
 from datetime import datetime, timedelta
 import json
+import sys
+from pathlib import Path
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Initialize Flask app
+app = Flask(__name__)
+CORS(app)  # Enable CORS for frontend requests
+
+# Add MP4 Pipeline to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "Zorro" / "Audio"))
+try:
+    from mp4_pipeline import MP4Pipeline, Voice
+    MP4_PIPELINE_AVAILABLE = True
+    logger.info("✅ MP4 Pipeline (Jenny voice) available")
+except ImportError as e:
+    MP4_PIPELINE_AVAILABLE = False
+    logger.warning(f"⚠️  MP4 Pipeline not available: {e}")
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -313,7 +333,8 @@ def root():
             '/health': 'Health check and connection status',
             '/api/amp-data': 'Get AMP data with optional filters',
             '/api/amp-metrics': 'Get summary metrics',
-            '/api/amp-filters': 'Get filter options'
+            '/api/amp-filters': 'Get filter options',
+            '/api/generate-audio': 'Generate summarized MP4 audio (Jenny voice)'
         },
         'bigquery': {
             'project': PROJECT_ID,
@@ -323,8 +344,149 @@ def root():
         'credentials': {
             'type': 'Application Default Credentials (gcloud)',
             'location': '~/.config/gcloud/application_default_credentials.json'
+        },
+        'audio': {
+            'available': MP4_PIPELINE_AVAILABLE,
+            'voice': 'Jenny Neural (Primary)',
+            'format': 'MP4 (AAC @ 256kbps)'
         }
     })
+
+
+@app.route('/api/generate-audio', methods=['POST'])
+def generate_summarized_audio():
+    """
+    Generate summarized MP4 audio from activity message using Jenny voice
+    
+    Request body:
+    {
+        "message_title": "Activity Title",
+        "message_description": "Activity Description",
+        "business_area": "Business Area",
+        "activity_type": "Action Required | FYI | etc",
+        "priority": "high | medium | low"
+    }
+    
+    Returns:
+    {
+        "success": true/false,
+        "audio_url": "/api/audio/<filename>",
+        "filename": "summarized_audio_XXXXXXXX.mp4",
+        "size_kb": 625.3,
+        "duration_seconds": 48,
+        "voice": "Jenny"
+    }
+    """
+    try:
+        if not MP4_PIPELINE_AVAILABLE:
+            return jsonify({
+                'success': False,
+                'error': 'MP4 Pipeline not available'
+            }), 503
+
+        # Get request data
+        data = request.get_json()
+        
+        message_title = data.get('message_title', 'Activity Update')
+        message_description = data.get('message_description', 'New activity message')
+        business_area = data.get('business_area', 'General')
+        activity_type = data.get('activity_type', 'FYI')
+        priority = data.get('priority', 'medium')
+        
+        # Build audio script
+        priority_text = 'HIGH PRIORITY' if priority.lower() in ['high', '1'] else 'priority' if priority.lower() in ['medium', '2'] else 'informational'
+        
+        audio_script = f"""
+        Hello and welcome to Walmart Activity Hub.
+        
+        This is a {priority_text} announcement from {business_area}.
+        
+        {message_title}
+        
+        Details: {message_description}
+        
+        This announcement is classified as {activity_type}.
+        
+        Please review this information and ensure your team is aware.
+        
+        Thank you for your attention.
+        """
+        
+        logger.info(f"Generating MP4 audio: {message_title}")
+        
+        # Generate MP4
+        pipeline = MP4Pipeline()
+        success, output_file = pipeline.synthesize(
+            text=audio_script,
+            voice=Voice.JENNY
+        )
+        
+        if not success or not output_file:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to generate audio'
+            }), 500
+        
+        # Get file info
+        file_path = Path(output_file)
+        file_size_kb = file_path.stat().st_size / 1024
+        filename = file_path.name
+        
+        # Estimate duration (words per minute: ~140)
+        word_count = len(audio_script.split())
+        duration_seconds = int((word_count / 140) * 60)
+        
+        logger.info(f"✅ Audio generated: {filename} ({file_size_kb:.1f}KB)")
+        
+        return jsonify({
+            'success': True,
+            'audio_url': f'/api/audio/{filename}',
+            'filename': filename,
+            'size_kb': round(file_size_kb, 1),
+            'duration_seconds': duration_seconds,
+            'voice': 'Jenny Neural',
+            'codec': 'AAC @ 256kbps',
+            'message_title': message_title,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Error generating audio: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/audio/<filename>', methods=['GET'])
+def serve_audio(filename):
+    """Serve MP4 audio file"""
+    try:
+        audio_dir = Path(__file__).parent.parent / "Zorro" / "Audio" / "mp4_output"
+        file_path = audio_dir / filename
+        
+        # Security: ensure file is in mp4_output directory
+        if not file_path.resolve().parent == audio_dir.resolve():
+            return jsonify({'error': 'Invalid file path'}), 403
+        
+        if not file_path.exists():
+            return jsonify({'error': 'Audio file not found'}), 404
+        
+        logger.info(f"Serving audio: {filename}")
+        
+        return send_file(
+            file_path,
+            mimetype='audio/mp4',
+            as_attachment=True,
+            download_name=filename
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ Error serving audio: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 
 if __name__ == '__main__':
@@ -332,6 +494,8 @@ if __name__ == '__main__':
     logger.info(f"🚀 Starting AMP Dashboard Backend on http://localhost:{port}")
     logger.info(f"📊 BigQuery: {PROJECT_ID}.{DATASET_ID}.{TABLE_ID}")
     logger.info(f"🔐 Using gcloud application default credentials")
+    logger.info(f"🎤 MP4 Audio Generation: {'✅ ENABLED (Jenny voice)' if MP4_PIPELINE_AVAILABLE else '⚠️  DISABLED'}")
     logger.info(f"📖 API docs: http://localhost:{port}/")
+    logger.info(f"🎧 Audio endpoint: POST http://localhost:{port}/api/generate-audio")
     
     app.run(host='localhost', port=port, debug=False)

@@ -11,23 +11,34 @@ Add-Type -AssemblyName System.Speech
 $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
 
 # Select voice
-$synth.SelectVoice($VoiceName)
+try {
+    $synth.SelectVoice($VoiceName)
+} catch {
+    Write-Error "Voice not found: $VoiceName"
+    exit 1
+}
 
 # Set volume
 $synth.Volume = 100
+$synth.Rate = 0  # Normal speed
 
-# Create file and audio stream
-$stream = New-Object System.IO.FileStream($OutputFile, [System.IO.FileMode]::Create)
-
-# Set output to file
-$synth.SetOutputToAudioStream($stream, [System.Speech.AudioFormat.SpeechAudioFormatInfo]::new([System.Speech.AudioFormat.EncodingFormat]::Pcm, 16000, 16, 1, 32000, 2, $null))
+# Output directly to WAV file (proper WAV format with headers)
+$synth.SetOutputToWaveFile($OutputFile)
 
 # Synthesize text
 $synth.Speak($Text)
 
 # Clean up
 $synth.SetOutputToNull()
-$stream.Close()
-$stream.Dispose()
 
-Write-Host "Synthesis successful: $OutputFile"
+# Verify file creation
+if (Test-Path $OutputFile) {
+    $fileSize = (Get-Item $OutputFile).Length
+    Write-Host "Synthesis successful"
+    Write-Host "  File: $OutputFile"
+    Write-Host "  Size: $fileSize bytes"
+    exit 0
+} else {
+    Write-Error "Failed to create WAV file"
+    exit 1
+}
