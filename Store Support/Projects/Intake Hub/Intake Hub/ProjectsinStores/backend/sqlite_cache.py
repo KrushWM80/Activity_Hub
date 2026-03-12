@@ -30,9 +30,9 @@ NOTIFY_EMAIL = "kendall.rush@walmart.com"
 FROM_EMAIL = "ProjectsInStoresDashboard@walmart.com"
 
 # Cache validation thresholds
-MIN_EXPECTED_RECORDS = 1_400_000  # Based on ~1.4M historical average
+MIN_EXPECTED_RECORDS = 550  # Based on ~955 Active projects in updated BigQuery schema
 MIN_SYNC_DURATION = 60  # Seconds - sync taking <60s likely means error
-MAX_ALLOWED_VARIANCE = 50_000  # Allow ±50k variance for daily data changes
+MAX_ALLOWED_VARIANCE = 200  # Allow ±200 variance for daily data changes
 ZERO_RECORD_RETRY_COUNT = 2  # Retry this many times before sending email
 ZERO_RECORD_RETRY_TIMEOUT = 2700  # 45 minutes - sync window is 15-35 min, give buffer
 
@@ -387,7 +387,7 @@ This is an automated alert. Do not reply to this email.
             # Fetch all data from BigQuery
             query = f"""
                 SELECT 
-                    COALESCE(CAST(Intake_Card AS STRING), CONCAT('R-', CAST(Facility AS STRING))) as project_id,
+                    COALESCE(CAST(Intake_Card AS STRING), CAST(PROJECT_ID AS STRING)) as project_id,
                     CAST(Intake_Card AS STRING) as intake_card,
                     CASE
                         WHEN Title IS NOT NULL AND Title != '' THEN Title
@@ -411,14 +411,14 @@ This is an automated alert. Do not reply to this email.
                     '' as partner,
                     COALESCE(Store_Area, '') as store_area,
                     COALESCE(Business_Area, '') as business_area,
-                    COALESCE(Health, PROJECT_HEALTH, '') as health,
+                    COALESCE(Health, PROJECT_HEALTH_DESC, PROJECT_HEALTH, '') as health,
                     COALESCE(Business_Type, '') as business_type,
-                    COALESCE(ASSOCIATE_IMPACT, '') as associate_impact,
-                    COALESCE(CUSTOMER_IMPACT, '') as customer_impact,
-                    Last_Updated as last_updated
+                    COALESCE(ASSOCIATE_IMPACT_DESC, ASSOCIATE_IMPACT, '') as associate_impact,
+                    COALESCE(CUSTOMER_IMPACT_DESC, CUSTOMER_IMPACT, '') as customer_impact,
+                    COALESCE(Last_Updated, UPDATE_TS) as last_updated
                 FROM `{project_id}.{dataset}.{table}`
                 WHERE Status = 'Active'
-                ORDER BY title, WM_Week
+                ORDER BY Title, WM_Week
             """
             
             result = bigquery_client.query(query).result()

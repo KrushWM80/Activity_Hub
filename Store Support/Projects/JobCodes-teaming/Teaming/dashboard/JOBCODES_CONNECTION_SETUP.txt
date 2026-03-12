@@ -1,0 +1,210 @@
+═══════════════════════════════════════════════════════════════════════════════
+JOB CODES DASHBOARD - NEW CONNECTION SYSTEM
+═══════════════════════════════════════════════════════════════════════════════
+
+Date: March 12, 2026
+Status: ✓ WORKING via IP Address (10.97.114.181:8080)
+
+═══════════════════════════════════════════════════════════════════════════════
+WHAT WAS CREATED
+═══════════════════════════════════════════════════════════════════════════════
+
+Following the pattern from "DC to Store Change Management Emails" project:
+
+1. ✓ config.py
+   ─────────────────────────────────────────────────────────────────────
+   Purpose: Centralized configuration for URL and connection settings
+   Location: Store Support\Projects\JobCodes-teaming\Teaming\dashboard\config.py
+   
+   Features:
+   • Switchable connection method: HOSTNAME vs IP
+   • Clear documentation of current issue
+   • Server configuration
+   • File paths and settings
+   
+   How to Use:
+   - Change ACTIVE_CONNECTION = "IP" or "HOSTNAME"
+   - All code will use the correct URL automatically
+   - When DNS is fixed, just change one line to switch
+
+
+2. ✓ JOBCODES_ACCESS_GUIDE.md
+   ─────────────────────────────────────────────────────────────────────
+   Purpose: Complete guide for users and IT
+   Location: Same folder as config.py
+   
+   Contents:
+   • Current working access URL
+   • Explanation of DNS issue
+   • IT escalation template
+   • Workaround options
+   • Configuration reference
+   
+   Use Case:
+   - Share with team members
+   - Send to IT with DNS fix request
+   - User reference guide
+
+
+3. ✓ JOBCODES_ACCESS_PORTAL.html
+   ─────────────────────────────────────────────────────────────────────
+   Purpose: Branded quick-access portal (like MOCK_EMAIL_TEMPLATE.html)
+   Location: Same folder as config.py
+   
+   Features:
+   • Beautiful Walmart-branded interface
+   • One-click access via IP
+   • Clear explanation of issue
+   • Copy-to-clipboard functionality
+   • Mobile friendly
+   
+   How to Use:
+   1. Right-click: JOBCODES_ACCESS_PORTAL.html
+   2. Select: "Open with" → Your web browser
+   3. Click: "Access Job Codes Dashboard"
+   4. Bookmark this page for quick access
+   
+   Can Replace Your Bookmark:
+   - Instead of hostname bookmark
+   - Shows you're using IP-based access
+   - Clear status updates
+   - Links to both IP and hostname options
+
+
+═══════════════════════════════════════════════════════════════════════════════
+CURRENT CONFIGURATION
+═══════════════════════════════════════════════════════════════════════════════
+
+From config.py:
+
+  ACTIVE_CONNECTION = "IP"
+  ACCESS_URL = "http://10.97.114.181:8080/static/index.html#"
+  
+  Hostname (waiting for DNS fix):
+    "http://leus62315243171.homeoffice.wal-mart.com:8080/static/index.html#"
+
+═══════════════════════════════════════════════════════════════════════════════
+IMMEDIATE ACTION ITEMS
+═══════════════════════════════════════════════════════════════════════════════
+
+FOR YOU (Right Now):
+────────────────────────────────────────────────────────────────────────────
+
+✓ OPTION 1: Quick Access via Portal (RECOMMENDED)
+  1. Open: JOBCODES_ACCESS_PORTAL.html in web browser
+  2. Click: "Access Job Codes Dashboard (IP Address)"
+  3. Bookmark this portal page for future use
+  
+✓ OPTION 2: Direct IP Access
+  1. Visit: http://10.97.114.181:8080/static/index.html#
+  2. Bookmark this URL
+  3. Works immediately - no DNS needed
+  
+✓ OPTION 3: Update Your Bookmark
+  1. Find your current bookmark to Job Codes
+  2. Edit the URL to: http://10.97.114.181:8080/static/index.html#
+  3. Save the change
+
+
+FOR IT (DNS Fix - Long Term):
+────────────────────────────────────────────────────────────────────────────
+
+Send this to your IT department:
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ SUBJECT: Update DNS A Record for Job Codes Dashboard                   │
+│                                                                         │
+│ DETAILS:                                                                │
+│ ───────                                                                 │
+│ Hostname: leus62315243171.homeoffice.wal-mart.com                       │
+│ Current DNS:    10.97.108.66 (WRONG - no service)                       │
+│ Should be:      10.97.114.181 (CORRECT - service running)               │
+│ Port:           8080                                                    │
+│ Application:    Job Codes Teaming Dashboard                             │
+│ Service Status: ✓ Running and responding                                │
+│                                                                         │
+│ IMPACT:                                                                 │
+│ Users cannot access via hostname URL. Temporary workaround              │
+│ is IP-based access. This DNS fix makes hostname work again.             │
+│                                                                         │
+│ REFERENCE DOCS:                                                         │
+│ See: JOBCODES_ACCESS_GUIDE.md for full details                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+AFTER DNS IS FIXED (Coming Soon)
+═══════════════════════════════════════════════════════════════════════════════
+
+Once IT updates the DNS A record to point to 10.97.114.181:
+
+1. Verify hostname works:
+   → Visit: http://leus62315243171.homeoffice.wal-mart.com:8080/static/index.html#
+
+2. Update config.py:
+   OLD: ACTIVE_CONNECTION = "IP"
+   NEW: ACTIVE_CONNECTION = "HOSTNAME"
+
+3. You're done! 
+   → Hostname will work for everyone
+   → No more IP addresses to remember
+   → Normal URL behavior
+
+
+═══════════════════════════════════════════════════════════════════════════════
+COMPARISON TO DC EMAIL SYSTEM
+═══════════════════════════════════════════════════════════════════════════════
+
+This follows the same pattern as "DC to Store Change Management Emails":
+
+DC Email System:
+  ✓ config.py - Central configuration
+  ✓ TEST_MODE - Easy switching between modes
+  ✓ Documentation guides
+  ✓ Setup files
+
+Job Codes System (Now):
+  ✓ config.py - Central configuration
+  ✓ ACTIVE_CONNECTION - Easy switching between IP/HOSTNAME
+  ✓ JOBCODES_ACCESS_GUIDE.md - Documentation
+  ✓ JOBCODES_ACCESS_PORTAL.html - User interface
+  ✓ This summary document
+
+
+═══════════════════════════════════════════════════════════════════════════════
+FILES CREATED
+═══════════════════════════════════════════════════════════════════════════════
+
+Location: C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\
+          Store Support\Projects\JobCodes-teaming\Teaming\dashboard\
+
+1. config.py                        ← Configuration (NEW)
+2. JOBCODES_ACCESS_GUIDE.md         ← User guide (NEW)
+3. JOBCODES_ACCESS_PORTAL.html      ← Quick access portal (NEW)
+4. JOBCODES_CONNECTION_SETUP.txt    ← This file
+
+═══════════════════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════════
+
+Q: Can't access via hostname?
+A: Use IP instead. Hostname DNS not fixed yet. Normal.
+
+Q: Can't access via IP?
+A: Backend service may have stopped. Check scheduled task:
+   Task Name: "JobCodes-Backend-Server"
+   Status should be: Ready or Running
+
+Q: Which URL should I use?
+A: IP-based (10.97.114.181:8080) - works right now
+   Hostname - will work after IT fixes DNS
+
+Q: Can I use both URLs?
+A: Yes! IP works immediately. Hostname will work eventually.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Last Updated: March 12, 2026
+Service Status: ✅ Running on 10.97.114.181:8080
+Access Status: ✅ Available via IP address
+DNS Status: ⏳ Awaiting IT fix (using workaround)

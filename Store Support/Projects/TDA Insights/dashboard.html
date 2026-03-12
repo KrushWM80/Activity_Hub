@@ -29,6 +29,7 @@
             --on-track: #107C10;
             --at-risk: #F7630C;
             --off-track: #DC3545;
+            --continuous: #6F42C1;
             
             /* Spacing */
             --spacing-xs: 4px;
@@ -318,29 +319,31 @@
         /* Summary Stats */
         .summary-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: var(--spacing-lg);
+            grid-template-columns: repeat(6, 1fr);
+            gap: var(--spacing-md);
             margin-bottom: var(--spacing-lg);
         }
 
         .stat-card {
             background: white;
-            padding: var(--spacing-lg);
+            padding: var(--spacing-md);
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
             border-left: 4px solid var(--walmart-yellow);
+            text-align: center;
         }
 
         .stat-label {
-            font-size: var(--font-size-sm);
+            font-size: var(--font-size-xs, 11px);
             color: var(--text-secondary);
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-xs, 4px);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
         }
 
         .stat-value {
-            font-size: var(--font-size-2xl);
+            font-size: var(--font-size-xl, 24px);
             font-weight: 700;
             color: var(--walmart-blue-dark);
         }
@@ -432,6 +435,11 @@
         .badge-off-track {
             background-color: rgba(220, 53, 69, 0.2);
             color: var(--off-track);
+        }
+
+        .badge-continuous {
+            background-color: rgba(111, 66, 193, 0.2);
+            color: var(--continuous);
         }
 
         /* Phase Badge */
@@ -641,6 +649,14 @@
             <div class="stat-card">
                 <div class="stat-label">At Risk</div>
                 <div class="stat-value" id="stat-at-risk" style="color: var(--at-risk);">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Off Track</div>
+                <div class="stat-value" id="stat-off-track" style="color: var(--off-track);">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Continuous</div>
+                <div class="stat-value" id="stat-continuous" style="color: var(--continuous);">0</div>
             </div>
         </div>
 
@@ -940,8 +956,8 @@
                 'Health Status',
                 'Phase',
                 '# of Stores',
-                'Intake & Testing',
                 'Dallas POC',
+                'Intake & Testing',
                 'Deployment'
             ];
             
@@ -966,6 +982,8 @@
                             cellClass = 'badge badge-at-risk';
                         } else if (status.includes('off track')) {
                             cellClass = 'badge badge-off-track';
+                        } else if (status.includes('continuous')) {
+                            cellClass = 'badge badge-continuous';
                         } else {
                             cellClass = 'badge';
                         }
@@ -1036,15 +1054,21 @@
             
             let onTrack = 0;
             let atRisk = 0;
+            let offTrack = 0;
+            let continuous = 0;
             
             data.forEach(row => {
                 const status = String(row['Health Status']).toLowerCase();
                 if (status.includes('on track')) onTrack++;
                 else if (status.includes('at risk')) atRisk++;
+                else if (status.includes('off track')) offTrack++;
+                else if (status.includes('continuous')) continuous++;
             });
             
             document.getElementById('stat-on-track').textContent = onTrack;
             document.getElementById('stat-at-risk').textContent = atRisk;
+            document.getElementById('stat-off-track').textContent = offTrack;
+            document.getElementById('stat-continuous').textContent = continuous;
         }
 // Update record count
         function updateRecordCount(count) {
@@ -1163,7 +1187,7 @@
                         btn.textContent = `[Wait] Capturing ${phase} page ${pageIdx + 1}/${pages.length}...`;
                         
                         // Render this phase/page's table with inline styles matching dashboard
-                        const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Intake & Testing', 'Dallas POC', 'Deployment'];
+                        const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas POC', 'Intake & Testing', 'Deployment'];
                         let html = `<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
                                     <thead style="background-color: #F5F5F5; border-bottom: 2px solid #E5E5E5;">
                                     <tr>`;
@@ -1382,8 +1406,8 @@
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Health Status</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Phase</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;"># of Stores</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Intake & Testing</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Dallas POC</th>
+                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Intake & Testing</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Deployment</th>
                         </tr>
                     </thead>
@@ -1404,7 +1428,7 @@
                 let testRow = document.createElement('tr');
                 testRow.style.cssText = 'border: 1px solid #ddd;';
                 
-                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Intake & Testing', 'Dallas POC', 'Deployment'];
+                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas POC', 'Intake & Testing', 'Deployment'];
                 columns.forEach(col => {
                     const td = document.createElement('td');
                     td.style.cssText = 'padding: 8px; border: 1px solid #ddd; word-wrap: break-word; white-space: normal;';

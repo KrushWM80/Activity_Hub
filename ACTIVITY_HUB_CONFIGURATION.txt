@@ -1,0 +1,60 @@
+# Activity Hub Complete Service Configuration
+# Updated March 12, 2026
+
+The Activity Hub requires FOUR core services to be fully operational:
+
+## 1. PROJECTS IN STORES
+- Location: Store Support/Projects/Platform/
+- Service: FastAPI Backend
+- Port: 8001
+- Start Command: C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_server_24_7.bat
+- Task Name: ActivityHubServer
+- Auto-Start: YES (on system startup with 30-second delay)
+- Frontend: http://10.97.114.181:8001/
+- Hostname: leus62315243171.homeoffice.wal-mart.com (DNS currently incorrect - points to 10.97.108.66)
+
+## 2. JOB CODES TEAMING DASHBOARD
+- Location: Store Support/Projects/JobCodes-teaming/Teaming/dashboard/backend/
+- Service: FastAPI Backend
+- Port: 8080
+- Start Command: C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_jobcodes_server_24_7.bat
+- Task Name: JobCodes-Backend-Server
+- Auto-Start: YES (on system startup with 15-second delay)
+- Frontend: http://10.97.114.181:8080/static/index.html#
+- Hostname: leus62315243171.homeoffice.wal-mart.com (DNS currently incorrect - points to 10.97.108.66)
+- Additional: Daily reconciliation at 2:00 AM (Task: JobCodes-Daily-Reconciliation)
+
+## 3. DC MANAGER PAYCYCLE AUTOMATION
+- Location: Platform/daily_check_smart.py
+- Service: Scheduled Python Script
+- Frequency: Every 2 weeks on scheduled PayCycle dates
+- Task Names: DC-EMAIL-PC-01 through DC-EMAIL-PC-26
+- Dates: From March 6, 2026 through January 22, 2027
+- Time: 6:00 AM EST on each PayCycle date
+- Output: Sends emails to ATCTeamsupport@walmart.com, kendall.rush@walmart.com
+
+## 4. DAILY STATUS REPORTS
+- Location: MONITOR_AND_REPORT.ps1
+- Frequency: Every day at 6:00 AM + on system startup
+- Task Names: ActivityHub-DailyStatus-6AM, ActivityHub-Startup-Report
+- Recipients: ATCTeamsupport@walmart.com, kendall.rush@walmart.com
+- Status Checks: All 4 services (Projects in Stores, Job Codes, DC Tasks, System Health)
+- Features: Downtime detection, port monitoring, task verification
+
+## TOTAL SCHEDULED TASKS: 31
+- 1x ActivityHubServer (Projects)
+- 1x JobCodes-Backend-Server
+- 1x JobCodes-Daily-Reconciliation
+- 26x DC-EMAIL-PC-* (DC Manager PayCycle)
+- 1x ActivityHub-DailyStatus-6AM (Email)
+- 1x ActivityHub-Startup-Report (Email)
+
+## TO RESTORE ALL SERVICES - Run in Administrator PowerShell:
+
+powershell -ExecutionPolicy Bypass -File "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\RESTORE_ALL_TASKS_NOW.ps1"
+
+This will:
+- Create all 4 core service tasks
+- Create all 26 PayCycle automation tasks  
+- Create both daily email tasks
+- Verify all 31 tasks are active

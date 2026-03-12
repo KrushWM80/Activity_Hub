@@ -1,0 +1,24 @@
+DNS ISSUE - ACTIVITY HUB ACCESS
+
+PROBLEM:
+The hostname "leus62315243171.homeoffice.wal-mart.com" in Walmart DNS currently points to IP 10.97.108.66, but the actual Activity Hub servers are running on 10.97.114.181.
+
+WORKAROUND:
+Use the IP address directly instead of the hostname:
+
+- Projects in Stores:    http://10.97.114.181:8001/
+- Job Codes Dashboard:   http://10.97.114.181:8080/static/index.html#
+
+STATUS:
+Both servers are running and responsive at the IP addresses above.
+
+SOLUTION REQUIRED:
+Contact IT/Network team to update the DNS A record for:
+  leus62315243171.homeoffice.wal-mart.com
+To point to: 10.97.114.181 (instead of 10.97.108.66)
+
+Once DNS is corrected, the original URLs will work:
+- http://leus62315243171.homeoffice.wal-mart.com:8001/
+- http://leus62315243171.homeoffice.wal-mart.com:8080/static/index.html#
+
+DATE DISCOVERED: March 12, 2026

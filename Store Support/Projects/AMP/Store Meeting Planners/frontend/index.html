@@ -192,8 +192,30 @@
         .calendar-nav button:hover { background: var(--gray-200); }
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: 60px repeat(7, 1fr);
             gap: 4px;
+        }
+        .cal-wk {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--walmart-navy);
+            background: var(--walmart-blue-lightest);
+            border-radius: 6px;
+            min-height: 100px;
+            text-align: center;
+            padding: 4px;
+        }
+        .cal-wk-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--walmart-navy);
+            padding: 8px 0;
         }
         .cal-dow {
             text-align: center;
@@ -245,6 +267,19 @@
         }
         .event-dot.calendar-event { background: var(--walmart-blue); }
         .event-dot.protected-week { background: var(--walmart-yellow); }
+        .event-label {
+            display: block;
+            font-size: 0.6rem;
+            color: var(--walmart-blue-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            line-height: 1.1;
+        }
+        .event-label.protected-label {
+            color: var(--walmart-yellow-dark);
+        }
         .legend {
             display: flex;
             gap: 16px;
@@ -560,16 +595,15 @@
 <!-- TAB NAVIGATION                          -->
 <!-- ======================================= -->
 <nav class="tab-nav">
-    <button class="tab-btn active" data-tab="calendar">📅 Calendar</button>
-    <button class="tab-btn" data-tab="submit">📝 Submit Request</button>
-    <button class="tab-btn" data-tab="myrequests">📋 My Requests</button>
+    <button class="tab-btn active" data-tab="myrequests">📋 My Requests</button>
     <button class="tab-btn hidden" data-tab="admin" id="adminTab">⚙️ Admin</button>
 </nav>
 
 <!-- ======================================= -->
-<!-- TAB: CALENDAR                           -->
+<!-- TAB: MY REQUESTS (merged Calendar + Submit + Requests) -->
 <!-- ======================================= -->
-<div class="tab-content active" id="tab-calendar">
+<div class="tab-content active" id="tab-myrequests">
+    <!-- Calendar Section -->
     <div class="card">
         <div class="calendar-header">
             <h2 id="calendarMonthTitle">January 2026</h2>
@@ -584,18 +618,127 @@
             <div class="legend-item"><div class="legend-color" style="background:var(--success-bg);border:1px solid var(--success)"></div> Available</div>
             <div class="legend-item"><div class="legend-color" style="background:var(--warning-bg);border:1px solid var(--warning)"></div> Filling Up</div>
             <div class="legend-item"><div class="legend-color" style="background:var(--error-bg);border:1px solid var(--error)"></div> Full</div>
-            <div class="legend-item"><div class="legend-color" style="background:var(--walmart-yellow);border:1px solid var(--walmart-yellow-dark)"></div> Protected Week (10 slots)</div>
+            <div class="legend-item"><div class="legend-color" style="background:var(--walmart-yellow);border:1px solid var(--walmart-yellow-dark)"></div> Protected Week</div>
             <div class="legend-item"><div class="event-dot calendar-event" style="width:10px;height:10px"></div> AMP Calendar Event</div>
+        </div>
+    </div>
+
+    <!-- Submit Request Button -->
+    <div style="margin-bottom:1.5rem;">
+        <button class="btn btn-primary" onclick="openSubmitModal()">📝 Submit New Request</button>
+    </div>
+
+    <!-- My Requests Table -->
+    <div class="card">
+        <h2 class="card-title">My Requests</h2>
+        <div id="myRequestsLoading"><div class="spinner"></div><p class="loading-text">Loading your requests...</p></div>
+        <div id="myRequestsEmpty" style="display:none;text-align:center;padding:2rem;color:var(--gray-500);">
+            No requests found. <a href="#" onclick="openSubmitModal();return false;" style="color:var(--walmart-blue)">Submit your first request →</a>
+        </div>
+        <table class="data-table" id="myRequestsTable" style="display:none">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Duration</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Source</th>
+                    <th>Submitted</th>
+                </tr>
+            </thead>
+            <tbody id="myRequestsBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ======================================= -->
+<!-- TAB: ADMIN                              -->
+<!-- ======================================= -->
+<div class="tab-content" id="tab-admin">
+    <!-- AMP Sync Indicator -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h2 style="font-size:1.3rem;font-weight:600;">Admin Dashboard</h2>
+        <div style="display:flex;gap:12px;align-items:center;">
+            <div class="sync-indicator">
+                <div class="sync-dot"></div>
+                <span>AMP Auto-Sync Active</span>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="triggerAmpSync()">🔄 Sync Now</button>
+        </div>
+    </div>
+
+    <!-- Admin Sub-tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:1.5rem;">
+        <button class="btn btn-sm" id="adminSubQueue" onclick="showAdminSub('queue')" style="background:var(--walmart-blue);color:#fff;">Request Queue</button>
+        <button class="btn btn-sm btn-outline" id="adminSubReport" onclick="showAdminSub('report')">Meeting Tracker Report</button>
+    </div>
+
+    <!-- Sub: Request Queue -->
+    <div id="adminSubContent-queue">
+        <div class="filters-bar">
+            <select id="adminFilterStatus" onchange="loadAdminRequests()">
+                <option value="">All Statuses</option>
+                <option value="Review" selected>Review</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Needs Changes">Needs Changes</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+            <select id="adminFilterType" onchange="loadAdminRequests()">
+                <option value="">All Types</option>
+                <option value="Training">Training</option>
+                <option value="Launch">Launch</option>
+                <option value="Open Office Hours">Open Office Hours</option>
+            </select>
+            <input type="date" id="adminFilterStart" onchange="loadAdminRequests()" title="Start date">
+            <input type="date" id="adminFilterEnd" onchange="loadAdminRequests()" title="End date">
+        </div>
+        <div class="card">
+            <div id="adminRequestsLoading"><div class="spinner"></div></div>
+            <table class="data-table" id="adminRequestsTable" style="display:none">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Submitter</th>
+                        <th>Date</th>
+                        <th>Duration</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody id="adminRequestsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Sub: Meeting Tracker Report -->
+    <div id="adminSubContent-report" style="display:none">
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h3 class="card-title" style="margin:0">Calls to Stores — Meeting Tracker</h3>
+                <button class="btn btn-outline btn-sm" onclick="exportReport()">📥 Export CSV</button>
+            </div>
+            <div class="filters-bar">
+                <input type="date" id="reportStart" placeholder="Start date">
+                <input type="date" id="reportEnd" placeholder="End date">
+                <button class="btn btn-primary btn-sm" onclick="loadReport()">Generate</button>
+            </div>
+            <div id="reportContent"></div>
         </div>
     </div>
 </div>
 
 <!-- ======================================= -->
-<!-- TAB: SUBMIT REQUEST                     -->
+<!-- MODAL: Submit Request                   -->
 <!-- ======================================= -->
-<div class="tab-content" id="tab-submit">
-    <div class="card" style="max-width: 800px;">
-        <h2 class="card-title">Submit Meeting Request</h2>
+<div class="modal-overlay" id="submitModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Submit Meeting Request</h3>
+            <button class="modal-close" onclick="closeSubmitModal()">&times;</button>
+        </div>
         <p style="color:var(--gray-600);font-size:0.9rem;margin-bottom:1.5rem;">
             Complete the form below to request a meeting time slot. An admin will review and assign a start time.
         </p>
@@ -695,114 +838,8 @@
 
             <div style="margin-top:1.5rem; display:flex; gap:12px; align-items:center;">
                 <button type="submit" class="btn btn-primary" id="submitBtn">Submit Request</button>
-                <a href="#" onclick="switchTab('calendar');return false;" style="font-size:0.85rem;color:var(--walmart-blue);">Review available calendar slots →</a>
             </div>
         </form>
-    </div>
-</div>
-
-<!-- ======================================= -->
-<!-- TAB: MY REQUESTS                        -->
-<!-- ======================================= -->
-<div class="tab-content" id="tab-myrequests">
-    <div class="card">
-        <h2 class="card-title">My Requests</h2>
-        <div id="myRequestsLoading"><div class="spinner"></div><p class="loading-text">Loading your requests...</p></div>
-        <div id="myRequestsEmpty" style="display:none;text-align:center;padding:2rem;color:var(--gray-500);">
-            No requests found. <a href="#" onclick="switchTab('submit');return false;" style="color:var(--walmart-blue)">Submit your first request →</a>
-        </div>
-        <table class="data-table" id="myRequestsTable" style="display:none">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Date</th>
-                    <th>Duration</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Source</th>
-                    <th>Submitted</th>
-                </tr>
-            </thead>
-            <tbody id="myRequestsBody"></tbody>
-        </table>
-    </div>
-</div>
-
-<!-- ======================================= -->
-<!-- TAB: ADMIN                              -->
-<!-- ======================================= -->
-<div class="tab-content" id="tab-admin">
-    <!-- AMP Sync Indicator -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-        <h2 style="font-size:1.3rem;font-weight:600;">Admin Dashboard</h2>
-        <div style="display:flex;gap:12px;align-items:center;">
-            <div class="sync-indicator">
-                <div class="sync-dot"></div>
-                <span>AMP Auto-Sync Active</span>
-            </div>
-            <button class="btn btn-outline btn-sm" onclick="triggerAmpSync()">🔄 Sync Now</button>
-        </div>
-    </div>
-
-    <!-- Admin Sub-tabs -->
-    <div style="display:flex;gap:8px;margin-bottom:1.5rem;">
-        <button class="btn btn-sm" id="adminSubQueue" onclick="showAdminSub('queue')" style="background:var(--walmart-blue);color:#fff;">Request Queue</button>
-        <button class="btn btn-sm btn-outline" id="adminSubReport" onclick="showAdminSub('report')">Meeting Tracker Report</button>
-    </div>
-
-    <!-- Sub: Request Queue -->
-    <div id="adminSubContent-queue">
-        <div class="filters-bar">
-            <select id="adminFilterStatus" onchange="loadAdminRequests()">
-                <option value="">All Statuses</option>
-                <option value="Review" selected>Review</option>
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Needs Changes">Needs Changes</option>
-                <option value="Rejected">Rejected</option>
-            </select>
-            <select id="adminFilterType" onchange="loadAdminRequests()">
-                <option value="">All Types</option>
-                <option value="Training">Training</option>
-                <option value="Launch">Launch</option>
-                <option value="Open Office Hours">Open Office Hours</option>
-            </select>
-            <input type="date" id="adminFilterStart" onchange="loadAdminRequests()" title="Start date">
-            <input type="date" id="adminFilterEnd" onchange="loadAdminRequests()" title="End date">
-        </div>
-        <div class="card">
-            <div id="adminRequestsLoading"><div class="spinner"></div></div>
-            <table class="data-table" id="adminRequestsTable" style="display:none">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Submitter</th>
-                        <th>Date</th>
-                        <th>Duration</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                        <th>Source</th>
-                    </tr>
-                </thead>
-                <tbody id="adminRequestsBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Sub: Meeting Tracker Report -->
-    <div id="adminSubContent-report" style="display:none">
-        <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                <h3 class="card-title" style="margin:0">Calls to Stores — Meeting Tracker</h3>
-                <button class="btn btn-outline btn-sm" onclick="exportReport()">📥 Export CSV</button>
-            </div>
-            <div class="filters-bar">
-                <input type="date" id="reportStart" placeholder="Start date">
-                <input type="date" id="reportEnd" placeholder="End date">
-                <button class="btn btn-primary btn-sm" onclick="loadReport()">Generate</button>
-            </div>
-            <div id="reportContent"></div>
-        </div>
     </div>
 </div>
 
@@ -838,6 +875,7 @@ async function init() {
     setupTabs();
     renderCalendar();
     loadCalendarData();
+    loadMyRequests();
 }
 
 async function loadUser() {
@@ -868,10 +906,10 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
     if (btn) btn.classList.add('active');
-    document.getElementById('tab-' + tabId).classList.add('active');
+    const tabEl = document.getElementById('tab-' + tabId);
+    if (tabEl) tabEl.classList.add('active');
 
-    // Lazy-load data
-    if (tabId === 'myrequests') loadMyRequests();
+    if (tabId === 'myrequests') { loadMyRequests(); loadCalendarData(); }
     if (tabId === 'admin') loadAdminRequests();
 }
 
@@ -883,55 +921,92 @@ function renderCalendar() {
     document.getElementById('calendarMonthTitle').textContent = `${months[calendarMonth]} ${calendarYear}`;
 
     const grid = document.getElementById('calendarGrid');
-    // Walmart fiscal week: Sat–Fri, but we'll show Sun-Sat for readability
-    const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
+    // Walmart fiscal week: Sat–Fri
+    const dows = ['Sat','Sun','Mon','Tue','Wed','Thu','Fri'];
+    let html = '<div class="cal-wk-header">WK</div>';
+    html += dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
 
-    const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+    const firstDay = new Date(calendarYear, calendarMonth, 1).getDay(); // 0=Sun
     const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
     const today = new Date();
 
-    // Empty cells before first day
-    for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+    // Convert Sunday-based (0=Sun) to Saturday-based (0=Sat): Sat=0, Sun=1, Mon=2...Fri=6
+    const satBasedFirst = (firstDay + 1) % 7;
 
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = `${calendarYear}-${String(calendarMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const isToday = (today.getFullYear() === calendarYear && today.getMonth() === calendarMonth && today.getDate() === d);
-        const slotInfo = calendarData.slots.find(s => s.date === dateStr);
+    // Build array of all cells (empty + real days)
+    const cells = [];
+    for (let i = 0; i < satBasedFirst; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
-        let classes = 'cal-day';
-        if (isToday) classes += ' today';
-        if (slotInfo && slotInfo.is_protected_week) classes += ' protected';
+    // Render rows of 7 days, with WM WK label on left
+    let cellIdx = 0;
+    while (cellIdx < cells.length) {
+        const rowCells = cells.slice(cellIdx, cellIdx + 7);
+        // Pad last row
+        while (rowCells.length < 7) rowCells.push(null);
 
-        let inner = `<div class="day-number">${d}</div>`;
-        if (slotInfo) {
-            const used = slotInfo.approved_count;
-            const max = slotInfo.max_slots;
-            const pct = max > 0 ? used / max : 0;
-            let badgeClass = 'green';
-            if (pct >= 1) badgeClass = 'red';
-            else if (pct >= 0.7) badgeClass = 'yellow';
-            inner += `<span class="slot-badge ${badgeClass}">${used}/${max}</span>`;
-            if (slotInfo.is_protected_week) inner += '<br><span style="font-size:0.65rem;color:var(--walmart-yellow-dark)">Protected</span>';
+        // Find the WM WK for the Saturday (first cell) of this row
+        let wmWk = '';
+        // Find first non-null day in this row to look up WM week
+        const firstRealDay = rowCells.find(c => c !== null);
+        if (firstRealDay) {
+            // Use the Saturday of this row for WM WK lookup
+            const satDay = rowCells[0]; // first col is Saturday
+            const lookupDay = satDay || firstRealDay;
+            const lookupDate = `${calendarYear}-${String(calendarMonth+1).padStart(2,'0')}-${String(lookupDay).padStart(2,'0')}`;
+            const slotForWk = calendarData.slots.find(s => s.date === lookupDate);
+            if (slotForWk && slotForWk.wm_week) {
+                wmWk = 'WK ' + slotForWk.wm_week;
+            }
         }
 
-        // Event dots
-        const dayEvents = calendarData.events.filter(e => {
-            const eStart = e.start_date ? e.start_date.substring(0, 10) : '';
-            const eEnd = e.end_date ? e.end_date.substring(0, 10) : '';
-            return dateStr >= eStart && dateStr <= eEnd;
-        });
-        if (dayEvents.length > 0) {
-            inner += '<div style="margin-top:2px">';
-            dayEvents.slice(0, 5).forEach(ev => {
-                const dotClass = ev.is_protected_week ? 'protected-week' : 'calendar-event';
-                inner += `<span class="event-dot ${dotClass}" title="${ev.title || ''}"></span>`;
-            });
-            if (dayEvents.length > 5) inner += `<span style="font-size:0.6rem;color:var(--gray-500)">+${dayEvents.length - 5}</span>`;
-            inner += '</div>';
-        }
+        html += `<div class="cal-wk">${wmWk}</div>`;
 
-        html += `<div class="${classes}" onclick="calendarDayClick('${dateStr}')">${inner}</div>`;
+        for (let i = 0; i < 7; i++) {
+            const d = rowCells[i];
+            if (d === null) {
+                html += '<div class="cal-day empty"></div>';
+            } else {
+                const dateStr = `${calendarYear}-${String(calendarMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const isToday = (today.getFullYear() === calendarYear && today.getMonth() === calendarMonth && today.getDate() === d);
+                const slotInfo = calendarData.slots.find(s => s.date === dateStr);
+
+                let classes = 'cal-day';
+                if (isToday) classes += ' today';
+                if (slotInfo && slotInfo.is_protected_week) classes += ' protected';
+
+                let inner = `<div class="day-number">${d}</div>`;
+                if (slotInfo) {
+                    const used = slotInfo.approved_count;
+                    const max = slotInfo.max_slots;
+                    const pct = max > 0 ? used / max : 0;
+                    let badgeClass = 'green';
+                    if (pct >= 1) badgeClass = 'red';
+                    else if (pct >= 0.7) badgeClass = 'yellow';
+                    inner += `<span class="slot-badge ${badgeClass}">${used}/${max}</span>`;
+                    if (slotInfo.is_protected_week) inner += '<br><span style="font-size:0.65rem;color:var(--walmart-yellow-dark)">Protected</span>';
+                }
+
+                // Event labels
+                const dayEvents = calendarData.events.filter(e => {
+                    const eStart = e.start_date ? e.start_date.substring(0, 10) : '';
+                    const eEnd = e.end_date ? e.end_date.substring(0, 10) : '';
+                    return dateStr >= eStart && dateStr <= eEnd;
+                });
+                if (dayEvents.length > 0) {
+                    inner += '<div style="margin-top:2px">';
+                    dayEvents.slice(0, 3).forEach(ev => {
+                        const labelClass = ev.is_protected_week ? 'event-label protected-label' : 'event-label';
+                        inner += `<span class="${labelClass}" title="${esc(ev.title || '')}">${esc(ev.title || 'Event')}</span>`;
+                    });
+                    if (dayEvents.length > 3) inner += `<span style="font-size:0.6rem;color:var(--gray-500)">+${dayEvents.length - 3} more</span>`;
+                    inner += '</div>';
+                }
+
+                html += `<div class="${classes}" onclick="calendarDayClick('${dateStr}')">${inner}</div>`;
+            }
+        }
+        cellIdx += 7;
     }
 
     grid.innerHTML = html;
@@ -983,6 +1058,16 @@ function calendarDayClick(dateStr) {
 // =============================================
 // SUBMIT REQUEST
 // =============================================
+function openSubmitModal() {
+    document.getElementById('submitModal').classList.add('open');
+}
+function closeSubmitModal() {
+    document.getElementById('submitModal').classList.remove('open');
+}
+document.getElementById('submitModal').addEventListener('click', function(e) {
+    if (e.target === this) closeSubmitModal();
+});
+
 function toggleAmpUrl() {
     document.getElementById('ampUrlGroup').style.display = document.getElementById('ampCheckbox').checked ? '' : 'none';
 }
@@ -1019,6 +1104,7 @@ async function submitRequest(e) {
             document.getElementById('submitForm').reset();
             document.getElementById('ampUrlGroup').style.display = 'none';
             document.getElementById('customStoreGroup').style.display = 'none';
+            setTimeout(() => { closeSubmitModal(); loadMyRequests(); loadCalendarData(); }, 2000);
         } else {
             showAlert('submitAlert', 'error', data.detail || 'Error submitting request.');
         }
@@ -1362,7 +1448,7 @@ function renderReport(rows) {
     for (const [week, items] of Object.entries(grouped)) {
         html += `<div class="report-section"><h3>${week}</h3>`;
         html += `<table class="data-table"><thead><tr>
-            <th>Description</th><th>Type</th><th>Date</th><th>Day</th><th>Time</th><th>Store Audience</th><th>Author</th>
+            <th>Description</th><th>Type</th><th>Date</th><th>Day</th><th>Time</th><th>Store Count</th><th>Store Audience</th><th>Author</th>
         </tr></thead><tbody>`;
         items.forEach(r => {
             html += `<tr style="cursor:default">
@@ -1371,6 +1457,7 @@ function renderReport(rows) {
                 <td>${formatDate(r.date)}</td>
                 <td>${esc(r.day)}</td>
                 <td>${esc(r.time) || '—'}</td>
+                <td>${r.store_count != null ? r.store_count : '—'}</td>
                 <td>${esc(r.store_audience)}</td>
                 <td>${esc(r.author)}</td>
             </tr>`;
@@ -1382,7 +1469,7 @@ function renderReport(rows) {
 
 function exportReport() {
     if (!reportData.length) return alert('No data to export. Generate a report first.');
-    const headers = ['Description','Type of Meeting','Date','Day','Time','Store Audience','Author','WM Week'];
+    const headers = ['Description','Type of Meeting','Date','Day','Time','Store Count','Store Audience','Author','WM Week'];
     const csvRows = [headers.join(',')];
     reportData.forEach(r => {
         csvRows.push([
@@ -1391,6 +1478,7 @@ function exportReport() {
             `"${r.date||''}"`,
             `"${r.day||''}"`,
             `"${r.time||''}"`,
+            `"${r.store_count != null ? r.store_count : ''}"`,
             `"${(r.store_audience||'').replace(/"/g,'""')}"`,
             `"${r.author||''}"`,
             r.wm_week||''

@@ -41,6 +41,17 @@ class DatabaseService:
     def is_connected(self) -> bool:
         return self.client is not None
 
+    @staticmethod
+    def _to_timestamp_str(val) -> str:
+        """Convert a date string or value to TIMESTAMP-compatible format."""
+        if not val:
+            return ""
+        s = str(val)
+        # If it's just a date (YYYY-MM-DD), append time component
+        if len(s) == 10 and s[4] == "-" and s[7] == "-":
+            return f"{s} 00:00:00"
+        return s
+
     def _run_query(self, query: str, params: list = None) -> list:
         if not self.client:
             print("[DB] No BigQuery client available")
@@ -136,22 +147,29 @@ class DatabaseService:
         return protected_dates
 
     def get_slot_availability(self, start_date: str, end_date: str) -> list:
-        """Get slot availability for a date range."""
+        """Get slot availability for a date range.
+        Counts approved meetings (including recurring monthly expansions) against slots."""
+        # Direct approved counts for this date range
         query = f"""
             SELECT
-                DATE(`Start Date`) as request_date,
+                DATE(SAFE_CAST(`Start Date` AS TIMESTAMP)) as request_date,
                 COUNT(*) as approved_count
             FROM {REQUEST_TABLE}
             WHERE Status = 'Approved'
-              AND DATE(`Start Date`) >= @start_date
-              AND DATE(`Start Date`) <= @end_date
-            GROUP BY DATE(`Start Date`)
+              AND DATE(SAFE_CAST(`Start Date` AS TIMESTAMP)) >= @start_date
+              AND DATE(SAFE_CAST(`Start Date` AS TIMESTAMP)) <= @end_date
+            GROUP BY DATE(SAFE_CAST(`Start Date` AS TIMESTAMP))
         """
         params = [
             bigquery.ScalarQueryParameter("start_date", "DATE", start_date),
             bigquery.ScalarQueryParameter("end_date", "DATE", end_date),
         ]
         approved = {str(r["request_date"]): r["approved_count"] for r in self._run_query(query, params)}
+
+        # Expand recurring monthly approved meetings into this date range
+        recurring_counts = self._get_recurring_approved_counts(start_date, end_date)
+        for date_str, count in recurring_counts.items():
+            approved[date_str] = approved.get(date_str, 0) + count
 
         protected_dates = self.get_protected_week_dates()
 
@@ -189,6 +207,64 @@ class DatabaseService:
                 "fiscal_year": row.get("FISCAL_YEAR_NBR"),
             })
         return slots
+
+    def _get_recurring_approved_counts(self, start_date: str, end_date: str) -> dict:
+        """Expand recurring (Monthly) approved meetings into date counts
+        for the given range. Returns {date_str: additional_count}."""
+        query = f"""
+            SELECT
+                Title,
+                DATE(SAFE_CAST(`Start Date` AS TIMESTAMP)) as original_date,
+                `Meeting Reoccurrence` as reoccurrence
+            FROM {REQUEST_TABLE}
+            WHERE Status = 'Approved'
+              AND `Meeting Reoccurrence` = 'Monthly'
+        """
+        rows = self._run_query(query)
+        if not rows:
+            return {}
+
+        try:
+            range_start = datetime.strptime(start_date, "%Y-%m-%d").date()
+            range_end = datetime.strptime(end_date, "%Y-%m-%d").date()
+        except Exception:
+            return {}
+
+        counts = {}
+        for row in rows:
+            orig = row.get("original_date")
+            if not orig:
+                continue
+            if hasattr(orig, 'date'):
+                orig = orig.date()
+            elif isinstance(orig, str):
+                try:
+                    orig = datetime.strptime(str(orig)[:10], "%Y-%m-%d").date()
+                except Exception:
+                    continue
+
+            # Generate monthly occurrences from the original date
+            day_of_month = orig.day
+            current = orig
+            while True:
+                # Next month
+                if current.month == 12:
+                    next_month = current.replace(year=current.year + 1, month=1, day=1)
+                else:
+                    next_month = current.replace(month=current.month + 1, day=1)
+                # Try to keep same day of month
+                import calendar
+                max_day = calendar.monthrange(next_month.year, next_month.month)[1]
+                actual_day = min(day_of_month, max_day)
+                current = next_month.replace(day=actual_day)
+
+                if current > range_end:
+                    break
+                if current >= range_start:
+                    ds = current.isoformat()
+                    counts[ds] = counts.get(ds, 0) + 1
+
+        return counts
 
     # =========================================
     # REQUESTS CRUD
@@ -250,10 +326,10 @@ class DatabaseService:
             conditions.append("`Meeting Type` = @meeting_type")
             params.append(bigquery.ScalarQueryParameter("meeting_type", "STRING", meeting_type))
         if start_date:
-            conditions.append("DATE(`Start Date`) >= @filter_start")
+            conditions.append("DATE(SAFE_CAST(`Start Date` AS TIMESTAMP)) >= @filter_start")
             params.append(bigquery.ScalarQueryParameter("filter_start", "DATE", start_date))
         if end_date:
-            conditions.append("DATE(`Start Date`) <= @filter_end")
+            conditions.append("DATE(SAFE_CAST(`Start Date` AS TIMESTAMP)) <= @filter_end")
             params.append(bigquery.ScalarQueryParameter("filter_end", "DATE", end_date))
 
         where = " AND ".join(conditions)
@@ -269,7 +345,7 @@ class DatabaseService:
                     WHEN 'Approved' THEN 4
                     WHEN 'Rejected' THEN 5
                 END,
-                `Start Date` DESC
+                SAFE_CAST(`Start Date` AS TIMESTAMP) DESC
         """
         rows = self._run_query(query, params if params else None)
         return [self._add_source_info(self._normalize_request_row(r)) for r in rows]
@@ -280,7 +356,7 @@ class DatabaseService:
             SELECT *
             FROM {REQUEST_TABLE}
             WHERE LOWER(Email) = LOWER(@email)
-            ORDER BY `Start Date` DESC
+            ORDER BY SAFE_CAST(`Start Date` AS TIMESTAMP) DESC
         """
         params = [bigquery.ScalarQueryParameter("email", "STRING", email)]
         rows = self._run_query(query, params)
@@ -299,8 +375,8 @@ class DatabaseService:
             "Name": name,
             "AMP Activity": data.get("AMP_Activity", False),
             "AMP Activity URL": data.get("AMP_Activity_URL", ""),
-            "Start Date": data.get("Start_Date"),
-            "End Date": data.get("End_Date"),
+            "Start Date": self._to_timestamp_str(data.get("Start_Date")),
+            "End Date": self._to_timestamp_str(data.get("End_Date")),
             "Meeting Duration": data.get("Meeting_Duration"),
             "Meeting Type": data.get("Meeting_Type", ""),
             "Impacted Shift": data.get("Impacted_Shift"),
@@ -555,14 +631,15 @@ class DatabaseService:
     # =========================================
 
     def get_meeting_tracker_report(self, start_date: str = None, end_date: str = None) -> list:
-        """Get approved meetings formatted for the Calls to Stores report."""
+        """Get approved meetings formatted for the Calls to Stores report.
+        Includes store_count from AMP ALL 2 via URL matching, sorted by earliest WM week/year."""
         conditions = ["Status = 'Approved'"]
         params = []
         if start_date:
-            conditions.append("DATE(`Start Date`) >= @report_start")
+            conditions.append("DATE(SAFE_CAST(`Start Date` AS TIMESTAMP)) >= @report_start")
             params.append(bigquery.ScalarQueryParameter("report_start", "DATE", start_date))
         if end_date:
-            conditions.append("DATE(`Start Date`) <= @report_end")
+            conditions.append("DATE(SAFE_CAST(`Start Date` AS TIMESTAMP)) <= @report_end")
             params.append(bigquery.ScalarQueryParameter("report_end", "DATE", end_date))
         where = " AND ".join(conditions)
 
@@ -570,18 +647,54 @@ class DatabaseService:
             SELECT
                 r.Title as description,
                 r.`Meeting Type` as type_of_meeting,
-                r.`Start Date` as date,
+                SAFE_CAST(r.`Start Date` AS TIMESTAMP) as date,
                 r.`Meeting Day of the Week` as day,
                 r.`Start Time` as time,
                 r.`Store Selection` as store_audience,
                 r.Name as author,
                 r.Email as author_email,
                 c.WM_WEEK_NBR as wm_week,
-                c.FISCAL_YEAR_NBR as fiscal_year
+                c.FISCAL_YEAR_NBR as fiscal_year,
+                r.`AMP Activity URL` as amp_url,
+                r.`Meeting Reoccurrence` as reoccurrence
             FROM {REQUEST_TABLE} r
             LEFT JOIN {CAL_DIM_TABLE} c
-                ON DATE(r.`Start Date`) = c.CALENDAR_DATE
+                ON DATE(SAFE_CAST(r.`Start Date` AS TIMESTAMP)) = c.CALENDAR_DATE
             WHERE {where}
-            ORDER BY c.WM_WEEK_NBR, r.`Start Date`, r.`Start Time`
+            ORDER BY c.FISCAL_YEAR_NBR ASC, c.WM_WEEK_NBR ASC, SAFE_CAST(r.`Start Date` AS TIMESTAMP) ASC, r.`Start Time`
         """
-        return self._run_query(query, params if params else None)
+        rows = self._run_query(query, params if params else None)
+
+        # Build a lookup for store counts from AMP ALL 2 keyed by event_id
+        amp_store_counts = self._get_amp_store_counts()
+
+        for row in rows:
+            amp_url = row.get("amp_url") or ""
+            store_count = None
+            if amp_url:
+                # Extract event_id from URL like .../message/<event_id>/<wm_week>/<wm_year>
+                parts = amp_url.rstrip("/").split("/")
+                if len(parts) >= 3:
+                    event_id = parts[-3]
+                    store_count = amp_store_counts.get(event_id)
+            row["store_count"] = store_count
+        return rows
+
+    def _get_amp_store_counts(self) -> dict:
+        """Get a mapping of event_id -> Store_Cnt from AMP ALL 2."""
+        query = f"""
+            SELECT DISTINCT event_id, Store_Cnt
+            FROM {AMP_TABLE}
+            WHERE event_id IS NOT NULL
+        """
+        rows = self._run_query(query)
+        result = {}
+        for r in rows:
+            eid = str(r.get("event_id", ""))
+            cnt = r.get("Store_Cnt")
+            if eid and cnt is not None:
+                try:
+                    result[eid] = int(cnt)
+                except (ValueError, TypeError):
+                    result[eid] = cnt
+        return result

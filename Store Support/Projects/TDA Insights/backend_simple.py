@@ -86,8 +86,8 @@ def get_bigquery_data():
             Health_Update as `Health Status`,
             Phase,
             COUNT(DISTINCT Facility) as `# of Stores`,
-            Intake_n_Testing as `Intake & Testing`,
             Dallas_POC as `Dallas POC`,
+            Intake_n_Testing as `Intake & Testing`,
             Deployment
         FROM `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE}`
         WHERE Topic IS NOT NULL
@@ -105,9 +105,9 @@ def get_bigquery_data():
                 'Initiative - Project Title': row['Initiative - Project Title'] or 'Unknown',
                 'Health Status': row['Health Status'] or 'Unknown',
                 'Phase': row['Phase'] or 'Unknown',
-                '# of Stores': row['# of Stores'] or 0,
-                'Intake & Testing': row['Intake & Testing'] or 'N/A',
+                '# of Stores': 0 if (row['# of Stores'] or 0) == 1 else (row['# of Stores'] or 0),
                 'Dallas POC': row['Dallas POC'] or 'N/A',
+                'Intake & Testing': row['Intake & Testing'] or 'N/A',
                 'Deployment': row['Deployment'] or 'N/A'
             })
         
@@ -390,13 +390,13 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
 </Relationships>'''
             zf.writestr(f'ppt/slides/_rels/slide{slide_num}.xml.rels', slide_rels)
             
-            # TITLE SLIDE - Professional Walmart Brand Design with Spark Logo
+            # TITLE SLIDE - Matches the dashboard header style (blue bar + Spark logo)
             title_slide = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 <p:cSld>
 <p:bg>
 <p:bgPr>
-<a:solidFill><a:srgbClr val="3B82F6"/></a:solidFill>
+<a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
 <a:effectLst/>
 </p:bgPr>
 </p:bg>
@@ -412,62 +412,109 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
 <a:ext cx="9144000" cy="6858000"/>
 </a:xfrm>
 </p:grpSpPr>
+<!-- Blue header bar across top -->
 <p:sp>
 <p:nvSpPr>
-<p:cNvPr id="2" name="TitleText"/>
+<p:cNvPr id="2" name="HeaderBar"/>
+<p:cNvSpPr/>
+<p:nvPr/>
+</p:nvSpPr>
+<p:spPr>
+<a:xfrm>
+<a:off x="0" y="0"/>
+<a:ext cx="9144000" cy="1143000"/>
+</a:xfrm>
+<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+<a:solidFill><a:srgbClr val="3B82F6"/></a:solidFill>
+<a:ln><a:noFill/></a:ln>
+</p:spPr>
+<p:txBody>
+<a:bodyPr anchor="ctr" lIns="457200" rIns="91440" tIns="0" bIns="0"/>
+<a:lstStyle/>
+<a:p>
+<a:pPr algn="l"/>
+<a:r>
+<a:rPr lang="en-US" sz="2800" b="1" dirty="0">
+<a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
+<a:latin typeface="Segoe UI"/>
+</a:rPr>
+<a:t>TDA Initiatives Insights</a:t>
+</a:r>
+</a:p>
+</p:txBody>
+</p:sp>
+<!-- Main title centered on slide -->
+<p:sp>
+<p:nvSpPr>
+<p:cNvPr id="3" name="MainTitle"/>
 <p:cNvSpPr/>
 <p:nvPr/>
 </p:nvSpPr>
 <p:spPr>
 <a:xfrm>
 <a:off x="457200" y="2200000"/>
-<a:ext cx="8230200" cy="2500000"/>
+<a:ext cx="8230000" cy="1800000"/>
 </a:xfrm>
 </p:spPr>
 <p:txBody>
-<a:bodyPr/>
+<a:bodyPr anchor="ctr"/>
 <a:lstStyle/>
 <a:p>
-<a:pPr algn="l"/>
+<a:pPr algn="ctr"/>
 <a:r>
-<a:rPr lang="en-US" sz="5600" bold="1" latin="Segoe UI"/>
-<a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
-<a:t>Initiative</a:t>
-</a:r>
-</a:p>
-<a:p>
-<a:pPr algn="l"/>
-<a:r>
-<a:rPr lang="en-US" sz="5600" bold="1" latin="Segoe UI"/>
-<a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
-<a:t>Status Insights</a:t>
+<a:rPr lang="en-US" sz="4000" b="1" dirty="0">
+<a:solidFill><a:srgbClr val="1E3A5F"/></a:solidFill>
+<a:latin typeface="Segoe UI"/>
+</a:rPr>
+<a:t>Initiative Status Insights</a:t>
 </a:r>
 </a:p>
 </p:txBody>
 </p:sp>
+<!-- Subtitle -->
 <p:sp>
 <p:nvSpPr>
-<p:cNvPr id="3" name="WalmartText"/>
+<p:cNvPr id="4" name="Subtitle"/>
 <p:cNvSpPr/>
 <p:nvPr/>
 </p:nvSpPr>
 <p:spPr>
 <a:xfrm>
-<a:off x="457200" y="5600000"/>
-<a:ext cx="2500000" cy="900000"/>
+<a:off x="457200" y="3900000"/>
+<a:ext cx="8230000" cy="800000"/>
 </a:xfrm>
 </p:spPr>
 <p:txBody>
-<a:bodyPr/>
+<a:bodyPr anchor="t"/>
 <a:lstStyle/>
 <a:p>
+<a:pPr algn="ctr"/>
 <a:r>
-<a:rPr lang="en-US" sz="3200" bold="1" latin="Segoe UI"/>
-<a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
-<a:t>Walmart</a:t>
+<a:rPr lang="en-US" sz="2000" dirty="0">
+<a:solidFill><a:srgbClr val="666666"/></a:solidFill>
+<a:latin typeface="Segoe UI"/>
+</a:rPr>
+<a:t>Store Support  |  Asset Protection</a:t>
 </a:r>
 </a:p>
 </p:txBody>
+</p:sp>
+<!-- Bottom accent line -->
+<p:sp>
+<p:nvSpPr>
+<p:cNvPr id="5" name="AccentLine"/>
+<p:cNvSpPr/>
+<p:nvPr/>
+</p:nvSpPr>
+<p:spPr>
+<a:xfrm>
+<a:off x="0" y="6658000"/>
+<a:ext cx="9144000" cy="200000"/>
+</a:xfrm>
+<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+<a:solidFill><a:srgbClr val="FFC220"/></a:solidFill>
+<a:ln><a:noFill/></a:ln>
+</p:spPr>
 </p:sp>
 </p:spTree>
 </p:cSld>

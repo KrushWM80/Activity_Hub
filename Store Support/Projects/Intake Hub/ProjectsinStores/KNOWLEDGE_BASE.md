@@ -25,6 +25,71 @@ For detailed information, see these companion documents:
 - **☁️ [GOOGLE_CLOUD_SETUP.md](GOOGLE_CLOUD_SETUP.md)** - Google Cloud configuration, BigQuery access, authentication
 - **📊 [DATA_MODEL_REFERENCE.md](DATA_MODEL_REFERENCE.md)** - Data structures, schemas, field mappings, examples
 - **🔗 [DEPENDENCY_MAPPING.md](DEPENDENCY_MAPPING.md)** - Code dependencies, packages, versions, relationships
+- **💾 [CACHE_FALLBACK_STRATEGY.md](CACHE_FALLBACK_STRATEGY.md)** - Cache data source logic, fallback behavior, troubleshooting (March 12, 2026 update)
+
+---
+
+## 0. CRITICAL: Cache Fallback Strategy (March 12, 2026)
+
+### ⚠️ Fix Summary
+
+**Issue Fixed**: Dashboard showing incomplete data after cache ages beyond 30 minutes, even though cache had good data.
+
+**Root Cause**: Time-based cache expiration (30 min) conflicted with smart validation protection. When sync failed validation, cache wasn't updated. Cache aged past 30 min → system abandoned good cached data → fallback to BigQuery → received incomplete/stale data.
+
+**Solution Implemented** (March 11-12, 2026):
+1. Changed from TIME-BASED to DATA-BASED cache fallback logic
+2. Added `/api/cache/usage` endpoint for visibility
+3. Enhanced documentation with detailed strategy
+
+### 🔄 How Cache Fallback Works NOW (Corrected)
+
+**Cache First Strategy:**
+```
+API Request → Check: Does cache have data?
+    ├─ YES → Use SQLite Cache (milliseconds)
+    └─ NO → Fall back to BigQuery (seconds)
+```
+
+**Key Points:**
+- ✅ Cache is used regardless of age (smart validation prevents bad data)
+- ✅ Only falls back to BigQuery if cache is completely empty
+- ✅ Sync validation protects cache from contamination (0-records retries, variance checks)
+- ✅ Dashboard visibility via `/api/cache/usage` endpoint
+
+**Why This Works:**
+- Smart validation (March 5) prevents bad data from ever entering cache
+- Age doesn't matter if data quality is guaranteed
+- Graceful degradation: If sync fails, keep good old data rather than switch to potentially incomplete BigQuery data
+- Last valid data persists until new valid data arrives
+
+### 📊 Status Endpoint: `/api/cache/usage`
+
+Returns which data source is active and why:
+
+```json
+{
+  "data_source": "SQLite Cache (LOCAL)",
+  "reason": "Cache has valid data",
+  "cache_populated": true,
+  "record_count": 1350000,
+  "last_sync_time": "2026-03-12T08:45:30.123456",
+  "cache_age_minutes": 45,
+  "cache_age_seconds": 2700,
+  "cache_location": "backend/cache.db",
+  "notes": [
+    "✓ Fallback logic uses DATA presence, not age",
+    "✓ Smart validation prevents bad data in cache",
+    "Cache created 45 minutes ago"
+  ]
+}
+```
+
+**Use This To:**
+- Verify you're using cache (not BigQuery)
+- Check why dashboard shows specific data source
+- Monitor cache age (non-critical, validation protects quality)
+- Troubleshoot data freshness questions
 
 ---
 

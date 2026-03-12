@@ -129,13 +129,16 @@ def map_amp_to_request(event: dict, parsed: dict) -> dict:
         except (ValueError, TypeError):
             pass
 
-    # Start/End dates
+    # Start/End dates — format as TIMESTAMP-compatible strings
     start_date = event.get("start_date")
     end_date = event.get("end_date")
     if start_date and hasattr(start_date, 'isoformat'):
         start_date = start_date.isoformat()
     if end_date and hasattr(end_date, 'isoformat'):
         end_date = end_date.isoformat()
+    # Ensure timestamp format (YYYY-MM-DD HH:MM:SS)
+    start_date_ts = f"{start_date} 00:00:00" if start_date and len(str(start_date)) == 10 else str(start_date or "")
+    end_date_ts = f"{end_date} 00:00:00" if end_date and len(str(end_date)) == 10 else str(end_date or "")
 
     # Author info
     author_email = event.get("activity_email", "") or ""
@@ -148,8 +151,8 @@ def map_amp_to_request(event: dict, parsed: dict) -> dict:
         "Name": author_name,
         "AMP_Activity": True,
         "AMP_Activity_URL": amp_url,
-        "Start_Date": str(start_date) if start_date else "",
-        "End_Date": str(end_date) if end_date else "",
+        "Start_Date": start_date_ts,
+        "End_Date": end_date_ts,
         "Meeting_Duration": duration,
         "Meeting_Type": "",  # NOT available from AMP
         "Impacted_Shift": None,  # NOT available from AMP

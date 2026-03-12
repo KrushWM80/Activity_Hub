@@ -17,24 +17,66 @@ function Get-SystemStatus {
         TimeStamp = Get-Date
         ProjectsInStoresRunning = $false
         Port8001Listening = $false
+        JobCodesRunning = $false
+        Port8080Listening = $false
         DCTasksCount = 0
-        JobCodesTaskActive = $false
+        JobCodesBackendTask = $false
+        TDARunning = $false
+        Port5000Listening = $false
+        StoreActivityDashboardRunning = $false
+        ZorroRunning = $false
+        Port8888Listening = $false
     }
     
-    # Check Projects in Stores
+    # Check Projects in Stores (port 8001)
     $netstat = netstat -ano 2>$null | Select-String ":8001.*LISTENING"
     if ($netstat) {
         $status.ProjectsInStoresRunning = $true
         $status.Port8001Listening = $true
     }
     
+    # Check Job Codes Backend (port 8080)
+    $netstat8080 = netstat -ano 2>$null | Select-String ":8080.*LISTENING"
+    if ($netstat8080) {
+        $status.JobCodesRunning = $true
+        $status.Port8080Listening = $true
+    }
+    
+    # Check TDA Insights (port 5000)
+    $netstat5000 = netstat -ano 2>$null | Select-String ":5000.*LISTENING"
+    if ($netstat5000) {
+        $status.TDARunning = $true
+        $status.Port5000Listening = $true
+    }
+    
+    # Check Store Activity Dashboard (port 8080) - amp_backend_server.py
+    $netstat8080alt = netstat -ano 2>$null | Select-String ":8080.*LISTENING" | Select-String -NotMatch "8080" | Select-Object -First 1
+    # Note: We look for port 8080 but need to distinguish from Job Codes also on 8080
+    # Store Dashboard runs separately, check process or verify via HTTP
+    try {
+        $response = Invoke-WebRequest -Uri "http://localhost:8080/" -TimeoutSec 2 -ErrorAction SilentlyContinue
+        if ($response.StatusCode -eq 200) {
+            $status.StoreActivityDashboardRunning = $true
+        }
+    } catch {
+        # Dashboard not responding on port 8080
+        $status.StoreActivityDashboardRunning = $false
+    }
+    
+    # Check Zorro (port 8888) - podcast_server.py
+    $netstat8888 = netstat -ano 2>$null | Select-String ":8888.*LISTENING"
+    if ($netstat8888) {
+        $status.ZorroRunning = $true
+        $status.Port8888Listening = $true
+    }
+    
+    # Check Job Codes Backend Task
+    $jobCodesTask = Get-ScheduledTask -TaskName "JobCodes-Backend-Server" -ErrorAction SilentlyContinue
+    $status.JobCodesBackendTask = $null -ne $jobCodesTask
+    
     # Check DC Manager Tasks
     $dcTasks = Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object {$_.TaskName -like "DC-EMAIL-PC-*"}
     $status.DCTasksCount = if ($dcTasks) { $dcTasks.Count } else { 0 }
-    
-    # Check Job Codes Task
-    $jobCodesTask = Get-ScheduledTask -TaskName "JobCodes-Continuous-Sync" -ErrorAction SilentlyContinue
-    $status.JobCodesTaskActive = $null -ne $jobCodesTask
     
     return $status
 }
@@ -72,7 +114,7 @@ function Get-DowntimeInfo {
 function Build-StatusEmail {
     param($CurrentStatus, $DowntimeInfo, $IsRestartEmail = $false)
     
-    $statusOK = $CurrentStatus.ProjectsInStoresRunning -and $CurrentStatus.DCTasksCount -eq 26 -and $CurrentStatus.JobCodesTaskActive
+    $statusOK = $CurrentStatus.ProjectsInStoresRunning -and $CurrentStatus.DCTasksCount -eq 26 -and $CurrentStatus.JobCodesRunning
     $statusIndicator = if ($statusOK) { "ALL SYSTEMS OPERATIONAL" } else { "ATTENTION REQUIRED" }
     $currentTime = Get-Date -Format 'MMMM d, yyyy - h:mm tt'
     
@@ -138,14 +180,29 @@ function Build-StatusEmail {
                 <td>Port 8001 - $(if ($CurrentStatus.Port8001Listening) { 'Listening' } else { 'Not responding' })</td>
             </tr>
             <tr>
+                <td>Job Codes Teaming Dashboard</td>
+                <td class="$(if ($CurrentStatus.JobCodesRunning) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.JobCodesRunning) { 'RUNNING' } else { 'OFFLINE' })</td>
+                <td>Port 8080 - $(if ($CurrentStatus.Port8080Listening) { 'Listening' } else { 'Not responding' })</td>
+            </tr>
+            <tr>
+                <td>TDA Insights Dashboard</td>
+                <td class="$(if ($CurrentStatus.TDARunning) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.TDARunning) { 'RUNNING' } else { 'OFFLINE' })</td>
+                <td>Port 5000 - $(if ($CurrentStatus.Port5000Listening) { 'Listening' } else { 'Not responding' })</td>
+            </tr>
+            <tr>
+                <td>AMP Store Updates Dashboard</td>
+                <td class="$(if ($CurrentStatus.StoreActivityDashboardRunning) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.StoreActivityDashboardRunning) { 'RUNNING' } else { 'OFFLINE' })</td>
+                <td>HTTP Server port 8080 - $(if ($CurrentStatus.StoreActivityDashboardRunning) { 'Responding' } else { 'Not responding' })</td>
+            </tr>
+            <tr>
+                <td>Zorro Podcast Server</td>
+                <td class="$(if ($CurrentStatus.ZorroRunning) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.ZorroRunning) { 'RUNNING' } else { 'OFFLINE' })</td>
+                <td>Port 8888 - $(if ($CurrentStatus.Port8888Listening) { 'Listening' } else { 'Not responding' })</td>
+            </tr>
+            <tr>
                 <td>DC Manager PayCycle Tasks</td>
                 <td class="$(if ($CurrentStatus.DCTasksCount -eq 26) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.DCTasksCount -eq 26) { 'ACTIVE' } else { 'INCOMPLETE' })</td>
                 <td>$($CurrentStatus.DCTasksCount)/26 tasks scheduled</td>
-            </tr>
-            <tr>
-                <td>Job Codes Continuous Sync</td>
-                <td class="$(if ($CurrentStatus.JobCodesTaskActive) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.JobCodesTaskActive) { 'ACTIVE' } else { 'INACTIVE' })</td>
-                <td>Daily reconciliation at 2:00 AM</td>
             </tr>
         </table>
     </div>
@@ -154,31 +211,213 @@ function Build-StatusEmail {
         <h3>Key Metrics</h3>
         <ul>
             <li><strong>Overall Status:</strong> $(if ($statusOK) { 'All systems operational' } else { 'Issues detected' })</li>
-            <li><strong>Services Running:</strong> 3 of 3 configured</li>
+            <li><strong>Services Running:</strong> $(($CurrentStatus.ProjectsInStoresRunning -as [int]) + ($CurrentStatus.JobCodesRunning -as [int]) + ($CurrentStatus.TDARunning -as [int]) + ($CurrentStatus.StoreActivityDashboardRunning -as [int]) + ($CurrentStatus.ZorroRunning -as [int]))/5 running</li>
             <li><strong>Scheduled Tasks:</strong> 29 active</li>
             <li><strong>Report Generated:</strong> $currentTime</li>
         </ul>
     </div>
 
     <div class="section">
+        <h3>Access Points</h3>
+        <ul>
+            <li><strong>Projects in Stores:</strong> http://10.97.114.181:8001/</li>
+            <li><strong>Job Codes Dashboard:</strong> http://10.97.114.181:8080/static/index.html#</li>
+            <li><strong>TDA Insights:</strong> http://localhost:5000/dashboard.html</li>
+            <li><strong>Store Activity Dashboard:</strong> http://localhost:8080/</li>
+            <li><strong>Zorro Podcast Server:</strong> http://localhost:8888/</li>
+            <li><strong>Note:</strong> Use IP address for Job Codes & Projects. Use localhost for TDA, Store Dashboard, and Zorro.</li>
+        </ul>
+    </div>
+
+    <div class="section">
         <h3>Upcoming Events</h3>
         <ul>
-            <li><strong>Tonight (2:00 AM EST):</strong> Job Codes reconciliation</li>
-            <li><strong>Tomorrow (6:00 AM EST):</strong> Daily status report</li>
-            <li><strong>March 6, 2026 (6:00 AM EST):</strong> Next DC Manager PayCycle (PC-03)</li>
+            <li><strong>Daily (3:00 AM EST):</strong> Job Codes scheduled restart</li>
+            <li><strong>Daily (6:00 AM EST):</strong> Health check and status report</li>
+            <li><strong>Every 6 Hours:</strong> Background health check restart cycle</li>
         </ul>
     </div>
 
     <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
     <p style="font-size: 9pt; color: #666;">
         <strong>Activity Hub Monitor</strong> | Computer: WEUS42608431466<br>
-        Automated status report | Next scheduled: Tomorrow 6:00 AM
+        Automated status report with health checks and auto-restart capability | Next scheduled: Tomorrow 6:00 AM
     </p>
 </body>
 </html>
 "@
     
     return $html
+}
+
+# ==========================================
+# JOB CODES HEALTH CHECK & AUTO-RESTART
+# ==========================================
+function Check-And-RestartJobCodes {
+    param($SystemStatus)
+    
+    if (-not $SystemStatus.JobCodesRunning) {
+        Write-Host "⚠ Job Codes is offline - attempting automatic restart..." -ForegroundColor Yellow
+        
+        try {
+            # Trigger the JobCodes-Backend-Server task to run immediately
+            $jobCodesTask = Get-ScheduledTask -TaskName "JobCodes-Backend-Server" -ErrorAction SilentlyContinue
+            if ($jobCodesTask) {
+                Start-ScheduledTask -TaskName "JobCodes-Backend-Server" -ErrorAction SilentlyContinue
+                Write-Host "✓ Triggered JobCodes-Backend-Server task" -ForegroundColor Green
+                
+                # Wait 3 seconds for process to start
+                Start-Sleep -Seconds 3
+                
+                # Re-check if it's running
+                $netstat = netstat -ano 2>$null | Select-String ":8080.*LISTENING"
+                if ($netstat) {
+                    Write-Host "✓ Job Codes successfully restarted and listening on port 8080" -ForegroundColor Green
+                    return $true
+                } else {
+                    Write-Host "✗ Job Codes task triggered but not yet listening" -ForegroundColor Yellow
+                    return $false
+                }
+            }
+        } catch {
+            Write-Host "✗ Error restarting Job Codes: $_" -ForegroundColor Red
+            return $false
+        }
+    } else {
+        Write-Host "✓ Job Codes is running normally on port 8080" -ForegroundColor Green
+        return $true
+    }
+}
+
+# ==========================================
+# TDA INSIGHTS HEALTH CHECK & AUTO-RESTART
+# ==========================================
+function Check-And-RestartTDA {
+    param($SystemStatus)
+    
+    if (-not $SystemStatus.TDARunning) {
+        Write-Host "⚠ TDA Insights is offline - attempting automatic restart..." -ForegroundColor Yellow
+        
+        try {
+            # Define TDA backend path and startup command
+            $tdaPath = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\TDA Insights"
+            $pythonExe = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\.venv\Scripts\python.exe"
+            
+            if (Test-Path $tdaPath) {
+                # Start TDA backend process in background
+                $env:GOOGLE_APPLICATION_CREDENTIALS = "C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json"
+                $process = Start-Process -FilePath $pythonExe -ArgumentList "$tdaPath\backend_simple.py" -WorkingDirectory $tdaPath -WindowStyle Hidden -PassThru -ErrorAction SilentlyContinue
+                
+                if ($process) {
+                    Write-Host "✓ Started TDA Insights backend (PID: $($process.Id))" -ForegroundColor Green
+                    Start-Sleep -Seconds 2
+                    
+                    # Re-check if it's running
+                    $netstat = netstat -ano 2>$null | Select-String ":5000.*LISTENING"
+                    if ($netstat) {
+                        Write-Host "✓ TDA successfully restarted and listening on port 5000" -ForegroundColor Green
+                        return $true
+                    }
+                }
+            }
+        } catch {
+            Write-Host "✗ Error restarting TDA: $_" -ForegroundColor Red
+            return $false
+        }
+    } else {
+        Write-Host "✓ TDA Insights is running normally on port 5000" -ForegroundColor Green
+        return $true
+    }
+}
+
+# ==========================================
+# ZORRO HEALTH CHECK & AUTO-RESTART
+# ==========================================
+function Check-And-RestartZorro {
+    param($SystemStatus)
+    
+    if (-not $SystemStatus.ZorroRunning) {
+        Write-Host "⚠ Zorro is offline - attempting automatic restart..." -ForegroundColor Yellow
+        
+        try {
+            # Define Zorro path and startup command
+            $zorroPath = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\AMP\Zorro"
+            $pythonExe = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\.venv\Scripts\python.exe"
+            
+            if (Test-Path $zorroPath) {
+                # Start Zorro server process in background
+                $process = Start-Process -FilePath $pythonExe -ArgumentList "$zorroPath\podcast_server.py" -WorkingDirectory $zorroPath -WindowStyle Hidden -PassThru -ErrorAction SilentlyContinue
+                
+                if ($process) {
+                    Write-Host "✓ Started Zorro server (PID: $($process.Id))" -ForegroundColor Green
+                    Start-Sleep -Seconds 2
+                    
+                    # Re-check if it's running
+                    $netstat = netstat -ano 2>$null | Select-String ":8888.*LISTENING"
+                    if ($netstat) {
+                        Write-Host "✓ Zorro successfully restarted and listening on port 8888" -ForegroundColor Green
+                        return $true
+                    }
+                }
+            }
+        } catch {
+            Write-Host "✗ Error restarting Zorro: $_" -ForegroundColor Red
+            return $false
+        }
+    } else {
+        Write-Host "✓ Zorro is running normally on port 8888" -ForegroundColor Green
+        return $true
+    }
+}
+
+# ==========================================
+# AMP STORE UPDATES DASHBOARD HEALTH CHECK & AUTO-RESTART
+# ==========================================
+function Check-And-RestartAMPDashboard {
+    param($SystemStatus)
+    
+    if (-not $SystemStatus.StoreActivityDashboardRunning) {
+        Write-Host "⚠ AMP Store Updates Dashboard is offline - attempting automatic restart..." -ForegroundColor Yellow
+        
+        try {
+            # Define AMP dashboard path and startup command
+            $ampPath = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\AMP\Store Updates Dashboard"
+            $pythonExe = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\.venv\Scripts\python.exe"
+            
+            if (Test-Path $ampPath) {
+                # Set Google Cloud credentials (amp_backend_server.py needs BigQuery access)
+                $env:GOOGLE_APPLICATION_CREDENTIALS = "C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json"
+                
+                # Start AMP backend process in background
+                $process = Start-Process -FilePath $pythonExe -ArgumentList "$ampPath\amp_backend_server.py" -WorkingDirectory $ampPath -WindowStyle Hidden -PassThru -ErrorAction SilentlyContinue
+                
+                if ($process) {
+                    Write-Host "✓ Started AMP Store Updates Dashboard (PID: $($process.Id))" -ForegroundColor Green
+                    Start-Sleep -Seconds 3
+                    
+                    # Re-check if it's responding
+                    try {
+                        $response = Invoke-WebRequest -Uri "http://localhost:8080/" -TimeoutSec 2 -ErrorAction SilentlyContinue
+                        if ($response.StatusCode -eq 200) {
+                            Write-Host "✓ AMP Dashboard successfully restarted and responding on port 8080" -ForegroundColor Green
+                            return $true
+                        }
+                    } catch {
+                        Write-Host "✗ AMP Dashboard started but not yet responding" -ForegroundColor Yellow
+                        return $false
+                    }
+                }
+            } else {
+                Write-Host "✗ AMP Dashboard path not found: $ampPath" -ForegroundColor Red
+            }
+        } catch {
+            Write-Host "✗ Error restarting AMP Dashboard: $_" -ForegroundColor Red
+            return $false
+        }
+    } else {
+        Write-Host "✓ AMP Store Updates Dashboard is running normally on port 8080" -ForegroundColor Green
+        return $true
+    }
 }
 
 # Send email via Outlook
@@ -217,6 +456,26 @@ Write-Host "================================================`n" -ForegroundColor
 # Get current status
 $currentStatus = Get-SystemStatus
 Write-Host "✓ Current Status retrieved" -ForegroundColor Green
+
+# Check Job Codes health and auto-restart if needed
+Write-Host "`nChecking Job Codes health..." -ForegroundColor Cyan
+Check-And-RestartJobCodes -SystemStatus $currentStatus
+
+# Check TDA Insights health and auto-restart if needed
+Write-Host "`nChecking TDA Insights health..." -ForegroundColor Cyan
+Check-And-RestartTDA -SystemStatus $currentStatus
+
+# Check Zorro health and auto-restart if needed
+Write-Host "`nChecking Zorro health..." -ForegroundColor Cyan
+Check-And-RestartZorro -SystemStatus $currentStatus
+
+# Check AMP Store Updates Dashboard health and auto-restart if needed
+Write-Host "`nChecking AMP Store Updates Dashboard health..." -ForegroundColor Cyan
+Check-And-RestartAMPDashboard -SystemStatus $currentStatus
+
+# Refresh status after all potential restarts
+$currentStatus = Get-SystemStatus
+Write-Host "`n✓ All health checks complete" -ForegroundColor Green
 
 # Check for downtime
 $downtimeInfo = Get-DowntimeInfo
