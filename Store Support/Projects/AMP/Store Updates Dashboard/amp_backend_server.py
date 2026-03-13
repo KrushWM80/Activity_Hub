@@ -13,6 +13,7 @@ from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from google.cloud import bigquery
 import logging
+import os
 from datetime import datetime, timedelta
 import json
 import sys
@@ -490,7 +491,7 @@ def serve_audio(filename):
 
 
 if __name__ == '__main__':
-    port = 5000
+    port = int(os.getenv('PORT', 8081))
     logger.info(f"🚀 Starting AMP Dashboard Backend on http://localhost:{port}")
     logger.info(f"📊 BigQuery: {PROJECT_ID}.{DATASET_ID}.{TABLE_ID}")
     logger.info(f"🔐 Using gcloud application default credentials")

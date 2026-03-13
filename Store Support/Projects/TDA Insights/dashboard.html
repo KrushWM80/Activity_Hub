@@ -992,6 +992,13 @@
                         html += `<td><span class="phase-tag">${value}</span></td>`;
                     } else if (col === '# of Stores') {
                         html += `<td style="font-weight: 600; color: var(--walmart-blue);">${value}</td>`;
+                    } else if (col === 'Initiative - Project Title') {
+                        const projectId = row['Project ID'];
+                        if (projectId) {
+                            html += `<td><a href="https://hoops.wal-mart.com/intake-hub/projects/${projectId}" target="_blank" style="color: var(--walmart-blue); text-decoration: none; font-weight: 500;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${value}</a></td>`;
+                        } else {
+                            html += `<td>${value}</td>`;
+                        }
                     } else {
                         html += `<td>${value}</td>`;
                     }
@@ -1221,6 +1228,13 @@
                                     html += `<td style="${cellStyle}"><span style="display: inline-block; padding: 4px 10px; background-color: #DBEAFE; color: #1E3A8A; border-radius: 4px; font-weight: 500; font-size: 12px;">${value}</span></td>`;
                                 } else if (col === '# of Stores') {
                                     html += `<td style="${cellStyle} font-weight: 600; color: #0071CE;">${value}</td>`;
+                                } else if (col === 'Initiative - Project Title') {
+                                    const projectId = row['Project ID'];
+                                    if (projectId) {
+                                        html += `<td style="${cellStyle}"><a href="https://hoops.wal-mart.com/intake-hub/projects/${projectId}" style="color: #0071CE; text-decoration: none; font-weight: 500;">${value}</a></td>`;
+                                    } else {
+                                        html += `<td style="${cellStyle}">${value}</td>`;
+                                    }
                                 } else {
                                     html += `<td style="${cellStyle}">${value}</td>`;
                                 }
@@ -1437,7 +1451,16 @@
                     if (col === 'Health Status' || col === 'Phase' || col === '# of Stores') {
                         td.style.fontWeight = '600';
                     }
-                    td.textContent = String(value);
+                    if (col === 'Initiative - Project Title' && row['Project ID']) {
+                        const a = document.createElement('a');
+                        a.href = `https://hoops.wal-mart.com/intake-hub/projects/${row['Project ID']}`;
+                        a.target = '_blank';
+                        a.style.cssText = 'color: #0071CE; text-decoration: none; font-weight: 500;';
+                        a.textContent = String(value);
+                        td.appendChild(a);
+                    } else {
+                        td.textContent = String(value);
+                    }
                     testRow.appendChild(td);
                 });
                 

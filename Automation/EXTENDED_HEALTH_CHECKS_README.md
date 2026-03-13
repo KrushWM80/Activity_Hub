@@ -44,7 +44,7 @@ The `Get-SystemStatus` function now detects:
 - ✅ Job Codes running on port 8080
 - ✅ Projects in Stores running on port 8001
 - ✅ TDA Insights running on port 5000
-- ✅ Store Activity Dashboard running on port 8080
+- ✅ Store Activity Dashboard running on port 8081
 - ✅ Zorro running on port 8888
 - ✅ All 26 DC Manager PayCycle tasks
 - ✅ Job Codes scheduled task configuration
@@ -119,7 +119,7 @@ PS> .\MONITOR_AND_REPORT.ps1
 
 ### From Inside the Network (Localhost)
 - **TDA Insights:** http://localhost:5000/dashboard.html
-- **Store Activity Dashboard:** http://localhost:8080/
+- **Store Activity Dashboard:** http://localhost:8081/
 - **Zorro Podcast Server:** http://localhost:8888/
 - **Zorro Audio Generator:** http://localhost:8888/create-audio
 
@@ -190,10 +190,10 @@ The MONITOR_AND_REPORT.ps1 script will:
 
 ### Port Assignments
 - TDA Insights uses port 5000 (Flask)
-- Store Activity Dashboard uses port 8080 (Flask + BigQuery)
+- Store Activity Dashboard uses port 8081 (Flask + BigQuery)
 - Zorro uses unique port 8888 (HTTP Server)
 - Job Codes uses unique port 8080 (FastAPI, IP-based access)
-- **Note:** Job Codes and Store Dashboard both on port 8080 require IP-based access vs. localhost
+- **Note:** Each service has unique port assignment - access Job Codes via IP (10.97.114.181:8080), Store Dashboard via localhost (localhost:8081)
 
 ### Manual Restart
 ```powershell

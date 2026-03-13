@@ -3,7 +3,7 @@ REM ==========================================
 REM Store Activity & Communication Dashboard - 24/7 Auto-Restart
 REM ==========================================
 REM Purpose: Keep Store Dashboard running continuously
-REM Access: http://localhost:8080/
+REM Access: http://localhost:8081/
 REM Status File: store_dashboard_server.log
 REM
 REM Features:
@@ -20,7 +20,7 @@ set ProjectRoot=C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_
 set DashboardPath=%ProjectRoot%\Store Support\Projects\AMP\Store Updates Dashboard
 set PythonExe=%ProjectRoot%\.venv\Scripts\python.exe
 set LogFile=%DashboardPath%\store_dashboard_server.log
-set Port=8080
+set Port=8081
 
 REM Set up Google Cloud credentials for BigQuery access
 set GOOGLE_APPLICATION_CREDENTIALS=%APPDATA%\gcloud\application_default_credentials.json
@@ -29,7 +29,7 @@ echo.
 echo ================================================================
 echo Store Activity & Communication Dashboard - 24/7 Operating Mode
 echo ================================================================
-echo Access: http://localhost:%Port%/
+echo Access: http://localhost:8081/
 echo Log File: %LogFile%
 echo Time: %date% %time%
 echo ================================================================

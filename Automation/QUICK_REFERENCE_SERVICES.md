@@ -9,10 +9,10 @@
 | **Job Codes Dashboard** | 8080 | http://10.97.114.181:8080/static/index.html# | FastAPI | netstat :8080 |
 | **Projects in Stores** | 8001 | http://10.97.114.181:8001/ | Teaming | netstat :8001 |
 | **TDA Insights** | 5000 | http://localhost:5000/dashboard.html | Flask | netstat :5000 |
-| **Store Activity Dashboard** | 8080* | http://localhost:8080/ | Flask | netstat :8080 or HTTP GET |
+| **Store Activity Dashboard** | 8081* | http://localhost:8081/ | Flask | HTTP GET verification |
 | **Zorro Podcast Server** | 8888 | http://localhost:8888/ | HTTP | netstat :8888 |
 
-*Note: Store Dashboard uses HTTP verification (not just netstat) due to shared port with Job Codes (IP-based access)
+*Note: Store Dashboard uses HTTP verification (not just netstat) and unique port 8081 to avoid conflict with Job Codes port 8080
 
 ---
 
@@ -29,7 +29,7 @@ Every 6 Hours (Background)  → Automatic restart if services offline
 ✅ Job Codes (Port 8080)  
 ✅ Projects in Stores (Port 8001)  
 ✅ TDA Insights (Port 5000)  
-✅ Store Activity Dashboard (Port 8080)  
+✅ Store Activity Dashboard (Port 8081)  
 ✅ Zorro (Port 8888)  
 ✅ DC Manager Tasks (26 tasks)  
 
@@ -54,7 +54,7 @@ Each service:
 ### From Local Machine (Same Computer)
 ```
 TDA Insights              → http://localhost:5000/dashboard.html
-Store Activity Dashboard  → http://localhost:8080/
+Store Activity Dashboard  → http://localhost:8081/
 Zorro Podcast Server      → http://localhost:8888/
   ↳ Audio Generator       → http://localhost:8888/create-audio
 ```
@@ -124,7 +124,7 @@ Zorro            → Store Support/Projects/AMP/Zorro/zorro_server.log
 ### Checking Service Status
 ```powershell
 # Check all listening ports
-netstat -ano | findstr "LISTENING" | findstr ":80\|:5000\|:8001\|:8080\|:8888"
+netstat -ano | findstr "LISTENING" | findstr ":80\|:5000\|:8001\|:8081\|:8888"
 
 # Check specific service
 netstat -ano | findstr ":8080.*LISTENING"  # Job Codes
@@ -206,7 +206,7 @@ cd "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Su
 |------|---------|--------|
 | 5000 | TDA Insights | Monitored |
 | 8001 | Projects in Stores | Monitored |
-| 8080 | Store Activity Dashboard | Auto-restart |
+| 8081 | Store Activity Dashboard | Auto-restart |
 | 8080 | Job Codes | 24/7 Auto-restart |
 | 8888 | Zorro | Auto-restart |
 

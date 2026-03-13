@@ -454,13 +454,16 @@ class DatabaseService:
             query = f"""
                 SELECT 
                     COUNT(DISTINCT CASE 
-                        WHEN {table_ref}.Intake_Card IS NOT NULL THEN CAST({table_ref}.Intake_Card AS STRING)
-                        ELSE CONCAT('R-', CAST({table_ref}.Facility AS STRING))
+                        WHEN {table_ref}.Project_Source IN ('Operations', 'Intake Hub') AND {table_ref}.Intake_Card IS NOT NULL 
+                          THEN CAST({table_ref}.Intake_Card AS STRING)
+                        WHEN {table_ref}.Project_Source = 'Realty'
+                          THEN {table_ref}.Title
+                        ELSE NULL
                     END) as total_active_projects,
                     COUNT(DISTINCT {table_ref}.Facility) as total_stores,
-                    COUNT(DISTINCT CASE WHEN {table_ref}.Project_Source IN ('Operations', 'Intake Hub') THEN {table_ref}.Intake_Card END) as intake_hub_projects,
+                    COUNT(DISTINCT CASE WHEN {table_ref}.Project_Source IN ('Operations', 'Intake Hub') AND {table_ref}.Intake_Card IS NOT NULL THEN {table_ref}.Intake_Card END) as intake_hub_projects,
                     COUNT(DISTINCT CASE WHEN {table_ref}.Project_Source IN ('Operations', 'Intake Hub') THEN {table_ref}.Facility END) as intake_hub_stores,
-                    COUNT(DISTINCT CASE WHEN {table_ref}.Project_Source = 'Realty' THEN CONCAT('R-', CAST({table_ref}.Facility AS STRING)) END) as realty_projects,
+                    COUNT(DISTINCT CASE WHEN {table_ref}.Project_Source = 'Realty' THEN {table_ref}.Title END) as realty_projects,
                     COUNT(DISTINCT CASE WHEN {table_ref}.Project_Source = 'Realty' THEN {table_ref}.Facility END) as realty_stores,
                     MAX({table_ref}.Last_Updated) as last_updated
                 FROM `{self.project_id}.{self.dataset}.{self.table}`{"as main " + join_clause if join_clause else ""}

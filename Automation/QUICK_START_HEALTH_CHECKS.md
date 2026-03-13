@@ -4,7 +4,7 @@
 Your monitoring system now includes **3 additional services** with automated health checks and restart capabilities:
 
 1. **TDA Insights** - Port 5000 - Store analytics dashboard
-2. **Store Activity Dashboard** - Port 8080 - AMP communication platform  
+2. **Store Activity Dashboard** - Port 8081 - AMP communication platform  
 3. **Zorro Podcast Server** - Port 8888 - Jenny voice audio generation
 
 Plus existing services:
@@ -18,7 +18,7 @@ Plus existing services:
 ### Access From Your Computer (Localhost)
 ```
 TDA Insights:             http://localhost:5000/dashboard.html
-Store Dashboard:          http://localhost:8080/
+Store Dashboard:          http://localhost:8081/
 Zorro Audio Generator:    http://localhost:8888/create-audio
 Zorro Index:              http://localhost:8888/
 ```
@@ -44,7 +44,7 @@ Every 6 Hours         → Job Codes automatic restart cycle
 ✅ Job Codes (Port 8080)  
 ✅ Projects in Stores (Port 8001)  
 ✅ TDA Insights (Port 5000)  
-✅ Store Activity Dashboard (Port 8080)  
+✅ Store Activity Dashboard (Port 8081)  
 ✅ Zorro (Port 8888)  
 
 ### If Service is Offline
@@ -132,7 +132,7 @@ Every morning at 6:00 AM (and on system startup), you'll get an email showing:
 | Job Codes | RUNNING | Port 8080 - Listening |
 | Projects | RUNNING | Port 8001 - Listening |
 | TDA Insights | RUNNING | Port 5000 - Listening |
-| Store Dashboard | RUNNING | Port 8080 - Responding |
+| Store Dashboard | RUNNING | Port 8081 - Responding |
 | Zorro | RUNNING | Port 8888 - Listening |
 
 **Access Links:** All URLs you need to access each service
@@ -194,7 +194,7 @@ taskkill /F /PID [PID_NUMBER]
 
 📌 **Unique Port Assignments**
 - TDA Insights uses port 5000
-- Store Dashboard uses port 8080
+- Store Dashboard uses port 8081
 - Job Codes also uses port 8080 (network IP-based access)
 - Zorro uses port 8888
 - All services can run simultaneously
@@ -235,7 +235,7 @@ taskkill /F /PID [PID_NUMBER]
 
 # Access both:
 # TDA:              http://localhost:5000/dashboard.html
-# Store Dashboard:  http://localhost:8080/
+# Store Dashboard:  http://localhost:8081/
 ```
 
 ### I want to check status without waiting for email

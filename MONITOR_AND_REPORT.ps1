@@ -49,17 +49,14 @@ function Get-SystemStatus {
         $status.Port5000Listening = $true
     }
     
-    # Check Store Activity Dashboard (port 8080) - amp_backend_server.py
-    $netstat8080alt = netstat -ano 2>$null | Select-String ":8080.*LISTENING" | Select-String -NotMatch "8080" | Select-Object -First 1
-    # Note: We look for port 8080 but need to distinguish from Job Codes also on 8080
-    # Store Dashboard runs separately, check process or verify via HTTP
+    # Check Store Activity Dashboard (port 8081) - amp_backend_server.py
     try {
-        $response = Invoke-WebRequest -Uri "http://localhost:8080/" -TimeoutSec 2 -ErrorAction SilentlyContinue
+        $response = Invoke-WebRequest -Uri "http://localhost:8081/" -TimeoutSec 2 -ErrorAction SilentlyContinue
         if ($response.StatusCode -eq 200) {
             $status.StoreActivityDashboardRunning = $true
         }
     } catch {
-        # Dashboard not responding on port 8080
+        # Dashboard not responding on port 8081
         $status.StoreActivityDashboardRunning = $false
     }
     
@@ -192,7 +189,7 @@ function Build-StatusEmail {
             <tr>
                 <td>AMP Store Updates Dashboard</td>
                 <td class="$(if ($CurrentStatus.StoreActivityDashboardRunning) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.StoreActivityDashboardRunning) { 'RUNNING' } else { 'OFFLINE' })</td>
-                <td>HTTP Server port 8080 - $(if ($CurrentStatus.StoreActivityDashboardRunning) { 'Responding' } else { 'Not responding' })</td>
+                <td>HTTP Server port 8081 - $(if ($CurrentStatus.StoreActivityDashboardRunning) { 'Responding' } else { 'Not responding' })</td>
             </tr>
             <tr>
                 <td>Zorro Podcast Server</td>
@@ -223,7 +220,7 @@ function Build-StatusEmail {
             <li><strong>Projects in Stores:</strong> http://10.97.114.181:8001/</li>
             <li><strong>Job Codes Dashboard:</strong> http://10.97.114.181:8080/static/index.html#</li>
             <li><strong>TDA Insights:</strong> http://localhost:5000/dashboard.html</li>
-            <li><strong>Store Activity Dashboard:</strong> http://localhost:8080/</li>
+            <li><strong>Store Activity Dashboard:</strong> http://localhost:8081/</li>
             <li><strong>Zorro Podcast Server:</strong> http://localhost:8888/</li>
             <li><strong>Note:</strong> Use IP address for Job Codes & Projects. Use localhost for TDA, Store Dashboard, and Zorro.</li>
         </ul>
@@ -387,6 +384,7 @@ function Check-And-RestartAMPDashboard {
             if (Test-Path $ampPath) {
                 # Set Google Cloud credentials (amp_backend_server.py needs BigQuery access)
                 $env:GOOGLE_APPLICATION_CREDENTIALS = "C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json"
+                $env:PORT = "8081"
                 
                 # Start AMP backend process in background
                 $process = Start-Process -FilePath $pythonExe -ArgumentList "$ampPath\amp_backend_server.py" -WorkingDirectory $ampPath -WindowStyle Hidden -PassThru -ErrorAction SilentlyContinue
@@ -397,9 +395,9 @@ function Check-And-RestartAMPDashboard {
                     
                     # Re-check if it's responding
                     try {
-                        $response = Invoke-WebRequest -Uri "http://localhost:8080/" -TimeoutSec 2 -ErrorAction SilentlyContinue
+                        $response = Invoke-WebRequest -Uri "http://localhost:8081/" -TimeoutSec 2 -ErrorAction SilentlyContinue
                         if ($response.StatusCode -eq 200) {
-                            Write-Host "✓ AMP Dashboard successfully restarted and responding on port 8080" -ForegroundColor Green
+                            Write-Host "✓ AMP Dashboard successfully restarted and responding on port 8081" -ForegroundColor Green
                             return $true
                         }
                     } catch {
@@ -415,7 +413,7 @@ function Check-And-RestartAMPDashboard {
             return $false
         }
     } else {
-        Write-Host "✓ AMP Store Updates Dashboard is running normally on port 8080" -ForegroundColor Green
+        Write-Host "✓ AMP Store Updates Dashboard is running normally on port 8081" -ForegroundColor Green
         return $true
     }
 }

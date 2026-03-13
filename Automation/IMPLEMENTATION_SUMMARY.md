@@ -4,7 +4,7 @@
 
 ### Three New Services Added to Monitoring
 1. **TDA Insights Dashboard** (Port 5000) - Store analytics with BigQuery
-2. **Store Activity & Communication Dashboard** (Port 8080) - AMP communication platform
+2. **Store Activity & Communication Dashboard** (Port 8081) - AMP communication platform
 3. **Zorro Podcast Server** (Port 8888) - Jenny Neural voice audio generation
 
 ### Monitoring Enhancements
@@ -91,7 +91,7 @@
 - Job Codes Dashboard (Port 8080) - Running/Offline
 - Projects in Stores (Port 8001) - Running/Offline
 - TDA Insights (Port 5000) - Running/Offline
-- Store Activity Dashboard (Port 8080) - Running/Offline
+- Store Activity Dashboard (Port 8081) - Running/Offline
 - Zorro Podcast Server (Port 8888) - Running/Offline
 - DC Manager Tasks - Active (26/26)
 
@@ -106,7 +106,7 @@
 Projects in Stores:          http://10.97.114.181:8001/
 Job Codes Dashboard:         http://10.97.114.181:8080/static/index.html#
 TDA Insights:                http://localhost:5000/dashboard.html
-Store Activity Dashboard:    http://localhost:8080/
+Store Activity Dashboard:    http://localhost:8081/
 Zorro Podcast Server:        http://localhost:8888/
 ```
 
@@ -192,7 +192,7 @@ The existing MONITOR_AND_REPORT.ps1 task now:
 ### From Same Computer (Localhost)
 ```
 TDA Insights              http://localhost:5000/dashboard.html
-Store Activity Dashboard  http://localhost:8080/
+Store Activity Dashboard  http://localhost:8081/
 Zorro Podcast Server      http://localhost:8888/
   ↳ Audio Generator       http://localhost:8888/create-audio
 ```

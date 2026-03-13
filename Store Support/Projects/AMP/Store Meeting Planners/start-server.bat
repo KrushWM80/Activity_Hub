@@ -7,22 +7,35 @@ echo.
 
 cd /d "%~dp0backend"
 
-REM Check if Python is available
-where python >nul 2>nul
-if errorlevel 1 (
-    echo [ERROR] Python not found in PATH. Please install Python 3.10+.
+REM Define Python executable path
+set PYTHON_EXE=C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\.venv\Scripts\python.exe
+set PROJECT_ROOT=C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub
+
+REM Check if Python exists
+if not exist "%PYTHON_EXE%" (
+    echo [ERROR] Python not found at %PYTHON_EXE%
     pause
     exit /b 1
 )
 
+REM Set Google Cloud credentials for BigQuery
+set GOOGLE_APPLICATION_CREDENTIALS=%APPDATA%\gcloud\application_default_credentials.json
+
 REM Install requirements if needed
 echo [Setup] Checking dependencies...
-pip install -r requirements.txt --quiet 2>nul
+"%PYTHON_EXE%" -m pip install -r requirements.txt --quiet 2>nul
 
 echo.
 echo [Server] Starting on http://localhost:8090
 echo [Server] Press Ctrl+C to stop.
 echo.
 
-python main.py
-pause
+REM Run the server
+"%PYTHON_EXE%" main.py
+
+if errorlevel 1 (
+    echo.
+    echo [ERROR] Server failed to start. Check the error above.
+    pause
+)
+

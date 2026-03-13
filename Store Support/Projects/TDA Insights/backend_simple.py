@@ -79,16 +79,17 @@ def get_bigquery_data():
         
         # Query the actual BigQuery table with correct column names
         # Table: Output- TDA Report
-        # Columns: Topic, Health_Update, Phase, Dallas_POC, Deployment, Intake_n_Testing, Facility
+        # Columns: Topic, Health_Update, Phase, Dallas_POC, Deployment, Intake_n_Testing, Facility, Facility_Phase
         query = f"""
         SELECT 
             Topic as `Initiative - Project Title`,
             Health_Update as `Health Status`,
             Phase,
-            COUNT(DISTINCT Facility) as `# of Stores`,
+            SUM(CASE WHEN Phase = Facility_Phase THEN Facility ELSE 0 END) as `# of Stores`,
             Dallas_POC as `Dallas POC`,
             Intake_n_Testing as `Intake & Testing`,
-            Deployment
+            Deployment,
+            MAX(Intake_Card_Nbr) as `Project ID`
         FROM `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE}`
         WHERE Topic IS NOT NULL
         GROUP BY Topic, Health_Update, Phase, Intake_n_Testing, Dallas_POC, Deployment
@@ -105,10 +106,11 @@ def get_bigquery_data():
                 'Initiative - Project Title': row['Initiative - Project Title'] or 'Unknown',
                 'Health Status': row['Health Status'] or 'Unknown',
                 'Phase': row['Phase'] or 'Unknown',
-                '# of Stores': 0 if (row['# of Stores'] or 0) == 1 else (row['# of Stores'] or 0),
+                '# of Stores': row['# of Stores'] or 0,
                 'Dallas POC': row['Dallas POC'] or 'N/A',
                 'Intake & Testing': row['Intake & Testing'] or 'N/A',
-                'Deployment': row['Deployment'] or 'N/A'
+                'Deployment': row['Deployment'] or 'N/A',
+                'Project ID': row['Project ID'] or 0
             })
         
         print(f"[OK] Loaded {len(data)} projects from BigQuery")

@@ -12,7 +12,7 @@ I've successfully extended your Activity Hub monitoring system to include **3 ad
 1. ✅ **Job Codes Dashboard** - Port 8080 - 24/7 Auto-restart
 2. ✅ **Projects in Stores** - Port 8001 - Monitored
 3. ✅ **TDA Insights Dashboard** - Port 5000 - Auto-restart on offline
-4. ✅ **Store Activity Dashboard** - Port 8080 - Auto-restart on offline
+4. ✅ **Store Activity Dashboard** - Port 8081 - Auto-restart on offline
 5. ✅ **Zorro Podcast Server** - Port 8888 - Auto-restart on offline
 
 ### Service URLs (Quick Reference)
@@ -20,7 +20,7 @@ I've successfully extended your Activity Hub monitoring system to include **3 ad
 | Service | URL | Access |
 |---------|-----|--------|
 | **TDA Insights** | http://localhost:5000/dashboard.html | Local |
-| **Store Activity Dashboard** | http://localhost:8080/ | Local |
+| **Store Activity Dashboard** | http://localhost:8081/ | Local |
 | **Zorro Audio Generator** | http://localhost:8888/create-audio | Local |
 | **Zorro Podcast Server** | http://localhost:8888/ | Local |
 | **Job Codes** | http://10.97.114.181:8080/static/index.html# | Network |
@@ -147,7 +147,7 @@ Automation/IMPLEMENTATION_SUMMARY.md       (What changed)
 | 5000 | TDA Insights | Monitored |
 | 8001 | Projects in Stores | Monitored |
 | 8080 | Job Codes | 24/7 Auto-restart |
-| 8080 | Store Dashboard | Auto-restart on offline |
+| 8081 | Store Dashboard | Auto-restart on offline |
 | 8888 | Zorro | Auto-restart on offline |
 
 ---
@@ -189,7 +189,7 @@ A: Use URLs from the Quick Reference table above. TDA/Dashboard/Zorro use localh
 A: Monitoring will auto-restart it during the next check cycle (at 6 AM or on startup). You'll see status in email.
 
 **Q: Can I run both TDA and Store Dashboard?**  
-A: Yes! TDA runs on port 5000 and Store Dashboard runs on port 8080, so they can both run simultaneously.
+A: Yes! TDA runs on port 5000 and Store Dashboard runs on port 8081, so they can both run simultaneously.
 
 **Q: What if I want more frequent checks?**  
 A: Run `MONITOR_AND_REPORT.ps1` manually anytime. Or modify scheduled task to run more frequently.
@@ -200,7 +200,7 @@ A: Run `MONITOR_AND_REPORT.ps1` manually anytime. Or modify scheduled task to ru
 
 📌 **Unique Port Assignments**
 - TDA Insights runs on port 5000
-- Store Dashboard runs on port 8080
+- Store Dashboard runs on port 8081
 - Job Codes also on port 8080 (network IP-based access)
 - Zorro runs on port 8888
 - All services can run simultaneously

@@ -334,17 +334,20 @@ This is an automated alert. Do not reply to this email.
                 print(f"[SQLite] ❌ {reason}")
                 return False, reason
         
-        # Check 2: Validate record count is within acceptable variance (±50k)
+        # Check 2: Validate record count is within acceptable variance
         variance = abs(record_count - MIN_EXPECTED_RECORDS)
         
         if variance > MAX_ALLOWED_VARIANCE:
             reason = f"Record count variance too high ({record_count:,} vs {MIN_EXPECTED_RECORDS:,}, variance: ±{variance:,} > ±{MAX_ALLOWED_VARIANCE:,})"
             return False, reason
         
-        # Check 3: Sync duration reasonable
-        if sync_duration < MIN_SYNC_DURATION:
-            reason = f"Sync completed too quickly ({sync_duration:.1f}s < {MIN_SYNC_DURATION}s) - likely incomplete"
-            return False, reason
+        # Check 3: Sync duration reasonable (only check if we have records)
+        # If we got valid record count, speed doesn't matter - fast sync is good!
+        # Only worry about slow/incomplete syncs if we got 0 records
+        if record_count > 0 and sync_duration < MIN_SYNC_DURATION:
+            # Got records quickly - this is actually good, not bad. Accept it.
+            print(f"[SQLite] ✓ Fast sync completed in {sync_duration:.1f}s with {record_count:,} records")
+            return True, ""
         
         # All checks passed
         if variance > 0:

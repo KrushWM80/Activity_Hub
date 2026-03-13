@@ -40,11 +40,11 @@ Health Check:
 Service Name:    Store Activity & Communication Dashboard
 Backend File:    Store Support/Projects/AMP/Store Updates Dashboard/amp_backend_server.py
 Framework:       Flask with BigQuery
-Port:            8080
+Port:            8081
 Status:          Running (monitored)
 
 Access URLs:
-  Local:  http://localhost:8080/
+  Local:  http://localhost:8081/
   Remote: Not directly accessible (use VPN/forwarding)
 
 Data Source:
@@ -243,9 +243,10 @@ No special environment variables required
 
 ### Windows Firewall
 All services require these ports open (if using Windows Firewall):
-- Port 8080 (Job Codes + Store Dashboard)
+- Port 8080 (Job Codes only)
 - Port 8001 (Projects)
 - Port 5000 (TDA)
+- Port 8081 (Store Activity Dashboard)
 - Port 8888 (Zorro)
 
 ### Network Access
@@ -308,12 +309,11 @@ Get-Process python | Select-Object Id, ProcessName, @{
 - Verify IP is correct (should be 10.97.114.181, not 10.97.108.66)
 - Check network connectivity to machine
 
-### Port 8080 Sharing (Job Codes + Store Dashboard)
-- Both Job Codes and Store Dashboard use port 8080
-- Job Codes uses IP-based access: http://10.97.114.181:8080/
-- Store Dashboard uses localhost: http://localhost:8080/
-- Both can run simultaneously due to different access patterns
-- If Store Dashboard won't start, check if port 8080 is in use: `netstat -ano | findstr ":8080"`
+### Port 8081 Assignment (Store Activity Dashboard)
+- Store Activity Dashboard exclusively uses port 8081
+- Can run simultaneously with Job Codes (which uses port 8080)
+- Access: http://localhost:8081/
+- If Store Dashboard won't start, check if port 8081 is available: `netstat -ano | findstr ":8081"`
 
 ---
 

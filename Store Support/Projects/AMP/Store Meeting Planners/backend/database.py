@@ -71,25 +71,26 @@ class DatabaseService:
     # =========================================
 
     def get_calendar_events(self, start_date: str, end_date: str) -> list:
-        """Get AMP Calendar Events for display on the calendar."""
+        """Get AMP Calendar Events for display on the calendar (deduplicated)."""
         query = f"""
             SELECT
-                event_id,
+                MIN(event_id) as event_id,
                 Activity_Title as title,
-                Message_Type as message_type,
+                'Calendar Events' as message_type,
                 Start_Date as start_date,
                 End_Date as end_date,
-                Business_Area as business_area,
-                Author as author,
-                Store_Cnt as store_cnt,
-                WM_Week as wm_week,
-                WM_Year as wm_year,
-                Web_Preview as preview_url
+                MAX(Business_Area) as business_area,
+                MAX(Author) as author,
+                MAX(Store_Cnt) as store_cnt,
+                MAX(WM_Week) as wm_week,
+                MAX(WM_Year) as wm_year,
+                MAX(Web_Preview) as preview_url
             FROM {AMP_TABLE}
-            WHERE Message_Type = 'Calendar Event'
-              AND Message_Status = 'Published'
+            WHERE Message_Type = 'Calendar Events'
+              AND Message_Status IN ('Awaiting ATC Approval', 'Awaiting Comms Approval', 'Review for Publish review')
               AND Start_Date <= @end_date
               AND End_Date >= @start_date
+            GROUP BY Activity_Title, Start_Date, End_Date
             ORDER BY Start_Date
         """
         params = [
@@ -103,19 +104,20 @@ class DatabaseService:
         return rows
 
     def get_protected_weeks(self, fiscal_year: int) -> list:
-        """Get Protected Week dates from AMP ALL 2."""
+        """Get Protected Week dates from AMP ALL 2 (deduplicated)."""
         query = f"""
-            SELECT DISTINCT
-                Activity_Title as title,
+            SELECT
+                'Protected Week' as title,
                 Start_Date as start_date,
                 End_Date as end_date,
-                WM_Week as wm_week,
-                WM_Year as wm_year
+                MAX(WM_Week) as wm_week,
+                MAX(WM_Year) as wm_year
             FROM {AMP_TABLE}
             WHERE LOWER(Activity_Title) LIKE '%protected week%'
-              AND Message_Type = 'Calendar Event'
-              AND Message_Status = 'Published'
+              AND Message_Type = 'Calendar Events'
+              AND Message_Status IN ('Awaiting ATC Approval', 'Awaiting Comms Approval', 'Review for Publish review')
               AND CAST(WM_Year AS INT64) = @fiscal_year
+            GROUP BY Start_Date, End_Date
             ORDER BY Start_Date
         """
         params = [
@@ -126,13 +128,14 @@ class DatabaseService:
     def get_protected_week_dates(self) -> set:
         """Returns a set of date strings (YYYY-MM-DD) that fall in protected weeks."""
         query = f"""
-            SELECT DISTINCT
+            SELECT
                 Start_Date as pw_start,
                 End_Date as pw_end
             FROM {AMP_TABLE}
             WHERE LOWER(Activity_Title) LIKE '%protected week%'
-              AND Message_Type = 'Calendar Event'
-              AND Message_Status = 'Published'
+              AND Message_Type = 'Calendar Events'
+              AND Message_Status IN ('Awaiting ATC Approval', 'Awaiting Comms Approval', 'Review for Publish review')
+            GROUP BY Start_Date, End_Date
         """
         rows = self._run_query(query)
         protected_dates = set()
@@ -209,16 +212,18 @@ class DatabaseService:
         return slots
 
     def _get_recurring_approved_counts(self, start_date: str, end_date: str) -> dict:
-        """Expand recurring (Monthly) approved meetings into date counts
-        for the given range. Returns {date_str: additional_count}."""
+        """Expand recurring approved meetings (Weekly, Bi-Weekly, Monthly) into
+        date counts for the given range. Returns {date_str: additional_count}."""
         query = f"""
             SELECT
                 Title,
                 DATE(SAFE_CAST(`Start Date` AS TIMESTAMP)) as original_date,
+                DATE(SAFE_CAST(`End Date` AS TIMESTAMP)) as end_date,
                 `Meeting Reoccurrence` as reoccurrence
             FROM {REQUEST_TABLE}
             WHERE Status = 'Approved'
-              AND `Meeting Reoccurrence` = 'Monthly'
+              AND `Meeting Reoccurrence` IS NOT NULL
+              AND `Meeting Reoccurrence` NOT IN ('', 'None')
         """
         rows = self._run_query(query)
         if not rows:
@@ -243,28 +248,64 @@ class DatabaseService:
                 except Exception:
                     continue
 
-            # Generate monthly occurrences from the original date
-            day_of_month = orig.day
-            current = orig
+            # Cap end of recurrence at the meeting's End Date or 1 yr from start
+            meeting_end = row.get("end_date")
+            if meeting_end:
+                if hasattr(meeting_end, 'date'):
+                    meeting_end = meeting_end.date()
+                elif isinstance(meeting_end, str):
+                    try:
+                        meeting_end = datetime.strptime(str(meeting_end)[:10], "%Y-%m-%d").date()
+                    except Exception:
+                        meeting_end = None
+            if not meeting_end:
+                meeting_end = orig + timedelta(days=365)
+
+            reoccurrence = (row.get("reoccurrence") or "").strip()
+            occurrences = self._expand_occurrences(orig, meeting_end, reoccurrence)
+
+            for occ_date in occurrences:
+                if occ_date == orig:
+                    continue  # Original date already counted by direct query
+                if range_start <= occ_date <= range_end:
+                    ds = occ_date.isoformat()
+                    counts[ds] = counts.get(ds, 0) + 1
+
+        return counts
+
+    @staticmethod
+    def _expand_occurrences(start: date, end: date, reoccurrence: str) -> list:
+        """Generate all occurrence dates from start to end based on reoccurrence type."""
+        import calendar as cal_mod
+        dates = [start]
+        reoccurrence_lower = reoccurrence.lower()
+
+        if reoccurrence_lower == 'weekly':
+            current = start + timedelta(weeks=1)
+            while current <= end:
+                dates.append(current)
+                current += timedelta(weeks=1)
+        elif reoccurrence_lower == 'bi-weekly':
+            current = start + timedelta(weeks=2)
+            while current <= end:
+                dates.append(current)
+                current += timedelta(weeks=2)
+        elif reoccurrence_lower == 'monthly':
+            day_of_month = start.day
+            current = start
             while True:
-                # Next month
                 if current.month == 12:
                     next_month = current.replace(year=current.year + 1, month=1, day=1)
                 else:
                     next_month = current.replace(month=current.month + 1, day=1)
-                # Try to keep same day of month
-                import calendar
-                max_day = calendar.monthrange(next_month.year, next_month.month)[1]
+                max_day = cal_mod.monthrange(next_month.year, next_month.month)[1]
                 actual_day = min(day_of_month, max_day)
                 current = next_month.replace(day=actual_day)
-
-                if current > range_end:
+                if current > end:
                     break
-                if current >= range_start:
-                    ds = current.isoformat()
-                    counts[ds] = counts.get(ds, 0) + 1
+                dates.append(current)
 
-        return counts
+        return dates
 
     # =========================================
     # REQUESTS CRUD
@@ -532,7 +573,7 @@ class DatabaseService:
                 MP_Timezone as mp_timezone
             FROM {AMP_TABLE}
             WHERE LOWER(Keyword_Tags) LIKE '%meeting planner%'
-              AND Message_Status = 'Published'
+              AND Message_Status IN ('Awaiting ATC Approval', 'Awaiting Comms Approval', 'Review for Publish review')
             ORDER BY Start_Date DESC
         """
         return self._run_query(query)
@@ -632,7 +673,8 @@ class DatabaseService:
 
     def get_meeting_tracker_report(self, start_date: str = None, end_date: str = None) -> list:
         """Get approved meetings formatted for the Calls to Stores report.
-        Includes store_count from AMP ALL 2 via URL matching, sorted by earliest WM week/year."""
+        Expands recurring meetings into duplicate rows for each occurrence.
+        Includes store_count from AMP ALL 2 via URL matching."""
         conditions = ["Status = 'Approved'"]
         params = []
         if start_date:
@@ -648,11 +690,13 @@ class DatabaseService:
                 r.Title as description,
                 r.`Meeting Type` as type_of_meeting,
                 SAFE_CAST(r.`Start Date` AS TIMESTAMP) as date,
+                DATE(SAFE_CAST(r.`End Date` AS TIMESTAMP)) as end_date_raw,
                 r.`Meeting Day of the Week` as day,
                 r.`Start Time` as time,
                 r.`Store Selection` as store_audience,
                 r.Name as author,
                 r.Email as author_email,
+                r.Status as status,
                 c.WM_WEEK_NBR as wm_week,
                 c.FISCAL_YEAR_NBR as fiscal_year,
                 r.`AMP Activity URL` as amp_url,
@@ -661,24 +705,117 @@ class DatabaseService:
             LEFT JOIN {CAL_DIM_TABLE} c
                 ON DATE(SAFE_CAST(r.`Start Date` AS TIMESTAMP)) = c.CALENDAR_DATE
             WHERE {where}
-            ORDER BY c.FISCAL_YEAR_NBR ASC, c.WM_WEEK_NBR ASC, SAFE_CAST(r.`Start Date` AS TIMESTAMP) ASC, r.`Start Time`
+            ORDER BY c.FISCAL_YEAR_NBR DESC, c.WM_WEEK_NBR DESC, SAFE_CAST(r.`Start Date` AS TIMESTAMP) ASC, r.`Start Time`
         """
         rows = self._run_query(query, params if params else None)
 
         # Build a lookup for store counts from AMP ALL 2 keyed by event_id
         amp_store_counts = self._get_amp_store_counts()
 
+        # Build calendar dim lookup for expanded dates
+        cal_lookup = self._get_cal_dim_lookup()
+
+        day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+        expanded_rows = []
         for row in rows:
             amp_url = row.get("amp_url") or ""
             store_count = None
             if amp_url:
-                # Extract event_id from URL like .../message/<event_id>/<wm_week>/<wm_year>
                 parts = amp_url.rstrip("/").split("/")
                 if len(parts) >= 3:
                     event_id = parts[-3]
                     store_count = amp_store_counts.get(event_id)
             row["store_count"] = store_count
-        return rows
+
+            reoccurrence = (row.get("reoccurrence") or "").strip()
+            if reoccurrence and reoccurrence not in ("", "None"):
+                # Expand this recurring meeting
+                orig_date = row.get("date")
+                if orig_date:
+                    if hasattr(orig_date, 'date'):
+                        orig = orig_date.date()
+                    else:
+                        try:
+                            orig = datetime.strptime(str(orig_date)[:10], "%Y-%m-%d").date()
+                        except Exception:
+                            orig = None
+
+                    meeting_end = row.get("end_date_raw")
+                    if meeting_end:
+                        if hasattr(meeting_end, 'date'):
+                            meeting_end = meeting_end.date()
+                        elif isinstance(meeting_end, str):
+                            try:
+                                meeting_end = datetime.strptime(str(meeting_end)[:10], "%Y-%m-%d").date()
+                            except Exception:
+                                meeting_end = None
+                    if not meeting_end and orig:
+                        meeting_end = orig + timedelta(days=365)
+
+                    if orig and meeting_end:
+                        # Add the original row first
+                        expanded_rows.append(row)
+
+                        # Generate additional occurrences (skip original)
+                        occurrences = self._expand_occurrences(orig, meeting_end, reoccurrence)
+                        for occ_date in occurrences:
+                            if occ_date == orig:
+                                continue
+                            if start_date:
+                                try:
+                                    filt_start = datetime.strptime(start_date, "%Y-%m-%d").date()
+                                    if occ_date < filt_start:
+                                        continue
+                                except Exception:
+                                    pass
+                            if end_date:
+                                try:
+                                    filt_end = datetime.strptime(end_date, "%Y-%m-%d").date()
+                                    if occ_date > filt_end:
+                                        continue
+                                except Exception:
+                                    pass
+
+                            occ_str = occ_date.isoformat()
+                            cal_info = cal_lookup.get(occ_str, {})
+                            new_row = dict(row)
+                            new_row["date"] = occ_str
+                            new_row["day"] = day_names[occ_date.weekday()]
+                            new_row["wm_week"] = cal_info.get("WM_WEEK_NBR", row.get("wm_week"))
+                            new_row["fiscal_year"] = cal_info.get("FISCAL_YEAR_NBR", row.get("fiscal_year"))
+                            expanded_rows.append(new_row)
+                        continue  # Already added original above
+
+            expanded_rows.append(row)
+
+        # Sort expanded rows: fiscal year DESC, wm_week DESC, date ASC
+        def sort_key(r):
+            fy = r.get("fiscal_year") or 0
+            wk = r.get("wm_week") or 0
+            d = str(r.get("date") or "")[:10]
+            t = r.get("time") or ""
+            return (-fy, -wk, d, t)
+        expanded_rows.sort(key=sort_key)
+
+        # Remove end_date_raw from output
+        for row in expanded_rows:
+            row.pop("end_date_raw", None)
+
+        return expanded_rows
+
+    def _get_cal_dim_lookup(self) -> dict:
+        """Get a lookup of date -> {WM_WEEK_NBR, FISCAL_YEAR_NBR} from Cal_Dim_Data."""
+        query = f"""
+            SELECT CALENDAR_DATE, WM_WEEK_NBR, FISCAL_YEAR_NBR
+            FROM {CAL_DIM_TABLE}
+        """
+        rows = self._run_query(query)
+        result = {}
+        for r in rows:
+            d = str(r.get("CALENDAR_DATE", ""))
+            result[d] = {"WM_WEEK_NBR": r.get("WM_WEEK_NBR"), "FISCAL_YEAR_NBR": r.get("FISCAL_YEAR_NBR")}
+        return result
 
     def _get_amp_store_counts(self) -> dict:
         """Get a mapping of event_id -> Store_Cnt from AMP ALL 2."""

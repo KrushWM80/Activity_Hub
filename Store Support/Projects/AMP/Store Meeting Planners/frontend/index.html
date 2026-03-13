@@ -254,10 +254,12 @@
             border-radius: 10px;
             font-size: 0.7rem;
             font-weight: 600;
+            background: var(--gray-100);
+            color: var(--gray-500);
         }
-        .slot-badge.green { background: var(--success-bg); color: var(--success); }
-        .slot-badge.yellow { background: var(--warning-bg); color: var(--warning); }
-        .slot-badge.red { background: var(--error-bg); color: var(--error); }
+        .slot-num.green { color: var(--success); }
+        .slot-num.yellow { color: var(--warning); }
+        .slot-num.red { color: var(--error); }
         .event-dot {
             display: inline-block;
             width: 6px;
@@ -424,6 +426,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.875rem;
+            table-layout: fixed;
         }
         .data-table th {
             text-align: left;
@@ -438,7 +441,20 @@
         .data-table td {
             padding: 10px 12px;
             border-bottom: 1px solid var(--gray-200);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
+        /* Report table column widths */
+        .report-table th:nth-child(1), .report-table td:nth-child(1) { width: 25%; } /* Description */
+        .report-table th:nth-child(2), .report-table td:nth-child(2) { width: 10%; } /* Type */
+        .report-table th:nth-child(3), .report-table td:nth-child(3) { width: 10%; } /* Date */
+        .report-table th:nth-child(4), .report-table td:nth-child(4) { width: 8%; }  /* Day */
+        .report-table th:nth-child(5), .report-table td:nth-child(5) { width: 8%; }  /* Time */
+        .report-table th:nth-child(6), .report-table td:nth-child(6) { width: 9%; }  /* Store Count */
+        .report-table th:nth-child(7), .report-table td:nth-child(7) { width: 9%; }  /* Status */
+        .report-table th:nth-child(8), .report-table td:nth-child(8) { width: 12%; } /* Store Audience */
+        .report-table th:nth-child(9), .report-table td:nth-child(9) { width: 9%; }  /* Author */
         .data-table tr:hover { background: var(--gray-100); }
         .data-table tr { cursor: pointer; }
 
@@ -980,17 +996,21 @@ function renderCalendar() {
                     const used = slotInfo.approved_count;
                     const max = slotInfo.max_slots;
                     const pct = max > 0 ? used / max : 0;
-                    let badgeClass = 'green';
-                    if (pct >= 1) badgeClass = 'red';
-                    else if (pct >= 0.7) badgeClass = 'yellow';
-                    inner += `<span class="slot-badge ${badgeClass}">${used}/${max}</span>`;
+                    // Used count is always red (slots taken)
+                    const usedClass = used > 0 ? 'red' : 'green';
+                    // Available total: green normally, yellow at 50%+, red at 100%
+                    let maxClass = 'green';
+                    if (pct >= 1) maxClass = 'red';
+                    else if (pct >= 0.5) maxClass = 'yellow';
+                    inner += `<span class="slot-badge"><span class="slot-num ${usedClass}">${used}</span>/<span class="slot-num ${maxClass}">${max}</span></span>`;
                     if (slotInfo.is_protected_week) inner += '<br><span style="font-size:0.65rem;color:var(--walmart-yellow-dark)">Protected</span>';
                 }
 
-                // Event labels
+                // Event labels (exclude Protected Week — already shown via Protected indicator)
                 const dayEvents = calendarData.events.filter(e => {
                     const eStart = e.start_date ? e.start_date.substring(0, 10) : '';
                     const eEnd = e.end_date ? e.end_date.substring(0, 10) : '';
+                    if ((e.title || '').toLowerCase().includes('protected week')) return false;
                     return dateStr >= eStart && dateStr <= eEnd;
                 });
                 if (dayEvents.length > 0) {
@@ -1033,6 +1053,7 @@ function calendarDayClick(dateStr) {
     const dayEvents = calendarData.events.filter(e => {
         const eStart = e.start_date ? e.start_date.substring(0, 10) : '';
         const eEnd = e.end_date ? e.end_date.substring(0, 10) : '';
+        if ((e.title || '').toLowerCase().includes('protected week')) return false;
         return dateStr >= eStart && dateStr <= eEnd;
     });
     let html = `<h3 style="margin-bottom:1rem">${dateStr}</h3>`;
@@ -1447,18 +1468,19 @@ function renderReport(rows) {
     let html = '';
     for (const [week, items] of Object.entries(grouped)) {
         html += `<div class="report-section"><h3>${week}</h3>`;
-        html += `<table class="data-table"><thead><tr>
-            <th>Description</th><th>Type</th><th>Date</th><th>Day</th><th>Time</th><th>Store Count</th><th>Store Audience</th><th>Author</th>
+        html += `<table class="data-table report-table"><thead><tr>
+            <th>Description</th><th>Type</th><th>Date</th><th>Day</th><th>Time</th><th>Store Count</th><th>Status</th><th>Store Audience</th><th>Author</th>
         </tr></thead><tbody>`;
         items.forEach(r => {
             html += `<tr style="cursor:default">
-                <td>${esc(r.description)}</td>
+                <td title="${esc(r.description)}">${esc(r.description)}</td>
                 <td>${esc(r.type_of_meeting)}</td>
                 <td>${formatDate(r.date)}</td>
                 <td>${esc(r.day)}</td>
                 <td>${esc(r.time) || '—'}</td>
                 <td>${r.store_count != null ? r.store_count : '—'}</td>
-                <td>${esc(r.store_audience)}</td>
+                <td>${esc(r.status)}</td>
+                <td title="${esc(r.store_audience)}">${esc(r.store_audience)}</td>
                 <td>${esc(r.author)}</td>
             </tr>`;
         });
@@ -1469,7 +1491,7 @@ function renderReport(rows) {
 
 function exportReport() {
     if (!reportData.length) return alert('No data to export. Generate a report first.');
-    const headers = ['Description','Type of Meeting','Date','Day','Time','Store Count','Store Audience','Author','WM Week'];
+    const headers = ['Description','Type of Meeting','Date','Day','Time','Store Count','Status','Store Audience','Author','WM Week'];
     const csvRows = [headers.join(',')];
     reportData.forEach(r => {
         csvRows.push([
@@ -1479,6 +1501,7 @@ function exportReport() {
             `"${r.day||''}"`,
             `"${r.time||''}"`,
             `"${r.store_count != null ? r.store_count : ''}"`,
+            `"${r.status||''}"`,
             `"${(r.store_audience||'').replace(/"/g,'""')}"`,
             `"${r.author||''}"`,
             r.wm_week||''

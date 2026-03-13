@@ -21,6 +21,9 @@ mimetypes.add_type('audio/mp4', '.mp4')
 # Add Audio directory to path for MP4 pipeline
 audio_dir = Path(__file__).parent / "Audio"
 sys.path.insert(0, str(audio_dir))
+# Add Scripts directory for weekly audio pipeline
+scripts_dir = Path(__file__).parent / "Audio" / "Scripts"
+sys.path.insert(0, str(scripts_dir))
 
 class PodcastHandler(SimpleHTTPRequestHandler):
     """Custom HTTP handler for podcast files"""
@@ -230,76 +233,71 @@ class PodcastHandler(SimpleHTTPRequestHandler):
             self.send_json_response({'success': False, 'error': str(e)}, 500)
     
     def handle_template_generation(self):
-        """Handle audio generation from template file"""
+        """Handle automated weekly message audio generation from BigQuery data"""
         try:
             # Read request body
             content_length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_length).decode('utf-8')
             params = json.loads(body)
             
-            template_name = params.get('template', 'Weekly Messages Audio Template - Summarized - Week 4')
+            week = params.get('week')  # None = auto-detect
+            fy = params.get('fy')      # None = auto-detect
+            force = params.get('force', False)  # Force regeneration
             
-            # Check if template file exists
-            template_path = self.AUDIO_DIR / (template_name + '.mp4')
-            if not template_path.exists():
-                template_path = self.AUDIO_DIR / (template_name + '.mp3')
-            if not template_path.exists():
-                template_path = self.AUDIO_DIR / (template_name + '.wav')
-            
-            if not template_path.exists():
-                # Generate new audio from Jenny using a standard template message
-                pipeline = self.get_pipeline()
-                if not pipeline:
-                    self.send_json_response({'success': False, 'error': 'MP4 pipeline not available'}, 500)
-                    return
-                
-                audio_script = """
-                Hello and welcome to Walmart Activity Hub.
-                
-                This is your weekly summary for Week 4.
-                
-                We have several important announcements and updates this week.
-                
-                Please review the following messages carefully and ensure your team is aware of any operational changes.
-                
-                This summary has been prepared especially for you. Thank you for your attention and commitment to excellence.
-                """
-                
-                from mp4_pipeline import Voice
-                import time
-                success, output_file = pipeline.synthesize(audio_script, voice=Voice.JENNY)
-                
-                if success and output_file:
-                    output_path = Path(output_file)
-                    file_size_kb = output_path.stat().st_size / 1024
-                    filename = output_path.name
-                    
+            # If not forcing, check if file already exists
+            if not force and week:
+                existing = self.AUDIO_DIR / f"Weekly Messages Audio Template - Summarized - Week {week} - Jenny Neural - Vimeo.mp4"
+                if existing.exists():
+                    file_size_kb = existing.stat().st_size / 1024
                     response = {
                         'success': True,
-                        'audio_url': f'/audio/{filename}',
-                        'filename': filename,
-                        'size_kb': round(file_size_kb, 1),
-                        'voice': 'Jenny Neural',
-                        'codec': 'AAC @ 256kbps'
+                        'message': 'Template file already exists. Send force=true to regenerate.',
+                        'filename': existing.name,
+                        'size_kb': round(file_size_kb, 1)
                     }
                     self.send_json_response(response, 200)
-                else:
-                    self.send_json_response({'success': False, 'error': 'Audio generation failed'}, 500)
-            else:
-                # Template file exists, just report it
-                file_size_kb = template_path.stat().st_size / 1024
+                    return
+            
+            # Run the automated pipeline
+            from generate_weekly_audio import generate_weekly_message_audio
+            print(f"Starting automated pipeline: week={week}, fy={fy}")
+            result = generate_weekly_message_audio(
+                week=int(week) if week else None,
+                fy=int(fy) if fy else None,
+                voice="Jenny",
+                rate=0.95,
+                output_dir=str(self.AUDIO_DIR)
+            )
+            
+            if result['success']:
+                output_path = Path(result['output_file'])
+                file_size_kb = output_path.stat().st_size / 1024
                 response = {
                     'success': True,
-                    'message': 'Template file already exists',
-                    'filename': template_path.name,
-                    'size_kb': round(file_size_kb, 1)
+                    'filename': output_path.name,
+                    'audio_url': f'/podcasts/{output_path.name}',
+                    'size_kb': round(file_size_kb, 1),
+                    'voice': 'Jenny Neural',
+                    'codec': 'AAC @ 256kbps',
+                    'event_count': result['event_count'],
+                    'summarized_count': result['summarized_count'],
+                    'script_length': result['script_length'],
                 }
                 self.send_json_response(response, 200)
+            else:
+                self.send_json_response({
+                    'success': False,
+                    'error': result.get('error', 'Unknown error'),
+                    'event_count': result.get('event_count', 0),
+                    'summarized_count': result.get('summarized_count', 0),
+                }, 500)
         
         except json.JSONDecodeError:
             self.send_json_response({'success': False, 'error': 'Invalid JSON'}, 400)
         except Exception as e:
-            print(f"Error generating template audio: {e}")
+            print(f"Error in weekly audio pipeline: {e}")
+            import traceback
+            traceback.print_exc()
             self.send_json_response({'success': False, 'error': str(e)}, 500)
     
     def serve_jenny_audio_page(self):
@@ -1093,15 +1091,20 @@ class PodcastHandler(SimpleHTTPRequestHandler):
             fetch('/api/generate-from-template', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({template: 'Weekly Messages Audio Template - Summarized - Week 4'})
+                body: JSON.stringify({week: 4, fy: 2027, force: true})
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(`Audio generated successfully!\\nFile: ${data.filename}\\nSize: ${data.size_kb}KB\\nVoice: ${data.voice}`);
+                    let msg = `Audio generated successfully!\\nFile: ${data.filename}\\nSize: ${data.size_kb}KB`;
+                    if (data.summarized_count) msg += `\\nEvents with Summarized: ${data.summarized_count}/${data.event_count}`;
+                    if (data.voice) msg += `\\nVoice: ${data.voice}`;
+                    alert(msg);
                     setTimeout(() => location.reload(), 1500);
                 } else {
-                    alert('Error generating audio: ' + data.error);
+                    let errMsg = 'Error: ' + data.error;
+                    if (data.event_count !== undefined) errMsg += `\\nEvents found: ${data.event_count}, With Summarized: ${data.summarized_count}`;
+                    alert(errMsg);
                     const btn = event && event.target ? event.target : document.querySelector('.generate-btn[style*="8B5CF6"]');
                     if (btn) {
                         btn.disabled = false;
