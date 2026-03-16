@@ -174,11 +174,28 @@ SAMPLE_DATA = [
 print("\n[*] Loading data from BigQuery...")
 BQ_DATA = get_bigquery_data()
 DATA = BQ_DATA if BQ_DATA else SAMPLE_DATA
+DATA_LAST_REFRESH = time.strftime('%Y-%m-%d %H:%M:%S')
 
 if BQ_DATA:
     DATA_SOURCE = "BigQuery (wmt-assetprotection-prod)"
 else:
     DATA_SOURCE = "Sample Data (local)"
+
+def refresh_data():
+    """Re-fetch data from BigQuery and update the global DATA cache"""
+    global DATA, BQ_DATA, DATA_SOURCE, DATA_LAST_REFRESH
+    print(f"[{time.strftime('%H:%M:%S')}] Refreshing data from BigQuery...")
+    new_data = get_bigquery_data()
+    if new_data:
+        BQ_DATA = new_data
+        DATA = new_data
+        DATA_SOURCE = "BigQuery (wmt-assetprotection-prod)"
+        DATA_LAST_REFRESH = time.strftime('%Y-%m-%d %H:%M:%S')
+        print(f"[OK] Refreshed: {len(DATA)} records loaded")
+        return True, len(DATA)
+    else:
+        print("[WARN] Refresh failed, keeping existing data")
+        return False, len(DATA)
 def generate_minimal_pptx(phase=None):
     """Generate a PPTX file with data organized by phase"""
     pptx_buffer = io.BytesIO()
@@ -728,6 +745,18 @@ def handle_request(client_socket, addr):
             response_json = json.dumps({
                 'status': 'healthy',
                 'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
+            })
+            response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
+            client_socket.sendall(response.encode())
+        
+        elif path == '/api/refresh':
+            success, count = refresh_data()
+            response_json = json.dumps({
+                'success': success,
+                'count': count,
+                'source': DATA_SOURCE,
+                'last_refresh': DATA_LAST_REFRESH,
+                'message': f'Refreshed {count} records from BigQuery' if success else 'Refresh failed, using cached data'
             })
             response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
             client_socket.sendall(response.encode())

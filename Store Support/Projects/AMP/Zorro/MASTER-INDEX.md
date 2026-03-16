@@ -63,6 +63,14 @@
 | [NEXT_STEPS.md](NEXT_STEPS.md) | Upcoming work items | Project team |
 | [MANUAL_ACTION_ITEMS.md](MANUAL_ACTION_ITEMS.md) | Required manual actions | Project team |
 
+### Audio Pipeline (Weekly Messages)
+| Document | Purpose | Audience |
+|----------|---------|----------|
+| [Audio/README.md](Audio/README.md) | **📌 Audio pipeline overview & quick start** | All |
+| [Audio/Scripts/generate_weekly_audio.py](Audio/Scripts/generate_weekly_audio.py) | Main pipeline: BQ → TTS → MP4 | Developers |
+| [Audio/windows_media_synthesizer.py](Audio/windows_media_synthesizer.py) | edge-tts Jenny Neural + SAPI5 fallback | Developers |
+| [audio_server.py](audio_server.py) | Dashboard server (port 8888) | All |
+
 ### Compliance & Governance
 | Document | Purpose | Audience |
 |----------|---------|----------|
@@ -173,6 +181,7 @@ zorro/
 | Video Generation | ✅ Complete | Walmart Media Studio API working |
 | Video Trimmer | ✅ Complete | FFmpeg-based trim and download |
 | Accessibility | ✅ Complete | Captions, audio descriptions, transcripts |
+| Weekly Message Audio | ✅ Complete | BQ → Jenny Neural TTS → MP4 pipeline |
 | AI Disclosure | 🔴 Pending | Legal watermark requirement |
 
 **Phase:** Pilot (1-5 videos/week, 2 concurrent users)

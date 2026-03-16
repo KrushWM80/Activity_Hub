@@ -233,19 +233,26 @@ class PodcastHandler(SimpleHTTPRequestHandler):
             self.send_json_response({'success': False, 'error': str(e)}, 500)
     
     def handle_template_generation(self):
-        """Handle automated weekly message audio generation from BigQuery data"""
+        """Handle automated weekly message audio generation from BigQuery data.
+        
+        Supports two-phase VPN workflow:
+          phase='fetch'     → Pull BQ data + cache (requires VPN)
+          phase='synthesize' → Build audio from cache (requires OFF VPN)
+          phase=null/omit   → Auto: try full pipeline, fallback to cache
+        """
         try:
             # Read request body
             content_length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_length).decode('utf-8')
             params = json.loads(body)
             
-            week = params.get('week')  # None = auto-detect
-            fy = params.get('fy')      # None = auto-detect
-            force = params.get('force', False)  # Force regeneration
+            week = params.get('week')  # Required
+            fy = params.get('fy')      # Required
+            force = params.get('force', False)
+            phase = params.get('phase')  # 'fetch', 'synthesize', or None (auto)
             
-            # If not forcing, check if file already exists
-            if not force and week:
+            # If not forcing and not fetch-only, check if file already exists
+            if not force and phase != 'fetch' and week:
                 existing = self.AUDIO_DIR / f"Weekly Messages Audio Template - Summarized - Week {week} - Jenny Neural - Vimeo.mp4"
                 if existing.exists():
                     file_size_kb = existing.stat().st_size / 1024
@@ -258,37 +265,41 @@ class PodcastHandler(SimpleHTTPRequestHandler):
                     self.send_json_response(response, 200)
                     return
             
-            # Run the automated pipeline
+            # Run the pipeline
             from generate_weekly_audio import generate_weekly_message_audio
-            print(f"Starting automated pipeline: week={week}, fy={fy}")
+            print(f"Starting pipeline: week={week}, fy={fy}, phase={phase or 'auto'}")
             result = generate_weekly_message_audio(
                 week=int(week) if week else None,
                 fy=int(fy) if fy else None,
                 voice="Jenny",
                 rate=0.95,
-                output_dir=str(self.AUDIO_DIR)
+                output_dir=str(self.AUDIO_DIR),
+                phase=phase
             )
             
-            if result['success']:
-                output_path = Path(result['output_file'])
-                file_size_kb = output_path.stat().st_size / 1024
+            if result.get('success'):
                 response = {
                     'success': True,
-                    'filename': output_path.name,
-                    'audio_url': f'/podcasts/{output_path.name}',
-                    'size_kb': round(file_size_kb, 1),
-                    'voice': 'Jenny Neural',
-                    'codec': 'AAC @ 256kbps',
-                    'event_count': result['event_count'],
-                    'summarized_count': result['summarized_count'],
-                    'script_length': result['script_length'],
+                    'phase_completed': result.get('phase_completed'),
+                    'event_count': result.get('event_count', 0),
+                    'review_no_comm_count': result.get('review_no_comm_count', 0),
+                    'summarized_count': result.get('summarized_count', 0),
                 }
+                if result.get('output_file'):
+                    output_path = Path(result['output_file'])
+                    response['filename'] = output_path.name
+                    response['audio_url'] = f'/podcasts/{output_path.name}'
+                    response['size_kb'] = round(output_path.stat().st_size / 1024, 1)
+                    response['voice'] = 'Jenny Neural'
+                    response['codec'] = 'AAC @ 256kbps'
+                    response['script_length'] = result.get('script_length', 0)
                 self.send_json_response(response, 200)
             else:
                 self.send_json_response({
                     'success': False,
                     'error': result.get('error', 'Unknown error'),
                     'event_count': result.get('event_count', 0),
+                    'review_no_comm_count': result.get('review_no_comm_count', 0),
                     'summarized_count': result.get('summarized_count', 0),
                 }, 500)
         
@@ -940,10 +951,15 @@ class PodcastHandler(SimpleHTTPRequestHandler):
         <div class="generator-section">
             <h2>🎤 Generate New Summarized Audio</h2>
             <p>Create a new MP4 audio message with Jenny Neural voice.</p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <p style="font-size: 0.85em; color: #9CA3AF; margin-bottom: 10px;">
+                <strong>Step 1:</strong> Fetch Data (VPN ON) → <strong>Step 2:</strong> Generate Audio (VPN OFF)
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                 <a href="/create-audio" class="generate-btn">🎤 Custom Audio</a>
-                <button class="generate-btn" onclick="generateFromTemplate(event)" style="background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%); border: none; cursor: pointer; font-weight: 600;">🎤 Weekly Message Audio</button>
+                <button class="generate-btn" id="btn-fetch" onclick="fetchBQData(event)" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); border: none; cursor: pointer; font-weight: 600;">📡 1. Fetch Data (VPN)</button>
+                <button class="generate-btn" id="btn-synth" onclick="synthesizeAudio(event)" style="background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%); border: none; cursor: pointer; font-weight: 600;">🎤 2. Generate Audio</button>
             </div>
+            <div id="pipeline-status" style="margin-top: 12px; padding: 10px; border-radius: 8px; display: none; font-size: 0.9em;"></div>
         </div>
         
         <div class="files-section">
@@ -1074,52 +1090,91 @@ class PodcastHandler(SimpleHTTPRequestHandler):
             }
         }
         
-        function generateFromTemplate(event) {
-            if (event) {
-                event.preventDefault();
-                event.target.disabled = true;
-                event.target.textContent = '⏳ Generating...';
-                const btn = event.target;
-            } else {
-                const btn = document.querySelector('[onclick="generateFromTemplate(event)"]') || document.querySelector('.generate-btn[style*="8B5CF6"]');
-                if (btn) {
-                    btn.disabled = true;
-                    btn.textContent = '⏳ Generating...';
-                }
-            }
-            
+        function showStatus(html, type) {
+            const el = document.getElementById('pipeline-status');
+            el.innerHTML = html;
+            el.style.display = 'block';
+            el.style.background = type === 'success' ? '#064E3B' : type === 'error' ? '#7F1D1D' : '#1E3A5F';
+            el.style.color = '#F3F4F6';
+            el.style.border = '1px solid ' + (type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#3B82F6');
+        }
+
+        function fetchBQData(event) {
+            const btn = document.getElementById('btn-fetch');
+            btn.disabled = true;
+            btn.textContent = '⏳ Fetching from BigQuery...';
+            showStatus('Connecting to BigQuery... Requires VPN.', 'info');
+
             fetch('/api/generate-from-template', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({week: 4, fy: 2027, force: true})
+                body: JSON.stringify({week: 4, fy: 2027, phase: 'fetch'})
             })
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
+                btn.disabled = false;
+                btn.textContent = '📡 1. Fetch Data (VPN)';
                 if (data.success) {
-                    let msg = `Audio generated successfully!\\nFile: ${data.filename}\\nSize: ${data.size_kb}KB`;
-                    if (data.summarized_count) msg += `\\nEvents with Summarized: ${data.summarized_count}/${data.event_count}`;
-                    if (data.voice) msg += `\\nVoice: ${data.voice}`;
-                    alert(msg);
-                    setTimeout(() => location.reload(), 1500);
+                    showStatus(
+                        '<strong>✅ Data Cached Successfully!</strong><br>' +
+                        '<table style="margin-top:6px;font-size:0.9em;">' +
+                        '<tr><td>Weekly Messages (Review for Publish - No Comm):</td><td style="padding-left:10px;font-weight:bold;">' + data.review_no_comm_count + '</td></tr>' +
+                        '<tr><td>Total No Comm events:</td><td style="padding-left:10px;font-weight:bold;">' + data.event_count + '</td></tr>' +
+                        '<tr><td>With Summarized text:</td><td style="padding-left:10px;font-weight:bold;">' + data.summarized_count + '</td></tr>' +
+                        '</table>' +
+                        '<br><em>Now disconnect VPN and click "2. Generate Audio"</em>',
+                        'success'
+                    );
                 } else {
-                    let errMsg = 'Error: ' + data.error;
-                    if (data.event_count !== undefined) errMsg += `\\nEvents found: ${data.event_count}, With Summarized: ${data.summarized_count}`;
-                    alert(errMsg);
-                    const btn = event && event.target ? event.target : document.querySelector('.generate-btn[style*="8B5CF6"]');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.textContent = '🎤 Weekly Message Audio';
-                    }
+                    showStatus('<strong>❌ Fetch Failed:</strong> ' + data.error + '<br><em>Make sure you are connected to VPN.</em>', 'error');
                 }
             })
             .catch(err => {
-                console.error('Generation error:', err);
-                alert('Error generating audio: ' + err.message);
-                const btn = event && event.target ? event.target : document.querySelector('.generate-btn[style*="8B5CF6"]');
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = '🎤 Weekly Message Audio';
+                btn.disabled = false;
+                btn.textContent = '📡 1. Fetch Data (VPN)';
+                showStatus('<strong>❌ Network Error:</strong> ' + err.message, 'error');
+            });
+        }
+
+        function synthesizeAudio(event) {
+            const btn = document.getElementById('btn-synth');
+            btn.disabled = true;
+            btn.textContent = '⏳ Synthesizing Jenny Neural...';
+            showStatus('Building TTS script and synthesizing audio... Requires OFF VPN.', 'info');
+
+            fetch('/api/generate-from-template', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({week: 4, fy: 2027, phase: 'synthesize', force: true})
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.textContent = '🎤 2. Generate Audio';
+                if (data.success) {
+                    showStatus(
+                        '<strong>✅ Audio Generated!</strong><br>' +
+                        '<table style="margin-top:6px;font-size:0.9em;">' +
+                        '<tr><td>File:</td><td style="padding-left:10px;">' + data.filename + '</td></tr>' +
+                        '<tr><td>Size:</td><td style="padding-left:10px;">' + data.size_kb + ' KB</td></tr>' +
+                        '<tr><td>Voice:</td><td style="padding-left:10px;">' + data.voice + '</td></tr>' +
+                        '<tr><td>Review for Publish - No Comm:</td><td style="padding-left:10px;font-weight:bold;">' + data.review_no_comm_count + '</td></tr>' +
+                        '<tr><td>With Summarized text:</td><td style="padding-left:10px;font-weight:bold;">' + data.summarized_count + '</td></tr>' +
+                        '</table>',
+                        'success'
+                    );
+                    setTimeout(() => location.reload(), 3000);
+                } else {
+                    let hint = '';
+                    if (data.error && data.error.includes('No cached data')) hint = '<br><em>Run Step 1 (Fetch Data) on VPN first.</em>';
+                    else if (data.error && data.error.includes('synthesis failed')) hint = '<br><em>Make sure you are disconnected from VPN.</em>';
+                    showStatus('<strong>❌ Synthesis Failed:</strong> ' + data.error + hint, 'error');
                 }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.textContent = '🎤 2. Generate Audio';
+                showStatus('<strong>❌ Network Error:</strong> ' + err.message, 'error');
             });
         }
     </script>

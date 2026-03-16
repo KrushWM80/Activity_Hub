@@ -22,7 +22,8 @@ set LogFile=%TDAPath%\tda_insights_server.log
 set Port=5000
 
 REM Set up Google Cloud credentials for BigQuery access
-set GOOGLE_APPLICATION_CREDENTIALS=%APPDATA%\gcloud\application_default_credentials.json
+REM Use absolute path (not %%APPDATA%%) because SYSTEM user has a different profile
+set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json
 
 echo.
 echo ================================================================

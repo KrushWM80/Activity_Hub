@@ -602,6 +602,234 @@
         .iframe-wrapper.active {
             display: block;
         }
+
+        /* Link Management Widgets */
+        .link-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .link-badge-private {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .link-badge-shared {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .link-badge-public {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .link-health {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .link-health-good {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .link-health-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .health-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .health-dot-green {
+            background: #10B981;
+        }
+
+        .health-dot-red {
+            background: #EF4444;
+        }
+
+        .link-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-300);
+            gap: 1rem;
+        }
+
+        .link-item:last-child {
+            border-bottom: none;
+        }
+
+        .link-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .link-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .link-url {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .link-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .link-actions {
+            display: flex;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .link-btn {
+            padding: 0.25rem 0.6rem;
+            border: 1px solid var(--gray-300);
+            background: var(--white);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .link-btn:hover {
+            background: var(--gray-100);
+            border-color: var(--walmart-blue);
+            color: var(--walmart-blue);
+        }
+
+        .link-form {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--walmart-blue);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--walmart-blue-dark);
+        }
+
+        .error-message {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #EF4444;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #D1FAE5;
+            color: #065F46;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #10B981;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .for-you-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .link-card {
+            background: linear-gradient(135deg, var(--walmart-blue-light) 0%, var(--walmart-blue) 100%);
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border-color: var(--walmart-yellow);
+        }
+
+        .link-card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .link-card-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .link-card-health {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -836,6 +1064,140 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Row 4: Link Management Widgets -->
+            <!-- Managed Links Admin Widget -->
+            <div class="widget widget-extra-large">
+                <div class="widget-header">
+                    🔗 Managed Links (Admin)
+                </div>
+                <div class="widget-content">
+                    <!-- Add Link Form -->
+                    <div class="link-form">
+                        <h3 style="margin-bottom: 1rem; color: var(--gray-900);">➕ Create New Link</h3>
+                        <div id="duplicateError" class="error-message">⚠️ Error: URL already exists in the system. Please use a different URL.</div>
+                        <div id="successMessage" class="success-message">✅ Link created successfully!</div>
+                        
+                        <div class="form-group">
+                            <label>Link Name</label>
+                            <input type="text" id="linkName" placeholder="e.g., Confluence Portal" value="">
+                        </div>
+                        <div class="form-group">
+                            <label>URL</label>
+                            <input type="url" id="linkUrl" placeholder="https://example.com" value="">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="linkCategory">
+                                    <option value="Documentation">Documentation</option>
+                                    <option value="Tools">Tools</option>
+                                    <option value="Resources">Resources</option>
+                                    <option value="Internal">Internal</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Privacy Type</label>
+                                <select id="linkPrivacy">
+                                    <option value="private">Private</option>
+                                    <option value="shared">Shared</option>
+                                    <option value="public">Public</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Description (optional)</label>
+                            <input type="text" id="linkDescription" placeholder="What does this link do?" value="">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn-primary" onclick="demoCreateLink()">Create Link</button>
+                            <button class="btn-primary" style="background: var(--gray-600);" onclick="resetLinkForm()">Clear</button>
+                        </div>
+                    </div>
+
+                    <!-- Managed Links List -->
+                    <h3 style="margin-bottom: 1rem; color: var(--gray-900); margin-top: 1.5rem;">📋 Your Managed Links</h3>
+                    <div id="managedLinksList">
+                        <div class="link-item">
+                            <div class="link-info">
+                                <div class="link-title">Confluence Portal</div>
+                                <div class="link-url">https://confluence.walmart.com/display/home</div>
+                                <div class="link-meta">
+                                    <span class="link-badge link-badge-public">Public</span>
+                                    <span class="link-health link-health-good"><span class="health-dot health-dot-green"></span> Healthy</span>
+                                </div>
+                            </div>
+                            <div class="link-actions">
+                                <button class="link-btn" onclick="alert('Edit functionality coming soon')">✏️ Edit</button>
+                                <button class="link-btn" onclick="demoCheckHealth(this)">🔍 Check</button>
+                                <button class="link-btn" onclick="demoDeleteLink(this)" style="color: #EF4444;">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="link-item">
+                            <div class="link-info">
+                                <div class="link-title">Project Playbook</div>
+                                <div class="link-url">https://playbook.walmart.internal/projects</div>
+                                <div class="link-meta">
+                                    <span class="link-badge link-badge-shared">Shared</span>
+                                    <span class="link-health link-health-good"><span class="health-dot health-dot-green"></span> Healthy</span>
+                                </div>
+                            </div>
+                            <div class="link-actions">
+                                <button class="link-btn" onclick="alert('Edit functionality coming soon')">✏️ Edit</button>
+                                <button class="link-btn" onclick="demoCheckHealth(this)">🔍 Check</button>
+                                <button class="link-btn" onclick="demoDeleteLink(this)" style="color: #EF4444;">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="link-item">
+                            <div class="link-info">
+                                <div class="link-title">Help Desk Ticketing</div>
+                                <div class="link-url">https://helpdesk.walmart.com/tickets</div>
+                                <div class="link-meta">
+                                    <span class="link-badge link-badge-private">Private</span>
+                                    <span class="link-health link-health-danger"><span class="health-dot health-dot-red"></span> Degraded</span>
+                                </div>
+                            </div>
+                            <div class="link-actions">
+                                <button class="link-btn" onclick="alert('Edit functionality coming soon')">✏️ Edit</button>
+                                <button class="link-btn" onclick="demoCheckHealth(this)">🔍 Check</button>
+                                <button class="link-btn" onclick="demoDeleteLink(this)" style="color: #EF4444;">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- For You - Subscribed Links Widget -->
+            <div class="widget widget-large">
+                <div class="widget-header">
+                    ⭐ For You - Quick Links
+                </div>
+                <div class="widget-content">
+                    <p style="margin-bottom: 1rem; color: var(--gray-700); font-size: 0.9rem;">Your personalized quick-access links based on role and preferences</p>
+                    <div class="for-you-links">
+                        <div class="link-card" onclick="window.open('https://confluence.walmart.com', '_blank')">
+                            <div class="link-card-icon">📚</div>
+                            <div class="link-card-name">Confluence</div>
+                            <div class="link-card-health">✅ Online</div>
+                        </div>
+                        <div class="link-card" onclick="window.open('https://github.com', '_blank')">
+                            <div class="link-card-icon">💻</div>
+                            <div class="link-card-name">GitHub</div>
+                            <div class="link-card-health">✅ Online</div>
+                        </div>
+                        <div class="link-card" onclick="window.open('https://jira.walmart.com', '_blank')">
+                            <div class="link-card-icon">🎯</div>
+                            <div class="link-card-name">Jira</div>
+                            <div class="link-card-health">✅ Online</div>
+                        </div>
+                        <div class="link-card" onclick="alert('This link needs attention')">
+                            <div class="link-card-icon">⚠️</div>
+                            <div class="link-card-name">Help Desk</div>
+                            <div class="link-card-health">📍 Degraded</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -935,6 +1297,114 @@
                     // Allow real navigation for actual links
                 });
             });
+        }
+
+        // Link Management Demo Functions
+        function demoCreateLink() {
+            const name = document.getElementById('linkName').value;
+            const url = document.getElementById('linkUrl').value;
+            const category = document.getElementById('linkCategory').value;
+            const privacy = document.getElementById('linkPrivacy').value;
+            
+            const duplicateError = document.getElementById('duplicateError');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Hide messages first
+            duplicateError.classList.remove('show');
+            successMessage.classList.remove('show');
+            
+            // Validate inputs
+            if (!name || !url) {
+                alert('Please fill in Link Name and URL');
+                return;
+            }
+            
+            // Simulate duplicate check (demo: any link with .com is considered duplicate)
+            if (url.includes('example.com') || url.includes('.com')) {
+                duplicateError.classList.add('show');
+                setTimeout(() => {
+                    duplicateError.classList.remove('show');
+                }, 3000);
+                return;
+            }
+            
+            // Show success message
+            successMessage.classList.add('show');
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 3000);
+            
+            // Add new link to list
+            const newLink = document.createElement('div');
+            newLink.className = 'link-item';
+            const privacyClass = privacy === 'public' ? 'public' : privacy === 'shared' ? 'shared' : 'private';
+            
+            newLink.innerHTML = `
+                <div class="link-info">
+                    <div class="link-title">${name}</div>
+                    <div class="link-url">${url}</div>
+                    <div class="link-meta">
+                        <span class="link-badge link-badge-${privacyClass}">${privacy.charAt(0).toUpperCase() + privacy.slice(1)}</span>
+                        <span class="link-health link-health-good"><span class="health-dot health-dot-green"></span> Healthy</span>
+                    </div>
+                </div>
+                <div class="link-actions">
+                    <button class="link-btn" onclick="alert('Edit functionality coming soon')">✏️ Edit</button>
+                    <button class="link-btn" onclick="demoCheckHealth(this)">🔍 Check</button>
+                    <button class="link-btn" onclick="demoDeleteLink(this)" style="color: #EF4444;">🗑️</button>
+                </div>
+            `;
+            
+            document.getElementById('managedLinksList').insertBefore(newLink, document.getElementById('managedLinksList').children[0]);
+            resetLinkForm();
+        }
+        
+        function resetLinkForm() {
+            document.getElementById('linkName').value = '';
+            document.getElementById('linkUrl').value = '';
+            document.getElementById('linkCategory').value = 'Documentation';
+            document.getElementById('linkPrivacy').value = 'private';
+            document.getElementById('linkDescription').value = '';
+            document.getElementById('duplicateError').classList.remove('show');
+            document.getElementById('successMessage').classList.remove('show');
+        }
+        
+        function demoCheckHealth(button) {
+            const originalText = button.textContent;
+            button.textContent = '⏳ Checking...';
+            button.disabled = true;
+            
+            // Simulate health check
+            setTimeout(() => {
+                const linkItem = button.closest('.link-item');
+                const healthBadge = linkItem.querySelector('.link-health');
+                
+                const isHealthy = Math.random() > 0.3;
+                if (isHealthy) {
+                    healthBadge.innerHTML = '<span class="health-dot health-dot-green"></span> Healthy';
+                    healthBadge.classList.remove('link-health-danger');
+                    healthBadge.classList.add('link-health-good');
+                } else {
+                    healthBadge.innerHTML = '<span class="health-dot health-dot-red"></span> Degraded';
+                    healthBadge.classList.remove('link-health-good');
+                    healthBadge.classList.add('link-health-danger');
+                }
+                
+                button.textContent = originalText;
+                button.disabled = false;
+            }, 1500);
+        }
+        
+        function demoDeleteLink(button) {
+            const linkItem = button.closest('.link-item');
+            const linkName = linkItem.querySelector('.link-title').textContent;
+            
+            if (confirm(`Delete "${linkName}"?`)) {
+                linkItem.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => {
+                    linkItem.remove();
+                }, 300);
+            }
         }
 
         // Initialize demo

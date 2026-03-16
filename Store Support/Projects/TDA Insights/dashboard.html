@@ -627,6 +627,7 @@
             <div class="button-group">
                 <button class="btn-primary" id="apply-filters">Apply Filters</button>
                 <button class="btn-secondary" id="reset-filters">Reset</button>
+                <button class="btn-secondary" id="refresh-btn">🔄 Refresh Data</button>
                 <button class="btn-secondary" id="export-btn">📥 Export CSV</button>
                 <button class="btn-secondary" id="ppt-btn">📊 Generate PPT</button>
             </div>
@@ -734,6 +735,7 @@
             document.getElementById('reset-filters').addEventListener('click', resetFilters);
             document.getElementById('export-btn').addEventListener('click', exportCSV);
             document.getElementById('ppt-btn').addEventListener('click', generatePPT);
+            document.getElementById('refresh-btn').addEventListener('click', refreshData);
             
             // Pagination controls
             document.getElementById('prev-page-btn').addEventListener('click', goToPreviousPage);
@@ -1120,6 +1122,30 @@
             link.href = url;
             link.download = `tda-initiatives-${new Date().toISOString().split('T')[0]}.csv`;
             link.click();
+        }
+
+        // Refresh data from BigQuery
+        async function refreshData() {
+            const btn = document.getElementById('refresh-btn');
+            const origText = btn.textContent;
+            btn.textContent = '⏳ Refreshing...';
+            btn.disabled = true;
+            try {
+                const resp = await fetch(`${API_BASE}/refresh`);
+                const result = await resp.json();
+                if (result.success) {
+                    btn.textContent = '✅ Refreshed!';
+                    await loadFilters();
+                    await loadData();
+                } else {
+                    btn.textContent = '⚠️ Failed';
+                    alert('Refresh failed — using cached data');
+                }
+            } catch (e) {
+                btn.textContent = '❌ Error';
+                alert('Could not reach server for refresh');
+            }
+            setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 2000);
         }
 
         // Generate PPT with screenshots (integrated with backend)

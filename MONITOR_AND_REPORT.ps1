@@ -60,7 +60,7 @@ function Get-SystemStatus {
         $status.StoreActivityDashboardRunning = $false
     }
     
-    # Check Zorro (port 8888) - podcast_server.py
+    # Check Zorro (port 8888) - audio_server.py
     $netstat8888 = netstat -ano 2>$null | Select-String ":8888.*LISTENING"
     if ($netstat8888) {
         $status.ZorroRunning = $true
@@ -343,7 +343,7 @@ function Check-And-RestartZorro {
             
             if (Test-Path $zorroPath) {
                 # Start Zorro server process in background
-                $process = Start-Process -FilePath $pythonExe -ArgumentList "$zorroPath\podcast_server.py" -WorkingDirectory $zorroPath -WindowStyle Hidden -PassThru -ErrorAction SilentlyContinue
+                $process = Start-Process -FilePath $pythonExe -ArgumentList "$zorroPath\audio_server.py" -WorkingDirectory $zorroPath -WindowStyle Hidden -PassThru -ErrorAction SilentlyContinue
                 
                 if ($process) {
                     Write-Host "✓ Started Zorro server (PID: $($process.Id))" -ForegroundColor Green

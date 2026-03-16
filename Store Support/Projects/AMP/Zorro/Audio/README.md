@@ -1,162 +1,97 @@
 # Zorro Audio Production - README
 
-Welcome to the Zorro Audio folder! This is the centralized location for all audio production, workflow documentation, and template management for the Activity Hub.
+Welcome to the Zorro Audio folder! This is the centralized location for all audio production for the Activity Hub Weekly Messages.
 
 ## What's in This Folder?
 
-This folder contains everything needed to manage audio content creation for Zorro, including:
-- **Scripts** for generating audio files
-- **Templates** for recurring audio series
-- **Output** where all generated files are stored
-- **Documentation** explaining processes and requirements
+- **Scripts/** — Pipeline scripts for automated BQ → TTS → MP4 workflow
+- **Scripts/cache/** — JSON cache files for two-phase VPN workflow
+- **output/** — Generated MP4 audio files and script text files
+- **windows_media_synthesizer.py** — edge-tts Jenny Neural + SAPI5 fallback engine
+- **Documentation/** — Process guides and templates
 
 ## Quick Start
 
-### 1. Start the Dashboard Server
+### Dashboard (Recommended)
+The audio server runs at **http://localhost:8888** — started automatically via `Automation/start_zorro_24_7.bat`.
+
+Click **"Weekly Message Audio"** button → popup with two steps:
+1. **Fetch Data** (on Eagle WiFi / VPN) — pulls from BigQuery, caches locally
+2. **Generate Audio** (on Walmart WiFi / off VPN) — synthesizes with Jenny Neural
+
+### Command Line
 ```bash
-cd Scripts
-python podcast_server.py
-```
-Then open your browser to: **http://localhost:8888**
+# Phase 1: Fetch data (requires Eagle WiFi / VPN)
+python Scripts/generate_weekly_audio.py --week 4 --fy 2027 --phase fetch
 
-### 2. Generate Audio from an AMP Activity
-```bash
-cd Scripts
-python generate_both_voices.py
-```
-This creates David and Zira versions of the full Week 4 messages.
-
-### 3. Create a Summarized Weekly Template
-```bash
-cd Scripts
-python generate_summarized_final_zira.py
-```
-This creates a summarized version with Vimeo compatibility.
-
-## Folder Structure
-
-```
-Audio/
-├── Scripts/              ← Run Python scripts from here
-├── Templates/            ← Reusable template definitions
-├── Output/
-│   ├── podcasts/         ← Generated audio files
-│   └── archive/          ← Older versions
-└── Documentation/        ← Process guides and templates
+# Phase 2: Synthesize audio (requires Walmart WiFi / off VPN)
+python Scripts/generate_weekly_audio.py --week 4 --fy 2027 --phase synthesize
 ```
 
-## Key Documentation
+## Automated Weekly Message Audio Pipeline
 
-| Document | Purpose |
-|----------|---------|
-| [AUDIO_PROCESS_GUIDE.md](Documentation/AUDIO_PROCESS_GUIDE.md) | **START HERE** - Complete process overview |
-| [REQUIREMENTS_QUESTIONNAIRE.md](Documentation/REQUIREMENTS_QUESTIONNAIRE.md) | Form for requesting new templates |
-| [PROCESS_FLOW_DIAGRAMS.md](Documentation/PROCESS_FLOW_DIAGRAMS.md) | Visual flowcharts of both processes |
-| [TEMPLATE_LIBRARY.md](Documentation/TEMPLATE_LIBRARY.md) | Current templates and how to use them |
+### Data Source
+- **BigQuery Table**: `wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2`
+- **Filter**: `Message_Type = 'Merchant Message'` AND `Status = 'Review for Publish review - No Comms'`
+- **Content**: Extracts "Summarized:" text from each event's message body
 
-## Two Core Workflows
+### Area Groupings (in order)
+1. **Food & Consumables**: Beauty and Consumables, Food, Fresh
+2. **General Merchandise**: Entertainment, Fashion, Hardlines, Home, Seasonal
+3. **Operations**: Asset Protection, Auto Care, Backroom and Claims, Frontend, Pickup, People, Total Store
 
-### Workflow 1: Standard Audio (Yesterday's Approach)
-Convert any AMP Activity to audio file
-- ⏱️ **Time:** ~10 minutes
-- 📦 **Output:** MP4 audio file
-- 🔄 **Reuse:** One-time use
+### Two-Phase Cache System
+Required because Eagle WiFi/VPN is needed for BigQuery but blocks Jenny Neural TTS.
 
-**Used for:** Single messages, quick conversions, variety
+| Phase | Network | Action | Time |
+|-------|---------|--------|------|
+| Fetch | Eagle WiFi (VPN ON) | BQ query + text extraction + cache | ~5 seconds |
+| Synthesize | Walmart WiFi (VPN OFF) | TTS synthesis + MP4 encoding | ~2-4 minutes |
 
-### Workflow 2: Audio Template (Today's Innovation)
-Create reusable template for recurring content
-- ⏱️ **Time:** 2-4 hours initial, 10 minutes per use
-- 📦 **Output:** Template + generation script
-- 🔄 **Reuse:** 50+ times per year
+Cache stored at: `Scripts/cache/week_{N}_fy{YYYY}.json`
 
-**Used for:** Weekly messages, regular series, standardized formats
-
-## Available Templates
-
-### Weekly Messages Audio Template - Summarized ✅ ACTIVE
-- **Created:** February 27, 2026
-- **Frequency:** Weekly (52/year)
-- **Default Voice:** Zira (Female)
-- **Format:** Vimeo-compatible MP4
-- **Duration:** ~4:30 minutes
-- **Departments:** Entertainment (72), Fresh (93), Fashion (29)
-
-## Scripts Reference
-
-All scripts are in the `Scripts/` folder:
-
-| Script | What It Does |
-|--------|--------------|
-| `generate_both_voices.py` | Creates David + Zira versions of full messages |
-| `generate_summarized_final_zira.py` | Creates Zira-only summarized version with Vimeo conversion |
-| `convert_wav_to_mp4_installer.py` | Converts WAV files to MP4 |
-| `convert_standard_to_vimeo.py` | Adds Vimeo compatibility to existing MP4s |
-| `create_audio_thumbnail.py` | Generates standard thumbnail image |
-| `podcast_server.py` | Runs dashboard web server |
-
-## Audio Generation Pipeline
-
+### Audio Pipeline Flow
 ```
-Text Script
+BigQuery (AMP ALL 2)
+   ↓ Filter: Merchant Message + Review for Publish - No Comms
+Extract Summarized text from message body
+   ↓ Regex: Summarize[d]?\s*:\s*(.*) and Summarized\s+(.*)
+Group by Area (Food & Consumables → GM → Operations)
    ↓
-PowerShell SAPI5 (TTS)
+Build TTS Script (Intro → Groups → Areas → Events → Outro)
    ↓
-WAV File (10-25 MB)
+Save as: output/Audio/Week N - Weekly Messages Audio Script.txt
    ↓
-FFmpeg Conversion
+edge-tts Jenny Neural (en-US-JennyNeural)
    ↓
-Standard MP4 (2-6 MB)
+FFmpeg MP4 Encoding (AAC @ 256kbps)
    ↓
-Vimeo Conversion (add thumbnail)
-   ↓
-Vimeo-Compatible MP4 (3-9 MB) ← FINAL OUTPUT
+output/Audio/Week N - Weekly Messages Audio.mp4
 ```
 
-## Requesting a New Audio Template
+## Key Scripts
 
-If you need a recurring audio series:
-
-1. **Review:** Check [AUDIO_PROCESS_GUIDE.md](Documentation/AUDIO_PROCESS_GUIDE.md)
-2. **Fill Out:** [REQUIREMENTS_QUESTIONNAIRE.md](Documentation/REQUIREMENTS_QUESTIONNAIRE.md)
-3. **Submit:** Send questionnaire to development team
-4. **Timeline:** 2-4 hours for initial setup, then ~10 min per use
-
-## Dashboard Features
-
-The local dashboard (http://localhost:8888) provides:
-
-- 🎵 **Audio Player** - Native controls for each file
-- ⬇️ **Download** - Save files locally
-- 📋 **Copy Link** - Share URLs
-- 🗑️ **Delete** - Remove files (with confirmation)
-- 🔄 **Auto-Refresh** - Updates every 5 seconds
+| Script | Purpose |
+|--------|---------|
+| `Scripts/generate_weekly_audio.py` | **Main pipeline** — BQ fetch, text extraction, TTS, MP4 |
+| `windows_media_synthesizer.py` | edge-tts Jenny Neural engine with SAPI5 fallback |
+| `../audio_server.py` | Dashboard web server (port 8888) |
 
 ## Technical Details
 
 ### Dependencies
-- Python 3.7+
-- FFmpeg 4.0+ (for MP4/Vimeo conversion)
-- Pillow (for thumbnail generation)
-- Windows PowerShell (for TTS)
+- Python 3.14+, edge-tts v7.2.7
+- FFmpeg at `C:\ffmpeg\bin\ffmpeg.exe` (AAC @ 256kbps)
+- BQ Auth: gcloud application_default_credentials.json
 
-### Voice Names
-- **David:** "Microsoft David Desktop" (Male)
-- **Zira:** "Microsoft Zira Desktop" (Female)
+### Voice
+- **Primary**: en-US-JennyNeural (edge-tts, requires Walmart WiFi)
+- **Fallback**: SAPI5 David/Zira (works on any network)
 
-### Audio Specifications
-- **Sample Rate:** 44.1 kHz
-- **Bit Depth:** 16-bit
-- **Format:** MP4 (AAC @ 128k)
-- **Video (Vimeo):** H.264, yuv420p
-- **Thumbnail:** 1920x1080px JPEG
-
-## File Management
-
-### Keep ✅
-- Vimeo-compatible MP4 files (production output)
-- Thumbnails (reusable)
-- Final DAY MP4s (if needed for distribution)
+### Output Specifications
+- **Format**: MP4 audio (AAC)
+- **Bitrate**: 256 kbps
+- **Voice**: Jenny Neural (female, natural-sounding)
 
 ### Delete ❌
 - WAV files (after MP4 conversion)

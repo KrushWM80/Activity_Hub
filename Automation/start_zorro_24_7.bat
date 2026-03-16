@@ -40,10 +40,10 @@ cd /d "%ZorroPath%"
 
 REM Start Python backend with auto-restart loop
 :restart_loop
-echo [%date% %time%] Launching Zorro Server (podcast_server.py)... >> "%LogFile%"
+echo [%date% %time%] Launching Zorro Server (audio_server.py)... >> "%LogFile%"
 echo Launching Zorro on port %Port%...
 
-"%PythonExe%" podcast_server.py 2>> "%LogFile%"
+"%PythonExe%" audio_server.py 2>> "%LogFile%"
 
 REM If process exits, log it and wait before restarting
 echo [%date% %time%] Process exited with code !ERRORLEVEL! >> "%LogFile%"

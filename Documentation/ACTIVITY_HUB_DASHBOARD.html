@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Hub - Infrastructure & To Do Dashboard</title>
+    <style>
+        :root {
+            --walmart-navy: #1E3A8A;
+            --walmart-blue-dark: #1D4ED8;
+            --walmart-blue: #3B82F6;
+            --walmart-blue-light: #60A5FA;
+            --walmart-yellow: #FFCC00;
+            --gray-900: #1A202C;
+            --gray-700: #4A5568;
+            --gray-600: #718096;
+            --gray-300: #E2E8F0;
+            --gray-100: #F7FAFC;
+            --gray-50: #F9FAFB;
+            --white: #FFFFFF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-900);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-navy) 100%);
+            color: var(--white);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-info {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+        }
+
+        .status-progress {
+            background: rgba(245, 158, 11, 0.2);
+            color: #F59E0B;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            flex: 1;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--gray-300);
+            margin-bottom: 2rem;
+            background: var(--white);
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .tab-button {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            margin-bottom: -2px;
+        }
+
+        .tab-button:hover {
+            color: var(--walmart-blue);
+            background: var(--gray-50);
+        }
+
+        .tab-button.active {
+            color: var(--walmart-blue);
+            border-bottom-color: var(--walmart-blue);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--walmart-blue);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--walmart-navy);
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--gray-900);
+        }
+
+        .card p {
+            color: var(--gray-700);
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .grid-item {
+            background: var(--gray-50);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--gray-300);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .status-card {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status-card.complete {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 2px solid #10B981;
+        }
+
+        .status-card.progress {
+            background: #FEF3C7;
+            color: #92400E;
+            border: 2px solid #F59E0B;
+        }
+
+        .status-card.pending {
+            background: #DBEAFE;
+            color: #1E40AF;
+            border: 2px solid #3B82F6;
+        }
+
+        .status-card .number {
+            font-size: 2rem;
+            display: block;
+            margin: 0.5rem 0;
+        }
+
+        .architecture {
+            background: var(--gray-50);
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            line-height: 1.5;
+            white-space: pre;
+        }
+
+        .checklist {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.75rem;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-top: 0.25rem;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checklist-item label {
+            flex: 1;
+            cursor: pointer;
+            word-break: break-word;
+        }
+
+        .checklist-item input[type="checkbox"]:checked + label {
+            color: var(--gray-600);
+            text-decoration: line-through;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            margin: 1rem 0;
+        }
+
+        thead {
+            background: var(--gray-100);
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid var(--gray-300);
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .badge-complete {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-progress {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-pending {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .badge-file {
+            background: var(--walmart-blue);
+            color: var(--white);
+        }
+
+        .sprint {
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .sprint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .sprint h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--walmart-navy);
+        }
+
+        .progress-bar {
+            background: var(--gray-200);
+            border-radius: 8px;
+            height: 24px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--success) 0%, var(--walmart-blue) 100%);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: width 0.3s ease;
+        }
+
+        .footer {
+            background: var(--gray-100);
+            border-top: 1px solid var(--gray-300);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+
+        @media print {
+            .header, .footer, .tabs {
+                display: none;
+            }
+
+            .card {
+                page-break-inside: avoid;
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>🏗️ Activity Hub Infrastructure & To Do Dashboard</h1>
+            <div class="header-info">
+                <div><strong>Status:</strong> <span class="status-badge status-progress">Phase 2-3 In Progress</span></div>
+                <div><strong>Date:</strong> March 16, 2026</div>
+                <div><strong>Backend:</strong> <span class="status-badge status-active">Running :8001</span></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('overview')">📊 Overview</button>
+            <button class="tab-button" onclick="showTab('architecture')">🏛️ Architecture</button>
+            <button class="tab-button" onclick="showTab('components')">⚙️ Components</button>
+            <button class="tab-button" onclick="showTab('infrastructure')">💾 Infrastructure</button>
+            <button class="tab-button" onclick="showTab('todo')">📋 To Do List</button>
+            <button class="tab-button" onclick="showTab('files')">📁 Files</button>
+        </div>
+
+        <!-- OVERVIEW TAB -->
+        <div id="overview" class="tab-content active">
+            <div class="card">
+                <h2>🎯 Executive Summary</h2>
+                <p><strong>Activity Hub</strong> is a comprehensive enterprise platform serving <strong>50,000+</strong> Walmart employees across <strong>8 role tiers</strong>. The system integrates multiple services including user management, access control, link management, data transformation, and AI assistance.</p>
+            </div>
+
+            <div class="grid">
+                <div class="grid-item">
+                    <strong>📈 Expected ROI</strong>
+                    <p>694% first-year return on $3.4M investment</p>
+                </div>
+                <div class="grid-item">
+                    <strong>⏱️ Time Savings</strong>
+                    <p>4-6 hours per user per week</p>
+                </div>
+                <div class="grid-item">
+                    <strong>👥 User Base</strong>
+                    <p>50,000+ Walmart Enterprise employees</p>
+                </div>
+                <div class="grid-item">
+                    <strong>🎯 Role Tiers</strong>
+                    <p>8-level hierarchy from C-Level to Team Member</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🚀 Current Status</h2>
+                <h3>Completed Components ✅</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 80%;">80% Complete</div>
+                </div>
+                <ul style="margin-left: 1.5rem; list-style: none;">
+                    <li>✅ Landing Page - Operational</li>
+                    <li>✅ Admin Dashboard - Operational</li>
+                    <li>✅ Projects Interface - Operational</li>
+                    <li>✅ Data-Bridge Service - 40 fields, 9 categories</li>
+                    <li>✅ Role Manager - 8-tier hierarchy</li>
+                    <li>✅ Sparky AI - Fully integrated</li>
+                </ul>
+
+                <h3 style="margin-top: 1.5rem;">In Progress 🔄</h3>
+                <ul style="margin-left: 1.5rem; list-style: none;">
+                    <li>🔄 Link Management System (Backend ✅, Admin UI ✅, Integration 🔄)</li>
+                    <li>🔄 For You Sidebar (Phase 3)</li>
+                </ul>
+
+                <h3 style="margin-top: 1.5rem;">Upcoming ⏳</h3>
+                <ul style="margin-left: 1.5rem; list-style: none;">
+                    <li>⏳ Production Deployment (Phase 4-5)</li>
+                    <li>⏳ Comprehensive Testing</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ARCHITECTURE TAB -->
+        <div id="architecture" class="tab-content">
+            <div class="card">
+                <h2>🏛️ Three-Tier Architecture</h2>
+                <div class="architecture">┌─────────────────────────────────────────────┐
+│        PRESENTATION TIER                    │
+│  Landing | Admin | Projects | My Work      │
+│         Notifications | Reports | Settings  │
+└─────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────┐
+│       APPLICATION TIER                      │
+│  Role Manager | Access Control              │
+│  Link Manager | Data-Bridge | Sparky AI     │
+└─────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────┐
+│         DATA TIER                           │
+│  PostgreSQL | Redis | Elasticsearch         │
+│  File Storage | Active Directory            │
+└─────────────────────────────────────────────┘
