@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+# Fix remaining corrupted emoji in admin-dashboard.html
+
+file_path = r"Interface\Admin\admin-dashboard.html"
+
+# Read the file in binary mode
+with open(file_path, 'rb') as f:
+    content = f.read()
+
+# Mappings of corrupted UTF-8 to proper UTF-8 emoji
+replacements = [
+    (b'\xc3\xb0\xc2\x9f\xc2\x93\xe2\x80\x99', b'\xf0\x9f\x94\x91'),  # ðŸ"' → 🔑 (key)
+    (b'\xc3\xb0\xc2\x9f\xc2\x93\xc2\x9b', b'\xf0\x9f\x93\x8b'),      # ðŸ"" → 📋 (clipboard)
+    (b'\xc3\xa2\xc2\x9a\xc2\x99\xc3\xaf\xc2\xb8\xc2\x8f', b'\xe2\x9a\x99\xef\xb8\x8f'),  # âš™ï¸ → ⚙️ (gear)
+    (b'\xc3\xb0\xc2\x9f\xc2\x93\xc2\x97', b'\xf0\x9f\x94\x97'),      # ðŸ"— → 🔗 (link)
+    (b'\xc3\xb0\xc2\x9f\xc2\x93\xc2\x84', b'\xf0\x9f\x93\x84'),      # ðŸ"„ → 📄 (document)
+    (b'\xc3\xb0\xc2\x9f\xc2\x8e\xc2\xaf', b'\xf0\x9f\x8e\xaf'),      # ðŸŽ¯ → 🎯 (target)
+    (b'\xc3\xa2\xc2\x86\xc2\x92', b'\xe2\x86\x92'),                    # â†' → → (arrow right)
+    (b'\xc3\xb0\xc2\x9f\xc2\x97\xc2\x91\xc3\xaf\xc2\xb8\xc2\x8f', b'\xf0\x9f\x97\x91\xef\xb8\x8f'),  # ðŸ—'ï¸ → 🗑️ (trash)
+    (b'\xc3\xb0\xc2\x9f\xc2\x8e\xc2\xa8', b'\xf0\x9f\x8e\xa8'),      # ðŸŽ¨ → 🎨 (palette)
+    (b'\xc3\xb0\xc2\x9f\xc2\x92\xc2\xa1', b'\xf0\x9f\x92\xa1'),      # ðŸ'¡ → 💡 (lightbulb)
+    (b'\xc3\xb0\xc2\x9f\xc2\x98\xc2\x9e', b'\xf0\x9f\x98\x9e'),      # ðŸ˜ž → 😞 (sad)
+    (b'\xc3\xb0\xc2\x9f\xc2\x98', b'\xf0\x9f\x98\x90'),               # ðŸ˜ → 😐 (neutral) 
+    (b'\xc3\xb0\xc2\x9f\xc2\x98\xc2\x8a', b'\xf0\x9f\x98\x8a'),      # ðŸ˜Š → 😊 (happy)
+    (b'\xc3\xb0\xc2\x9f\xc2\x98\xc2\x84', b'\xf0\x9f\x98\x84'),      # ðŸ˜„ → 😄 (big smile)
+    (b'\xc3\xb0\xc2\x9f\xc2\xa4\xc2\xa9', b'\xf0\x9f\xa4\xa9'),      # ðŸ¤© → 🤩 (star eyes)
+    (b'\xc3\xb0\xc2\x9f\xc2\x93\xc2\xb7', b'\xf0\x9f\x93\xb7'),      # ðŸ"· → 📷 (camera)
+    (b'\xc3\xa2\xc2\x80\xc2\xa2', b'\xe2\x80\xa2'),                    # â€¢ → • (bullet)
+]
+
+# Apply all replacements
+for old, new in replacements:
+    content = content.replace(old, new)
+
+# Write back
+with open(file_path, 'wb') as f:
+    f.write(content)
+
+print("✅ Fixed all corrupted emoji sequences in admin-dashboard.html")

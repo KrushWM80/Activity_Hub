@@ -830,6 +830,335 @@
             font-size: 0.75rem;
             opacity: 0.9;
         }
+
+        /* Right Sidebar - Quick Links */
+        .quick-links-sidebar {
+            position: fixed;
+            right: 0;
+            top: 120px;
+            bottom: 0;
+            width: 120px;
+            background: var(--white);
+            border-left: 2px solid var(--gray-300);
+            overflow-y: auto;
+            z-index: 40;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.08);
+            padding: 1rem 0.5rem;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--gray-700);
+        }
+
+        .sidebar-add-btn {
+            background: var(--walmart-blue);
+            color: var(--white);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-add-btn:hover {
+            background: var(--walmart-blue-dark);
+            transform: scale(1.1);
+        }
+
+        .sidebar-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-link-card {
+            background: linear-gradient(135deg, var(--walmart-blue-light) 0%, var(--walmart-blue) 100%);
+            color: var(--white);
+            padding: 0.75rem 0.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            font-size: 0.85rem;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .sidebar-link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border-color: var(--walmart-yellow);
+        }
+
+        .sidebar-link-icon {
+            font-size: 1.75rem;
+        }
+
+        .sidebar-link-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+
+        .sidebar-link-health {
+            font-size: 0.6rem;
+            opacity: 0.8;
+        }
+
+        /* Links/Sidebar Management Modal */
+        .links-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .links-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .links-modal-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .links-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 1rem;
+        }
+
+        .links-modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--walmart-navy);
+            margin: 0;
+        }
+
+        .links-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .links-modal-close:hover {
+            color: var(--error);
+            transform: scale(1.1);
+        }
+
+        .links-modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .links-modal-option {
+            padding: 1.5rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--gray-50);
+        }
+
+        .links-modal-option:hover {
+            border-color: var(--walmart-blue);
+            background: var(--white);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .links-modal-option-icon {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .links-modal-option-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--walmart-navy);
+            margin-bottom: 0.25rem;
+        }
+
+        .links-modal-option-desc {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        /* Nested Modal - Create/Manage/Browse Links */
+        .nested-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .nested-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nested-modal-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 550px;
+            animation: slideUp 0.3s ease;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .nested-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 1rem;
+        }
+
+        .nested-modal-header h2 {
+            font-size: 1.3rem;
+            color: var(--walmart-navy);
+            margin: 0;
+        }
+
+        .nested-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nested-modal-close:hover {
+            color: var(--error);
+        }
+
+        .available-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .available-link-item {
+            padding: 1rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--gray-50);
+        }
+
+        .available-link-item:hover {
+            border-color: var(--walmart-blue);
+            background: var(--white);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .available-link-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .available-link-desc {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+        }
+
+        /* Adjust main dashboard for sidebar */
+        .main-container {
+            margin-right: 130px;
+        }
+
+        @media (max-width: 1024px) {
+            .quick-links-sidebar {
+                position: relative;
+                width: 100%;
+                border-left: none;
+                border-top: 2px solid var(--gray-300);
+                top: auto;
+                right: auto;
+                height: auto;
+                margin-top: 1.5rem;
+            }
+
+            .sidebar-links {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 0.75rem;
+            }
+
+            .sidebar-link-card {
+                min-height: auto;
+                padding: 1rem 0.5rem;
+            }
+
+            .main-container {
+                margin-right: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1065,140 +1394,198 @@
                 </div>
             </div>
 
-            <!-- Row 4: Link Management Widgets -->
-            <!-- Managed Links Admin Widget -->
-            <div class="widget widget-extra-large">
-                <div class="widget-header">
-                    🔗 Managed Links (Admin)
-                </div>
-                <div class="widget-content">
-                    <!-- Add Link Form -->
-                    <div class="link-form">
-                        <h3 style="margin-bottom: 1rem; color: var(--gray-900);">➕ Create New Link</h3>
-                        <div id="duplicateError" class="error-message">⚠️ Error: URL already exists in the system. Please use a different URL.</div>
-                        <div id="successMessage" class="success-message">✅ Link created successfully!</div>
-                        
-                        <div class="form-group">
-                            <label>Link Name</label>
-                            <input type="text" id="linkName" placeholder="e.g., Confluence Portal" value="">
-                        </div>
-                        <div class="form-group">
-                            <label>URL</label>
-                            <input type="url" id="linkUrl" placeholder="https://example.com" value="">
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label>Category</label>
-                                <select id="linkCategory">
-                                    <option value="Documentation">Documentation</option>
-                                    <option value="Tools">Tools</option>
-                                    <option value="Resources">Resources</option>
-                                    <option value="Internal">Internal</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Privacy Type</label>
-                                <select id="linkPrivacy">
-                                    <option value="private">Private</option>
-                                    <option value="shared">Shared</option>
-                                    <option value="public">Public</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Description (optional)</label>
-                            <input type="text" id="linkDescription" placeholder="What does this link do?" value="">
-                        </div>
-                        <div class="form-actions">
-                            <button class="btn-primary" onclick="demoCreateLink()">Create Link</button>
-                            <button class="btn-primary" style="background: var(--gray-600);" onclick="resetLinkForm()">Clear</button>
-                        </div>
-                    </div>
-
-                    <!-- Managed Links List -->
-                    <h3 style="margin-bottom: 1rem; color: var(--gray-900); margin-top: 1.5rem;">📋 Your Managed Links</h3>
-                    <div id="managedLinksList">
-                        <div class="link-item">
-                            <div class="link-info">
-                                <div class="link-title">Confluence Portal</div>
-                                <div class="link-url">https://confluence.walmart.com/display/home</div>
-                                <div class="link-meta">
-                                    <span class="link-badge link-badge-public">Public</span>
-                                    <span class="link-health link-health-good"><span class="health-dot health-dot-green"></span> Healthy</span>
-                                </div>
-                            </div>
-                            <div class="link-actions">
-                                <button class="link-btn" onclick="alert('Edit functionality coming soon')">✏️ Edit</button>
-                                <button class="link-btn" onclick="demoCheckHealth(this)">🔍 Check</button>
-                                <button class="link-btn" onclick="demoDeleteLink(this)" style="color: #EF4444;">🗑️</button>
-                            </div>
-                        </div>
-                        <div class="link-item">
-                            <div class="link-info">
-                                <div class="link-title">Project Playbook</div>
-                                <div class="link-url">https://playbook.walmart.internal/projects</div>
-                                <div class="link-meta">
-                                    <span class="link-badge link-badge-shared">Shared</span>
-                                    <span class="link-health link-health-good"><span class="health-dot health-dot-green"></span> Healthy</span>
-                                </div>
-                            </div>
-                            <div class="link-actions">
-                                <button class="link-btn" onclick="alert('Edit functionality coming soon')">✏️ Edit</button>
-                                <button class="link-btn" onclick="demoCheckHealth(this)">🔍 Check</button>
-                                <button class="link-btn" onclick="demoDeleteLink(this)" style="color: #EF4444;">🗑️</button>
-                            </div>
-                        </div>
-                        <div class="link-item">
-                            <div class="link-info">
-                                <div class="link-title">Help Desk Ticketing</div>
-                                <div class="link-url">https://helpdesk.walmart.com/tickets</div>
-                                <div class="link-meta">
-                                    <span class="link-badge link-badge-private">Private</span>
-                                    <span class="link-health link-health-danger"><span class="health-dot health-dot-red"></span> Degraded</span>
-                                </div>
-                            </div>
-                            <div class="link-actions">
-                                <button class="link-btn" onclick="alert('Edit functionality coming soon')">✏️ Edit</button>
-                                <button class="link-btn" onclick="demoCheckHealth(this)">🔍 Check</button>
-                                <button class="link-btn" onclick="demoDeleteLink(this)" style="color: #EF4444;">🗑️</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- For You - Subscribed Links Widget -->
-            <div class="widget widget-large">
-                <div class="widget-header">
-                    ⭐ For You - Quick Links
-                </div>
-                <div class="widget-content">
-                    <p style="margin-bottom: 1rem; color: var(--gray-700); font-size: 0.9rem;">Your personalized quick-access links based on role and preferences</p>
-                    <div class="for-you-links">
-                        <div class="link-card" onclick="window.open('https://confluence.walmart.com', '_blank')">
-                            <div class="link-card-icon">📚</div>
-                            <div class="link-card-name">Confluence</div>
-                            <div class="link-card-health">✅ Online</div>
-                        </div>
-                        <div class="link-card" onclick="window.open('https://github.com', '_blank')">
-                            <div class="link-card-icon">💻</div>
-                            <div class="link-card-name">GitHub</div>
-                            <div class="link-card-health">✅ Online</div>
-                        </div>
-                        <div class="link-card" onclick="window.open('https://jira.walmart.com', '_blank')">
-                            <div class="link-card-icon">🎯</div>
-                            <div class="link-card-name">Jira</div>
-                            <div class="link-card-health">✅ Online</div>
-                        </div>
-                        <div class="link-card" onclick="alert('This link needs attention')">
-                            <div class="link-card-icon">⚠️</div>
-                            <div class="link-card-name">Help Desk</div>
-                            <div class="link-card-health">📍 Degraded</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- For You - Subscribed Links Widget REMOVED FROM HERE - MOVED TO RIGHT SIDEBAR -->
         </main>
+    </div>
+
+    <!-- RIGHT SIDEBAR - Links -->
+    <div class="quick-links-sidebar">
+        <div class="sidebar-header">
+            🔗 Links
+            <button class="sidebar-add-btn" onclick="openLinksModal()">+</button>
+        </div>
+        <div class="sidebar-links">
+            <div class="sidebar-link-card" onclick="window.open('https://confluence.walmart.com', '_blank')">
+                <div class="sidebar-link-name">Confluence</div>
+            </div>
+            <div class="sidebar-link-card" onclick="window.open('https://github.com', '_blank')">
+                <div class="sidebar-link-name">GitHub</div>
+            </div>
+            <div class="sidebar-link-card" onclick="window.open('https://jira.walmart.com', '_blank')">
+                <div class="sidebar-link-name">Jira</div>
+            </div>
+            <div class="sidebar-link-card" onclick="alert('This link needs attention')">
+                <div class="sidebar-link-name">Help Desk</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Links Management Modal -->
+    <div id="linksModal" class="links-modal">
+        <div class="links-modal-content">
+            <div class="links-modal-header">
+                <h2>Manage Your Links</h2>
+                <button class="links-modal-close" onclick="closeLinksModal()">✕</button>
+            </div>
+            <div class="links-modal-options">
+                <div class="links-modal-option" onclick="selectLinksOption('manage')">
+                    <div class="links-modal-option-icon">📋</div>
+                    <div class="links-modal-option-title">Manage Links</div>
+                    <div class="links-modal-option-desc">Edit, reorder, or remove your existing quick links</div>
+                </div>
+                <div class="links-modal-option" onclick="selectLinksOption('browse')">
+                    <div class="links-modal-option-icon">🔍</div>
+                    <div class="links-modal-option-title">Browse Available Links</div>
+                    <div class="links-modal-option-desc">Discover new links by category and add them to your list</div>
+                </div>
+                <div class="links-modal-option" onclick="selectLinksOption('create')">
+                    <div class="links-modal-option-icon">➕</div>
+                    <div class="links-modal-option-title">Create New Link</div>
+                    <div class="links-modal-option-desc">Add a custom link for your team or department</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nested Modal: Create New Link Form -->
+    <div id="createLinkModal" class="nested-modal">
+        <div class="nested-modal-content">
+            <div class="nested-modal-header">
+                <h2>➕ Create New Link</h2>
+                <button class="nested-modal-close" onclick="closeCreateLinkModal()">✕</button>
+            </div>
+            <div class="link-form" style="background: transparent; padding: 0;">
+                <div id="createDuplicateError" class="error-message">⚠️ Error: URL already exists in the system. Please use a different URL.</div>
+                <div id="createSuccessMessage" class="success-message">✅ Link created successfully!</div>
+                
+                <div class="form-group">
+                    <label>Link Name</label>
+                    <input type="text" id="createLinkName" placeholder="e.g., Confluence Portal">
+                </div>
+                <div class="form-group">
+                    <label>URL</label>
+                    <input type="url" id="createLinkUrl" placeholder="https://example.com">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="createLinkCategory">
+                            <option value="Documentation">Documentation</option>
+                            <option value="Tools">Tools</option>
+                            <option value="Resources">Resources</option>
+                            <option value="Internal">Internal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Privacy Type</label>
+                        <select id="createLinkPrivacy">
+                            <option value="private">Private</option>
+                            <option value="shared">Shared</option>
+                            <option value="public">Public</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description (optional)</label>
+                    <input type="text" id="createLinkDescription" placeholder="What does this link do?">
+                </div>
+                <div class="form-actions">
+                    <button class="btn-primary" onclick="demoCreateNewLink()">Create Link</button>
+                    <button class="btn-primary" style="background: var(--gray-600);" onclick="resetCreateLinkForm()">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nested Modal: Manage Links -->
+    <div id="manageLinksModal" class="nested-modal">
+        <div class="nested-modal-content">
+            <div class="nested-modal-header">
+                <h2>📋 Manage Your Links</h2>
+                <button class="nested-modal-close" onclick="closeManageLinksModal()">✕</button>
+            </div>
+            <div id="manageLinksContainer">
+                <p style="color: var(--gray-600); margin-bottom: 1rem;">Drag to reorder, click Edit to modify, or click Delete to remove</p>
+                <div class="link-item">
+                    <div class="link-info">
+                        <div class="link-title">Confluence Portal</div>
+                        <div class="link-url">https://confluence.walmart.com/display/home</div>
+                        <div class="link-meta">
+                            <span class="link-badge link-badge-public">Public</span>
+                        </div>
+                    </div>
+                    <div class="link-actions">
+                        <button class="link-btn">✏️ Edit</button>
+                        <button class="link-btn" style="color: #EF4444;">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="link-item">
+                    <div class="link-info">
+                        <div class="link-title">GitHub Repos</div>
+                        <div class="link-url">https://github.com/walmart</div>
+                        <div class="link-meta">
+                            <span class="link-badge link-badge-shared">Shared</span>
+                        </div>
+                    </div>
+                    <div class="link-actions">
+                        <button class="link-btn">✏️ Edit</button>
+                        <button class="link-btn" style="color: #EF4444;">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="link-item">
+                    <div class="link-info">
+                        <div class="link-title">Jira Board</div>
+                        <div class="link-url">https://jira.walmart.com/projects</div>
+                        <div class="link-meta">
+                            <span class="link-badge link-badge-private">Private</span>
+                        </div>
+                    </div>
+                    <div class="link-actions">
+                        <button class="link-btn">✏️ Edit</button>
+                        <button class="link-btn" style="color: #EF4444;">🗑️ Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nested Modal: Browse Available Links -->
+    <div id="browseLinksModal" class="nested-modal">
+        <div class="nested-modal-content">
+            <div class="nested-modal-header">
+                <h2>🔍 Browse Available Links</h2>
+                <button class="nested-modal-close" onclick="closeBrowseLinksModal()">✕</button>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <input type="text" placeholder="Search links..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 6px;">
+            </div>
+            <div class="available-links-grid">
+                <div class="available-link-item" onclick="addLink('Slack')">
+                    <div class="available-link-name">💬 Slack</div>
+                    <div class="available-link-desc">Team Communication</div>
+                </div>
+                <div class="available-link-item" onclick="addLink('Salesforce')">
+                    <div class="available-link-name">☁️ Salesforce</div>
+                    <div class="available-link-desc">CRM Platform</div>
+                </div>
+                <div class="available-link-item" onclick="addLink('Tableau')">
+                    <div class="available-link-name">📊 Tableau</div>
+                    <div class="available-link-desc">Analytics & BI</div>
+                </div>
+                <div class="available-link-item" onclick="addLink('Sap')">
+                    <div class="available-link-name">📦 SAP</div>
+                    <div class="available-link-desc">ERP System</div>
+                </div>
+                <div class="available-link-item" onclick="addLink('Workday')">
+                    <div class="available-link-name">👥 Workday</div>
+                    <div class="available-link-desc">HR Platform</div>
+                </div>
+                <div class="available-link-item" onclick="addLink('ServiceNow')">
+                    <div class="available-link-name">🖛 ServiceNow</div>
+                    <div class="available-link-desc">IT Service Mgmt</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1297,6 +1684,217 @@
                     // Allow real navigation for actual links
                 });
             });
+        }
+
+        // Link Management Modal Functions
+        // Initialize user links storage
+        let userLinks = [
+            { name: 'Confluence Portal', url: 'https://confluence.walmart.com/display/home', category: 'Documentation', privacy: 'public' },
+            { name: 'GitHub Repos', url: 'https://github.com/walmart', category: 'Tools', privacy: 'shared' },
+            { name: 'Jira Board', url: 'https://jira.walmart.com/projects', category: 'Tools', privacy: 'private' }
+        ];
+
+        // Sync links to sessionStorage for admin dashboard access
+        function syncLinksToStorage() {
+            sessionStorage.setItem('activity-hub-links', JSON.stringify(userLinks));
+        }
+        
+        // Initialize storage on page load
+        syncLinksToStorage();
+
+        function openLinksModal() {
+            document.getElementById('linksModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLinksModal() {
+            document.getElementById('linksModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function selectLinksOption(option) {
+            closeLinksModal();
+            
+            switch(option) {
+                case 'manage':
+                    renderManageLinks();
+                    document.getElementById('manageLinksModal').classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    break;
+                case 'browse':
+                    document.getElementById('browseLinksModal').classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    break;
+                case 'create':
+                    document.getElementById('createLinkModal').classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    break;
+            }
+        }
+
+        function closeCreateLinkModal() {
+            document.getElementById('createLinkModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeManageLinksModal() {
+            document.getElementById('manageLinksModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeBrowseLinksModal() {
+            document.getElementById('browseLinksModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function addLink(linkName) {
+            const availableLinkMap = {
+                'Slack': { url: 'https://slack.com', category: 'Tools', privacy: 'shared' },
+                'Salesforce': { url: 'https://salesforce.com', category: 'Tools', privacy: 'public' },
+                'Tableau': { url: 'https://tableau.com', category: 'Tools', privacy: 'public' },
+                'Sap': { url: 'https://sap.com', category: 'Tools', privacy: 'public' },
+                'Workday': { url: 'https://workday.com', category: 'Tools', privacy: 'public' },
+                'ServiceNow': { url: 'https://servicenow.com', category: 'Tools', privacy: 'shared' }
+            };
+            
+            if (availableLinkMap[linkName]) {
+                const linkData = availableLinkMap[linkName];
+                userLinks.push({
+                    name: linkName,
+                    url: linkData.url,
+                    category: linkData.category,
+                    privacy: linkData.privacy
+                });
+                addLinkToSidebar(linkName, linkData.url);
+                closeBrowseLinksModal();
+                alert('✅ Added "' + linkName + '" to your links sidebar!');
+            }
+        }
+
+        function renderManageLinks() {
+            const container = document.getElementById('manageLinksContainer');
+            let html = '<p style="color: var(--gray-600); margin-bottom: 1rem;">Drag to reorder, click Edit to modify, or click Delete to remove</p>';
+            
+            userLinks.forEach((link, index) => {
+                const privacyClass = 'link-badge-' + link.privacy;
+                html += '<div class="link-item">' +
+                    '<div class="link-info">' +
+                    '<div class="link-title">' + link.name + '</div>' +
+                    '<div class="link-url">' + link.url + '</div>' +
+                    '<div class="link-meta">' +
+                    '<span class="link-badge ' + privacyClass + '">' + (link.privacy.charAt(0).toUpperCase() + link.privacy.slice(1)) + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="link-actions">' +
+                    '<button class="link-btn">✏️ Edit</button>' +
+                    '<button class="link-btn" style="color: #EF4444;" onclick="deleteLink(' + index + ')">🗑️ Delete</button>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function deleteLink(index) {
+            const linkName = userLinks[index].name;
+            userLinks.splice(index, 1);
+            syncLinksToStorage();  // Sync to sessionStorage
+            removeLinkFromSidebar(linkName);
+            renderManageLinks();
+            alert('Deleted "' + linkName + '" from your links');
+        }
+
+        function addLinkToSidebar(name, url) {
+            const sidebarLinks = document.querySelector('.sidebar-links');
+            const newCard = document.createElement('div');
+            newCard.className = 'sidebar-link-card';
+            newCard.onclick = function() { window.open(url, '_blank'); };
+            newCard.innerHTML = '<div class="sidebar-link-name">' + name + '</div>';
+            sidebarLinks.appendChild(newCard);
+        }
+
+        function removeLinkFromSidebar(name) {
+            const cards = document.querySelectorAll('.sidebar-link-card');
+            cards.forEach(card => {
+                if (card.textContent.trim() === name) {
+                    card.remove();
+                }
+            });
+        }
+
+        function demoCreateNewLink() {
+            const name = document.getElementById('createLinkName').value;
+            const url = document.getElementById('createLinkUrl').value;
+            const category = document.getElementById('createLinkCategory').value;
+            const privacy = document.getElementById('createLinkPrivacy').value;
+            
+            if (!name || !url) {
+                alert('Please fill in Link Name and URL');
+                return;
+            }
+            
+            const duplicateError = document.getElementById('createDuplicateError');
+            const successMessage = document.getElementById('createSuccessMessage');
+            
+            duplicateError.classList.remove('show');
+            successMessage.classList.remove('show');
+            
+            // Check for duplicate URLs
+            const isDuplicate = userLinks.some(link => link.url === url);
+            if (isDuplicate) {
+                duplicateError.classList.add('show');
+                setTimeout(() => {
+                    duplicateError.classList.remove('show');
+                }, 3000);
+                return;
+            }
+            
+            // Add link to storage and sidebar
+            userLinks.push({
+                name: name,
+                url: url,
+                category: category,
+                privacy: privacy
+            });
+            
+            syncLinksToStorage();  // Sync to sessionStorage for admin dashboard
+            addLinkToSidebar(name, url);
+            
+            successMessage.classList.add('show');
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+                resetCreateLinkForm();
+                closeCreateLinkModal();
+            }, 2000);
+        }
+
+        function resetCreateLinkForm() {
+            document.getElementById('createLinkName').value = '';
+            document.getElementById('createLinkUrl').value = '';
+            document.getElementById('createLinkCategory').value = 'Documentation';
+            document.getElementById('createLinkPrivacy').value = 'private';
+            document.getElementById('createLinkDescription').value = '';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const mainModal = document.getElementById('linksModal');
+            const createModal = document.getElementById('createLinkModal');
+            const manageModal = document.getElementById('manageLinksModal');
+            const browseModal = document.getElementById('browseLinksModal');
+            
+            if (event.target == mainModal) {
+                closeLinksModal();
+            }
+            if (event.target == createModal) {
+                closeCreateLinkModal();
+            }
+            if (event.target == manageModal) {
+                closeManageLinksModal();
+            }
+            if (event.target == browseModal) {
+                closeBrowseLinksModal();
+            }
         }
 
         // Link Management Demo Functions

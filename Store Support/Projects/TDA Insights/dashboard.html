@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TDA Initiatives Insights - Walmart</title>
-    <script src="http://localhost:5000/lib/html2canvas.min.js"></script>
+    <script src="/lib/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -575,7 +575,7 @@
     <div class="header">
         <div class="header-content">
             <div class="header-left">
-                <div class="header-logo"><img src="http://localhost:5000/spark-logo.png" alt="Walmart Spark" style="height: 40px; width: auto;"></div>
+                <div class="header-logo"><img src="/spark-logo.png" alt="Walmart Spark" style="height: 40px; width: auto;"></div>
                 <div class="header-title">
                     <h1>TDA Initiatives Insights</h1>
                     <p>Initiative Health & Deployment Status Dashboard</p>
@@ -610,6 +610,15 @@
                     <div class="dropdown-multi" id="health-dropdown">
                         <button type="button" class="dropdown-multi-btn" id="health-dropdown-btn">All Selected</button>
                         <div class="dropdown-multi-panel" id="health-dropdown-panel">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">TDA Ownership</label>
+                    <div class="dropdown-multi" id="ownership-dropdown">
+                        <button type="button" class="dropdown-multi-btn" id="ownership-dropdown-btn">All Selected</button>
+                        <div class="dropdown-multi-panel" id="ownership-dropdown-panel">
                             <!-- Populated dynamically -->
                         </div>
                     </div>
@@ -693,7 +702,7 @@
 
     <script>
         // Configuration
-        const API_BASE = 'http://localhost:5000/api';
+        const API_BASE = `${window.location.origin}/api`;
         
         /**
          * Dynamic pagination based on PPT slide dimensions (1280x720px)
@@ -718,6 +727,7 @@
         let currentSelectedPhases = [];
         let phases = [];
         let healthStatuses = [];
+        let tdaOwnerships = [];
         let projectTitles = [];
         let currentPage = 1;
 
@@ -774,9 +784,15 @@
                 const titlesData = await titlesRes.json();
                 projectTitles = titlesData.titles || [];
                 
+                // Load TDA ownership values
+                const ownershipRes = await fetch(`${API_BASE}/ownerships`);
+                const ownershipData = await ownershipRes.json();
+                tdaOwnerships = ownershipData.ownerships || [];
+
                 // Populate dropdowns
                 populateDropdown('phase-dropdown', phases);
                 populateDropdown('health-dropdown', healthStatuses);
+                populateDropdown('ownership-dropdown', tdaOwnerships);
                 populateDropdown('title-dropdown', projectTitles);
                 
                 updateConnectionStatus(true);
@@ -879,6 +895,7 @@
             try {
                 const selectedPhases = getSelectedValues('phase-dropdown');
                 const selectedStatuses = getSelectedValues('health-dropdown');
+                const selectedOwnerships = getSelectedValues('ownership-dropdown');
                 const selectedTitles = getSelectedValues('title-dropdown');
                 
                 if (selectedPhases.length === 0) {
@@ -893,6 +910,10 @@
                 const url = new URL(`${API_BASE}/data`);
                 selectedPhases.forEach(p => url.searchParams.append('phases', p));
                 selectedStatuses.forEach(s => url.searchParams.append('health_statuses', s));
+                // Only send ownership filter if not all are selected
+                if (selectedOwnerships.length < tdaOwnerships.length) {
+                    selectedOwnerships.forEach(o => url.searchParams.append('ownerships', o));
+                }
                 // Only send titles filter if not all are selected
                 if (selectedTitles.length < projectTitles.length) {
                     selectedTitles.forEach(t => url.searchParams.append('titles', t));
@@ -921,6 +942,45 @@
         }
 
         // Render table with pagination (organized by phase)
+        // Build the ordered list of ownership groups for rendering
+        // Special rule: "Pending + No Selection Provided" is always first
+        function getOwnershipOrder(data, phaseOrder) {
+            const UNASSIGNED = 'No Selection Provided';
+            const sections = []; // {ownership, phase, rows}
+
+            // 1. Pending + unassigned (null or "No Selection Provided") → top section
+            const pendingUnassigned = data.filter(r =>
+                r.Phase === 'Pending' && (!r['TDA Ownership'] || r['TDA Ownership'] === UNASSIGNED));
+            if (pendingUnassigned.length > 0) {
+                sections.push({ ownership: 'TDA Ownership - Currently No TDA Ownership', phase: 'Pending', rows: pendingUnassigned, isSpecial: false });
+            }
+
+            // 2. Collect distinct ownership values (excluding the special group above)
+            const ownershipSet = new Set();
+            data.forEach(r => {
+                const own = r['TDA Ownership'] || UNASSIGNED;
+                ownershipSet.add(own);
+            });
+            const ownershipList = Array.from(ownershipSet).sort();
+
+            // 3. For each ownership → for each phase → collect rows
+            ownershipList.forEach(ownership => {
+                phaseOrder.forEach(phase => {
+                    // Skip the special Pending+unassigned group already handled
+                    if (phase === 'Pending' && ownership === UNASSIGNED) return;
+                    const rows = data.filter(r => {
+                        const own = r['TDA Ownership'] || UNASSIGNED;
+                        return own === ownership && r.Phase === phase;
+                    });
+                    if (rows.length > 0) {
+                        const label = ownership === UNASSIGNED ? 'TDA Ownership - Currently No TDA Ownership' : ownership;
+                        sections.push({ ownership: label, phase, rows, isSpecial: false });
+                    }
+                });
+            });
+            return sections;
+        }
+
         function renderTable(data, selectedPhases) {
             const wrapper = document.getElementById('table-wrapper');
             const paginationControls = document.getElementById('pagination-controls');
@@ -937,21 +997,29 @@
                 return;
             }
             
-            // Organize data by phase in dropdown order
+            // Build pages with two-level grouping: Ownership → Phase
             const phaseOrder = selectedPhases || phases;
-            const dataByPhase = {};
-            phaseOrder.forEach(phase => {
-                dataByPhase[phase] = data.filter(item => item.Phase === phase);
+            const sections = getOwnershipOrder(data, phaseOrder);
+
+            // Pack each section's rows into pages, carrying ownership+phase labels
+            const pages = [];
+            sections.forEach(sec => {
+                const sectionPages = packRowsIntoPages(sec.rows);
+                sectionPages.forEach(pageRows => {
+                    pages.push({
+                        ownership: sec.ownership,
+                        phase: sec.phase,
+                        rows: pageRows,
+                        isSpecial: sec.isSpecial
+                    });
+                });
             });
-            
-            // Pack rows by phase, building pages with phase headers
-            const pages = packRowsIntoPagesByPhase(dataByPhase, phaseOrder);
             
             if (currentPage > pages.length) {
                 currentPage = 1;
             }
             
-            const pageData = pages[currentPage - 1] || { phase: 'N/A', rows: [] };
+            const pageData = pages[currentPage - 1] || { ownership: '', phase: 'N/A', rows: [] };
             
             const columns = [
                 'Initiative - Project Title',
@@ -963,7 +1031,10 @@
                 'Deployment'
             ];
             
-            let html = `<div style="background: #3B82F6; color: white; padding: 15px 20px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px 4px 0 0;">TDA Initiatives Insights - ${pageData.phase}</div>`;
+            // Ownership banner (navy #1E3A8A, same size as old phase banner)
+            let html = `<div style="background: #1E3A8A; color: white; padding: 15px 20px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px 4px 0 0;">${pageData.ownership}</div>`;
+            // Phase banner (half height, existing blue #3B82F6)
+            html += `<div style="background: #3B82F6; color: white; padding: 7px 20px; font-size: 14px; font-weight: 600; text-align: center;">${pageData.phase}</div>`;
             html += '<table><thead><tr>';
             columns.forEach(col => {
                 html += `<th>${col}</th>`;
@@ -973,7 +1044,7 @@
             pageData.rows.forEach(row => {
                 html += '<tr>';
                 columns.forEach(col => {
-                    let value = row[col] || '';
+                    let value = row[col] ?? '';
                     let cellClass = '';
                     
                     if (col === 'Health Status') {
@@ -1019,7 +1090,7 @@
                 document.getElementById('prev-page-btn').disabled = currentPage === 1;
                 document.getElementById('next-page-btn').disabled = currentPage === pages.length;
                 
-                console.log(`[Page ${currentPage}] Phase ${pageData.phase}: ${pageData.rows.length} items`);
+                console.log(`[Page ${currentPage}] ${pageData.ownership} / ${pageData.phase}: ${pageData.rows.length} items`);
             } else {
                 paginationControls.style.display = 'none';
             }
@@ -1089,9 +1160,11 @@
             // Re-check all checkboxes in all dropdowns
             document.querySelectorAll('#phase-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
             document.querySelectorAll('#health-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#ownership-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
             document.querySelectorAll('#title-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
             updateDropdownLabel('phase-dropdown', phases.length);
             updateDropdownLabel('health-dropdown', healthStatuses.length);
+            updateDropdownLabel('ownership-dropdown', tdaOwnerships.length);
             updateDropdownLabel('title-dropdown', projectTitles.length);
             updatePageTitle();
             loadData();
@@ -1109,7 +1182,7 @@
             
             allData.forEach(row => {
                 csv += columns.map(col => {
-                    const value = row[col] || '';
+                    const value = row[col] ?? '';
                     // Escape quotes and wrap in quotes if contains comma
                     const escaped = String(value).replace(/"/g, '""');
                     return escaped.includes(',') ? `"${escaped}"` : escaped;
@@ -1171,15 +1244,11 @@
                 btn.textContent = '[Wait] Generating...';
                 btn.disabled = true;
                 
-                // Organize data by phase in dropdown order
-                const phaseOrder = selectedPhases;
-                const dataByPhase = {};
-                phaseOrder.forEach(phase => {
-                    dataByPhase[phase] = allData.filter(item => item.Phase === phase);
-                });
+                // Organize data by ownership → phase using shared helper
+                const sections = getOwnershipOrder(allData.filter(item => selectedPhases.includes(item.Phase)), selectedPhases);
                 
                 console.log(`[PPT] Starting generation for phases:`, selectedPhases);
-                console.log(`[PPT] Data by phase:`, dataByPhase);
+                console.log(`[PPT] Sections:`, sections.map(s => `${s.ownership}/${s.phase}: ${s.rows.length} rows`));
                 
                 const screenshots = [];
                 const wrapper = document.getElementById('table-wrapper');
@@ -1199,25 +1268,21 @@
                 if (statsSection) statsSection.style.display = 'none';
                 if (footer) footer.style.display = 'none';
                 
-                // Process each phase
-                for (const phase of phaseOrder) {
-                    const phaseData = dataByPhase[phase] || [];
-                    console.log(`[PPT] Processing phase: ${phase}, items: ${phaseData.length}`);
-                    if (phaseData.length === 0) {
-                        console.log(`[PPT] Skipping ${phase} - no data`);
-                        continue;
-                    }
+                // Process each ownership → phase section
+                for (const section of sections) {
+                    console.log(`[PPT] Processing section: ${section.ownership} / ${section.phase}, items: ${section.rows.length}`);
+                    if (section.rows.length === 0) continue;
                     
-                    // Pack rows for this phase
-                    const pages = packRowsIntoPages(phaseData);
-                    console.log(`[PPT] Packed ${phase} into ${pages.length} pages`);
+                    // Pack rows for this section
+                    const pages = packRowsIntoPages(section.rows);
+                    console.log(`[PPT] Packed ${section.ownership}/${section.phase} into ${pages.length} pages`);
                     
                     for (let pageIdx = 0; pageIdx < pages.length; pageIdx++) {
                         const pageRows = pages[pageIdx];
                         const pageNum = screenshots.length + 1;
                         totalPages++;
                         
-                        btn.textContent = `[Wait] Capturing ${phase} page ${pageIdx + 1}/${pages.length}...`;
+                        btn.textContent = `[Wait] Capturing ${section.ownership} / ${section.phase} page ${pageIdx + 1}/${pages.length}...`;
                         
                         // Render this phase/page's table with inline styles matching dashboard
                         const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas POC', 'Intake & Testing', 'Deployment'];
@@ -1232,7 +1297,7 @@
                         pageRows.forEach(row => {
                             html += '<tr>';
                             columns.forEach(col => {
-                                let value = row[col] || '';
+                                let value = row[col] ?? '';
                                 let cellStyle = 'padding: 16px 24px; border-bottom: 1px solid #E5E5E5; text-align: left;';
                                 
                                 if (col === 'Health Status') {
@@ -1271,13 +1336,14 @@
                         
                         html += '</tbody></table>';
                         
-                        console.log(`[PPT] Phase: ${phase}, Page: ${pageIdx + 1}, Rows: ${pageRows.length}, HTML length: ${html.length}`);
+                        console.log(`[PPT] Section: ${section.ownership} / ${section.phase}, Page: ${pageIdx + 1}, Rows: ${pageRows.length}, HTML length: ${html.length}`);
                         
                         wrapper.innerHTML = html;
                         paginationControls.style.display = 'none';
                         
-                        // Add title showing phase (matches dashboard blue banner)
-                        const titleHtml = `<div style="background: #3B82F6; color: white; padding: 15px 20px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px 4px 0 0;">TDA Initiatives Insights - ${phase}</div>`;
+                        // Add ownership banner (navy) + phase banner (blue, half height)
+                        let titleHtml = `<div style="background: #1E3A8A; color: white; padding: 15px 20px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px 4px 0 0;">${section.ownership}</div>`;
+                        titleHtml += `<div style="background: #3B82F6; color: white; padding: 7px 20px; font-size: 14px; font-weight: 600; text-align: center;">${section.phase}</div>`;
                         wrapper.innerHTML = titleHtml + wrapper.innerHTML;
                         wrapper.style.display = 'block';
                         wrapper.style.visibility = 'visible';
@@ -1296,7 +1362,7 @@
                         const tableElement = wrapper.querySelector('table');
                         if (!tableElement) {
                             console.error(`[PPT ERROR] No table element found in wrapper!`);
-                            throw new Error(`No table element found for ${phase} page ${pageIdx + 1}`);
+                            throw new Error(`No table element found for ${section.ownership}/${section.phase} page ${pageIdx + 1}`);
                         }
                         console.log(`[PPT] Table element found, rows in tbody: ${tableElement.querySelectorAll('tbody tr').length}`);
                         
@@ -1314,16 +1380,17 @@
                             console.log(`[PPT] Screenshot captured successfully, canvas size: ${canvas.width}x${canvas.height}`);
                         } catch (captureError) {
                             console.error(`[PPT ERROR] html2canvas failed:`, captureError);
-                            throw new Error(`Screenshot capture failed for ${phase}: ${captureError.message}`);
+                            throw new Error(`Screenshot capture failed for ${section.ownership}/${section.phase}: ${captureError.message}`);
                         }
                         
                         // Reset zoom
                         document.body.style.zoom = '1';
                         
                         screenshots.push({
-                            phase: phase,
+                            ownership: section.ownership,
+                            phase: section.phase,
                             page: pageIdx + 1,
-                            header: `TDA Initiatives Insights - ${phase}`,
+                            header: `${section.ownership} — ${section.phase}`,
                             imageData: canvas.toDataURL('image/png')
                         });
                         
@@ -1344,7 +1411,7 @@
                 if (screenshots.length === 0) {
                     console.error(`[PPT ERROR] No screenshots captured!`);
                     console.error(`[PPT ERROR] Selected phases: ${selectedPhases.join(', ')}`);
-                    console.error(`[PPT ERROR] Data by phase:`, dataByPhase);
+                    console.error(`[PPT ERROR] Sections:`, sections);
                     throw new Error(`No screenshots captured. Selected phases: ${selectedPhases.join(', ')}. Check console for details.`);
                 }
                 
@@ -1473,7 +1540,7 @@
                     const td = document.createElement('td');
                     td.style.cssText = 'padding: 8px; border: 1px solid #ddd; word-wrap: break-word; white-space: normal;';
                     
-                    let value = row[col] || '';
+                    let value = row[col] ?? '';
                     if (col === 'Health Status' || col === 'Phase' || col === '# of Stores') {
                         td.style.fontWeight = '600';
                     }
@@ -1523,24 +1590,17 @@
             return pages;
         }
 
-        // Pack rows into pages organized by phase
+        // Pack rows into pages organized by ownership → phase (kept for backward compat, now unused by renderTable)
         function packRowsIntoPagesByPhase(dataByPhase, phaseOrder) {
             const pages = [];
-            
-            // For each phase in order, pack its rows and create pages with phase info
             phaseOrder.forEach(phase => {
                 const phaseData = dataByPhase[phase] || [];
                 if (phaseData.length === 0) return;
-                
                 const phasePages = packRowsIntoPages(phaseData);
                 phasePages.forEach(pageRows => {
-                    pages.push({
-                        phase: phase,
-                        rows: pageRows
-                    });
+                    pages.push({ phase: phase, rows: pageRows });
                 });
             });
-            
             return pages;
         }
 

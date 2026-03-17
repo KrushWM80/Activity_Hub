@@ -26,7 +26,7 @@ from xml.sax.saxutils import escape
 from PIL import Image, ImageChops
 
 # Configuration
-RECIPIENTS = ["Kendall.rush@walmart.com"]
+RECIPIENTS = ["Kendall.rush@walmart.com", "Matthew.Farnworth@walmart.com"]
 SUBJECT = "TDA Initiative Insights - Weekly Report"
 SCRIPT_DIR = Path(__file__).parent
 # Walmart fiscal week: FY starts Saturday closest to Feb 1
@@ -89,10 +89,11 @@ def fetch_data():
         Dallas_POC as `Dallas POC`,
         Intake_n_Testing as `Intake & Testing`,
         Deployment,
-        MAX(Intake_Card_Nbr) as `Project ID`
+        MAX(Intake_Card_Nbr) as `Project ID`,
+        COALESCE(TDA_Ownership, 'No Selection Provided') as `TDA Ownership`
     FROM `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE}`
     WHERE Topic IS NOT NULL
-    GROUP BY Topic, Health_Update, Phase, Intake_n_Testing, Dallas_POC, Deployment
+    GROUP BY Topic, Health_Update, Phase, Intake_n_Testing, Dallas_POC, Deployment, TDA_Ownership
     ORDER BY Topic
     """
     results = client.query(query).result()
@@ -110,6 +111,7 @@ def fetch_data():
             'Intake & Testing': row['Intake & Testing'] or 'N/A',
             'Deployment': row['Deployment'] or 'N/A',
             'Project ID': row['Project ID'] or 0,
+            'TDA Ownership': row['TDA Ownership'] or 'No Selection Provided',
         })
     return data
 
@@ -227,18 +229,41 @@ def build_email_html(data):
 </table>
 """
 
-    # Phase tables
-    for phase in PHASE_ORDER:
-        phase_data = [r for r in data if r['Phase'] == phase]
-        if not phase_data:
-            continue
+    # Phase tables — grouped by TDA Ownership → Phase
+    UNASSIGNED = 'No Selection Provided'
 
+    # Build ordered sections: Pending+unassigned first, then ownership→phase
+    sections = []
+    pending_unassigned = [r for r in data if r['Phase'] == 'Pending' and r.get('TDA Ownership', UNASSIGNED) == UNASSIGNED]
+    if pending_unassigned:
+        sections.append(('TDA Ownership - Currently No TDA Ownership', 'Pending', pending_unassigned, False))
+
+    ownership_set = sorted(set(r.get('TDA Ownership', UNASSIGNED) or UNASSIGNED for r in data))
+    for ownership in ownership_set:
+        for phase in PHASE_ORDER:
+            if phase == 'Pending' and ownership == UNASSIGNED:
+                continue  # already handled above
+            phase_data = [r for r in data if (r.get('TDA Ownership', UNASSIGNED) or UNASSIGNED) == ownership and r['Phase'] == phase]
+            if not phase_data:
+                continue
+            label = 'TDA Ownership - Currently No TDA Ownership' if ownership == UNASSIGNED else ownership
+            sections.append((label, phase, phase_data, False))
+
+    for ownership_label, phase, phase_data, _unused in sections:
+        count = len(phase_data)
+        # Ownership banner (navy)
         html += f"""
-<!-- {phase} Section -->
-<div style="background:{COLORS['walmart_blue']}; color:white; padding:10px 16px; font-size:15px; font-weight:700; border-radius:6px 6px 0 0; margin-top:16px;">
-    {escape(phase)} &mdash; {len(phase_data)} Project{'s' if len(phase_data) != 1 else ''}
+<!-- {ownership_label} / {phase} Section -->
+<div style="background:#1E3A8A; color:white; padding:10px 16px; font-size:15px; font-weight:700; border-radius:6px 6px 0 0; margin-top:16px;">
+    {escape(ownership_label)} &mdash; {count} Project{'s' if count != 1 else ''}
 </div>
-<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e5e5; border-top:none; border-collapse:collapse; margin-bottom:8px; font-size:14px;">
+"""
+        # Phase sub-banner (blue, half height)
+        html += f"""<div style="background:{COLORS['walmart_blue']}; color:white; padding:5px 16px; font-size:13px; font-weight:600;">
+    {escape(phase)}
+</div>
+"""
+        html += f"""<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e5e5; border-top:none; border-collapse:collapse; margin-bottom:8px; font-size:14px;">
 <thead>
 <tr style="background:#f5f5f5;">
     <th style="padding:10px 12px; text-align:left; border-bottom:2px solid #ddd; font-weight:700; color:#333; font-size:14px;">Initiative - Project Title</th>
@@ -279,12 +304,15 @@ def build_email_html(data):
     return html
 
 
-def _build_phase_html(phase, rows):
+def _build_phase_html(phase, rows, ownership=None, is_special=False):
     """Build the EXACT same HTML the dashboard builds for PPT screenshots."""
     columns = ['Initiative - Project Title', 'Health Status', 'Phase',
                 '# of Stores', 'Dallas POC', 'Intake & Testing', 'Deployment']
 
-    banner = f'<div style="background:#3B82F6;color:white;padding:15px 20px;font-size:18px;font-weight:700;text-align:center;border-radius:4px 4px 0 0;">TDA Initiatives Insights - {escape(phase)}</div>'
+    # Ownership banner (navy) + phase sub-banner (blue, half height)
+    ownership_label = ownership or phase
+    banner = f'<div style="background:#1E3A8A;color:white;padding:15px 20px;font-size:18px;font-weight:700;text-align:center;border-radius:4px 4px 0 0;">{escape(ownership_label)}</div>'
+    banner += f'<div style="background:#3B82F6;color:white;padding:7px 20px;font-size:14px;font-weight:600;text-align:center;">{escape(phase)}</div>'
 
     table = '<table style="width:100%;border-collapse:collapse;font-size:14px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Helvetica Neue\',Arial,sans-serif;">'
     table += '<thead style="background-color:#F5F5F5;border-bottom:2px solid #E5E5E5;"><tr>'
@@ -454,16 +482,31 @@ def generate_report_pptx(data):
     """Generate PPTX using Edge headless screenshots — identical to dashboard Generate PPT."""
     print("    Using Edge headless for screenshot-based PPT (matches dashboard)...")
 
-    # Group by phase and paginate
-    phase_groups = {}
-    for r in data:
-        phase_groups.setdefault(r['Phase'], []).append(r)
+    # Build ownership → phase sections (same logic as dashboard & email)
+    UNASSIGNED = 'No Selection Provided'
+    sections = []
 
-    screenshots = []  # list of (phase_label, png_bytes)
+    # 1. Pending + unassigned first
+    pending_unassigned = [r for r in data if r['Phase'] == 'Pending' and r.get('TDA Ownership', UNASSIGNED) == UNASSIGNED]
+    if pending_unassigned:
+        sections.append(('TDA Ownership - Currently No TDA Ownership', 'Pending', pending_unassigned))
+
+    # 2. Ownership → phase
+    ownership_set = sorted(set(r.get('TDA Ownership', UNASSIGNED) or UNASSIGNED for r in data))
+    for ownership in ownership_set:
+        for phase in PHASE_ORDER:
+            if phase == 'Pending' and ownership == UNASSIGNED:
+                continue
+            rows = [r for r in data if (r.get('TDA Ownership', UNASSIGNED) or UNASSIGNED) == ownership and r['Phase'] == phase]
+            if not rows:
+                continue
+            label = 'TDA Ownership - Currently No TDA Ownership' if ownership == UNASSIGNED else ownership
+            sections.append((label, phase, rows))
+
+    screenshots = []  # list of (label, png_bytes)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
-        for phase in PHASE_ORDER:
-            rows = phase_groups.get(phase, [])
+        for ownership_label, phase, rows in sections:
             if not rows:
                 continue
             # Measure actual row heights via Edge (matches dashboard packRowsIntoPages)
@@ -471,16 +514,16 @@ def generate_report_pptx(data):
             pages = _paginate_by_height(rows, heights)
             total_pages = len(pages)
             for page, page_rows in enumerate(pages):
-                label = f'TDA Initiatives Insights - {phase}'
+                label = f'{ownership_label} — {phase}'
                 if total_pages > 1:
                     label += f' ({page + 1}/{total_pages})'
 
-                html = _build_phase_html(phase, page_rows)
+                html = _build_phase_html(phase, page_rows, ownership=ownership_label)
                 png_path = os.path.join(tmp_dir, f'slide_{len(screenshots) + 1}.png')
                 _capture_html_screenshot(html, png_path)
                 png_bytes = Path(png_path).read_bytes()
                 screenshots.append((label, png_bytes))
-                print(f"    Captured: {phase} page {page + 1}/{total_pages} ({len(png_bytes):,} bytes)")
+                print(f"    Captured: {ownership_label}/{phase} page {page + 1}/{total_pages} ({len(png_bytes):,} bytes)")
 
     # Build the PPTX with title slide + screenshot slides
     pptx_buffer = io.BytesIO()

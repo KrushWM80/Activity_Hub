@@ -1,8 +1,9 @@
 # TDA Initiatives Insights Dashboard — Knowledge Base
 
-**Last Updated:** March 16, 2026  
+**Last Updated:** March 17, 2026  
 **Project:** Walmart Store Support — TDA Initiative Tracking  
 **Port:** 5000  
+**Host:** 0.0.0.0 (all interfaces — accessible to others on the network)  
 **Data Source:** `wmt-assetprotection-prod.Store_Support_Dev.Output- TDA Report` (BigQuery)
 
 ---
@@ -15,12 +16,12 @@
 │              dashboard.html — HTML5/CSS3/Vanilla JS              │
 │           Walmart Living Design · html2canvas · PPT Export       │
 └───────────────────────┬──────────────────────────────────────────┘
-                        │ HTTP (localhost:5000)
+                        │ HTTP (0.0.0.0:5000)
 ┌───────────────────────▼──────────────────────────────────────────┐
 │                   backend_simple.py                               │
 │              Pure-socket HTTP server (no Flask)                   │
 │         BigQuery fetch → JSON API → PPT generation               │
-│            Binds: 127.0.0.1:5000                                 │
+│            Binds: 0.0.0.0:5000 (network-accessible)             │
 └───────────────────────┬──────────────────────────────────────────┘
                         │ google-cloud-bigquery
 ┌───────────────────────▼──────────────────────────────────────────┐
@@ -31,7 +32,7 @@
 │                                                                   │
 │   Columns: Topic, Health_Update, Phase, Facility, Facility_Phase,│
 │            Intake_n_Testing, Dallas_POC, Deployment,             │
-│            Intake_Card_Nbr, Link, Impl_Date                     │
+│            Intake_Card_Nbr, Link, Impl_Date, TDA_Ownership       │
 └──────────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────────────┐
@@ -105,7 +106,7 @@
 
 - **Type:** Pure-socket HTTP server (no Flask, no framework)
 - **Port:** 5000
-- **Host:** 127.0.0.1 (localhost only)
+- **Host:** 0.0.0.0 (all network interfaces — accessible to team via hostname or IP)
 - **CORS:** `Access-Control-Allow-Origin: *`
 
 ### Startup Process
@@ -118,7 +119,7 @@
 6. Set `DATA` = BQ result or sample data
 7. Start listening on port 5000
 
-**Key:** Data is loaded once at startup and cached. Server restart required for fresh data.
+**Key:** Data is loaded once at startup and cached. Use `/api/refresh` endpoint or dashboard "Refresh Data" button to reload from BigQuery without restarting.
 
 ### BigQuery Query
 
@@ -131,25 +132,28 @@ SELECT
     Dallas_POC as `Dallas POC`,
     Intake_n_Testing as `Intake & Testing`,
     Deployment,
-    MAX(Intake_Card_Nbr) as `Project ID`
+    MAX(Intake_Card_Nbr) as `Project ID`,
+    COALESCE(TDA_Ownership, 'No Selection Provided') as `TDA Ownership`
 FROM `wmt-assetprotection-prod.Store_Support_Dev.Output- TDA Report`
 WHERE Topic IS NOT NULL
-GROUP BY Topic, Health_Update, Phase, Intake_n_Testing, Dallas_POC, Deployment
+GROUP BY Topic, Health_Update, Phase, Intake_n_Testing, Dallas_POC, Deployment, TDA_Ownership
 ORDER BY Topic
 ```
 
-**Note (March 16, 2026):** The `CASE WHEN Phase = Facility_Phase` store count logic needs review. BQ data now has 169 rows where most POC/POT rows have `Facility_Phase=Test` (not `POC/POT`), causing store count mismatches.
+**Note (March 17, 2026):** Store count logic `CASE WHEN Phase = Facility_Phase` is confirmed correct — dashboard shows accurate counts (91 projects, 16 with stores > 0). The same query is used in `send_weekly_report.py`.
 
 ### API Endpoints
 
 | Path | Method | Purpose |
 |------|--------|---------|
-| `/` or `/dashboard.html` | GET | Serves dashboard HTML |
+| `/` or `/dashboard.html` or `/tda-initiatives-insights` | GET | Serves dashboard HTML |
 | `/html2canvas.min.js` | GET | Serves local html2canvas library |
 | `/api/health` | GET | Health check with BQ connection status |
-| `/api/data` | GET | Filtered project data (multi-select: phases, health_statuses, titles) |
+| `/api/refresh` | GET | Re-fetch data from BigQuery into cache |
+| `/api/data` | GET | Filtered project data (multi-select: phases, health_statuses, titles, ownerships) |
 | `/api/phases` | GET | Available phase list (ordered) |
 | `/api/health-statuses` | GET | Available health status values |
+| `/api/ownerships` | GET | Available TDA Ownership values |
 | `/api/titles` | GET | Available project title list |
 | `/api/summary` | GET | Summary statistics |
 | `/api/export/csv` | GET | CSV export of filtered data |
@@ -171,9 +175,9 @@ When BigQuery is unavailable, serves 5 hardcoded projects:
 
 ### Features
 
-- Multi-select dropdown filters (Phase, Health Status, Project Title)
+- Multi-select dropdown filters (Phase, Health Status, TDA Ownership, Project Title)
 - Summary stat cards (Total Projects, Total Stores, On Track, At Risk, Off Track, Continuous)
-- Phase-organized table with pagination
+- **Two-level grouping:** TDA Ownership → Phase (navy ownership banner + blue phase sub-banner)
 - Health status badges (color-coded)
 - Project titles hyperlinked to Intake Hub (`https://hoops.wal-mart.com/intake-hub/projects/{ProjectID}`)
 - CSV export
@@ -204,6 +208,8 @@ Continuous      = count where Health Status contains "continuous"
 
 - **Phase order:** Pending → POC/POT → Test → Mkt Scale → Roll/Deploy
 - **Complete phase excluded** from display
+- **Two-level grouping:** TDA Ownership (navy `#1E3A8A` banner, 15px padding) → Phase (blue `#3B82F6` sub-banner, 7px padding)
+- "No Selection Provided" ownership displays as "TDA Ownership - Currently No TDA Ownership"
 - Previous/Next buttons with "Page X of Y" indicator
 - Content-aware pagination using DOM measurement
 
@@ -331,6 +337,7 @@ PPT filename: TDA_WK7_Report.pptx
 | Intake_Card_Nbr | INTEGER | Project ID for Intake Hub linkage |
 | Link | STRING | URL |
 | Impl_Date | DATE | Implementation date |
+| TDA_Ownership | STRING | TDA ownership group (e.g., "Intake & Test", NULL → "No Selection Provided") |
 
 ### Phase Model
 
@@ -402,13 +409,20 @@ Also requires `GOOGLE_APPLICATION_CREDENTIALS` pointing to gcloud ADC JSON, or r
 
 | User | URL |
 |------|-----|
-| Local (you) | `http://localhost:5000/dashboard.html` |
-| Team (VPN) | `http://LEUS62315243171.homeoffice.Wal-Mart.com:5000/dashboard.html` |
+| Local (you) | `http://localhost:5000/tda-initiatives-insights` |
+| Team (network) | `http://WEUS42608431466:5000/tda-initiatives-insights` |
+| Team (IP) | `http://10.97.114.181:5000/tda-initiatives-insights` |
 
-**Note:** Backend binds to `127.0.0.1`. To share on VPN, change to `0.0.0.0` and add firewall rule:
+**Server binds to `0.0.0.0:5000`** — accessible from any machine on the same network.
+
+**Firewall rule** (created March 17, 2026):
 ```powershell
-New-NetFirewallRule -DisplayName "TDA Dashboard 5000" -Direction Inbound -LocalPort 5000 -Protocol TCP -Action Allow
+New-NetFirewallRule -DisplayName 'TDA Insights Dashboard' -Direction Inbound -Protocol TCP -LocalPort 5000 -Action Allow -Profile Domain,Private
 ```
+
+All three URL paths serve the dashboard: `/`, `/dashboard.html`, `/tda-initiatives-insights`
+
+**API_BASE** in dashboard.html uses `window.location.origin` — works regardless of hostname/IP used to access.
 
 ---
 
@@ -420,7 +434,7 @@ New-NetFirewallRule -DisplayName "TDA Dashboard 5000" -Direction Inbound -LocalP
 cd "Store Support\Projects\TDA Insights"
 $env:GOOGLE_APPLICATION_CREDENTIALS = "$env:APPDATA\gcloud\application_default_credentials.json"
 python backend_simple.py
-# Open: http://localhost:5000/dashboard.html
+# Open: http://localhost:5000/tda-initiatives-insights
 ```
 
 ### Via MASTER_SETUP (Automatic)
@@ -438,11 +452,25 @@ python backend_simple.py
 
 ---
 
-## Known Issues & Pending Work (March 16, 2026)
+## Scheduled Tasks
 
-1. **Store Count Logic** — `SUM(CASE WHEN Phase = Facility_Phase THEN Facility ELSE 0 END)` zeros out most POC/POT rows since their Facility_Phase is "Test". Needs review.
-2. **Backend serves sample data if BQ fails at startup** — Server must be restarted with valid GCP credentials to get real data. No runtime refresh endpoint.
-3. **PPT right margin** — Edge headless reserves 24 CSS px scrollbar gutter. Auto-crop to `bbox[2]` mostly resolves but thin white strip may appear.
-4. **Windows Task Scheduler** — Weekly email on Thursdays 11 AM CT not yet scheduled.
-5. **Outdated documentation** — README, GETTING_STARTED, API_REFERENCE, IMPLEMENTATION_SUMMARY, QUICKSTART all reference Flask/python-pptx from the March 3 initial build. Should be updated or removed.
-6. **Debug scripts** — ~15 debug/test/investigation scripts can be cleaned up.
+| Task Name | Schedule | Purpose |
+|-----------|----------|--------|
+| `Activity_Hub_TDA_AutoStart` | On system start | Starts backend_simple.py on port 5000 (runs as SYSTEM) |
+| `Activity_Hub_TDA_Weekly_Email` | Thursdays 11:00 AM | Runs send_weekly_report.py → BQ fetch → PPT → Outlook email |
+
+Batch files in `Automation/`:
+- `start_tda_insights_24_7.bat` — Server auto-start with restart loop
+- `send_tda_weekly_email.bat` — Weekly email wrapper with logging to `weekly_email.log`
+- `create_weekly_email_task.ps1` — Admin script to recreate the scheduled task
+
+---
+
+## Known Issues & Pending Work (March 17, 2026)
+
+1. **Store counts confirmed correct** — Dashboard shows accurate data. Email needs test send to verify.
+2. **PPT right margin** — Edge headless reserves 24 CSS px scrollbar gutter. Auto-crop to `bbox[2]` mostly resolves but thin white strip may appear.
+3. **Outdated documentation** — README, GETTING_STARTED, API_REFERENCE, IMPLEMENTATION_SUMMARY, QUICKSTART all reference Flask/python-pptx from the March 3 initial build. Should be updated or removed.
+4. **Debug scripts** — ~15 debug/test/investigation scripts can be cleaned up.
+5. **TDA Ownership grouping** — Implemented March 17. Two-level layout: Ownership banner (navy) → Phase sub-banner (blue). Ownership values from BQ: "Intake & Test", "No Selection Provided" (includes NULLs). Special section for Pending + No Selection Provided always appears first.
+6. **Network sharing** — Server now binds to `0.0.0.0`. Firewall rule "TDA Insights Dashboard" allows inbound TCP 5000. Friendly URL: `/tda-initiatives-insights`.

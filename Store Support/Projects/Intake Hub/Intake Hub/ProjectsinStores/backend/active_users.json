@@ -1,246 +1,345 @@
 {
   "users": {
-    "96f9237a-f24c-46d7-a750-cc2b048f1ccd": {
-      "last_seen": "2026-03-13 15:47:36",
-      "page": "Main Dashboard",
-      "timestamp": 1773434856.335049,
+    "f9edb861-a6f3-4881-a951-2ec49b51565f": {
+      "last_seen": "2026-03-17 12:46:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773769610.279668,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "96f9237a-f24c-46d7-a750-cc2b048f1ccd",
-      "session": "96f9237a-f24c-46d7-a750-cc2b048f1ccd",
+      "session_id": "f9edb861-a6f3-4881-a951-2ec49b51565f",
+      "session": "f9edb861-a6f3-4881-a951-2ec49b51565f",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "d4e6be3b-23e8-4faa-ab27-38f0997eef8f": {
-      "last_seen": "2026-03-13 15:48:37",
-      "page": "Main Dashboard",
-      "timestamp": 1773434917.500239,
+    "238007f9-07f6-47b2-bf54-7c5d100ef2d0": {
+      "last_seen": "2026-03-17 12:47:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773769670.295579,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "d4e6be3b-23e8-4faa-ab27-38f0997eef8f",
-      "session": "d4e6be3b-23e8-4faa-ab27-38f0997eef8f",
+      "session_id": "238007f9-07f6-47b2-bf54-7c5d100ef2d0",
+      "session": "238007f9-07f6-47b2-bf54-7c5d100ef2d0",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "1c9ce12d-ebef-4c4f-94f7-62f263e9225d": {
-      "last_seen": "2026-03-13 15:49:38",
-      "page": "Main Dashboard",
-      "timestamp": 1773434978.486919,
+    "c25bb084-9f9d-467b-a401-5aa4e8e88f0c": {
+      "last_seen": "2026-03-17 12:48:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773769730.272071,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "1c9ce12d-ebef-4c4f-94f7-62f263e9225d",
-      "session": "1c9ce12d-ebef-4c4f-94f7-62f263e9225d",
+      "session_id": "c25bb084-9f9d-467b-a401-5aa4e8e88f0c",
+      "session": "c25bb084-9f9d-467b-a401-5aa4e8e88f0c",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "c1167e73-d3fe-485d-9b34-2413a488101d": {
-      "last_seen": "2026-03-13 15:50:39",
-      "page": "Main Dashboard",
-      "timestamp": 1773435039.465734,
+    "750aa1e7-1b17-458e-95b7-d0802cf896f6": {
+      "last_seen": "2026-03-17 12:49:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773769790.283422,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "c1167e73-d3fe-485d-9b34-2413a488101d",
-      "session": "c1167e73-d3fe-485d-9b34-2413a488101d",
+      "session_id": "750aa1e7-1b17-458e-95b7-d0802cf896f6",
+      "session": "750aa1e7-1b17-458e-95b7-d0802cf896f6",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "349f2bb3-2986-4245-adc7-da08b813ee29": {
-      "last_seen": "2026-03-13 15:51:40",
-      "page": "Main Dashboard",
-      "timestamp": 1773435100.469129,
+    "e562d087-9858-4f35-8f8d-d584cb4fa98d": {
+      "last_seen": "2026-03-17 12:50:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773769850.279088,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "349f2bb3-2986-4245-adc7-da08b813ee29",
-      "session": "349f2bb3-2986-4245-adc7-da08b813ee29",
+      "session_id": "e562d087-9858-4f35-8f8d-d584cb4fa98d",
+      "session": "e562d087-9858-4f35-8f8d-d584cb4fa98d",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "7e306417-6291-48fb-89b6-d8a037101d41": {
-      "last_seen": "2026-03-13 15:52:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435161.470861,
+    "a35c5e9a-5936-49d4-8de0-f8fac85f8439": {
+      "last_seen": "2026-03-17 12:51:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773769910.272575,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "7e306417-6291-48fb-89b6-d8a037101d41",
-      "session": "7e306417-6291-48fb-89b6-d8a037101d41",
+      "session_id": "a35c5e9a-5936-49d4-8de0-f8fac85f8439",
+      "session": "a35c5e9a-5936-49d4-8de0-f8fac85f8439",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "064d2447-a3a1-4ef1-9daa-cc192d43dd7f": {
-      "last_seen": "2026-03-13 15:53:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435221.490011,
+    "828ae7d9-37a5-422d-8828-a2ca2cfc5370": {
+      "last_seen": "2026-03-17 12:52:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773769970.404498,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "064d2447-a3a1-4ef1-9daa-cc192d43dd7f",
-      "session": "064d2447-a3a1-4ef1-9daa-cc192d43dd7f",
+      "session_id": "828ae7d9-37a5-422d-8828-a2ca2cfc5370",
+      "session": "828ae7d9-37a5-422d-8828-a2ca2cfc5370",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "b334585f-7562-4caa-be94-7480851db496": {
-      "last_seen": "2026-03-13 15:54:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435281.47463,
+    "8dc2f364-a5a7-4e09-be49-371a4c9271b4": {
+      "last_seen": "2026-03-17 12:53:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770030.281115,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "b334585f-7562-4caa-be94-7480851db496",
-      "session": "b334585f-7562-4caa-be94-7480851db496",
+      "session_id": "8dc2f364-a5a7-4e09-be49-371a4c9271b4",
+      "session": "8dc2f364-a5a7-4e09-be49-371a4c9271b4",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "d73467ad-a1a7-411e-b157-bf091bf37c6e": {
-      "last_seen": "2026-03-13 15:55:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435341.341168,
+    "9442127a-ee3d-4630-99bd-b95d417bddc6": {
+      "last_seen": "2026-03-17 12:54:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770090.283079,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "d73467ad-a1a7-411e-b157-bf091bf37c6e",
-      "session": "d73467ad-a1a7-411e-b157-bf091bf37c6e",
+      "session_id": "9442127a-ee3d-4630-99bd-b95d417bddc6",
+      "session": "9442127a-ee3d-4630-99bd-b95d417bddc6",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "ac223b97-e261-46d5-b294-658d6d6816e1": {
-      "last_seen": "2026-03-13 15:56:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435401.487462,
+    "ee5f16f5-ba67-4e48-9180-3ec95a7f39bc": {
+      "last_seen": "2026-03-17 12:55:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770150.270982,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "ac223b97-e261-46d5-b294-658d6d6816e1",
-      "session": "ac223b97-e261-46d5-b294-658d6d6816e1",
+      "session_id": "ee5f16f5-ba67-4e48-9180-3ec95a7f39bc",
+      "session": "ee5f16f5-ba67-4e48-9180-3ec95a7f39bc",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "74c88c6a-9433-420d-b926-4f4f1ce5cc50": {
-      "last_seen": "2026-03-13 15:57:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435461.502204,
+    "722bbb39-2ece-4bc4-b72b-85ebea4c37a5": {
+      "last_seen": "2026-03-17 12:56:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770210.27766,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "74c88c6a-9433-420d-b926-4f4f1ce5cc50",
-      "session": "74c88c6a-9433-420d-b926-4f4f1ce5cc50",
+      "session_id": "722bbb39-2ece-4bc4-b72b-85ebea4c37a5",
+      "session": "722bbb39-2ece-4bc4-b72b-85ebea4c37a5",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "79537f9f-e2a0-4d85-8035-4cb07bc54ad5": {
-      "last_seen": "2026-03-13 15:58:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435521.485226,
+    "53f8d7b2-6686-4207-b7e1-350a77057f08": {
+      "last_seen": "2026-03-17 12:57:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770270.28084,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "79537f9f-e2a0-4d85-8035-4cb07bc54ad5",
-      "session": "79537f9f-e2a0-4d85-8035-4cb07bc54ad5",
+      "session_id": "53f8d7b2-6686-4207-b7e1-350a77057f08",
+      "session": "53f8d7b2-6686-4207-b7e1-350a77057f08",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "93c02e78-4629-4959-96e4-e9ced987f128": {
-      "last_seen": "2026-03-13 15:59:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435581.357785,
+    "9c44d520-d605-4e31-879d-10a82fc13c7f": {
+      "last_seen": "2026-03-17 12:58:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770330.494204,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "93c02e78-4629-4959-96e4-e9ced987f128",
-      "session": "93c02e78-4629-4959-96e4-e9ced987f128",
+      "session_id": "9c44d520-d605-4e31-879d-10a82fc13c7f",
+      "session": "9c44d520-d605-4e31-879d-10a82fc13c7f",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "80c9cf39-8393-41ae-9a30-755ecef379e9": {
-      "last_seen": "2026-03-13 16:00:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435641.328041,
+    "9304ce8f-69e9-4e84-936f-907143690c6f": {
+      "last_seen": "2026-03-17 12:59:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770390.279378,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "80c9cf39-8393-41ae-9a30-755ecef379e9",
-      "session": "80c9cf39-8393-41ae-9a30-755ecef379e9",
+      "session_id": "9304ce8f-69e9-4e84-936f-907143690c6f",
+      "session": "9304ce8f-69e9-4e84-936f-907143690c6f",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "55abd918-b727-494b-b653-2dc16c781bcd": {
-      "last_seen": "2026-03-13 16:01:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435701.3304,
+    "2959bdd8-cbe0-40fa-a1ca-46442c03340b": {
+      "last_seen": "2026-03-17 13:00:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770450.277907,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "55abd918-b727-494b-b653-2dc16c781bcd",
-      "session": "55abd918-b727-494b-b653-2dc16c781bcd",
+      "session_id": "2959bdd8-cbe0-40fa-a1ca-46442c03340b",
+      "session": "2959bdd8-cbe0-40fa-a1ca-46442c03340b",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "67c2c6f9-99c8-473f-8690-8acb0b012af8": {
-      "last_seen": "2026-03-13 16:02:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435761.324254,
+    "f343bc05-97a6-4d42-bafc-02f3a5de0477": {
+      "last_seen": "2026-03-17 13:01:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770510.414136,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "67c2c6f9-99c8-473f-8690-8acb0b012af8",
-      "session": "67c2c6f9-99c8-473f-8690-8acb0b012af8",
+      "session_id": "f343bc05-97a6-4d42-bafc-02f3a5de0477",
+      "session": "f343bc05-97a6-4d42-bafc-02f3a5de0477",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "c378989f-7f86-4b37-b340-04379211b2e5": {
-      "last_seen": "2026-03-13 16:03:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435821.466932,
+    "75360139-8bad-4411-8c77-27337173e43a": {
+      "last_seen": "2026-03-17 13:02:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770570.43003,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "c378989f-7f86-4b37-b340-04379211b2e5",
-      "session": "c378989f-7f86-4b37-b340-04379211b2e5",
+      "session_id": "75360139-8bad-4411-8c77-27337173e43a",
+      "session": "75360139-8bad-4411-8c77-27337173e43a",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "4b3c5e38-efcc-4dd7-9ba2-d2bc4b57312a": {
-      "last_seen": "2026-03-13 16:04:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435881.448041,
+    "82d9ee87-30f3-44ba-a91c-e8e3f6bd1e07": {
+      "last_seen": "2026-03-17 13:03:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770630.476976,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "4b3c5e38-efcc-4dd7-9ba2-d2bc4b57312a",
-      "session": "4b3c5e38-efcc-4dd7-9ba2-d2bc4b57312a",
+      "session_id": "82d9ee87-30f3-44ba-a91c-e8e3f6bd1e07",
+      "session": "82d9ee87-30f3-44ba-a91c-e8e3f6bd1e07",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "a5415fb9-76d6-4f05-a767-2cad27f34f79": {
-      "last_seen": "2026-03-13 16:05:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773435941.475515,
+    "1b17b000-5bec-4421-9e38-d43b9ad23214": {
+      "last_seen": "2026-03-17 13:04:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770690.463068,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "a5415fb9-76d6-4f05-a767-2cad27f34f79",
-      "session": "a5415fb9-76d6-4f05-a767-2cad27f34f79",
+      "session_id": "1b17b000-5bec-4421-9e38-d43b9ad23214",
+      "session": "1b17b000-5bec-4421-9e38-d43b9ad23214",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "328bdca8-2010-4d7f-8e6c-35dc20c60476": {
-      "last_seen": "2026-03-13 16:06:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773436001.517132,
+    "17b08f25-a572-4cfb-87c8-f1eb8811c7b3": {
+      "last_seen": "2026-03-17 13:05:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770750.427883,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "328bdca8-2010-4d7f-8e6c-35dc20c60476",
-      "session": "328bdca8-2010-4d7f-8e6c-35dc20c60476",
+      "session_id": "17b08f25-a572-4cfb-87c8-f1eb8811c7b3",
+      "session": "17b08f25-a572-4cfb-87c8-f1eb8811c7b3",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "0600c634-8d1e-400c-a472-9a8274a7cbe6": {
-      "last_seen": "2026-03-13 16:15:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773436541.450412,
+    "cac39d6b-eb92-4e9b-9a35-2c61eca9e417": {
+      "last_seen": "2026-03-17 13:06:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770810.279992,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "0600c634-8d1e-400c-a472-9a8274a7cbe6",
-      "session": "0600c634-8d1e-400c-a472-9a8274a7cbe6",
+      "session_id": "cac39d6b-eb92-4e9b-9a35-2c61eca9e417",
+      "session": "cac39d6b-eb92-4e9b-9a35-2c61eca9e417",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     },
-    "2dbf3252-1cee-4420-a741-50ba07438899": {
-      "last_seen": "2026-03-13 16:16:41",
-      "page": "Main Dashboard",
-      "timestamp": 1773436601.449826,
+    "41fdcc4b-56af-4cbb-a498-2730b96aed97": {
+      "last_seen": "2026-03-17 13:07:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770870.274109,
       "user_email": "krush@homeoffice.wal-mart.com",
       "user": "krush@homeoffice.wal-mart.com",
-      "session_id": "2dbf3252-1cee-4420-a741-50ba07438899",
-      "session": "2dbf3252-1cee-4420-a741-50ba07438899",
+      "session_id": "41fdcc4b-56af-4cbb-a498-2730b96aed97",
+      "session": "41fdcc4b-56af-4cbb-a498-2730b96aed97",
       "device_info": "Desktop",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0"
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+    },
+    "638b559b-0fef-453f-911d-1ce3174313b5": {
+      "last_seen": "2026-03-17 13:08:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770930.42842,
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "user": "krush@homeoffice.wal-mart.com",
+      "session_id": "638b559b-0fef-453f-911d-1ce3174313b5",
+      "session": "638b559b-0fef-453f-911d-1ce3174313b5",
+      "device_info": "Desktop",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+    },
+    "31ada532-c6f0-45a0-b79a-ec4ceae075b3": {
+      "last_seen": "2026-03-17 13:09:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773770990.445177,
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "user": "krush@homeoffice.wal-mart.com",
+      "session_id": "31ada532-c6f0-45a0-b79a-ec4ceae075b3",
+      "session": "31ada532-c6f0-45a0-b79a-ec4ceae075b3",
+      "device_info": "Desktop",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+    },
+    "4f1c3307-0b28-43b0-821b-d11299de8ac8": {
+      "last_seen": "2026-03-17 13:10:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773771050.421319,
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "user": "krush@homeoffice.wal-mart.com",
+      "session_id": "4f1c3307-0b28-43b0-821b-d11299de8ac8",
+      "session": "4f1c3307-0b28-43b0-821b-d11299de8ac8",
+      "device_info": "Desktop",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+    },
+    "16258e90-7235-4bf6-80c0-2b6e6501362c": {
+      "last_seen": "2026-03-17 13:11:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773771110.28716,
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "user": "krush@homeoffice.wal-mart.com",
+      "session_id": "16258e90-7235-4bf6-80c0-2b6e6501362c",
+      "session": "16258e90-7235-4bf6-80c0-2b6e6501362c",
+      "device_info": "Desktop",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+    },
+    "040a6822-9783-42dc-8125-7d711c2074f0": {
+      "last_seen": "2026-03-17 13:12:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773771170.27353,
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "user": "krush@homeoffice.wal-mart.com",
+      "session_id": "040a6822-9783-42dc-8125-7d711c2074f0",
+      "session": "040a6822-9783-42dc-8125-7d711c2074f0",
+      "device_info": "Desktop",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+    },
+    "d3856756-1ed5-4b67-96bd-0e0e7d6b7759": {
+      "last_seen": "2026-03-17 13:13:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773771230.438899,
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "user": "krush@homeoffice.wal-mart.com",
+      "session_id": "d3856756-1ed5-4b67-96bd-0e0e7d6b7759",
+      "session": "d3856756-1ed5-4b67-96bd-0e0e7d6b7759",
+      "device_info": "Desktop",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+    },
+    "72521af6-4294-4770-bb6c-ff9502537434": {
+      "last_seen": "2026-03-17 13:14:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773771290.426826,
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "user": "krush@homeoffice.wal-mart.com",
+      "session_id": "72521af6-4294-4770-bb6c-ff9502537434",
+      "session": "72521af6-4294-4770-bb6c-ff9502537434",
+      "device_info": "Desktop",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+    },
+    "93228b4e-e0d6-4485-b345-0e01dcb1099a": {
+      "last_seen": "2026-03-17 13:15:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773771350.456754,
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "user": "krush@homeoffice.wal-mart.com",
+      "session_id": "93228b4e-e0d6-4485-b345-0e01dcb1099a",
+      "session": "93228b4e-e0d6-4485-b345-0e01dcb1099a",
+      "device_info": "Desktop",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+    },
+    "418e76c9-642e-4210-8596-99c06cc0c5cf": {
+      "last_seen": "2026-03-17 13:16:50",
+      "page": "Admin Dashboard",
+      "timestamp": 1773771410.272085,
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "user": "krush@homeoffice.wal-mart.com",
+      "session_id": "418e76c9-642e-4210-8596-99c06cc0c5cf",
+      "session": "418e76c9-642e-4210-8596-99c06cc0c5cf",
+      "device_info": "Desktop",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
     }
   }
 }

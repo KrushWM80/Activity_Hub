@@ -89,10 +89,11 @@ def get_bigquery_data():
             Dallas_POC as `Dallas POC`,
             Intake_n_Testing as `Intake & Testing`,
             Deployment,
-            MAX(Intake_Card_Nbr) as `Project ID`
+            MAX(Intake_Card_Nbr) as `Project ID`,
+            COALESCE(TDA_Ownership, 'No Selection Provided') as `TDA Ownership`
         FROM `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE}`
         WHERE Topic IS NOT NULL
-        GROUP BY Topic, Health_Update, Phase, Intake_n_Testing, Dallas_POC, Deployment
+        GROUP BY Topic, Health_Update, Phase, Intake_n_Testing, Dallas_POC, Deployment, TDA_Ownership
         ORDER BY Topic
         """
         
@@ -110,7 +111,8 @@ def get_bigquery_data():
                 'Dallas POC': row['Dallas POC'] or 'N/A',
                 'Intake & Testing': row['Intake & Testing'] or 'N/A',
                 'Deployment': row['Deployment'] or 'N/A',
-                'Project ID': row['Project ID'] or 0
+                'Project ID': row['Project ID'] or 0,
+                'TDA Ownership': row['TDA Ownership'] or 'No Selection Provided'
             })
         
         print(f"[OK] Loaded {len(data)} projects from BigQuery")
@@ -128,6 +130,7 @@ SAMPLE_DATA = [
         "Health Status": "On Track",
         "Phase": "Test",
         "# of Stores": 120,
+        "TDA Ownership": "Intake & Test",
         "Intake & Testing": "System testing in progress. All core features validated. Ready for POC expansion.",
         "Dallas POC": "John Smith - Store #4521, TX",
         "Deployment": "Scheduled for 3/15/2026. Training materials prepared. Rollout plan finalized."
@@ -137,6 +140,7 @@ SAMPLE_DATA = [
         "Health Status": "At Risk",
         "Phase": "POC/POT",
         "# of Stores": 95,
+        "TDA Ownership": "Intake & Test",
         "Intake & Testing": "POC execution with pilot stores. Initial results show 15% efficiency gains.",
         "Dallas POC": "Jane Doe - Store #2847, TX",
         "Deployment": "Delayed. Addressing performance issues discovered in POC phase. New target: 4/1/2026"
@@ -146,6 +150,7 @@ SAMPLE_DATA = [
         "Health Status": "On Track",
         "Phase": "Roll/Deploy",
         "# of Stores": 250,
+        "TDA Ownership": "No Selection Provided",
         "Intake & Testing": "All validation complete. Rollout in waves starting Week 3.",
         "Dallas POC": "Bob Wilson - Store #1234, TX",
         "Deployment": "Live in 250 stores as of 2/28/2026. Phase 2 rollout beginning next week."
@@ -155,6 +160,7 @@ SAMPLE_DATA = [
         "Health Status": "Off Track",
         "Phase": "Pending",
         "# of Stores": 180,
+        "TDA Ownership": "No Selection Provided",
         "Intake & Testing": "Initial requirements gathering delayed. No testing scheduled yet.",
         "Dallas POC": "Alice Johnson - Pending Assignment",
         "Deployment": "Blocked. Awaiting stakeholder sign-off on requirements."
@@ -164,6 +170,7 @@ SAMPLE_DATA = [
         "Health Status": "On Track",
         "Phase": "Mkt Scale",
         "# of Stores": 15,
+        "TDA Ownership": "Intake & Test",
         "Intake & Testing": "Market testing complete. System scaling for regional rollout.",
         "Dallas POC": "Tom Brown - Store #5678, TX",
         "Deployment": "Regional deployment Q2 2026. Infrastructure scaled for 500+ stores."
@@ -651,8 +658,8 @@ def generate_pptx_from_screenshots(screenshots_data, title="TDA Report"):
         print(f"[ERROR] Failed to generate PPTX from screenshots: {e}")
         raise
 
-def filter_data(phases=None, health_statuses=None, titles=None):
-    """Filter data by phases (list), health statuses (list), and titles (list)"""
+def filter_data(phases=None, health_statuses=None, titles=None, ownerships=None):
+    """Filter data by phases (list), health statuses (list), titles (list), and ownerships (list)"""
     # Always exclude "Complete" phase from dashboard
     EXCLUDED_PHASES = {'Complete'}
     data = [r for r in DATA if r.get("Phase") not in EXCLUDED_PHASES]
@@ -666,6 +673,10 @@ def filter_data(phases=None, health_statuses=None, titles=None):
     if titles and len(titles) > 0:
         titles_set = set(titles)
         data = [r for r in data if r.get("Initiative - Project Title") in titles_set]
+    # Handle ownership filter
+    if ownerships and len(ownerships) > 0:
+        ownerships_set = set(ownerships)
+        data = [r for r in data if (r.get("TDA Ownership") or 'No Selection Provided') in ownerships_set]
     return data
 
 def handle_request(client_socket, addr):
@@ -766,7 +777,8 @@ def handle_request(client_socket, addr):
             phases = query_params_multi.get('phases', [])
             health_statuses = query_params_multi.get('health_statuses', [])
             titles = query_params_multi.get('titles', [])
-            data = filter_data(phases=phases if phases else None, health_statuses=health_statuses if health_statuses else None, titles=titles if titles else None)
+            ownerships = query_params_multi.get('ownerships', [])
+            data = filter_data(phases=phases if phases else None, health_statuses=health_statuses if health_statuses else None, titles=titles if titles else None, ownerships=ownerships if ownerships else None)
             response_json = json.dumps({
                 'success': True,
                 'count': len(data),
@@ -801,6 +813,16 @@ def handle_request(client_socket, addr):
             response_json = json.dumps({
                 'success': True,
                 'titles': titles
+            })
+            response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
+            client_socket.sendall(response.encode())
+        
+        elif path == '/api/ownerships':
+            excluded = {'Complete'}
+            ownerships = sorted(set((r.get("TDA Ownership") or 'No Selection Provided') for r in DATA if r.get("Phase") not in excluded))
+            response_json = json.dumps({
+                'success': True,
+                'ownerships': ownerships
             })
             response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
             client_socket.sendall(response.encode())
@@ -873,7 +895,7 @@ def handle_request(client_socket, addr):
                 error_response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\nLogo not found"
                 client_socket.sendall(error_response.encode())
         
-        elif path == '/dashboard.html' or path == '/':
+        elif path in ('/dashboard.html', '/', '/tda-initiatives-insights'):
             html_file = SCRIPT_DIR / 'dashboard.html'
             if html_file.exists():
                 try:
@@ -977,19 +999,23 @@ def start_server():
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     
     try:
-        server_socket.bind(('127.0.0.1', PORT))
+        server_socket.bind(('0.0.0.0', PORT))
         server_socket.listen(5)
         
         record_count = len(DATA)
+        
+        # Get machine hostname for shareable URL
+        hostname = socket.gethostname()
         
         print("\n" + "="*60)
         print("[OK] TDA Insights Dashboard Backend")
         print("="*60)
         print(f"[OK] Data Source: {DATA_SOURCE}")
         print(f"[OK] Records Loaded: {record_count}")
-        print(f"[OK] Server listening on http://127.0.0.1:{PORT}")
-        print(f"[OK] Dashboard: http://localhost:{PORT}/dashboard.html")
-        print(f"[OK] API: http://localhost:{PORT}/api/data")
+        print(f"[OK] Server listening on 0.0.0.0:{PORT} (all interfaces)")
+        print(f"[OK] Local:   http://localhost:{PORT}/tda-initiatives-insights")
+        print(f"[OK] Network: http://{hostname}:{PORT}/tda-initiatives-insights")
+        print(f"[OK] API:     http://localhost:{PORT}/api/data")
         print("="*60)
         print("Press Ctrl+C to stop\n")
         

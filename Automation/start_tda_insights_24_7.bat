@@ -3,7 +3,8 @@ REM ==========================================
 REM TDA Insights Backend - 24/7 Auto-Restart
 REM ==========================================
 REM Purpose: Keep TDA Insights dashboard running continuously
-REM Access: http://localhost:5000/dashboard.html
+REM Access: http://localhost:5000/tda-initiatives-insights
+REM Network: http://WEUS42608431466:5000/tda-initiatives-insights
 REM Status File: tda_insights_server.log
 REM
 REM Features:
@@ -29,7 +30,8 @@ echo.
 echo ================================================================
 echo TDA Insights Backend - 24/7 Operating Mode
 echo ================================================================
-echo Access: http://localhost:%Port%/dashboard.html
+echo Access: http://localhost:%Port%/tda-initiatives-insights
+echo Network: http://WEUS42608431466:%Port%/tda-initiatives-insights
 echo Log File: %LogFile%
 echo Time: %date% %time%
 echo ================================================================
