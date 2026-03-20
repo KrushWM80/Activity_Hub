@@ -1060,6 +1060,48 @@
             margin-bottom: var(--space-4);
             display: none;
         }
+
+        /* Projects Sync Styles */
+        #projects-sync-progress {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #full-sync-btn:disabled,
+        #incremental-sync-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .projects-progress-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .projects-progress-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--gray-300);
+            border-top-color: var(--walmart-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
         
         /* Responsive */
         @media (max-width: 1024px) {
@@ -1423,6 +1465,7 @@
                     <button class="sub-nav-tab active" onclick="showSubTab('data-bridge', 'schema-overview')">Schema Overview</button>
                     <button class="sub-nav-tab" onclick="showSubTab('data-bridge', 'field-config')">Field Configuration</button>
                     <button class="sub-nav-tab" onclick="showSubTab('data-bridge', 'connections')">Data Connections</button>
+                    <button class="sub-nav-tab" onclick="showSubTab('data-bridge', 'projects-config')">Projects Sync</button>
                 </div>
                 <div id="schema-overview" class="sub-content active">
                     <div class="stats-grid">
@@ -1484,7 +1527,7 @@
                             <div class="item-list" id="saved-connections-admin">
                                 <div class="list-item">
                                     <div class="item-info">
-                                        <h4>ðŸ”· Intake Hub Data</h4>
+                                        <h4>📷 Intake Hub Data</h4>
                                         <p>BigQuery • wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data</p>
                                     </div>
                                     <div class="item-actions">
@@ -1503,6 +1546,193 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Projects Sync Configuration Sub-Tab -->
+                <div id="projects-config" class="sub-content">
+                    <!-- Sync Status Overview -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="projects-status-timestamp">--:--</div>
+                            <div class="stat-label">Last Sync</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="projects-total-count">0</div>
+                            <div class="stat-label">Total Projects</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="projects-bridged-count">0</div>
+                            <div class="stat-label">Bridged Projects</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="projects-error-count">0</div>
+                            <div class="stat-label">Sync Errors</div>
+                        </div>
+                    </div>
+
+                    <!-- Error Alert (shown if errors > 0) -->
+                    <div id="projects-error-alert" class="management-section full-width" style="display: none; background: #fef2f2; border-left: 4px solid #dc2626;">
+                        <div class="section-header" style="padding-bottom: 0; border-bottom: none;">
+                            <h3 class="section-title" style="color: #dc2626;">⚠️ Last Sync Had Errors</h3>
+                        </div>
+                        <div id="projects-error-details" style="padding: var(--space-4); color: #666;">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Manual Sync Controls -->
+                    <div class="management-section full-width">
+                        <div class="section-header">
+                            <h3 class="section-title">Manual Sync Controls</h3>
+                            <div style="display: flex; gap: var(--space-3);">
+                                <button class="btn-primary" id="full-sync-btn" onclick="triggerProjectsSync('full')">
+                                    🔄 Full Sync
+                                </button>
+                                <button class="btn-secondary" id="incremental-sync-btn" onclick="triggerProjectsSync('incremental')">
+                                    ⚡ Incremental Sync
+                                </button>
+                            </div>
+                        </div>
+                        <p style="color: var(--gray-600); margin-bottom: var(--space-4);">
+                            <strong>Full Sync:</strong> Re-fetch all projects from Intake Hub (slower, more thorough)
+                            <br><strong>Incremental Sync:</strong> Update only changed records (faster, recommended for frequent syncs)
+                        </p>
+                        
+                        <!-- Sync Progress Indicator -->
+                        <div id="projects-sync-progress" class="management-section" style="display: none; background: #f0fdf4; border-left: 4px solid #16a34a;">
+                            <div class="section-header" style="padding-bottom: 0; border-bottom: none;">
+                                <h3 class="section-title" style="color: #16a34a;">🔄 Sync in Progress...</h3>
+                            </div>
+                            <div style="padding: var(--space-4);">
+                                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                    <div style="flex: 1;">
+                                        <div id="projects-sync-status-text">Starting sync...</div>
+                                    </div>
+                                    <span style="font-size: 1.5rem;">⏳</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Last Sync Details -->
+                        <div id="projects-last-sync-details" class="management-section" style="display: none;">
+                            <div class="section-header" style="padding-bottom: 0; border-bottom: none;">
+                                <h3 class="section-title">✅ Last Sync Completed</h3>
+                            </div>
+                            <div style="padding: var(--space-4);">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                                    <div>
+                                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: var(--space-2);">Mode</p>
+                                        <p style="font-weight: 600; font-size: 1.1rem;" id="projects-sync-mode">--</p>
+                                    </div>
+                                    <div>
+                                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: var(--space-2);">Duration</p>
+                                        <p style="font-weight: 600; font-size: 1.1rem;" id="projects-sync-duration">--</p>
+                                    </div>
+                                    <div>
+                                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: var(--space-2);">Projects Synced</p>
+                                        <p style="font-weight: 600; font-size: 1.1rem;" id="projects-sync-record-count">--</p>
+                                    </div>
+                                    <div>
+                                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: var(--space-2);">Validation Success Rate</p>
+                                        <p style="font-weight: 600; font-size: 1.1rem; color: var(--success);" id="projects-sync-success-rate">--</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Storage Overview -->
+                    <div class="management-grid">
+                        <div class="management-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Storage Overview</h3>
+                            </div>
+                            <div class="item-list">
+                                <div class="list-item" style="border-bottom: 1px solid var(--gray-200);">
+                                    <div class="item-info">
+                                        <h4>📁 Native Projects</h4>
+                                        <p style="color: var(--gray-600); font-size: 0.9rem;">User-created projects in Activity Hub</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-weight: 600; font-size: 1rem;" id="projects-native-count">0</div>
+                                        <div style="color: var(--gray-500); font-size: 0.85rem;">projects</div>
+                                    </div>
+                                </div>
+                                <div class="list-item" style="border-bottom: 1px solid var(--gray-200);">
+                                    <div class="item-info">
+                                        <h4>🔗 Bridged Cache</h4>
+                                        <p style="color: var(--gray-600); font-size: 0.9rem;">Projects synced from Intake Hub</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-weight: 600; font-size: 1rem;" id="projects-bridged-cache-count">0</div>
+                                        <div style="color: var(--gray-500); font-size: 0.85rem;">projects</div>
+                                    </div>
+                                </div>
+                                <div class="list-item">
+                                    <div class="item-info">
+                                        <h4>👥 Relationships</h4>
+                                        <p style="color: var(--gray-600); font-size: 0.9rem;">Followers & partner group links</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-weight: 600; font-size: 1rem;" id="projects-relationships-count">0</div>
+                                        <div style="color: var(--gray-500); font-size: 0.85rem;">relationships</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="management-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Data Quality</h3>
+                            </div>
+                            <div style="padding: var(--space-4);">
+                                <div style="margin-bottom: var(--space-6);">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                        <span style="color: var(--gray-700); font-weight: 500;">Field Mapping Coverage</span>
+                                        <span style="color: var(--success); font-weight: 600;" id="projects-mapping-coverage">0%</span>
+                                    </div>
+                                    <div style="background: var(--gray-200); height: 8px; border-radius: 4px; overflow: hidden;">
+                                        <div id="projects-mapping-bar" style="background: var(--success); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: var(--space-6);">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                        <span style="color: var(--gray-700); font-weight: 500;">Validation Success Rate</span>
+                                        <span style="color: var(--success); font-weight: 600;" id="projects-validation-success">0%</span>
+                                    </div>
+                                    <div style="background: var(--gray-200); height: 8px; border-radius: 4px; overflow: hidden;">
+                                        <div id="projects-validation-bar" style="background: var(--success); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                        <span style="color: var(--gray-700); font-weight: 500;">Intake Hub Connection</span>
+                                        <span id="projects-connection-status" style="color: var(--gray-600); font-weight: 600;">Checking...</span>
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: var(--gray-500);" id="projects-connection-details">
+                                        wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backend Service Status -->
+                    <div id="projects-service-unavailable" class="management-section full-width" style="display: none; background: #fef3c7; border-left: 4px solid #f59e0b;">
+                        <div class="section-header" style="padding-bottom: 0; border-bottom: none;">
+                            <h3 class="section-title" style="color: #92400e;">🔌 Projects Service Unavailable</h3>
+                        </div>
+                        <div style="padding: var(--space-4); color: #78350f;">
+                            <p>The Projects backend service on port 8001 is not currently running. To enable Projects sync management:</p>
+                            <ol style="margin-top: var(--space-3); margin-left: var(--space-6);">
+                                <li>Navigate to: <code style="background: rgba(0,0,0,0.05); padding: 2px 6px;">Platform/Data-Bridge/Projects/</code></li>
+                                <li>Run: <code style="background: rgba(0,0,0,0.05); padding: 2px 6px;">npm install</code> (if first time)</li>
+                                <li>Run: <code style="background: rgba(0,0,0,0.05); padding: 2px 6px;">npm start</code></li>
+                            </ol>
+                            <button class="btn-secondary" onclick="loadProjectsStats()" style="margin-top: var(--space-4);">🔄 Retry Connection</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             </div>
 
             <!-- Activity Log Tab -->
@@ -2864,7 +3094,279 @@
             } catch (e) {
                 // Silently ignore
             }
+
+            // Initialize Projects sync UI
+            setTimeout(() => {
+                loadProjectsStats();
+                setupProjectsPolling();
+            }, 1000);
         });
+
+        // ==========================================
+        // PROJECTS SYNC ADMIN CONTROLS
+        // ==========================================
+
+        const PROJECTS_API_BASE = 'http://localhost:8002/api';
+        let projectsSyncPoller = null;
+        let projectsSyncInProgress = false;
+
+        async function loadProjectsStats() {
+            try {
+                const response = await fetch(`${PROJECTS_API_BASE}/sync/status`, { timeout: 5000 });
+                
+                if (!response.ok) {
+                    showProjectsServiceUnavailable();
+                    return;
+                }
+
+                const data = await response.json();
+                if (data.success && data.data) {
+                    renderProjectsStats(data.data);
+                    hideProjectsServiceUnavailable();
+                } else {
+                    showProjectsServiceUnavailable();
+                }
+            } catch (error) {
+                console.log('Projects service not available:', error.message);
+                showProjectsServiceUnavailable();
+            }
+        }
+
+        function renderProjectsStats(statusData) {
+            try {
+                // Parse timestamp
+                const lastSyncTime = new Date(statusData.timestamp);
+                const now = new Date();
+                const timeDiff = Math.floor((now - lastSyncTime) / 1000); // seconds ago
+                let timeStr = '';
+                if (timeDiff < 60) timeStr = 'Just now';
+                else if (timeDiff < 3600) timeStr = Math.floor(timeDiff / 60) + 'm ago';
+                else if (timeDiff < 86400) timeStr = Math.floor(timeDiff / 3600) + 'h ago';
+                else timeStr = Math.floor(timeDiff / 86400) + 'd ago';
+
+                // Update stat cards
+                document.getElementById('projects-status-timestamp').textContent = timeStr;
+                document.getElementById('projects-total-count').textContent = (statusData.project_count || 0) + (statusData.native_count || 0);
+                document.getElementById('projects-bridged-count').textContent = statusData.project_count || 0;
+                
+                const errorCount = statusData.errors && statusData.errors.length ? statusData.errors.length : 0;
+                document.getElementById('projects-error-count').textContent = errorCount;
+
+                // Handle error alert
+                if (errorCount > 0) {
+                    showProjectsErrorAlert(statusData.errors);
+                } else {
+                    hideProjectsErrorAlert();
+                }
+
+                // Update storage metrics
+                document.getElementById('projects-native-count').textContent = statusData.native_count || 0;
+                document.getElementById('projects-bridged-cache-count').textContent = statusData.project_count || 0;
+                document.getElementById('projects-relationships-count').textContent = statusData.relationships_count || 0;
+
+                // Update sync details if available
+                if (statusData.duration_ms !== undefined) {
+                    const duration = (statusData.duration_ms / 1000).toFixed(2) + 's';
+                    document.getElementById('projects-sync-mode').textContent = statusData.mode || 'full';
+                    document.getElementById('projects-sync-duration').textContent = duration;
+                    document.getElementById('projects-sync-record-count').textContent = statusData.count || 0;
+                    
+                    // Calculate success rate
+                    const successRate = statusData.count && errorCount > 0 
+                        ? Math.round(((statusData.count - errorCount) / statusData.count) * 100) 
+                        : 100;
+                    document.getElementById('projects-sync-success-rate').textContent = successRate + '%';
+                    
+                    // Show last sync details section
+                    document.getElementById('projects-last-sync-details').style.display = 'block';
+                }
+
+                // Update data quality
+                document.getElementById('projects-mapping-coverage').textContent = '85%'; // Placeholder
+                document.getElementById('projects-mapping-bar').style.width = '85%';
+                document.getElementById('projects-validation-success').textContent = '94%'; // Placeholder
+                document.getElementById('projects-validation-bar').style.width = '94%';
+                document.getElementById('projects-connection-status').textContent = '✅ Connected';
+                document.getElementById('projects-connection-status').style.color = 'var(--success)';
+
+            } catch (error) {
+                console.error('Error rendering Projects stats:', error);
+            }
+        }
+
+        function showProjectsErrorAlert(errors) {
+            const alertDiv = document.getElementById('projects-error-alert');
+            const detailsDiv = document.getElementById('projects-error-details');
+            
+            if (alertDiv && detailsDiv) {
+                let detailsHtml = '<ul style="margin: 0; padding-left: 20px;">';
+                errors.slice(0, 3).forEach(err => {
+                    detailsHtml += `<li style="margin-bottom: 4px;">${err}</li>`;
+                });
+                if (errors.length > 3) {
+                    detailsHtml += `<li style="margin-top: 8px; color: var(--gray-500);">... and ${errors.length - 3} more</li>`;
+                }
+                detailsHtml += '</ul>';
+                
+                detailsDiv.innerHTML = detailsHtml;
+                alertDiv.style.display = 'block';
+            }
+        }
+
+        function hideProjectsErrorAlert() {
+            const alertDiv = document.getElementById('projects-error-alert');
+            if (alertDiv) alertDiv.style.display = 'none';
+        }
+
+        function showProjectsServiceUnavailable() {
+            const unavailableDiv = document.getElementById('projects-service-unavailable');
+            if (unavailableDiv) {
+                unavailableDiv.style.display = 'block';
+                // Disable sync buttons
+                document.getElementById('full-sync-btn').disabled = true;
+                document.getElementById('incremental-sync-btn').disabled = true;
+                document.getElementById('full-sync-btn').style.opacity = '0.5';
+                document.getElementById('incremental-sync-btn').style.opacity = '0.5';
+            }
+        }
+
+        function hideProjectsServiceUnavailable() {
+            const unavailableDiv = document.getElementById('projects-service-unavailable');
+            if (unavailableDiv) {
+                unavailableDiv.style.display = 'none';
+                // Enable sync buttons
+                document.getElementById('full-sync-btn').disabled = false;
+                document.getElementById('incremental-sync-btn').disabled = false;
+                document.getElementById('full-sync-btn').style.opacity = '1';
+                document.getElementById('incremental-sync-btn').style.opacity = '1';
+            }
+        }
+
+        async function triggerProjectsSync(mode) {
+            if (projectsSyncInProgress) {
+                showNotification('Sync already in progress. Please wait...', 'warning');
+                return;
+            }
+
+            try {
+                projectsSyncInProgress = true;
+
+                // Show progress UI
+                document.getElementById('projects-sync-progress').style.display = 'block';
+                document.getElementById('projects-last-sync-details').style.display = 'none';
+                document.getElementById('projects-sync-status-text').textContent = `Starting ${mode} sync from Intake Hub...`;
+
+                // Disable buttons
+                document.getElementById('full-sync-btn').disabled = true;
+                document.getElementById('incremental-sync-btn').disabled = true;
+
+                // Log the action
+                logAudit('Data Bridge', 'Sync Trigger', `Started ${mode} Projects sync from Intake Hub`, {
+                    syncMode: mode,
+                    timestamp: new Date().toISOString()
+                });
+
+                // Call backend API
+                const response = await fetch(`${PROJECTS_API_BASE}/sync/trigger`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: mode })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Sync request failed');
+                }
+
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    // Update UI with sync results
+                    renderProjectsStats(data.data);
+                    
+                    const count = data.data.count || 0;
+                    const errors = data.data.errors ? data.data.errors.length : 0;
+                    
+                    // Log completion
+                    logAudit('Data Bridge', 'Sync Complete', `${mode} sync completed: ${count} projects synced, ${errors} errors`, {
+                        syncMode: mode,
+                        projectsCount: count,
+                        errorCount: errors,
+                        duration: data.data.duration_ms
+                    });
+
+                    showNotification(`✅ ${mode} sync completed successfully! ${count} projects synced.`, 'success');
+                } else {
+                    throw new Error('Invalid sync response');
+                }
+
+            } catch (error) {
+                console.error('Sync error:', error);
+                logAudit('Data Bridge', 'Sync Error', `${mode} sync failed: ${error.message}`, {
+                    syncMode: mode,
+                    error: error.message
+                });
+                showNotification(`❌ Sync failed: ${error.message}`, 'error');
+            } finally {
+                // Re-enable buttons
+                document.getElementById('full-sync-btn').disabled = false;
+                document.getElementById('incremental-sync-btn').disabled = false;
+                
+                // Hide progress UI after a short delay
+                setTimeout(() => {
+                    document.getElementById('projects-sync-progress').style.display = 'none';
+                    projectsSyncInProgress = false;
+                }, 1500);
+            }
+        }
+
+        function setupProjectsPolling() {
+            // Clear existing poller if any
+            if (projectsSyncPoller) clearInterval(projectsSyncPoller);
+
+            // Set up polling to refresh every 30 seconds when Projects tab is visible
+            const originalShowSubTab = window.showSubTab;
+            window.showSubTab = function(parentTab, subTabName) {
+                originalShowSubTab(parentTab, subTabName);
+                
+                if (parentTab === 'data-bridge' && subTabName === 'projects-config') {
+                    // User switched to Projects tab - start polling
+                    loadProjectsStats(); // Immediate refresh
+                    projectsSyncPoller = setInterval(() => {
+                        if (document.getElementById('projects-config').classList.contains('active')) {
+                            loadProjectsStats();
+                        }
+                    }, 30000); // Every 30 seconds
+                }
+            };
+        }
+
+        function showNotification(message, type = 'info') {
+            // Use a simple alert or create a toast-like notification
+            // For now, use console and browser's built-in alert for important messages
+            if (type === 'error') {
+                console.error(message);
+            } else if (type === 'success') {
+                console.log('✅', message);
+            } else {
+                console.log(message);
+            }
+        }
+
+        function logAudit(area, action, details, metadata = {}) {
+            // This function should match the existing audit logging system
+            // For now, we'll create a simple implementation that logs to console
+            // In a real system, this would POST to an audit API endpoint
+            console.log(`[AUDIT] ${area} | ${action} | ${details}`, metadata);
+            
+            // Try to call the actual logAudit function if it exists elsewhere
+            if (typeof window.auditLog !== 'undefined' && window.auditLog.log) {
+                try {
+                    window.auditLog.log(area, action, details, metadata);
+                } catch (e) {
+                    // Ignore if the audit system isn't available
+                }
+            }
+        }
             
         // ==========================================
 

@@ -1,77 +1,192 @@
-"""Find AMP ALL 2 events with meeting/call info in message body that aren't in Meeting Planner."""
-import os
+"""Find AMP events with meeting/call details in Cosmos message body that aren't in Meeting Planner."""
+import os, re
 os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS",
     os.path.join(os.environ["APPDATA"], "gcloud", "application_default_credentials.json"))
 
 from google.cloud import bigquery
 client = bigquery.Client()
 
-# Step 1: Find non-Calendar-Event AMP entries with meeting keywords in body
+# Step 1: Get event_ids from AMP ALL 2 (Store Updates + Calendar Events only)
 print("=" * 70)
-print("Searching AMP ALL 2 for meeting/call details in Message Body...")
-print("(non-Calendar Events, after Oct 2025)")
+print("Step 1: Fetching AMP events (Store Updates + Calendar Events)...")
 print("=" * 70)
 
-q = """
-SELECT
-    Activity_Title,
-    Message_Type,
-    Message_Status,
-    event_id,
-    Author_email,
-    Store_Cnt,
-    MIN(SAFE_CAST(Start_Date AS DATE)) as start_date,
-    MAX(SAFE_CAST(End_Date AS DATE)) as end_date,
-    ANY_VALUE(Message_Body) as message_body
-FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2`
-WHERE Message_Type != 'Calendar Events'
-  AND Message_Status IN ('Awaiting ATC Approval', 'Awaiting Comms Approval', 'Review for Publish review')
-  AND SAFE_CAST(Start_Date AS DATE) >= '2025-10-01'
-  AND (
-    LOWER(Message_Body) LIKE '%meeting id%'
-    OR LOWER(Message_Body) LIKE '%passcode%'
-    OR LOWER(Message_Body) LIKE '%zoom%'
-    OR LOWER(Message_Body) LIKE '%teams meeting%'
-    OR LOWER(Message_Body) LIKE '%join the call%'
-    OR LOWER(Message_Body) LIKE '%attend the%call%'
-    OR LOWER(Message_Body) LIKE '%office hours%'
-    OR LOWER(Message_Body) LIKE '%webex%'
-    OR LOWER(Message_Body) LIKE '%dial-in%'
-    OR LOWER(Message_Body) LIKE '%conference call%'
-    OR LOWER(Message_Body) LIKE '% at % p.m.%'
-    OR LOWER(Message_Body) LIKE '% at % a.m.%'
-    OR LOWER(Message_Body) LIKE '%kickoff call%'
-    OR LOWER(Message_Body) LIKE '%listening session%'
-    OR LOWER(Message_Body) LIKE '%brown bag%'
-    OR LOWER(Message_Body) LIKE '%deployment call%'
-    OR LOWER(Message_Body) LIKE '%admin call%'
-    OR LOWER(Message_Body) LIKE '%installation call%'
-    OR LOWER(Message_Body) LIKE '%broadcast%'
-  )
-GROUP BY Activity_Title, Message_Type, Message_Status, event_id, Author_email, Store_Cnt
-ORDER BY start_date DESC
+q_events = """
+SELECT DISTINCT
+    a.event_id,
+    a.Activity_Title,
+    a.Message_Type,
+    a.Message_Status,
+    a.Author_email,
+    a.Store_Cnt,
+    a.Start_Date,
+    a.End_Date,
+    a.Business_Area
+FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2` a
+WHERE a.Start_Date >= '2025-10-01'
+  AND a.Message_Type IN ('Store Updates', 'Calendar Events')
+  AND a.Message_Status IN ('Awaiting ATC Approval', 'Awaiting Comms Approval',
+      'Review for Publish review', 'Review for Publish review - No Comms')
+  AND a.event_id IS NOT NULL
 """
+events = list(client.query(q_events).result())
+print(f"Found {len(events)} AMP events since Oct 2025 (Store Updates + Calendar Events)\n")
 
-rows = list(client.query(q).result())
-print(f"\nFound {len(rows)} AMP events with meeting/call content\n")
+# Deduplicate by event_id (one row per event)
+event_map = {}
+for e in events:
+    eid = e.event_id
+    if eid not in event_map:
+        event_map[eid] = dict(e)
+print(f"Unique events by event_id: {len(event_map)}")
 
-# Step 2: Cross-reference against existing meeting requests
+# Step 2: Query Cosmos table for message bodies of these events
+print("\n" + "=" * 70)
+print("Step 2: Fetching message bodies from Cosmos/EDW...")
+print("=" * 70)
+
+event_ids = list(event_map.keys())
+# Batch query in groups of 50
+body_map = {}
+batch_size = 50
+for i in range(0, len(event_ids), batch_size):
+    batch = event_ids[i:i+batch_size]
+    id_list = ", ".join(f"'{eid}'" for eid in batch)
+    q_body = f"""
+    SELECT event_id, msg_txt, msg_subj_nm
+    FROM `wmt-edw-prod.WW_SOA_DL_VM.STORE_OPS_APPLN_ACTV_MGMT_PLAN_MSG_EVENT`
+    WHERE event_id IN ({id_list})
+    """
+    for row in client.query(q_body).result():
+        eid = row.event_id
+        # Extract text from msg_txt STRUCT<array ARRAY<STRING>>
+        msg_txt = row.msg_txt
+        body_text = ""
+        if msg_txt:
+            arr = []
+            if isinstance(msg_txt, dict):
+                arr = msg_txt.get('array', [])
+            elif hasattr(msg_txt, 'get'):
+                arr = msg_txt.get('array', [])
+            elif isinstance(msg_txt, (list, tuple)):
+                arr = msg_txt
+            else:
+                arr = [str(msg_txt)]
+            if arr:
+                raw_html = str(arr[0])
+                # Strip HTML tags
+                body_text = re.sub(r'<[^>]+>', ' ', raw_html)
+                body_text = re.sub(r'\s+', ' ', body_text).strip()
+        body_map[eid] = {
+            "body": body_text,
+            "subject": str(row.msg_subj_nm or "")
+        }
+    print(f"  Batch {i//batch_size + 1}: fetched {len(batch)} events")
+
+print(f"\nGot message bodies for {len(body_map)} events")
+
+# Debug: show sample bodies
+non_empty = [(eid, info) for eid, info in body_map.items() if info["body"]]
+print(f"Non-empty bodies: {len(non_empty)} / {len(body_map)}")
+if non_empty:
+    sample_eid, sample_info = non_empty[0]
+    print(f"  Sample ({sample_eid}): {sample_info['body'][:200]}...")
+else:
+    # Show raw type info for first entry
+    print("  WARNING: All bodies empty! Checking raw msg_txt structure...")
+    # Quick debug query for one event
+    sample_id = event_ids[0]
+    q_debug = f"""
+    SELECT event_id, msg_txt
+    FROM `wmt-edw-prod.WW_SOA_DL_VM.STORE_OPS_APPLN_ACTV_MGMT_PLAN_MSG_EVENT`
+    WHERE event_id = '{sample_id}'
+    """
+    for dbg in client.query(q_debug).result():
+        mt = dbg.msg_txt
+        print(f"  msg_txt type: {type(mt)}")
+        print(f"  msg_txt repr: {repr(mt)[:500]}")
+        if isinstance(mt, dict):
+            print(f"  dict keys: {mt.keys()}")
+        elif hasattr(mt, '__dict__'):
+            print(f"  attrs: {[a for a in dir(mt) if not a.startswith('_')]}")
+        print(f"  str(msg_txt)[:300]: {str(mt)[:300]}")
+
+# Step 3: Search bodies for meeting/call indicators
+print("\n" + "=" * 70)
+print("Step 3: Searching message bodies for meeting/call content...")
+print("=" * 70)
+
+meeting_patterns = [
+    r'meeting\s*id',
+    r'passcode',
+    r'zoom\.(us|com)',
+    r'teams\.microsoft',
+    r'webex',
+    r'dial[\s-]in',
+    r'conference\s*call',
+    r'join\s*(the\s*)?(call|meeting)',
+    r'attend\s*(the\s*)?(call|meeting)',
+    r'at\s+\d{1,2}\s*(:|\.)\s*\d{2}\s*(a\.?m|p\.?m)',
+    r'at\s+\d{1,2}\s+(a\.?m|p\.?m)',
+    r'kickoff\s*call',
+    r'deployment\s*call',
+    r'admin\s*call',
+    r'installation\s*call',
+    r'office\s*hours',
+    r'listening\s*session',
+    r'brown\s*bag',
+    r'broadcast',
+]
+compiled = [re.compile(p, re.IGNORECASE) for p in meeting_patterns]
+
+meetings_found = []
+for eid, info in body_map.items():
+    body = info["body"]
+    if not body:
+        continue
+    matched_patterns = []
+    for i, pat in enumerate(compiled):
+        if pat.search(body):
+            matched_patterns.append(meeting_patterns[i])
+    if matched_patterns:
+        event_meta = event_map.get(eid, {})
+        meetings_found.append({
+            "event_id": eid,
+            "title": event_meta.get("Activity_Title", ""),
+            "type": event_meta.get("Message_Type", ""),
+            "status": event_meta.get("Message_Status", ""),
+            "author": event_meta.get("Author_email", ""),
+            "start": str(event_meta.get("Start_Date", ""))[:10],
+            "end": str(event_meta.get("End_Date", ""))[:10],
+            "area": event_meta.get("Business_Area", ""),
+            "stores": event_meta.get("Store_Cnt", 0),
+            "patterns": matched_patterns,
+            "body_snippet": body[:400]
+        })
+
+print(f"Events with meeting/call content: {len(meetings_found)}")
+
+# Step 4: Cross-reference against existing meeting requests
+print("\n" + "=" * 70)
+print("Step 4: Cross-referencing against existing Meeting Planner requests...")
+print("=" * 70)
+
 q_existing = """
 SELECT DISTINCT LOWER(TRIM(Title)) as title_lower
 FROM `wmt-assetprotection-prod.Store_Support_Dev.store_meeting_request_data`
 """
-existing = set()
+existing_titles = set()
 for r in client.query(q_existing).result():
     if r.title_lower:
-        existing.add(r.title_lower)
+        existing_titles.add(r.title_lower)
+print(f"Existing meeting request titles: {len(existing_titles)}")
 
 missing = []
 already_tracked = []
-for r in rows:
-    title = (r.Activity_Title or '').strip()
-    title_lower = title.lower()
+for m in meetings_found:
+    title_lower = m["title"].strip().lower()
     found = False
-    for et in existing:
+    for et in existing_titles:
         if title_lower in et or et in title_lower:
             found = True
             break
@@ -79,30 +194,26 @@ for r in rows:
             found = True
             break
     if found:
-        already_tracked.append(r)
+        already_tracked.append(m)
     else:
-        missing.append(r)
+        missing.append(m)
 
-print(f"Already have a meeting request: {len(already_tracked)}")
-print(f"MISSING from Meeting Planner:   {len(missing)}")
+print(f"\nAlready tracked in Meeting Planner: {len(already_tracked)}")
+print(f"MISSING from Meeting Planner:      {len(missing)}")
 
-print("\n" + "=" * 70)
-print("EVENTS ALREADY TRACKED IN MEETING PLANNER:")
-print("=" * 70)
-for r in already_tracked:
-    sd = str(r.start_date or '')[:10]
-    print(f"  {sd} | {r.Message_Type:<20} | {(r.Activity_Title or '')[:55]}")
+if already_tracked:
+    print("\n--- Already Tracked ---")
+    for m in already_tracked:
+        print(f"  {m['start']} | {m['type']:<20} | {m['title'][:55]}")
 
 print("\n" + "=" * 70)
-print("EVENTS MISSING FROM MEETING PLANNER (need a request):")
+print("EVENTS WITH MEETING CONTENT NOT IN MEETING PLANNER:")
 print("=" * 70)
-for r in missing:
-    sd = str(r.start_date or '')[:10]
-    ed = str(r.end_date or '')[:10]
-    body = (r.message_body or '')[:300].replace('\n', ' ')
-    print(f"\n  Title:    {r.Activity_Title}")
-    print(f"  Type:     {r.Message_Type} | Status: {r.Message_Status}")
-    print(f"  Dates:    {sd} to {ed}")
-    print(f"  Author:   {r.Author_email}")
-    print(f"  EventID:  {r.event_id} | Stores: {r.Store_Cnt}")
-    print(f"  Body:     {body}...")
+for m in missing:
+    print(f"\n  Title:    {m['title']}")
+    print(f"  Type:     {m['type']} | Status: {m['status']}")
+    print(f"  Dates:    {m['start']} to {m['end']}")
+    print(f"  Author:   {m['author']}")
+    print(f"  Area:     {m['area']} | Stores: {m['stores']}")
+    print(f"  Patterns: {', '.join(m['patterns'])}")
+    print(f"  Body:     {m['body_snippet'][:250]}...")

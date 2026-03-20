@@ -28,6 +28,7 @@ from PIL import Image, ImageChops
 # Configuration
 RECIPIENTS = ["Kendall.rush@walmart.com", "Matthew.Farnworth@walmart.com", "Justin.Barrick@walmart.com"]
 SUBJECT = "TDA Initiative Insights - Weekly Report"
+DASHBOARD_URL = "http://WEUS42608431466:5000/tda-initiatives-insights"
 SCRIPT_DIR = Path(__file__).parent
 # Walmart fiscal week: FY starts Saturday closest to Feb 1
 def _walmart_week():
@@ -48,6 +49,7 @@ def _walmart_week():
 
 WEEK_NUM = _walmart_week()
 PPT_OUTPUT = SCRIPT_DIR / f"TDA_WK{WEEK_NUM}_Report.pptx"
+PDF_OUTPUT = SCRIPT_DIR / f"TDA_WK{WEEK_NUM}_Report.pdf"
 HTML_PREVIEW = SCRIPT_DIR / "email_preview.html"
 
 # BQ Configuration
@@ -175,6 +177,21 @@ def build_email_html(data):
         <div style="color: #cccccc; font-size: 13px; margin-top: 2px;">Weekly Report &mdash; {today}</div>
     </td>
     </tr></table>
+</td>
+</tr>
+</table>
+
+<!-- Dashboard Button -->
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+<tr>
+<td align="center" style="padding: 16px 0;">
+    <table cellpadding="0" cellspacing="0" style="border-collapse: separate;">
+    <tr>
+    <td align="center" bgcolor="#0052CC" style="background-color: #0052CC; border-radius: 30px; mso-padding-alt: 14px 40px;">
+        <a href="{DASHBOARD_URL}" target="_blank" style="background-color: #0052CC; color: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif; font-size: 16px; font-weight: 700; text-decoration: none; padding: 14px 40px; border-radius: 30px; display: inline-block; letter-spacing: 0.5px; mso-padding-alt: 0; border: 2px solid #0052CC;">Go to Dashboard</a>
+    </td>
+    </tr>
+    </table>
 </td>
 </tr>
 </table>
@@ -674,10 +691,24 @@ def generate_report_pptx(data):
             zf.writestr(f'ppt/slides/slide{slide_num}.xml', slide_xml)
 
     pptx_buffer.seek(0)
-    return pptx_buffer.getvalue()
+    return pptx_buffer.getvalue(), screenshots
 
 
-def send_outlook_email(html_body, pptx_path, recipients):
+def generate_report_pdf(pptx_screenshots):
+    """Convert screenshot images to a multi-page PDF using Pillow."""
+    if not pptx_screenshots:
+        return None
+    pages = []
+    for label, png_bytes in pptx_screenshots:
+        img = Image.open(io.BytesIO(png_bytes)).convert('RGB')
+        pages.append(img)
+    pdf_buffer = io.BytesIO()
+    pages[0].save(pdf_buffer, 'PDF', save_all=True, append_images=pages[1:], resolution=150)
+    pdf_buffer.seek(0)
+    return pdf_buffer.getvalue()
+
+
+def send_outlook_email(html_body, attachments, recipients):
     """Send email via Outlook with PPT attachment"""
     import win32com.client
     outlook = win32com.client.Dispatch('Outlook.Application')
@@ -685,7 +716,8 @@ def send_outlook_email(html_body, pptx_path, recipients):
     mail.Subject = SUBJECT
     mail.HTMLBody = html_body
     mail.To = '; '.join(recipients)
-    mail.Attachments.Add(str(pptx_path))
+    for att in attachments:
+        mail.Attachments.Add(str(att))
     mail.Send()
     print(f"[OK] Email sent to: {', '.join(recipients)}")
 
@@ -702,29 +734,38 @@ def main():
     data = fetch_data()
     print(f"  Loaded {len(data)} projects")
 
-    # 2. Generate PPT
-    print("[2/4] Generating PPT report...")
-    pptx_data = generate_report_pptx(data)
+    # 2. Generate PPT + PDF
+    print("[2/5] Generating PPT report...")
+    pptx_data, screenshots = generate_report_pptx(data)
     PPT_OUTPUT.write_bytes(pptx_data)
     print(f"  Saved: {PPT_OUTPUT}")
     print(f"  Size: {len(pptx_data):,} bytes")
 
-    # 3. Build email HTML
-    print("[3/4] Building email HTML...")
+    print("[3/5] Generating PDF report...")
+    pdf_data = generate_report_pdf(screenshots)
+    if pdf_data:
+        PDF_OUTPUT.write_bytes(pdf_data)
+        print(f"  Saved: {PDF_OUTPUT}")
+        print(f"  Size: {len(pdf_data):,} bytes")
+
+    # 4. Build email HTML
+    print("[4/5] Building email HTML...")
     html = build_email_html(data)
 
     if preview_only:
         HTML_PREVIEW.write_text(html, encoding='utf-8')
         print(f"\n  PREVIEW MODE - files saved:")
         print(f"  PPT:   {PPT_OUTPUT}")
+        print(f"  PDF:   {PDF_OUTPUT}")
         print(f"  HTML:  {HTML_PREVIEW}")
         print(f"\n  Open {HTML_PREVIEW} in a browser to review the email.")
         print("  Run without --preview to send.")
         return
 
-    # 4. Send email
-    print(f"[4/4] Sending email to {', '.join(RECIPIENTS)}...")
-    send_outlook_email(html, PPT_OUTPUT, RECIPIENTS)
+    # 5. Send email with PDF attachment
+    print(f"[5/5] Sending email to {', '.join(RECIPIENTS)}...")
+    attachments = [PDF_OUTPUT] if PDF_OUTPUT.exists() else [PPT_OUTPUT]
+    send_outlook_email(html, attachments, RECIPIENTS)
 
     print("\n" + "=" * 60)
     print("Done!")
