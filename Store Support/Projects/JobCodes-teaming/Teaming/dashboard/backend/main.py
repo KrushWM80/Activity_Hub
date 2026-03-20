@@ -184,21 +184,10 @@ def to_json_safe(val):
 def load_job_code_data():
     """Load and merge job code data from Polaris and Teaming sources"""
     # Check files exist
-    if not os.path.exists(TEAMING_DATA_FILE):
-        raise FileNotFoundError(f"Teaming data file not found: {TEAMING_DATA_FILE}")
     if not os.path.exists(POLARIS_DATA_FILE):
         raise FileNotFoundError(f"Polaris data file not found: {POLARIS_DATA_FILE}")
     
-    print(f"Loading Teaming data from: {TEAMING_DATA_FILE}")
     print(f"Loading Polaris data from: {POLARIS_DATA_FILE}")
-    
-    # Load Teaming data
-    teaming_df = pd.read_excel(TEAMING_DATA_FILE)
-    teaming_df['composite_job_code'] = (
-        teaming_df['divNumber'].fillna(0).astype(int).astype(str) + '-' +
-        teaming_df['deptNumber'].fillna(0).astype(int).astype(str) + '-' +
-        teaming_df['jobCode'].fillna(0).astype(int).astype(str)
-    )
     
     # Load Polaris data
     polaris_df = pd.read_csv(POLARIS_DATA_FILE)
@@ -215,36 +204,94 @@ def load_job_code_data():
         print("User counts file not found, defaulting to 0")
         polaris_df['user_count'] = 0
     
-    # Get unique teaming info
-    teaming_summary = teaming_df.groupby('composite_job_code').agg({
-        'jobCodeTitle': 'first',
-        'teamName': lambda x: list(x.unique()),
-        'teamId': lambda x: list(x.unique()),
-        'workgroupName': lambda x: list(x.unique()),
-        'workgroupId': lambda x: list(x.unique()),
-        'divNumber': 'first',
-        'deptNumber': 'first',
-        'jobCode': 'first'
-    }).reset_index()
+    # Try to load teaming data (optional)
+    teaming_df = None
+    merged = polaris_df.copy()
+    has_team_data = False
     
-    # Merge with Polaris
-    merged = polaris_df.merge(
-        teaming_summary,
-        left_on='job_code',
-        right_on='composite_job_code',
-        how='left'
-    )
+    if os.path.exists(TEAMING_DATA_FILE):
+        try:
+            print(f"Loading Teaming data from: {TEAMING_DATA_FILE}")
+            teaming_df = pd.read_excel(TEAMING_DATA_FILE)
+            
+            # Check which columns are available
+            available_cols = list(teaming_df.columns)
+            print(f"Available Teaming columns: {available_cols}")
+            
+            # Create composite key from available columns
+            teaming_df['composite_job_code'] = (
+                teaming_df['divNumber'].fillna(0).astype(int).astype(str) + '-' +
+                teaming_df['deptNumber'].fillna(0).astype(int).astype(str) + '-' +
+                teaming_df['jobCode'].fillna(0).astype(int).astype(str)
+            )
+            
+            # Check if teaming has full columns needed for aggregation
+            required_team_cols = ['jobCodeTitle', 'teamName', 'teamId', 'workgroupName', 'workgroupId']
+            has_team_data = all(col in available_cols for col in required_team_cols)
+            
+            if has_team_data:
+                print("Full teaming data available - aggregating by team")
+                # Get unique teaming info
+                teaming_summary = teaming_df.groupby('composite_job_code').agg({
+                    'jobCodeTitle': 'first',
+                    'teamName': lambda x: list(x.unique()),
+                    'teamId': lambda x: list(x.unique()),
+                    'workgroupName': lambda x: list(x.unique()),
+                    'workgroupId': lambda x: list(x.unique()),
+                    'divNumber': 'first',
+                    'deptNumber': 'first',
+                    'jobCode': 'first'
+                }).reset_index()
+            else:
+                print(f"Partial teaming data - only {available_cols} available")
+                # Just use the basic columns for division/department mapping
+                teaming_summary = teaming_df[['composite_job_code', 'divNumber', 'deptNumber', 'jobCode']].drop_duplicates()
+            
+            # Merge with Polaris
+            merged = polaris_df.merge(
+                teaming_summary,
+                left_on='job_code',
+                right_on='composite_job_code',
+                how='left'
+            )
+            
+        except ImportError as e:
+            print(f"⚠️  WARNING: Cannot load Excel teaming data: {e}")
+            print("   Proceeding without teaming data (openpyxl not installed)")
+            teaming_df = pd.DataFrame()  # Empty dataframe
+        except Exception as e:
+            print(f"⚠️  WARNING: Error loading teaming data: {e}")
+            teaming_df = pd.DataFrame()  # Empty dataframe
+    else:
+        print(f"Teaming data file not found at {TEAMING_DATA_FILE}, using Polaris data only")
+        teaming_df = pd.DataFrame()  # Empty dataframe
     
     # Mark status
-    merged['status'] = merged['composite_job_code'].apply(
-        lambda x: 'Assigned' if pd.notna(x) else 'Missing'
-    )
-    
-    # Fill missing job titles
-    merged['job_title'] = merged.apply(
-        lambda row: row['jobCodeTitle'] if pd.notna(row['jobCodeTitle']) else row['job_nm'],
+    merged['status'] = merged.apply(
+        lambda row: 'Assigned' if 'composite_job_code' in merged.columns and pd.notna(row.get('composite_job_code')) else 'Missing',
         axis=1
     )
+    
+    # Add default columns for missing team data
+    if not has_team_data:
+        merged['jobCodeTitle'] = merged['job_nm']  # Use job name as title
+        merged['job_title'] = merged['job_nm']  # Also set job_title
+        # Properly initialize list columns - create independent lists for each row
+        merged['teamName'] = pd.Series([[] for _ in range(len(merged))], index=merged.index)
+        merged['teamId'] = pd.Series([[] for _ in range(len(merged))], index=merged.index)
+        merged['workgroupName'] = pd.Series([[] for _ in range(len(merged))], index=merged.index)
+        merged['workgroupId'] = pd.Series([[] for _ in range(len(merged))], index=merged.index)
+    else:
+        # Fill missing job titles
+        merged['job_title'] = merged.apply(
+            lambda row: row['jobCodeTitle'] if pd.notna(row['jobCodeTitle']) else row['job_nm'],
+            axis=1
+        )
+        # Ensure list columns are properly initialized
+        merged['teamName'] = merged['teamName'].apply(lambda x: x if isinstance(x, list) else [])
+        merged['teamId'] = merged['teamId'].apply(lambda x: x if isinstance(x, list) else [])
+        merged['workgroupName'] = merged['workgroupName'].apply(lambda x: x if isinstance(x, list) else [])
+        merged['workgroupId'] = merged['workgroupId'].apply(lambda x: x if isinstance(x, list) else [])
     
     return merged, teaming_df
 
@@ -254,16 +301,29 @@ def get_team_options():
         raise FileNotFoundError(f"Teaming data file not found: {TEAMING_DATA_FILE}")
     teaming_df = pd.read_excel(TEAMING_DATA_FILE)
     
-    teams = teaming_df[['teamName', 'teamId', 'workgroupName', 'workgroupId']].drop_duplicates()
+    # Check if team columns exist
+    team_cols = ['teamName', 'teamId', 'workgroupName', 'workgroupId']
+    available_cols = [col for col in team_cols if col in teaming_df.columns]
+    
+    if not available_cols:
+        # No team data available - return empty list
+        print(f"No team columns found in teaming data. Available: {list(teaming_df.columns)}")
+        return []
+    
+    # Only use available columns
+    teams = teaming_df[available_cols].drop_duplicates()
+    
     # Convert to JSON-safe format
     result = []
     for _, row in teams.iterrows():
-        result.append({
-            "teamName": str(row["teamName"]) if pd.notna(row["teamName"]) else "",
-            "teamId": to_json_safe(row["teamId"]),
-            "workgroupName": str(row["workgroupName"]) if pd.notna(row["workgroupName"]) else "",
-            "workgroupId": to_json_safe(row["workgroupId"])
-        })
+        team_entry = {}
+        for col in available_cols:
+            if col == 'teamId' or col == 'workgroupId':
+                team_entry[col] = to_json_safe(row[col])
+            else:
+                team_entry[col] = str(row[col]) if pd.notna(row[col]) else ""
+        result.append(team_entry)
+    
     return result
 
 # ============================================================

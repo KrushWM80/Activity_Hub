@@ -9,7 +9,7 @@ Audio Features:
 - Direct text-to-MP4 synthesis with FFmpeg
 """
 
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request, send_file, render_template_string
 from flask_cors import CORS
 from google.cloud import bigquery
 import logging
@@ -36,10 +36,6 @@ try:
 except ImportError as e:
     MP4_PIPELINE_AVAILABLE = False
     logger.warning(f"⚠️  MP4 Pipeline not available: {e}")
-
-# Initialize Flask app
-app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend requests
 
 # BigQuery Configuration
 PROJECT_ID = 'wmt-assetprotection-prod'
@@ -325,7 +321,71 @@ def build_amp_query(filters, days, limit):
 
 @app.route('/', methods=['GET'])
 def root():
-    """Root endpoint with API documentation"""
+    """Serve dashboard HTML interface"""
+    print("DEBUG: root() called")  # DEBUG
+    try:
+        # Try multiple paths to find index.html
+        possible_paths = [
+            Path(__file__).parent / 'index.html',  # Current directory
+            Path.cwd() / 'index.html',              # Working directory
+            Path('C:/Users/krush/OneDrive - Walmart Inc/Documents/VSCode/Activity_Hub/Store Support/Projects/AMP/Store Updates Dashboard/index.html')  # Absolute path
+        ]
+        print(f"DEBUG: Checking paths: {[str(p) for p in possible_paths]}")  # DEBUG
+        
+        index_html = None
+        for path in possible_paths:
+            print(f"DEBUG: Checking {path} - exists: {path.exists()}")  # DEBUG
+            if path.exists():
+                index_html = path
+                break
+        
+        if index_html:
+            print(f"DEBUG: Found index.html at {index_html}, serving HTML")  # DEBUG
+            with open(index_html, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            logger.info(f"✓ Serving dashboard HTML from: {index_html}")
+            return html_content, 200, {'Content-Type': 'text/html; charset=utf-8'}
+        else:
+            print("DEBUG: index.html not found, returning fallback JSON")  # DEBUG
+            # Fallback to API documentation if index.html not found
+            return jsonify({
+                'service': 'AMP Dashboard Backend API',
+                'version': '1.0',
+                'status': 'running',
+                'message': 'Note: Dashboard HTML (index.html) not found. Showing API documentation instead.',
+                'endpoints': {
+                    '/health': 'Health check and connection status',
+                    '/api/amp-data': 'Get AMP data with optional filters',
+                    '/api/amp-metrics': 'Get summary metrics',
+                    '/api/amp-filters': 'Get filter options',
+                    '/api/generate-audio': 'Generate summarized MP4 audio (Jenny voice)'
+                },
+                'bigquery': {
+                    'project': PROJECT_ID,
+                    'dataset': DATASET_ID,
+                    'table': TABLE_ID
+                },
+                'credentials': {
+                    'type': 'Application Default Credentials (gcloud)',
+                    'location': '~/.config/gcloud/application_default_credentials.json'
+                },
+                'audio': {
+                    'available': MP4_PIPELINE_AVAILABLE,
+                    'voice': 'Jenny Neural (Primary)',
+                    'format': 'MP4 (AAC @ 256kbps)'
+                }
+            })
+    except Exception as e:
+        logger.error(f"Error serving dashboard: {e}")
+        return jsonify({
+            'error': 'Failed to load dashboard',
+            'details': str(e)
+        }), 500
+
+
+@app.route('/api/config', methods=['GET'])
+def api_config():
+    """API configuration and documentation endpoint"""
     return jsonify({
         'service': 'AMP Dashboard Backend API',
         'version': '1.0',
@@ -352,6 +412,7 @@ def root():
             'format': 'MP4 (AAC @ 256kbps)'
         }
     })
+
 
 
 @app.route('/api/generate-audio', methods=['POST'])

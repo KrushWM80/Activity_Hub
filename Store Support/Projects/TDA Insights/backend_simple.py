@@ -819,7 +819,11 @@ def handle_request(client_socket, addr):
         
         elif path == '/api/ownerships':
             excluded = {'Complete'}
-            ownerships = sorted(set((r.get("TDA Ownership") or 'No Selection Provided') for r in DATA if r.get("Phase") not in excluded))
+            OWNERSHIP_ORDER = ['Dallas POC', 'Intake & Test', 'Deployment', 'No Selection Provided']
+            all_ownerships = set((r.get("TDA Ownership") or 'No Selection Provided') for r in DATA if r.get("Phase") not in excluded)
+            known_set = set(OWNERSHIP_ORDER)
+            unknown_ownerships = sorted(o for o in all_ownerships if o not in known_set)
+            ownerships = [o for o in OWNERSHIP_ORDER if o in all_ownerships] + unknown_ownerships
             response_json = json.dumps({
                 'success': True,
                 'ownerships': ownerships

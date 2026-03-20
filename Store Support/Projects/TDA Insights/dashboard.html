@@ -943,25 +943,28 @@
 
         // Render table with pagination (organized by phase)
         // Build the ordered list of ownership groups for rendering
-        // Special rule: "Pending + No Selection Provided" is always first
+        // Custom order: Pending+Unassigned first, then Dallas POC, Intake & Test, Deployment, then remaining No Selection Provided
         function getOwnershipOrder(data, phaseOrder) {
             const UNASSIGNED = 'No Selection Provided';
+            const OWNERSHIP_ORDER = ['Dallas POC', 'Intake & Test', 'Deployment', UNASSIGNED];
             const sections = []; // {ownership, phase, rows}
 
-            // 1. Pending + unassigned (null or "No Selection Provided") → top section
+            // 1. Pending + unassigned (null or "No Selection Provided") → always first
             const pendingUnassigned = data.filter(r =>
                 r.Phase === 'Pending' && (!r['TDA Ownership'] || r['TDA Ownership'] === UNASSIGNED));
             if (pendingUnassigned.length > 0) {
                 sections.push({ ownership: 'TDA Ownership - Currently No TDA Ownership', phase: 'Pending', rows: pendingUnassigned, isSpecial: false });
             }
 
-            // 2. Collect distinct ownership values (excluding the special group above)
+            // 2. Build ordered ownership list: defined order first, then any new values alphabetically
             const ownershipSet = new Set();
             data.forEach(r => {
                 const own = r['TDA Ownership'] || UNASSIGNED;
                 ownershipSet.add(own);
             });
-            const ownershipList = Array.from(ownershipSet).sort();
+            const knownSet = new Set(OWNERSHIP_ORDER);
+            const unknownOwnerships = Array.from(ownershipSet).filter(o => !knownSet.has(o)).sort();
+            const ownershipList = [...OWNERSHIP_ORDER.filter(o => ownershipSet.has(o)), ...unknownOwnerships];
 
             // 3. For each ownership → for each phase → collect rows
             ownershipList.forEach(ownership => {

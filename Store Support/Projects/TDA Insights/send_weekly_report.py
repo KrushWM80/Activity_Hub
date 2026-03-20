@@ -26,7 +26,7 @@ from xml.sax.saxutils import escape
 from PIL import Image, ImageChops
 
 # Configuration
-RECIPIENTS = ["Kendall.rush@walmart.com", "Matthew.Farnworth@walmart.com"]
+RECIPIENTS = ["Kendall.rush@walmart.com", "Matthew.Farnworth@walmart.com", "Justin.Barrick@walmart.com"]
 SUBJECT = "TDA Initiative Insights - Weekly Report"
 SCRIPT_DIR = Path(__file__).parent
 # Walmart fiscal week: FY starts Saturday closest to Feb 1
@@ -232,14 +232,19 @@ def build_email_html(data):
     # Phase tables — grouped by TDA Ownership → Phase
     UNASSIGNED = 'No Selection Provided'
 
-    # Build ordered sections: Pending+unassigned first, then ownership→phase
+    # Build ordered sections: Pending+unassigned first, then custom ownership order
+    OWNERSHIP_ORDER = ['Dallas POC', 'Intake & Test', 'Deployment', UNASSIGNED]
     sections = []
     pending_unassigned = [r for r in data if r['Phase'] == 'Pending' and r.get('TDA Ownership', UNASSIGNED) == UNASSIGNED]
     if pending_unassigned:
         sections.append(('TDA Ownership - Currently No TDA Ownership', 'Pending', pending_unassigned, False))
 
-    ownership_set = sorted(set(r.get('TDA Ownership', UNASSIGNED) or UNASSIGNED for r in data))
-    for ownership in ownership_set:
+    # Ordered ownership list: defined order first, then any new values alphabetically
+    all_ownerships = set(r.get('TDA Ownership', UNASSIGNED) or UNASSIGNED for r in data)
+    known_set = set(OWNERSHIP_ORDER)
+    unknown_ownerships = sorted(o for o in all_ownerships if o not in known_set)
+    ownership_list = [o for o in OWNERSHIP_ORDER if o in all_ownerships] + unknown_ownerships
+    for ownership in ownership_list:
         for phase in PHASE_ORDER:
             if phase == 'Pending' and ownership == UNASSIGNED:
                 continue  # already handled above
@@ -491,9 +496,13 @@ def generate_report_pptx(data):
     if pending_unassigned:
         sections.append(('TDA Ownership - Currently No TDA Ownership', 'Pending', pending_unassigned))
 
-    # 2. Ownership → phase
-    ownership_set = sorted(set(r.get('TDA Ownership', UNASSIGNED) or UNASSIGNED for r in data))
-    for ownership in ownership_set:
+    # 2. Custom ownership order: Dallas POC, Intake & Test, Deployment, then unassigned
+    OWNERSHIP_ORDER = ['Dallas POC', 'Intake & Test', 'Deployment', UNASSIGNED]
+    all_ownerships = set(r.get('TDA Ownership', UNASSIGNED) or UNASSIGNED for r in data)
+    known_set = set(OWNERSHIP_ORDER)
+    unknown_ownerships = sorted(o for o in all_ownerships if o not in known_set)
+    ownership_list = [o for o in OWNERSHIP_ORDER if o in all_ownerships] + unknown_ownerships
+    for ownership in ownership_list:
         for phase in PHASE_ORDER:
             if phase == 'Pending' and ownership == UNASSIGNED:
                 continue
