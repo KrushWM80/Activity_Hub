@@ -1,6 +1,6 @@
 # Activity Hub Services - Quick Reference Guide
 
-## Service Inventory (Updated March 12, 2026)
+## Service Inventory (Updated March 24, 2026)
 
 ### Core Infrastructure Services
 
@@ -9,10 +9,10 @@
 | **Job Codes Dashboard** | 8080 | http://10.97.114.181:8080/static/index.html# | FastAPI | netstat :8080 |
 | **Projects in Stores** | 8001 | http://10.97.114.181:8001/ | Teaming | netstat :8001 |
 | **TDA Insights** | 5000 | http://localhost:5000/dashboard.html | Flask | netstat :5000 |
-| **Store Activity Dashboard** | 8081* | http://localhost:8081/ | Flask | HTTP GET verification |
+| **AMP Store Dashboard** | 8081 | http://localhost:8081/ | Flask | HTTP GET verification |
 | **Zorro Podcast Server** | 8888 | http://localhost:8888/ | HTTP | netstat :8888 |
-
-*Note: Store Dashboard uses HTTP verification (not just netstat) and unique port 8081 to avoid conflict with Job Codes port 8080
+| **V.E.T. Dashboard** | 5001 | http://localhost:5001/vet_dashboard.html | Flask | netstat :5001 |
+| **Store Meeting Planner** | 8090 | http://localhost:8090/ | FastAPI | netstat :8090 |
 
 ---
 
@@ -29,17 +29,22 @@ Every 6 Hours (Background)  → Automatic restart if services offline
 ✅ Job Codes (Port 8080)  
 ✅ Projects in Stores (Port 8001)  
 ✅ TDA Insights (Port 5000)  
-✅ Store Activity Dashboard (Port 8081)  
+✅ AMP Store Dashboard (Port 8081)  
 ✅ Zorro (Port 8888)  
+✅ V.E.T. Dashboard (Port 5001)  
+✅ Store Meeting Planner (Port 8090)  
 ✅ DC Manager Tasks (26 tasks)  
+✅ TDA Weekly Email Task (Thursday 11 AM)
 
 ### Auto-Restart Actions
 When monitoring detects a service is offline:
 
 1. **Job Codes** → Triggers scheduled task `JobCodes-Backend-Server`
 2. **TDA Insights** → Starts `backend_simple.py` via `start_tda_insights_24_7.bat`
-3. **Store Dashboard** → Starts `amp_backend_server.py` via `start_store_dashboard_24_7.bat`
+3. **AMP Store Dashboard** → Starts `amp_backend_server.py` via `start_store_dashboard_24_7.bat`
 4. **Zorro** → Starts `podcast_server.py` via `start_zorro_24_7.bat`
+5. **V.E.T. Dashboard** → Starts `backend.py` via `start_vet_dashboard_24_7.bat`
+6. **Store Meeting Planner** → Starts `main.py` via `start_meeting_planner_24_7.bat`
 
 Each service:
 - Auto-restarts on crash (5-second interval)
@@ -54,9 +59,11 @@ Each service:
 ### From Local Machine (Same Computer)
 ```
 TDA Insights              → http://localhost:5000/dashboard.html
-Store Activity Dashboard  → http://localhost:8081/
+AMP Store Dashboard       → http://localhost:8081/
 Zorro Podcast Server      → http://localhost:8888/
   ↳ Audio Generator       → http://localhost:8888/create-audio
+V.E.T. Dashboard          → http://localhost:5001/vet_dashboard.html
+Store Meeting Planner     → http://localhost:8090/
 ```
 
 ### From Network (IP-Based Access)

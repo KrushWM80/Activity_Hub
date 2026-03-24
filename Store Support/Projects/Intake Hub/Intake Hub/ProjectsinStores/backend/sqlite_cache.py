@@ -15,6 +15,7 @@ VALIDATION STRATEGY:
 import sqlite3
 import threading
 import time
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict, Any
@@ -30,11 +31,18 @@ NOTIFY_EMAIL = "kendall.rush@walmart.com"
 FROM_EMAIL = "ProjectsInStoresDashboard@walmart.com"
 
 # Cache validation thresholds
-MIN_EXPECTED_RECORDS = 550  # Based on ~955 Active projects in updated BigQuery schema
-MIN_SYNC_DURATION = 60  # Seconds - sync taking <60s likely means error
-MAX_ALLOWED_VARIANCE = 200  # Allow ±200 variance for daily data changes
+# BQ table has ~3.27M records per successful Tableau Prep refresh
+MIN_EXPECTED_RECORDS = 100000  # Minimum to consider sync valid
+MIN_SYNC_DURATION = 5  # Seconds - very fast sync still OK if we got records
+MAX_ALLOWED_VARIANCE = 5000000  # Allow wide variance - table size changes with refreshes
 ZERO_RECORD_RETRY_COUNT = 2  # Retry this many times before sending email
 ZERO_RECORD_RETRY_TIMEOUT = 2700  # 45 minutes - sync window is 15-35 min, give buffer
+MID_REFRESH_RETRY_INTERVAL = 120  # 2 minutes - retry quickly when BQ mid-refresh
+
+# Snapshot file for fallback when cache is empty
+SNAPSHOT_DIR = Path(__file__).parent / "snapshots"
+SNAPSHOT_FILE = SNAPSHOT_DIR / "last_good_sync.json"
+SNAPSHOT_META_FILE = SNAPSHOT_DIR / "last_good_sync_meta.json"
 
 class SQLiteCache:
     """Local SQLite cache for fast data access"""
@@ -169,6 +177,179 @@ class SQLiteCache:
         conn.commit()
         conn.close()
         print(f"[SQLite] Database initialized at {self.db_path}")
+        
+        # If cache is empty, try to restore from last good snapshot
+        if self.get_record_count() == 0:
+            self._restore_from_snapshot()
+    
+    def _save_snapshot(self, row_count: int):
+        """Save current SQLite cache to a JSON snapshot file as fallback"""
+        try:
+            SNAPSHOT_DIR.mkdir(exist_ok=True)
+            conn = self._get_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM projects")
+            columns = [desc[0] for desc in cursor.description]
+            rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            
+            # Save partner data too
+            cursor.execute("SELECT intake_card, partner_name FROM project_partners")
+            partners = [{"intake_card": r[0], "partner_name": r[1]} for r in cursor.fetchall()]
+            conn.close()
+            
+            snapshot = {"projects": rows, "partners": partners}
+            
+            # Write to temp file then rename for atomicity
+            tmp_file = SNAPSHOT_FILE.with_suffix(".tmp")
+            with open(tmp_file, "w") as f:
+                json.dump(snapshot, f)
+            tmp_file.replace(SNAPSHOT_FILE)
+            
+            # Save metadata separately (small file, quick to read)
+            meta = {
+                "record_count": row_count,
+                "snapshot_time": datetime.now().isoformat(),
+                "partner_count": len(partners)
+            }
+            with open(SNAPSHOT_META_FILE, "w") as f:
+                json.dump(meta, f, indent=2)
+            
+            print(f"[SQLite] Snapshot saved: {row_count:,} projects, {len(partners):,} partners")
+        except Exception as e:
+            print(f"[SQLite] Failed to save snapshot: {e}")
+    
+    def _restore_from_snapshot(self):
+        """Restore cache from last good JSON snapshot"""
+        if not SNAPSHOT_FILE.exists():
+            print("[SQLite] No snapshot file found, cache will be empty until BQ sync completes")
+            return
+        
+        try:
+            # Read metadata first
+            meta = {}
+            if SNAPSHOT_META_FILE.exists():
+                with open(SNAPSHOT_META_FILE) as f:
+                    meta = json.load(f)
+            
+            snapshot_time = meta.get("snapshot_time", "unknown")
+            print(f"[SQLite] Restoring from snapshot (saved: {snapshot_time})...")
+            
+            with open(SNAPSHOT_FILE) as f:
+                snapshot = json.load(f)
+            
+            projects = snapshot.get("projects", [])
+            partners = snapshot.get("partners", [])
+            
+            if not projects:
+                print("[SQLite] Snapshot is empty, skipping restore")
+                return
+            
+            conn = self._get_connection()
+            cursor = conn.cursor()
+            
+            # Get column names from first row
+            columns = list(projects[0].keys())
+            # Filter to only columns that exist in our table (skip 'id')
+            columns = [c for c in columns if c != 'id']
+            placeholders = ','.join(['?' for _ in columns])
+            col_names = ','.join(columns)
+            
+            cursor.execute("DELETE FROM projects")
+            
+            insert_sql = f"INSERT INTO projects ({col_names}) VALUES ({placeholders})"
+            batch = []
+            for row in projects:
+                batch.append(tuple(row.get(c) for c in columns))
+                if len(batch) >= 1000:
+                    cursor.executemany(insert_sql, batch)
+                    batch = []
+            if batch:
+                cursor.executemany(insert_sql, batch)
+            
+            # Restore partners
+            if partners:
+                cursor.execute("DELETE FROM project_partners")
+                partner_batch = []
+                for p in partners:
+                    partner_batch.append((p["intake_card"], p["partner_name"]))
+                    if len(partner_batch) >= 5000:
+                        cursor.executemany("INSERT INTO project_partners (intake_card, partner_name) VALUES (?, ?)", partner_batch)
+                        partner_batch = []
+                if partner_batch:
+                    cursor.executemany("INSERT INTO project_partners (intake_card, partner_name) VALUES (?, ?)", partner_batch)
+            
+            # Set sync metadata to indicate this is snapshot data
+            now = datetime.now().isoformat()
+            cursor.execute("""
+                INSERT OR REPLACE INTO sync_metadata (key, value, updated_at)
+                VALUES ('last_sync', ?, ?)
+            """, (snapshot_time, now))
+            cursor.execute("""
+                INSERT OR REPLACE INTO sync_metadata (key, value, updated_at)
+                VALUES ('data_source', 'snapshot', ?)
+            """, (now,))
+            
+            conn.commit()
+            conn.close()
+            
+            self._last_sync = datetime.fromisoformat(snapshot_time) if snapshot_time != "unknown" else None
+            print(f"[SQLite] Restored {len(projects):,} projects and {len(partners):,} partners from snapshot")
+        except Exception as e:
+            print(f"[SQLite] Failed to restore from snapshot: {e}")
+    
+    def get_data_freshness(self) -> Dict:
+        """Get information about data freshness for the API"""
+        record_count = self.get_record_count()
+        last_sync = self.get_last_sync_time()
+        
+        # Check data source (live sync vs snapshot)
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT value FROM sync_metadata WHERE key = 'data_source'")
+        row = cursor.fetchone()
+        if row:
+            data_source = row['value']
+        elif last_sync:
+            # data_source key absent but last_sync exists → was a live BQ sync (snapshot restores always write both)
+            data_source = 'live'
+        else:
+            data_source = 'unknown'
+        conn.close()
+        
+        # Read snapshot time from meta file (independent of DB state, useful as ultimate fallback)
+        snapshot_time = None
+        if SNAPSHOT_META_FILE.exists():
+            try:
+                with open(SNAPSHOT_META_FILE) as f:
+                    snap_meta = json.load(f)
+                snapshot_time = snap_meta.get("snapshot_time")
+            except Exception:
+                pass
+
+        freshness = {
+            "record_count": record_count,
+            "last_sync": last_sync.isoformat() if last_sync else None,
+            "snapshot_time": snapshot_time,  # Raw snapshot file timestamp (ISO string or None)
+            "data_source": data_source,  # 'live', 'snapshot', or 'unknown'
+            "is_stale": False,
+            "message": ""
+        }
+        
+        if record_count == 0:
+            freshness["is_stale"] = True
+            freshness["message"] = "No data available. BigQuery may be mid-refresh (runs every 4 hours, takes 20-45 min)."
+        elif data_source == "snapshot":
+            freshness["is_stale"] = True
+            freshness["message"] = f"Serving cached data from {last_sync.strftime('%b %d, %I:%M %p') if last_sync else 'unknown time'}. Live refresh pending."
+        elif last_sync:
+            age_minutes = (datetime.now() - last_sync).total_seconds() / 60
+            if age_minutes > 60:
+                freshness["is_stale"] = True
+                freshness["message"] = f"Data is {int(age_minutes)} minutes old. Next sync may be pending."
+            else:
+                freshness["message"] = f"Data synced {int(age_minutes)} minutes ago."
+        
+        return freshness
     
     def get_last_sync_time(self) -> Optional[datetime]:
         """Get the last successful sync time"""
@@ -390,7 +571,7 @@ This is an automated alert. Do not reply to this email.
             # Fetch all data from BigQuery
             query = f"""
                 SELECT 
-                    COALESCE(CAST(Intake_Card AS STRING), CAST(PROJECT_ID AS STRING)) as project_id,
+                    COALESCE(CAST(Intake_Card AS STRING), CAST(PROJECT_ID AS STRING), CONCAT('FAC-', CAST(Facility AS STRING))) as project_id,
                     CAST(Intake_Card AS STRING) as intake_card,
                     CASE
                         WHEN Title IS NOT NULL AND Title != '' THEN Title
@@ -566,6 +747,10 @@ This is an automated alert. Do not reply to this email.
                 INSERT OR REPLACE INTO sync_metadata (key, value, updated_at)
                 VALUES ('last_sync', ?, ?)
             """, (now, now))
+            cursor.execute("""
+                INSERT OR REPLACE INTO sync_metadata (key, value, updated_at)
+                VALUES ('data_source', 'live', ?)
+            """, (now,))
             
             # Log successful sync with record count
             cursor.execute("""
@@ -574,6 +759,9 @@ This is an automated alert. Do not reply to this email.
             """, (f"SUCCESS: {len(rows)} records synced from BigQuery", len(rows), elapsed))
             
             conn.commit()
+            
+            # Save snapshot for fallback (after commit so data is consistent)
+            self._save_snapshot(len(rows))
             
             # Invalidate in-memory caches - partner data now comes from BigQuery JOIN
             from database import DatabaseService
@@ -682,6 +870,10 @@ This is an automated alert. Do not reply to this email.
             params.append(f"%{title_search.lower()}%")
             params.append(f"%{title_search.lower()}%")
         
+        # Always exclude NULL project_ids — they cause Pydantic validation crashes
+        conditions.append("project_id IS NOT NULL")
+        conditions.append("project_id != ''")
+        
         where_clause = " AND ".join(conditions)
         
         # Build query with DISTINCT to deduplicate rows
@@ -742,13 +934,16 @@ This is an automated alert. Do not reply to this email.
         cursor = conn.cursor()
         
         # Total counts
+        # NOTE: Realty records use title as unique identifier (project_id is NULL for Realty)
+        # Operations/Intake Hub records use project_id as unique identifier
         cursor.execute("""
             SELECT 
-                COUNT(DISTINCT project_id) as total_projects,
+                (COUNT(DISTINCT CASE WHEN project_source IN ('Operations', 'Intake Hub') AND project_id IS NOT NULL THEN project_id END) +
+                 COUNT(DISTINCT CASE WHEN project_source = 'Realty' AND title IS NOT NULL THEN title END)) as total_projects,
                 COUNT(DISTINCT store) as total_stores,
-                COUNT(DISTINCT CASE WHEN project_source IN ('Operations', 'Intake Hub') THEN project_id END) as intake_projects,
+                COUNT(DISTINCT CASE WHEN project_source IN ('Operations', 'Intake Hub') AND project_id IS NOT NULL THEN project_id END) as intake_projects,
                 COUNT(DISTINCT CASE WHEN project_source IN ('Operations', 'Intake Hub') THEN store END) as intake_stores,
-                COUNT(DISTINCT CASE WHEN project_source = 'Realty' THEN project_id END) as realty_projects,
+                COUNT(DISTINCT CASE WHEN project_source = 'Realty' AND title IS NOT NULL THEN title END) as realty_projects,
                 COUNT(DISTINCT CASE WHEN project_source = 'Realty' THEN store END) as realty_stores,
                 MAX(last_updated) as last_updated
             FROM projects
@@ -863,12 +1058,23 @@ This is an automated alert. Do not reply to this email.
         def sync_loop():
             while not self._stop_sync.is_set():
                 try:
-                    self.sync_from_bigquery(bigquery_client, project_id, dataset, table)
+                    success = self.sync_from_bigquery(bigquery_client, project_id, dataset, table)
                 except Exception as e:
                     print(f"[SQLite] Background sync error: {e}")
+                    success = False
                 
-                # Wait for next sync interval (check every second for stop signal)
-                for _ in range(self.sync_interval):
+                # If sync got 0 rows (BQ mid-refresh), retry faster (every 2 min)
+                # Otherwise use normal 15-minute interval
+                if not success and self.get_record_count() == 0 and len(self._zero_record_failures) > 0:
+                    wait_seconds = MID_REFRESH_RETRY_INTERVAL
+                    print(f"[SQLite] BQ appears mid-refresh, retrying in {wait_seconds}s...")
+                elif not success and self._zero_record_failures:
+                    wait_seconds = MID_REFRESH_RETRY_INTERVAL
+                    print(f"[SQLite] Zero records from BQ, retrying in {wait_seconds}s...")
+                else:
+                    wait_seconds = self.sync_interval
+                
+                for _ in range(wait_seconds):
                     if self._stop_sync.is_set():
                         break
                     time.sleep(1)

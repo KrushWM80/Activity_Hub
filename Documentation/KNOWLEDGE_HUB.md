@@ -737,6 +737,148 @@ When working with Job Codes:
 
 ---
 
-**Version**: 1.2  
+---
+
+## 🗂️ Projects in Stores — Service Reference
+
+**Service**: Projects in Stores  
+**Port**: 8001  
+**Host**: `weus42608431466.homeoffice.wal-mart.com:8001`  
+**Backend Dir**: `Store Support/Projects/Intake Hub/Intake Hub/ProjectsinStores/backend/`  
+**Frontend Dir**: `Store Support/Projects/Intake Hub/Intake Hub/ProjectsinStores/frontend/`  
+**Python Env**: `.venv/Scripts/python.exe` (workspace root)  
+**Last Reviewed**: March 24, 2026
+
+---
+
+### Architecture Overview
+
+```
+BigQuery (wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data)
+    │  Tableau Prep refreshes the BQ table every ~4 hours (takes 20-45 min, table has 0 rows during refresh)
+    ▼
+sqlite_cache.py — SQLiteCache class
+    │  Background thread: full re-sync every 15 min (retry every 2 min when BQ returns 0 rows)
+    │  On successful sync → saves JSON snapshot AND writes data_source='live' to sync_metadata
+    ▼
+projects_cache.db (SQLite, ~1.4M rows)
+    │  1,279,863 Realty rows  +  153,828 Operations/Intake Hub rows
+    ▼
+snapshots/last_good_sync.json  ←  atomic snapshot of last good DB state (750 MB)
+snapshots/last_good_sync_meta.json  ←  metadata: record_count, snapshot_time, partner_count
+    │
+    └─ On service restart: if DB is empty → restore from snapshot automatically
+       This ensures zero downtime even during BQ mid-refresh gaps
+    ▼
+main.py — FastAPI (Uvicorn, port 8001)
+    │  /api/summary  /api/projects  /api/filters  /api/data-status  /api/reconnect
+    ▼
+frontend/index.html — Dashboard UI (served by FastAPI /static)
+```
+
+---
+
+### "Never a Down Moment" Strategy
+
+The service is designed to always show data, regardless of BQ state:
+
+| Scenario | What Happens |
+|----------|-------------|
+| BQ mid-refresh (0 rows returned) | Retry every 2 min; serve from existing SQLite cache |
+| Service restart + BQ down | If SQLite is empty → auto-restore from JSON snapshot |
+| BQ returns bad data | Smart validation (MIN_EXPECTED_RECORDS=100,000) rejects it; snapshot preserved |
+| Snapshot exists, DB empty | Full restore on startup before accepting any requests |
+| No snapshot, no BQ, no cache | `/api/summary` returns 500; frontend shows loading state |
+
+The last scenario (empty-slate first boot with no BQ) is the only true "down" state, and it self-heals the moment BQ becomes available.
+
+---
+
+### Data Source — Critical Quirks
+
+#### Realty Records: project_id is NULL
+All Realty records in BQ have `Intake_Card = NULL` and `PROJECT_ID = NULL`. The COALESCE in the sync query produces a `FAC-{facility}` fallback for future syncs, but existing cached records may still have `project_id = NULL`.
+
+**Workarounds applied:**
+- `get_summary()` counts Realty by `title` (not `project_id`): `COUNT(DISTINCT CASE WHEN project_source = 'Realty' AND title IS NOT NULL THEN title END)`
+- `get_projects()` WHERE clause: `project_id IS NOT NULL AND project_id != ''` — **Realty records are excluded from the project list by design** until a COALESCE fallback id is written
+- `main.py` project builder: per-row skip for NULL project_ids (prevents Pydantic ValidationError from killing the entire 50K list)
+
+#### Two Sources, One Table
+| Source | project_id | Count Method | Records |
+|--------|-----------|--------------|---------|
+| Operations / Intake Hub | Intake_Card from BQ | `COUNT(DISTINCT project_id)` | ~153,828 |
+| Realty | NULL (all) | `COUNT(DISTINCT title)` | ~1,279,863 |
+
+---
+
+### Last Updated Timestamp — Priority Chain
+
+The `last_updated` field in `/api/summary` response uses the best available timestamp:
+
+1. **`last_sync`** from `sync_metadata` — when our system last pulled from BQ (most accurate; covers both live and snapshot-restored states)
+2. **`MAX(last_updated)`** from data rows — latest record modification timestamp in BQ data
+3. **`snapshot_time`** from `last_good_sync_meta.json` — when the snapshot file was saved (ultimate fallback, independent of DB state)
+4. **`null`** → frontend displays `"Last Updated: Please send Feedback"`
+
+Frontend (`index.html` `updateLastUpdatedTimestamp()`):
+- Displays `"Last Updated (Live): ..."` or `"Last Updated (Cached): ..."` based on `data_source`
+- Never falls back to current clock time (that was misleading and was removed March 24, 2026)
+
+---
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `backend/sqlite_cache.py` | All SQLite logic: sync, snapshot, summary, freshness |
+| `backend/main.py` | FastAPI routes, Pydantic models, startup logic |
+| `backend/database.py` | BigQuery client wrapper (mock methods deprecated) |
+| `backend/projects_cache.db` | Live SQLite cache (~1.4M rows) |
+| `backend/snapshots/last_good_sync.json` | JSON snapshot (~750 MB) |
+| `backend/snapshots/last_good_sync_meta.json` | Snapshot metadata (record_count, snapshot_time) |
+| `frontend/index.html` | Dashboard UI (all-in-one HTML) |
+
+---
+
+### Runtime Management
+
+**Check if running:**
+```powershell
+netstat -ano | findstr ":8001 " | findstr LISTENING
+```
+
+**Restart (auto-restart is built into the bat file; killing the PID triggers it):**
+```powershell
+Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -Command 'taskkill /PID <PID> /F'"
+# Wait ~20-25 seconds for auto-restart
+```
+
+**Verify after restart:**
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8001/api/summary" | Select-Object total_active_projects, realty_projects, last_updated, data_source
+```
+
+**Check data freshness:**
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8001/api/data-status"
+```
+
+---
+
+### Session History — Issues Resolved (March 24, 2026)
+
+| Bug | Root Cause | Fix |
+|-----|-----------|-----|
+| Project list empty (`[]` for 50K request) | Realty records have `project_id = NULL`; one bad row in list comprehension triggered Pydantic `ValidationError`, caught silently → fell to BQ (empty mid-refresh) → `[]` | Per-row skip loop in main.py + `IS NOT NULL` in cache query |
+| Realty count = 0 on dashboard | `COUNT(DISTINCT project_id)` for Realty = 0 because all 1.28M Realty records have `project_id = NULL` | Changed `get_summary()` to count Realty by `title` |
+| Total projects showed 277, not 517 | Same root cause: total_projects only counted Operations project_ids | Fixed total to combine Operations project_ids + Realty titles |
+| "Last Updated" showed current clock time | Frontend fell back to `new Date()` when no timestamp found | Changed fallback to `"Please send Feedback"`; backend exposes best-available timestamp with priority chain |
+| `data_source = 'unknown'` in API response | `data_source` key not written to `sync_metadata` in certain restart scenarios | Infer `live` when `last_sync` exists but `data_source` key absent (snapshot restores always write both keys) |
+| Mock "Store Renovation" data showing | `get_projects()` fell back to hardcoded mock data when BQ unavailable | Removed mock fallbacks; snapshot system restores real data |
+
+---
+
+**Version**: 1.3  
 **Status**: Active  
-**Last Reviewed**: March 4, 2026
+**Last Reviewed**: March 24, 2026

@@ -1,6 +1,9 @@
-# Activity Hub Status Monitor - Enhanced with Downtime Detection
+﻿# Activity Hub Status Monitor - Enhanced with Downtime Detection
 # Runs daily at 6 AM and on system startup
 # Detects outages and reports them in emails
+# Services monitored: 8001 (Projects in Stores), 8080 (Job Codes), 5000 (TDA Insights),
+#                     8081 (AMP Store Dashboard), 8888 (Zorro), 5001 (VET Dashboard),
+#                     8090 (Store Meeting Planner), DC PayCycle (26 tasks)
 
 $EmailAddresses = @("ATCTeamsupport@walmart.com", "kendall.rush@walmart.com")
 $LogFile = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\system_status.log"
@@ -20,12 +23,17 @@ function Get-SystemStatus {
         JobCodesRunning = $false
         Port8080Listening = $false
         DCTasksCount = 0
+        TDAWeeklyEmailTask = $false
         JobCodesBackendTask = $false
         TDARunning = $false
         Port5000Listening = $false
         StoreActivityDashboardRunning = $false
         ZorroRunning = $false
         Port8888Listening = $false
+        VETDashboardRunning = $false
+        Port5001Listening = $false
+        MeetingPlannerRunning = $false
+        Port8090Listening = $false
     }
     
     # Check Projects in Stores (port 8001)
@@ -67,9 +75,27 @@ function Get-SystemStatus {
         $status.Port8888Listening = $true
     }
     
+    # Check VET Dashboard (port 5001) - backend.py
+    $netstat5001 = netstat -ano 2>$null | Select-String ":5001.*LISTENING"
+    if ($netstat5001) {
+        $status.VETDashboardRunning = $true
+        $status.Port5001Listening = $true
+    }
+    
+    # Check Store Meeting Planner (port 8090) - main.py
+    $netstat8090 = netstat -ano 2>$null | Select-String ":8090.*LISTENING"
+    if ($netstat8090) {
+        $status.MeetingPlannerRunning = $true
+        $status.Port8090Listening = $true
+    }
+    
     # Check Job Codes Backend Task
     $jobCodesTask = Get-ScheduledTask -TaskName "JobCodes-Backend-Server" -ErrorAction SilentlyContinue
     $status.JobCodesBackendTask = $null -ne $jobCodesTask
+    
+    # Check TDA Weekly Email Task
+    $tdaWeeklyTask = Get-ScheduledTask -TaskName "Activity_Hub_TDA_Weekly_Email" -ErrorAction SilentlyContinue
+    $status.TDAWeeklyEmailTask = $null -ne $tdaWeeklyTask
     
     # Check DC Manager Tasks
     $dcTasks = Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object {$_.TaskName -like "DC-EMAIL-PC-*"}
@@ -111,7 +137,7 @@ function Get-DowntimeInfo {
 function Build-StatusEmail {
     param($CurrentStatus, $DowntimeInfo, $IsRestartEmail = $false)
     
-    $statusOK = $CurrentStatus.ProjectsInStoresRunning -and $CurrentStatus.DCTasksCount -eq 26 -and $CurrentStatus.JobCodesRunning
+    $statusOK = $CurrentStatus.ProjectsInStoresRunning -and $CurrentStatus.DCTasksCount -eq 26 -and $CurrentStatus.JobCodesRunning -and $CurrentStatus.VETDashboardRunning -and $CurrentStatus.MeetingPlannerRunning
     $statusIndicator = if ($statusOK) { "ALL SYSTEMS OPERATIONAL" } else { "ATTENTION REQUIRED" }
     $currentTime = Get-Date -Format 'MMMM d, yyyy - h:mm tt'
     
@@ -197,9 +223,24 @@ function Build-StatusEmail {
                 <td>Port 8888 - $(if ($CurrentStatus.Port8888Listening) { 'Listening' } else { 'Not responding' })</td>
             </tr>
             <tr>
+                <td>V.E.T. Dashboard</td>
+                <td class="$(if ($CurrentStatus.VETDashboardRunning) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.VETDashboardRunning) { 'RUNNING' } else { 'OFFLINE' })</td>
+                <td>Port 5001 - $(if ($CurrentStatus.Port5001Listening) { 'Listening' } else { 'Not responding' })</td>
+            </tr>
+            <tr>
+                <td>Store Meeting Planner</td>
+                <td class="$(if ($CurrentStatus.MeetingPlannerRunning) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.MeetingPlannerRunning) { 'RUNNING' } else { 'OFFLINE' })</td>
+                <td>Port 8090 - $(if ($CurrentStatus.Port8090Listening) { 'Listening' } else { 'Not responding' })</td>
+            </tr>
+            <tr>
                 <td>DC Manager PayCycle Tasks</td>
                 <td class="$(if ($CurrentStatus.DCTasksCount -eq 26) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.DCTasksCount -eq 26) { 'ACTIVE' } else { 'INCOMPLETE' })</td>
                 <td>$($CurrentStatus.DCTasksCount)/26 tasks scheduled</td>
+            </tr>
+            <tr>
+                <td>TDA Weekly Email Task</td>
+                <td class="$(if ($CurrentStatus.TDAWeeklyEmailTask) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.TDAWeeklyEmailTask) { 'REGISTERED' } else { 'NOT REGISTERED' })</td>
+                <td>Scheduled: Thursdays 11:00 AM</td>
             </tr>
         </table>
     </div>
@@ -208,7 +249,7 @@ function Build-StatusEmail {
         <h3>Key Metrics</h3>
         <ul>
             <li><strong>Overall Status:</strong> $(if ($statusOK) { 'All systems operational' } else { 'Issues detected' })</li>
-            <li><strong>Services Running:</strong> $(($CurrentStatus.ProjectsInStoresRunning -as [int]) + ($CurrentStatus.JobCodesRunning -as [int]) + ($CurrentStatus.TDARunning -as [int]) + ($CurrentStatus.StoreActivityDashboardRunning -as [int]) + ($CurrentStatus.ZorroRunning -as [int]))/5 running</li>
+            <li><strong>Services Running:</strong> $(($CurrentStatus.ProjectsInStoresRunning -as [int]) + ($CurrentStatus.JobCodesRunning -as [int]) + ($CurrentStatus.TDARunning -as [int]) + ($CurrentStatus.StoreActivityDashboardRunning -as [int]) + ($CurrentStatus.ZorroRunning -as [int]) + ($CurrentStatus.VETDashboardRunning -as [int]) + ($CurrentStatus.MeetingPlannerRunning -as [int]))/7 running</li>
             <li><strong>Scheduled Tasks:</strong> 29 active</li>
             <li><strong>Report Generated:</strong> $currentTime</li>
         </ul>
@@ -220,9 +261,11 @@ function Build-StatusEmail {
             <li><strong>Projects in Stores:</strong> http://10.97.114.181:8001/</li>
             <li><strong>Job Codes Dashboard:</strong> http://10.97.114.181:8080/static/index.html#</li>
             <li><strong>TDA Insights:</strong> http://localhost:5000/dashboard.html</li>
-            <li><strong>Store Activity Dashboard:</strong> http://localhost:8081/</li>
+            <li><strong>AMP Store Dashboard:</strong> http://localhost:8081/</li>
             <li><strong>Zorro Podcast Server:</strong> http://localhost:8888/</li>
-            <li><strong>Note:</strong> Use IP address for Job Codes & Projects. Use localhost for TDA, Store Dashboard, and Zorro.</li>
+            <li><strong>V.E.T. Dashboard:</strong> http://localhost:5001/vet_dashboard.html</li>
+            <li><strong>Store Meeting Planner:</strong> http://localhost:8090/</li>
+            <li><strong>Note:</strong> Use IP address for Job Codes &amp; Projects. Use localhost for all others.</li>
         </ul>
     </div>
 
@@ -418,6 +461,88 @@ function Check-And-RestartAMPDashboard {
     }
 }
 
+# ==========================================
+# VET DASHBOARD HEALTH CHECK & AUTO-RESTART
+# ==========================================
+function Check-And-RestartVETDashboard {
+    param($SystemStatus)
+    
+    if (-not $SystemStatus.VETDashboardRunning) {
+        Write-Host "⚠ V.E.T. Dashboard is offline - attempting automatic restart..." -ForegroundColor Yellow
+        
+        try {
+            $vetPath = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\VET_Dashboard"
+            $pythonExe = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\.venv\Scripts\python.exe"
+            $batFile = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_vet_dashboard_24_7.bat"
+            
+            if (Test-Path $batFile) {
+                $process = Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$batFile`"" -WindowStyle Hidden -PassThru -ErrorAction SilentlyContinue
+                Start-Sleep -Seconds 4
+            } elseif (Test-Path $vetPath) {
+                $env:GOOGLE_APPLICATION_CREDENTIALS = "C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json"
+                $process = Start-Process -FilePath $pythonExe -ArgumentList "backend.py" -WorkingDirectory $vetPath -WindowStyle Hidden -PassThru -ErrorAction SilentlyContinue
+                Start-Sleep -Seconds 4
+            }
+            
+            $check = netstat -ano 2>$null | Select-String ":5001.*LISTENING"
+            if ($check) {
+                Write-Host "✓ V.E.T. Dashboard successfully restarted on port 5001" -ForegroundColor Green
+                return $true
+            } else {
+                Write-Host "✗ V.E.T. Dashboard restart attempted but not yet listening" -ForegroundColor Yellow
+                return $false
+            }
+        } catch {
+            Write-Host "✗ Error restarting V.E.T. Dashboard: $_" -ForegroundColor Red
+            return $false
+        }
+    } else {
+        Write-Host "✓ V.E.T. Dashboard is running normally on port 5001" -ForegroundColor Green
+        return $true
+    }
+}
+
+# ==========================================
+# STORE MEETING PLANNER HEALTH CHECK & AUTO-RESTART
+# ==========================================
+function Check-And-RestartMeetingPlanner {
+    param($SystemStatus)
+    
+    if (-not $SystemStatus.MeetingPlannerRunning) {
+        Write-Host "⚠ Store Meeting Planner is offline - attempting automatic restart..." -ForegroundColor Yellow
+        
+        try {
+            $plannerPath = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\AMP\Store Meeting Planners\backend"
+            $pythonExe = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\.venv\Scripts\python.exe"
+            $batFile = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_meeting_planner_24_7.bat"
+            
+            if (Test-Path $batFile) {
+                $process = Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$batFile`"" -WindowStyle Hidden -PassThru -ErrorAction SilentlyContinue
+                Start-Sleep -Seconds 4
+            } elseif (Test-Path $plannerPath) {
+                $env:GOOGLE_APPLICATION_CREDENTIALS = "C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json"
+                $process = Start-Process -FilePath $pythonExe -ArgumentList "main.py" -WorkingDirectory $plannerPath -WindowStyle Hidden -PassThru -ErrorAction SilentlyContinue
+                Start-Sleep -Seconds 4
+            }
+            
+            $check = netstat -ano 2>$null | Select-String ":8090.*LISTENING"
+            if ($check) {
+                Write-Host "✓ Store Meeting Planner successfully restarted on port 8090" -ForegroundColor Green
+                return $true
+            } else {
+                Write-Host "✗ Store Meeting Planner restart attempted but not yet listening" -ForegroundColor Yellow
+                return $false
+            }
+        } catch {
+            Write-Host "✗ Error restarting Store Meeting Planner: $_" -ForegroundColor Red
+            return $false
+        }
+    } else {
+        Write-Host "✓ Store Meeting Planner is running normally on port 8090" -ForegroundColor Green
+        return $true
+    }
+}
+
 # Send email via Outlook
 function Send-StatusEmail {
     param($Subject, $HTMLBody)
@@ -471,6 +596,14 @@ Check-And-RestartZorro -SystemStatus $currentStatus
 Write-Host "`nChecking AMP Store Updates Dashboard health..." -ForegroundColor Cyan
 Check-And-RestartAMPDashboard -SystemStatus $currentStatus
 
+# Check VET Dashboard health and auto-restart if needed
+Write-Host "`nChecking V.E.T. Dashboard health..." -ForegroundColor Cyan
+Check-And-RestartVETDashboard -SystemStatus $currentStatus
+
+# Check Store Meeting Planner health and auto-restart if needed
+Write-Host "`nChecking Store Meeting Planner health..." -ForegroundColor Cyan
+Check-And-RestartMeetingPlanner -SystemStatus $currentStatus
+
 # Refresh status after all potential restarts
 $currentStatus = Get-SystemStatus
 Write-Host "`n✓ All health checks complete" -ForegroundColor Green
@@ -480,11 +613,15 @@ $downtimeInfo = Get-DowntimeInfo
 $isRestartEmail = $false
 
 # Detect if this is a startup email (check if system was recently restarted)
-$bootTime = [datetime]::FromFileTime((Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\Session` Manager).SystemBootTime.ToInt64())
-$timeSinceBoot = (Get-Date) - $bootTime
-if ($timeSinceBoot.TotalMinutes -lt 5) {
-    $isRestartEmail = $true
-    Write-Host "✓ Startup detected - sending restart notification" -ForegroundColor Green
+try {
+    $bootTime = [datetime]::FromFileTime((Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager").SystemBootTime.ToInt64())
+    $timeSinceBoot = (Get-Date) - $bootTime
+    if ($timeSinceBoot.TotalMinutes -lt 5) {
+        $isRestartEmail = $true
+        Write-Host "✓ Startup detected - sending restart notification" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "⚠ Could not determine boot time, assuming normal run" -ForegroundColor Yellow
 }
 
 # Build email

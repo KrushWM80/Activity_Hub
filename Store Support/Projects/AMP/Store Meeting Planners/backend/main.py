@@ -315,6 +315,20 @@ async def meeting_tracker_report(
 
 
 # =============================================
+# API: Compliance Scan
+# =============================================
+
+@app.get("/api/reports/compliance-scan")
+async def compliance_scan():
+    """Admin: scan AMP events for meetings missing from Meeting Planner."""
+    username = get_windows_username()
+    if not is_admin(username):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    results = db.scan_compliance_gaps()
+    return results
+
+
+# =============================================
 # STATIC FILES & FRONTEND
 # =============================================
 

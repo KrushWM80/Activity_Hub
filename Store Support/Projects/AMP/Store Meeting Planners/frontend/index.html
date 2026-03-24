@@ -688,6 +688,7 @@
     <div style="display:flex;gap:8px;margin-bottom:1.5rem;">
         <button class="btn btn-sm" id="adminSubQueue" onclick="showAdminSub('queue')" style="background:var(--walmart-blue);color:#fff;">Request Queue</button>
         <button class="btn btn-sm btn-outline" id="adminSubReport" onclick="showAdminSub('report')">Meeting Tracker Report</button>
+        <button class="btn btn-sm btn-outline" id="adminSubCompliance" onclick="showAdminSub('compliance')">🔍 Compliance Scan</button>
     </div>
 
     <!-- Sub: Request Queue -->
@@ -742,6 +743,22 @@
                 <button class="btn btn-primary btn-sm" onclick="loadReport()">Generate</button>
             </div>
             <div id="reportContent"></div>
+        </div>
+    </div>
+
+    <!-- Sub: Compliance Scan -->
+    <div id="adminSubContent-compliance" style="display:none">
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h3 class="card-title" style="margin:0">AMP Compliance Scan</h3>
+                <button class="btn btn-primary btn-sm" onclick="runComplianceScan()" id="complianceScanBtn">🔍 Run Scan</button>
+            </div>
+            <p style="color:#666;font-size:0.85rem;margin-bottom:1rem;">
+                Scans AMP Store Updates &amp; Calendar Events from the last 6 months for meeting content
+                (Meeting IDs, Passcodes, Zoom/Teams links) that wasn't submitted through Meeting Planner.
+            </p>
+            <div id="complianceLoading" style="display:none"><div class="spinner"></div><p style="text-align:center;color:#666">Scanning Cosmos message bodies...</p></div>
+            <div id="complianceResults"></div>
         </div>
     </div>
 </div>
@@ -1209,11 +1226,62 @@ async function loadAdminRequests() {
 function showAdminSub(sub) {
     document.querySelectorAll('[id^="adminSubContent-"]').forEach(el => el.style.display = 'none');
     document.getElementById('adminSubContent-' + sub).style.display = '';
-    document.getElementById('adminSubQueue').className = sub === 'queue' ? 'btn btn-sm' : 'btn btn-sm btn-outline';
-    document.getElementById('adminSubQueue').style.cssText = sub === 'queue' ? 'background:var(--walmart-blue);color:#fff' : '';
-    document.getElementById('adminSubReport').className = sub === 'report' ? 'btn btn-sm' : 'btn btn-sm btn-outline';
-    document.getElementById('adminSubReport').style.cssText = sub === 'report' ? 'background:var(--walmart-blue);color:#fff' : '';
+    ['Queue','Report','Compliance'].forEach(name => {
+        const key = name.toLowerCase();
+        const btn = document.getElementById('adminSub' + name);
+        if (btn) {
+            btn.className = sub === key ? 'btn btn-sm' : 'btn btn-sm btn-outline';
+            btn.style.cssText = sub === key ? 'background:var(--walmart-blue);color:#fff' : '';
+        }
+    });
     if (sub === 'report') loadReport();
+}
+
+// =============================================
+// ADMIN: COMPLIANCE SCAN
+// =============================================
+async function runComplianceScan() {
+    const btn = document.getElementById('complianceScanBtn');
+    const loading = document.getElementById('complianceLoading');
+    const results = document.getElementById('complianceResults');
+    btn.disabled = true;
+    btn.textContent = 'Scanning...';
+    loading.style.display = '';
+    results.innerHTML = '';
+    try {
+        const res = await fetch(`${API}/api/reports/compliance-scan`);
+        const data = await res.json();
+        const flagged = data.flagged || [];
+        let html = `<div style="margin-bottom:1rem;padding:10px;background:#f0f4ff;border-radius:8px;font-size:0.85rem;">
+            Scanned <strong>${data.total_scanned}</strong> AMP events &bull;
+            <strong>${data.total_with_bodies}</strong> bodies checked &bull;
+            <strong>${flagged.length}</strong> flagged as missing meeting request
+        </div>`;
+        if (flagged.length === 0) {
+            html += '<div style="text-align:center;padding:2rem;color:#28a745;font-weight:600;">✅ No compliance gaps found — all meetings have requests.</div>';
+        } else {
+            html += '<table class="data-table"><thead><tr><th>Confidence</th><th>Title</th><th>Type</th><th>Dates</th><th>Author</th><th>Stores</th><th>Preview</th></tr></thead><tbody>';
+            flagged.forEach(f => {
+                const confClass = f.confidence === 'HIGH' ? 'color:#dc3545;font-weight:700' : 'color:#ffc107;font-weight:600';
+                html += `<tr>
+                    <td style="${confClass}">${esc(f.confidence)}</td>
+                    <td>${esc(f.title)}</td>
+                    <td>${esc(f.message_type)}</td>
+                    <td>${f.start_date} — ${f.end_date}</td>
+                    <td>${esc(f.author)}</td>
+                    <td>${f.stores || '—'}</td>
+                    <td style="font-size:0.75rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(f.body_preview)}">${esc(f.body_preview.substring(0,80))}...</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+        }
+        results.innerHTML = html;
+    } catch (e) {
+        results.innerHTML = `<div style="color:#dc3545;padding:1rem;">Error running scan: ${e.message}</div>`;
+    }
+    btn.disabled = false;
+    btn.textContent = '🔍 Run Scan';
+    loading.style.display = 'none';
 }
 
 // =============================================

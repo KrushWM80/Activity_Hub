@@ -242,6 +242,17 @@ async def startup_event():
     # The cache will be empty initially but will sync asynchronously
     print("[Startup] Starting background cache sync...")
     
+    # If BigQuery client failed to init, retry a few times before giving up
+    if not db_service.client:
+        import time as _time
+        for attempt in range(3):
+            print(f"[Startup] BigQuery not connected, retry {attempt+1}/3...")
+            _time.sleep(5)
+            db_service._initialize_client()
+            if db_service.client:
+                print("[Startup] BigQuery connected on retry!")
+                break
+    
     # Start background sync (every 15 minutes) 
     # This includes initial sync on first run
     if db_service.client:
@@ -252,6 +263,8 @@ async def startup_event():
         )
         sync_thread.start()
         print("[Startup] Background sync thread started, server ready for requests")
+    else:
+        print("[Startup] WARNING: BigQuery not available, serving mock/cached data")
 
 
 def _background_cache_init():
@@ -329,7 +342,9 @@ class ProjectSummaryResponse(BaseModel):
     realty_stores: int
     by_division: dict
     by_phase: dict
-    last_updated: str
+    last_updated: Optional[str] = None  # ISO timestamp; None when no data source available
+    data_source: Optional[str] = None  # 'live', 'snapshot', or 'unknown'
+    data_freshness_message: Optional[str] = None  # Human-readable freshness info
 
 class FilterOptionsResponse(BaseModel):
     tribes: List[str] = []
@@ -428,6 +443,13 @@ async def cache_status():
         "cache_file": sqlite_cache.db_path
     }
 
+@app.get("/api/data-status")
+async def get_data_status():
+    """Get data freshness info - when was data last updated, is it from a snapshot, etc."""
+    freshness = sqlite_cache.get_data_freshness()
+    freshness["bigquery_connected"] = db_service.client is not None
+    return freshness
+
 @app.post("/api/cache/sync")
 async def force_cache_sync():
     """Force an immediate sync from BigQuery to SQLite cache"""
@@ -448,7 +470,33 @@ async def force_cache_sync():
             "last_sync": sqlite_cache.get_last_sync_time().isoformat()
         }
     else:
-        raise HTTPException(status_code=500, detail="Sync failed")
+        # Return more info about why it failed
+        freshness = sqlite_cache.get_data_freshness()
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Sync failed: {freshness.get('message', 'Unknown reason')}. Cache has {freshness['record_count']} records."
+        )
+
+@app.post("/api/reconnect")
+async def reconnect_database():
+    """Reconnect to BigQuery and resync cache - use when database shows disconnected"""
+    import threading
+    was_connected = db_service.client is not None
+    db_service._initialize_client()
+    is_connected = db_service.client is not None
+    
+    if is_connected:
+        # Trigger background cache sync
+        sync_thread = threading.Thread(target=_background_cache_init, daemon=True)
+        sync_thread.start()
+        return {
+            "status": "reconnected",
+            "was_connected": was_connected,
+            "now_connected": True,
+            "message": "BigQuery reconnected, cache sync started in background"
+        }
+    else:
+        raise HTTPException(status_code=503, detail="Failed to reconnect to BigQuery")
 
 @app.get("/api/cache/usage")
 async def cache_usage_status():
@@ -602,9 +650,15 @@ async def get_projects(
                         if p.get('intake_card') in partner_set
                     ]
                 
-                return [
-                    ProjectResponse(
-                        project_id=p['project_id'],
+                results = []
+                skipped = 0
+                for p in cached_projects:
+                    pid = p['project_id'] or ''
+                    if not pid:
+                        skipped += 1
+                        continue
+                    results.append(ProjectResponse(
+                        project_id=pid,
                         project_source=p['project_source'] or 'Unknown',
                         title=p['title'] or '',
                         division=p['division'] or '',
@@ -612,13 +666,13 @@ async def get_projects(
                         market=p['market'] or '',
                         store=p['store'] or '',
                         phase=p['phase'] or '',
-                        tribe='',  # Not in cache
+                        tribe='',
                         wm_week=p['wm_week'] or '',
                         fy=p['fy'] or '',
                         status=p['status'] or 'Active',
                         store_count=p['store_count'] or 1,
                         owner=p.get('owner'),
-                        partner=partner if partner else (p.get('partner') or ''),  # Use filter or cached
+                        partner=partner if partner else (p.get('partner') or ''),
                         store_area=p.get('store_area'),
                         business_area=p.get('business_area'),
                         health=p.get('health'),
@@ -632,11 +686,15 @@ async def get_projects(
                         city=None,
                         state=None,
                         zip_code=None
-                    )
-                    for p in cached_projects
-                ]
+                    ))
+                if skipped:
+                    print(f"[API] Skipped {skipped} records with NULL project_id")
+                return results
             except Exception as cache_error:
-                print(f"[API] SQLite cache error: {cache_error}, falling back to BigQuery")
+                import traceback
+                print(f"[API] SQLite cache error: {cache_error}")
+                traceback.print_exc()
+                print("[API] Falling back to BigQuery...")
         
         # Fall back to BigQuery (slower)
         print("[API] Using BigQuery for /api/projects (cache miss or include_location=true)")
@@ -711,10 +769,19 @@ async def get_summary(
 ):
     """Get dashboard summary statistics. Uses SQLite cache for fast response."""
     try:
+        freshness = sqlite_cache.get_data_freshness()
+        
         # Use cache if it has data (protection by smart validation prevents bad data contamination)
         if sqlite_cache.get_record_count() > 0 and not tribe and not division and not region:
             print("[API] Using SQLite cache for /api/summary")
             cached_summary = sqlite_cache.get_summary()
+            # Best available timestamp — priority: (1) last BQ/sync pull time,
+            # (2) MAX timestamp from data rows, (3) last snapshot save time, (4) None
+            best_ts = (
+                freshness.get('last_sync')           # When we last pulled from BQ (live or snapshot)
+                or cached_summary.get('last_updated')  # MAX(last_updated) from data rows
+                or freshness.get('snapshot_time')    # When snapshot file was saved
+            )  # None → frontend will show "Please send Feedback"
             return ProjectSummaryResponse(
                 total_active_projects=cached_summary['total_active_projects'],
                 total_stores=cached_summary['total_stores'],
@@ -724,7 +791,9 @@ async def get_summary(
                 realty_stores=cached_summary['realty_stores'],
                 by_division={},  # Not cached
                 by_phase={},  # Not cached
-                last_updated=cached_summary['last_updated'] or datetime.now().isoformat()
+                last_updated=best_ts,
+                data_source=freshness.get("data_source"),
+                data_freshness_message=freshness.get("message")
             )
         
         # Fall back to BigQuery
@@ -749,7 +818,9 @@ async def get_summary(
             realty_stores=summary.realty_stores,
             by_division=summary.by_division,
             by_phase=summary.by_phase,
-            last_updated=summary.last_updated.isoformat()
+            last_updated=summary.last_updated.isoformat(),
+            data_source="live",
+            data_freshness_message="Data from BigQuery (live)"
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

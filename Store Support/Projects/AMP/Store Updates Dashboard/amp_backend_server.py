@@ -322,31 +322,26 @@ def build_amp_query(filters, days, limit):
 @app.route('/', methods=['GET'])
 def root():
     """Serve dashboard HTML interface"""
-    print("DEBUG: root() called")  # DEBUG
     try:
         # Try multiple paths to find index.html
         possible_paths = [
-            Path(__file__).parent / 'index.html',  # Current directory
-            Path.cwd() / 'index.html',              # Working directory
-            Path('C:/Users/krush/OneDrive - Walmart Inc/Documents/VSCode/Activity_Hub/Store Support/Projects/AMP/Store Updates Dashboard/index.html')  # Absolute path
+            Path(__file__).parent / 'index.html',
+            Path.cwd() / 'index.html',
+            Path('C:/Users/krush/OneDrive - Walmart Inc/Documents/VSCode/Activity_Hub/Store Support/Projects/AMP/Store Updates Dashboard/index.html')
         ]
-        print(f"DEBUG: Checking paths: {[str(p) for p in possible_paths]}")  # DEBUG
         
         index_html = None
         for path in possible_paths:
-            print(f"DEBUG: Checking {path} - exists: {path.exists()}")  # DEBUG
             if path.exists():
                 index_html = path
                 break
         
         if index_html:
-            print(f"DEBUG: Found index.html at {index_html}, serving HTML")  # DEBUG
             with open(index_html, 'r', encoding='utf-8') as f:
                 html_content = f.read()
             logger.info(f"✓ Serving dashboard HTML from: {index_html}")
             return html_content, 200, {'Content-Type': 'text/html; charset=utf-8'}
         else:
-            print("DEBUG: index.html not found, returning fallback JSON")  # DEBUG
             # Fallback to API documentation if index.html not found
             return jsonify({
                 'service': 'AMP Dashboard Backend API',

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>V.E.T. Dashboard Executive Report - Walmart</title>
-    <script src="/lib/html2canvas.min.js"></script>
+    <script src="/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -354,6 +354,66 @@
             margin-top: var(--spacing-sm);
         }
 
+        /* Needs Attention Section */
+        .needs-attention-section {
+            background: #fff3cd;
+            border-left: 6px solid #dc3545;
+            border-radius: 8px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.15);
+        }
+
+        .needs-attention-header {
+            font-size: 18px;
+            font-weight: 700;
+            color: #dc3545;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .needs-attention-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .needs-attention-item {
+            background: white;
+            border: 1px solid #dc3545;
+            border-radius: 6px;
+            padding: var(--spacing-md);
+            box-shadow: 0 1px 3px rgba(220, 53, 69, 0.1);
+        }
+
+        .needs-attention-item-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+            font-size: var(--font-size-base);
+        }
+
+        .needs-attention-item-badge {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .needs-attention-item-detail {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin: 4px 0;
+            padding-left: 8px;
+            border-left: 2px solid #dc3545;
+        }
+
         /* Data Table */
         .table-section {
             background: white;
@@ -615,15 +675,6 @@
                     </div>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">TDA Ownership</label>
-                    <div class="dropdown-multi" id="ownership-dropdown">
-                        <button type="button" class="dropdown-multi-btn" id="ownership-dropdown-btn">All Selected</button>
-                        <div class="dropdown-multi-panel" id="ownership-dropdown-panel">
-                            <!-- Populated dynamically -->
-                        </div>
-                    </div>
-                </div>
-                <div class="filter-group">
                     <label class="filter-label">Project Title</label>
                     <div class="dropdown-multi" id="title-dropdown">
                         <button type="button" class="dropdown-multi-btn" id="title-dropdown-btn">All Selected</button>
@@ -668,6 +719,12 @@
                 <div class="stat-label">Continuous</div>
                 <div class="stat-value" id="stat-continuous" style="color: var(--continuous);">0</div>
             </div>
+        </div>
+
+        <!-- Needs Attention Section (At Risk Items) -->
+        <div class="needs-attention-section" id="needs-attention-section" style="display: none; margin: 30px 0;">
+            <div class="needs-attention-header">🚨 Needs Attention</div>
+            <div class="needs-attention-items" id="needs-attention-items"></div>
         </div>
 
         <!-- Data Table -->
@@ -727,7 +784,6 @@
         let currentSelectedPhases = [];
         let phases = [];
         let healthStatuses = [];
-        let tdaOwnerships = [];
         let projectTitles = [];
         let currentPage = 1;
 
@@ -783,17 +839,19 @@
                 const titlesRes = await fetch(`${API_BASE}/titles`);
                 const titlesData = await titlesRes.json();
                 projectTitles = titlesData.titles || [];
-                
-                // Load TDA ownership values
-                const ownershipRes = await fetch(`${API_BASE}/ownerships`);
-                const ownershipData = await ownershipRes.json();
-                tdaOwnerships = ownershipData.ownerships || [];
 
-                // Populate dropdowns
+                // Populate dropdowns (TDA Ownership is always Dallas POC)
                 populateDropdown('phase-dropdown', phases);
                 populateDropdown('health-dropdown', healthStatuses);
-                populateDropdown('ownership-dropdown', tdaOwnerships);
                 populateDropdown('title-dropdown', projectTitles);
+                
+                // Update dropdown labels to reflect initial state (all selected)
+                updateDropdownLabel('phase-dropdown', phases.length);
+                updateDropdownLabel('health-dropdown', healthStatuses.length);
+                updateDropdownLabel('title-dropdown', projectTitles.length);
+                
+                // Load data with default filters (all selected)
+                await loadData();
                 
                 updateConnectionStatus(true);
             } catch (error) {
@@ -883,6 +941,17 @@
             document.querySelectorAll('.dropdown-multi-panel.open').forEach(p => p.classList.remove('open'));
         });
 
+        // Separate At Risk items from regular data for the Needs Attention section
+        function separateAtRiskItems(data) {
+            const atRisk = data.filter(row => 
+                String(row['Health Status'] || '').toLowerCase() === 'at risk'
+            );
+            const regular = data.filter(row => 
+                String(row['Health Status'] || '').toLowerCase() !== 'at risk'
+            );
+            return { atRisk, regular };
+        }
+
         // Get selected filter values (array)
         function getSelectedValues(dropdownId) {
             const panel = document.getElementById(dropdownId + '-panel');
@@ -895,7 +964,6 @@
             try {
                 const selectedPhases = getSelectedValues('phase-dropdown');
                 const selectedStatuses = getSelectedValues('health-dropdown');
-                const selectedOwnerships = getSelectedValues('ownership-dropdown');
                 const selectedTitles = getSelectedValues('title-dropdown');
                 
                 if (selectedPhases.length === 0) {
@@ -910,10 +978,7 @@
                 const url = new URL(`${API_BASE}/data`);
                 selectedPhases.forEach(p => url.searchParams.append('phases', p));
                 selectedStatuses.forEach(s => url.searchParams.append('health_statuses', s));
-                // Only send ownership filter if not all are selected
-                if (selectedOwnerships.length < tdaOwnerships.length) {
-                    selectedOwnerships.forEach(o => url.searchParams.append('ownerships', o));
-                }
+                url.searchParams.append('ownerships', 'Dallas POC');
                 // Only send titles filter if not all are selected
                 if (selectedTitles.length < projectTitles.length) {
                     selectedTitles.forEach(t => url.searchParams.append('titles', t));
@@ -926,7 +991,13 @@
                     allData = result.data;
                     currentSelectedPhases = selectedPhases;
                     currentPage = 1; // Reset to first page
-                    renderTable(allData, currentSelectedPhases);
+                    
+                    // Separate and render At Risk items
+                    const { atRisk, regular } = separateAtRiskItems(result.data);
+                    renderNeedsAttention(atRisk);
+                    
+                    // Render regular (non-At Risk) initiatives
+                    renderTable(regular, currentSelectedPhases);
                     updateSummary(result.data);
                     updateRecordCount(result.count);
                     updateLastUpdated();
@@ -982,6 +1053,48 @@
                 });
             });
             return sections;
+        }
+
+        // Render Needs Attention section (At Risk items)
+        function renderNeedsAttention(atRiskData) {
+            const section = document.getElementById('needs-attention-section');
+            const itemsContainer = document.getElementById('needs-attention-items');
+            
+            if (!atRiskData || atRiskData.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            itemsContainer.innerHTML = '';
+            
+            // Group by Phase for organization
+            const phaseMap = {};
+            atRiskData.forEach(item => {
+                const phase = item.Phase || 'Unknown';
+                if (!phaseMap[phase]) phaseMap[phase] = [];
+                phaseMap[phase].push(item);
+            });
+            
+            // Render items grouped by phase
+            Object.entries(phaseMap).forEach(([phase, items]) => {
+                items.forEach(item => {
+                    const html = `
+                        <div class="needs-attention-item">
+                            <div style="margin-bottom: 8px;">
+                                <div class="needs-attention-item-badge">🚨 At Risk</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Phase: ${phase}</div>
+                            </div>
+                            <div class="needs-attention-item-title">${escapeHtml(item['Initiative - Project Title'] || 'N/A')}</div>
+                            <div class="needs-attention-item-detail"><strong>Stores:</strong> ${item['# of Stores'] || 0}</div>
+                            <div class="needs-attention-item-detail"><strong>Notes:</strong> ${escapeHtml(item['Executive Notes'] || 'No notes')}</div>
+                            <div class="needs-attention-item-detail"><strong>WM Week:</strong> ${item['WM Week'] || 'TBD'}</div>
+                            <div class="needs-attention-item-detail"><strong>Status:</strong> ${escapeHtml(item['Deployment'] || 'N/A')}</div>
+                        </div>
+                    `;
+                    itemsContainer.innerHTML += html;
+                });
+            });
         }
 
         function renderTable(data, selectedPhases) {
@@ -1164,11 +1277,9 @@
             // Re-check all checkboxes in all dropdowns
             document.querySelectorAll('#phase-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
             document.querySelectorAll('#health-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
-            document.querySelectorAll('#ownership-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
             document.querySelectorAll('#title-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
             updateDropdownLabel('phase-dropdown', phases.length);
             updateDropdownLabel('health-dropdown', healthStatuses.length);
-            updateDropdownLabel('ownership-dropdown', tdaOwnerships.length);
             updateDropdownLabel('title-dropdown', projectTitles.length);
             updatePageTitle();
             loadData();
@@ -1639,6 +1750,18 @@
                     <p>${message}</p>
                 </div>
             `;
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text || '').replace(/[&<>"']/g, m => map[m]);
         }
     </script>
 </body>

@@ -1,0 +1,18 @@
+{
+    "ProjectsInStoresRunning":  true,
+    "Port8080Listening":  true,
+    "TDARunning":  true,
+    "JobCodesRunning":  true,
+    "DCTasksCount":  0,
+    "JobCodesBackendTask":  false,
+    "Port5000Listening":  true,
+    "StoreActivityDashboardRunning":  false,
+    "TimeStamp":  {
+                      "value":  "\/Date(1774384666659)\/",
+                      "DisplayHint":  2,
+                      "DateTime":  "Tuesday, March 24, 2026 3:37:46 PM"
+                  },
+    "Port8888Listening":  true,
+    "ZorroRunning":  true,
+    "Port8001Listening":  true
+}

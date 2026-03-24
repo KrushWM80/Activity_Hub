@@ -4,16 +4,10 @@ Integrates PowerPoint generation with the Flask backend
 """
 
 from flask import Blueprint, jsonify, request, send_file
-from generate_ppt import TDAPowerPointGenerator
-from google.cloud import bigquery
 import logging
 from datetime import datetime
 from pathlib import Path
 import os
-import base64
-from io import BytesIO
-from pptx import Presentation
-from pptx.util import Inches
 
 logger = logging.getLogger(__name__)
 
@@ -24,11 +18,15 @@ ppt_bp = Blueprint('ppt', __name__, url_prefix='/api/ppt')
 OUTPUT_DIR = Path(__file__).parent / 'reports'
 OUTPUT_DIR.mkdir(exist_ok=True)
 
-# Initialize BigQuery client
+# Try to import optional dependencies
 try:
+    from generate_ppt import TDAPowerPointGenerator
+    from google.cloud import bigquery
     bq_client = bigquery.Client()
+    PPT_AVAILABLE = True
 except Exception as e:
-    logger.error(f"BigQuery client initialization failed: {e}")
+    logger.warning(f"PPT service not fully available: {e}")
+    PPT_AVAILABLE = False
     bq_client = None
 
 
@@ -36,7 +34,10 @@ class ReportManager:
     """Manages PPT report generation and caching"""
     
     def __init__(self):
-        self.generator = TDAPowerPointGenerator(bq_client)
+        if PPT_AVAILABLE:
+            self.generator = TDAPowerPointGenerator(bq_client)
+        else:
+            self.generator = None
         self.last_report_path = None
         self.last_report_time = None
     

@@ -762,9 +762,11 @@ def main():
         print("  Run without --preview to send.")
         return
 
-    # 5. Send email with PDF attachment
+    # 5. Send email with PPT + PDF attachments
     print(f"[5/5] Sending email to {', '.join(RECIPIENTS)}...")
-    attachments = [PDF_OUTPUT] if PDF_OUTPUT.exists() else [PPT_OUTPUT]
+    attachments = [PPT_OUTPUT]
+    if PDF_OUTPUT.exists():
+        attachments.append(PDF_OUTPUT)
     send_outlook_email(html, attachments, RECIPIENTS)
 
     print("\n" + "=" * 60)

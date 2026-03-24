@@ -1,0 +1,4 @@
+@echo off
+echo Registering Activity Hub Daily Health Check task...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-NoProfile -ExecutionPolicy Bypass -File \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\MONITOR_AND_REPORT.ps1\"'; $trigger = New-ScheduledTaskTrigger -Daily -At '06:00AM'; $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Minutes 30) -RestartCount 1; Register-ScheduledTask -TaskName 'Activity_Hub_Daily_HealthCheck' -Action $action -Trigger $trigger -Settings $settings -RunLevel Highest -Force; Write-Host 'Task registered. Next run: tomorrow 6:00 AM' -ForegroundColor Green; Get-ScheduledTask -TaskName 'Activity_Hub_Daily_HealthCheck' | Select-Object TaskName, State, @{N='NextRun';E={$_.NextRunTime}}"
+pause

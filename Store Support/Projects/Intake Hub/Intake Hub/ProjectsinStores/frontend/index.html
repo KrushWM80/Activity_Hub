@@ -678,82 +678,55 @@
             }
         }
 
-        // Update Last Updated timestamp from BigQuery data
+        // Update Last Updated timestamp — priority chain:
+        // 1. backend last_sync (when we last pulled from BQ, or when snapshot was saved)
+        // 2. MAX project row timestamp (BQ data's own "last modified" field)
+        // 3. "Please send Feedback" (no timestamp available from any source)
         function updateLastUpdatedTimestamp() {
-            // Use the backend summary's last_updated if available (from BigQuery)
+            const fmt = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+            const source = window.backendSummary && window.backendSummary.data_source;
+            const sourceLabel = source === 'snapshot' ? 'Cached' : 'Live';
+
+            // Level 1: use the backend's best-available timestamp (sync time > data row time > snapshot file time)
             if (window.backendSummary && window.backendSummary.last_updated) {
                 try {
                     const date = new Date(window.backendSummary.last_updated);
                     if (!isNaN(date.getTime())) {
-                        const formatted = date.toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true
-                        });
-                        document.getElementById('last-updated').textContent = `Last Updated: ${formatted}`;
-                        console.log('[Timestamp] Using BigQuery last_updated:', formatted);
+                        const formatted = date.toLocaleString('en-US', fmt);
+                        document.getElementById('last-updated').textContent = `Last Updated (${sourceLabel}): ${formatted}`;
+                        console.log(`[Timestamp] Using backend last_updated (${sourceLabel}):`, formatted);
                         return;
                     }
                 } catch (e) {
-                    console.error('[Timestamp] Error parsing BigQuery timestamp:', e);
+                    console.error('[Timestamp] Error parsing backend timestamp:', e);
                 }
             }
-            
-            // Fallback: Try to get latest from projects data
+
+            // Level 2: derive latest timestamp from project rows loaded into the browser
             if (window.allProjects && window.allProjects.length > 0) {
                 let latestTimestamp = null;
-                
-                // Try different possible field names for timestamp
                 window.allProjects.forEach(project => {
-                    const projectDate = project.last_updated || 
-                                       project.date_updated || 
-                                       project.updated_at ||
-                                       project.created_at;
-                    
+                    const projectDate = project.last_updated || project.date_updated || project.updated_at || project.created_at;
                     if (projectDate && typeof projectDate === 'string') {
                         try {
                             const date = new Date(projectDate);
-                            if (!isNaN(date.getTime())) {
-                                if (!latestTimestamp || date > latestTimestamp) {
-                                    latestTimestamp = date;
-                                }
+                            if (!isNaN(date.getTime()) && (!latestTimestamp || date > latestTimestamp)) {
+                                latestTimestamp = date;
                             }
-                        } catch (e) {
-                            // Skip invalid dates
-                        }
+                        } catch (e) { /* skip */ }
                     }
                 });
-                
                 if (latestTimestamp) {
-                    const formatted = latestTimestamp.toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: true
-                    });
-                    document.getElementById('last-updated').textContent = `Last Updated: ${formatted}`;
-                    console.log('[Timestamp] Using project data timestamp:', formatted);
+                    const formatted = latestTimestamp.toLocaleString('en-US', fmt);
+                    document.getElementById('last-updated').textContent = `Last Updated (${sourceLabel}): ${formatted}`;
+                    console.log('[Timestamp] Using project row timestamp:', formatted);
                     return;
                 }
             }
-            
-            // Fallback: Show current time as API sync time
-            const now = new Date();
-            const formatted = now.toLocaleString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-            document.getElementById('last-updated').textContent = `Last Updated: ${formatted}`;
-            console.log('[Timestamp] Using current time:', formatted);
+
+            // Level 3: no timestamp available from any source
+            document.getElementById('last-updated').textContent = 'Last Updated: Please send Feedback';
+            console.log('[Timestamp] No timestamp available - showing feedback prompt');
         }
 
         async function loadData() {

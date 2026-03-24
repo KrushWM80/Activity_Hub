@@ -206,6 +206,85 @@ Note: Currently uses existing startup process
       Not automated restart (standalone service)
 ```
 
+### V.E.T. Dashboard
+```
+Service Name:    V.E.T. (Vendor/Executive/Tracking) Dashboard
+Backend File:    Store Support/Projects/VET_Dashboard/backend.py
+Framework:       Flask with BigQuery
+Port:            5001
+Status:          Running (monitored)
+
+Access URLs:
+  Dashboard:  http://localhost:5001/vet_dashboard.html
+  API Base:   http://localhost:5001/api/
+  Data:       http://localhost:5001/api/data
+
+Data Source:
+  - Google Cloud BigQuery
+  - Project: wmt-assetprotection-prod
+  - Dataset: Store_Support_Dev
+  - Table: Output- TDA Report
+
+Features:
+  - Executive report view
+  - Implementation week tracking
+  - Dallas POC focus
+  - PowerPoint export via PPT service
+  - CSV export
+
+API Endpoints:
+  GET /api/data           - All project data (with filters)
+  GET /api/phases         - Distinct phase list
+  GET /api/health-statuses - Distinct health status list
+  GET /api/ownerships     - Distinct ownership list
+  GET /api/titles         - Distinct title list
+  GET /api/export/csv     - CSV export
+
+Log File:
+  - Store Support/Projects/VET_Dashboard/vet_dashboard_server.log
+
+Auto-Restart Launcher:
+  - Automation/start_vet_dashboard_24_7.bat
+
+Health Check:
+  - Monitored daily (6 AM)
+  - Manual check: netstat -ano | findstr ":5001.*LISTENING"
+```
+
+### Store Meeting Planner
+```
+Service Name:    Store Meeting Planner API
+Backend File:    Store Support/Projects/AMP/Store Meeting Planners/backend/main.py
+Framework:       FastAPI with BigQuery
+Port:            8090
+Status:          Running (monitored)
+
+Access URLs:
+  Local:       http://localhost:8090/
+  API Base:    http://localhost:8090/api/
+  Health:      http://localhost:8090/api/health
+  Frontend:    http://localhost:8090/ (served as static files)
+
+Data Source:
+  - Google Cloud BigQuery (AMP data via amp_ingestion.py)
+
+Features:
+  - Store meeting planning and scheduling
+  - AMP data sync
+  - File upload support
+  - Meeting tracker report
+
+Log File:
+  - Store Support/Projects/AMP/Store Meeting Planners/backend/meeting_planner_server.log
+
+Auto-Restart Launcher:
+  - Automation/start_meeting_planner_24_7.bat
+
+Health Check:
+  - Monitored daily (6 AM)
+  - Manual check: netstat -ano | findstr ":8090.*LISTENING"
+```
+
 ---
 
 ## Quick Access Table
@@ -214,11 +293,11 @@ Note: Currently uses existing startup process
 |---------|------|--------------|----------------|------|
 | Job Codes | 8080 | 127.0.0.1:8080 | 10.97.114.181:8080 | ✅ Monitored |
 | Projects | 8001 | 127.0.0.1:8001 | 10.97.114.181:8001 | ✅ Monitored |
-| TDA | 5000 | localhost:5000 | VPN Required | ✅ Auto-Restart |
-| Store Dash | 5000* | localhost:5000 | VPN Required | ✅ Auto-Restart |
+| TDA Insights | 5000 | localhost:5000 | VPN Required | ✅ Auto-Restart |
+| AMP Dashboard | 8081 | localhost:8081 | VPN Required | ✅ Auto-Restart |
 | Zorro | 8888 | localhost:8888 | VPN Required | ✅ Auto-Restart |
-
-*Shared port with TDA - only one can run simultaneously
+| V.E.T. Dashboard | 5001 | localhost:5001 | VPN Required | ✅ Auto-Restart |
+| Store Meeting Planner | 8090 | localhost:8090 | VPN Required | ✅ Auto-Restart |
 
 ---
 
@@ -308,6 +387,18 @@ Get-Process python | Select-Object Id, ProcessName, @{
 - Check scheduled task: `Get-ScheduledTask "JobCodes-Backend-Server"`
 - Verify IP is correct (should be 10.97.114.181, not 10.97.108.66)
 - Check network connectivity to machine
+
+### Can't access http://localhost:5001/vet_dashboard.html
+- Check if V.E.T. Dashboard backend is running
+- Verify port 5001 is listening: `netstat -ano | findstr ":5001"`
+- Check log file: `Store Support/Projects/VET_Dashboard/vet_dashboard_server.log`
+- Restart: `& "Automation/start_vet_dashboard_24_7.bat"`
+
+### Can't access http://localhost:8090/
+- Check if Store Meeting Planner is running
+- Verify port 8090 is listening: `netstat -ano | findstr ":8090"`
+- Check log file: `Store Support/Projects/AMP/Store Meeting Planners/backend/meeting_planner_server.log`
+- Restart: `& "Automation/start_meeting_planner_24_7.bat"`
 
 ### Port 8081 Assignment (Store Activity Dashboard)
 - Store Activity Dashboard exclusively uses port 8081

@@ -1,5 +1,6 @@
 """BigQuery service for Store Meeting Planner"""
 import os
+import re
 import uuid
 from datetime import datetime, date, timedelta
 from typing import Optional
@@ -14,6 +15,25 @@ AMP_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.Output - AMP ALL 2`"
 REQUEST_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.store_meeting_request_data`"
 CAL_DIM_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.Cal_Dim_Data`"
 STORE_CUR_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.Store_Cur_Data`"
+COSMOS_TABLE = "`wmt-edw-prod.WW_SOA_DL_VM.STORE_OPS_APPLN_ACTV_MGMT_PLAN_MSG_EVENT`"
+
+# Meeting detection patterns for compliance scanning
+_HIGH_PATTERNS = [
+    re.compile(r'meeting\s*id\s*[:\s]\s*\d{3,}', re.I),
+    re.compile(r'passcode\s*[:\s]\s*\S+', re.I),
+    re.compile(r'zoom\.(us|com)/[jw]/\d+', re.I),
+    re.compile(r'teams\.microsoft\.com/.+/meetup-join', re.I),
+    re.compile(r'webex\.\w+\.com/\S+', re.I),
+    re.compile(r'(?:dial|call)[\s-]in\s*(?:number|info)', re.I),
+    re.compile(r'\d{3}[\s.-]\d{3,4}[\s.-]\d{4}.*(?:pin|code|access)', re.I),
+]
+_MED_PATTERNS = [
+    re.compile(r'join\s+(?:the\s+)?(?:call|meeting|session)', re.I),
+    re.compile(r'attend\s+(?:the\s+)?(?:call|meeting|session)', re.I),
+    re.compile(r'conference\s*(?:call|bridge|line)', re.I),
+    re.compile(r'(?:kickoff|deployment|admin|installation)\s*call', re.I),
+    re.compile(r'listening\s+session', re.I),
+]
 
 REGULAR_MAX_SLOTS = 20
 PROTECTED_MAX_SLOTS = 10
@@ -33,12 +53,16 @@ class DatabaseService:
             if os.path.exists(creds_path):
                 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = creds_path
             self.client = bigquery.Client(project=PROJECT_ID)
+            # Quick connectivity check
+            list(self.client.query("SELECT 1").result())
             print(f"[DB] Connected to BigQuery project: {PROJECT_ID}")
         except Exception as e:
             print(f"[DB] BigQuery connection error: {e}")
             self.client = None
 
     def is_connected(self) -> bool:
+        if not self.client:
+            self._connect()
         return self.client is not None
 
     @staticmethod
@@ -54,7 +78,10 @@ class DatabaseService:
 
     def _run_query(self, query: str, params: list = None) -> list:
         if not self.client:
-            print("[DB] No BigQuery client available")
+            print("[DB] No BigQuery client — attempting reconnect...")
+            self._connect()
+        if not self.client:
+            print("[DB] Reconnect failed, no BigQuery client available")
             return []
         try:
             job_config = bigquery.QueryJobConfig()
@@ -63,8 +90,19 @@ class DatabaseService:
             result = self.client.query(query, job_config=job_config)
             return [dict(row) for row in result]
         except Exception as e:
-            print(f"[DB] Query error: {e}")
-            return []
+            print(f"[DB] Query error: {e} — attempting reconnect...")
+            self._connect()
+            if not self.client:
+                return []
+            try:
+                job_config = bigquery.QueryJobConfig()
+                if params:
+                    job_config.query_parameters = params
+                result = self.client.query(query, job_config=job_config)
+                return [dict(row) for row in result]
+            except Exception as e2:
+                print(f"[DB] Query retry failed: {e2}")
+                return []
 
     # =========================================
     # CALENDAR & PROTECTED WEEKS
@@ -835,3 +873,116 @@ class DatabaseService:
                 except (ValueError, TypeError):
                     result[eid] = cnt
         return result
+
+    # -------------------------------------------------
+    # Compliance Scan: find AMP events with meeting
+    # content that lack a Meeting Planner request
+    # -------------------------------------------------
+
+    def scan_compliance_gaps(self) -> dict:
+        """Scan AMP Store Updates for meetings missing from Meeting Planner."""
+        # Step 1: Get distinct AMP events (Store Updates + Calendar Events)
+        q_events = f"""
+            SELECT DISTINCT
+                a.event_id,
+                a.Activity_Title,
+                a.Message_Type,
+                a.Message_Status,
+                a.Author_email,
+                a.Store_Cnt,
+                CAST(a.Start_Date AS STRING) AS Start_Date,
+                CAST(a.End_Date AS STRING) AS End_Date,
+                a.Business_Area
+            FROM {AMP_TABLE} a
+            WHERE a.Start_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+              AND a.Message_Type IN ('Store Updates', 'Calendar Events')
+              AND a.Message_Status IN (
+                  'Awaiting ATC Approval', 'Awaiting Comms Approval',
+                  'Review for Publish review', 'Review for Publish review - No Comms')
+              AND a.event_id IS NOT NULL
+        """
+        events = self._run_query(q_events)
+        event_map = {}
+        for e in events:
+            eid = e.get("event_id")
+            if eid and eid not in event_map:
+                event_map[eid] = dict(e)
+
+        if not event_map:
+            return {"flagged": [], "total_scanned": 0, "scan_date": datetime.utcnow().isoformat()}
+
+        # Step 2: Get message bodies from Cosmos
+        event_ids = list(event_map.keys())
+        body_map = {}
+        batch_size = 50
+        for i in range(0, len(event_ids), batch_size):
+            batch = event_ids[i:i + batch_size]
+            id_list = ", ".join(f"'{eid}'" for eid in batch)
+            q_body = f"""
+                SELECT event_id, msg_txt
+                FROM {COSMOS_TABLE}
+                WHERE event_id IN ({id_list})
+            """
+            for row in self._run_query(q_body):
+                eid = row.get("event_id")
+                msg_txt = row.get("msg_txt")
+                body_text = ""
+                if msg_txt and isinstance(msg_txt, dict):
+                    arr = msg_txt.get("array", [])
+                    if arr:
+                        raw_html = str(arr[0])
+                        body_text = re.sub(r'<[^>]+>', ' ', raw_html)
+                        body_text = re.sub(r'\s+', ' ', body_text).strip()
+                body_map[eid] = body_text
+
+        # Step 3: Detect meeting content with two-tier patterns
+        flagged = []
+        for eid, body in body_map.items():
+            if not body:
+                continue
+            high = [p.pattern for p in _HIGH_PATTERNS if p.search(body)]
+            med = [p.pattern for p in _MED_PATTERNS if p.search(body)]
+            if high or len(med) >= 2:
+                meta = event_map.get(eid, {})
+                flagged.append({
+                    "event_id": eid,
+                    "title": meta.get("Activity_Title", ""),
+                    "message_type": meta.get("Message_Type", ""),
+                    "status": meta.get("Message_Status", ""),
+                    "author": meta.get("Author_email", ""),
+                    "start_date": str(meta.get("Start_Date", ""))[:10],
+                    "end_date": str(meta.get("End_Date", ""))[:10],
+                    "area": meta.get("Business_Area", ""),
+                    "stores": meta.get("Store_Cnt", 0),
+                    "confidence": "HIGH" if high else "MEDIUM",
+                    "body_preview": body[:300],
+                })
+
+        # Step 4: Exclude events already tracked in Meeting Planner
+        q_existing = f"""
+            SELECT DISTINCT LOWER(TRIM(Title)) as title_lower
+            FROM {REQUEST_TABLE}
+        """
+        existing = set()
+        for r in self._run_query(q_existing):
+            t = r.get("title_lower")
+            if t:
+                existing.add(t)
+
+        missing = []
+        for f in flagged:
+            title_l = f["title"].strip().lower()
+            tracked = any(
+                title_l in et or et in title_l
+                for et in existing
+            )
+            if not tracked:
+                missing.append(f)
+
+        return {
+            "flagged": missing,
+            "total_scanned": len(event_map),
+            "total_with_bodies": len(body_map),
+            "total_flagged_before_filter": len(flagged),
+            "scan_date": datetime.utcnow().isoformat(),
+        }

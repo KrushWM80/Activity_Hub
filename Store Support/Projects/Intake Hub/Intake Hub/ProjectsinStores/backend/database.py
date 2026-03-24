@@ -248,7 +248,8 @@ class DatabaseService:
     def get_projects(self, filters: FilterCriteria, include_location: bool = False, limit: Optional[int] = None, title_search: Optional[str] = None) -> List[Project]:
         """Get filtered list of projects with caching for performance"""
         if not self.client:
-            return self._get_mock_projects()
+            print("[BQ] Client not available, returning empty (SQLite cache is primary fallback)")
+            return []
         
         try:
             # Check if partner filter is applied - use BigQuery JOIN if so
@@ -437,13 +438,14 @@ class DatabaseService:
             return projects
         except Exception as e:
             print(f"Error querying projects: {e}")
-            return self._get_mock_projects()
+            return []
     
     @async_wrap
     def get_summary(self, filters: FilterCriteria) -> ProjectSummary:
         """Get summary statistics"""
         if not self.client:
-            return self._get_mock_summary()
+            print("[BQ] Client not available for summary, returning zeros")
+            return ProjectSummary()
         
         try:
             where_clause, join_clause = self._build_where_clause(filters)
@@ -505,7 +507,7 @@ class DatabaseService:
             return summary
         except Exception as e:
             print(f"Error getting summary: {e}")
-            return self._get_mock_summary()
+            return ProjectSummary()
     
     # Class-level cache for filter options
     _filters_cache = None
@@ -515,7 +517,8 @@ class DatabaseService:
     def get_filter_options(self) -> Dict:
         """Get all available filter options with caching"""
         if not self.client:
-            return self._get_mock_filter_options()
+            print("[BQ] Client not available for filters, returning empty")
+            return {}
         
         # Check filter cache
         if (DatabaseService._filters_cache is not None and 
@@ -678,13 +681,13 @@ class DatabaseService:
             print(f"[DB] Error getting filter options: {e}", flush=True)
             import traceback
             traceback.print_exc()
-            return self._get_mock_filter_options()
+            return {}
     
     @async_wrap
     def get_store_counts(self, group_by: str) -> List[Dict]:
         """Get store counts grouped by dimension"""
         if not self.client:
-            return self._get_mock_store_counts(group_by)
+            return []
         
         try:
             # Map group_by to actual column names
@@ -721,9 +724,9 @@ class DatabaseService:
             ]
         except Exception as e:
             print(f"Error getting store counts: {e}")
-            return self._get_mock_store_counts(group_by)
+            return []
     
-    # Mock data methods for testing without database connection
+    # DEPRECATED: Mock data methods kept for reference only - no longer called
     def _get_mock_projects(self) -> List[Project]:
         """Return mock project data"""
         mock_data = []

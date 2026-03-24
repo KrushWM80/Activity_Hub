@@ -11,39 +11,64 @@ from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from google.cloud import bigquery
 import logging
+from dotenv import load_dotenv
 
-# Import PPT service
-try:
-    from ppt_service import register_ppt_routes
-except ImportError:
-    register_ppt_routes = None
+# Load environment variables from .env file
+load_dotenv()
+
+# Import sample data
+from sample_data import SAMPLE_DATA_49_PROJECTS
 
 # Configuration
-app = Flask(__name__)
+app = Flask(__name__, static_folder=os.path.dirname(__file__), static_url_path='')
 CORS(app)
 
 # Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Import PPT service (after logger is initialized)
+try:
+    from ppt_service import register_ppt_routes
+except Exception as e:
+    logger.warning(f"PPT service not available: {e}")
+    register_ppt_routes = None
+
 # BigQuery Configuration
 PROJECT_ID = "wmt-assetprotection-prod"
 DATASET_ID = "Store_Support_Dev"
-TABLE_ID = "Output- TDA Report"  # Note: space before TDA
+TABLE_ID = "Output- TDA Report"  # Table name with space
 INTAKE_HUB_TABLE = "IH_Intake_Data"
-FULL_TABLE_ID = f"{PROJECT_ID}.{DATASET_ID}.`{TABLE_ID}`"
-FULL_INTAKE_HUB_ID = f"{PROJECT_ID}.{DATASET_ID}.{INTAKE_HUB_TABLE}"
+FULL_TABLE_ID = f"`{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`"
+FULL_INTAKE_HUB_ID = f"`{PROJECT_ID}.{DATASET_ID}.{INTAKE_HUB_TABLE}`"
 
 # V.E.T. Dashboard specific config
 DEFAULT_OWNERSHIP_FILTER = "Dallas POC"
 
 # Initialize BigQuery client
+client = None
 try:
+    # Try Application Default Credentials (gcloud auth application-default login)
     client = bigquery.Client(project=PROJECT_ID)
-    logger.info(f"BigQuery client initialized for project: {PROJECT_ID}")
-except Exception as e:
-    logger.error(f"Failed to initialize BigQuery client: {e}")
+    logger.info(f"✅ BigQuery client initialized with Application Default Credentials for project: {PROJECT_ID}")
+except Exception as e_adc:
+    logger.warning(f"⚠️ Application Default Credentials failed: {e_adc}")
     client = None
+    
+    # Try GOOGLE_APPLICATION_CREDENTIALS file if set
+    creds_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+    if creds_path and os.path.exists(creds_path):
+        try:
+            from google.oauth2 import service_account
+            credentials = service_account.Credentials.from_service_account_file(creds_path)
+            client = bigquery.Client(credentials=credentials, project=PROJECT_ID)
+            logger.info(f"✅ BigQuery client initialized with service account from: {creds_path}")
+        except Exception as e_sa:
+            logger.error(f"❌ Service account credentials failed: {e_sa}")
+            client = None
+    
+if not client:
+    logger.warning(f"⚠️ BigQuery not available - falling back to sample data. To use real data, run: gcloud auth application-default login")
 
 
 class VETDataManager:
@@ -66,50 +91,46 @@ class VETDataManager:
                     return self._data_cache
         
         if not self.client:
-            logger.error("BigQuery client not initialized")
-            return []
+            logger.warning(f"BigQuery client not initialized - using {len(SAMPLE_DATA_49_PROJECTS)} sample projects")
+            # Return comprehensive sample data when BigQuery is not available
+            self._data_cache = SAMPLE_DATA_49_PROJECTS
+            self._cache_timestamp = datetime.now()
+            return SAMPLE_DATA_49_PROJECTS
         
         try:
             query = f"""
             SELECT 
-                tda.`Initiative - Project Title`,
-                tda.`Health Status`,
+                tda.Topic AS `Initiative - Project Title`,
+                tda.Health_Update AS `Health Status`,
                 tda.Phase,
-                tda.`# of Stores`,
-                tda.`Dallas POC` AS `Executive Notes`,
-                tda.`TDA Ownership`,
+                1 AS `# of Stores`,
+                tda.Dallas_POC AS `Executive Notes`,
+                tda.TDA_Ownership,
                 tda.Intake_Card_Nbr AS `Project ID`,
-                tda.`Intake & Testing`,
+                tda.Intake_n_Testing AS `Intake & Testing`,
                 tda.Deployment,
-                COALESCE(MIN(intake.WM_Week), 'TBD') AS `WM Week`,
-                tda.Region,
-                tda.Market,
-                tda.`Proposed Date`,
-                tda.`Implementation Status`
+                COALESCE(CAST(MIN(intake.WM_Week) AS STRING), 'TBD') AS `WM Week`,
+                tda.Facility
             FROM 
-                `{FULL_TABLE_ID}` tda
+                {FULL_TABLE_ID} tda
             LEFT JOIN 
-                `{FULL_INTAKE_HUB_ID}` intake
+                {FULL_INTAKE_HUB_ID} intake
                 ON CAST(tda.Intake_Card_Nbr AS STRING) = CAST(intake.Intake_Card AS STRING)
             WHERE 
-                tda.`TDA Ownership` = '{DEFAULT_OWNERSHIP_FILTER}'
+                tda.TDA_Ownership = '{DEFAULT_OWNERSHIP_FILTER}'
             GROUP BY
-                tda.`Initiative - Project Title`,
-                tda.`Health Status`,
+                tda.Topic,
+                tda.Health_Update,
                 tda.Phase,
-                tda.`# of Stores`,
-                tda.`Dallas POC`,
-                tda.`TDA Ownership`,
+                tda.Dallas_POC,
+                tda.TDA_Ownership,
                 tda.Intake_Card_Nbr,
-                tda.`Intake & Testing`,
+                tda.Intake_n_Testing,
                 tda.Deployment,
-                tda.Region,
-                tda.Market,
-                tda.`Proposed Date`,
-                tda.`Implementation Status`
+                tda.Facility
             ORDER BY 
                 tda.Phase ASC,
-                tda.`Initiative - Project Title` ASC
+                tda.Topic ASC
             """
             
             logger.info("Executing BigQuery query with Intake Hub join...")
@@ -132,14 +153,18 @@ class VETDataManager:
             return []
     
     def get_unique_phases(self) -> List[str]:
-        """Get list of unique phases"""
+        """Get list of unique phases - returned in TDA progression order"""
         data = self.fetch_all_data()
-        phases = set()
+        phases_found = set()
         for row in data:
             phase = row.get('Phase', 'Unknown')
             if phase:
-                phases.add(str(phase))
-        return sorted(list(phases))
+                phases_found.add(str(phase))
+        
+        # TDA phase progression order
+        phase_order = ['Pending', 'POC/POT', 'Test', 'Mkt Scale', 'Roll/Deploy']
+        # Return only phases that exist in data, in the correct order
+        return [p for p in phase_order if p in phases_found]
     
     def get_unique_health_statuses(self) -> List[str]:
         """Get list of unique health statuses (Dallas POC only)"""
@@ -151,9 +176,15 @@ class VETDataManager:
                 statuses.add(str(status))
         return sorted(list(statuses))
     
-    def get_unique_ownerships(self) -> List[str]:
-        """Get list of unique ownerships (returns only Dallas POC for V.E.T.)"""
-        return [DEFAULT_OWNERSHIP_FILTER]
+    def get_unique_titles(self) -> List[str]:
+        """Get list of unique project titles"""
+        data = self.fetch_all_data()
+        titles = set()
+        for row in data:
+            title = row.get('Initiative - Project Title', 'Unknown')
+            if title:
+                titles.add(str(title))
+        return sorted(list(titles))
     
     def get_at_risk_items(self) -> List[Dict[str, Any]]:
         """Get items with At Risk health status (Needs Attention section)"""
@@ -279,19 +310,20 @@ def get_health_statuses():
         }), 500
 
 
-@app.route('/api/ownerships', methods=['GET'])
-def get_ownerships():
-    """Get list of ownerships (V.E.T. dashboard - always Dallas POC)"""
+
+
+@app.route('/api/titles', methods=['GET'])
+def get_titles():
+    """Get list of unique project titles"""
     try:
-        ownerships = data_manager.get_unique_ownerships()
+        titles = data_manager.get_unique_titles()
         return jsonify({
             'success': True,
-            'ownerships': ownerships,
-            'default': DEFAULT_OWNERSHIP_FILTER,
+            'titles': titles,
             'timestamp': datetime.now().isoformat()
         })
     except Exception as e:
-        logger.error(f"Error in /api/ownerships: {e}")
+        logger.error(f"Error in /api/titles: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -400,7 +432,7 @@ def export_csv():
 
 
 if __name__ == '__main__':
-    port = int(os.getenv('PORT', 5000))
+    port = int(os.getenv('PORT', 5001))
     debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     
     # Register PPT service routes

@@ -116,39 +116,46 @@ print("\n" + "=" * 70)
 print("Step 3: Searching message bodies for meeting/call content...")
 print("=" * 70)
 
-meeting_patterns = [
-    r'meeting\s*id',
-    r'passcode',
-    r'zoom\.(us|com)',
-    r'teams\.microsoft',
-    r'webex',
-    r'dial[\s-]in',
-    r'conference\s*call',
-    r'join\s*(the\s*)?(call|meeting)',
-    r'attend\s*(the\s*)?(call|meeting)',
-    r'at\s+\d{1,2}\s*(:|\.)\s*\d{2}\s*(a\.?m|p\.?m)',
-    r'at\s+\d{1,2}\s+(a\.?m|p\.?m)',
-    r'kickoff\s*call',
-    r'deployment\s*call',
-    r'admin\s*call',
-    r'installation\s*call',
-    r'office\s*hours',
-    r'listening\s*session',
-    r'brown\s*bag',
-    r'broadcast',
+# HIGH-CONFIDENCE patterns: actual meeting join details (Meeting ID + Passcode, links)
+high_confidence_patterns = [
+    r'meeting\s*id\s*[:\s]\s*\d{3,}',           # "Meeting ID: 12345678"
+    r'passcode\s*[:\s]\s*\S+',                    # "Passcode: abc123"
+    r'zoom\.(us|com)/[jw]/\d+',                   # Zoom join link
+    r'teams\.microsoft\.com/.+/meetup-join',       # Teams join link
+    r'webex\.\w+\.com/\S+',                        # WebEx link
+    r'(?:dial|call)[\s-]in\s*(?:number|info)',     # "Dial-in number/info"
+    r'\d{3}[\s.-]\d{3,4}[\s.-]\d{4}.*(?:pin|code|access)', # Phone + PIN
 ]
-compiled = [re.compile(p, re.IGNORECASE) for p in meeting_patterns]
+# MEDIUM-CONFIDENCE patterns: meeting language (needs 2+ to flag)
+medium_patterns = [
+    r'join\s+(?:the\s+)?(?:call|meeting|session)',
+    r'attend\s+(?:the\s+)?(?:call|meeting|session)',
+    r'conference\s*(?:call|bridge|line)',
+    r'(?:kickoff|deployment|admin|installation)\s*call',
+    r'listening\s+session',
+]
+high_compiled = [re.compile(p, re.IGNORECASE) for p in high_confidence_patterns]
+med_compiled = [re.compile(p, re.IGNORECASE) for p in medium_patterns]
 
 meetings_found = []
 for eid, info in body_map.items():
     body = info["body"]
     if not body:
         continue
-    matched_patterns = []
-    for i, pat in enumerate(compiled):
+    # Check high-confidence patterns (any 1 match = flag)
+    high_matches = []
+    for i, pat in enumerate(high_compiled):
         if pat.search(body):
-            matched_patterns.append(meeting_patterns[i])
-    if matched_patterns:
+            high_matches.append(high_confidence_patterns[i])
+    # Check medium-confidence patterns (need 2+ matches to flag)
+    med_matches = []
+    for i, pat in enumerate(med_compiled):
+        if pat.search(body):
+            med_matches.append(medium_patterns[i])
+    # Flag if any high-confidence OR 2+ medium-confidence
+    if high_matches or len(med_matches) >= 2:
+        confidence = "HIGH" if high_matches else "MEDIUM"
+        all_matches = high_matches + med_matches
         event_meta = event_map.get(eid, {})
         meetings_found.append({
             "event_id": eid,
@@ -160,7 +167,8 @@ for eid, info in body_map.items():
             "end": str(event_meta.get("End_Date", ""))[:10],
             "area": event_meta.get("Business_Area", ""),
             "stores": event_meta.get("Store_Cnt", 0),
-            "patterns": matched_patterns,
+            "patterns": all_matches,
+            "confidence": confidence,
             "body_snippet": body[:400]
         })
 
@@ -210,7 +218,7 @@ print("\n" + "=" * 70)
 print("EVENTS WITH MEETING CONTENT NOT IN MEETING PLANNER:")
 print("=" * 70)
 for m in missing:
-    print(f"\n  Title:    {m['title']}")
+    print(f"\n  [{m.get('confidence','?')}] {m['title']}")
     print(f"  Type:     {m['type']} | Status: {m['status']}")
     print(f"  Dates:    {m['start']} to {m['end']}")
     print(f"  Author:   {m['author']}")

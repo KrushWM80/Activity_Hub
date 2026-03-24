@@ -1128,7 +1128,7 @@
     <header class="header">
         <div class="header-content">
             <div class="logo-section">
-                <div class="spark-logo">â˜…</div>
+                <div class="spark-logo">★</div>
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
@@ -1209,7 +1209,7 @@
                             <div class="landing-card-arrow">→</div>
                         </div>
                         <div class="landing-card" onclick="navigateToTab('workflows')">
-                            <div class="landing-card-icon workflows">�</div>
+                            <div class="landing-card-icon workflows">⚡</div>
                             <h3>Workflows</h3>
                             <p>Design process flows and automation rules for different teams and project types.</p>
                             <ul class="card-features">
@@ -1231,7 +1231,7 @@
                             <div class="landing-card-arrow">→</div>
                         </div>
                         <div class="landing-card" onclick="navigateToTab('activity-log')">
-                            <div class="landing-card-icon" style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff);">�</div>
+                            <div class="landing-card-icon" style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff);">📜</div>
                             <h3>Activity Log</h3>
                             <p>View audit trail of all admin actions, track changes, and monitor who did what.</p>
                             <ul class="card-features">
@@ -1346,7 +1346,7 @@
                     <div class="management-section full-width">
                         <div class="section-header"><h3 class="section-title">Logic Configuration Areas</h3></div>
                         <div class="item-list">
-                            <div class="list-item" onclick="showSubTab('logic', 'task-logic')" style="cursor: pointer;"><div class="item-info"><h4>🔐‹ Task Logic</h4><p>Configure task assignments, priorities, and automation rules</p></div><div style="color: var(--walmart-blue);">→</div></div>
+                            <div class="list-item" onclick="showSubTab('logic', 'task-logic')" style="cursor: pointer;"><div class="item-info"><h4>⚙️ Task Logic</h4><p>Configure task assignments, priorities, and automation rules</p></div><div style="color: var(--walmart-blue);">→</div></div>
                             <div class="list-item" onclick="showSubTab('logic', 'notification-alerts')" style="cursor: pointer;"><div class="item-info"><h4>🔔 Notification Alerts</h4><p>Manage alert triggers, delivery channels, and escalations</p></div><div style="color: var(--walmart-blue);">→</div></div>
                             <div class="list-item" onclick="showSubTab('logic', 'next-steps')" style="cursor: pointer;"><div class="item-info"><h4>🎯 Next Steps</h4><p>Define recommended actions and workflow guidance</p></div><div style="color: var(--walmart-blue);">→</div></div>
                         </div>
@@ -1441,9 +1441,9 @@
                         <div class="workflow-canvas">
                             <div class="workflow-node trigger"><strong>🚀 Trigger</strong><p style="font-size: 0.85rem; margin-top: var(--space-2);">New Project Created</p></div>
                             <span style="font-size: 1.5rem; color: var(--gray-600);">→</span>
-                            <div class="workflow-node condition"><strong>â“ Condition</strong><p style="font-size: 0.85rem; margin-top: var(--space-2);">Check Team Type</p></div>
+                            <div class="workflow-node condition"><strong>❓ Condition</strong><p style="font-size: 0.85rem; margin-top: var(--space-2);">Check Team Type</p></div>
                             <span style="font-size: 1.5rem; color: var(--gray-600);">→</span>
-                            <div class="workflow-node action"><strong>âš¡ Action</strong><p style="font-size: 0.85rem; margin-top: var(--space-2);">Route to Manager</p></div>
+                            <div class="workflow-node action"><strong>⚡ Action</strong><p style="font-size: 0.85rem; margin-top: var(--space-2);">Route to Manager</p></div>
                             <div style="text-align: center; margin-top: var(--space-6);"><button class="btn-secondary" style="margin-right: var(--space-2);">+ Add Condition</button><button class="btn-secondary">+ Add Action</button></div>
                         </div>
                     </div>
@@ -1478,7 +1478,7 @@
                         <div class="management-section full-width">
                             <div class="section-header">
                                 <h3 class="section-title">Projects Schema</h3>
-                                <button class="btn-secondary" onclick="exportSchema()">🔐¥ Export Schema</button>
+                                <button class="btn-secondary" onclick="exportSchema()">📤 Export Schema</button>
                             </div>
                             <p style="color: var(--gray-600); margin-bottom: var(--space-4);">Define and manage the canonical column definitions for project data. This schema serves as the source of truth for all data bridging operations.</p>
                             <div class="schema-categories-admin" id="schema-categories-list">
@@ -1762,7 +1762,7 @@
                                 <option value="update">Update</option>
                                 <option value="toggle">Toggle</option>
                             </select>
-                            <button class="btn-secondary" onclick="exportActivityLog()">🔐¥ Export</button>
+                            <button class="btn-secondary" onclick="exportActivityLog()">📤 Export</button>
                             <button class="btn-secondary" onclick="clearActivityLog()" style="color: var(--error);">🗑️ Clear</button>
                         </div>
                     </div>
@@ -1784,10 +1784,10 @@
                     <div class="management-section">
                         <div class="section-header"><h3 class="section-title">System Health</h3></div>
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4);">
-                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">â—</div><div style="font-weight: 600;">Auth</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
-                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">â—</div><div style="font-weight: 600;">Database</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
-                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">â—</div><div style="font-weight: 600;">API</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
-                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">â—</div><div style="font-weight: 600;">Load Balancer</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
+                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">●</div><div style="font-weight: 600;">Auth</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
+                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">●</div><div style="font-weight: 600;">Database</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
+                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">●</div><div style="font-weight: 600;">API</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
+                            <div style="text-align: center; padding: var(--space-4); background: #f0fdf4; border-radius: 8px;"><div style="font-size: 1.5rem; color: var(--success);">●</div><div style="font-weight: 600;">Load Balancer</div><div style="color: var(--success); font-size: 0.8rem;">Operational</div></div>
                         </div>
                     </div>
                     <div class="management-section">
@@ -1914,8 +1914,8 @@
                 <div class="feedback-categories">
                     <label class="feedback-category"><input type="radio" name="feedback-category" value="Dashboard UI"><span>🎨</span> Dashboard UI</label>
                     <label class="feedback-category"><input type="radio" name="feedback-category" value="Admin Features"><span>⚙️</span> Admin Features</label>
-                    <label class="feedback-category"><input type="radio" name="feedback-category" value="Workflows"><span>🔐‹</span> Workflows & Logic</label>
-                    <label class="feedback-category"><input type="radio" name="feedback-category" value="Performance"><span>âš¡</span> Performance</label>
+                    <label class="feedback-category"><input type="radio" name="feedback-category" value="Workflows"><span>🔄</span> Workflows & Logic</label>
+                    <label class="feedback-category"><input type="radio" name="feedback-category" value="Performance"><span>⚡</span> Performance</label>
                     <label class="feedback-category"><input type="radio" name="feedback-category" value="Other"><span>💡</span> Other</label>
                 </div>
                 <div class="feedback-actions"><button class="feedback-btn-next" onclick="nextFeedbackStep()">Next →</button></div>
@@ -1930,7 +1930,7 @@
                     <label class="rating-option"><input type="radio" name="feedback-rating" value="5"><span class="rating-emoji">🤩</span><span class="rating-label">Excellent</span></label>
                 </div>
                 <div class="form-group"><label class="form-label">Comments (optional)</label><textarea class="feedback-textarea" placeholder="Tell us more..."></textarea></div>
-                <div class="feedback-actions"><button class="feedback-btn-back" onclick="prevFeedbackStep()">â† Back</button><button class="feedback-btn-next" onclick="submitFeedback()">Submit</button></div>
+                <div class="feedback-actions"><button class="feedback-btn-back" onclick="prevFeedbackStep()">← Back</button><button class="feedback-btn-next" onclick="submitFeedback()">Submit</button></div>
             </div>
             <div id="feedback-step3" class="feedback-step">
                 <div class="feedback-success"><div class="feedback-success-icon">✅</div><h3 style="margin-bottom: var(--space-2);">Thank You!</h3><p style="color: var(--gray-600);">Your feedback has been submitted.</p><button class="feedback-btn-next" style="margin-top: var(--space-6);" onclick="resetFeedback()">Close</button></div>
@@ -1970,7 +1970,7 @@
                 if (areaFilter !== 'all') logs = logs.filter(l => l.area === areaFilter);
                 if (actionFilter !== 'all') logs = logs.filter(l => (l.action||'').toLowerCase().includes(actionFilter));
                 if (!Array.isArray(logs) || logs.length === 0) {
-                    container.innerHTML = `<div style="padding: var(--space-8); text-align: center; color: var(--gray-500);"><div style="font-size: 3rem; margin-bottom: var(--space-4);">🔐‹</div><p>No activity logs found</p></div>`;
+                    container.innerHTML = `<div style="padding: var(--space-8); text-align: center; color: var(--gray-500);"><div style="font-size: 3rem; margin-bottom: var(--space-4);">📋</div><p>No activity logs found</p></div>`;
                     return;
                 }
                 let html = '<table style="width: 100%; border-collapse: collapse; font-size: 13px;">';
@@ -2018,7 +2018,7 @@
                         <div style="flex:1;">
                             <div><strong>${s.user_email || s.user || '-'}</strong><br><span style="color:var(--gray-600);font-size:11px;">${s.page||'Dashboard'} • ${s.device_info || 'Unknown'}</span></div>
                         </div>
-                        <span style="color:var(--success);font-size:18px;">â—</span>
+                        <span style="color:var(--success);font-size:18px;">●</span>
                     </div>`;
                 }
                 html += '</div>';
@@ -2505,9 +2505,9 @@
             }
 
             const categoryIcons = {
-                identifiers: '🔑', status: '🔐Š', location: '🔐', time: '🔐…', 
-                ownership: '👤', categorization: '🏷️', impact: '🔐ˆ', 
-                description: '🔐', amp_meeting: '🔐‹'
+                identifiers: '🔑', status: '📊', location: '📍', time: '⏰', 
+                ownership: '👤', categorization: '🏷️', impact: '💥', 
+                description: '📝', amp_meeting: '📅'
             };
 
             let html = '';
@@ -2516,7 +2516,7 @@
                 html += `
                     <div class="schema-category-card shadow-box">
                         <div class="category-header">
-                            <span class="category-icon">${categoryIcons[category] || '🔐'}</span>
+                            <span class="category-icon">${categoryIcons[category] || '📁'}</span>
                             <span class="category-name">${category.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
                             <span class="category-count">${fields.length} fields</span>
                             ${requiredCount > 0 ? `<span class="required-badge">${requiredCount} required</span>` : ''}
@@ -2525,7 +2525,7 @@
                             ${fields.map(f => `
                                 <div class="schema-field-chip ${f.required ? 'required' : ''}" onclick="showFieldDescription('${f.key}', '${(f.description || '').replace(/'/g, "\\'")}')">
                                     <span class="field-name">${f.displayName || f.key}</span>
-                                    <span class="field-info-icon" title="Click for description">â„¹ï¸</span>
+                                    <span class="field-info-icon" title="Click for description">ℹ️</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -2600,7 +2600,7 @@
                 
                 let toggleHtml = '';
                 if (isAutoPopulate) {
-                    toggleHtml = `<span class="auto-badge" title="Auto-populated from Data Connection">âš¡ Auto</span>`;
+                    toggleHtml = `<span class="auto-badge" title="Auto-populated from Data Connection">⚡ Auto</span>`;
                 } else if (isCoreLocked) {
                     toggleHtml = `<label class="toggle-switch disabled" title="Core required field - cannot be changed">
                         <input type="checkbox" checked disabled onclick="showCoreRequiredError()">
@@ -2676,7 +2676,7 @@
                             <div style="font-size: 12px; color: var(--gray-500);">${fieldKey}</div>
                             <div style="font-size: 13px; color: var(--gray-600); margin-top: var(--space-2);">${field.description || ''}</div>
                         </div>
-                        <p style="margin: 0; color: #b91c1c; font-size: 13px;">âš ï¸ This action cannot be undone. Existing data for this field will no longer be mapped.</p>
+                        <p style="margin: 0; color: #b91c1c; font-size: 13px;">⚠️ This action cannot be undone. Existing data for this field will no longer be mapped.</p>
                     </div>
                     <div class="modal-footer" style="padding: var(--space-4) var(--space-6); border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: var(--space-3);">
                         <button class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
