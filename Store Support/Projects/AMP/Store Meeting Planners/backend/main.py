@@ -15,6 +15,7 @@ from fastapi.responses import FileResponse
 
 from database import DatabaseService
 from amp_ingestion import run_amp_sync
+import traceback
 
 # =============================================
 # APP SETUP
@@ -24,6 +25,19 @@ PORT = int(os.getenv("PORT", "8090"))
 HOST = os.getenv("HOST", "0.0.0.0")
 
 app = FastAPI(title="Store Meeting Planner API")
+
+
+@app.middleware("http")
+async def catch_all_errors(request: Request, call_next):
+    """Global safety net — log any unhandled exception instead of crashing."""
+    try:
+        return await call_next(request)
+    except Exception as exc:
+        print(f"[FATAL] Unhandled error on {request.method} {request.url}: {exc}")
+        traceback.print_exc()
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=500, content={"detail": str(exc)})
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -120,6 +134,20 @@ async def startup():
 async def shutdown():
     if scheduler:
         scheduler.shutdown(wait=False)
+
+
+# =============================================
+# FAVICON (prevent 404)
+# =============================================
+
+@app.get("/favicon.ico")
+async def favicon():
+    fav_path = Path(__file__).parent.parent / "frontend" / "favicon.ico"
+    if fav_path.exists():
+        return FileResponse(str(fav_path))
+    # Return a minimal 1x1 transparent ico
+    from fastapi.responses import Response
+    return Response(content=b"", media_type="image/x-icon", status_code=204)
 
 
 # =============================================
@@ -260,8 +288,13 @@ async def update_request(request_id: str, body: dict):
     if not is_admin(username):
         raise HTTPException(status_code=403, detail="Admin access required")
     email = get_user_email(username)
-    result = db.update_request(request_id, body, email)
-    return result
+    try:
+        result = db.update_request(request_id, body, email)
+        return result
+    except Exception as e:
+        print(f"[ERROR] update_request failed: {e}")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.put("/api/requests/{request_id}/complete")
@@ -347,4 +380,4 @@ if frontend_path.exists():
 
 if __name__ == "__main__":
     print(f"[Server] Starting Store Meeting Planner on {HOST}:{PORT}")
-    uvicorn.run("main:app", host=HOST, port=PORT, reload=True)
+    uvicorn.run(app, host=HOST, port=PORT, log_level="info")

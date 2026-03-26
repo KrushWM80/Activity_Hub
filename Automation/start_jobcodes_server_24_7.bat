@@ -12,13 +12,19 @@ set LOG_FILE=C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub
 cd /d "%JOBCODES_PATH%"
 
 :START
+REM (port-kill block temporarily disabled for diagnosis)
+REM for /f "tokens=5" %%a in (...)
+timeout /t 2 /nobreak > nul
+
 echo. >> "%LOG_FILE%"
 echo [%date% %time%] ===== JOB CODES SERVER START ===== >> "%LOG_FILE%"
 echo [%date% %time%] Starting Job Codes Backend Server on port 8080... >> "%LOG_FILE%"
 echo [%date% %time%] Access: http://10.97.114.181:8080/static/index.html# >> "%LOG_FILE%"
 
-REM Start server and capture any errors
-"%PYTHON_EXE%" main.py 2>> "%LOG_FILE%"
+REM Start server and capture all output (stdout + stderr)
+"%PYTHON_EXE%" main.py >> "%LOG_FILE%" 2>&1
+set /a exitcode=%ERRORLEVEL%
+echo [%date% %time%] Process exited with code %exitcode% >> "%LOG_FILE%"
 
 echo [%date% %time%] Server stopped. Checking before restart... >> "%LOG_FILE%"
 

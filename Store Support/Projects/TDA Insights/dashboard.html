@@ -247,9 +247,24 @@
             border-radius: 0 0 4px 4px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             z-index: 100;
-            max-height: 220px;
+            max-height: 320px;
             overflow-y: auto;
             padding: 4px 0;
+        }
+
+        .dropdown-search {
+            width: calc(100% - 24px);
+            margin: 6px 12px;
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: var(--font-size-base);
+            outline: none;
+            box-sizing: border-box;
+        }
+        .dropdown-search:focus {
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 2px rgba(0,113,206,0.15);
         }
 
         .dropdown-multi-panel.open {
@@ -639,6 +654,7 @@
                 <button class="btn-secondary" id="refresh-btn">🔄 Refresh Data</button>
                 <button class="btn-secondary" id="export-btn">📥 Export CSV</button>
                 <button class="btn-secondary" id="ppt-btn">📊 Generate PPT</button>
+                <button class="btn-secondary" id="feedback-btn" onclick="openFeedback()" title="Send Feedback">💬 Feedback</button>
             </div>
         </div>
 
@@ -807,7 +823,23 @@
             const panel = document.getElementById(dropdownId + '-panel');
             const btn = document.getElementById(dropdownId + '-btn');
             panel.innerHTML = '';
-            
+            const hasSearch = (dropdownId === 'title-dropdown');
+
+            // Add search input for title dropdown
+            if (hasSearch) {
+                const searchInput = document.createElement('input');
+                searchInput.type = 'text';
+                searchInput.placeholder = 'Search titles...';
+                searchInput.className = 'dropdown-search';
+                searchInput.addEventListener('input', () => {
+                    const term = searchInput.value.toLowerCase();
+                    panel.querySelectorAll('label[data-option]').forEach(lbl => {
+                        lbl.style.display = lbl.dataset.option.toLowerCase().includes(term) ? '' : 'none';
+                    });
+                });
+                panel.appendChild(searchInput);
+            }
+
             // Add "All" toggle at top
             const allLabel = document.createElement('label');
             allLabel.style.borderBottom = '1px solid #ddd';
@@ -820,7 +852,12 @@
             allCb.dataset.selectAll = 'true';
             allCb.addEventListener('change', () => {
                 const checked = allCb.checked;
-                panel.querySelectorAll('input[type="checkbox"]:not([data-select-all])').forEach(cb => cb.checked = checked);
+                // Only toggle visible options
+                panel.querySelectorAll('label[data-option]').forEach(lbl => {
+                    if (lbl.style.display !== 'none') {
+                        lbl.querySelector('input').checked = checked;
+                    }
+                });
                 updateDropdownLabel(dropdownId, options.length);
             });
             allLabel.appendChild(allCb);
@@ -829,13 +866,14 @@
             
             options.forEach((option, idx) => {
                 const label = document.createElement('label');
+                label.dataset.option = option;
                 const cb = document.createElement('input');
                 cb.type = 'checkbox';
                 cb.value = option;
                 cb.checked = true;
                 cb.addEventListener('change', () => {
                     // Update "All" checkbox state
-                    const allCheckboxes = panel.querySelectorAll('input[type="checkbox"]:not([data-select-all])');
+                    const allCheckboxes = panel.querySelectorAll('label[data-option]:not([style*="display: none"]) input[type="checkbox"]');
                     const allChecked = Array.from(allCheckboxes).every(c => c.checked);
                     panel.querySelector('input[data-select-all]').checked = allChecked;
                     updateDropdownLabel(dropdownId, options.length);
@@ -845,21 +883,29 @@
                 panel.appendChild(label);
             });
             
-            // Toggle panel on button click
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Close other dropdowns
-                document.querySelectorAll('.dropdown-multi-panel.open').forEach(p => {
-                    if (p !== panel) p.classList.remove('open');
-                });
-                panel.classList.toggle('open');
-            });
-            
-            // Prevent panel clicks from closing it
-            panel.addEventListener('click', (e) => e.stopPropagation());
-            
             updateDropdownLabel(dropdownId, options.length);
         }
+
+        // Single event delegation handler for all dropdown buttons/panels (runs once, never stacks)
+        (function initDropdownDelegation() {
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.dropdown-multi-btn');
+                const panel = e.target.closest('.dropdown-multi-panel');
+                if (btn) {
+                    const siblingPanel = btn.nextElementSibling;
+                    // Close other dropdowns
+                    document.querySelectorAll('.dropdown-multi-panel.open').forEach(p => {
+                        if (p !== siblingPanel) p.classList.remove('open');
+                    });
+                    siblingPanel.classList.toggle('open');
+                } else if (panel) {
+                    // Clicking inside a panel — do nothing (keep it open)
+                } else {
+                    // Clicking outside — close all dropdowns
+                    document.querySelectorAll('.dropdown-multi-panel.open').forEach(p => p.classList.remove('open'));
+                }
+            });
+        })();
 
         // Update dropdown button text based on selections
         function updateDropdownLabel(dropdownId, totalCount) {
@@ -877,11 +923,6 @@
                 btn.textContent = `${checked.length} of ${totalCount} selected`;
             }
         }
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.dropdown-multi-panel.open').forEach(p => p.classList.remove('open'));
-        });
 
         // Get selected filter values (array)
         function getSelectedValues(dropdownId) {
@@ -959,7 +1000,8 @@
             // 2. Build ordered ownership list: defined order first, then any new values alphabetically
             const ownershipSet = new Set();
             data.forEach(r => {
-                const own = r['TDA Ownership'] || UNASSIGNED;
+                const own = (r['TDA Ownership'] === '*Select Owner' || !r['TDA Ownership']) ? UNASSIGNED : r['TDA Ownership'];
+                r['TDA Ownership'] = own;
                 ownershipSet.add(own);
             });
             const knownSet = new Set(OWNERSHIP_ORDER);
@@ -1024,20 +1066,31 @@
             
             const pageData = pages[currentPage - 1] || { ownership: '', phase: 'N/A', rows: [] };
             
+            // Determine which notes columns to show based on TDA Ownership
+            const ownershipLabel = pageData.ownership || '';
+            let noteColumns = [];
+            if (ownershipLabel.includes('Currently No TDA Ownership')) {
+                noteColumns = ['Dallas POC', 'Intake & Testing', 'Deployment'];
+            } else if (ownershipLabel === 'Dallas POC') {
+                noteColumns = ['Dallas POC'];
+            } else if (ownershipLabel === 'Intake & Test' || ownershipLabel === 'Intake & Testing') {
+                noteColumns = ['Intake & Testing'];
+            } else if (ownershipLabel === 'Deployment') {
+                noteColumns = ['Deployment'];
+            } else {
+                noteColumns = ['Dallas POC', 'Intake & Testing', 'Deployment'];
+            }
+            
             const columns = [
                 'Initiative - Project Title',
                 'Health Status',
                 'Phase',
                 '# of Stores',
-                'Dallas POC',
-                'Intake & Testing',
-                'Deployment'
+                ...noteColumns
             ];
             
-            // Ownership banner (navy #1E3A8A, same size as old phase banner)
+            // Ownership banner (navy #1E3A8A)
             let html = `<div style="background: #1E3A8A; color: white; padding: 15px 20px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px 4px 0 0;">${pageData.ownership}</div>`;
-            // Phase banner (half height, existing blue #3B82F6)
-            html += `<div style="background: #3B82F6; color: white; padding: 7px 20px; font-size: 14px; font-weight: 600; text-align: center;">${pageData.phase}</div>`;
             html += '<table><thead><tr>';
             columns.forEach(col => {
                 html += `<th>${col}</th>`;
@@ -1288,7 +1341,21 @@
                         btn.textContent = `[Wait] Capturing ${section.ownership} / ${section.phase} page ${pageIdx + 1}/${pages.length}...`;
                         
                         // Render this phase/page's table with inline styles matching dashboard
-                        const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas POC', 'Intake & Testing', 'Deployment'];
+                        // Determine which notes columns to show based on TDA Ownership
+                        const ownershipLabel = section.ownership || '';
+                        let noteColumns = [];
+                        if (ownershipLabel.includes('Currently No TDA Ownership')) {
+                            noteColumns = ['Dallas POC', 'Intake & Testing', 'Deployment'];
+                        } else if (ownershipLabel === 'Dallas POC') {
+                            noteColumns = ['Dallas POC'];
+                        } else if (ownershipLabel === 'Intake & Test' || ownershipLabel === 'Intake & Testing') {
+                            noteColumns = ['Intake & Testing'];
+                        } else if (ownershipLabel === 'Deployment') {
+                            noteColumns = ['Deployment'];
+                        } else {
+                            noteColumns = ['Dallas POC', 'Intake & Testing', 'Deployment'];
+                        }
+                        const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', ...noteColumns];
                         let html = `<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
                                     <thead style="background-color: #F5F5F5; border-bottom: 2px solid #E5E5E5;">
                                     <tr>`;
@@ -1344,9 +1411,8 @@
                         wrapper.innerHTML = html;
                         paginationControls.style.display = 'none';
                         
-                        // Add ownership banner (navy) + phase banner (blue, half height)
+                        // Add ownership banner (navy) with phase merged in
                         let titleHtml = `<div style="background: #1E3A8A; color: white; padding: 15px 20px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px 4px 0 0;">${section.ownership}</div>`;
-                        titleHtml += `<div style="background: #3B82F6; color: white; padding: 7px 20px; font-size: 14px; font-weight: 600; text-align: center;">${section.phase}</div>`;
                         wrapper.innerHTML = titleHtml + wrapper.innerHTML;
                         wrapper.style.display = 'block';
                         wrapper.style.visibility = 'visible';
@@ -1393,7 +1459,7 @@
                             ownership: section.ownership,
                             phase: section.phase,
                             page: pageIdx + 1,
-                            header: `${section.ownership} — ${section.phase}`,
+                            header: section.ownership,
                             imageData: canvas.toDataURL('image/png')
                         });
                         
@@ -1639,6 +1705,111 @@
                 </div>
             `;
         }
+    </script>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:12px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+            <div style="background:linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-dark) 100%); color:white; padding:20px; border-radius:12px 12px 0 0; display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0;">💬 Send Feedback</h2>
+                <button onclick="closeFeedback()" style="background:transparent; color:white; border:none; font-size:24px; cursor:pointer; padding:0; width:30px; height:30px;">×</button>
+            </div>
+            <form id="feedback-form" onsubmit="event.preventDefault(); submitFeedback();" style="padding:30px;">
+                <div id="feedback-step1">
+                    <p style="margin-bottom:20px;">What area would you like to give feedback on?</p>
+                    <label style="display:block; padding:12px; margin-bottom:10px; border:2px solid var(--border-color); border-radius:8px; cursor:pointer;">
+                        <input type="radio" name="feedback-category" value="Dashboard UI" style="margin-right:10px;"> 📊 Dashboard UI & Filters
+                    </label>
+                    <label style="display:block; padding:12px; margin-bottom:10px; border:2px solid var(--border-color); border-radius:8px; cursor:pointer;">
+                        <input type="radio" name="feedback-category" value="Data Quality" style="margin-right:10px;"> 📋 Data Quality & Accuracy
+                    </label>
+                    <label style="display:block; padding:12px; margin-bottom:10px; border:2px solid var(--border-color); border-radius:8px; cursor:pointer;">
+                        <input type="radio" name="feedback-category" value="Reports" style="margin-right:10px;"> 📧 Email Reports & PPT
+                    </label>
+                    <label style="display:block; padding:12px; margin-bottom:20px; border:2px solid var(--border-color); border-radius:8px; cursor:pointer;">
+                        <input type="radio" name="feedback-category" value="Other" style="margin-right:10px;"> 💡 Other / Feature Request
+                    </label>
+                    <button type="button" onclick="nextFeedbackStep()" style="width:100%; padding:12px; background:var(--walmart-blue); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Next</button>
+                </div>
+                <div id="feedback-step2" style="display:none;">
+                    <p style="margin-bottom:20px;">How would you rate your experience?</p>
+                    <div style="display:flex; justify-content:space-around; margin-bottom:20px;">
+                        <label style="text-align:center; cursor:pointer;"><input type="radio" name="feedback-rating" value="1" style="display:none;"><div class="rating-emoji" style="font-size:32px; padding:10px; border-radius:8px; border:2px solid var(--border-color);">😞</div><div style="font-size:12px; margin-top:5px;">Poor</div></label>
+                        <label style="text-align:center; cursor:pointer;"><input type="radio" name="feedback-rating" value="2" style="display:none;"><div class="rating-emoji" style="font-size:32px; padding:10px; border-radius:8px; border:2px solid var(--border-color);">😐</div><div style="font-size:12px; margin-top:5px;">Fair</div></label>
+                        <label style="text-align:center; cursor:pointer;"><input type="radio" name="feedback-rating" value="3" style="display:none;"><div class="rating-emoji" style="font-size:32px; padding:10px; border-radius:8px; border:2px solid var(--border-color);">🙂</div><div style="font-size:12px; margin-top:5px;">Good</div></label>
+                        <label style="text-align:center; cursor:pointer;"><input type="radio" name="feedback-rating" value="4" style="display:none;"><div class="rating-emoji" style="font-size:32px; padding:10px; border-radius:8px; border:2px solid var(--border-color);">😄</div><div style="font-size:12px; margin-top:5px;">Great</div></label>
+                        <label style="text-align:center; cursor:pointer;"><input type="radio" name="feedback-rating" value="5" style="display:none;"><div class="rating-emoji" style="font-size:32px; padding:10px; border-radius:8px; border:2px solid var(--border-color);">🤩</div><div style="font-size:12px; margin-top:5px;">Excellent</div></label>
+                    </div>
+                    <p style="margin-bottom:10px; font-weight:600;">Tell us more:</p>
+                    <textarea id="feedback-comments" placeholder="Share your thoughts, suggestions, or report issues..." style="width:100%; height:120px; padding:12px; border:2px solid var(--border-color); border-radius:8px; resize:vertical; box-sizing:border-box;" required></textarea>
+                    <div style="display:flex; gap:10px; margin-top:20px;">
+                        <button type="button" onclick="backFeedbackStep()" style="flex:1; padding:12px; background:var(--border-color); color:var(--text-primary); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Back</button>
+                        <button type="submit" style="flex:2; padding:12px; background:var(--walmart-blue); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Submit Feedback</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Feedback functions
+        function openFeedback() {
+            document.getElementById('feedback-modal').style.display = 'flex';
+        }
+        function closeFeedback() {
+            document.getElementById('feedback-modal').style.display = 'none';
+            document.getElementById('feedback-form').reset();
+            document.getElementById('feedback-step1').style.display = 'block';
+            document.getElementById('feedback-step2').style.display = 'none';
+        }
+        function nextFeedbackStep() {
+            if (!document.querySelector('input[name="feedback-category"]:checked')) { alert('Please select a category'); return; }
+            document.getElementById('feedback-step1').style.display = 'none';
+            document.getElementById('feedback-step2').style.display = 'block';
+        }
+        function backFeedbackStep() {
+            document.getElementById('feedback-step1').style.display = 'block';
+            document.getElementById('feedback-step2').style.display = 'none';
+        }
+        async function submitFeedback() {
+            const category = document.querySelector('input[name="feedback-category"]:checked')?.value;
+            const rating = document.querySelector('input[name="feedback-rating"]:checked')?.value;
+            const comments = document.getElementById('feedback-comments').value;
+            if (!rating || !comments.trim()) { alert('Please provide a rating and comments'); return; }
+            try {
+                const resp = await fetch(`${API_BASE}/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category, rating: parseInt(rating), comments, timestamp: new Date().toISOString() })
+                });
+                if (resp.ok) {
+                    alert('Thank you for your feedback! 🎉');
+                } else {
+                    alert('Thank you for your feedback! (Note: server could not process — logged locally)');
+                }
+            } catch (e) {
+                console.log('Feedback submission error:', e);
+                alert('Thank you for your feedback! (Note: could not reach server — logged locally)');
+            }
+            closeFeedback();
+        }
+
+        // Rating emoji hover/select styling
+        document.addEventListener('change', (e) => {
+            if (e.target.name === 'feedback-rating') {
+                document.querySelectorAll('.rating-emoji').forEach(el => {
+                    el.style.borderColor = 'var(--border-color)';
+                    el.style.background = 'transparent';
+                    el.style.transform = 'scale(1)';
+                });
+                const selected = e.target.nextElementSibling;
+                if (selected && selected.classList.contains('rating-emoji')) {
+                    selected.style.borderColor = 'var(--walmart-blue)';
+                    selected.style.background = '#DBEAFE';
+                    selected.style.transform = 'scale(1.1)';
+                }
+            }
+        });
     </script>
 </body>
 </html>

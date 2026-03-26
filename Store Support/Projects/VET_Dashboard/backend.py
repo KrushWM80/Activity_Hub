@@ -103,14 +103,16 @@ class VETDataManager:
                 tda.Topic AS `Initiative - Project Title`,
                 tda.Health_Update AS `Health Status`,
                 tda.Phase,
-                1 AS `# of Stores`,
+                SUM(CASE 
+                    WHEN tda.Phase = tda.Facility_Phase THEN tda.Facility 
+                    ELSE 0 
+                END) AS `# of Stores`,
                 tda.Dallas_POC AS `Executive Notes`,
                 tda.TDA_Ownership,
                 tda.Intake_Card_Nbr AS `Project ID`,
                 tda.Intake_n_Testing AS `Intake & Testing`,
                 tda.Deployment,
-                COALESCE(CAST(MIN(intake.WM_Week) AS STRING), 'TBD') AS `WM Week`,
-                tda.Facility
+                COALESCE(CAST(MIN(intake.WM_Week) AS STRING), 'TBD') AS `WM Week`
             FROM 
                 {FULL_TABLE_ID} tda
             LEFT JOIN 
@@ -126,8 +128,7 @@ class VETDataManager:
                 tda.TDA_Ownership,
                 tda.Intake_Card_Nbr,
                 tda.Intake_n_Testing,
-                tda.Deployment,
-                tda.Facility
+                tda.Deployment
             ORDER BY 
                 tda.Phase ASC,
                 tda.Topic ASC
@@ -185,6 +186,16 @@ class VETDataManager:
             if title:
                 titles.add(str(title))
         return sorted(list(titles))
+    
+    def get_unique_ownerships(self) -> List[str]:
+        """Get list of unique TDA ownerships"""
+        data = self.fetch_all_data()
+        ownerships = set()
+        for row in data:
+            ownership = row.get('TDA Ownership', 'Unknown')
+            if ownership:
+                ownerships.add(str(ownership))
+        return sorted(list(ownerships))
     
     def get_at_risk_items(self) -> List[Dict[str, Any]]:
         """Get items with At Risk health status (Needs Attention section)"""
@@ -330,6 +341,24 @@ def get_titles():
         }), 500
 
 
+@app.route('/api/ownerships', methods=['GET'])
+def get_ownerships():
+    """Get list of unique TDA ownerships"""
+    try:
+        ownerships = data_manager.get_unique_ownerships()
+        return jsonify({
+            'success': True,
+            'ownerships': ownerships,
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"Error in /api/ownerships: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 @app.route('/api/needs-attention', methods=['GET'])
 def get_needs_attention():
     """Get At Risk items for Needs Attention section"""
@@ -385,6 +414,27 @@ def get_summary():
         
     except Exception as e:
         logger.error(f"Error in /api/summary: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/refresh', methods=['GET'])
+def refresh_data():
+    """Clear cache and refresh data from BigQuery"""
+    try:
+        global cache_data, cache_timestamp
+        cache_data = None
+        cache_timestamp = None
+        logger.info("Cache cleared, data will be refreshed on next request")
+        return jsonify({
+            'success': True,
+            'message': 'Cache cleared, data will be refreshed',
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"Error in /api/refresh: {e}")
         return jsonify({
             'success': False,
             'error': str(e)

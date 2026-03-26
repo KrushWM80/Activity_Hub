@@ -182,18 +182,24 @@ def map_amp_to_request(event: dict, parsed: dict) -> dict:
 
 def run_amp_sync(db: DatabaseService) -> dict:
     """Main sync function — queries AMP, maps events, inserts new records.
-    Returns summary of sync results."""
+    Form submissions are source of truth — if a Form request already covers
+    the same meeting (by title match), we link via AMP URL instead of inserting
+    a duplicate.  Returns summary of sync results."""
     print("[AMP Sync] Starting AMP auto-ingestion...")
 
     # Get existing AMP URLs to prevent duplicates
     existing_urls = db.get_existing_amp_urls()
     print(f"[AMP Sync] Found {len(existing_urls)} existing AMP records")
 
+    # Get ALL existing request titles + IDs for form-first dedup
+    existing_requests = db.get_existing_request_titles()  # [{title_lower, id, amp_url}]
+    existing_titles = {r["title_lower"]: r for r in existing_requests}
+
     # Get AMP events with Meeting Planner keywords
     amp_events = db.get_amp_meeting_planner_events()
     print(f"[AMP Sync] Found {len(amp_events)} AMP Meeting Planner events")
 
-    stats = {"total": len(amp_events), "new": 0, "skipped": 0, "errors": 0}
+    stats = {"total": len(amp_events), "new": 0, "skipped": 0, "linked": 0, "errors": 0}
 
     for event in amp_events:
         event_id = str(event.get("event_id", ""))
@@ -205,6 +211,25 @@ def run_amp_sync(db: DatabaseService) -> dict:
 
         if amp_url and amp_url in existing_urls:
             stats["skipped"] += 1
+            continue
+
+        # Check if a Form submission already covers this event (title match)
+        amp_title = (event.get("title") or "").strip().lower()
+        matched_form = None
+        for t_lower, req_info in existing_titles.items():
+            if amp_title and (amp_title in t_lower or t_lower in amp_title):
+                matched_form = req_info
+                break
+
+        if matched_form:
+            # Form is source of truth — link AMP URL if the form request is missing it
+            if amp_url and not matched_form.get("amp_url"):
+                db.link_amp_url_to_request(matched_form["id"], amp_url)
+                print(f"[AMP Sync] Linked AMP URL to Form request: {matched_form['id']}")
+                stats["linked"] += 1
+            else:
+                stats["skipped"] += 1
+            existing_urls.add(amp_url)
             continue
 
         # Parse Keywords for additional field data
@@ -228,9 +253,10 @@ def run_amp_sync(db: DatabaseService) -> dict:
         if success:
             stats["new"] += 1
             existing_urls.add(amp_url)  # Track for this batch
+            existing_titles[row["Title"].strip().lower()] = {"title_lower": row["Title"].strip().lower(), "id": row["ID"], "amp_url": amp_url}
             print(f"[AMP Sync] Inserted: {row['Title']} (Status: {row['Status']})")
         else:
             stats["errors"] += 1
 
-    print(f"[AMP Sync] Complete — New: {stats['new']}, Skipped: {stats['skipped']}, Errors: {stats['errors']}")
+    print(f"[AMP Sync] Complete — New: {stats['new']}, Linked: {stats['linked']}, Skipped: {stats['skipped']}, Errors: {stats['errors']}")
     return stats

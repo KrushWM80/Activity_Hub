@@ -8,6 +8,10 @@ import logging
 from datetime import datetime
 from pathlib import Path
 import os
+import base64
+from io import BytesIO
+from pptx import Presentation
+from pptx.util import Inches
 
 logger = logging.getLogger(__name__)
 

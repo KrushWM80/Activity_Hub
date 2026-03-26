@@ -1,4 +1,5 @@
 """BigQuery service for Store Meeting Planner"""
+# Reloaded: March 26, 2026
 import os
 import re
 import uuid
@@ -12,28 +13,58 @@ DATASET_ID = os.getenv("BIGQUERY_DATASET", "Store_Support_Dev")
 
 # Table references
 AMP_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.Output - AMP ALL 2`"
+AMP_RAW_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.AMP2 Data`"
+AMP_HEADLINE_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.AMP2 Headline`"
 REQUEST_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.store_meeting_request_data`"
 CAL_DIM_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.Cal_Dim_Data`"
 STORE_CUR_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.Store_Cur_Data`"
 COSMOS_TABLE = "`wmt-edw-prod.WW_SOA_DL_VM.STORE_OPS_APPLN_ACTV_MGMT_PLAN_MSG_EVENT`"
 
+# msg_type_nm mapping in AMP2 Data (raw Cosmos)
+# 0 = Calendar Events, 1 = Store Updates
+AMP_RAW_TYPE_MAP = {"0": "Calendar Events", "1": "Store Updates"}
+
 # Meeting detection patterns for compliance scanning
+# Derived from keyword analysis of 132 known meeting request message bodies
+# HIGH: Any single match = flag as likely meeting (strong indicators)
 _HIGH_PATTERNS = [
-    re.compile(r'meeting\s*id\s*[:\s]\s*\d{3,}', re.I),
-    re.compile(r'passcode\s*[:\s]\s*\S+', re.I),
-    re.compile(r'zoom\.(us|com)/[jw]/\d+', re.I),
-    re.compile(r'teams\.microsoft\.com/.+/meetup-join', re.I),
-    re.compile(r'webex\.\w+\.com/\S+', re.I),
-    re.compile(r'(?:dial|call)[\s-]in\s*(?:number|info)', re.I),
-    re.compile(r'\d{3}[\s.-]\d{3,4}[\s.-]\d{4}.*(?:pin|code|access)', re.I),
+    re.compile(r'meeting\s*id\s*[:\s]\s*\d{3,}', re.I),        # Meeting ID with digits (38% of known)
+    re.compile(r'passcode\s*[:\s]\s*\S+', re.I),                # Passcode (8%)
+    re.compile(r'zoom\.(us|com)/[jw]/\d+', re.I),               # Zoom join URL
+    re.compile(r'zoom\.us/my/\S+', re.I),                        # Zoom personal room
+    re.compile(r'teams\.microsoft\.com/.+/meetup-join', re.I),   # Teams join link
+    re.compile(r'webex\.\w+\.com/\S+', re.I),                   # WebEx link
+    re.compile(r'(?:dial|call)[\s-]in\s*(?:number|info)', re.I), # Dial-in info
+    re.compile(r'\d{3}[\s.-]\d{3,4}[\s.-]\d{4}.*(?:pin|code|access)', re.I),  # Phone + PIN
+    re.compile(r'office\s+hours', re.I),                         # "Office Hours" (31% of known)
+    re.compile(r'(?:kickoff|kick-off)\s+(?:call|meeting)?', re.I),  # Kickoff (in titles)
 ]
+# MEDIUM: Need 2+ matches to flag (weaker/contextual indicators)
 _MED_PATTERNS = [
-    re.compile(r'join\s+(?:the\s+)?(?:call|meeting|session)', re.I),
-    re.compile(r'attend\s+(?:the\s+)?(?:call|meeting|session)', re.I),
-    re.compile(r'conference\s*(?:call|bridge|line)', re.I),
-    re.compile(r'(?:kickoff|deployment|admin|installation)\s*call', re.I),
-    re.compile(r'listening\s+session', re.I),
+    re.compile(r'join\s+(?:the\s+)?(?:call|meeting|session|us)', re.I),   # "Join the call/us" (19%)
+    re.compile(r'attend\s+(?:the\s+)?(?:call|meeting|session)', re.I),    # "Attend the meeting" (12%)
+    re.compile(r'conference\s*(?:call|bridge|line)', re.I),               # Conference call
+    re.compile(r'(?:deployment|admin|installation|evaluation)\s*call', re.I),  # Specific call types (12%)
+    re.compile(r'listening\s+session', re.I),                              # Listening session
+    re.compile(r'\bregister\b.*(?:call|meeting|session|webinar)', re.I),  # Register for event (15%)
+    re.compile(r'(?:virtual|live)\s+(?:session|meeting|event|training)', re.I),  # Virtual session (15%)
+    re.compile(r'\btraining\b.*(?:call|session|meeting|zoom|teams)', re.I),  # Training with meeting (27%)
+    re.compile(r'(?:weekly|bi-weekly|recurring)\s+(?:call|meeting)', re.I),  # Recurring call
+    re.compile(r'\bzoom\b', re.I),                                         # Any mention of Zoom (23%)
+    re.compile(r'\b(?:phone|dial)\s*(?:number|:)', re.I),                  # Phone number reference (23%)
+    re.compile(r'(?:pre-launch|launch)\s+(?:call|meeting|actions?)', re.I),  # Launch call
+    re.compile(r'\bhost(?:ing)?\s+(?:a\s+)?(?:call|meeting|session)', re.I),  # Hosting a call (8%)
+    re.compile(r'\bschedule[ds]?\s+(?:a\s+)?(?:call|meeting)', re.I),      # Scheduled call
+    re.compile(r'(?:support|update|champion)\s+call', re.I),               # Support/update call
 ]
+
+# Active statuses for AMP Calendar Events / Store Updates display
+# Excludes only Draft and Denied (not meaningful for calendar display)
+AMP_ACTIVE_STATUSES = (
+    "'Awaiting ATC Approval','Awaiting Comms Approval','Review for Publish review',"
+    "'Review for Publish review - No Comms','Published','Expired',"
+    "'ATC final review','Awaiting Business Review','Awaiting Legal Approval'"
+)
 
 REGULAR_MAX_SLOTS = 20
 PROTECTED_MAX_SLOTS = 10
@@ -42,6 +73,7 @@ PROTECTED_MAX_SLOTS = 10
 class DatabaseService:
     def __init__(self):
         self.client = None
+        self._amp_table_status = None  # None=unchecked, 'primary', 'fallback'
         self._connect()
 
     def _connect(self):
@@ -64,6 +96,21 @@ class DatabaseService:
         if not self.client:
             self._connect()
         return self.client is not None
+
+    def _check_amp_table(self) -> str:
+        """Check if Output - AMP ALL 2 has data; if not, use AMP2 Data fallback.
+        Returns 'primary' or 'fallback'. Caches result for 10 minutes."""
+        if self._amp_table_status and hasattr(self, '_amp_check_time'):
+            if (datetime.utcnow() - self._amp_check_time).total_seconds() < 600:
+                return self._amp_table_status
+        rows = self._run_query(f"SELECT 1 FROM {AMP_TABLE} LIMIT 1")
+        if rows:
+            self._amp_table_status = 'primary'
+        else:
+            print("[DB] Output - AMP ALL 2 is empty — using AMP2 Data fallback")
+            self._amp_table_status = 'fallback'
+        self._amp_check_time = datetime.utcnow()
+        return self._amp_table_status
 
     @staticmethod
     def _to_timestamp_str(val) -> str:
@@ -110,27 +157,51 @@ class DatabaseService:
 
     def get_calendar_events(self, start_date: str, end_date: str) -> list:
         """Get AMP Calendar Events for display on the calendar (deduplicated)."""
-        query = f"""
-            SELECT
-                MIN(event_id) as event_id,
-                Activity_Title as title,
-                'Calendar Events' as message_type,
-                Start_Date as start_date,
-                End_Date as end_date,
-                MAX(Business_Area) as business_area,
-                MAX(Author) as author,
-                MAX(Store_Cnt) as store_cnt,
-                MAX(WM_Week) as wm_week,
-                MAX(WM_Year) as wm_year,
-                MAX(Web_Preview) as preview_url
-            FROM {AMP_TABLE}
-            WHERE Message_Type = 'Calendar Events'
-              AND Message_Status IN ('Awaiting ATC Approval', 'Awaiting Comms Approval', 'Review for Publish review')
-              AND Start_Date <= @end_date
-              AND End_Date >= @start_date
-            GROUP BY Activity_Title, Start_Date, End_Date
-            ORDER BY Start_Date
-        """
+        source = self._check_amp_table()
+        if source == 'primary':
+            query = f"""
+                SELECT
+                    MIN(event_id) as event_id,
+                    Activity_Title as title,
+                    'Calendar Events' as message_type,
+                    Start_Date as start_date,
+                    End_Date as end_date,
+                    MAX(Business_Area) as business_area,
+                    MAX(Author) as author,
+                    MAX(Store_Cnt) as store_cnt,
+                    MAX(WM_Week) as wm_week,
+                    MAX(WM_Year) as wm_year,
+                    MAX(Web_Preview) as preview_url
+                FROM {AMP_TABLE}
+                WHERE Message_Type = 'Calendar Events'
+                  AND Message_Status IN ({AMP_ACTIVE_STATUSES})
+                  AND Start_Date <= @end_date
+                  AND End_Date >= @start_date
+                GROUP BY Activity_Title, Start_Date, End_Date
+                ORDER BY Start_Date
+            """
+        else:
+            query = f"""
+                SELECT
+                    MIN(event_id) as event_id,
+                    actv_title_home_ofc_nm as title,
+                    'Calendar Events' as message_type,
+                    msg_start_dt as start_date,
+                    msg_end_dt as end_date,
+                    MAX(bus_domain_nm) as business_area,
+                    MAX(tag_user_nm) as author,
+                    0 as store_cnt,
+                    NULL as wm_week,
+                    NULL as wm_year,
+                    NULL as preview_url
+                FROM {AMP_RAW_TABLE}
+                WHERE msg_type_nm = '0'
+                  AND msg_leg_status_nm IN ('APPROVED', 'REQUESTED')
+                  AND msg_start_dt <= @end_date
+                  AND msg_end_dt >= @start_date
+                GROUP BY actv_title_home_ofc_nm, msg_start_dt, msg_end_dt
+                ORDER BY msg_start_dt
+            """
         params = [
             bigquery.ScalarQueryParameter("start_date", "DATE", start_date),
             bigquery.ScalarQueryParameter("end_date", "DATE", end_date),
@@ -142,22 +213,38 @@ class DatabaseService:
         return rows
 
     def get_protected_weeks(self, fiscal_year: int) -> list:
-        """Get Protected Week dates from AMP ALL 2 (deduplicated)."""
-        query = f"""
-            SELECT
-                'Protected Week' as title,
-                Start_Date as start_date,
-                End_Date as end_date,
-                MAX(WM_Week) as wm_week,
-                MAX(WM_Year) as wm_year
-            FROM {AMP_TABLE}
-            WHERE LOWER(Activity_Title) LIKE '%protected week%'
-              AND Message_Type = 'Calendar Events'
-              AND Message_Status IN ('Awaiting ATC Approval', 'Awaiting Comms Approval', 'Review for Publish review')
-              AND CAST(WM_Year AS INT64) = @fiscal_year
-            GROUP BY Start_Date, End_Date
-            ORDER BY Start_Date
-        """
+        """Get Protected Week dates (deduplicated)."""
+        source = self._check_amp_table()
+        if source == 'primary':
+            query = f"""
+                SELECT
+                    'Protected Week' as title,
+                    Start_Date as start_date,
+                    End_Date as end_date,
+                    MAX(WM_Week) as wm_week,
+                    MAX(WM_Year) as wm_year
+                FROM {AMP_TABLE}
+                WHERE LOWER(Activity_Title) LIKE '%protected week%'
+                  AND Message_Type = 'Calendar Events'
+                  AND Message_Status IN ({AMP_ACTIVE_STATUSES})
+                  AND CAST(WM_Year AS INT64) = @fiscal_year
+                GROUP BY Start_Date, End_Date
+                ORDER BY Start_Date
+            """
+        else:
+            query = f"""
+                SELECT
+                    'Protected Week' as title,
+                    msg_start_dt as start_date,
+                    msg_end_dt as end_date,
+                    NULL as wm_week,
+                    NULL as wm_year
+                FROM {AMP_RAW_TABLE}
+                WHERE LOWER(actv_title_home_ofc_nm) LIKE '%protected week%'
+                  AND msg_leg_status_nm IN ('APPROVED', 'REQUESTED')
+                GROUP BY msg_start_dt, msg_end_dt
+                ORDER BY msg_start_dt
+            """
         params = [
             bigquery.ScalarQueryParameter("fiscal_year", "INT64", fiscal_year),
         ]
@@ -165,16 +252,28 @@ class DatabaseService:
 
     def get_protected_week_dates(self) -> set:
         """Returns a set of date strings (YYYY-MM-DD) that fall in protected weeks."""
-        query = f"""
-            SELECT
-                Start_Date as pw_start,
-                End_Date as pw_end
-            FROM {AMP_TABLE}
-            WHERE LOWER(Activity_Title) LIKE '%protected week%'
-              AND Message_Type = 'Calendar Events'
-              AND Message_Status IN ('Awaiting ATC Approval', 'Awaiting Comms Approval', 'Review for Publish review')
-            GROUP BY Start_Date, End_Date
-        """
+        source = self._check_amp_table()
+        if source == 'primary':
+            query = f"""
+                SELECT
+                    Start_Date as pw_start,
+                    End_Date as pw_end
+                FROM {AMP_TABLE}
+                WHERE LOWER(Activity_Title) LIKE '%protected week%'
+                  AND Message_Type = 'Calendar Events'
+                  AND Message_Status IN ({AMP_ACTIVE_STATUSES})
+                GROUP BY Start_Date, End_Date
+            """
+        else:
+            query = f"""
+                SELECT
+                    msg_start_dt as pw_start,
+                    msg_end_dt as pw_end
+                FROM {AMP_RAW_TABLE}
+                WHERE LOWER(actv_title_home_ofc_nm) LIKE '%protected week%'
+                  AND msg_leg_status_nm IN ('APPROVED', 'REQUESTED')
+                GROUP BY msg_start_dt, msg_end_dt
+            """
         rows = self._run_query(query)
         protected_dates = set()
         for row in rows:
@@ -339,6 +438,31 @@ class DatabaseService:
                 max_day = cal_mod.monthrange(next_month.year, next_month.month)[1]
                 actual_day = min(day_of_month, max_day)
                 current = next_month.replace(day=actual_day)
+                if current > end:
+                    break
+                dates.append(current)
+        elif reoccurrence_lower == 'quarterly':
+            day_of_month = start.day
+            current = start
+            while True:
+                new_month = current.month + 3
+                new_year = current.year
+                while new_month > 12:
+                    new_month -= 12
+                    new_year += 1
+                max_day = cal_mod.monthrange(new_year, new_month)[1]
+                actual_day = min(day_of_month, max_day)
+                current = date(new_year, new_month, actual_day)
+                if current > end:
+                    break
+                dates.append(current)
+        elif reoccurrence_lower == 'yearly':
+            current = start
+            while True:
+                try:
+                    current = current.replace(year=current.year + 1)
+                except ValueError:
+                    current = current.replace(year=current.year + 1, day=28)
                 if current > end:
                     break
                 dates.append(current)
@@ -588,32 +712,61 @@ class DatabaseService:
 
     def get_amp_meeting_planner_events(self) -> list:
         """Get AMP events that contain Meeting Planner data in Keyword_Tags."""
-        query = f"""
-            SELECT
-                event_id,
-                Activity_Title as title,
-                Message_Type as message_type,
-                Start_Date as start_date,
-                End_Date as end_date,
-                Business_Area as business_area,
-                Author as author,
-                Author_email as activity_email,
-                Store_Cnt as store_cnt,
-                WM_Week as wm_week,
-                WM_Year as wm_year,
-                Keyword_Tags as keywords,
-                Web_Preview as preview_url,
-                Edit_Link as edit_link,
-                MP_Date as mp_date,
-                MP_Duration as mp_duration,
-                MP_Start_Datetime as mp_start_datetime,
-                MP_End_Datetime as mp_end_datetime,
-                MP_Timezone as mp_timezone
-            FROM {AMP_TABLE}
-            WHERE LOWER(Keyword_Tags) LIKE '%meeting planner%'
-              AND Message_Status IN ('Awaiting ATC Approval', 'Awaiting Comms Approval', 'Review for Publish review')
-            ORDER BY Start_Date DESC
-        """
+        source = self._check_amp_table()
+        if source == 'primary':
+            query = f"""
+                SELECT
+                    event_id,
+                    Activity_Title as title,
+                    Message_Type as message_type,
+                    Start_Date as start_date,
+                    End_Date as end_date,
+                    Business_Area as business_area,
+                    Author as author,
+                    Author_email as activity_email,
+                    Store_Cnt as store_cnt,
+                    WM_Week as wm_week,
+                    WM_Year as wm_year,
+                    Keyword_Tags as keywords,
+                    Web_Preview as preview_url,
+                    Edit_Link as edit_link,
+                    MP_Date as mp_date,
+                    MP_Duration as mp_duration,
+                    MP_Start_Datetime as mp_start_datetime,
+                    MP_End_Datetime as mp_end_datetime,
+                    MP_Timezone as mp_timezone
+                FROM {AMP_TABLE}
+                WHERE LOWER(Keyword_Tags) LIKE '%meeting planner%'
+                  AND Message_Status IN ({AMP_ACTIVE_STATUSES})
+                ORDER BY Start_Date DESC
+            """
+        else:
+            query = f"""
+                SELECT
+                    event_id,
+                    actv_title_home_ofc_nm as title,
+                    CASE msg_type_nm WHEN '0' THEN 'Calendar Events' ELSE 'Store Updates' END as message_type,
+                    msg_start_dt as start_date,
+                    msg_end_dt as end_date,
+                    bus_domain_nm as business_area,
+                    tag_user_nm as author,
+                    tag_user_email_id as activity_email,
+                    0 as store_cnt,
+                    NULL as wm_week,
+                    NULL as wm_year,
+                    msg_kw_array as keywords,
+                    NULL as preview_url,
+                    NULL as edit_link,
+                    NULL as mp_date,
+                    NULL as mp_duration,
+                    NULL as mp_start_datetime,
+                    NULL as mp_end_datetime,
+                    NULL as mp_timezone
+                FROM {AMP_RAW_TABLE}
+                WHERE LOWER(IFNULL(msg_kw_array, '')) LIKE '%meeting planner%'
+                  AND msg_leg_status_nm IN ('APPROVED', 'REQUESTED')
+                ORDER BY msg_start_dt DESC
+            """
         return self._run_query(query)
 
     def get_existing_amp_urls(self) -> set:
@@ -627,6 +780,32 @@ class DatabaseService:
         """
         rows = self._run_query(query)
         return {r["AMP Activity URL"] for r in rows}
+
+    def get_existing_request_titles(self) -> list:
+        """Get all request titles + IDs + AMP URLs for dedup during AMP sync."""
+        query = f"""
+            SELECT ID, LOWER(TRIM(Title)) as title_lower,
+                   `AMP Activity URL` as amp_url
+            FROM {REQUEST_TABLE}
+        """
+        rows = self._run_query(query)
+        return [{"id": r["ID"], "title_lower": r["title_lower"] or "", "amp_url": r.get("amp_url") or ""} for r in rows]
+
+    def link_amp_url_to_request(self, request_id: str, amp_url: str):
+        """Update a Form-submitted request with its matching AMP URL."""
+        query = f"""
+            UPDATE {REQUEST_TABLE}
+            SET `AMP Activity` = TRUE,
+                `AMP Activity URL` = @amp_url,
+                Modified = @modified
+            WHERE ID = @request_id
+        """
+        params = [
+            bigquery.ScalarQueryParameter("amp_url", "STRING", amp_url),
+            bigquery.ScalarQueryParameter("modified", "STRING", datetime.utcnow().isoformat()),
+            bigquery.ScalarQueryParameter("request_id", "STRING", request_id),
+        ]
+        self._run_query(query, params)
 
     def _to_bq_keys(self, row: dict) -> dict:
         """Convert underscore API keys back to BQ space-named columns."""
@@ -856,12 +1035,22 @@ class DatabaseService:
         return result
 
     def _get_amp_store_counts(self) -> dict:
-        """Get a mapping of event_id -> Store_Cnt from AMP ALL 2."""
-        query = f"""
-            SELECT DISTINCT event_id, Store_Cnt
-            FROM {AMP_TABLE}
-            WHERE event_id IS NOT NULL
-        """
+        """Get a mapping of event_id -> Store_Cnt from AMP ALL 2 or fallback."""
+        source = self._check_amp_table()
+        if source == 'primary':
+            query = f"""
+                SELECT DISTINCT event_id, Store_Cnt
+                FROM {AMP_TABLE}
+                WHERE event_id IS NOT NULL
+            """
+        else:
+            # AMP2 Data doesn't have Store_Cnt; count from Store Activity
+            query = f"""
+                SELECT event_id, COUNT(DISTINCT store_org_cd) as Store_Cnt
+                FROM `{PROJECT_ID}.{DATASET_ID}.AMP 2 Store Activity`
+                WHERE event_id IS NOT NULL
+                GROUP BY event_id
+            """
         rows = self._run_query(query)
         result = {}
         for r in rows:
@@ -881,26 +1070,44 @@ class DatabaseService:
 
     def scan_compliance_gaps(self) -> dict:
         """Scan AMP Store Updates for meetings missing from Meeting Planner."""
+        source = self._check_amp_table()
         # Step 1: Get distinct AMP events (Store Updates + Calendar Events)
-        q_events = f"""
-            SELECT DISTINCT
-                a.event_id,
-                a.Activity_Title,
-                a.Message_Type,
-                a.Message_Status,
-                a.Author_email,
-                a.Store_Cnt,
-                CAST(a.Start_Date AS STRING) AS Start_Date,
-                CAST(a.End_Date AS STRING) AS End_Date,
-                a.Business_Area
-            FROM {AMP_TABLE} a
-            WHERE a.Start_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
-              AND a.Message_Type IN ('Store Updates', 'Calendar Events')
-              AND a.Message_Status IN (
-                  'Awaiting ATC Approval', 'Awaiting Comms Approval',
-                  'Review for Publish review', 'Review for Publish review - No Comms')
-              AND a.event_id IS NOT NULL
-        """
+        if source == 'primary':
+            q_events = f"""
+                SELECT DISTINCT
+                    a.event_id,
+                    a.Activity_Title,
+                    a.Message_Type,
+                    a.Message_Status,
+                    a.Author_email,
+                    a.Store_Cnt,
+                    CAST(a.Start_Date AS STRING) AS Start_Date,
+                    CAST(a.End_Date AS STRING) AS End_Date,
+                    a.Business_Area
+                FROM {AMP_TABLE} a
+                WHERE a.Start_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+                  AND a.Message_Type IN ('Store Updates', 'Calendar Events')
+                  AND a.Message_Status IN ({AMP_ACTIVE_STATUSES})
+                  AND a.event_id IS NOT NULL
+            """
+        else:
+            q_events = f"""
+                SELECT DISTINCT
+                    a.event_id,
+                    a.actv_title_home_ofc_nm AS Activity_Title,
+                    CASE a.msg_type_nm WHEN '0' THEN 'Calendar Events' ELSE 'Store Updates' END AS Message_Type,
+                    a.msg_leg_status_nm AS Message_Status,
+                    a.tag_user_email_id AS Author_email,
+                    0 AS Store_Cnt,
+                    CAST(a.msg_start_dt AS STRING) AS Start_Date,
+                    CAST(a.msg_end_dt AS STRING) AS End_Date,
+                    a.bus_domain_nm AS Business_Area
+                FROM {AMP_RAW_TABLE} a
+                WHERE a.msg_start_dt >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+                  AND a.msg_type_nm IN ('0', '1')
+                  AND a.msg_leg_status_nm IN ('APPROVED', 'REQUESTED')
+                  AND a.event_id IS NOT NULL
+            """
         events = self._run_query(q_events)
         event_map = {}
         for e in events:
@@ -936,12 +1143,33 @@ class DatabaseService:
                 body_map[eid] = body_text
 
         # Step 3: Detect meeting content with two-tier patterns
+        # Check BOTH body text AND title for meeting indicators
+        _TITLE_PATTERNS = [
+            re.compile(r'office\s+hours', re.I),
+            re.compile(r'(?:kickoff|kick-off)\b', re.I),
+            re.compile(r'\bcall\b', re.I),
+            re.compile(r'\bbroadcast\b', re.I),
+            re.compile(r'listening\s+session', re.I),
+            re.compile(r'\bwebinar\b', re.I),
+            re.compile(r'town[\s-]*hall', re.I),
+            re.compile(r'brown\s+bag', re.I),
+            re.compile(r'\bdemo\b', re.I),
+            re.compile(r'q\s*[&+]\s*a\b', re.I),
+            re.compile(r'pre[\s-]*launch\s+actions', re.I),
+        ]
         flagged = []
+        # Scan events with bodies
         for eid, body in body_map.items():
-            if not body:
-                continue
-            high = [p.pattern for p in _HIGH_PATTERNS if p.search(body)]
-            med = [p.pattern for p in _MED_PATTERNS if p.search(body)]
+            text = body or ""
+            title = (event_map.get(eid, {}).get("Activity_Title") or "")
+            # Check body for HIGH/MED patterns
+            high = [p.pattern for p in _HIGH_PATTERNS if text and p.search(text)]
+            med = [p.pattern for p in _MED_PATTERNS if text and p.search(text)]
+            # Also check title for meeting-indicating patterns
+            title_hits = [p.pattern for p in _TITLE_PATTERNS if p.search(title)]
+            if title_hits and not high:
+                # Title match counts as HIGH confidence
+                high = title_hits
             if high or len(med) >= 2:
                 meta = event_map.get(eid, {})
                 flagged.append({
@@ -955,26 +1183,61 @@ class DatabaseService:
                     "area": meta.get("Business_Area", ""),
                     "stores": meta.get("Store_Cnt", 0),
                     "confidence": "HIGH" if high else "MEDIUM",
-                    "body_preview": body[:300],
+                    "matched_patterns": (high or []) + med,
+                    "body_preview": (text or title)[:300],
+                })
+        # Also scan events without bodies (title-only detection)
+        for eid in event_map:
+            if eid in body_map:
+                continue  # Already processed
+            title = (event_map[eid].get("Activity_Title") or "")
+            title_hits = [p.pattern for p in _TITLE_PATTERNS if p.search(title)]
+            if title_hits:
+                meta = event_map[eid]
+                flagged.append({
+                    "event_id": eid,
+                    "title": meta.get("Activity_Title", ""),
+                    "message_type": meta.get("Message_Type", ""),
+                    "status": meta.get("Message_Status", ""),
+                    "author": meta.get("Author_email", ""),
+                    "start_date": str(meta.get("Start_Date", ""))[:10],
+                    "end_date": str(meta.get("End_Date", ""))[:10],
+                    "area": meta.get("Business_Area", ""),
+                    "stores": meta.get("Store_Cnt", 0),
+                    "confidence": "HIGH",
+                    "matched_patterns": title_hits,
+                    "body_preview": f"[Title match] {title}",
                 })
 
         # Step 4: Exclude events already tracked in Meeting Planner
+        # Match by title (fuzzy) and by AMP Activity URL (event_id in URL)
         q_existing = f"""
-            SELECT DISTINCT LOWER(TRIM(Title)) as title_lower
+            SELECT DISTINCT LOWER(TRIM(Title)) as title_lower,
+                   `AMP Activity URL` as amp_url
             FROM {REQUEST_TABLE}
         """
-        existing = set()
+        existing_titles = set()
+        existing_event_ids = set()
         for r in self._run_query(q_existing):
             t = r.get("title_lower")
             if t:
-                existing.add(t)
+                existing_titles.add(t)
+            url = r.get("amp_url") or ""
+            # Extract event_id UUID from AMP URL
+            eid_match = re.search(r'/(message|preview)/([a-f0-9-]{36})/', url)
+            if eid_match:
+                existing_event_ids.add(eid_match.group(2))
 
         missing = []
         for f in flagged:
+            # Check if event_id is already tracked via AMP URL
+            if f["event_id"] in existing_event_ids:
+                continue
+            # Check title fuzzy match
             title_l = f["title"].strip().lower()
             tracked = any(
                 title_l in et or et in title_l
-                for et in existing
+                for et in existing_titles
             )
             if not tracked:
                 missing.append(f)

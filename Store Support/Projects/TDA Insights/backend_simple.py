@@ -112,7 +112,7 @@ def get_bigquery_data():
                 'Intake & Testing': row['Intake & Testing'] or 'N/A',
                 'Deployment': row['Deployment'] or 'N/A',
                 'Project ID': row['Project ID'] or 0,
-                'TDA Ownership': row['TDA Ownership'] or 'No Selection Provided'
+                'TDA Ownership': 'No Selection Provided' if (row['TDA Ownership'] or 'No Selection Provided') in ('No Selection Provided', '*Select Owner') else row['TDA Ownership']
             })
         
         print(f"[OK] Loaded {len(data)} projects from BigQuery")
@@ -918,6 +918,66 @@ def handle_request(client_socket, addr):
                 response = f"HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\n{error}"
                 client_socket.sendall(response.encode())
         
+        elif path == '/api/feedback':
+            # Accept feedback, log it, and send email notification
+            try:
+                feedback = json.loads(request_data_str) if request_data_str else {}
+                feedback['received_at'] = time.strftime('%Y-%m-%d %H:%M:%S')
+                feedback_file = SCRIPT_DIR / 'feedback_log.json'
+                existing = []
+                if feedback_file.exists():
+                    try:
+                        existing = json.loads(feedback_file.read_text())
+                    except Exception:
+                        existing = []
+                existing.append(feedback)
+                feedback_file.write_text(json.dumps(existing, indent=2))
+                print(f"  [Feedback] {feedback.get('category', 'N/A')} - Rating: {feedback.get('rating', 'N/A')}")
+
+                # Send feedback email in background thread
+                def _send_feedback_email(fb):
+                    try:
+                        import win32com.client
+                        import pythoncom
+                        pythoncom.CoInitialize()
+                        outlook = win32com.client.Dispatch('Outlook.Application')
+                        mail = outlook.CreateItem(0)
+                        mail.To = 'kendall.rush@walmart.com; atcteamsupport@walmart.com'
+                        mail.Subject = f"TDA Dashboard Feedback — {fb.get('category', 'General')} ({fb.get('received_at', '')})"
+                        rating = fb.get('rating', 'N/A')
+                        category = fb.get('category', 'N/A')
+                        comments = fb.get('comments', 'No comments provided')
+                        received = fb.get('received_at', '')
+                        mail.HTMLBody = f"""<div style="font-family:Segoe UI,Arial,sans-serif;max-width:600px;">
+    <h2 style="color:#1E3A8A;margin-bottom:4px;">TDA Insights Dashboard — Feedback</h2>
+    <hr style="border:1px solid #E5E7EB;">
+    <table style="border-collapse:collapse;width:100%;margin-top:12px;">
+        <tr><td style="padding:8px 12px;font-weight:600;color:#374151;width:140px;">Category</td><td style="padding:8px 12px;">{category}</td></tr>
+        <tr style="background:#F9FAFB;"><td style="padding:8px 12px;font-weight:600;color:#374151;">Rating</td><td style="padding:8px 12px;font-size:20px;">{rating}</td></tr>
+        <tr><td style="padding:8px 12px;font-weight:600;color:#374151;">Comments</td><td style="padding:8px 12px;">{comments}</td></tr>
+        <tr style="background:#F9FAFB;"><td style="padding:8px 12px;font-weight:600;color:#374151;">Submitted</td><td style="padding:8px 12px;">{received}</td></tr>
+    </table>
+    <p style="color:#6B7280;font-size:12px;margin-top:16px;">This message was sent automatically from the TDA Insights Dashboard.</p>
+</div>"""
+                        mail.Send()
+                        print(f"  [Feedback Email] Sent to kendall.rush@walmart.com, atcteamsupport@walmart.com")
+                    except Exception as email_err:
+                        print(f"  [Feedback Email ERROR] {email_err}")
+                    finally:
+                        try:
+                            pythoncom.CoUninitialize()
+                        except Exception:
+                            pass
+
+                threading.Thread(target=_send_feedback_email, args=(dict(feedback),), daemon=True).start()
+
+                response_json = json.dumps({'success': True})
+                response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
+            except Exception as e:
+                response_json = json.dumps({'success': False, 'error': str(e)})
+                response = f"HTTP/1.1 500 Internal Server Error\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
+            client_socket.sendall(response.encode())
+
         elif path == '/api/ppt/generate-from-screenshots':
             try:
                 # Parse JSON from request body

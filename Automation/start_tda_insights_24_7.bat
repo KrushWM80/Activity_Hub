@@ -44,6 +44,14 @@ cd /d "%TDAPath%"
 
 REM Start Python backend with auto-restart loop
 :restart_loop
+REM --- Kill any stale process holding the port before starting ---
+for /f "tokens=5" %%a in ('netstat -ano 2^>nul ^| findstr ":%Port% " ^| findstr "LISTENING"') do (
+    echo [%date% %time%] Killing stale PID %%a on port %Port%... >> "%LogFile%"
+    echo [%date% %time%] Killing stale PID %%a on port %Port%...
+    taskkill /F /PID %%a > nul 2>&1
+)
+timeout /t 2 /nobreak > nul
+
 echo [%date% %time%] Launching TDA Insights (backend_simple.py)... >> "%LogFile%"
 echo Launching TDA Insights on port %Port%...
 

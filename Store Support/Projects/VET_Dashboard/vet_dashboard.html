@@ -447,7 +447,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: var(--font-size-base);
+            font-size: 12px;
         }
 
         thead {
@@ -456,16 +456,18 @@
         }
 
         th {
-            padding: var(--spacing-md) var(--spacing-lg);
+            padding: 5px 10px;
             text-align: left;
             font-weight: 600;
             color: var(--text-primary);
             white-space: nowrap;
+            font-size: 12px;
         }
 
         td {
-            padding: var(--spacing-md) var(--spacing-lg);
+            padding: 5px 10px;
             border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
         }
 
         tbody tr:hover {
@@ -1141,17 +1143,13 @@
                 'Initiative - Project Title',
                 'Health Status',
                 'Phase',
-                '# of Stores',
-                'Executive Notes',
                 'WM Week',
-                'Intake & Testing',
-                'Deployment'
+                '# of Stores',
+                'Executive Notes'
             ];
             
-            // Ownership banner (navy #1E3A8A, same size as old phase banner)
-            let html = `<div style="background: #1E3A8A; color: white; padding: 15px 20px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px 4px 0 0;">${pageData.ownership}</div>`;
-            // Phase banner (half height, existing blue #3B82F6)
-            html += `<div style="background: #3B82F6; color: white; padding: 7px 20px; font-size: 14px; font-weight: 600; text-align: center;">${pageData.phase}</div>`;
+            // Phase banner only (no TDA Ownership layer)
+            let html = `<div style="background: #3B82F6; color: white; padding: 10px 20px; font-size: 16px; font-weight: 600; text-align: center; border-radius: 4px 4px 0 0;">Phase: ${pageData.phase}</div>`;
             html += '<table><thead><tr>';
             columns.forEach(col => {
                 html += `<th>${col}</th>`;
@@ -1373,15 +1371,74 @@
                 // Hide all other page elements
                 const header = document.querySelector('.header');
                 const sidebar = document.querySelector('.sidebar');
-                const filterSection = document.querySelector('.filter-section');
-                const statsSection = document.querySelector('.stats-section');
+                const filterSection = document.querySelector('.filters-section');
+                const statsSection = document.querySelector('.summary-section');
+                const needsAttention = document.querySelector('.needs-attention-section');
                 const footer = document.querySelector('.footer');
                 
-                if (header) header.style.display = 'none';
-                if (sidebar) sidebar.style.display = 'none';
+                // STEP 1: Capture summary slide (header + stats + needs attention)
+                try {
+                    btn.textContent = '[Wait] Capturing executive summary...';
+                    
+                    // Show only header, stats, needs attention (hide tables)
+                    if (filterSection) filterSection.style.display = 'none';
+                    wrapper.style.display = 'none';
+                    if (footer) footer.style.display = 'none';
+                    if (sidebar) sidebar.style.display = 'none';
+                    
+                    // Ensure header, stats, needs attention are visible
+                    if (header) header.style.display = '';
+                    if (statsSection) statsSection.style.display = '';
+                    if (needsAttention) needsAttention.style.display = '';
+                    
+                    // Create summary container
+                    const summaryContainer = document.createElement('div');
+                    summaryContainer.id = 'summary-for-ppt';
+                    summaryContainer.style.cssText = 'background: white; padding: 40px; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;';
+                    
+                    // Copy summary content
+                    const headerClone = header ? header.cloneNode(true) : null;
+                    const statsClone = statsSection ? statsSection.cloneNode(true) : null;
+                    const needsClone = needsAttention ? needsAttention.cloneNode(true) : null;
+                    
+                    if (headerClone) summaryContainer.appendChild(headerClone);
+                    if (statsClone) summaryContainer.appendChild(statsClone);
+                    if (needsClone) summaryContainer.appendChild(needsClone);
+                    
+                    document.body.appendChild(summaryContainer);
+                    
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    const summaryCanvas = await html2canvas(summaryContainer, {
+                        scale: 1.5,
+                        backgroundColor: '#ffffff',
+                        allowTaint: true,
+                        useCORS: true
+                    });
+                    
+                    screenshots.push({
+                        ownership: 'Executive Summary',
+                        phase: 'Overview',
+                        page: 1,
+                        header: 'Executive Summary — Dashboard Overview',
+                        imageData: summaryCanvas.toDataURL('image/png')
+                    });
+                    
+                    document.body.removeChild(summaryContainer);
+                    totalPages++;
+                    console.log(`[PPT] Summary slide captured`);
+                } catch (summaryError) {
+                    console.warn(`[PPT WARNING] Summary slide capture failed:`, summaryError);
+                    // Continue without summary slide
+                }
+                
+                // STEP 2: Capture data table slides by phase
                 if (filterSection) filterSection.style.display = 'none';
                 if (statsSection) statsSection.style.display = 'none';
+                if (needsAttention) needsAttention.style.display = 'none';
                 if (footer) footer.style.display = 'none';
+                if (sidebar) sidebar.style.display = 'none';
+                if (header) header.style.display = 'none';
                 
                 // Process each ownership → phase section
                 for (const section of sections) {
@@ -1399,8 +1456,8 @@
                         
                         btn.textContent = `[Wait] Capturing ${section.ownership} / ${section.phase} page ${pageIdx + 1}/${pages.length}...`;
                         
-                        // Render this phase/page's table with inline styles matching dashboard
-                        const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Executive Notes', 'WM Week', 'Intake & Testing', 'Deployment'];
+                        // Render this phase/page's table with optimized columns
+                        const columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'WM Week', '# of Stores', 'Executive Notes'];
                         let html = `<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
                                     <thead style="background-color: #F5F5F5; border-bottom: 2px solid #E5E5E5;">
                                     <tr>`;
@@ -1456,9 +1513,8 @@
                         wrapper.innerHTML = html;
                         paginationControls.style.display = 'none';
                         
-                        // Add ownership banner (navy) + phase banner (blue, half height)
-                        let titleHtml = `<div style="background: #1E3A8A; color: white; padding: 15px 20px; font-size: 18px; font-weight: 700; text-align: center; border-radius: 4px 4px 0 0;">${section.ownership}</div>`;
-                        titleHtml += `<div style="background: #3B82F6; color: white; padding: 7px 20px; font-size: 14px; font-weight: 600; text-align: center;">${section.phase}</div>`;
+                        // Add phase banner only (no TDA Ownership banner)
+                        let titleHtml = `<div style="background: #3B82F6; color: white; padding: 10px 20px; font-size: 16px; font-weight: 600; text-align: center; border-radius: 4px 4px 0 0;">Phase: ${section.phase}</div>`;
                         wrapper.innerHTML = titleHtml + wrapper.innerHTML;
                         wrapper.style.display = 'block';
                         wrapper.style.visibility = 'visible';
@@ -1519,6 +1575,7 @@
                 if (sidebar) sidebar.style.display = '';
                 if (filterSection) filterSection.style.display = '';
                 if (statsSection) statsSection.style.display = '';
+                if (needsAttention) needsAttention.style.display = '';
                 if (footer) footer.style.display = '';
                 
                 console.log(`[PPT] Capture complete. Total screenshots: ${screenshots.length}, Total pages: ${totalPages}`);

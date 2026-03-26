@@ -22,6 +22,13 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import threading
 
+# BigQuery for employee lookup
+try:
+    from google.cloud import bigquery
+    HAS_BIGQUERY = True
+except ImportError:
+    HAS_BIGQUERY = False
+
 # Fix Unicode encoding for Windows console output
 import io
 if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
@@ -670,6 +677,90 @@ async def get_teams(request: Request):
     user = require_auth(request)
     teams = get_team_options()
     return {"teams": teams}
+
+@app.post("/api/job-codes/lookup")
+async def lookup_job_code_employees(request: Request):
+    """
+    Lookup employees by job code and pay type using Polaris BigQuery data.
+    
+    Body:
+    {
+        "job_code": "30-49-855",
+        "pay_types": ["H", "S"]  # or comma-separated string "H,S"
+    }
+    """
+    user = require_auth(request)
+    
+    if not HAS_BIGQUERY:
+        raise HTTPException(status_code=503, detail="BigQuery not available. Missing google-cloud-bigquery library.")
+    
+    try:
+        data = await request.json()
+        job_code = data.get("job_code", "").strip()
+        pay_types = data.get("pay_types", ["H", "S"])
+        
+        # Handle both list and comma-separated string
+        if isinstance(pay_types, str):
+            pay_types = [pt.strip() for pt in pay_types.split(",")]
+        
+        if not job_code:
+            raise HTTPException(status_code=400, detail="job_code is required")
+        
+        # Query Polaris for employees with this job code and pay type
+        client = bigquery.Client()
+        
+        # Build pay type filter
+        pay_type_list = "', '".join(pay_types)
+        query = f"""
+        SELECT DISTINCT
+            CAST(worker_id AS STRING) as worker_id,
+            first_name,
+            last_name,
+            job_code,
+            job_nm,
+            worker_payment_type,
+            CAST(location_id AS STRING) as location_id,
+            location_nm,
+            hire_date,
+            empl_type_code
+        FROM `polaris-analytics-prod.us_walmart.vw_polaris_current_schedule`
+        WHERE job_code = '{job_code}'
+          AND worker_payment_type IN ('{pay_type_list}')
+        ORDER BY location_id, worker_id
+        LIMIT 500
+        """
+        
+        print(f"[LOOKUP] Querying for job_code='{job_code}', pay_types={pay_types}")
+        results = client.query(query).result()
+        rows = [dict(row) for row in results]
+        
+        # Convert to list of dictionaries
+        workers = []
+        for row in rows:
+            workers.append({
+                "worker_id": str(row.get("worker_id", "")),
+                "first_name": str(row.get("first_name", "")),
+                "last_name": str(row.get("last_name", "")),
+                "job_code": str(row.get("job_code", "")),
+                "job_nm": str(row.get("job_nm", "")),
+                "pay_type": str(row.get("worker_payment_type", "")),
+                "location_id": str(row.get("location_id", "")),
+                "location_nm": str(row.get("location_nm", "")),
+            })
+        
+        return {
+            "job_code": job_code,
+            "pay_types": pay_types,
+            "employee_count": len(workers),
+            "workers": workers,
+            "query_timestamp": datetime.now().isoformat()
+        }
+        
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON in request body")
+    except Exception as e:
+        print(f"[ERROR] Job code lookup error: {e}")
+        raise HTTPException(status_code=500, detail=f"Query error: {str(e)}")
 
 @app.post("/api/comprehensive-teaming-request")
 async def comprehensive_teaming_request(request: Request):

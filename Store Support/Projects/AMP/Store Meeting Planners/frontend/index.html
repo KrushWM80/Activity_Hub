@@ -740,7 +740,8 @@
             <div class="filters-bar">
                 <input type="date" id="reportStart" placeholder="Start date">
                 <input type="date" id="reportEnd" placeholder="End date">
-                <button class="btn btn-primary btn-sm" onclick="loadReport()">Generate</button>
+                <button class="btn btn-primary btn-sm" onclick="loadReport()">Filter</button>
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('reportStart').value='';document.getElementById('reportEnd').value='';loadReport()">Clear Filters</button>
             </div>
             <div id="reportContent"></div>
         </div>
@@ -822,6 +823,7 @@
                     <label>Reoccurrence</label>
                     <select class="form-control" id="reoccurrence">
                         <option value="None">None (one-time)</option>
+                        <option value="Weekly">Weekly</option>
                         <option value="Bi-Weekly">Bi-Weekly</option>
                         <option value="Monthly">Monthly</option>
                         <option value="Quarterly">Quarterly</option>
@@ -1293,7 +1295,7 @@ function showAdminRequestDetail(r) {
             <div><strong>ID:</strong> ${esc(r.ID)}</div>
             <div><strong>Status:</strong> <span class="status-badge status-${(r.Status||'').replace(/\s/g,'')}">${esc(r.Status)}</span></div>
             <div><strong>Title:</strong> ${esc(r.Title)}</div>
-            <div><strong>Source:</strong> ${r.source || '—'}${r.source === 'AMP' && r.preview_url ? ` <a href="${r.preview_url}" target="_blank" style="color:var(--walmart-blue);font-size:0.8rem">View in AMP</a>` : ''}</div>
+            <div><strong>Source:</strong> ${r.source || '—'}${r.AMP_Activity_URL ? ` <a href="${r.AMP_Activity_URL}" target="_blank" style="color:var(--walmart-blue);font-size:0.8rem">View in AMP ↗</a>` : ''}</div>
             <div><strong>Submitter:</strong> ${esc(r.Name)} (${esc(r.Email)})</div>
             <div><strong>Date:</strong> ${formatDate(r.Start_Date)} — ${formatDate(r.End_Date)}</div>
             <div><strong>Duration:</strong> ${r.Meeting_Duration || '—'} min</div>

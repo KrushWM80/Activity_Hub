@@ -35,7 +35,7 @@ ERROR = RGBColor(220, 53, 69)
 # BigQuery Configuration
 PROJECT_ID = "wmt-assetprotection-prod"
 DATASET_ID = "Store_Support_Dev"
-TABLE_ID = "Output_TDA Report"
+TABLE_ID = "Output- TDA Report"
 FULL_TABLE_ID = f"{PROJECT_ID}.{DATASET_ID}.`{TABLE_ID}`"
 
 
@@ -52,12 +52,32 @@ class TDAPowerPointGenerator:
         try:
             query = f"""
             SELECT 
-                *
+                Topic AS `Initiative - Project Title`,
+                Health_Update AS `Health Status`,
+                Phase,
+                SUM(CASE 
+                    WHEN Phase = Facility_Phase THEN Facility 
+                    ELSE 0 
+                END) AS `# of Stores`,
+                Dallas_POC,
+                TDA_Ownership,
+                Intake_Card_Nbr AS `Project ID`,
+                Intake_n_Testing AS `Intake & Testing`,
+                Deployment
             FROM 
-                `{FULL_TABLE_ID}`
+                {FULL_TABLE_ID}
+            GROUP BY
+                Topic,
+                Health_Update,
+                Phase,
+                Dallas_POC,
+                TDA_Ownership,
+                Intake_Card_Nbr,
+                Intake_n_Testing,
+                Deployment
             ORDER BY 
-                `Phase` ASC,
-                `Initiative - Project Title` ASC
+                Phase ASC,
+                Topic ASC
             """
             
             query_job = self.client.query(query)
@@ -121,8 +141,23 @@ class TDAPowerPointGenerator:
         logo_para.font.size = Pt(44)
         logo_para.alignment = PP_ALIGN.CENTER
     
-    def add_phase_summary_slide(self, prs: Presentation, phase: str, phase_data: List[Dict]):
-        """Add a summary slide for a phase"""
+    def add_phase_summary_slide(self, prs: Presentation, phase: str, phase_data: List[Dict], slide_index: int = 0):
+        """Add a summary slide for a phase (splits into multiple slides if needed)"""
+        # Calculate items per slide (dynamically based on available space)
+        # Available space: 7.5" - 4.0" (table_top) = 3.5" for content
+        # With header/footer: ~3.0" for items
+        # Using 0.3" per row with 0.05" spacing = 0.35" per item
+        # This gives us ~8-9 items per slide comfortably
+        ITEMS_PER_SLIDE = 8
+        
+        # Determine which items to show on this slide
+        start_idx = slide_index * ITEMS_PER_SLIDE
+        end_idx = min(start_idx + ITEMS_PER_SLIDE, len(phase_data))
+        initiatives_to_show = phase_data[start_idx:end_idx]
+        
+        if not initiatives_to_show:
+            return
+        
         slide = prs.slides.add_slide(prs.slide_layouts[6])  # Blank layout
         
         # Background
@@ -140,80 +175,89 @@ class TDAPowerPointGenerator:
         top_border.fill.fore_color.rgb = WALMART_BLUE
         top_border.line.fill.background()
         
-        # Phase title
+        # Phase title (with slide number if multi-slide phase)
+        total_slides = (len(phase_data) + ITEMS_PER_SLIDE - 1) // ITEMS_PER_SLIDE
+        title_text = f"Phase: {phase}"
+        if total_slides > 1:
+            title_text += f" ({slide_index + 1}/{total_slides})"
+        
         title_box = slide.shapes.add_textbox(
             Inches(0.5), Inches(0.3), Inches(9), Inches(0.6)
         )
         title_para = title_box.text_frame.paragraphs[0]
-        title_para.text = f"Phase: {phase}"
+        title_para.text = title_text
         title_para.font.size = Pt(40)
         title_para.font.bold = True
         title_para.font.color.rgb = WALMART_BLUE_DARK
         
-        # Summary stats
-        total_projects = len(phase_data)
-        total_stores = sum([int(row.get('# of Stores', 0) or 0) for row in phase_data])
-        
-        on_track = sum(1 for row in phase_data if 'on track' in str(row.get('Health Status', '')).lower())
-        at_risk = sum(1 for row in phase_data if 'at risk' in str(row.get('Health Status', '')).lower())
-        off_track = sum(1 for row in phase_data if 'off track' in str(row.get('Health Status', '')).lower())
-        
-        # Stats boxes
-        stat_y = 1.2
-        stats = [
-            (f"Total Initiatives", total_projects, WALMART_BLUE),
-            (f"Total Stores Impacted", total_stores, WALMART_BLUE),
-            (f"On Track", on_track, SUCCESS),
-            (f"At Risk", at_risk, WARNING),
-            (f"Off Track", off_track, ERROR),
-        ]
-        
-        for idx, (label, value, color) in enumerate(stats):
-            x_pos = 0.5 + (idx % 5) * 1.9
-            if idx >= 5:
-                stat_y = 2.8
-                x_pos = 0.5 + (idx - 5) * 1.9
+        # Only show summary stats on first slide of phase
+        if slide_index == 0:
+            # Summary stats
+            total_projects = len(phase_data)
+            total_stores = sum([int(row.get('# of Stores', 0) or 0) for row in phase_data])
             
-            # Box
-            stat_shape = slide.shapes.add_shape(
-                1,  # Rectangle
-                Inches(x_pos), Inches(stat_y), Inches(1.7), Inches(0.8)
-            )
-            stat_shape.fill.solid()
-            stat_shape.fill.fore_color.rgb = RGBColor(245, 245, 245)
-            stat_shape.line.color.rgb = color
-            stat_shape.line.width = Pt(2)
+            on_track = sum(1 for row in phase_data if 'on track' in str(row.get('Health Status', '')).lower())
+            at_risk = sum(1 for row in phase_data if 'at risk' in str(row.get('Health Status', '')).lower())
+            off_track = sum(1 for row in phase_data if 'off track' in str(row.get('Health Status', '')).lower())
             
-            # Value
-            val_box = slide.shapes.add_textbox(
-                Inches(x_pos + 0.1), Inches(stat_y + 0.1), Inches(1.5), Inches(0.35)
-            )
-            val_para = val_box.text_frame.paragraphs[0]
-            val_para.text = str(value)
-            val_para.font.size = Pt(28)
-            val_para.font.bold = True
-            val_para.font.color.rgb = color
-            val_para.alignment = PP_ALIGN.CENTER
+            # Stats boxes
+            stat_y = 1.2
+            stats = [
+                (f"Total Initiatives", total_projects, WALMART_BLUE),
+                (f"Total Stores Impacted", total_stores, WALMART_BLUE),
+                (f"On Track", on_track, SUCCESS),
+                (f"At Risk", at_risk, WARNING),
+                (f"Off Track", off_track, ERROR),
+            ]
             
-            # Label
-            lbl_box = slide.shapes.add_textbox(
-                Inches(x_pos + 0.1), Inches(stat_y + 0.45), Inches(1.5), Inches(0.3)
-            )
-            lbl_para = lbl_box.text_frame.paragraphs[0]
-            lbl_para.text = label
-            lbl_para.font.size = Pt(9)
-            lbl_para.font.color.rgb = TEXT_SECONDARY
-            lbl_para.alignment = PP_ALIGN.CENTER
+            for idx, (label, value, color) in enumerate(stats):
+                x_pos = 0.5 + (idx % 5) * 1.9
+                if idx >= 5:
+                    stat_y = 2.8
+                    x_pos = 0.5 + (idx - 5) * 1.9
+                
+                # Box
+                stat_shape = slide.shapes.add_shape(
+                    1,  # Rectangle
+                    Inches(x_pos), Inches(stat_y), Inches(1.7), Inches(0.8)
+                )
+                stat_shape.fill.solid()
+                stat_shape.fill.fore_color.rgb = RGBColor(245, 245, 245)
+                stat_shape.line.color.rgb = color
+                stat_shape.line.width = Pt(2)
+                
+                # Value
+                val_box = slide.shapes.add_textbox(
+                    Inches(x_pos + 0.1), Inches(stat_y + 0.1), Inches(1.5), Inches(0.35)
+                )
+                val_para = val_box.text_frame.paragraphs[0]
+                val_para.text = str(value)
+                val_para.font.size = Pt(28)
+                val_para.font.bold = True
+                val_para.font.color.rgb = color
+                val_para.alignment = PP_ALIGN.CENTER
+                
+                # Label
+                lbl_box = slide.shapes.add_textbox(
+                    Inches(x_pos + 0.1), Inches(stat_y + 0.45), Inches(1.5), Inches(0.3)
+                )
+                lbl_para = lbl_box.text_frame.paragraphs[0]
+                lbl_para.text = label
+                lbl_para.font.size = Pt(9)
+                lbl_para.font.color.rgb = TEXT_SECONDARY
+                lbl_para.alignment = PP_ALIGN.CENTER
+            
+            table_top = 4.0
+        else:
+            # For continuation slides, start higher
+            table_top = 1.2
         
-        # Table of initiatives
-        table_top = 4.0
+        # Table header
         slide.shapes.add_textbox(
             Inches(0.5), Inches(table_top - 0.4), Inches(9), Inches(0.3)
         ).text_frame.paragraphs[0].text = "Key Initiatives"
         
-        # Create simplified table (first 8 projects)
-        initiatives_to_show = phase_data[:8]
-        
+        # Render initiatives with better spacing
         for idx, initiative in enumerate(initiatives_to_show):
             y_pos = table_top + (idx * 0.35)
             
@@ -292,10 +336,17 @@ class TDAPowerPointGenerator:
         # Get unique phases
         phases = sorted(set(str(row.get('Phase', 'Unknown')) for row in self.data))
         
-        # Add slide for each phase
+        # Add slides for each phase (split into multiple slides if needed)
         for phase in phases:
             phase_data = [row for row in self.data if str(row.get('Phase', '')) == phase]
-            self.add_phase_summary_slide(self.presentation, phase, phase_data)
+            
+            # Calculate number of slides needed for this phase (8 items per slide)
+            ITEMS_PER_SLIDE = 8
+            num_slides = (len(phase_data) + ITEMS_PER_SLIDE - 1) // ITEMS_PER_SLIDE
+            
+            # Add slide for each chunk of the phase
+            for slide_idx in range(num_slides):
+                self.add_phase_summary_slide(self.presentation, phase, phase_data, slide_idx)
         
         # Add overview slide
         self.add_overview_slide()

@@ -14,7 +14,6 @@ import sys
 import json
 import io
 import re
-import zipfile
 import time
 import base64
 import struct
@@ -23,6 +22,10 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 from xml.sax.saxutils import escape
+from pptx import Presentation
+from pptx.util import Inches, Pt, Emu
+from pptx.dml.color import RGBColor
+from pptx.enum.text import PP_ALIGN
 from PIL import Image, ImageChops
 
 # Configuration
@@ -30,24 +33,32 @@ RECIPIENTS = ["Kendall.rush@walmart.com", "Matthew.Farnworth@walmart.com", "Just
 SUBJECT = "TDA Initiative Insights - Weekly Report"
 DASHBOARD_URL = "http://WEUS42608431466:5000/tda-initiatives-insights"
 SCRIPT_DIR = Path(__file__).parent
-# Walmart fiscal week: FY starts Saturday closest to Feb 1
+# Walmart fiscal week from BQ Cal_Dim_Data table
 def _walmart_week():
-    from datetime import date
+    from google.cloud import bigquery
+    client = bigquery.Client(project='wmt-assetprotection-prod')
+    query = """
+    SELECT WM_WEEK_NBR, FISCAL_YEAR_NBR
+    FROM `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data`
+    WHERE CALENDAR_DATE = CURRENT_DATE()
+    LIMIT 1
+    """
+    rows = list(client.query(query).result())
+    if rows:
+        return rows[0]['WM_WEEK_NBR'], rows[0]['FISCAL_YEAR_NBR']
+    # Fallback: manual calc if Cal_Dim_Data row missing
+    from datetime import date, timedelta
     today = date.today()
-    # FY start dates (Saturday closest to Feb 1)
-    jan31 = date(today.year, 1, 31)
-    # Find Saturday closest to Feb 1 (weekday 5=Saturday)
     feb1 = date(today.year, 2, 1)
     days_to_sat = (5 - feb1.weekday()) % 7
-    nearest_sat = feb1 + __import__('datetime').timedelta(days=days_to_sat - 7 if days_to_sat > 3 else days_to_sat)
+    nearest_sat = feb1 + timedelta(days=days_to_sat - 7 if days_to_sat > 3 else days_to_sat)
     if today < nearest_sat:
-        # Use previous year's FY start
         feb1_prev = date(today.year - 1, 2, 1)
         days_to_sat = (5 - feb1_prev.weekday()) % 7
-        nearest_sat = feb1_prev + __import__('datetime').timedelta(days=days_to_sat - 7 if days_to_sat > 3 else days_to_sat)
-    return (today - nearest_sat).days // 7 + 1
+        nearest_sat = feb1_prev + timedelta(days=days_to_sat - 7 if days_to_sat > 3 else days_to_sat)
+    return (today - nearest_sat).days // 7 + 1, today.year
 
-WEEK_NUM = _walmart_week()
+WEEK_NUM, FISCAL_YEAR = _walmart_week()
 PPT_OUTPUT = SCRIPT_DIR / f"TDA_WK{WEEK_NUM}_Report.pptx"
 PDF_OUTPUT = SCRIPT_DIR / f"TDA_WK{WEEK_NUM}_Report.pdf"
 HTML_PREVIEW = SCRIPT_DIR / "email_preview.html"
@@ -113,7 +124,7 @@ def fetch_data():
             'Intake & Testing': row['Intake & Testing'] or 'N/A',
             'Deployment': row['Deployment'] or 'N/A',
             'Project ID': row['Project ID'] or 0,
-            'TDA Ownership': row['TDA Ownership'] or 'No Selection Provided',
+            'TDA Ownership': 'No Selection Provided' if (row['TDA Ownership'] or 'No Selection Provided') in ('No Selection Provided', '*Select Owner') else row['TDA Ownership'],
         })
     return data
 
@@ -551,145 +562,76 @@ def generate_report_pptx(data):
                 screenshots.append((label, png_bytes))
                 print(f"    Captured: {ownership_label}/{phase} page {page + 1}/{total_pages} ({len(png_bytes):,} bytes)")
 
-    # Build the PPTX with title slide + screenshot slides
+    # Build the PPTX with python-pptx (schema-compliant, no Repair dialog)
+    SLIDE_WIDTH = Inches(10)
+    SLIDE_HEIGHT = Inches(7.5)
+
+    prs = Presentation()
+    prs.slide_width = SLIDE_WIDTH
+    prs.slide_height = SLIDE_HEIGHT
+
+    # ── Slide 1: Title slide (white bg, blue header, yellow accent) ──
+    slide_layout = prs.slide_layouts[6]  # Blank layout
+    slide = prs.slides.add_slide(slide_layout)
+
+    # Blue header bar
+    header_shape = slide.shapes.add_shape(1, Emu(0), Emu(0), SLIDE_WIDTH, Inches(1.2))
+    header_shape.fill.solid()
+    header_shape.fill.fore_color.rgb = RGBColor(0x3B, 0x82, 0xF6)
+    header_shape.line.fill.background()
+    tf = header_shape.text_frame
+    tf.word_wrap = True
+    tf.margin_left = Inches(0.5)
+    p = tf.paragraphs[0]
+    p.alignment = PP_ALIGN.LEFT
+    run = p.add_run()
+    run.text = "TDA Initiatives Insights"
+    run.font.size = Pt(28)
+    run.font.bold = True
+    run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+    run.font.name = "Segoe UI"
+
+    # Main title
+    txBox = slide.shapes.add_textbox(Inches(0.5), Inches(2.2), Inches(9), Inches(1.8))
+    p = txBox.text_frame.paragraphs[0]
+    p.alignment = PP_ALIGN.CENTER
+    run = p.add_run()
+    run.text = "Initiative Status Insights"
+    run.font.size = Pt(40)
+    run.font.bold = True
+    run.font.color.rgb = RGBColor(0x1E, 0x3A, 0x5F)
+    run.font.name = "Segoe UI"
+
+    # Subtitle
+    txBox2 = slide.shapes.add_textbox(Inches(0.5), Inches(3.9), Inches(9), Inches(0.8))
+    p2 = txBox2.text_frame.paragraphs[0]
+    p2.alignment = PP_ALIGN.CENTER
+    run2 = p2.add_run()
+    run2.text = "Store Support  |  Asset Protection"
+    run2.font.size = Pt(20)
+    run2.font.color.rgb = RGBColor(0x66, 0x66, 0x66)
+    run2.font.name = "Segoe UI"
+
+    # Yellow accent bar at bottom
+    accent = slide.shapes.add_shape(1, Emu(0), Inches(7.1), SLIDE_WIDTH, Inches(0.4))
+    accent.fill.solid()
+    accent.fill.fore_color.rgb = RGBColor(0xFF, 0xC2, 0x20)
+    accent.line.fill.background()
+
+    # ── Screenshot slides ──
+    for label, png_bytes in screenshots:
+        slide = prs.slides.add_slide(prs.slide_layouts[6])
+        img = Image.open(io.BytesIO(png_bytes))
+        img_w, img_h = img.size
+        aspect = img_h / img_w if img_w > 0 else 0.5625
+        final_w = SLIDE_WIDTH
+        final_h = Emu(int(SLIDE_WIDTH * aspect))
+        if final_h > SLIDE_HEIGHT:
+            final_h = SLIDE_HEIGHT
+        slide.shapes.add_picture(io.BytesIO(png_bytes), Emu(0), Emu(0), final_w, final_h)
+
     pptx_buffer = io.BytesIO()
-    total_slides = 1 + len(screenshots)
-
-    with zipfile.ZipFile(pptx_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
-        # [Content_Types].xml
-        ct_parts = '\n'.join(
-            f'<Override PartName="/ppt/slides/slide{i}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>'
-            for i in range(1, total_slides + 1)
-        )
-        zf.writestr('[Content_Types].xml', f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-<Default Extension="xml" ContentType="application/xml"/>
-<Default Extension="jpeg" ContentType="image/jpeg"/>
-<Default Extension="png" ContentType="image/png"/>
-<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>
-{ct_parts}
-</Types>''')
-
-        zf.writestr('_rels/.rels', '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
-</Relationships>''')
-
-        ppt_rels = '\n'.join(
-            f'<Relationship Id="rId{i}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide{i}.xml"/>'
-            for i in range(1, total_slides + 1)
-        )
-        zf.writestr('ppt/_rels/presentation.xml.rels', f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-{ppt_rels}
-</Relationships>''')
-
-        sld_ids = '\n'.join(
-            f'<p:sldId id="{255 + i}" r:id="rId{i}"/>'
-            for i in range(1, total_slides + 1)
-        )
-        zf.writestr('ppt/presentation.xml', f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-<p:sldIdLst>
-{sld_ids}
-</p:sldIdLst>
-<p:sldSz cx="9144000" cy="6858000" type="custom"/>
-<p:notesSz cx="6858000" cy="9144000"/>
-</p:presentation>''')
-
-        # ── Slide 1: Title slide (white bg, blue header, yellow accent — same as dashboard) ──
-        zf.writestr('ppt/slides/_rels/slide1.xml.rels', '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>''')
-
-        title_slide = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-<p:cSld>
-<p:bg><p:bgPr><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>
-<p:spTree>
-<p:nvGrpSpPr><p:cNvPr id="1" name="Title"/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>
-<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="9144000" cy="6858000"/></a:xfrm></p:grpSpPr>
-<p:sp><p:nvSpPr><p:cNvPr id="2" name="HeaderBar"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>
-<p:spPr>
-<a:xfrm><a:off x="0" y="0"/><a:ext cx="9144000" cy="1143000"/></a:xfrm>
-<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
-<a:solidFill><a:srgbClr val="3B82F6"/></a:solidFill>
-<a:ln><a:noFill/></a:ln>
-</p:spPr>
-<p:txBody><a:bodyPr anchor="ctr" lIns="457200" rIns="91440" tIns="0" bIns="0"/><a:lstStyle/>
-<a:p><a:pPr algn="l"/><a:r><a:rPr lang="en-US" sz="2800" b="1" dirty="0"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:latin typeface="Segoe UI"/></a:rPr><a:t>TDA Initiatives Insights</a:t></a:r></a:p>
-</p:txBody></p:sp>
-<p:sp><p:nvSpPr><p:cNvPr id="3" name="MainTitle"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>
-<p:spPr><a:xfrm><a:off x="457200" y="2200000"/><a:ext cx="8230000" cy="1800000"/></a:xfrm></p:spPr>
-<p:txBody><a:bodyPr anchor="ctr"/><a:lstStyle/>
-<a:p><a:pPr algn="ctr"/><a:r><a:rPr lang="en-US" sz="4000" b="1" dirty="0"><a:solidFill><a:srgbClr val="1E3A5F"/></a:solidFill><a:latin typeface="Segoe UI"/></a:rPr><a:t>Initiative Status Insights</a:t></a:r></a:p>
-</p:txBody></p:sp>
-<p:sp><p:nvSpPr><p:cNvPr id="4" name="Subtitle"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>
-<p:spPr><a:xfrm><a:off x="457200" y="3900000"/><a:ext cx="8230000" cy="800000"/></a:xfrm></p:spPr>
-<p:txBody><a:bodyPr anchor="t"/><a:lstStyle/>
-<a:p><a:pPr algn="ctr"/><a:r><a:rPr lang="en-US" sz="2000" dirty="0"><a:solidFill><a:srgbClr val="666666"/></a:solidFill><a:latin typeface="Segoe UI"/></a:rPr><a:t>Store Support  |  Asset Protection</a:t></a:r></a:p>
-</p:txBody></p:sp>
-<p:sp><p:nvSpPr><p:cNvPr id="5" name="AccentLine"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>
-<p:spPr>
-<a:xfrm><a:off x="0" y="6658000"/><a:ext cx="9144000" cy="200000"/></a:xfrm>
-<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
-<a:solidFill><a:srgbClr val="FFC220"/></a:solidFill>
-<a:ln><a:noFill/></a:ln>
-</p:spPr></p:sp>
-</p:spTree>
-</p:cSld>
-</p:sld>'''
-        zf.writestr('ppt/slides/slide1.xml', title_slide)
-
-        # ── Screenshot slides (identical to dashboard Generate PPT) ──
-        SLIDE_W = 9144000
-        SLIDE_H = 6858000
-
-        for idx, (label, png_bytes) in enumerate(screenshots):
-            slide_num = idx + 2
-            img_filename = f'image{idx + 1}.jpg'
-
-            # Store the image
-            zf.writestr(f'ppt/media/{img_filename}', png_bytes)
-
-            # Read JPEG dimensions
-            img_w, img_h = 1920, 1080
-            try:
-                pil_img = Image.open(io.BytesIO(png_bytes))
-                img_w, img_h = pil_img.size
-            except Exception:
-                pass
-
-            # Scale to fill slide width, maintain aspect
-            aspect = img_h / img_w if img_w > 0 else 0.5625
-            final_w = SLIDE_W
-            final_h = int(SLIDE_W * aspect)
-            if final_h > SLIDE_H:
-                final_h = SLIDE_H
-
-            # Slide relationships (link to image)
-            zf.writestr(f'ppt/slides/_rels/slide{slide_num}.xml.rels', f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/{img_filename}"/>
-</Relationships>''')
-
-            slide_xml = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-<p:cSld>
-<p:bg><p:bgPr><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>
-<p:spTree>
-<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>
-<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{SLIDE_W}" cy="{SLIDE_H}"/></a:xfrm></p:grpSpPr>
-<p:pic>
-<p:nvPicPr><p:cNvPr id="2" name="Screenshot"/><p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr>
-<p:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></p:blipFill>
-<p:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{final_w}" cy="{final_h}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>
-</p:pic>
-</p:spTree>
-</p:cSld>
-</p:sld>'''
-            zf.writestr(f'ppt/slides/slide{slide_num}.xml', slide_xml)
-
+    prs.save(pptx_buffer)
     pptx_buffer.seek(0)
     return pptx_buffer.getvalue(), screenshots
 
