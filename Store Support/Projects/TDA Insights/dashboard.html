@@ -1278,9 +1278,15 @@
         }
 
         // Generate PPT with screenshots (integrated with backend)
+        let pptGenerating = false;
         async function generatePPT() {
+            // Prevent double-clicks
+            if (pptGenerating) return;
+            pptGenerating = true;
+            
             // Check if html2canvas is loaded
             if (typeof html2canvas === 'undefined') {
+                pptGenerating = false;
                 alert('[ERROR] html2canvas library failed to load.\n\nPlease:\n1. Check your internet connection\n2. Check browser console for errors\n3. Try a different browser\n4. Disable tracking protection temporarily');
                 return;
             }
@@ -1291,6 +1297,7 @@
             const originalText = btn.textContent;
             
             if (selectedPhases.length === 0) {
+                pptGenerating = false;
                 showError('Please select at least one phase');
                 return;
             }
@@ -1513,6 +1520,10 @@
                 }
                 
                 const blob = await response.blob();
+                if (!blob || blob.size === 0) {
+                    throw new Error('Server returned empty file. Check backend logs.');
+                }
+                console.log(`[PPT] Downloaded blob: ${blob.size} bytes, type: ${blob.type}`);
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
@@ -1520,10 +1531,11 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                window.URL.revokeObjectURL(url);
+                // Delay revokeObjectURL so browser has time to start the download
+                setTimeout(() => window.URL.revokeObjectURL(url), 10000);
                 
                 // Show success message
-                alert(`[OK] Report generated and downloaded successfully!\n\nFile: ${filename}\nPages: ${totalPages}\nPhases: ${selectedPhases.join(', ')}`);
+                alert(`[OK] Report generated and downloaded successfully!\n\nFile: ${filename}\nSize: ${(blob.size / 1024).toFixed(0)} KB\nPages: ${totalPages}\nPhases: ${selectedPhases.join(', ')}`);
                 
                 // Re-render current page with all data
                 currentPage = 1;
@@ -1540,6 +1552,7 @@
                 document.body.style.zoom = '1';
                 btn.textContent = originalText;
                 btn.disabled = false;
+                pptGenerating = false;
             }
         }
 

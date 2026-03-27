@@ -682,10 +682,12 @@ def filter_data(phases=None, health_statuses=None, titles=None, ownerships=None)
 def handle_request(client_socket, addr):
     """Handle a single HTTP request"""
     try:
+        # Set generous timeout for large PPT payloads (19 screenshots ~ 30MB)
+        client_socket.settimeout(120)
         # Receive request headers first
         request_data = b''
         while b'\r\n\r\n' not in request_data:
-            chunk = client_socket.recv(4096)
+            chunk = client_socket.recv(65536)
             if not chunk:
                 return
             request_data += chunk
@@ -704,7 +706,7 @@ def handle_request(client_socket, addr):
         
         # Read remaining body if Content-Length indicates more data
         while len(body_data) < content_length:
-            chunk = client_socket.recv(4096)
+            chunk = client_socket.recv(65536)
             if not chunk:
                 break
             body_data += chunk
@@ -750,6 +752,19 @@ def handle_request(client_socket, addr):
         
         # Store request_data for later use
         request_data_str = body_str
+        
+        # Handle CORS preflight (OPTIONS) for all API routes
+        if method == 'OPTIONS':
+            cors_response = (
+                "HTTP/1.1 204 No Content\r\n"
+                "Access-Control-Allow-Origin: *\r\n"
+                "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
+                "Access-Control-Allow-Headers: Content-Type\r\n"
+                "Access-Control-Max-Age: 86400\r\n"
+                "Connection: close\r\n\r\n"
+            )
+            client_socket.sendall(cors_response.encode())
+            return
         
         # Handle routes
         if path == '/api/health':

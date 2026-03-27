@@ -342,10 +342,9 @@ def _build_phase_html(phase, rows, ownership=None, is_special=False):
     columns = ['Initiative - Project Title', 'Health Status', 'Phase',
                 '# of Stores', 'Dallas POC', 'Intake & Testing', 'Deployment']
 
-    # Ownership banner (navy) + phase sub-banner (blue, half height)
+    # Ownership banner (navy) — phase sub-banner removed to match dashboard
     ownership_label = ownership or phase
     banner = f'<div style="background:#1E3A8A;color:white;padding:15px 20px;font-size:18px;font-weight:700;text-align:center;border-radius:4px 4px 0 0;">{escape(ownership_label)}</div>'
-    banner += f'<div style="background:#3B82F6;color:white;padding:7px 20px;font-size:14px;font-weight:600;text-align:center;">{escape(phase)}</div>'
 
     table = '<table style="width:100%;border-collapse:collapse;font-size:14px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Helvetica Neue\',Arial,sans-serif;">'
     table += '<thead style="background-color:#F5F5F5;border-bottom:2px solid #E5E5E5;"><tr>'
