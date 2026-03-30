@@ -257,9 +257,10 @@ class TDAPowerPointGenerator:
             Inches(0.5), Inches(table_top - 0.4), Inches(9), Inches(0.3)
         ).text_frame.paragraphs[0].text = "Key Initiatives"
         
-        # Render initiatives with better spacing
+        # Render initiatives with fixed spacing (no stretching)
+        ROW_HEIGHT = 0.35  # Fixed height per row
         for idx, initiative in enumerate(initiatives_to_show):
-            y_pos = table_top + (idx * 0.35)
+            y_pos = table_top + (idx * ROW_HEIGHT)
             
             # Initiative name
             name_box = slide.shapes.add_textbox(
@@ -311,7 +312,7 @@ class TDAPowerPointGenerator:
             Inches(0.5), Inches(7), Inches(9), Inches(0.4)
         )
         footer_para = footer_box.text_frame.paragraphs[0]
-        footer_para.text = f"Data Source: wmt-assetprotection-prod.Store_Support_Dev.Output_TDA Report | Generated: {datetime.now().strftime('%B %d, %Y')}"
+        footer_para.text = f"V.E.T. Executive Report | Data Source: wmt-assetprotection-prod.Store_Support_Dev | Generated: {datetime.now().strftime('%B %d, %Y')}"
         footer_para.font.size = Pt(8)
         footer_para.font.color.rgb = TEXT_SECONDARY
         footer_para.alignment = PP_ALIGN.CENTER
@@ -326,11 +327,18 @@ class TDAPowerPointGenerator:
         # Create presentation
         self.presentation = self.create_presentation()
         
+        # Get WM Week from data (if available)
+        wm_week = "Current"
+        if self.data and 'WM Week' in self.data[0]:
+            wm_weeks = set(str(row.get('WM Week', 'Current')) for row in self.data if row.get('WM Week'))
+            if wm_weeks:
+                wm_week = ', '.join(sorted(wm_weeks))
+        
         # Add title slide
         self.add_title_slide(
             self.presentation,
-            "TDA Initiatives Insights",
-            "Executive Dashboard Report"
+            "V.E.T. Executive Report",
+            f"Walmart Enterprise Transformation - {wm_week}"
         )
         
         # Get unique phases
@@ -353,7 +361,7 @@ class TDAPowerPointGenerator:
         
         # Save presentation
         if not output_path:
-            output_path = f"TDA_Initiatives_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pptx"
+            output_path = f"VET_Executive_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pptx"
         
         self.presentation.save(output_path)
         logger.info(f"PowerPoint report generated: {output_path}")

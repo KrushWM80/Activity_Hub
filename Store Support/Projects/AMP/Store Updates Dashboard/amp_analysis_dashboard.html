@@ -1028,7 +1028,7 @@
  <div class="header-top">
  <div>
  <h1>
- <img src="Spark_Blank.png" alt="Spark" style="height: 40px; vertical-align: middle; margin-right: 8px;">Store Activity and Communications
+ <img src="./Spark_Blank.png" alt="Spark" style="height: 40px; vertical-align: middle; margin-right: 8px;">Store Activity and Communications
  </h1>
  <span class="subtitle">Activity Performance & Engagement Metrics through MyWalmart > Inbox > Store Updates</span>
  </div>
@@ -2962,7 +2962,7 @@
  }
  });
 
- // Search Function
+ // Search Function - Calls BigQuery API
  function searchData() {
  const filters = {
  search: document.getElementById('filterSearch').value,
@@ -2974,8 +2974,8 @@
  market: document.getElementById('filterMarket').value,
  store: document.getElementById('filterStore').value,
  alignment: document.getElementById('filterAlignment').value,
- fy: document.getElementById('filterFY').value,
- week: document.getElementById('filterWeek').value
+ fy: document.getElementById('filterFY').value || 2027,
+ week: parseInt(document.getElementById('filterWeek').value) || 1
  };
 
  console.log('Searching with filters:', filters);
@@ -2983,14 +2983,76 @@
  // Hide search suggestions
  document.getElementById('searchSuggestions').style.display = 'none';
  
- // TODO: Call BigQuery API with filters
- // Activity Search searches across: Title, Keyword_Tags, Message_Body, and other columns
- console.log('Search query will look in: Title, Keyword_Tags, Message_Body, Business_Area, Store_Area');
+ // Show loading state
+ document.getElementById('tableBody').innerHTML = `
+ <tr>
+ <td colspan="9" style="text-align: center; padding: 40px; color: var(--gray-600);">
+ <strong>Loading data from BigQuery...</strong>
+ </td>
+ </tr>
+ `;
+ 
+ // TODO (Phase 2): Implement advanced filtering by Title, Keyword_Tags, Message_Body
+ // Current: Returns WK 1+ data for specified FY, sorted by Activity_Title
+ // Future: Add text search, business area filters, region/market/store hierarchies
+ 
+ // Call BigQuery API with filters - minimum week is 1
+ const minWeek = Math.max(filters.week, 1);
+ fetch(`/api/amp-data?fy=${filters.fy}&week=${minWeek}`)
+ .then(response => {
+ if (!response.ok) {
+ throw new Error(`HTTP error! status: ${response.status}`);
+ }
+ return response.json();
+ })
+ .then(data => {
+ if (!data || !data.data || data.data.length === 0) {
+ document.getElementById('tableBody').innerHTML = `
+ <tr>
+ <td colspan="9" style="text-align: center; padding: 40px; color: var(--gray-600);">
+ No activities found for Week ${minWeek}+ in FY ${filters.fy}
+ </td>
+ </tr>
+ `;
+ return;
+ }
+ 
+ // Populate table with API data
+ const tableBody = document.getElementById('tableBody');
+ tableBody.innerHTML = data.data.map((row, index) => `
+ <tr>
+ <td class="text-nowrap font-weight-bold">${row.Week}</td>
+ <td><a class="activity-title-link" href="${row.Preview_Link || '#'}" target="_blank">${row.Activity_Title}</a></td>
+ <td>${row.Activity_Type || '-'}</td>
+ <td>${row.Business_Area || '-'}</td>
+ <td class="metric-column">${row.Stores_With_Access || 0}</td>
+ <td class="metric-column">${row.Total_Impressions?.toLocaleString() || 0}</td>
+ <td class="metric-column">${row.Unique_Viewers?.toLocaleString() || 0}</td>
+ <td class="metric-column">${row.Engagement_Rate || '-'}</td>
+ <td class="metric-column">${row.Completion_Rate || '-'}</td>
+ <td><span class="status-badge status-published">${row.Status || 'Published'}</span></td>
+ </tr>
+ `).join('');
+ })
+ .catch(error => {
+ console.error('Error fetching data:', error);
+ document.getElementById('tableBody').innerHTML = `
+ <tr>
+ <td colspan="9" style="text-align: center; padding: 40px; color: var(--error);">
+ <strong>Error loading data</strong><br>
+ <small>${error.message}</small>
+ </td>
+ </tr>
+ `;
+ });
  }
 
- // Export Function
+ // Export Function - Exports filtered data to CSV
  function exportData() {
  console.log('🔥 Exporting data to CSV...');
+ 
+ // TODO (Phase 5): Test CSV export with live BigQuery data
+ // Future: Add export options (Excel, PDF), include all columns, add timestamp filter
  
  // Get table data
  const table = document.querySelector('table');
@@ -3019,28 +3081,17 @@
  console.log('… Export complete');
  }
 
- // Refresh Function - Clears all filters and resets to original data
+ // Refresh Function - Clears all filters and reloads data from BigQuery
  function refreshData() {
- console.log('🔄 Clearing filters and refreshing data...');
+ console.log('🔄 Refreshing data from BigQuery...');
  
  // Clear all filters first
  clearAllFilters();
  
- // Show loading state
- document.getElementById('tableBody').innerHTML = `
- <tr>
- <td colspan="9" style="text-align: center; padding: 40px; color: var(--gray-600);">
- <div style="font-size: 24px; margin-bottom: 8px;"></div>
- <strong>Refreshing data...</strong>
- </td>
- </tr>
- `;
-
- // Simulate refresh (in production, would reload from BigQuery)
- setTimeout(() => {
- // Reload page to restore original data
+ // Reload page to fetch fresh data from backend
+ // TODO (Phase 3): Add timestamp refresh indicator and cache management
+ // Future: Show last-refreshed timestamp, add manual vs auto refresh options
  location.reload();
- }, 500);
  }
 
  function clearAllFilters() {
@@ -3298,6 +3349,10 @@
  
  // Initialize filter placeholders
  initFilterPlaceholders();
+ 
+ // Load live BigQuery data (WK 1+) by default
+ // TODO (Phase 4): Add loading indicator during initial data fetch
+ searchData();
  
  // Add event listener to week filter for real-time stat updates
  const weekFilter = document.getElementById('filterWeek');

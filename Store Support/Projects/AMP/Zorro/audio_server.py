@@ -9,8 +9,10 @@ import os
 import json
 from pathlib import Path
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+from socketserver import ThreadingMixIn
 from urllib.parse import unquote, urlparse
 import mimetypes
+import re
 import sys
 
 # Initialize mimetypes
@@ -75,7 +77,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
         if path.startswith("/audio/"):
             filename = path.replace("/audio/", "")
             filepath = self.AUDIO_DIR / filename
-            if filepath.exists() and filepath.suffix in ['.wav', '.mp3', '.m4a', '.mp4']:
+            if filepath.exists() and filepath.suffix in ['.wav', '.mp3', '.m4a', '.mp4', '.txt', '.html']:
                 self.serve_file(filepath)
                 return
         
@@ -108,6 +110,16 @@ class AudioHandler(SimpleHTTPRequestHandler):
         # Handle template generation
         if path == "/api/generate-from-template":
             self.handle_template_generation()
+            return
+        
+        # Handle setting Stream URL for an audio file
+        if path == "/api/set-audio-link":
+            self.handle_set_audio_link()
+            return
+        
+        # Handle sending email report
+        if path == "/api/send-email-report":
+            self.handle_send_email_report()
             return
         
         # Default 404
@@ -290,9 +302,13 @@ class AudioHandler(SimpleHTTPRequestHandler):
                     response['filename'] = output_path.name
                     response['audio_url'] = f'/audio/{output_path.name}'
                     response['size_kb'] = round(output_path.stat().st_size / 1024, 1)
-                    response['voice'] = 'Jenny Neural'
+                    response['voice'] = 'Jenny Neural (V2 Enhanced Prosody)'
                     response['codec'] = 'AAC @ 256kbps'
                     response['script_length'] = result.get('script_length', 0)
+                    response['duration_seconds'] = result.get('duration_seconds', 0)
+                if result.get('email_report'):
+                    report_path = Path(result['email_report'])
+                    response['email_report_url'] = f'/audio/{report_path.name}'
                 self.send_json_response(response, 200)
             else:
                 self.send_json_response({
@@ -647,6 +663,75 @@ class AudioHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(response.encode())
     
+    # ── Audio Link (Stream URL) persistence ──────────────────────────
+    LINKS_FILE = Path(__file__).parent / "output" / "Audio" / "audio_links.json"
+    
+    @classmethod
+    def _load_audio_links(cls):
+        if cls.LINKS_FILE.exists():
+            with open(cls.LINKS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {}
+    
+    @classmethod
+    def _save_audio_links(cls, links):
+        cls.LINKS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(cls.LINKS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(links, f, indent=2)
+    
+    def handle_set_audio_link(self):
+        """Save a Stream/SharePoint URL for an audio file."""
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode('utf-8')
+            params = json.loads(body)
+            
+            filename = params.get('filename', '').strip()
+            link = params.get('link', '').strip()
+            
+            if not filename:
+                self.send_json_response({'success': False, 'error': 'filename is required'}, 400)
+                return
+            
+            links = self._load_audio_links()
+            if link:
+                links[filename] = link
+            else:
+                links.pop(filename, None)
+            self._save_audio_links(links)
+            
+            self.send_json_response({'success': True, 'filename': filename, 'link': link})
+        except Exception as e:
+            self.send_json_response({'success': False, 'error': str(e)}, 500)
+    
+    def handle_send_email_report(self):
+        """Send the Weekly Messages Audio Report email via Outlook COM."""
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode('utf-8')
+            params = json.loads(body)
+            
+            week = params.get('week')
+            fy = params.get('fy', 2027)
+            to = params.get('to', 'kendall.rush@walmart.com')
+            
+            if not week:
+                self.send_json_response({'success': False, 'error': 'week is required'}, 400)
+                return
+            
+            recipients = [r.strip() for r in to.split(';') if r.strip()]
+            
+            from generate_weekly_audio import send_audio_report_email
+            result = send_audio_report_email(int(week), int(fy), to_recipients=recipients)
+            
+            status_code = 200 if result.get('success') else 500
+            self.send_json_response(result, status_code)
+        except Exception as e:
+            print(f"Error sending email report: {e}")
+            import traceback
+            traceback.print_exc()
+            self.send_json_response({'success': False, 'error': str(e)}, 500)
+    
     def serve_index(self):
         """Serve Zorro Activity Hub index page with Week 4 Summarized Messages"""
         # Collect audio files from both /output/Audio/ and /Audio/mp4_output/
@@ -899,6 +984,34 @@ class AudioHandler(SimpleHTTPRequestHandler):
             background: #2563EB;
         }
         
+        .script-btn {
+            background: #8B5CF6;
+            color: white;
+        }
+        
+        .script-btn:hover {
+            background: #7C3AED;
+        }
+        
+        .report-btn {
+            background: #EA580C;
+            color: white;
+        }
+        
+        .report-btn:hover {
+            background: #C2410C;
+        }
+        
+        .setlink-btn {
+            background: #0891B2;
+            color: white;
+            white-space: nowrap;
+        }
+        
+        .setlink-btn:hover {
+            background: #0E7490;
+        }
+        
         .delete-btn {
             background: #EF4444;
             color: white;
@@ -1008,6 +1121,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
 """
         
         if audio_files:
+            audio_links = self._load_audio_links()
             html += '<div class="files-grid">'
             for filepath in audio_files:
                 filename = filepath.name
@@ -1034,7 +1148,6 @@ class AudioHandler(SimpleHTTPRequestHandler):
                     url = f"/audio/{filename}"
                 else:
                     url = f"/audio/{filename}"
-                file_url = f"http://localhost:8888{url}"
                 
                 # Clean up filename for display
                 display_name = filename.rsplit('.', 1)[0]  # Remove extension
@@ -1050,8 +1163,42 @@ class AudioHandler(SimpleHTTPRequestHandler):
                 }
                 mime_type = mime_type_map.get(ext, f'audio/{ext}')
                 
+                # Check for matching TTS script .txt file
+                wk_match = re.search(r'Week (\d+)', filename)
+                script_btn = ''
+                report_btn = ''
+                if wk_match:
+                    script_name = f"Week {wk_match.group(1)} - Weekly Messages Audio Script.txt"
+                    script_path = self.AUDIO_DIR / script_name
+                    if script_path.exists():
+                        script_url = f"/audio/{script_name}"
+                        script_btn = f'<button class="action-btn script-btn" onclick="downloadFile(\'{script_url}\', \'{script_name}\')">📝 Script</button>'
+                    report_name = f"Week {wk_match.group(1)} - Weekly Messages Audio Report.html"
+                    report_path = self.AUDIO_DIR / report_name
+                    if report_path.exists():
+                        report_url = f"/audio/{report_name}"
+                        wk_num = wk_match.group(1)
+                        report_btn = f'<button class="action-btn report-btn" onclick="sendEmailReport({wk_num}, this)">📧 Email Report</button>'
+                
+                # Auto-generate the internal Walmart CMS URL from the week number
+                cms_base = 'https://internal.walmart.com/content/store-communications/home/merchandise/total-store'
+                if wk_match:
+                    cms_url = f'{cms_base}/Weekly_Messages_Audio_WK{wk_match.group(1)}.html'
+                    # Auto-save to audio_links.json for BQ publish
+                    audio_links = self._load_audio_links()
+                    if audio_links.get(filename) != cms_url:
+                        audio_links[filename] = cms_url
+                        self._save_audio_links(audio_links)
+                else:
+                    cms_url = ''
+                
+                import html as html_mod
+                html_escaped_cms = html_mod.escape(cms_url) if cms_url else ''
+                copy_disabled = '' if cms_url else ' disabled title="No week detected in filename"'
+                copy_style = 'opacity:0.4;cursor:not-allowed;' if not cms_url else ''
+                
                 html += f"""
-            <div class="file-card">
+            <div class="file-card" id="card-{hash(filename) & 0xFFFFFFFF}">
                 <div class="file-header">
                     <div class="voice-badge" style="background-color: {badge_bg};">{voice_label}</div>
                     <div class="file-title">{display_name}</div>
@@ -1064,9 +1211,16 @@ class AudioHandler(SimpleHTTPRequestHandler):
                         <source src="{url}" type="{mime_type}">
                         Your browser does not support the audio element.
                     </audio>
+                    <div class="link-row" style="margin:6px 0;display:flex;gap:6px;align-items:center;">
+                        <span style="font-size:0.82em;color:#6B7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{html_escaped_cms}">🔗 {html_escaped_cms}</span>
+                    </div>
                     <div class="file-actions">
-                        <button class="action-btn copy-btn" onclick="copyURL('{file_url}')">📋 Copy URL</button>
+                        <button class="action-btn copy-btn"
+                                onclick="copyStreamURL(this)"{copy_disabled}
+                                style="{copy_style}">📋 Copy URL</button>
                         <button class="action-btn download-btn" onclick="downloadFile('{url}', '{filename}')">⬇️ Download</button>
+                        {script_btn}
+                        {report_btn}
                         <button class="action-btn delete-btn" onclick="deleteFile('{filename}')">🗑️ Delete</button>
                     </div>
                 </div>
@@ -1091,6 +1245,51 @@ class AudioHandler(SimpleHTTPRequestHandler):
     </div>
     
     <script>
+        function copyStreamURL(btn) {
+            const card = btn.closest('.file-card');
+            const span = card.querySelector('.link-row span');
+            const url = span ? span.textContent.replace(/^🔗\s*/, '').trim() : '';
+            if (!url) {
+                alert('No CMS URL available (week number not detected in filename).');
+                return;
+            }
+            navigator.clipboard.writeText(url).then(() => {
+                const orig = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = orig, 1500);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+        
+        function sendEmailReport(week, btn) {
+            if (!confirm('Send Weekly Messages Audio Report email for Week ' + week + '?')) return;
+            const orig = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '⏳ Sending...';
+            fetch('/api/send-email-report', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({week: week, fy: 2027})
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.disabled = false;
+                if (data.success) {
+                    btn.textContent = '✅ Sent!';
+                    setTimeout(() => btn.textContent = orig, 3000);
+                } else {
+                    btn.textContent = orig;
+                    alert('Email failed: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.textContent = orig;
+                alert('Email error: ' + err.message);
+            });
+        }
+        
         function copyURL(text) {
             navigator.clipboard.writeText(text).then(() => {
                 alert('URL copied to clipboard!');
@@ -1327,10 +1526,13 @@ class AudioHandler(SimpleHTTPRequestHandler):
         """Custom logging"""
         print(f"[{self.client_address[0]}] {format % args}")
 
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    daemon_threads = True
+
 def start_server(port=8888):
     """Start the audio server"""
     server_address = ('', port)
-    httpd = HTTPServer(server_address, AudioHandler)
+    httpd = ThreadingHTTPServer(server_address, AudioHandler)
     
     print(f"""
 ╔════════════════════════════════════════════════════════╗

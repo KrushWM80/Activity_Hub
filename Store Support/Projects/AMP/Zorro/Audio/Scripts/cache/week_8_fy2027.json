@@ -1,0 +1,325 @@
+{
+  "week": 8,
+  "fy": 2027,
+  "cached_at": "2026-03-30T09:08:11.609608",
+  "event_count": 52,
+  "review_no_comm_count": 52,
+  "summarized_count": 1,
+  "events_with_summaries": [
+    {
+      "event_id": "7075edb9-ad14-449b-a9eb-592a5f2aa0cc",
+      "store_area": "Total Store",
+      "title": "Open Office Hours for the New Incident Intake",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Open Office Hours for the New Incident Intake Walmart Claims Services is hosting open office hours to help with the new Incident Intake system, which replaces the Accident app and IRS. Join Mondays and Thursdays from March 23 through April 30, 2 to 3 p.m. Central. Drop in anytime with questions or issues."
+    }
+  ],
+  "events_without_summary": [
+    {
+      "event_id": "55a2d156-c042-4783-8548-6a79c6607086",
+      "title": "Auto Battery Returns  ",
+      "area": "Auto Care",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "9882d71c-a761-4a83-9775-9ddce4b17230",
+      "title": "Dept. 10: Castrol Edge UPC Hold Notice",
+      "area": "Auto Care",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "22be8805-82ba-443d-ba2f-eaeda0cd529a",
+      "title": "Dribble, pass\u2026 and pay later. OnePay Later helps with your March Madness parties",
+      "area": "Auto Care",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "07b26d4f-22c2-456f-92ef-fe9245e0fbed",
+      "title": "Backroom: Join the DSD Office Hours for Real-Time Support",
+      "area": "Backroom and Claims",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "739e53da-504e-4797-8a2e-ddc0e929564b",
+      "title": "Dept. 40: Common Supplements Signing Kit",
+      "area": "Consumables",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "fbe85abe-45c9-4202-bb30-8c64ef0689fb",
+      "title": "Dept. 4: Disposable Tabletop Solo Shippers Pink and Green",
+      "area": "Consumables",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "1c509321-703f-4e2f-b313-318f70871352",
+      "title": "Dept. 8: Boxiecat Cat Litter - Do Not Open Boxes",
+      "area": "Consumables",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "34f36c08-f811-4c3c-865a-9727653810f3",
+      "title": "Dept. 8: Spring Blue Buffalo Endcap Feature Set Now",
+      "area": "Consumables",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "b5578db5-b969-4600-a6af-98528f221a74",
+      "title": "Don\u2019t Let Sales\u00a0Egg-scape You This Easter!\u00a0",
+      "area": "Digital",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "06ea833d-e266-4da4-982c-4d18d2470975",
+      "title": "Drive Smart, Deliver Strong",
+      "area": "Digital",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "fac2de21-e71f-4ec4-b8aa-f530dd306205",
+      "title": "Reminder: Store Fulfillment Baseline Operating Structure",
+      "area": "Digital",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "ef133868-6d86-4a40-b31d-211de6de3848",
+      "title": "Dept. 72: User Account Change for VIZIO and onn. TVs",
+      "area": "Entertainment",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "a41991fd-3d52-43ae-ae3e-70f1d6cfa91d",
+      "title": "Dept. 25: Madden NYC Trend Pod Signage",
+      "area": "Fashion",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "95275859-5a1e-4b42-9bc0-a8c0b290ddf8",
+      "title": "Dept. 32: Final Correction Issued for Markdown Pricing Discrepancies",
+      "area": "Fashion",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "73e53e18-01e4-4dfe-bfe0-62c9057ea78a",
+      "title": "Dept. 32: Watch Markdowns",
+      "area": "Fashion",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "6136a376-990f-4bbe-9a15-09c0ffa3c5b9",
+      "title": "Dept. 90: Cream Cheese and Eggs for Easter",
+      "area": "Food",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "b6a78a43-5534-4d5d-9757-c62382e0db58",
+      "title": "Dept. 91: Frozen Modular Update",
+      "area": "Food",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "d2d3e72c-865f-468b-b7e9-4b77cc0f35cf",
+      "title": "Dept. 92: Quick Mod Execution",
+      "area": "Food",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "cb578dba-dd14-4154-ac3d-7ae98037f3c5",
+      "title": "Dept. 95: Munchies Sandwich Crackers Transition to Store Stocking ",
+      "area": "Food",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "ae42d3ec-2774-4e60-b107-40517411fc3c",
+      "title": "Dept. 98: Final Two Weeks of the Spring Bake Center",
+      "area": "Food",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "1f4e189d-4920-4c29-9cc8-8f2eeca1b9bb",
+      "title": "D80: Rotisserie Bundle Signage",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "e7ebb0bb-9006-4951-a535-e93bef0e4d13",
+      "title": "D97: Item Withdrawal Notice",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "e96103fe-5fa1-475d-8b11-6b4afde8b7aa",
+      "title": "D97: Items Department Switch Update",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "ede470c5-798e-4067-b9d5-83424d875ef4",
+      "title": "Dept. 80: Deli Meat & Cheese-Reset the Basics",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "9a883b18-31b0-44d5-92e8-e1beba01e837",
+      "title": "Dept. 93: Week 8 Merch Message",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "74f4df64-3950-4dc8-a283-b98ec04f48af",
+      "title": "Dept. 94: Produce Updates",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "862ce237-9329-42b5-b917-dadf880cad26",
+      "title": "Dept. 98 & 81: Fresh Bakery & Commercial Bread Update",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "113f515c-8f0b-499b-9126-b8522f1a81ad",
+      "title": "Week 08 - Dept. 94: Easter Merchandising, Fresh Floral and Produce Updates",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "d3e5adb2-b7f8-435e-a528-34ed04d5d00f",
+      "title": "Cancel Staged Returns",
+      "area": "Frontend",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "a3812df2-1daf-4070-b04b-6bce10e5518d",
+      "title": "Front End: Direct2Cash Is Helping Communities Impacted by Disasters",
+      "area": "Frontend",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "80d96b13-9baf-4a5a-85f1-28e285951f23",
+      "title": "Front End: Recalled Merchandise Returns",
+      "area": "Frontend",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "d8e2204d-e6ac-43bf-9990-13d8f25195f6",
+      "title": "Front End: Your Front End Operations Resolution Team is Here to Help!",
+      "area": "Frontend",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "46e9915e-77e7-4e54-8bcf-045806ad9cbf",
+      "title": "Dept. 20: Beach Towel Delays and Action Plan",
+      "area": "General Merchandise",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "cd57916f-0823-41f2-b1e3-2296e01d751f",
+      "title": "Dept. 11: Week 6 Merch Message - Dehumidifier Trait Issue Resolved",
+      "area": "Hardlines",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "c3114b2b-d142-4385-bcc3-f8219b81c9cf",
+      "title": "Dept. 19: Finish S1 Strong Diamond Painting Feature",
+      "area": "Hardlines",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "be81e251-4e8f-48a5-a8b0-69ca893917c8",
+      "title": "Fall SCOG Ordering Now Open",
+      "area": "Hardlines",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "da4780e3-a498-4603-891b-6d7fda1abb52",
+      "title": "Dept. 14: Glass Bakeware Instock Update",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "b7e8deb1-d027-476c-9e56-9ba042c17a3d",
+      "title": "Dept. 14: Mainstays Foil S2/Easter Pallet Execution",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "608fb9dc-6dd4-4a07-8c97-7765bbda6b22",
+      "title": "Dept. 14: Mainstays Metal Bakeware Instocks ",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "4a4aa7f5-18f1-4dc3-98d3-c861921587ed",
+      "title": "Dept. 14: Ninja Thirsti",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "074d9a73-0588-4e49-869d-67788aba7d20",
+      "title": "Dept. 74: Storage Mod Reset is Here!",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "15a865b3-4483-48a3-bf00-412d409b6e45",
+      "title": "Home: Mainstays Kids Brand Launch",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "e479bdf7-ed2d-4fa4-9cbc-fdd0ac21b384",
+      "title": "Home: Mainstays Kids Brand Launch Playbook is Live!",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "1d3e195c-a1d6-4bec-be1f-be3548094eab",
+      "title": "AI Tip of the Week",
+      "area": "People",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "b156d2fd-c2f7-4d7f-b607-9bc9b0e5db64",
+      "title": "Front End: 33% Associate Discount With Jackson Hewitt",
+      "area": "People",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "588d7fa0-588e-45b6-ae1a-2d8bbe673601",
+      "title": "Dept. 18/67: Easter Is Hopping Around the Corner!",
+      "area": "Seasonal",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "b1a808c1-885c-491b-8950-f2d090df9814",
+      "title": "Patriotic Season Flag Features and Plus-Up Ordering",
+      "area": "Seasonal",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "0585f6c9-905a-4622-81cb-c325bbb8f257",
+      "title": "Dept. 16/56: Easter Flowers, Grill Rollbacks and More! ",
+      "area": "Total Store",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "dc4aac47-3c2a-430e-9f8b-31d3ed524856",
+      "title": "Explore the New Culture of Listening Page on Better Way",
+      "area": "Total Store",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "4bc2266d-c6d9-47d7-8a43-847194a84e10",
+      "title": "Nano Lesson & Badging Relaunch Coming Soon",
+      "area": "Total Store",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "59228502-b83b-4881-ae61-bf5ad94fe4bd",
+      "title": "New Order Number\u00a0Kaivac For Fan Guards Cover",
+      "area": "Total Store",
+      "status": "Review for Publish review - No Comms"
+    }
+  ]
+}

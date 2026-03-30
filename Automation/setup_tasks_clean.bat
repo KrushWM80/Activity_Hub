@@ -49,7 +49,7 @@ if %errorlevel% equ 0 echo   ✓ Created
 
 REM Task 5: Store Meeting Planner
 echo Creating Task 5 of 7: Store Meeting Planner Auto-Start...
-schtasks /create /tn Activity_Hub_StoreMeetingPlanner_AutoStart /tr "cmd /c \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\AMP\Store Meeting Planners\start-server.bat\"" /sc onstart /ru SYSTEM /rl HIGHEST /f >nul 2>&1
+schtasks /create /tn Activity_Hub_StoreMeetingPlanner_AutoStart /tr "cmd /c \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_meeting_planner_24_7.bat\"" /sc onlogon /rl HIGHEST /f >nul 2>&1
 if %errorlevel% equ 0 echo   ✓ Created
 
 REM Task 6: Zorro

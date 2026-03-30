@@ -732,7 +732,7 @@
         <!-- Data Table -->
         <div class="table-section">
             <div class="table-header">
-                <h2 id="table-title">TDA Initiatives Insights - All Phases</h2>
+                <h2 id="table-title">V.E.T. Executive Report - All Phases</h2>
                 <div class="table-actions">
                     <span id="record-count" style="color: var(--text-secondary); font-size: var(--font-size-sm);">Loading...</span>
                 </div>
@@ -740,7 +740,7 @@
             <div class="table-wrapper" id="table-wrapper">
                 <div class="loading">
                     <div class="loader"></div>
-                    <span>Loading TDA Initiatives...</span>
+                    <span>Loading V.E.T. Executive Report...</span>
                 </div>
             </div>
             <div class="pagination-controls" id="pagination-controls" style="display: none;">
@@ -1026,7 +1026,7 @@
             const pendingUnassigned = data.filter(r =>
                 r.Phase === 'Pending' && (!r['TDA Ownership'] || r['TDA Ownership'] === UNASSIGNED));
             if (pendingUnassigned.length > 0) {
-                sections.push({ ownership: 'TDA Ownership - Currently No TDA Ownership', phase: 'Pending', rows: pendingUnassigned, isSpecial: false });
+                sections.push({ ownership: 'Pending', phase: 'Pending', rows: pendingUnassigned, isSpecial: false });
             }
 
             // 2. Build ordered ownership list: defined order first, then any new values alphabetically
@@ -1049,7 +1049,7 @@
                         return own === ownership && r.Phase === phase;
                     });
                     if (rows.length > 0) {
-                        const label = ownership === UNASSIGNED ? 'TDA Ownership - Currently No TDA Ownership' : ownership;
+                        const label = ownership === UNASSIGNED ? 'No Selection Provided' : ownership;
                         sections.push({ ownership: label, phase, rows, isSpecial: false });
                     }
                 });
@@ -1598,7 +1598,7 @@
                     body: JSON.stringify({
                         screenshots: screenshots,
                         selectedPhases: selectedPhases,
-                        title: 'TDA Initiatives Insights'
+                        title: 'V.E.T. Executive Report'
                     })
                 });
                 
@@ -1609,7 +1609,7 @@
                 
                 // Download the PPT file
                 const contentDisposition = response.headers.get('content-disposition');
-                let filename = 'TDA_Report.pptx';
+                let filename = 'VET_Executive_Report.pptx';
                 if (contentDisposition) {
                     const match = contentDisposition.match(/filename="([^"]+)"/);
                     if (match) filename = match[1];

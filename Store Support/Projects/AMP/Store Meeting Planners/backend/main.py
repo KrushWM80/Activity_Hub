@@ -77,8 +77,43 @@ admin_config = load_admin_access_list()
 
 
 def get_windows_username() -> str:
+    """Get the real logged-in Windows username.
+    When running as SYSTEM (scheduled task), USERNAME is the machine account
+    (e.g. weus42608431466$). Fall back to multiple detection methods."""
     username = os.getenv("USERNAME", "").lower()
-    return username if username else "unknown"
+    # Machine accounts end with '$' — not a real user
+    # 'systemprofile' is the SYSTEM home dir, also not a real user
+    _bad = lambda u: (not u or u.endswith("$") or u in ("systemprofile", "system", "unknown", ""))
+    if _bad(username):
+        # Try USERPROFILE (C:\Users\krush -> krush)
+        profile = os.getenv("USERPROFILE", "")
+        if profile:
+            username = Path(profile).name.lower()
+    if _bad(username):
+        # Try extracting from the python executable path
+        # e.g. C:\Users\krush\...\python.exe -> krush
+        import sys
+        exe = sys.executable or ""
+        parts = Path(exe).parts
+        for i, p in enumerate(parts):
+            if p.lower() == "users" and i + 1 < len(parts):
+                username = parts[i + 1].lower()
+                break
+    if _bad(username):
+        # Try expanduser
+        home = os.path.expanduser("~")
+        if home:
+            username = Path(home).name.lower()
+    if _bad(username):
+        # Try GCP credentials path
+        creds = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
+        if creds:
+            cparts = Path(creds).parts
+            for i, p in enumerate(cparts):
+                if p.lower() == "users" and i + 1 < len(cparts):
+                    username = cparts[i + 1].lower()
+                    break
+    return username if not _bad(username) else "unknown"
 
 
 def get_user_email(username: str) -> str:
@@ -367,11 +402,17 @@ async def compliance_scan():
 
 frontend_path = Path(__file__).parent.parent / "frontend"
 if frontend_path.exists():
-    app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
+    app.mount("/StoreMeetingPlanner/static", StaticFiles(directory=str(frontend_path)), name="static")
 
-    @app.get("/")
+    @app.get("/StoreMeetingPlanner")
+    @app.get("/StoreMeetingPlanner/")
     async def serve_frontend():
         return FileResponse(str(frontend_path / "index.html"))
+
+    @app.get("/")
+    async def root_redirect():
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/StoreMeetingPlanner")
 
 
 # =============================================

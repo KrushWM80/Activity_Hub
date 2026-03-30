@@ -261,11 +261,11 @@ function Build-StatusEmail {
             <li><strong>Projects in Stores:</strong> http://10.97.114.181:8001/</li>
             <li><strong>Job Codes Dashboard:</strong> http://10.97.114.181:8080/static/index.html#</li>
             <li><strong>TDA Insights:</strong> http://localhost:5000/dashboard.html</li>
-            <li><strong>AMP Store Dashboard:</strong> http://localhost:8081/</li>
+            <li><strong>AMP Store Dashboard:</strong> http://weus42608431466:8081/StoreActivityandCommunications</li>
             <li><strong>Zorro Podcast Server:</strong> http://localhost:8888/</li>
             <li><strong>V.E.T. Dashboard:</strong> http://localhost:5001/vet_dashboard.html</li>
             <li><strong>Store Meeting Planner:</strong> http://localhost:8090/</li>
-            <li><strong>Note:</strong> Use IP address for Job Codes &amp; Projects. Use localhost for all others.</li>
+            <li><strong>Note:</strong> Use desktop name for Store Dashboard. Use IP address for Job Codes &amp; Projects. Use localhost for TDA, Zorro, and Meeting Planner.</li>
         </ul>
     </div>
 

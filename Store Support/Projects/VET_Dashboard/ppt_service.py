@@ -12,8 +12,33 @@ import base64
 from io import BytesIO
 from pptx import Presentation
 from pptx.util import Inches
+from PIL import Image
 
 logger = logging.getLogger(__name__)
+
+
+def get_walmart_week():
+    """
+    Calculate current Walmart fiscal week (WK01-WK13)
+    Walmart fiscal year starts Feb 1 with 13 periods of 28 days each
+    """
+    today = datetime.now()
+    
+    # Walmart fiscal year starts Feb 1
+    fiscal_year_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
+    
+    # Days since start of fiscal year
+    days_elapsed = (today - fiscal_year_start).days
+    
+    # Each Walmart period is 28 days
+    # WK01 = days 0-27, WK02 = days 28-55, etc
+    week_num = (days_elapsed // 28) + 1
+    
+    # Ensure week is between 1-13
+    week_num = max(1, min(13, week_num))
+    
+    return f"WK{week_num:02d}"
+
 
 # Create Blueprint
 ppt_bp = Blueprint('ppt', __name__, url_prefix='/api/ppt')
@@ -83,7 +108,7 @@ class ReportManager:
             
             # Generate report
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            output_file = OUTPUT_DIR / f"TDA_Report_{timestamp}.pptx"
+            output_file = OUTPUT_DIR / f"VET_Executive_Report_{timestamp}.pptx"
             
             logger.info(f"Generating PowerPoint report: {output_file}")
             self.generator.generate_report(str(output_file))
@@ -263,7 +288,7 @@ def generate_ppt_from_screenshots():
         data = request.get_json() or {}
         screenshots = data.get('screenshots', [])
         selected_phases = data.get('selectedPhases', [])
-        title = data.get('title', 'TDA Report')
+        title = data.get('title', 'V.E.T. Executive Report')
         
         if not screenshots:
             return jsonify({
@@ -300,10 +325,35 @@ def generate_ppt_from_screenshots():
                 blank_slide_layout = prs.slide_layouts[6]  # Blank layout
                 slide = prs.slides.add_slide(blank_slide_layout)
                 
-                # Add image to slide (full width/height)
-                slide.shapes.add_picture(image_stream, Inches(0), Inches(0), width=prs.slide_width, height=prs.slide_height)
+                # Add image to slide with proper aspect ratio (don't stretch)
+                # Image is positioned at top-left with margins, maintaining aspect ratio
+                image_stream.seek(0)
+                pil_image = Image.open(image_stream)
+                img_width_px, img_height_px = pil_image.size
+                
+                # Calculate dimensions that maintain aspect ratio
+                # Slide is 9.6" x 7.2", leave 0.2" margin on top/left, 0.4" on right
+                max_width_inches = 9.2  # 9.6 - 0.4 for margins
+                max_height_inches = 6.8  # 7.2 - 0.2 top - 0.2 bottom
+                
+                aspect_ratio = img_width_px / img_height_px
+                
+                # Determine which dimension is limiting WITHOUT specifying both
+                # Specifying only one dimension lets python-pptx auto-calculate the other
+                left = Inches(0.2)
+                top = Inches(0.2)
+                
+                if aspect_ratio > (max_width_inches / max_height_inches):
+                    # Image is wider proportionally - constrain by width only
+                    image_stream.seek(0)
+                    slide.shapes.add_picture(image_stream, left, top, width=Inches(max_width_inches))
+                else:
+                    # Image is taller proportionally - constrain by height only
+                    image_stream.seek(0)
+                    slide.shapes.add_picture(image_stream, left, top, height=Inches(max_height_inches))
+                
                 slides_added += 1
-                logger.info(f"Added screenshot for page {page_num}")
+                logger.info(f"Added screenshot for page {page_num} (original: {img_width_px}x{img_height_px}px)")
             except Exception as e:
                 logger.error(f"Error processing screenshot for page {page_num}: {e}")
                 continue
@@ -314,9 +364,9 @@ def generate_ppt_from_screenshots():
                 'error': 'No screenshots could be processed'
             }), 400
         
-        # Save file to disk
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f'TDA_Report_{timestamp}.pptx'
+        # Save file to disk with WK format
+        wk_format = get_walmart_week()
+        filename = f'VET_Executive_Report_{wk_format}.pptx'
         file_path = OUTPUT_DIR / filename
         
         # Save to file
@@ -346,7 +396,7 @@ def ppt_status():
     """Get status of PPT generation service"""
     return jsonify({
         'success': True,
-        'service': 'TDA PPT Report Generator',
+        'service': 'V.E.T. Executive Report Generator',
         'status': 'operational',
         'output_directory': str(OUTPUT_DIR),
         'reports_directory_exists': OUTPUT_DIR.exists(),

@@ -1,13 +1,23 @@
 {
   "users": {
-    "82f3c1fa-c2fe-4a9d-9716-93540662a496": {
-      "last_seen": "2026-03-27 08:25:02",
+    "46fb6cf7-9e26-47e2-a6d9-4fa3a96f9f16": {
+      "last_seen": "2026-03-30 11:50:54",
       "page": "Main Dashboard",
-      "timestamp": 1774617902.54867,
+      "timestamp": 1774889454.888745,
       "user_email": "weus42608431466$@homeoffice.wal-mart.com",
       "user": "weus42608431466$@homeoffice.wal-mart.com",
-      "session_id": "82f3c1fa-c2fe-4a9d-9716-93540662a496",
-      "session": "82f3c1fa-c2fe-4a9d-9716-93540662a496",
+      "session_id": "46fb6cf7-9e26-47e2-a6d9-4fa3a96f9f16",
+      "session": "46fb6cf7-9e26-47e2-a6d9-4fa3a96f9f16",
+      "device_info": "Windows AD Login"
+    },
+    "9e240116-ea40-4442-b4df-8f863a148fc7": {
+      "last_seen": "2026-03-30 11:51:02",
+      "page": "Main Dashboard",
+      "timestamp": 1774889462.808815,
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "session_id": "9e240116-ea40-4442-b4df-8f863a148fc7",
+      "session": "9e240116-ea40-4442-b4df-8f863a148fc7",
       "device_info": "Windows AD Login"
     }
   }

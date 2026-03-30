@@ -26,7 +26,7 @@ echo [Setup] Checking dependencies...
 "%PYTHON_EXE%" -m pip install -r requirements.txt --quiet 2>nul
 
 echo.
-echo [Server] Starting on http://localhost:8090
+echo [Server] Starting on http://localhost:8090/StoreMeetingPlanner
 echo [Server] Press Ctrl+C to stop.
 echo.
 

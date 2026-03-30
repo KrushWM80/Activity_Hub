@@ -49,10 +49,10 @@ Write-Host "   ✓ Activity_Hub_Store_Dashboard_AutoStart" -ForegroundColor Gree
 
 # Task 5: Store Meeting Planner
 Write-Host "Creating Task 5: Store Meeting Planner Auto-Start..."
-$action5 = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$ProjectRoot\Store Support\Projects\AMP\Store Meeting Planners\start-server.bat`""
-$trigger5 = New-ScheduledTaskTrigger -AtStartup
+$action5 = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$ProjectRoot\Automation\start_meeting_planner_24_7.bat`""
+$trigger5 = New-ScheduledTaskTrigger -AtLogon
 $settings5 = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
-$principal5 = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+$principal5 = New-ScheduledTaskPrincipal -RunLevel Highest
 Register-ScheduledTask -TaskName "Activity_Hub_StoreMeetingPlanner_AutoStart" -Action $action5 -Trigger $trigger5 -Settings $settings5 -Principal $principal5 -Force | Out-Null
 Write-Host "   ✓ Activity_Hub_StoreMeetingPlanner_AutoStart" -ForegroundColor Green
 

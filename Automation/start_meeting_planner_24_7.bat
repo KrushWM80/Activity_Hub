@@ -3,8 +3,8 @@ REM ==========================================
 REM Store Meeting Planner Backend - 24/7 Auto-Restart
 REM ==========================================
 REM Purpose: Keep Store Meeting Planner backend running continuously
-REM Access:  http://localhost:8090/
-REM Network: http://WEUS42608431466:8090/
+REM Access:  http://localhost:8090/StoreMeetingPlanner
+REM Network: http://WEUS42608431466:8090/StoreMeetingPlanner
 REM Log:     Store Support/Projects/AMP/Store Meeting Planners/backend/meeting_planner_server.log
 REM
 REM Features:

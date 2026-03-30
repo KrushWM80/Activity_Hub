@@ -541,25 +541,33 @@ def generate_report_pptx(data):
 
     screenshots = []  # list of (label, png_bytes)
 
+    # Combine phases within same ownership (phases stay in order, packed by height)
+    from collections import OrderedDict
+    ownership_groups = OrderedDict()
+    for ownership_label, phase, rows in sections:
+        if ownership_label not in ownership_groups:
+            ownership_groups[ownership_label] = []
+        ownership_groups[ownership_label].extend(rows)
+
     with tempfile.TemporaryDirectory() as tmp_dir:
-        for ownership_label, phase, rows in sections:
-            if not rows:
+        for ownership_label, all_rows in ownership_groups.items():
+            if not all_rows:
                 continue
             # Measure actual row heights via Edge (matches dashboard packRowsIntoPages)
-            heights = _measure_row_heights(phase, rows)
-            pages = _paginate_by_height(rows, heights)
+            heights = _measure_row_heights(ownership_label, all_rows)
+            pages = _paginate_by_height(all_rows, heights)
             total_pages = len(pages)
             for page, page_rows in enumerate(pages):
-                label = f'{ownership_label} — {phase}'
+                label = ownership_label
                 if total_pages > 1:
                     label += f' ({page + 1}/{total_pages})'
 
-                html = _build_phase_html(phase, page_rows, ownership=ownership_label)
+                html = _build_phase_html(None, page_rows, ownership=ownership_label)
                 png_path = os.path.join(tmp_dir, f'slide_{len(screenshots) + 1}.png')
                 _capture_html_screenshot(html, png_path)
                 png_bytes = Path(png_path).read_bytes()
                 screenshots.append((label, png_bytes))
-                print(f"    Captured: {ownership_label}/{phase} page {page + 1}/{total_pages} ({len(png_bytes):,} bytes)")
+                print(f"    Captured: {ownership_label} page {page + 1}/{total_pages} ({len(png_bytes):,} bytes)")
 
     # Build the PPTX with python-pptx (schema-compliant, no Repair dialog)
     SLIDE_WIDTH = Inches(10)

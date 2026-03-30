@@ -2339,6 +2339,69 @@
       "user_email": "weus42608431466$@homeoffice.wal-mart.com",
       "details": "Logged in via windows_ad",
       "category": "dashboard_main"
+    },
+    {
+      "id": "e4bfda68",
+      "timestamp": "2026-03-30 07:53:19",
+      "action": "User Login",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "f004521f",
+      "timestamp": "2026-03-30 07:53:38",
+      "action": "Accessed Main Dashboard",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "ea7b55b6",
+      "timestamp": "2026-03-30 08:00:06",
+      "action": "User Login",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "812b2bd4",
+      "timestamp": "2026-03-30 08:00:08",
+      "action": "Accessed Main Dashboard",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "6515a007",
+      "timestamp": "2026-03-30 11:50:54",
+      "action": "User Login",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "7c4ec6ce",
+      "timestamp": "2026-03-30 11:50:56",
+      "action": "Accessed Main Dashboard",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "b2b8f176",
+      "timestamp": "2026-03-30 11:51:02",
+      "action": "User Login",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
     }
   ]
 }

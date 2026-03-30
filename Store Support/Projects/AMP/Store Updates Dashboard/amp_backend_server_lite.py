@@ -58,6 +58,8 @@ class AMPRequestHandler(http.server.BaseHTTPRequestHandler):
         # Route handlers
         if path == '/health':
             self._handle_health()
+        elif path == '/StoreActivityandCommunications':
+            self._handle_dashboard()
         elif path == '/api/amp-data':
             self._handle_amp_data(query_params)
         elif path == '/api/amp-metrics':
@@ -92,6 +94,26 @@ class AMPRequestHandler(http.server.BaseHTTPRequestHandler):
         }
         self._send_json(response)
         logger.info(f"Health check: BigQuery={'✅ Connected' if bigquery_available else '❌ Not available'}")
+
+    def _handle_dashboard(self):
+        """Serve the AMP Analysis Dashboard at the named route"""
+        import os
+        try:
+            dashboard_path = os.path.join(os.path.dirname(__file__), 'amp_analysis_dashboard.html')
+            with open(dashboard_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(html_content.encode('utf-8'))
+            logger.info("✅ Dashboard served at /StoreActivityandCommunications")
+        except FileNotFoundError:
+            logger.error(f"Dashboard file not found")
+            self.send_error(404, "Dashboard not found")
+        except Exception as e:
+            logger.error(f"Error serving dashboard: {e}")
+            self.send_error(500, f"Failed to load dashboard: {e}")
 
     def _handle_root(self):
         """Root endpoint with API documentation"""

@@ -1,0 +1,251 @@
+{
+  "week": 6,
+  "fy": 2027,
+  "cached_at": "2026-03-30T09:02:48.009904",
+  "event_count": 40,
+  "review_no_comm_count": 40,
+  "summarized_count": 0,
+  "events_with_summaries": [],
+  "events_without_summary": [
+    {
+      "event_id": "80b9e5c8-b181-4e20-8bd9-ae11fbc2c55e",
+      "title": "Asset Protection added to Associate Retention Tool",
+      "area": "Asset Protection",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "b3dca49d-2e46-469b-976c-a961735f48da",
+      "title": "Dept. 95: New Takis 40-Count Launching Week 6",
+      "area": "Asset Protection",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "62710fd1-516a-4da3-956c-712474b22b06",
+      "title": "Dept. 10: Auto Chemicals Items Not Clearance",
+      "area": "Auto Care",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "65ae1a4e-a2b8-476d-bf3d-248cf5dd0ffb",
+      "title": "Dept. 07: Week 7 Preschool Trendpod Update",
+      "area": "Backroom and Claims",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "2e68ef74-62ef-4f4b-be1c-af3fa9753f60",
+      "title": "Dept. 46: Spring Beauty Event and Signage Execution ",
+      "area": "Backroom and Claims",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "95bb3923-6de4-4972-a8da-d8a931e6e368",
+      "title": "Join the DSD Office Hours for Real-Time Support",
+      "area": "Backroom and Claims",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "dc535f1c-1eec-480e-aa97-7c06e41cffde",
+      "title": "Reminder - SCAN all pallets using MyWalmart Receiving",
+      "area": "Backroom and Claims",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "d3730d70-ba66-48e7-b720-5652d235221b",
+      "title": "Dept. 46: Bubble x Poppi Collaboration Walmart Exclusive",
+      "area": "Consumables",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "2c58ba55-5b36-4b3d-aaba-1456dc079245",
+      "title": "Oversized Picking Safety Update",
+      "area": "Digital",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "e62d7e96-4691-4a1a-99c4-02b640558f0c",
+      "title": "Dept. 72: PC New Software Display, Storage Update",
+      "area": "Entertainment",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "1f3ddaf7-40ce-4b16-8e25-ddb706a1ee3d",
+      "title": "Dept. 24: Boys Short and Tee Table",
+      "area": "Fashion",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "910109cb-23b9-4102-997a-6ec99a46b319",
+      "title": "Dept. 90: Select Plant-Based Cheese Will Move to Dairy",
+      "area": "Food",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "71dc031e-efda-463c-b216-2139f4f7efb4",
+      "title": "Dept. 91: Frozen Modular Update",
+      "area": "Food",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "0b694afd-cabe-4328-8d16-b1accf2648c6",
+      "title": "Dept. 92: Potatoes/Stuffing/Gravy Quick Modular Is Coming\\n\\n",
+      "area": "Food",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "a197cb41-949f-4c7e-a9e9-466623d4db13",
+      "title": "Dept. 92: SPAM + Bachan\u2019s +\u00a0Ramen Winning Combos",
+      "area": "Food",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "ce682604-2957-42ba-9ff8-21ba60e2a292",
+      "title": "Dept. 92: Week 6 Combo Modular Reset for Kencko Items",
+      "area": "Food",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "656af1f5-e4c6-4efc-9611-1d95d92d2a7c",
+      "title": "Dept. 80: Deli Meat & Cheese",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "dea7e37d-4635-4362-9a1d-cd4f901467f8",
+      "title": "Dept. 94: Produce Updates",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "91520cb5-b289-4033-b950-c751c75766c9",
+      "title": "Dept. 98/81: Final Build + Maintain for St. Patrick\u2019s Day",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "01bb0377-18d5-4ccf-957f-5a228b208108",
+      "title": "Fresh: Week 7 Mod (and St. Patrick's Day) is almost Here!",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "0d9f7cca-bcae-4e22-bf4e-20c9d92a3e9e",
+      "title": "Front End: The Spring Gift Card Pallet Is Hopping Your Way",
+      "area": "Frontend",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "d0fcf6c3-93eb-4cc7-9e7f-b42f2a86f909",
+      "title": "Frontend: How to Prevent Financial Services Scams and Fraud",
+      "area": "Frontend",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "8d261380-ff2c-478e-bcfe-736b1fef069b",
+      "title": "Frontend: Postage Stamp Overview",
+      "area": "Frontend",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "1c535bca-4629-4066-a152-a007bf40ca4f",
+      "title": "Dept. 09: Life Jackets Missing Hangers and Water Sports Mod Delays",
+      "area": "Hardlines",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "3ce9bba1-47bc-483b-a590-d6adedead373",
+      "title": "Dept. 09: Molded Pools Modular Updates",
+      "area": "Hardlines",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "3cd051f4-7b8b-4f19-ab92-26a78d0b9f40",
+      "title": "Dept. 09: Updated Signing Kit",
+      "area": "Hardlines",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "c31acc3e-a19d-4924-a54f-f7ee522c46f2",
+      "title": "Dept. 11: Dehumidifier Traiting Error",
+      "area": "Hardlines",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "a486b941-245b-4cca-ba81-11d9ce47fadd",
+      "title": "Dept. 11: Power Tools Mini Modular",
+      "area": "Hardlines",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "fb8615d6-ba50-48b9-a016-829c8026dd40",
+      "title": "Dept. 14: Mainstays $0.97 Gadgets Inventory",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "a327d74d-dab6-4f82-b7ce-d7d57fa649e0",
+      "title": "Dept. 14: Mainstays Foil S2/Easter Pallet Execution",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "ba48f0a8-3947-4c2c-8f74-8399f562b0a0",
+      "title": "Home: Mainstays Kids Brand Launch",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "a275afcd-a79a-4146-a05b-49e9c8f2bab9",
+      "title": "AI Tip of the Week",
+      "area": "People",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "8a0fb764-7e54-4f48-ad58-d8878f110768",
+      "title": "Celebrate Belonging: \\nWomen\u2019s History Month and International Women\u2019s Day!",
+      "area": "People",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "69ef5602-384e-4005-aaed-30ea3336dfbd",
+      "title": "Dept. 18/67: 2026 Easter Updates",
+      "area": "Seasonal",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "13a642e9-00f7-42e4-a678-a8951a0b2966",
+      "title": "Clean Floor Safety",
+      "area": "Total Store",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "787c84da-6659-4cee-bdf8-383a29397e0d",
+      "title": "Dept. 26: Toddler Girl Inventory Update",
+      "area": "Total Store",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "4aa2db97-ac77-48d8-bc75-29d2658ccb50",
+      "title": "Dept. 56: Week 6 Merch Message",
+      "area": "Total Store",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "c9f77ba2-e8fa-46ef-98af-0ff357c3c4ba",
+      "title": "NIL Research Report in Now Live!",
+      "area": "Total Store",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "febf71fb-e08a-41ea-961e-1b234ec0b725",
+      "title": "Post New\u00a0DSL Hardware Disposal Signage",
+      "area": "Total Store",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "56866c36-8806-426f-83c3-e970709c936e",
+      "title": "Profit Protection Framework: March Updates ",
+      "area": "Total Store",
+      "status": "Review for Publish review - No Comms"
+    }
+  ]
+}

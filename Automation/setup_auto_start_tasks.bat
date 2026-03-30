@@ -75,9 +75,9 @@ if %errorlevel% equ 0 (
     echo   ✗ Failed to create Store Dashboard task (error code: %errorlevel%)
 )
 
-REM Task 5: Store Meeting Planner Auto-Start on Reboot
-echo Creating Task 5: Store Meeting Planner Auto-Start on Reboot...
-schtasks /create /tn Activity_Hub_StoreMeetingPlanner_AutoStart /tr "cmd /c \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\AMP\Store Meeting Planners\start-server.bat\"" /sc onstart /ru SYSTEM /f
+REM Task 5: Store Meeting Planner Auto-Start on Logon
+echo Creating Task 5: Store Meeting Planner Auto-Start on Logon...
+schtasks /create /tn Activity_Hub_StoreMeetingPlanner_AutoStart /tr "cmd /c \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_meeting_planner_24_7.bat\"" /sc onlogon /rl HIGHEST /f
 if %errorlevel% equ 0 (
     echo   ✓ Task created: Activity_Hub_StoreMeetingPlanner_AutoStart
 ) else (
@@ -130,9 +130,9 @@ echo    - Service: Store Dashboard (port 8081)
 echo    - Access: http://localhost:8081/
 echo.
 echo 5. Activity_Hub_StoreMeetingPlanner_AutoStart
-echo    - Starts: On system reboot
+echo    - Starts: On user logon
 echo    - Service: Store Meeting Planner (port 8090)
-echo    - Access: http://localhost:8090/
+echo    - Access: http://weus42608431466:8090/StoreMeetingPlanner
 echo.
 echo 6. Activity_Hub_Zorro_AutoStart
 echo    - Starts: On system reboot
