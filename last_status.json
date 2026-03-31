@@ -1,23 +1,23 @@
 {
-    "Port8888Listening":  true,
-    "ProjectsInStoresRunning":  true,
-    "JobCodesBackendTask":  false,
+    "Port8888Listening":  false,
+    "ProjectsInStoresRunning":  false,
+    "JobCodesBackendTask":  true,
     "VETDashboardRunning":  true,
-    "Port8001Listening":  true,
+    "Port8001Listening":  false,
     "TimeStamp":  {
-                      "value":  "\/Date(1774881392183)\/",
+                      "value":  "\/Date(1774954822216)\/",
                       "DisplayHint":  2,
-                      "DateTime":  "Monday, March 30, 2026 9:36:32 AM"
+                      "DateTime":  "Tuesday, March 31, 2026 6:00:22 AM"
                   },
     "TDAWeeklyEmailTask":  true,
-    "TDARunning":  true,
+    "TDARunning":  false,
     "Port8090Listening":  true,
     "StoreActivityDashboardRunning":  false,
     "MeetingPlannerRunning":  true,
     "JobCodesRunning":  true,
     "Port8080Listening":  true,
-    "ZorroRunning":  true,
-    "DCTasksCount":  0,
+    "ZorroRunning":  false,
+    "DCTasksCount":  26,
     "Port5001Listening":  true,
-    "Port5000Listening":  true
+    "Port5000Listening":  false
 }

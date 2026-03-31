@@ -1,9 +1,43 @@
 # Zorro - Knowledge Base & Dependency Map
 
-## AI Video Generation Platform for Walmart Operations
-**Last Updated:** January 23, 2026  
-**Version:** 1.0  
+## AI Video Generation Platform & Audio Message Hub for Walmart Operations
+**Last Updated:** March 31, 2026  
+**Version:** 2.0  
 **Project Status:** Phase 1 Production - Pilot Active
+
+---
+
+## Audio Message Hub
+
+| Property | Value |
+|----------|-------|
+| **Name** | Audio Message Hub |
+| **URL** | http://weus42608431466:8888/Zorro/Audio_Message_Hub |
+| **Port** | 8888 |
+| **Server Script** | `audio_server.py` |
+| **Pipeline Script** | `Audio/Scripts/generate_weekly_audio.py` |
+| **Synthesizer** | `Audio/windows_media_synthesizer.py` |
+| **Voice** | Jenny Neural (en-US) via edge-tts |
+| **Fallback Voice** | SAPI5 (Microsoft David) when VPN blocks edge-tts |
+| **Output Dir** | `output/Audio/` |
+| **Automation** | `Automation/start_zorro_24_7.bat` (auto-restart) |
+| **Health Check** | `MONITOR_AND_REPORT.ps1` (daily 6 AM, port 8888 check) |
+| **BQ Source** | `wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2` |
+| **BQ Filter** | `Message_Type = 'Merchant Message' AND Status = 'Review for Publish review - No Comms'` |
+| **CMS URL Pattern** | `https://enablement.walmart.com/content/store-communications/home/merchandise/weekly-messages/{year}/week-{week}/weekly_messages_audiowk{week}.html` |
+| **Email** | Outlook COM (win32com.client) with retry for RPC_E_CALL_REJECTED |
+
+### Audio Pipeline Steps
+1. **Step 1 (BQ Fetch)** — Queries AMP ALL 2 + Cosmos for message bodies, extracts summaries, caches to `Audio/Scripts/cache/week_{N}_fy{FY}.json`. Requires Eagle WiFi (non-VPN).
+2. **Step 2 (Synthesize)** — Single-pass Jenny Neural TTS → AAC 256kbps MP4 with thumbnail mux. Generates Standard Script, Inflection Script, HTML Email Report. Requires Walmart WiFi (off VPN).
+3. **Email Report** — Sends via Outlook COM with MP4 + both scripts attached.
+
+### Output Files
+- `Weekly Messages Audio Template - Summarized - Week {N} - Jenny Neural - Vimeo.mp4`
+- `Week {N} - Weekly Messages Audio Script.txt` (Standard)
+- `Week {N} - Weekly Messages Audio Script (Inflection).txt` (with prosody markings)
+- `Week {N} - Weekly Messages Audio Report.html`
+- `audio_links.json` (CMS URLs for BQ publish)
 
 ---
 

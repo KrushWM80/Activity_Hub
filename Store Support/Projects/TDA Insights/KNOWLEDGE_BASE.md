@@ -1,10 +1,17 @@
 # TDA Initiatives Insights Dashboard — Knowledge Base
 
-**Last Updated:** March 17, 2026  
+**Last Updated:** March 31, 2026  
 **Project:** Walmart Store Support — TDA Initiative Tracking  
 **Port:** 5000  
 **Host:** 0.0.0.0 (all interfaces — accessible to others on the network)  
 **Data Source:** `wmt-assetprotection-prod.Store_Support_Dev.Output- TDA Report` (BigQuery)
+
+> **March 31, 2026 — Naming Changes (temporary normalization in code until BQ data updates):**
+> - "Total Projects" → **"Total Initiatives"** in dashboard and email reports
+> - TDA Ownership: "Dallas POC" → **"Dallas VET"**
+> - Phases renamed: POC/POT → **Vet**, Mkt Scale → **Test Markets**
+> - New phase order: Pending → Vet → Test → Test Markets → Roll/Deploy → Complete
+> - `_PHASE_MAP` and `_OWNERSHIP_MAP` dicts in backend_simple.py and send_weekly_report.py handle transition
 
 ---
 
@@ -164,10 +171,10 @@ ORDER BY Topic
 
 When BigQuery is unavailable, serves 5 hardcoded projects:
 - Sidekick Enhancement (Test, 120 stores)
-- GMD Optimization (POC/POT, 95 stores)
+- GMD Optimization (Vet, 95 stores)
 - DSD Redesign (Roll/Deploy, 250 stores)
 - Fresh Department Update (Pending, 180 stores)
-- Inventory System Migration (Mkt Scale, 15 stores)
+- Inventory System Migration (Test Markets, 15 stores)
 
 ---
 
@@ -176,7 +183,7 @@ When BigQuery is unavailable, serves 5 hardcoded projects:
 ### Features
 
 - Multi-select dropdown filters (Phase, Health Status, TDA Ownership, Project Title)
-- Summary stat cards (Total Projects, Total Stores, On Track, At Risk, Off Track, Continuous)
+- Summary stat cards (Total Initiatives, Total Stores, On Track, At Risk, Off Track, Continuous)
 - **Two-level grouping:** TDA Ownership → Phase (navy ownership banner + blue phase sub-banner)
 - Health status badges (color-coded)
 - Project titles hyperlinked to Intake Hub (`https://hoops.wal-mart.com/intake-hub/projects/{ProjectID}`)
@@ -196,7 +203,7 @@ When BigQuery is unavailable, serves 5 hardcoded projects:
 ### Summary Card Calculations
 
 ```
-Total Projects  = data.length
+Total Initiatives = data.length
 Total Stores    = SUM(# of Stores)
 On Track        = count where Health Status contains "on track"
 At Risk         = count where Health Status contains "at risk"
@@ -206,7 +213,7 @@ Continuous      = count where Health Status contains "continuous"
 
 ### Table Pagination
 
-- **Phase order:** Pending → POC/POT → Test → Mkt Scale → Roll/Deploy
+- **Phase order:** Pending → Vet → Test → Test Markets → Roll/Deploy
 - **Complete phase excluded** from display
 - **Two-level grouping:** TDA Ownership (navy `#1E3A8A` banner, 15px padding) → Phase (blue `#3B82F6` sub-banner, 7px padding)
 - "No Selection Provided" ownership displays as "TDA Ownership - Currently No TDA Ownership"
@@ -249,7 +256,7 @@ Generates and sends a weekly TDA Insights email with attached PPTX report via Ou
 
 ```python
 RECIPIENTS     = ["Kendall.rush@walmart.com"]
-PHASE_ORDER    = ['Pending', 'POC/POT', 'Test', 'Mkt Scale', 'Roll/Deploy']
+PHASE_ORDER    = ['Pending', 'Vet', 'Test', 'Test Markets', 'Roll/Deploy']
 EXCLUDED_PHASES = {'Complete'}
 EDGE_PATH      = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 PPT_FILENAME   = "TDA_WK{wm_week}_Report.pptx"
@@ -332,7 +339,7 @@ PPT filename: TDA_WK7_Report.pptx
 | Facility | INTEGER | Store count for this Facility_Phase |
 | Facility_Phase | STRING | Phase that the store count applies to |
 | Intake_n_Testing | STRING | Intake and testing status notes |
-| Dallas_POC | STRING | Point of contact |
+| Dallas_POC | STRING | Point of contact (displayed as "Dallas VET") |
 | Deployment | STRING | Deployment status notes |
 | Intake_Card_Nbr | INTEGER | Project ID for Intake Hub linkage |
 | Link | STRING | URL |
@@ -343,21 +350,21 @@ PPT filename: TDA_WK7_Report.pptx
 
 ```
 Phase lifecycle (project-level):
-  Pending → POC/POT → Test → Mkt Scale → Roll/Deploy → Complete
+    Pending → Vet → Test → Test Markets → Roll/Deploy → Complete
 
 Facility_Phase (store-level):
   Indicates what phase the stores are actually in for a given row.
   One Topic can have multiple rows with different Facility_Phase values.
-  E.g., "Practice Card" may have rows for Mkt Scale (220), Roll/Deploy (2), Complete (31)
+    E.g., "Practice Card" may have rows for Test Markets (220), Roll/Deploy (2), Complete (31)
 ```
 
 ### Data Relationships (March 16 observations)
 
 - Table has **169 rows** (multiple rows per Topic)
 - Each row represents stores in a specific Facility_Phase for a Topic
-- A single Topic at Phase=POC/POT may have Facility_Phase=Test (stores being tested)
-- Distinct Facility_Phase values: Complete, Mkt Scale, No List, Pending, Roll/Deploy, Test
-- Phase values: Complete, POC/POT, Pending, Roll/Deploy, Test, Mkt Scale
+- A single Topic at Phase=Vet may have Facility_Phase=Test (stores being tested)
+- Distinct Facility_Phase values: Complete, Test Markets, No List, Pending, Roll/Deploy, Test
+- Phase values: Complete, Vet, Pending, Roll/Deploy, Test, Test Markets
 
 ---
 

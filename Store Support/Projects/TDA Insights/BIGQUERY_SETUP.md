@@ -96,6 +96,6 @@ Once authentication is working:
 - **BigQuery Project**: wmt-assetprotection-prod
 - **Dataset**: Store_Support_Dev
 - **Table**: Output_TDA Report
-- **Required Columns**: Initiative - Project Title, Health Status, Phase, # of Stores, Intake & Testing, Dallas POC, Deployment
+- **Required Columns**: Initiative - Project Title, Health Status, Phase, # of Stores, Intake & Testing, Dallas VET, Deployment
 
 ---

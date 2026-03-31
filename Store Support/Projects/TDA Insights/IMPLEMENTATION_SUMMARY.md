@@ -35,7 +35,7 @@ TDA Insights/
 - **Real-time Data Display** - Fetches TDA initiatives from BigQuery
 - **Phase-based Filtering** - Filter by Test, Production, Planning, etc.
 - **Health Status Filtering** - On Track, At Risk, Off Track
-- **Summary Cards** - Key metrics (Total Projects, Total Stores, Status Counts)
+- **Summary Cards** - Key metrics (Total Initiatives, Total Stores, Status Counts)
 - **Detailed Table** - Complete initiative listings with status badges
 - **CSV Export** - Download filtered data as CSV
 - **Connection Status** - Real-time backend connectivity indicator

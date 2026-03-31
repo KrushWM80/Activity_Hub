@@ -20,7 +20,7 @@ load_dotenv()
 from sample_data import SAMPLE_DATA_49_PROJECTS
 
 # Configuration
-app = Flask(__name__, static_folder=os.path.dirname(__file__), static_url_path='')
+app = Flask(__name__, static_folder=os.path.dirname(__file__), static_url_path='/static')
 CORS(app)
 
 # Logging
@@ -43,7 +43,14 @@ FULL_TABLE_ID = f"`{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`"
 FULL_INTAKE_HUB_ID = f"`{PROJECT_ID}.{DATASET_ID}.{INTAKE_HUB_TABLE}`"
 
 # V.E.T. Dashboard specific config
-DEFAULT_OWNERSHIP_FILTER = "Dallas POC"
+# BQ data still uses "Dallas POC" as TDA_Ownership value; we query with that but display as "Dallas VET"
+BQ_OWNERSHIP_FILTER = "Dallas POC"
+DISPLAY_OWNERSHIP_NAME = "Dallas VET"
+
+# Phase normalization (until BQ data reflects new names)
+_PHASE_MAP = {'POC/POT': 'Vet', 'Mkt Scale': 'Test Markets'}
+def _normalize_phase(phase):
+    return _PHASE_MAP.get(phase, phase)
 
 # Initialize BigQuery client
 client = None
@@ -93,6 +100,9 @@ class VETDataManager:
         if not self.client:
             logger.warning(f"BigQuery client not initialized - using {len(SAMPLE_DATA_49_PROJECTS)} sample projects")
             # Return comprehensive sample data when BigQuery is not available
+            # Normalize phases in sample data
+            for row in SAMPLE_DATA_49_PROJECTS:
+                row['Phase'] = _normalize_phase(row.get('Phase', 'Unknown'))
             self._data_cache = SAMPLE_DATA_49_PROJECTS
             self._cache_timestamp = datetime.now()
             return SAMPLE_DATA_49_PROJECTS
@@ -119,7 +129,7 @@ class VETDataManager:
                 {FULL_INTAKE_HUB_ID} intake
                 ON CAST(tda.Intake_Card_Nbr AS STRING) = CAST(intake.Intake_Card AS STRING)
             WHERE 
-                tda.TDA_Ownership = '{DEFAULT_OWNERSHIP_FILTER}'
+                tda.TDA_Ownership = '{BQ_OWNERSHIP_FILTER}'
             GROUP BY
                 tda.Topic,
                 tda.Health_Update,
@@ -135,12 +145,14 @@ class VETDataManager:
             """
             
             logger.info("Executing BigQuery query with Intake Hub join...")
-            logger.info(f"Filtering for TDA Ownership = '{DEFAULT_OWNERSHIP_FILTER}'")
+            logger.info(f"Filtering for TDA Ownership = '{BQ_OWNERSHIP_FILTER}'")
             query_job = self.client.query(query)
             rows = query_job.result()
             
-            # Convert to list of dictionaries
+            # Convert to list of dictionaries and normalize phases
             data = [dict(row) for row in rows]
+            for row in data:
+                row['Phase'] = _normalize_phase(row.get('Phase', 'Unknown'))
             
             # Cache the data
             self._data_cache = data
@@ -163,7 +175,7 @@ class VETDataManager:
                 phases_found.add(str(phase))
         
         # TDA phase progression order
-        phase_order = ['Pending', 'POC/POT', 'Test', 'Mkt Scale', 'Roll/Deploy']
+        phase_order = ['Pending', 'Vet', 'Test', 'Test Markets', 'Roll/Deploy']
         # Return only phases that exist in data, in the correct order
         return [p for p in phase_order if p in phases_found]
     
@@ -226,6 +238,7 @@ data_manager = VETDataManager(client)
 
 # Root route - serve the V.E.T. Dashboard HTML
 @app.route('/', methods=['GET'])
+@app.route('/VET_Executive_Report', methods=['GET'])
 def show_dashboard():
     """Serve the V.E.T. Dashboard HTML file"""
     try:
@@ -481,6 +494,41 @@ def export_csv():
         }), 500
 
 
+# ── VET PPT Generation Endpoint ──
+@app.route('/api/vet/generate-ppt', methods=['POST'])
+def generate_vet_ppt():
+    """Generate V.E.T. Executive Report PowerPoint (VET-specific generator)"""
+    try:
+        from vet_ppt_generator import generate_vet_pptx
+        
+        logger.info("Generating VET Executive Report PPT...")
+        pptx_path = generate_vet_pptx()
+        
+        if not pptx_path:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to generate PPT'
+            }), 500
+        
+        from pathlib import Path
+        filename = Path(pptx_path).name
+        
+        return jsonify({
+            'success': True,
+            'message': 'PPT generated successfully',
+            'file_name': filename,
+            'file_path': str(pptx_path),
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    except Exception as e:
+        logger.error(f"Error in /api/vet/generate-ppt: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': f'Server error: {str(e)}'
+        }), 500
+
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5001))
     debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
@@ -490,6 +538,6 @@ if __name__ == '__main__':
         register_ppt_routes(app)
         logger.info("PPT service routes registered")
     
-    logger.info(f"Starting V.E.T. Dashboard backend on port {port} (Dallas POC focus)")
-    logger.info(f"Default TDA Ownership Filter: {DEFAULT_OWNERSHIP_FILTER}")
+    logger.info(f"Starting V.E.T. Dashboard backend on port {port} (Dallas VET focus)")
+    logger.info(f"BQ Ownership Filter: {BQ_OWNERSHIP_FILTER} (displayed as {DISPLAY_OWNERSHIP_NAME})")
     app.run(host='0.0.0.0', port=port, debug=debug)

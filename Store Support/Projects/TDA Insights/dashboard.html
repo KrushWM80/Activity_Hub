@@ -661,7 +661,7 @@
         <!-- Summary Stats -->
         <div class="summary-section" id="summary-section">
             <div class="stat-card">
-                <div class="stat-label">Total Projects</div>
+                <div class="stat-label">Total Initiatives</div>
                 <div class="stat-value" id="stat-projects">0</div>
             </div>
             <div class="stat-card">
@@ -987,7 +987,7 @@
         // Custom order: Pending+Unassigned first, then Dallas POC, Intake & Test, Deployment, then remaining No Selection Provided
         function getOwnershipOrder(data, phaseOrder) {
             const UNASSIGNED = 'No Selection Provided';
-            const OWNERSHIP_ORDER = ['Dallas POC', 'Intake & Test', 'Deployment', UNASSIGNED];
+            const OWNERSHIP_ORDER = ['Dallas VET', 'Intake & Test', 'Deployment', UNASSIGNED];
             const sections = []; // {ownership, phase, rows}
 
             // 1. Pending + unassigned (null or "No Selection Provided") → always first
@@ -1081,15 +1081,15 @@
             const ownershipLabel = pageData.ownership || '';
             let noteColumns = [];
             if (ownershipLabel.includes('Currently No TDA Ownership')) {
-                noteColumns = ['Dallas POC', 'Intake & Testing', 'Deployment'];
-            } else if (ownershipLabel === 'Dallas POC') {
-                noteColumns = ['Dallas POC'];
+                noteColumns = ['Dallas VET', 'Intake & Testing', 'Deployment'];
+            } else if (ownershipLabel === 'Dallas VET') {
+                noteColumns = ['Dallas VET'];
             } else if (ownershipLabel === 'Intake & Test' || ownershipLabel === 'Intake & Testing') {
                 noteColumns = ['Intake & Testing'];
             } else if (ownershipLabel === 'Deployment') {
                 noteColumns = ['Deployment'];
             } else {
-                noteColumns = ['Dallas POC', 'Intake & Testing', 'Deployment'];
+                noteColumns = ['Dallas VET', 'Intake & Testing', 'Deployment'];
             }
             
             const columns = [
@@ -1375,15 +1375,15 @@
                         const ownershipLabel = ownershipKey || '';
                         let noteColumns = [];
                         if (ownershipLabel.includes('Currently No TDA Ownership')) {
-                            noteColumns = ['Dallas POC', 'Intake & Testing', 'Deployment'];
-                        } else if (ownershipLabel === 'Dallas POC') {
-                            noteColumns = ['Dallas POC'];
+                            noteColumns = ['Dallas VET', 'Intake & Testing', 'Deployment'];
+                        } else if (ownershipLabel === 'Dallas VET') {
+                            noteColumns = ['Dallas VET'];
                         } else if (ownershipLabel === 'Intake & Test' || ownershipLabel === 'Intake & Testing') {
                             noteColumns = ['Intake & Testing'];
                         } else if (ownershipLabel === 'Deployment') {
                             noteColumns = ['Deployment'];
                         } else {
-                            noteColumns = ['Dallas POC', 'Intake & Testing', 'Deployment'];
+                            noteColumns = ['Dallas VET', 'Intake & Testing', 'Deployment'];
                         }
                         const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', ...noteColumns];
                         let html = `<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
@@ -1618,7 +1618,7 @@
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Health Status</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Phase</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;"># of Stores</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Dallas POC</th>
+                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Dallas VET</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Intake & Testing</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Deployment</th>
                         </tr>
@@ -1640,7 +1640,7 @@
                 let testRow = document.createElement('tr');
                 testRow.style.cssText = 'border: 1px solid #ddd;';
                 
-                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas POC', 'Intake & Testing', 'Deployment'];
+                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas VET', 'Intake & Testing', 'Deployment'];
                 columns.forEach(col => {
                     const td = document.createElement('td');
                     td.style.cssText = 'padding: 8px; border: 1px solid #ddd; word-wrap: break-word; white-space: normal;';

@@ -57,6 +57,13 @@ class VETEmailService:
         at_risk = report_data.get('at_risk', 0)
         off_track = report_data.get('off_track', 0)
         wm_week = report_data.get('wm_week', '')
+        dashboard_html = report_data.get('dashboard_html', None)
+        
+        # Build dashboard HTML section
+        if dashboard_html:
+            dashboard_html_section = dashboard_html.replace('<!DOCTYPE html>', '').replace('<html>', '').replace('</html>', '').replace('<head>.*?</head>', '', 1).replace('<body>', '').replace('</body>', '')
+        else:
+            dashboard_html_section = ''
         
         # Calculate percentages
         pct_on_track = (on_track / total_projects * 100) if total_projects > 0 else 0
@@ -65,203 +72,82 @@ class VETEmailService:
         avg_stores = (total_stores / total_projects) if total_projects > 0 else 0
         
         html = f"""
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>V.E.T. Executive Report</title>
-    <style>
-        body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #fafafa;
-        }}
-        .wrapper {{
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-            max-width: 800px;
-            margin: 20px auto;
-        }}
-        .header {{
-            background: linear-gradient(135deg, #1e3a8a 0%, #0071ce 100%);
-            color: white;
-            padding: 24px;
-            text-align: center;
-        }}
-        .header h1 {{
-            margin: 0 0 8px 0;
-            font-size: 32px;
-            font-weight: bold;
-            color: white;
-        }}
-        .header p {{
-            margin: 0;
-            font-size: 16px;
-            opacity: 0.9;
-        }}
-        .content {{
-            padding: 24px;
-        }}
-        h2 {{
-            font-size: 18px;
-            color: #1e3a8a;
-            margin: 0 0 16px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
-            border-bottom: 2px solid #0071ce;
-            padding-bottom: 8px;
-        }}
-        .stats-grid {{
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
-        }}
-        .stat-item {{
-            background-color: #f8f9fa;
-            border-left: 4px solid #0071ce;
-            padding: 14px 10px;
-            text-align: center;
-            border-radius: 4px;
-        }}
-        .stat-number {{
-            font-size: 28px;
-            font-weight: bold;
-            color: #1e3a8a;
-            margin: 0;
-        }}
-        .stat-label {{
-            font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
-            margin-top: 6px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }}
-        .stat-item.on-track {{
-            border-left-color: #107c10;
-        }}
-        .stat-item.on-track .stat-number {{
-            color: #107c10;
-        }}
-        .stat-item.at-risk {{
-            border-left-color: #f7630c;
-        }}
-        .stat-item.at-risk .stat-number {{
-            color: #f7630c;
-        }}
-        .stat-item.off-track {{
-            border-left-color: #dc3545;
-        }}
-        .stat-item.off-track .stat-number {{
-            color: #dc3545;
-        }}
-        .insights-box {{
-            background-color: #f0f4ff;
-            border-left: 4px solid #0071ce;
-            padding: 16px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }}
-        .insights-box h3 {{
-            margin: 0 0 12px 0;
-            font-size: 13px;
-            color: #1e3a8a;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }}
-        .insights-box ul {{
-            margin: 0;
-            padding-left: 20px;
-            list-style-type: none;
-        }}
-        .insights-box li {{
-            margin: 8px 0;
-            color: #333;
-            font-size: 13px;
-            line-height: 1.5;
-        }}
-        .insights-box li:before {{
-            content: '•';
-            color: #0071ce;
-            font-weight: bold;
-            margin-right: 8px;
-        }}
-        .footer {{
-            background-color: #f8f9fa;
-            padding: 16px;
-            text-align: center;
-            font-size: 11px;
-            color: #666;
-            border-top: 1px solid #e0e0e0;
-        }}
-        @media (max-width: 600px) {{
-            .stats-grid {{
-                grid-template-columns: repeat(2, 1fr);
-            }}
-        }}
-    </style>
 </head>
-<body>
-    <div class="wrapper">
-        <div class="header">
-            <h1>V.E.T. Executive Report</h1>
-            <p>Walmart Enterprise Transformation Dashboard</p>
-        </div>
-        
-        <div class="content">
-            <h2>Executive Summary</h2>
+<body style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: white;">
+
+<table style="width: 100%; max-width: 800px; margin: 0; background-color: white;" cellpadding="0" cellspacing="0" border="0">
+    
+    <!-- HEADER -->
+    <tr>
+        <td style="background-color: #1e3a8a; color: #ffffff; padding: 32px 24px; text-align: center; font-weight: bold;">
+            <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">V.E.T. Executive Report</h1>
+            <p style="margin: 0; font-size: 14px; font-weight: 500; color: #ffffff; letter-spacing: 0.5px;">Walmart Enterprise Transformation Dashboard</p>
+        </td>
+    </tr>
+    
+    <!-- CONTENT -->
+    <tr>
+        <td style="padding: 24px;">
             
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number">{total_projects}</div>
-                    <div class="stat-label">Total Projects</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">{total_stores:,}</div>
-                    <div class="stat-label">Stores Impacted</div>
-                </div>
-                <div class="stat-item on-track">
-                    <div class="stat-number">{on_track}</div>
-                    <div class="stat-label">On Track</div>
-                </div>
-                <div class="stat-item at-risk">
-                    <div class="stat-number">{at_risk}</div>
-                    <div class="stat-label">At Risk</div>
-                </div>
-                <div class="stat-item off-track">
-                    <div class="stat-number">{off_track}</div>
-                    <div class="stat-label">Off Track</div>
-                </div>
-            </div>
+            <!-- Section Title -->
+            <h2 style="font-size: 16px; font-weight: 700; color: #1e3a8a; margin: 0 0 14px 0; text-transform: uppercase; border-bottom: 2px solid #0071ce; padding-bottom: 6px;">Executive Summary</h2>
             
-            <div class="insights-box">
-                <h3>Key Insights</h3>
-                <ul>
-                    <li><strong>{pct_on_track:.1f}%</strong> of initiatives are on track</li>
-                    <li><strong>{pct_at_risk:.1f}%</strong> of initiatives are at risk</li>
-                    <li><strong>{pct_off_track:.1f}%</strong> of initiatives are off track</li>
-                    <li>Average stores per initiative: <strong>{avg_stores:.0f}</strong></li>
-                </ul>
-            </div>
+            <!-- Stats - Table Layout for Outlook Compatibility -->
+            <table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="width: 20%; background-color: #f8f9fa; border-left: 4px solid #0071ce; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #1e3a8a; line-height: 1.3;">{total_projects}</td>
+                    <td style="width: 20%; background-color: #f8f9fa; border-left: 4px solid #0071ce; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #1e3a8a; line-height: 1.3;">{total_stores:,}</td>
+                    <td style="width: 20%; background-color: #f8f9fa; border-left: 4px solid #107c10; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #107c10; line-height: 1.3;">{on_track}</td>
+                    <td style="width: 20%; background-color: #f8f9fa; border-left: 4px solid #f7630c; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #f7630c; line-height: 1.3;">{at_risk}</td>
+                    <td style="width: 20%; background-color: #f8f9fa; border-left: 4px solid #dc3545; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #dc3545; line-height: 1.3;">{off_track}</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; padding: 6px 4px;">Total Projects</td>
+                    <td style="text-align: center; font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; padding: 6px 4px;">Stores Impacted</td>
+                    <td style="text-align: center; font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; padding: 6px 4px;">On Track</td>
+                    <td style="text-align: center; font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; padding: 6px 4px;">At Risk</td>
+                    <td style="text-align: center; font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; padding: 6px 4px;">Off Track</td>
+                </tr>
+            </table>
             
-            <p style="font-size: 12px; color: #666; margin: 16px 0; line-height: 1.5;">
-                <strong>Report Contents:</strong> PowerPoint attachment includes detailed phase summaries, health status metrics, store counts, and strategic initiatives for each project.
+            <!-- Key Insights -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; background-color: #f0f4ff; border-left: 4px solid #0071ce;" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td style="padding: 14px;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 12px; color: #1e3a8a; text-transform: uppercase; font-weight: 700; letter-spacing: 0.3px;">Key Insights</h3>
+                        <ul style="margin: 0; padding-left: 18px; list-style: none;">
+                            <li style="margin: 6px 0; color: #333; font-size: 12px; line-height: 1.4;"><span style="color: #0071ce; font-weight: 700;">•</span> <strong>{pct_on_track:.1f}%</strong> of initiatives are on track</li>
+                            <li style="margin: 6px 0; color: #333; font-size: 12px; line-height: 1.4;"><span style="color: #0071ce; font-weight: 700;">•</span> <strong>{pct_at_risk:.1f}%</strong> of initiatives are at risk</li>
+                            <li style="margin: 6px 0; color: #333; font-size: 12px; line-height: 1.4;"><span style="color: #0071ce; font-weight: 700;">•</span> <strong>{pct_off_track:.1f}%</strong> of initiatives are off track</li>
+                            <li style="margin: 6px 0; color: #333; font-size: 12px; line-height: 1.4;"><span style="color: #0071ce; font-weight: 700;">•</span> Average stores per initiative: <strong>{avg_stores:.0f}</strong></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            
+            <!-- Dashboard Content Section -->
+            {dashboard_html_section}
+            
+            <p style="font-size: 11px; color: #666; margin: 14px 0; line-height: 1.5;">
+                <strong>Report Contents:</strong> PowerPoint and PDF attachments include detailed phase summaries, health status metrics, store counts, and strategic initiatives for each project phase.
             </p>
-        </div>
-        
-        <div class="footer">
+            
+        </td>
+    </tr>
+    
+    <!-- FOOTER -->
+    <tr>
+        <td style="background-color: #f8f9fa; padding: 14px; text-align: center; font-size: 10px; color: #999; border-top: 1px solid #e0e0e0;">
             <p style="margin: 0;">Data Source: Walmart Enterprise Transformation Dashboard | {datetime.now().strftime('%B %d, %Y')}</p>
-        </div>
-    </div>
+        </td>
+    </tr>
+    
+</table>
+
 </body>
 </html>
         """

@@ -72,10 +72,23 @@ BQ_DATASET = 'Store_Support_Dev'
 BQ_TABLE = 'Output- TDA Report'
 
 EXCLUDED_PHASES = {'Complete'}
-PHASE_ORDER = ['Pending', 'POC/POT', 'Test', 'Mkt Scale', 'Roll/Deploy']
+PHASE_ORDER = ['Pending', 'Vet', 'Test', 'Test Markets', 'Roll/Deploy']
 
 SPARK_LOGO = Path(__file__).parent.parent.parent / "General Setup" / "Design" / "Spark Blank.png"
 EDGE_PATH = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+
+# ── Temporary data normalization (until BQ data reflects new names) ──
+_PHASE_MAP = {'POC/POT': 'Vet', 'Mkt Scale': 'Test Markets'}
+_OWNERSHIP_MAP = {'Dallas POC': 'Dallas VET'}
+
+def _normalize_phase(phase):
+    return _PHASE_MAP.get(phase, phase)
+
+def _normalize_ownership(raw):
+    own = raw or 'No Selection Provided'
+    if own in ('No Selection Provided', '*Select Owner'):
+        return 'No Selection Provided'
+    return _OWNERSHIP_MAP.get(own, own)
 
 # Colors
 COLORS = {
@@ -118,13 +131,13 @@ def fetch_data():
         data.append({
             'Initiative - Project Title': row['Initiative - Project Title'] or 'Unknown',
             'Health Status': row['Health Status'] or 'Unknown',
-            'Phase': phase,
+            'Phase': _normalize_phase(phase),
             '# of Stores': row['# of Stores'] or 0,
-            'Dallas POC': row['Dallas POC'] or 'N/A',
+            'Dallas VET': row['Dallas POC'] or 'N/A',
             'Intake & Testing': row['Intake & Testing'] or 'N/A',
             'Deployment': row['Deployment'] or 'N/A',
             'Project ID': row['Project ID'] or 0,
-            'TDA Ownership': 'No Selection Provided' if (row['TDA Ownership'] or 'No Selection Provided') in ('No Selection Provided', '*Select Owner') else row['TDA Ownership'],
+            'TDA Ownership': _normalize_ownership(row['TDA Ownership']),
         })
     return data
 
@@ -219,7 +232,7 @@ def build_email_html(data):
 <tr>
     <td width="16%" style="padding: 0 4px;">
         <div style="background:white; border:1px solid #e5e5e5; border-left:4px solid {COLORS['walmart_yellow']}; border-radius:6px; padding:12px; text-align:center;">
-            <div style="font-size:11px; color:#666; text-transform:uppercase; letter-spacing:0.5px;">Total Projects</div>
+            <div style="font-size:11px; color:#666; text-transform:uppercase; letter-spacing:0.5px;">Total Initiatives</div>
             <div style="font-size:24px; font-weight:700; color:{COLORS['walmart_blue_dark']};">{total}</div>
         </div>
     </td>
@@ -261,7 +274,7 @@ def build_email_html(data):
     UNASSIGNED = 'No Selection Provided'
 
     # Build ordered sections: Pending+unassigned first, then custom ownership order
-    OWNERSHIP_ORDER = ['Dallas POC', 'Intake & Test', 'Deployment', UNASSIGNED]
+    OWNERSHIP_ORDER = ['Dallas VET', 'Intake & Test', 'Deployment', UNASSIGNED]
     sections = []
     pending_unassigned = [r for r in data if r['Phase'] == 'Pending' and r.get('TDA Ownership', UNASSIGNED) == UNASSIGNED]
     if pending_unassigned:
@@ -340,7 +353,7 @@ def build_email_html(data):
 def _build_phase_html(phase, rows, ownership=None, is_special=False):
     """Build the EXACT same HTML the dashboard builds for PPT screenshots."""
     columns = ['Initiative - Project Title', 'Health Status', 'Phase',
-                '# of Stores', 'Dallas POC', 'Intake & Testing', 'Deployment']
+                '# of Stores', 'Dallas VET', 'Intake & Testing', 'Deployment']
 
     # Ownership banner (navy) — phase sub-banner removed to match dashboard
     ownership_label = ownership or phase
@@ -396,7 +409,7 @@ def _build_phase_html(phase, rows, ownership=None, is_special=False):
 def _measure_row_heights(phase, rows):
     """Use Edge --dump-dom to measure row heights with same styling as dashboard's packRowsIntoPages."""
     columns = ['Initiative - Project Title', 'Health Status', 'Phase',
-                '# of Stores', 'Dallas POC', 'Intake & Testing', 'Deployment']
+                '# of Stores', 'Dallas VET', 'Intake & Testing', 'Deployment']
 
     # Build measurement HTML that matches dashboard's measurement container
     # Dashboard uses padding:8px, border:1px solid #ddd, word-wrap:break-word — NOT the render padding
@@ -523,8 +536,8 @@ def generate_report_pptx(data):
     if pending_unassigned:
         sections.append(('TDA Ownership - Currently No TDA Ownership', 'Pending', pending_unassigned))
 
-    # 2. Custom ownership order: Dallas POC, Intake & Test, Deployment, then unassigned
-    OWNERSHIP_ORDER = ['Dallas POC', 'Intake & Test', 'Deployment', UNASSIGNED]
+    # 2. Custom ownership order: Dallas VET, Intake & Test, Deployment, then unassigned
+    OWNERSHIP_ORDER = ['Dallas VET', 'Intake & Test', 'Deployment', UNASSIGNED]
     all_ownerships = set(r.get('TDA Ownership', UNASSIGNED) or UNASSIGNED for r in data)
     known_set = set(OWNERSHIP_ORDER)
     unknown_ownerships = sorted(o for o in all_ownerships if o not in known_set)

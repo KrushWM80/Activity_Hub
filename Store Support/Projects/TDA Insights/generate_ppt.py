@@ -258,7 +258,7 @@ class TDAPowerPointGenerator:
                 Inches(8.6), Inches(y_pos), Inches(1.2), Inches(0.3)
             )
             poc_para = poc_box.text_frame.paragraphs[0]
-            poc_para.text = str(initiative.get('Dallas POC', ''))[:15]
+            poc_para.text = str(initiative.get('Dallas VET', ''))[:15]
             poc_para.font.size = Pt(8)
             poc_para.font.color.rgb = TEXT_SECONDARY
         

@@ -145,16 +145,26 @@ TIER_ANNOTATIONS = {
 
 
 class HTMLTextExtractor(HTMLParser):
-    """Extract plain text from HTML, skipping tags."""
+    """Extract plain text from HTML, preserving paragraph breaks for block elements."""
+    BLOCK_TAGS = {'p', 'div', 'br', 'li', 'tr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'}
+
     def __init__(self):
         super().__init__()
         self.text_parts = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() in self.BLOCK_TAGS:
+            self.text_parts.append('\n')
+
+    def handle_endtag(self, tag):
+        if tag.lower() in self.BLOCK_TAGS:
+            self.text_parts.append('\n')
 
     def handle_data(self, data):
         self.text_parts.append(data)
 
     def get_text(self):
-        return ' '.join(self.text_parts)
+        return ''.join(self.text_parts)
 
 
 def html_to_text(html_str):
@@ -185,17 +195,28 @@ def extract_summarized_text(raw_text):
     if not match:
         return None
     text = match.group(1).strip()
-    # Clean up CSS artifacts and extra whitespace
+    # Clean up CSS artifacts
     text = re.sub(r'::marker\s*\{[^}]*\}', '', text)
-    text = re.sub(r'\s+', ' ', text).strip()
+    # Normalize line endings
+    text = text.replace('\r\n', '\n')
+    # Ensure paragraph breaks before sub-topic headers (Dept. XX:)
+    text = re.sub(r'\n+\s*(Dept\.)', r'\n\n\1', text)
+    # Normalize remaining runs of 2+ newlines to exactly 2
+    text = re.sub(r'\n{2,}', '\n\n', text)
+    # Within each paragraph, collapse whitespace to single spaces
+    paragraphs = [re.sub(r'[ \t]+', ' ', p).strip() for p in text.split('\n\n')]
+    paragraphs = [p for p in paragraphs if p]  # remove empties
+    # Within each paragraph, preserve single newlines (title + body on separate lines)
+    paragraphs = [re.sub(r'\n', '\n\n', p) if '\n' in p else p for p in paragraphs]
+    text = '\n\n'.join(paragraphs)
     # Truncate at reasonable length for TTS
-    if len(text) > 600:
+    if len(text) > 2000:
         # Try to cut at a sentence boundary
-        cut = text[:600].rfind('. ')
-        if cut > 200:
+        cut = text[:2000].rfind('. ')
+        if cut > 400:
             text = text[:cut + 1]
         else:
-            text = text[:600] + '...'
+            text = text[:2000] + '...'
     return text
 
 
@@ -291,8 +312,12 @@ def build_tts_script(week, events_with_summaries):
             lines.append(f"{display_name} Area:")
             lines.append("")
             for evt in events:
-                lines.append(evt['summary_text'])
-                lines.append("")
+                # Preserve paragraph breaks as separate lines for natural TTS pacing
+                for sub in evt['summary_text'].split('\n\n'):
+                    sub = sub.strip()
+                    if sub:
+                        lines.append(sub)
+                        lines.append("")
 
     # Include any ungrouped areas
     if ungrouped:
@@ -374,12 +399,12 @@ def build_tts_segments(week, events_with_summaries) -> List[Segment]:
                 title = evt.get('title', '')
                 summary = evt['summary_text']
 
-                # Try to extract a headline from the title
-                if title:
-                    segments.append(_headline(f"{title}.", title))
-                    segments.append(_silence(200, "micro"))
-
-                segments.append(_body(summary, title or summary[:40]))
+                # Split multi-topic summaries (separated by double newlines) into separate segments
+                sub_topics = [s.strip() for s in summary.split('\n\n') if s.strip()]
+                for j, sub in enumerate(sub_topics):
+                    segments.append(_body(sub, title or sub[:40]))
+                    if j < len(sub_topics) - 1:
+                        segments.append(_pause())  # pause between sub-topics
 
                 if i < len(events) - 1:
                     segments.append(_pause())
@@ -391,8 +416,6 @@ def build_tts_segments(week, events_with_summaries) -> List[Segment]:
         segments.append(_pause())
         for evt in ungrouped:
             display = AREA_DISPLAY_NAME.get(evt['store_area'], evt['store_area'])
-            segments.append(_headline(f"{display}.", display))
-            segments.append(_silence(200))
             segments.append(_body(evt['summary_text'], display))
             segments.append(_pause())
 
@@ -564,11 +587,16 @@ def synthesize_from_cache(week, fy, voice="Jenny", rate=0.95, output_dir=None):
 
     output_file = output_dir / f"Weekly Messages Audio Template - Summarized - Week {week} - Jenny Neural - Vimeo.mp4"
 
-    # Save enhanced TTS script (with inflection annotations) as .txt
+    # Save both standard and annotated scripts
     script_file = output_dir / f"Week {week} - Weekly Messages Audio Script.txt"
     with open(script_file, 'w', encoding='utf-8') as sf:
+        sf.write(plain_script)
+    logger.info(f"Saved standard TTS script to {script_file.name}")
+
+    inflection_file = output_dir / f"Week {week} - Weekly Messages Audio Script (Inflection).txt"
+    with open(inflection_file, 'w', encoding='utf-8') as sf:
         sf.write(annotated_script)
-    logger.info(f"Saved annotated TTS script to {script_file.name}")
+    logger.info(f"Saved inflection script to {inflection_file.name}")
 
     sys.path.insert(0, str(Path(__file__).parent.parent))
     from windows_media_synthesizer import WindowsMediaSynthesizer
@@ -636,7 +664,8 @@ def _generate_email_report(result, output_dir, week, fy, annotated_script, cache
     """
     output_dir = Path(output_dir)
     mp4_name = Path(result.get('output_file', '')).name if result.get('output_file') else 'N/A'
-    script_name = Path(result.get('script_file', '')).name if result.get('script_file') else 'N/A'
+    script_name = f"Week {week} - Weekly Messages Audio Script.txt"
+    inflection_name = f"Week {week} - Weekly Messages Audio Script (Inflection).txt"
     mp4_size = 'N/A'
     if result.get('output_file') and Path(result['output_file']).exists():
         mp4_size = f"{Path(result['output_file']).stat().st_size / 1024:.1f} KB"
@@ -649,8 +678,8 @@ def _generate_email_report(result, output_dir, week, fy, annotated_script, cache
     else:
         duration_str = "N/A"
 
-    cms_base = 'https://internal.walmart.com/content/store-communications/home/merchandise/total-store'
-    cms_url = f"{cms_base}/Weekly_Messages_Audio_WK{week}.html"
+    year = fy - 1  # Walmart FY2027 covers calendar year 2026
+    cms_url = f"https://enablement.walmart.com/content/store-communications/home/merchandise/weekly-messages/{year}/week-{week}/weekly_messages_audiowk{week}.html"
 
     event_count = cache_data.get('event_count', result.get('event_count', 0))
     summarized_count = cache_data.get('summarized_count', result.get('summarized_count', 0))
@@ -713,11 +742,14 @@ def _generate_email_report(result, output_dir, week, fy, annotated_script, cache
     <div style="max-width:700px;margin:20px auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.1);">
         
         <!-- Header -->
-        <div style="background:linear-gradient(135deg,#1E3A8A 0%,#1D4ED8 100%);color:white;padding:28px 32px;text-align:center;">
-            <div style="font-size:28px;margin-bottom:4px;">🎙️</div>
-            <h1 style="font-size:22px;font-weight:700;margin:0;">Weekly Messages Audio Report</h1>
-            <p style="font-size:14px;opacity:0.85;margin:6px 0 0;">Week {week} &bull; FY{fy} &bull; {generated_at}</p>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td align="center" style="padding:28px 32px;border-bottom:4px solid #1D4ED8;background-color:#EFF6FF;">
+                    <h1 style="font-size:22px;font-weight:700;margin:0;color:#1E3A8A;">Weekly Messages Audio Report</h1>
+                    <p style="font-size:14px;margin:6px 0 0;color:#4B5563;">Week {week} &#8226; FY{fy} &#8226; {generated_at}</p>
+                </td>
+            </tr>
+        </table>
 
         <!-- Summary Stats -->
         <div style="padding:24px 32px;">
@@ -748,10 +780,14 @@ def _generate_email_report(result, output_dir, week, fy, annotated_script, cache
                     <td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;">{mp4_name} ({mp4_size})</td>
                 </tr>
                 <tr>
-                    <td style="padding:8px 12px;font-weight:600;border-bottom:1px solid #E5E7EB;">Script</td>
-                    <td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;">{script_name}</td>
+                    <td style="padding:8px 12px;font-weight:600;border-bottom:1px solid #E5E7EB;">Standard Script</td>
+                    <td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;">📄 {script_name}</td>
                 </tr>
                 <tr style="background:#F9FAFB;">
+                    <td style="padding:8px 12px;font-weight:600;border-bottom:1px solid #E5E7EB;">Inflection Script</td>
+                    <td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;">🎭 {inflection_name}</td>
+                </tr>
+                <tr>
                     <td style="padding:8px 12px;font-weight:600;border-bottom:1px solid #E5E7EB;">CMS URL</td>
                     <td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;">
                         <a href="{cms_url}" style="color:#2563EB;word-break:break-all;">{cms_url}</a>
@@ -897,11 +933,16 @@ def generate_weekly_message_audio(week=None, fy=None, voice="Jenny", rate=0.95, 
 
     output_file = output_dir / f"Weekly Messages Audio Template - Summarized - Week {week} - Jenny Neural - Vimeo.mp4"
 
-    # Save enhanced TTS script (with inflection annotations)
+    # Save both standard and annotated scripts
     script_file = output_dir / f"Week {week} - Weekly Messages Audio Script.txt"
     with open(script_file, 'w', encoding='utf-8') as sf:
+        sf.write(plain_script)
+    logger.info(f"Saved standard TTS script to {script_file.name}")
+
+    inflection_file = output_dir / f"Week {week} - Weekly Messages Audio Script (Inflection).txt"
+    with open(inflection_file, 'w', encoding='utf-8') as sf:
         sf.write(annotated_script)
-    logger.info(f"Saved annotated TTS script to {script_file.name}")
+    logger.info(f"Saved inflection script to {inflection_file.name}")
 
     sys.path.insert(0, str(Path(__file__).parent.parent))
     from windows_media_synthesizer import WindowsMediaSynthesizer
@@ -968,6 +1009,7 @@ def send_audio_report_email(week, fy, to_recipients=None):
     report_file = output_dir / f"Week {week} - Weekly Messages Audio Report.html"
     mp4_file = output_dir / f"Weekly Messages Audio Template - Summarized - Week {week} - Jenny Neural - Vimeo.mp4"
     script_file = output_dir / f"Week {week} - Weekly Messages Audio Script.txt"
+    inflection_file = output_dir / f"Week {week} - Weekly Messages Audio Script (Inflection).txt"
 
     if not report_file.exists():
         return {'success': False, 'error': f'Report not found: {report_file.name}. Run synthesis first.'}
@@ -977,14 +1019,15 @@ def send_audio_report_email(week, fy, to_recipients=None):
 
     # Collect valid attachments
     attachments = []
-    for f in [mp4_file, script_file]:
+    for f in [mp4_file, script_file, inflection_file]:
         if f.exists():
             attachments.append(str(f.absolute()))
         else:
             logger.warning(f"Attachment not found, skipping: {f.name}")
 
     # CMS URL for reference
-    cms_url = f"https://internal.walmart.com/content/store-communications/home/merchandise/total-store/Weekly_Messages_Audio_WK{week}.html"
+    year = fy - 1  # Walmart FY2027 covers calendar year 2026
+    cms_url = f"https://enablement.walmart.com/content/store-communications/home/merchandise/weekly-messages/{year}/week-{week}/weekly_messages_audiowk{week}.html"
 
     try:
         import pythoncom

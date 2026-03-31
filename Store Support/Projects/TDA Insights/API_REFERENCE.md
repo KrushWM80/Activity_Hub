@@ -98,7 +98,7 @@ curl "http://localhost:5000/api/data?refresh=true"
       "Phase": "Test",
       "# of Stores": 120,
       "Intake & Testing": "In Progress",
-      "Dallas POC": "John Smith",
+      "Dallas VET": "John Smith",
       "Deployment": "Scheduled"
     },
     ...

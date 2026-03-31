@@ -1,16 +1,16 @@
 @echo off
 REM ==========================================
-REM Zorro Activity Hub - 24/7 Auto-Restart
+REM Audio Message Hub - 24/7 Auto-Restart
 REM ==========================================
-REM Purpose: Keep Zorro podcast server running continuously
-REM Access: http://localhost:8888/
+REM Purpose: Keep Audio Message Hub server running continuously
+REM Access: http://weus42608431466:8888/Zorro/Audio_Message_Hub
 REM Status File: zorro_server.log
 REM
 REM Features:
 REM - Auto-restart on crash
 REM - Logging of all starts and errors
 REM - Jenny Neural voice MP4 audio generation
-REM - Podcast server with metadata support
+REM - Audio Message Hub with dashboard
 REM - 5-second restart interval on failure
 
 setlocal enabledelayedexpansion
@@ -24,10 +24,9 @@ set Port=8888
 
 echo.
 echo ================================================================
-echo Zorro Activity Hub Podcast Server - 24/7 Operating Mode
+echo Audio Message Hub - 24/7 Operating Mode
 echo ================================================================
-echo Access: http://localhost:%Port%/
-echo Audio Generator: http://localhost:%Port%/create-audio
+echo Access: http://weus42608431466:%Port%/Zorro/Audio_Message_Hub
 echo Log File: %LogFile%
 echo Time: %date% %time%
 echo ================================================================

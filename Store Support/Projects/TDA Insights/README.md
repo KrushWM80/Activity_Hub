@@ -23,7 +23,7 @@ The dashboard pulls data from the TDA Report table in BigQuery, which contains:
 - Phase (Test, Production, etc.)
 - Number of Stores Impacted
 - Intake & Testing Status
-- Dallas POC (Point of Contact)
+- Dallas VET (Vetting)
 - Deployment Information
 
 ## Features

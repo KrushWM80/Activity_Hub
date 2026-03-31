@@ -55,7 +55,7 @@ def build_sections(data):
     if pending_unassigned:
         sections.append(('TDA Ownership - Currently No TDA Ownership', 'Pending', pending_unassigned))
 
-    OWNERSHIP_ORDER = ['Dallas POC', 'Intake & Test', 'Deployment', UNASSIGNED]
+    OWNERSHIP_ORDER = ['Dallas VET', 'Intake & Test', 'Deployment', UNASSIGNED]
     all_ownerships = set(r.get('TDA Ownership', UNASSIGNED) or UNASSIGNED for r in data)
     known_set = set(OWNERSHIP_ORDER)
     unknown_ownerships = sorted(o for o in all_ownerships if o not in known_set)

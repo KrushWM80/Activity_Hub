@@ -80,7 +80,7 @@ python backend.py
 - **Modern Design** - Exceeds your reference image
 - **Real-time Data** - Pulls from BigQuery `Output_TDA Report` table
 - **Live Filtering** - Phase, Health Status
-- **Summary Cards** - Total projects, stores, on-track/at-risk counts
+- **Summary Cards** - Total initiatives, stores, on-track/at-risk counts
 - **Detailed Table** - All initiative details with color-coded status
 - **CSV Export** - Download filtered data
 - **Responsive** - Works on desktop, tablet, mobile
@@ -130,7 +130,7 @@ python backend.py
 - Generate PPT button
 
 ### Summary Cards
-- **Total Projects** - Count of all initiatives
+- **Total Initiatives** - Count of all initiatives
 - **Total Stores** - Sum of stores impacted
 - **On Track** - Green count
 - **At Risk** - Orange count

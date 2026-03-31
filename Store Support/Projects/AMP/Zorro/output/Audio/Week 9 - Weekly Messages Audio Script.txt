@@ -1,377 +1,236 @@
-[WARM, PERSONAL] Hello! Your Week 9 Weekly Messages are Here!
+Hello! Your Week 9 Weekly Messages are Here!
 
-  --- 400ms pause ---
+Please Visit the Landing Page to access full content.
 
-[WARM, PERSONAL] Please visit the Landing Page to access full content.
+Food & Consumables Merchant Messages:
 
-  --- 800ms intro break ---
+Beauty and Consumables Area:
 
-[SLOW, LIFTED] Food & Consumables Merchant Messages.
+Bettergoods is coming to the Dept. 79 Baby Food modular with the week 10 reset, but some items may arrive later (no later than week 14), so fill any gaps with nearby Serenity Kids pouches and Gerber 1st Foods tubs until bettergoods can be set as shown.
 
-  --- 400ms pause ---
 
-[MODERATE, LIFTED] Beauty and Consumables Area.
+Food Area:
 
-  --- 300ms header pause ---
+Dept. 92: Easter Week Focus
 
-[SLIGHTLY SLOW, LIFTED] Dept. 79: Bettergoods Arrival Timing Update (Baby Food Modular).
+As an Easter week focus, stores need to make sure their Soup category in department 92 is in-stock, both on the sidecounter and on secondary features.
 
-  --- 200ms micro ---
+Dept. 92: Get Ready for the 13th Annual Fight Hunger. Spark Change.
 
-[NORMAL PACE] Bettergoods is coming to the Dept. 79 Baby Food modular with the week 10 reset, but some items may arrive later (no later than week 14), so fill any gaps with nearby Serenity Kids pouches and Gerber 1st Foods tubs until bettergoods can be set as shown.
+It is time for the 13th Annual Fight Hunger. Spark Change. campaign. This AMP message lists the items involved and where the features will be placed. Suppliers have made a significant investment in this program and stores need to execute at the highest level.
 
-  --- 600ms area break ---
+Dept. 92: Knorr Rice and Pasta Sides Are on $1 Rollback
 
-[MODERATE, LIFTED] Food Area.
+Knorr Rice and pasta sides are going on Rollback for $1.
 
-  --- 300ms header pause ---
+Dept. 92: Spring SCOG Pallets Will Arrive Next Week
 
-[SLIGHTLY SLOW, LIFTED] Dept. 92: Easter Week Focus.
+Beginning Saturday, April 11, Spring SCOG Pallets will begin to arrive in stores. Featured items include Knorr $1 Rollback, Nongshim K-Pop Demon Hunters, Idahoan Potatoes 8oz and Cup Noodles 6-pack Ramen.
 
-  --- 200ms micro ---
+Dept. 95: Get Ready for a $5 KDP 12-Pack Easter Rollback
 
-[NORMAL PACE] Dept. 92: Easter Week Focus As an Easter week focus, stores need to make sure their Soup category in department 92 is in-stock, both on the sidecounter and on secondary features.
+Stores will soon be receiving a $5.00 KDP 12-pack flavor Rollback on Canada Dry, A&W, 7UP, Sunkist and Squirt.
 
-  --- 400ms pause ---
+Dept. 95: Keep Electrolit Glide Equipment
 
-[SLIGHTLY SLOW, LIFTED] Dept. 92: Get Ready for the 13th Annual Fight Hunger. Spark Change..
+As stores complete the upcoming Sports Drink modular reset, they must not throw away the Electrolit guides.
 
-  --- 200ms micro ---
+Dept. 95: Updated Direction for Alani LTO Lime-Slush
 
-[NORMAL PACE] Dept. 92: Get Ready for the 13th Annual Fight Hunger. Spark Change. It is time for the 13th Annual Fight Hunger. Spark Change. campaign. This AMP message lists the items involved and where the features will be placed. Suppliers have made a significant investment in this program and stores need to execute at the highest level.
+Alani Limited Time Offer (LTO) Lime-Slush is selling out quickly and creating out-of-stock issues. Stores should expand on neighboring Alani products.
 
-  --- 400ms pause ---
 
-[SLIGHTLY SLOW, LIFTED] Dept. 92: Knorr Rice and Pasta Sides Are on $1 Rollback.
+Fresh Area:
 
-  --- 200ms micro ---
+This April, our Food Safety Focus Points remind associates to use the new CORE app for daily checks and to review proper food storage guidelines, especially for cold holding and separating raw from ready-to-eat foods.
 
-[NORMAL PACE] Dept. 92: Knorr Rice and Pasta Sides Are on $1 Rollback Knorr Rice and pasta sides are going on Rollback for $1.
+Rotisserie Ordering – How to Manage Inventory and Drive Sales
 
-  --- 400ms pause ---
+Manual rotisserie orders are causing chain-wide inventory gaps. Rotisserie is designed to replenish automatically, not through manual orders. If stores are consistently needing to manual order rotisserie, there is a breakdown in the Deli process that must be corrected.
 
-[SLIGHTLY SLOW, LIFTED] Dept. 92: Spring SCOG Pallets Will Arrive Next Week.
+Dept. 94: Easter Floral
 
-  --- 200ms micro ---
+The key actions stores need to take for a successful Easter floral season are listed in the message.
 
-[NORMAL PACE] Dept. 92: Spring SCOG Pallets Will Arrive Next Week Beginning Saturday, April 11, Spring SCOG Pallets will begin to arrive in stores. Featured items include Knorr $1 Rollback, Nongshim K-Pop Demon Hunters, Idahoan Potatoes 8oz and Cup Noodles 6-pack Ramen.
+Dept. 94: In-stock Risk and Expected Get Well
 
-  --- 400ms pause ---
+A list of items with in-stock challenges and their expected get-well dates are listed in the message.
 
-[SLIGHTLY SLOW, LIFTED] Dept. 95: Get Ready for a $5 KDP 12-Pack Easter Rollback.
+Dept. 94: Snacking Tomatoes Are on Feature
 
-  --- 200ms micro ---
+Select stores will receive a wing stack feature of snacking tomatoes.
 
-[NORMAL PACE] Dept. 95: Get Ready for a $5 KDP 12-Pack Easter Rollback Stores will soon be receiving a $5.00 KDP 12-pack flavor Rollback on Canada Dry, A&W, 7UP, Sunkist and Squirt.
+Dept. 94: Easter Flowers are Here
 
-  --- 400ms pause ---
+Easter flowers are arriving in the Produce Dept. Make sure they are displayed correctly and maintained to the highest standard. The message includes instructions on how Store Fulfillment Personal Shoppers should handle fresh flower orders.
 
-[SLIGHTLY SLOW, LIFTED] Dept. 95: Keep Electrolit Glide Equipment.
+Dept. 94: Plant-Based Cheese is Moving to the Dairy Cheese Set
 
-  --- 200ms micro ---
+Field Roast Chao Slices and VioLife Smoked Provolone are moving from the Produce to Dairy.
 
-[NORMAL PACE] Dept. 95: Keep Electrolit Glide Equipment As stores complete the upcoming Sports Drink modular reset, they must not throw away the Electrolit guides.
+Dept. 94: Important Item Updates
 
-  --- 400ms pause ---
+Item updates for Sweet Baby Broccoli, Organic Lettuce, Carrots, Roma Tomatoes, Bulk Corn and Mixed Vegetables are listed in the message.
 
-[SLIGHTLY SLOW, LIFTED] Dept. 95: Updated Direction for Alani LTO Lime-Slush.
+Dept. 98: Fresh Bakery Final Easter Push
 
-  --- 200ms micro ---
+This is the final full week before Easter (Sunday, April 4) to build volume and protect in-stocks heading into the weekend.
 
-[NORMAL PACE] Dept. 95: Updated Direction for Alani LTO Lime-Slush Alani Limited Time Offer (LTO) Lime-Slush is selling out quickly and creating out-of-stock issues. Stores should expand on neighboring Alani products.
+Dept. 98: Cakes and Cupcakes: Decorating Guide Compliance
 
-  --- 600ms area break ---
+Boost sales and reduce rework. Nail Spring and Easter cake and cupcake standards fast. Keep top sellers stocked.
 
-[MODERATE, LIFTED] Fresh Area.
+Dept. 81: Commercial Bread Holiday Readiness
 
-  --- 300ms header pause ---
+Keep commercial bread features full. Partner with your DSD representative and watch your Brown & Serve items and don’t forget core rolls.
 
-[SLIGHTLY SLOW, LIFTED] April Food Safety Focus Points.
+Dept. 98/81: Quick Bakery Department Checklist for Week 9
 
-  --- 200ms micro ---
+Follow this Bakery Dept. checklist for all week 9 key focus points.
 
-[NORMAL PACE] This April, our Food Safety Focus Points remind associates to use the new CORE app for daily checks and to review proper food storage guidelines, especially for cold holding and separating raw from ready-to-eat foods.
+Dept. 98: A Reminder About Edible Image Printer Ink and Fresh Order Guide
 
-  --- 400ms pause ---
+Reinforcing food safety programs as the busy Easter holiday approaches. Only edible ink cartridges are approved for use in edible image printers. Only use the Fresh Order Guide available on OneWalmart to order in-store made items.
 
-[SLIGHTLY SLOW, LIFTED] D80: Rotisserie Best Practice.
+Dept. 93: New Frozen Modular
 
-  --- 200ms micro ---
+There is a new frozen modular coming soon to the meat department. This modular will make room for summer grilling favorites and some new items like the Smashed Burgers.
 
-[NORMAL PACE] Rotisserie Ordering – How to Manage Inventory and Drive Sales Manual rotisserie orders are causing chain-wide inventory gaps. Rotisserie is designed to replenish automatically, not through manual orders. If stores are consistently needing to manual order rotisserie, there is a breakdown in the Deli process that must be corrected.
+Dept. 93: Easter Preparation
 
-  --- 400ms pause ---
+The Meat Dept. needs to finish the Lent season strong and be prepared for the Easter rush.
 
-[SLIGHTLY SLOW, LIFTED] Dept. 94: Easter Floral.
 
-  --- 200ms micro ---
+General Merchandise Merchant Messages:
 
-[NORMAL PACE] Dept. 94: Easter Floral The key actions stores need to take for a successful Easter floral season are listed in the message.
+Entertainment Area:
 
-  --- 400ms pause ---
+Starting March 23, customers setting up new VIZIO and select onn. smart TVs may be prompted to sign in or create a Walmart account, so associates should be ready to explain the integration and direct setup issues to VIZIO Support.
 
-[SLIGHTLY SLOW, LIFTED] Dept. 94: Produce Updates.
+Dept. 72 will receive new 2026 Samsung 43" and 50" TVs in week 9-10 to support a week 10 modular item swap, with clearance markdowns on the outgoing 2025 models and setup of the new models on the Medium TV modular.
 
-  --- 200ms micro ---
 
-[NORMAL PACE] Dept. 94: In-stock Risk and Expected Get Well A list of items with in-stock challenges and their expected get-well dates are listed in the message. Dept. 94: Snacking Tomatoes Are on Feature Select stores will receive a wing stack feature of snacking tomatoes. Dept. 94: Easter Flowers are Here Easter flowers are arriving in the Produce Dept. Make sure they are displayed correctly and maintained to the highest standard. The message includes instructions on how Store Fulfillment Personal Shoppers should handle fresh flower orders. Dept.
+Fashion Area:
 
-  --- 400ms pause ---
+Dept. 23: Team Sports Dynasty MLB Jersey Update
 
-[SLIGHTLY SLOW, LIFTED] Dept. 98/81: Week 9 Bakery and Bread Updates.
+Stores will receive new barcode tags for MLB jerseys, which were originally sent with incorrect barcodes.
 
-  --- 200ms micro ---
+Dept. 29: Sleepwear & Intimates Updates
 
-[NORMAL PACE] Dept. 98: Fresh Bakery Final Easter Push This is the final full week before Easter (Sunday, April 4) to build volume and protect in-stocks heading into the weekend. Dept. 98: Cakes and Cupcakes: Decorating Guide Compliance Boost sales and reduce rework. Nail Spring and Easter cake and cupcake standards fast. Keep top sellers stocked. Dept. 81: Commercial Bread Holiday Readiness Keep commercial bread features full. Partner with your DSD representative and watch your Brown & Serve items and don’t forget core rolls. Dept.
+The week 10 mod includes Aria gowns and No Boundaries Baby Tees and Woven Bottoms. Stores should also use the included image to set the 4-foot Bra Accessories wall.
 
-  --- 400ms pause ---
 
-[SLIGHTLY SLOW, LIFTED] Dept. 98: A Reminder About Edible Image Printer Ink and Fresh Order Guide .
+Hardlines Area:
 
-  --- 200ms micro ---
+Some stores should flex and spread the 500 power tools modular using Hart endcap items now, then transition the endcap to incoming Hyper Tough storage bins and signage to keep features full and organized.
 
-[NORMAL PACE] Dept. 98: A Reminder About Edible Image Printer Ink and Fresh Order Guide Reinforcing food safety programs as the busy Easter holiday approaches. Only edible ink cartridges are approved for use in edible image printers. Only use the Fresh Order Guide available on OneWalmart to order in-store made items.
+Some stores received a non-working Hyper Tough Blower Fan display unit, so please follow the setup steps to secure the wedge and fan properly for a clean, consistent presentation.
 
-  --- 400ms pause ---
+Dept. 9 launches Speedo in week 10, and store associates should set the shipped signage kit on time, following the included instructions, to ensure a clean, easy-to-shop presentation.
 
-[SLIGHTLY SLOW, LIFTED] It’s Frozen Mod Week!.
+Dept. 9 Week 10 GM Pad modular delays are impacting select Water Sports, Swim, Pools, and Water Toys items, with expected in-stock “get well” weeks ranging from 11 to 13 (and a few in week 14).
 
-  --- 200ms micro ---
 
-[NORMAL PACE] Dept. 93: New Frozen Modular There is a new frozen modular coming soon to the meat department. This modular will make room for summer grilling favorites and some new items like the Smashed Burgers. Dept. 93: Easter Preparation The Meat Dept. needs to finish the Lent season strong and be prepared for the Easter rush.
+Home Area:
 
-  --- 800ms → General Merchandise Merchant Messages ---
+Dept. 17: Home Fragrance Quick Mod
 
-[SLOW, LIFTED] General Merchandise Merchant Messages.
+Our upcoming quick mod deletes several Mainstays 20-ounce candles which will be replaced with 14 ounce textured-wrap candles. This update addresses supply and inventory challenges.
 
-  --- 400ms pause ---
+Home: Key Updates on the Mainstays Kids Brand Launch
 
-[MODERATE, LIFTED] Entertainment Area.
+The week 14 Mainstays Kids launch is approaching, so stores are encouraged to print their current floor plans, check modular hours and review the playbook.
 
-  --- 300ms header pause ---
 
-[SLIGHTLY SLOW, LIFTED] Dept. 72: User Account Change for VIZIO and onn. TVs.
+Seasonal Area:
 
-  --- 200ms micro ---
+Easter is Sunday, April 5—maximize final-week sales by keeping Dept. 18 and 67 displays full and shoppable, stocking key items and cards/gift packaging, preparing for the April 6 modular drop, and following NFW compliance by marking down and disposing of any sparklers or party poppers where shipments have stopped.
 
-[NORMAL PACE] Starting March 23, customers setting up new VIZIO and select onn. smart TVs may be prompted to sign in or create a Walmart account, so associates should be ready to explain the integration and direct setup issues to VIZIO Support.
 
-  --- 400ms pause ---
+Operations Messages:
 
-[SLIGHTLY SLOW, LIFTED] Dept. 72: Week 10 Samsung TV Item Swap.
+Asset Protection Area:
 
-  --- 200ms micro ---
+Keys for the new Pharmacy iPad locked cases must be stored in the CII safe. This protocol helps control access and supports Health & Wellness operations without compromising key control standards.
 
-[NORMAL PACE] Dept. 72 will receive new 2026 Samsung 43" and 50" TVs in week 9-10 to support a week 10 modular item swap, with clearance markdowns on the outgoing 2025 models and setup of the new models on the Medium TV modular.
+--------------------------------------------------------------------------------------------
 
-  --- 600ms area break ---
+Restitution Checks Mailing Update
 
-[MODERATE, LIFTED] Fashion Area.
+All restitution checks must now be mailed to one standardized address. Preprinted envelopes are no longer available.
 
-  --- 300ms header pause ---
+Why It Matters
 
-[SLIGHTLY SLOW, LIFTED] Dept. 23: Team Sports Dynasty MLB Jersey Update.
+Sending restitution checks to one standardized address helps payments get processed accurately and without delays.
 
-  --- 200ms micro ---
+This gives courts, attorneys and external partners a clear and consistent location to mail all restitution issued on Walmart’s behalf.
 
-[NORMAL PACE] Dept. 23: Team Sports Dynasty MLB Jersey Update Stores will receive new barcode tags for MLB jerseys, which were originally sent with incorrect barcodes.
+Preparing Mail
 
-  --- 400ms pause ---
+Mail all restitution checks to:
 
-[SLIGHTLY SLOW, LIFTED] Dept. 29: Sleepwear & Intimates Updates.
+Walmart Restitution Recovery
 
-  --- 200ms micro ---
+P.O. Box 7412016
 
-[NORMAL PACE] Dept. 29: Sleepwear & Intimates Updates The week 10 mod includes Aria gowns and No Boundaries Baby Tees and Woven Bottoms. Stores should also use the included image to set the 4-foot Bra Accessories wall.
+Chicago, IL 606742016
 
-  --- 600ms area break ---
+Teams should send all restitution checks in standard envelopes.
 
-[MODERATE, LIFTED] Hardlines Area.
+Preprinted envelopes can no longer be used or requested.
 
-  --- 300ms header pause ---
+Explore More
 
-[SLIGHTLY SLOW, LIFTED] Dept. 11: Flex 500 Modular With Hart Tools.
+Go to OneWalmart > BetterWay > Supercenters/Division 1 > Asset Protection >  Investigations.
 
-  --- 200ms micro ---
+Summarized: Preprinted restitution check envelopes are no longer available. Associates must send all restitution checks to one address using standard envelopes.
 
-[NORMAL PACE] Some stores should flex and spread the 500 power tools modular using Hart endcap items now, then transition the endcap to incoming Hyper Tough storage bins and signage to keep features full and organized.
 
-  --- 400ms pause ---
+Auto Care Area:
 
-[SLIGHTLY SLOW, LIFTED] Dept. 11: Hyper Tough Blower Fan Display Setup Instructions.
+Stores will transition in week 9 from assorted penlight PDQs to color-specific Black and/or Red PDQs with unique UPCs to improve picking accuracy and demand tracking, while selling through current inventory with no markdowns.
 
-  --- 200ms micro ---
+Make Easter Egg-stra Special With the OnePay Credit Card
 
-[NORMAL PACE] Some stores received a non-working Hyper Tough Blower Fan display unit, so please follow the setup steps to secure the wedge and fan properly for a clean, consistent presentation.
+Associates and customers can use the OnePay credit card to make Easter purchases.
 
-  --- 400ms pause ---
 
-[SLIGHTLY SLOW, LIFTED] Dept. 9: Speedo Week 10 Launch Kit.
+Frontend Area:
 
-  --- 200ms micro ---
+Enhancing Your Customer's Money Services Profile
 
-[NORMAL PACE] Dept. 9 launches Speedo in week 10, and store associates should set the shipped signage kit on time, following the included instructions, to ensure a clean, easy-to-shop presentation.
+Money Services is enhancing customer profiles to speed repeat transactions and improve the digital experience. A customer’s phone number is now required for every Financial Services transaction and will link to a unique profile.
 
-  --- 400ms pause ---
 
-[SLIGHTLY SLOW, LIFTED] Dept. 9: Week 10 GM Pad Modular Item Delays.
+Pickup Area:
 
-  --- 200ms micro ---
+No Bunny Likes Empty Shelves – Let's Keep Easter Hopping!
 
-[NORMAL PACE] Dept. 9 Week 10 GM Pad modular delays are impacting select Water Sports, Swim, Pools, and Water Toys items, with expected in-stock “get well” weeks ranging from 11 to 13 (and a few in week 14).
+Stay ahead of the Easter rush by keeping fast movers and key seasonal items stocked and visible, preparing for late-week demand and evening delivery spikes, and maintaining fresh, properly staged floral to maximize sales and execution.
 
-  --- 600ms area break ---
 
-[MODERATE, LIFTED] Home Area.
+People Area:
 
-  --- 300ms header pause ---
+My Assistant can act like your own personal coach. Try using a prompt like: "Coach me on how to explain this policy confidently and calmly." or "Provide guidance on how to have a difficult conversation."
 
-[SLIGHTLY SLOW, LIFTED] Dept. 17: Home Fragrance Quick Mod.
 
-  --- 200ms micro ---
+Total Store Area:
 
-[NORMAL PACE] Dept. 17: Home Fragrance Quick Mod Our upcoming quick mod deletes several Mainstays 20-ounce candles which will be replaced with 14 ounce textured-wrap candles. This update addresses supply and inventory challenges.
+Dept. 16/56 Spring Hardlines Update highlights Kingsford charcoal and Keter shed seasonal actions plus Dept. 56 guidance on live plant tagging, Easter flower timing and markdowns, branded parking lot execution and Bonnie grocery placement to drive sales.
 
-  --- 400ms pause ---
+DSL Supply Update for Stores Converted Before Feb. 2026
 
-[SLIGHTLY SLOW, LIFTED] Home: Key Updates on the Mainstays Kids Brand Launch.
+Stores converted before Feb. 2026 may experience delays in receiving certain digital shelf label (DSL) supplies due to low inventory and backorders affecting several adapters. Stores should continue placing orders through QuickBase, avoid duplicate requests, and review for misuse before ordering standalone tags, as those with excessive misuse will not be approved. Use the DSL Order Dashboard to track approved orders and stay updated on order statuses.
 
-  --- 200ms micro ---
+With hot weather conditions increasing the risk of heat-related illness, it's crucial for your teams to prepare by following safety tips like drinking water, resting in the shade and ventilating enclosed spaces. Associates should always look out for each other and report any symptoms immediately to a manager.
 
-[NORMAL PACE] Home: Key Updates on the Mainstays Kids Brand Launch The week 14 Mainstays Kids launch is approaching, so stores are encouraged to print their current floor plans, check modular hours and review the playbook.
+How to Improve Scrubber Performance and Run Time
 
-  --- 600ms area break ---
+Keep scrubbers running efficiently with simple daily habits. The Maintenance team should clean and check the squeegee, hose, sensors and tank after each use. As a best practice, members of management will know this is done right if they see the lids are left open for proper air drying to prevent odors and maintain performance.
 
-[MODERATE, LIFTED] Seasonal Area.
+Slip, Trip and Fall Safety
 
-  --- 300ms header pause ---
+Spring break means more customers – and more slip, trip and fall risk. Plan cleaning coverage for busy times, keep orange Towel-in-Pocket supplies ready, review weather daily, and do quick safety sweeps to fix hazards fast.
 
-[SLIGHTLY SLOW, LIFTED] Dept. 18/67: Final Prep Week for Easter.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] Easter is Sunday, April 5—maximize final-week sales by keeping Dept. 18 and 67 displays full and shoppable, stocking key items and cards/gift packaging, preparing for the April 6 modular drop, and following NFW compliance by marking down and disposing of any sparklers or party poppers where shipments have stopped.
-
-  --- 800ms → Operations Messages ---
-
-[SLOW, LIFTED] Operations Messages.
-
-  --- 400ms pause ---
-
-[MODERATE, LIFTED] Asset Protection Area.
-
-  --- 300ms header pause ---
-
-[SLIGHTLY SLOW, LIFTED] Keep Pharmacy iPads Secure and Restitution Checks Mailing Update.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] Keys for the new Pharmacy iPad locked cases must be stored in the CII safe. This protocol helps control access and supports Health & Wellness operations without compromising key control standards. -------------------------------------------------------------------------------------------- Restitution Checks Mailing Update All restitution checks must now be mailed to one standardized address. Preprinted envelopes are no longer available. Why It Matters Sending restitution checks to one standardized address helps payments get processed accurately and without delays.
-
-  --- 600ms area break ---
-
-[MODERATE, LIFTED] Auto Care Area.
-
-  --- 300ms header pause ---
-
-[SLIGHTLY SLOW, LIFTED] Dept. 10: Penlight Changes — Auto Accessories.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] Stores will transition in week 9 from assorted penlight PDQs to color-specific Black and/or Red PDQs with unique UPCs to improve picking accuracy and demand tracking, while selling through current inventory with no markdowns.
-
-  --- 400ms pause ---
-
-[SLIGHTLY SLOW, LIFTED] Make Easter Egg-stra Special with the OnePay Credit Card.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] Make Easter Egg-stra Special With the OnePay Credit Card Associates and customers can use the OnePay credit card to make Easter purchases.
-
-  --- 600ms area break ---
-
-[MODERATE, LIFTED] Frontend Area.
-
-  --- 300ms header pause ---
-
-[SLIGHTLY SLOW, LIFTED] Front End:  Enhancing Your Customer's Money Services Profile.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] Enhancing Your Customer's Money Services Profile Money Services is enhancing customer profiles to speed repeat transactions and improve the digital experience. A customer’s phone number is now required for every Financial Services transaction and will link to a unique profile.
-
-  --- 600ms area break ---
-
-[MODERATE, LIFTED] Pickup Area.
-
-  --- 300ms header pause ---
-
-[SLIGHTLY SLOW, LIFTED] No Bunny Likes Empty Shelves – Let’s Keep Easter Hopping! .
-
-  --- 200ms micro ---
-
-[NORMAL PACE] No Bunny Likes Empty Shelves – Let's Keep Easter Hopping! Stay ahead of the Easter rush by keeping fast movers and key seasonal items stocked and visible, preparing for late-week demand and evening delivery spikes, and maintaining fresh, properly staged floral to maximize sales and execution.
-
-  --- 600ms area break ---
-
-[MODERATE, LIFTED] People Area.
-
-  --- 300ms header pause ---
-
-[SLIGHTLY SLOW, LIFTED] AI Tip of the Week.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] My Assistant can act like your own personal coach. Try using a prompt like: "Coach me on how to explain this policy confidently and calmly." or "Provide guidance on how to have a difficult conversation."
-
-  --- 600ms area break ---
-
-[MODERATE, LIFTED] Total Store Area.
-
-  --- 300ms header pause ---
-
-[SLIGHTLY SLOW, LIFTED] Dept. 16/56: Spring Hardlines Update.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] Dept. 16/56 Spring Hardlines Update highlights Kingsford charcoal and Keter shed seasonal actions plus Dept. 56 guidance on live plant tagging, Easter flower timing and markdowns, branded parking lot execution and Bonnie grocery placement to drive sales.
-
-  --- 400ms pause ---
-
-[SLIGHTLY SLOW, LIFTED] Digital Shelf Label (DSL) Supply Update for Stores Converted Before Feb. 2026.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] DSL Supply Update for Stores Converted Before Feb. 2026 Stores converted before Feb. 2026 may experience delays in receiving certain digital shelf label (DSL) supplies due to low inventory and backorders affecting several adapters. Stores should continue placing orders through QuickBase, avoid duplicate requests, and review for misuse before ordering standalone tags, as those with excessive misuse will not be approved. Use the DSL Order Dashboard to track approved orders and stay updated on order statuses.
-
-  --- 400ms pause ---
-
-[SLIGHTLY SLOW, LIFTED] Heat-Related Illness Safety.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] With hot weather conditions increasing the risk of heat-related illness, it's crucial for your teams to prepare by following safety tips like drinking water, resting in the shade and ventilating enclosed spaces. Associates should always look out for each other and report any symptoms immediately to a manager.
-
-  --- 400ms pause ---
-
-[SLIGHTLY SLOW, LIFTED] How to Improve Scrubber Performance and Run Time.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] How to Improve Scrubber Performance and Run Time Keep scrubbers running efficiently with simple daily habits. The Maintenance team should clean and check the squeegee, hose, sensors and tank after each use. As a best practice, members of management will know this is done right if they see the lids are left open for proper air drying to prevent odors and maintain performance.
-
-  --- 400ms pause ---
-
-[SLIGHTLY SLOW, LIFTED] Slip, Trip and Fall Safety.
-
-  --- 200ms micro ---
-
-[NORMAL PACE] Slip, Trip and Fall Safety Spring break means more customers – and more slip, trip and fall risk. Plan cleaning coverage for busy times, keep orange Towel-in-Pocket supplies ready, review weather daily, and do quick safety sweeps to fix hazards fast.
-
-  --- 800ms outro ---
-
-[WARM, PERSONAL] That's your Week 9 Weekly Messages.
-
-  --- 400ms pause ---
-
-[WARM, PERSONAL] Have a Great Week!
+That's your Week 9 Weekly Messages, Have a Great Week!

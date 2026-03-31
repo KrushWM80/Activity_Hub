@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Egg Hunt - Production Eggs 4" (25 eggs)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .watermark {
+            background: #ff6b6b;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+        
+        .instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .instructions h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .egg-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+            padding: 0 20px;
+        }
+        
+        .egg-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s, filter 0.3s;
+            min-height: 300px;
+        }
+        
+        .egg-container:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.3));
+        }
+        
+        .egg-oval {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        .print-info {
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .print-info {
+                display: none;
+            }
+            
+            .instructions {
+                display: none;
+            }
+            
+            .egg-grid {
+                gap: 20px;
+            }
+            
+            .egg-card {
+                page-break-inside: avoid;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 20px;
+            }
+            
+            .egg-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥚 Digital Egg Hunt - Production Eggs 4" (25 eggs) 🥚</h1>
+        
+        
+        
+        <div class="instructions">
+            <h2>📋 Printing Instructions</h2>
+            <ol>
+                <li><strong>Print this page</strong> on cardstock or regular white paper</li>
+                <li><strong>Cut out each egg</strong> along the border (careful with the QR code)</li>
+                <li><strong>Optional:</strong> Laminate eggs for durability</li>
+                <li><strong>Hide eggs</strong> around the building</li>
+                <li><strong>Participants scan QR codes</strong> with their smartphones</li>
+            </ol>
+            <p style="margin-top: 15px;"><strong>📱 How it works:</strong> When someone scans a QR code with their phone camera, they'll be taken directly to the leaderboard app to start counting their eggs.</p>
+        </div>
+        
+        <div class="egg-grid">
+            
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FF6B6B" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-031" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-031</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#4ECDC4" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-032" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-032</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FFE66D" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-033" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-033</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#95E1D3" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-034" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-034</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#F38181" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-035" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-035</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#AA96DA" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-036" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-036</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FCBAD3" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-037" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-037</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#A8D8EA" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-038" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-038</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FCF781" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-039" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-039</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FF8C94" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-040" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-040</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#A8E6CF" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-041" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-041</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FFD3B6" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-042" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-042</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FF6B6B" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-043" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-043</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#4ECDC4" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-044" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-044</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FFE66D" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-045" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-045</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#95E1D3" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-046" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-046</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#F38181" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-047" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-047</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#AA96DA" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-048" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-048</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FCBAD3" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-049" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-049</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#A8D8EA" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-050" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-050</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FCF781" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-051" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-051</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FF8C94" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-052" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-052</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#A8E6CF" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-053" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-053</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FFD3B6" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-054" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-054</text>
+            </svg>
+        </div>
+        
+        <div class="egg-container">
+            <svg class="egg-oval" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+                <!-- Oval egg shape -->
+                <ellipse cx="192.0" cy="174.54545454545453" rx="182.0" ry="207.77777777777777" fill="#FF6B6B" stroke="#333" stroke-width="2"/>
+                
+                <!-- QR Code embedded in center with padding -->
+                <image href="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http%3A//weus42608431466%3A4326/Digital_Egg_Hunt%3Fegg%3DEGG-055" x="96.0" y="76.8" width="192" height="192" preserveAspectRatio="none"/>
+                
+                <!-- Egg name at bottom -->
+                <text x="192.0" y="364" font-size="38" font-weight="bold" text-anchor="middle" fill="#333">EGG-055</text>
+            </svg>
+        </div>
+        
+        </div>
+        
+        <div class="print-info">
+            <strong>Print this page to create eggs for the Digital Egg Hunt</strong><br>
+            Use Print function (Ctrl+P) and select "Print to PDF" or print directly
+        </div>
+    </div>
+</body>
+</html>

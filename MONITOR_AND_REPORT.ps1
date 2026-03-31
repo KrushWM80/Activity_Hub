@@ -2,7 +2,7 @@
 # Runs daily at 6 AM and on system startup
 # Detects outages and reports them in emails
 # Services monitored: 8001 (Projects in Stores), 8080 (Job Codes), 5000 (TDA Insights),
-#                     8081 (AMP Store Dashboard), 8888 (Zorro), 5001 (VET Dashboard),
+#                     8081 (AMP Store Dashboard), 8888 (Audio Message Hub), 5001 (VET Dashboard),
 #                     8090 (Store Meeting Planner), DC PayCycle (26 tasks)
 
 $EmailAddresses = @("ATCTeamsupport@walmart.com", "kendall.rush@walmart.com")
@@ -68,7 +68,7 @@ function Get-SystemStatus {
         $status.StoreActivityDashboardRunning = $false
     }
     
-    # Check Zorro (port 8888) - audio_server.py
+    # Check Audio Message Hub (port 8888) - audio_server.py
     $netstat8888 = netstat -ano 2>$null | Select-String ":8888.*LISTENING"
     if ($netstat8888) {
         $status.ZorroRunning = $true
@@ -218,7 +218,7 @@ function Build-StatusEmail {
                 <td>HTTP Server port 8081 - $(if ($CurrentStatus.StoreActivityDashboardRunning) { 'Responding' } else { 'Not responding' })</td>
             </tr>
             <tr>
-                <td>Zorro Podcast Server</td>
+                <td>Audio Message Hub</td>
                 <td class="$(if ($CurrentStatus.ZorroRunning) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.ZorroRunning) { 'RUNNING' } else { 'OFFLINE' })</td>
                 <td>Port 8888 - $(if ($CurrentStatus.Port8888Listening) { 'Listening' } else { 'Not responding' })</td>
             </tr>
@@ -262,10 +262,10 @@ function Build-StatusEmail {
             <li><strong>Job Codes Dashboard:</strong> http://10.97.114.181:8080/static/index.html#</li>
             <li><strong>TDA Insights:</strong> http://localhost:5000/dashboard.html</li>
             <li><strong>AMP Store Dashboard:</strong> http://weus42608431466:8081/StoreActivityandCommunications</li>
-            <li><strong>Zorro Podcast Server:</strong> http://localhost:8888/</li>
+            <li><strong>Audio Message Hub:</strong> http://weus42608431466:8888/Zorro/Audio_Message_Hub</li>
             <li><strong>V.E.T. Dashboard:</strong> http://localhost:5001/vet_dashboard.html</li>
             <li><strong>Store Meeting Planner:</strong> http://localhost:8090/</li>
-            <li><strong>Note:</strong> Use desktop name for Store Dashboard. Use IP address for Job Codes &amp; Projects. Use localhost for TDA, Zorro, and Meeting Planner.</li>
+            <li><strong>Note:</strong> Use desktop name for Store Dashboard and Audio Message Hub. Use IP address for Job Codes &amp; Projects. Use localhost for TDA and Meeting Planner.</li>
         </ul>
     </div>
 

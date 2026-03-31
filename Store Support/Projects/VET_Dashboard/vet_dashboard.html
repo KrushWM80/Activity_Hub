@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V.E.T. Dashboard Executive Report - Walmart</title>
-    <script src="/html2canvas.min.js"></script>
+    <title>V.E.T. Executive Report - Walmart</title>
+    <script src="/static/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -637,10 +637,10 @@
     <div class="header">
         <div class="header-content">
             <div class="header-left">
-                <div class="header-logo"><img src="/spark-logo.png" alt="Walmart Spark" style="height: 40px; width: auto;"></div>
+                <div class="header-logo"><img src="/static/spark-logo.png" alt="Walmart Spark" style="height: 40px; width: auto;"></div>
                 <div class="header-title">
-                    <h1>V.E.T. Dashboard Executive Report</h1>
-                    <p>TDA Initiatives - Dallas POC Focus</p>
+                    <h1>V.E.T. Executive Report</h1>
+                    <p>TDA Initiatives - Dallas VET Focus</p>
                 </div>
             </div>
             <div class="header-right">
@@ -754,7 +754,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>V.E.T. Dashboard Executive Report | Data Source: wmt-assetprotection-prod.Store_Support_Dev.Output- TDA Report (Dallas POC)</p>
+            <p>V.E.T. Executive Report | Data Source: wmt-assetprotection-prod.Store_Support_Dev.Output- TDA Report (Dallas VET)</p>
             <p id="last-updated">Last updated: Never</p>
         </div>
     </div>
@@ -980,7 +980,7 @@
                 const url = new URL(`${API_BASE}/data`);
                 selectedPhases.forEach(p => url.searchParams.append('phases', p));
                 selectedStatuses.forEach(s => url.searchParams.append('health_statuses', s));
-                url.searchParams.append('ownerships', 'Dallas POC');
+                url.searchParams.append('ownerships', 'Dallas VET');
                 // Only send titles filter if not all are selected
                 if (selectedTitles.length < projectTitles.length) {
                     selectedTitles.forEach(t => url.searchParams.append('titles', t));
@@ -1019,7 +1019,7 @@
         // Custom order: Pending+Unassigned first, then Dallas POC, Intake & Test, Deployment, then remaining No Selection Provided
         function getOwnershipOrder(data, phaseOrder) {
             const UNASSIGNED = 'No Selection Provided';
-            const OWNERSHIP_ORDER = ['Dallas POC', 'Intake & Test', 'Deployment', UNASSIGNED];
+            const OWNERSHIP_ORDER = ['Dallas VET', 'Intake & Test', 'Deployment', UNASSIGNED];
             const sections = []; // {ownership, phase, rows}
 
             // 1. Pending + unassigned (null or "No Selection Provided") → always first
@@ -1685,7 +1685,7 @@
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Health Status</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Phase</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;"># of Stores</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Dallas POC</th>
+                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Dallas VET</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Intake & Testing</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Deployment</th>
                         </tr>
@@ -1707,7 +1707,7 @@
                 let testRow = document.createElement('tr');
                 testRow.style.cssText = 'border: 1px solid #ddd;';
                 
-                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas POC', 'Intake & Testing', 'Deployment'];
+                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas VET', 'Intake & Testing', 'Deployment'];
                 columns.forEach(col => {
                     const td = document.createElement('td');
                     td.style.cssText = 'padding: 8px; border: 1px solid #ddd; word-wrap: break-word; white-space: normal;';

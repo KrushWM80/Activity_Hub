@@ -13,6 +13,7 @@ from socketserver import ThreadingMixIn
 from urllib.parse import unquote, urlparse
 import mimetypes
 import re
+from datetime import datetime
 import sys
 
 # Initialize mimetypes
@@ -54,7 +55,20 @@ class AudioHandler(SimpleHTTPRequestHandler):
         # Parse the URL
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
+
+        # Strip the /Zorro/Audio_Message_Hub prefix for hostname-based URL support
+        if path.startswith("/Zorro/Audio_Message_Hub"):
+            path = path[len("/Zorro/Audio_Message_Hub"):] or "/"
         
+        # Serve Spark logo
+        if path == "/Spark_Blank.png":
+            logo = Path(__file__).parent / "Spark_Blank.png"
+            if logo.exists():
+                self.serve_file(logo)
+            else:
+                self.send_error(404, "Logo not found")
+            return
+
         # Serve Jenny Audio generator page
         if path in ("/create-audio", "/create-audio/", "/summarized-audio", "/summarized-audio/"):
             self.serve_jenny_audio_page()
@@ -70,7 +84,12 @@ class AudioHandler(SimpleHTTPRequestHandler):
         
         # Serve audio index
         if path == "/" or path == "/index.html":
-            self.serve_index()
+            try:
+                self.serve_index()
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                self.send_error(500, str(e))
             return
         
         # Serve audio files
@@ -96,6 +115,10 @@ class AudioHandler(SimpleHTTPRequestHandler):
         """Handle POST requests for Jenny audio generation and file operations"""
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
+
+        # Strip the /Zorro/Audio_Message_Hub prefix for hostname-based URL support
+        if path.startswith("/Zorro/Audio_Message_Hub"):
+            path = path[len("/Zorro/Audio_Message_Hub"):]
         
         # Handle Jenny audio generation API
         if path == "/api/generate-jenny-audio" or path == "/api/generate-audio":
@@ -733,7 +756,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
             self.send_json_response({'success': False, 'error': str(e)}, 500)
     
     def serve_index(self):
-        """Serve Zorro Activity Hub index page with Week 4 Summarized Messages"""
+        """Serve Audio Message Hub index page"""
         # Collect audio files from both /output/Audio/ and /Audio/mp4_output/
         audio_files = []
         
@@ -780,7 +803,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Week 4 Summarized Messages - Zorro Activity Hub</title>
+    <title>Audio Message Hub - Zorro Activity Hub</title>
     <style>
         * {
             margin: 0;
@@ -789,26 +812,33 @@ class AudioHandler(SimpleHTTPRequestHandler):
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
-            background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #F7FAFC;
             min-height: 100vh;
             padding: 20px;
         }
         
         .header {
-            background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+            background: linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 100%);
             color: white;
-            padding: 40px 20px;
+            padding: 32px 24px;
             border-radius: 12px;
             margin-bottom: 30px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 20px rgba(30, 58, 138, 0.25);
+        }
+
+        .header-logo {
+            height: 48px;
+            vertical-align: middle;
+            margin-bottom: 8px;
         }
         
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
+            font-size: 26px;
+            margin-bottom: 6px;
             font-weight: 700;
+            color: white;
         }
         
         .header p {
@@ -821,6 +851,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
             font-size: 12px;
             opacity: 0.85;
             font-weight: 500;
+            color: #BFDBFE;
         }
         
         .container {
@@ -834,7 +865,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
             border-radius: 12px;
             margin-bottom: 30px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-left: 5px solid #06B6D4;
+            border-left: 5px solid #3B82F6;
         }
         
         .generator-section h2 {
@@ -854,7 +885,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
         
         .generate-btn {
             display: inline-block;
-            background: linear-gradient(135deg, #06B6D4 0%, #0891b2 100%);
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
             color: white;
             padding: 12px 28px;
             border-radius: 8px;
@@ -868,7 +899,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
         
         .generate-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3);
+            box-shadow: 0 6px 20px rgba(29, 78, 216, 0.3);
         }
         
         .files-section h2 {
@@ -985,12 +1016,12 @@ class AudioHandler(SimpleHTTPRequestHandler):
         }
         
         .script-btn {
-            background: #8B5CF6;
+            background: #1D4ED8;
             color: white;
         }
         
         .script-btn:hover {
-            background: #7C3AED;
+            background: #1E3A8A;
         }
         
         .report-btn {
@@ -1055,18 +1086,19 @@ class AudioHandler(SimpleHTTPRequestHandler):
 </head>
 <body>
     <div class="header">
-        <h1>📊 Week 4 Summarized Messages</h1>
-        <p>Your weekly activity announcements and highlights</p>
-        <div class="branding">🎤 ZORRO ACTIVITY HUB</div>
+        <img src="/Spark_Blank.png" alt="Spark" class="header-logo"><br>
+        <h1>Audio Message Hub</h1>
+        <p>Creating Audio Activity for WM US Stores</p>
+        <div class="branding">ZORRO ACTIVITY HUB</div>
     </div>
     
     <div class="container">
         <div class="generator-section">
-            <h2>🎤 Generate New Summarized Audio</h2>
+            <h2>🎤 Generate New Audio</h2>
             <p>Create a new MP4 audio message with Jenny Neural voice.</p>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                 <a href="/create-audio" class="generate-btn">🎤 Custom Audio</a>
-                <button class="generate-btn" id="btn-weekly" onclick="openWeeklyAudioModal()" style="background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%); border: none; cursor: pointer; font-weight: 600;">🎤 Weekly Message Audio</button>
+                <button class="generate-btn" id="btn-weekly" onclick="openWeeklyAudioModal()" style="background: linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%); border: none; cursor: pointer; font-weight: 600;">🎤 Weekly Message Audio</button>
             </div>
             <div id="pipeline-status" style="margin-top: 12px; padding: 10px; border-radius: 8px; display: none; font-size: 0.9em;"></div>
         </div>
@@ -1103,11 +1135,11 @@ class AudioHandler(SimpleHTTPRequestHandler):
                     <!-- Step 2 -->
                     <div id="step2-card" style="background:#111827; border:1px solid #374151; border-radius:12px; padding:16px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <span style="color:#8B5CF6; font-weight:700; font-size:1em;">Step 2: Generate Audio</span>
+                            <span style="color:#1D4ED8; font-weight:700; font-size:1em;">Step 2: Generate Audio</span>
                             <span style="background:#1E1B4B; color:#A78BFA; padding:3px 10px; border-radius:6px; font-size:0.75em; font-weight:600;">Requires Walmart WiFi</span>
                         </div>
                         <p style="color:#9CA3AF; margin:0 0 12px; font-size:0.85em;">Synthesizes the cached script with Jenny Neural voice into an MP4 file. Must be off Eagle WiFi / VPN.</p>
-                        <button id="modal-synth-btn" onclick="modalSynthesizeAudio()" style="width:100%; padding:10px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:0.95em; background:linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%); color:white;">🎤 Generate Audio with Jenny Neural</button>
+                        <button id="modal-synth-btn" onclick="modalSynthesizeAudio()" style="width:100%; padding:10px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:0.95em; background:linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%); color:white;">🎤 Generate Audio with Jenny Neural</button>
                         <div id="step2-status" style="margin-top:10px; display:none; padding:8px; border-radius:6px; font-size:0.85em;"></div>
                     </div>
                 </div>
@@ -1169,10 +1201,18 @@ class AudioHandler(SimpleHTTPRequestHandler):
                 report_btn = ''
                 if wk_match:
                     script_name = f"Week {wk_match.group(1)} - Weekly Messages Audio Script.txt"
+                    inflection_name = f"Week {wk_match.group(1)} - Weekly Messages Audio Script (Inflection).txt"
                     script_path = self.AUDIO_DIR / script_name
-                    if script_path.exists():
-                        script_url = f"/audio/{script_name}"
-                        script_btn = f'<button class="action-btn script-btn" onclick="downloadFile(\'{script_url}\', \'{script_name}\')">📝 Script</button>'
+                    inflection_path = self.AUDIO_DIR / inflection_name
+                    has_standard = script_path.exists()
+                    has_inflection = inflection_path.exists()
+                    if has_standard or has_inflection:
+                        from urllib.parse import quote
+                        script_url = f"/audio/{quote(script_name)}" if has_standard else ''
+                        inflection_url = f"/audio/{quote(inflection_name)}" if has_inflection else ''
+                        # Escape for safe JS embedding (parentheses in filenames)
+                        esc = lambda s: s.replace("'", "\\'")
+                        script_btn = f'<button class="action-btn script-btn" onclick="chooseScript(\'{esc(script_url)}\', \'{esc(script_name)}\', \'{esc(inflection_url)}\', \'{esc(inflection_name)}\')">📝 Script</button>'
                     report_name = f"Week {wk_match.group(1)} - Weekly Messages Audio Report.html"
                     report_path = self.AUDIO_DIR / report_name
                     if report_path.exists():
@@ -1180,10 +1220,11 @@ class AudioHandler(SimpleHTTPRequestHandler):
                         wk_num = wk_match.group(1)
                         report_btn = f'<button class="action-btn report-btn" onclick="sendEmailReport({wk_num}, this)">📧 Email Report</button>'
                 
-                # Auto-generate the internal Walmart CMS URL from the week number
-                cms_base = 'https://internal.walmart.com/content/store-communications/home/merchandise/total-store'
+                # Auto-generate the enablement Walmart CMS URL from the week number
                 if wk_match:
-                    cms_url = f'{cms_base}/Weekly_Messages_Audio_WK{wk_match.group(1)}.html'
+                    _wk = wk_match.group(1)
+                    _yr = datetime.now().year
+                    cms_url = f'https://enablement.walmart.com/content/store-communications/home/merchandise/weekly-messages/{_yr}/week-{_wk}/weekly_messages_audiowk{_wk}.html'
                     # Auto-save to audio_links.json for BQ publish
                     audio_links = self._load_audio_links()
                     if audio_links.get(filename) != cms_url:
@@ -1248,7 +1289,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
         function copyStreamURL(btn) {
             const card = btn.closest('.file-card');
             const span = card.querySelector('.link-row span');
-            const url = span ? span.textContent.replace(/^🔗\s*/, '').trim() : '';
+            const url = span ? span.textContent.replace(/^.*?https/, 'https').trim() : '';
             if (!url) {
                 alert('No CMS URL available (week number not detected in filename).');
                 return;
@@ -1305,6 +1346,36 @@ class AudioHandler(SimpleHTTPRequestHandler):
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        function chooseScript(stdUrl, stdName, infUrl, infName) {
+            // Remove any existing popup
+            const old = document.getElementById('script-choice-popup');
+            if (old) old.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'script-choice-popup';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            overlay.innerHTML = `
+                <div style="background:white;border-radius:12px;padding:28px 32px;max-width:400px;width:90%;box-shadow:0 8px 30px rgba(0,0,0,0.25);text-align:center;">
+                    <div style="font-size:24px;margin-bottom:8px;">📝</div>
+                    <h3 style="margin:0 0 6px;font-size:18px;color:#111827;">Download Script</h3>
+                    <p style="font-size:13px;color:#6B7280;margin:0 0 20px;">Choose which version to download:</p>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        ${stdUrl ? `<button onclick="downloadFile('${stdUrl}','${stdName}');document.getElementById('script-choice-popup').remove();" style="padding:12px 16px;border:1px solid #D1D5DB;border-radius:8px;background:white;cursor:pointer;font-size:14px;text-align:left;transition:background 0.15s;">
+                            <strong>📄 Standard Script</strong><br>
+                            <span style="font-size:12px;color:#6B7280;">Clean text — no annotations</span>
+                        </button>` : ''}
+                        ${infUrl ? `<button onclick="downloadFile('${infUrl}','${infName}');document.getElementById('script-choice-popup').remove();" style="padding:12px 16px;border:1px solid #D1D5DB;border-radius:8px;background:white;cursor:pointer;font-size:14px;text-align:left;transition:background 0.15s;">
+                            <strong>🎭 Script with Inflection</strong><br>
+                            <span style="font-size:12px;color:#6B7280;">Includes prosody markings [WARM, PERSONAL] etc.</span>
+                        </button>` : ''}
+                    </div>
+                    <button onclick="document.getElementById('script-choice-popup').remove();" style="margin-top:16px;padding:8px 20px;border:none;background:#F3F4F6;border-radius:6px;cursor:pointer;font-size:13px;color:#6B7280;">Cancel</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
         }
         
         function deleteFile(filename) {
@@ -1535,21 +1606,21 @@ def start_server(port=8888):
     httpd = ThreadingHTTPServer(server_address, AudioHandler)
     
     print(f"""
-╔════════════════════════════════════════════════════════╗
-║          🎙️  AMP AUDIO SERVER STARTED 🎙️              ║
-╚════════════════════════════════════════════════════════╝
+========================================================
+       AMP AUDIO SERVER STARTED
+========================================================
 
-✅ Server Running on: http://localhost:{port}
+Server Running on: http://localhost:{port}
 
-📚 Available URLs:
-  • Web Player: http://localhost:{port}
-  • Download: http://localhost:{port}/audio/[filename]
-  • Metadata: http://localhost:{port}/metadata/[json]
+Available URLs:
+  Web Player: http://localhost:{port}
+  Download:   http://localhost:{port}/audio/[filename]
+  Metadata:   http://localhost:{port}/metadata/[json]
 
-📁 Serving from:
+Serving from:
   {AudioHandler.AUDIO_DIR}
 
-⏹️  Press Ctrl+C to stop the server
+Press Ctrl+C to stop the server
     """)
     
     try:

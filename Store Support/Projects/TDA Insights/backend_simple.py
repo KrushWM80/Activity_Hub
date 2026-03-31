@@ -67,6 +67,19 @@ def get_bigquery_client():
         print(f"[HINT] Make sure you ran: gcloud auth application-default login")
         return None
 
+# ── Temporary data normalization (until BQ data reflects new names) ──
+_PHASE_MAP = {'POC/POT': 'Vet', 'Mkt Scale': 'Test Markets'}
+_OWNERSHIP_MAP = {'Dallas POC': 'Dallas VET'}
+
+def _normalize_phase(phase):
+    return _PHASE_MAP.get(phase, phase)
+
+def _normalize_ownership(raw):
+    own = raw or 'No Selection Provided'
+    if own in ('No Selection Provided', '*Select Owner'):
+        return 'No Selection Provided'
+    return _OWNERSHIP_MAP.get(own, own)
+
 def get_bigquery_data():
     """Fetch data from BigQuery"""
     if not BQ_AVAILABLE:
@@ -106,13 +119,13 @@ def get_bigquery_data():
             data.append({
                 'Initiative - Project Title': row['Initiative - Project Title'] or 'Unknown',
                 'Health Status': row['Health Status'] or 'Unknown',
-                'Phase': row['Phase'] or 'Unknown',
+                'Phase': _normalize_phase(row['Phase'] or 'Unknown'),
                 '# of Stores': row['# of Stores'] or 0,
-                'Dallas POC': row['Dallas POC'] or 'N/A',
+                'Dallas VET': row['Dallas POC'] or 'N/A',
                 'Intake & Testing': row['Intake & Testing'] or 'N/A',
                 'Deployment': row['Deployment'] or 'N/A',
                 'Project ID': row['Project ID'] or 0,
-                'TDA Ownership': 'No Selection Provided' if (row['TDA Ownership'] or 'No Selection Provided') in ('No Selection Provided', '*Select Owner') else row['TDA Ownership']
+                'TDA Ownership': _normalize_ownership(row['TDA Ownership'])
             })
         
         print(f"[OK] Loaded {len(data)} projects from BigQuery")
@@ -132,17 +145,17 @@ SAMPLE_DATA = [
         "# of Stores": 120,
         "TDA Ownership": "Intake & Test",
         "Intake & Testing": "System testing in progress. All core features validated. Ready for POC expansion.",
-        "Dallas POC": "John Smith - Store #4521, TX",
+        "Dallas VET": "John Smith - Store #4521, TX",
         "Deployment": "Scheduled for 3/15/2026. Training materials prepared. Rollout plan finalized."
     },
     {
         "Initiative - Project Title": "GMD Optimization",
         "Health Status": "At Risk",
-        "Phase": "POC/POT",
+        "Phase": "Vet",
         "# of Stores": 95,
         "TDA Ownership": "Intake & Test",
         "Intake & Testing": "POC execution with pilot stores. Initial results show 15% efficiency gains.",
-        "Dallas POC": "Jane Doe - Store #2847, TX",
+        "Dallas VET": "Jane Doe - Store #2847, TX",
         "Deployment": "Delayed. Addressing performance issues discovered in POC phase. New target: 4/1/2026"
     },
     {
@@ -152,7 +165,7 @@ SAMPLE_DATA = [
         "# of Stores": 250,
         "TDA Ownership": "No Selection Provided",
         "Intake & Testing": "All validation complete. Rollout in waves starting Week 3.",
-        "Dallas POC": "Bob Wilson - Store #1234, TX",
+        "Dallas VET": "Bob Wilson - Store #1234, TX",
         "Deployment": "Live in 250 stores as of 2/28/2026. Phase 2 rollout beginning next week."
     },
     {
@@ -162,17 +175,17 @@ SAMPLE_DATA = [
         "# of Stores": 180,
         "TDA Ownership": "No Selection Provided",
         "Intake & Testing": "Initial requirements gathering delayed. No testing scheduled yet.",
-        "Dallas POC": "Alice Johnson - Pending Assignment",
+        "Dallas VET": "Alice Johnson - Pending Assignment",
         "Deployment": "Blocked. Awaiting stakeholder sign-off on requirements."
     },
     {
         "Initiative - Project Title": "Inventory System Migration",
         "Health Status": "On Track",
-        "Phase": "Mkt Scale",
+        "Phase": "Test Markets",
         "# of Stores": 15,
         "TDA Ownership": "Intake & Test",
         "Intake & Testing": "Market testing complete. System scaling for regional rollout.",
-        "Dallas POC": "Tom Brown - Store #5678, TX",
+        "Dallas VET": "Tom Brown - Store #5678, TX",
         "Deployment": "Regional deployment Q2 2026. Infrastructure scaled for 500+ stores."
     },
 ]
@@ -259,7 +272,7 @@ def generate_minimal_pptx(phase=None):
         zf.writestr('ppt/presentation.xml', presentation)
         
         # Create slides for each phase
-        phases_list = ['Pending', 'POC/POT', 'Test', 'Mkt Scale', 'Roll/Deploy', 'Summary']
+        phases_list = ['Pending', 'Vet', 'Test', 'Test Markets', 'Roll/Deploy', 'Summary']
         
         for slide_num, phase_name in enumerate(phases_list, 1):
             # ppt/slides/_rels/slideN.xml.rels
@@ -272,7 +285,7 @@ def generate_minimal_pptx(phase=None):
             if phase_name == 'Summary':
                 phase_data = filter_data()
                 title = "TDA Initiatives Summary"
-                content = f"Total Projects: {len(phase_data)}\n"
+                content = f"Total Initiatives: {len(phase_data)}\n"
                 content += f"Total Stores: {sum(int(p.get('# of Stores', 0) or 0) for p in phase_data)}\n\n"
                 
                 # Count by status
@@ -804,7 +817,7 @@ def handle_request(client_socket, addr):
         
         elif path == '/api/phases':
             # Return phases in proper order
-            phases = ['Pending', 'POC/POT', 'Test', 'Mkt Scale', 'Roll/Deploy']
+            phases = ['Pending', 'Vet', 'Test', 'Test Markets', 'Roll/Deploy']
             response_json = json.dumps({
                 'success': True,
                 'phases': phases
@@ -834,7 +847,7 @@ def handle_request(client_socket, addr):
         
         elif path == '/api/ownerships':
             excluded = {'Complete'}
-            OWNERSHIP_ORDER = ['Dallas POC', 'Intake & Test', 'Deployment', 'No Selection Provided']
+            OWNERSHIP_ORDER = ['Dallas VET', 'Intake & Test', 'Deployment', 'No Selection Provided']
             all_ownerships = set((r.get("TDA Ownership") or 'No Selection Provided') for r in DATA if r.get("Phase") not in excluded)
             known_set = set(OWNERSHIP_ORDER)
             unknown_ownerships = sorted(o for o in all_ownerships if o not in known_set)
@@ -955,6 +968,7 @@ def handle_request(client_socket, addr):
                         import win32com.client
                         import pythoncom
                         pythoncom.CoInitialize()
+                        print(f"  [Feedback Email] COM initialized, dispatching Outlook...")
                         outlook = win32com.client.Dispatch('Outlook.Application')
                         mail = outlook.CreateItem(0)
                         mail.To = 'kendall.rush@walmart.com; atcteamsupport@walmart.com'
@@ -974,10 +988,13 @@ def handle_request(client_socket, addr):
     </table>
     <p style="color:#6B7280;font-size:12px;margin-top:16px;">This message was sent automatically from the TDA Insights Dashboard.</p>
 </div>"""
+                        print(f"  [Feedback Email] Calling mail.Send()...")
                         mail.Send()
                         print(f"  [Feedback Email] Sent to kendall.rush@walmart.com, atcteamsupport@walmart.com")
                     except Exception as email_err:
+                        import traceback
                         print(f"  [Feedback Email ERROR] {email_err}")
+                        traceback.print_exc()
                     finally:
                         try:
                             pythoncom.CoUninitialize()

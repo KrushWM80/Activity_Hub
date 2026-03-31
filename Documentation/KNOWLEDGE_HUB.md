@@ -209,6 +209,27 @@ Individual Tier (7-8) → Specialist, Team Member, Admin
 
 ---
 
+### **3. Audio Message Hub (Zorro)**
+
+- **Purpose**: Automated audio generation for Weekly Merchant Messages
+- **URL**: http://weus42608431466:8888/Zorro/Audio_Message_Hub
+- **Port**: 8888
+- **Key Files**:
+  - `Store Support/Projects/AMP/Zorro/audio_server.py` - Dashboard server (ThreadingHTTPServer)
+  - `Store Support/Projects/AMP/Zorro/Audio/Scripts/generate_weekly_audio.py` - BQ pipeline + synthesis
+  - `Store Support/Projects/AMP/Zorro/Audio/windows_media_synthesizer.py` - edge-tts + FFmpeg encoder
+- **Voice**: Jenny Neural (en-US) via edge-tts, SAPI5 fallback
+- **Data Source**: BigQuery AMP ALL 2 table (Merchant Messages, Review for Publish review - No Comms)
+- **Output**: MP4 (AAC 256kbps + thumbnail), Standard Script, Inflection Script, HTML Email Report
+- **CMS URL**: `https://enablement.walmart.com/content/store-communications/home/merchandise/weekly-messages/{year}/week-{week}/weekly_messages_audiowk{week}.html`
+- **Email**: Outlook COM with MP4 + scripts attached
+- **Automation**: `Automation/start_zorro_24_7.bat` (auto-restart on crash)
+- **Health Check**: `MONITOR_AND_REPORT.ps1` (daily 6 AM)
+- **Network**: BQ fetch on Eagle WiFi, synthesis on Walmart WiFi (off VPN)
+- **Read First**: [Store Support/Projects/AMP/Zorro/docs/KNOWLEDGE_BASE_AND_DEPENDENCY_MAP.md](../Store%20Support/Projects/AMP/Zorro/docs/KNOWLEDGE_BASE_AND_DEPENDENCY_MAP.md)
+
+---
+
 ## ⚙️ Configuration Reference
 
 ### **Role Configuration** (`Interface/Admin/role-configuration.json`)

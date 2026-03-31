@@ -1,0 +1,67 @@
+{
+  "week": 10,
+  "fy": 2027,
+  "cached_at": "2026-03-31T16:11:27.060733",
+  "event_count": 8,
+  "review_no_comm_count": 8,
+  "summarized_count": 8,
+  "events_with_summaries": [
+    {
+      "event_id": "488d8017-7cd2-4990-92a0-a7727e57106f",
+      "store_area": "Asset Protection",
+      "title": "Dept. 46: Inkbox Brand Exit \u2013 Action Required",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 46: Inkbox is exiting, so pull all product now and process dispose claims in the Claims app by end of week 11 to receive credit."
+    },
+    {
+      "event_id": "a71c7feb-75c8-4fea-8594-b04fcb25e4e4",
+      "store_area": "Asset Protection",
+      "title": "Handling Excess Pennies",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Handling Excess Pennies\n\nAs cash transactions in stores are now rounded to the nearest nickel, associates need to monitor the amount of pennies in registers and self-checkouts and know how to process the excess pennies. This message includes instruction on dealing with excess pennies."
+    },
+    {
+      "event_id": "c2404a68-7ba0-421f-8c45-28a4de4d6812",
+      "store_area": "Backroom and Claims",
+      "title": "Dept. 46: L'Oreal Inventory Increase",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 46: Expect a planned L\u2019Oreal inventory build through early April to protect in-stocks, then a gradual return to normal by early June with flow stabilizing by July 4."
+    },
+    {
+      "event_id": "674e0c1a-9d6c-4c62-a631-3a78122a9dc1",
+      "store_area": "Food",
+      "title": "Dept. 90: Cream Cheese and\u00a0Ricotta Cheese Move to Cheese Mod",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 90: Supplier Shortage on Philadelphia No Bake Cheesecake\n\nThere is currently a supply shortage of Philadelphia No Bake Cheesecake. In Q3, an additional assortment will be launched which should improve the situation.\n\nDept. 90: Ricotta Cheese Will Move to the Cheese Modular\n\nIn week 9 (March 28 \u2013 April 3), ricotta cheese moved from the Cultured modular to the Cheese modular."
+    },
+    {
+      "event_id": "5e5ebcae-1ac3-42b9-a90c-71d6216b2d08",
+      "store_area": "Frontend",
+      "title": "Frontend: How to Prevent Financial Services Scams and Fraud",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "How to Prevent Financial Services Scams and Fraud\n\nPreventing fraud and protecting Financial Services customers is a critical part of your Money Center associates job. This message gives associates resources for learning to prevent Financial Services scams and fraud."
+    },
+    {
+      "event_id": "182f632a-7381-42bb-a512-55435a8f0b7e",
+      "store_area": "Hardlines",
+      "title": "Dept. 9: Speedo Week 10 Launch Kit",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 9: Launches\u00a0Speedo in week 10, and store associates should set the shipped signage kit on time, following the included instructions, to ensure a clean, easy-to-shop presentation."
+    },
+    {
+      "event_id": "16d66431-5236-40a5-aebd-ca5e757b73de",
+      "store_area": "Hardlines",
+      "title": "Dept. 9: Week 10 GM Pad Modular Delays",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 9: Week 10 GM Pad: Delays in Water Sports, Swim, Pools and Water Toys see the table for impacted items and get-well dates."
+    },
+    {
+      "event_id": "fbee7e10-b32e-4ad5-8e1e-200d6839c5d3",
+      "store_area": "Total Store",
+      "title": "Balancing Over-the-Phone Ticket Support",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Balancing Over-the-Phone Ticket Support\n\nAll associates who answer the store phone should understand that technology support agents may call regarding open incidents or tickets. After reading this message, phone operators will know how to authenticate and validate if the person calling is a Walmart technology agent. They will also learn how to report suspicious activity."
+    }
+  ],
+  "events_without_summary": []
+}
