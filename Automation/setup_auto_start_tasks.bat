@@ -8,11 +8,12 @@ REM and run daily health checks
 REM
 REM Required: Run as Administrator
 REM
-REM Services Auto-Start (6 total):
+REM Services Auto-Start (7 total):
 REM - Job Codes Dashboard (port 8080) - On system startup
 REM - Projects in Stores (port 8001) - On system startup
 REM - TDA Insights (port 5000) - On system startup
 REM - Store Dashboard (port 8081) - On system startup
+REM - V.E.T. Dashboard (port 5001) - On system startup
 REM - Store Meeting Planner (port 8090) - On system startup
 REM - Zorro (port 8888) - On system startup
 REM - Health Check (email) - Daily at 6:00 AM
@@ -50,7 +51,7 @@ if %errorlevel% equ 0 (
 
 REM Task 2: Projects in Stores Auto-Start on Reboot
 echo Creating Task 2: Projects in Stores Auto-Start on Reboot...
-schtasks /create /tn Activity_Hub_ProjectsInStores_AutoStart /tr "cmd /c \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\Intake Hub\ProjectsinStores\START_BACKEND.bat\"" /sc onstart /ru SYSTEM /f
+schtasks /create /tn Activity_Hub_ProjectsInStores_AutoStart /tr "cmd /c \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_projects_in_stores_24_7.bat\"" /sc onstart /ru SYSTEM /f
 if %errorlevel% equ 0 (
     echo   ✓ Task created: Activity_Hub_ProjectsInStores_AutoStart
 ) else (
@@ -75,13 +76,22 @@ if %errorlevel% equ 0 (
     echo   ✗ Failed to create Store Dashboard task (error code: %errorlevel%)
 )
 
-REM Task 5: Store Meeting Planner Auto-Start on Logon
-echo Creating Task 5: Store Meeting Planner Auto-Start on Logon...
-schtasks /create /tn Activity_Hub_StoreMeetingPlanner_AutoStart /tr "cmd /c \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_meeting_planner_24_7.bat\"" /sc onlogon /rl HIGHEST /f
+REM Task 5: Store Meeting Planner Auto-Start on Reboot
+echo Creating Task 5: Store Meeting Planner Auto-Start on Reboot...
+schtasks /create /tn Activity_Hub_StoreMeetingPlanner_AutoStart /tr "cmd /c \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_meeting_planner_24_7.bat\"" /sc onstart /ru SYSTEM /f
 if %errorlevel% equ 0 (
     echo   ✓ Task created: Activity_Hub_StoreMeetingPlanner_AutoStart
 ) else (
     echo   ✗ Failed to create Store Meeting Planner task (error code: %errorlevel%)
+)
+
+REM Task 5b: V.E.T. Dashboard Auto-Start on Reboot
+echo Creating Task 5b: V.E.T. Dashboard Auto-Start on Reboot...
+schtasks /create /tn Activity_Hub_VETDashboard_AutoStart /tr "cmd /c \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_vet_dashboard_24_7.bat\"" /sc onstart /ru SYSTEM /f
+if %errorlevel% equ 0 (
+    echo   ✓ Task created: Activity_Hub_VETDashboard_AutoStart
+) else (
+    echo   ✗ Failed to create V.E.T. Dashboard task (error code: %errorlevel%)
 )
 
 REM Task 6: Zorro Auto-Start on Reboot
@@ -95,7 +105,7 @@ if %errorlevel% equ 0 (
 
 REM Task 7: Daily Health Check at 6 AM EST
 echo Creating Task 7: Daily Health Check at 6:00 AM...
-schtasks /create /tn Activity_Hub_Daily_HealthCheck /tr "powershell -ExecutionPolicy Bypass -File \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\MONITOR_AND_REPORT.ps1\"" /sc daily /st 06:00:00 /ru SYSTEM /f
+schtasks /create /tn Activity_Hub_Daily_HealthCheck /tr "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\MONITOR_AND_REPORT.ps1\"" /sc daily /st 06:00:00 /ru SYSTEM /f
 if %errorlevel% equ 0 (
     echo   ✓ Task created: Activity_Hub_Daily_HealthCheck
 ) else (
@@ -130,9 +140,14 @@ echo    - Service: Store Dashboard (port 8081)
 echo    - Access: http://localhost:8081/
 echo.
 echo 5. Activity_Hub_StoreMeetingPlanner_AutoStart
-echo    - Starts: On user logon
+echo    - Starts: On system reboot
 echo    - Service: Store Meeting Planner (port 8090)
 echo    - Access: http://weus42608431466:8090/StoreMeetingPlanner
+echo.
+echo 5b. Activity_Hub_VETDashboard_AutoStart
+echo    - Starts: On system reboot
+echo    - Service: V.E.T. Dashboard (port 5001)
+echo    - Access: http://localhost:5001/vet_dashboard.html
 echo.
 echo 6. Activity_Hub_Zorro_AutoStart
 echo    - Starts: On system reboot

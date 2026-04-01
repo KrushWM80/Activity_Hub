@@ -1,11 +1,18 @@
 {
   "week": 10,
   "fy": 2027,
-  "cached_at": "2026-03-31T16:11:27.060733",
-  "event_count": 8,
-  "review_no_comm_count": 8,
-  "summarized_count": 8,
+  "cached_at": "2026-04-01T08:26:53.918615",
+  "event_count": 11,
+  "review_no_comm_count": 11,
+  "summarized_count": 11,
   "events_with_summaries": [
+    {
+      "event_id": "7b53a0cd-cb56-4325-928e-d77d71603689",
+      "store_area": "Asset Protection",
+      "title": "Dept. 46: Emerging Brands Modular - Correction Needed (Cat. 111)",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 46: Stores should immediately move the Emerging Brands modular (C111) to the approved 4-foot gondola per the floor plan and remove it from any nonapproved fixtures to ensure correct execution ahead of week 12 support."
+    },
     {
       "event_id": "488d8017-7cd2-4990-92a0-a7727e57106f",
       "store_area": "Asset Protection",
@@ -18,7 +25,21 @@
       "store_area": "Asset Protection",
       "title": "Handling Excess Pennies",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Handling Excess Pennies\n\nAs cash transactions in stores are now rounded to the nearest nickel, associates need to monitor the amount of pennies in registers and self-checkouts and know how to process the excess pennies. This message includes instruction on dealing with excess pennies."
+      "summary_text": "Handling excess pennies.\n\nAs cash transactions in stores are now rounded to the nearest nickel, associates need to monitor the amount of pennies in registers and self-checkouts, and know how to process the excess pennies. This message includes instruction on dealing with excess pennies."
+    },
+    {
+      "event_id": "10690871-30a6-4259-b53e-9b36e746a35c",
+      "store_area": "Auto Care",
+      "title": "Dept. 12: Moving Boxes Feature And Inventory",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 12: An 8-foot Moving Supplies train is rolling out to 2,500 stores in April through September, and regular deep out scans on boxes are needed to maintain in-stock for customers."
+    },
+    {
+      "event_id": "66817c03-5c67-4329-9a61-8ca8a00653dd",
+      "store_area": "Backroom and Claims",
+      "title": "Dept. 46: Bubble x Poppi Feature - Execution and Support",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 46: Stores should immediately move Bubble x Poppi inventory to the salesfloor and set the endcap to capture limited-time demand, with weekly vendor replenishment support for Poppi beverages."
     },
     {
       "event_id": "c2404a68-7ba0-421f-8c45-28a4de4d6812",
@@ -32,14 +53,14 @@
       "store_area": "Food",
       "title": "Dept. 90: Cream Cheese and\u00a0Ricotta Cheese Move to Cheese Mod",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 90: Supplier Shortage on Philadelphia No Bake Cheesecake\n\nThere is currently a supply shortage of Philadelphia No Bake Cheesecake. In Q3, an additional assortment will be launched which should improve the situation.\n\nDept. 90: Ricotta Cheese Will Move to the Cheese Modular\n\nIn week 9 (March 28 \u2013 April 3), ricotta cheese moved from the Cultured modular to the Cheese modular."
+      "summary_text": "Dept. 90:\u00a0There is currently a supply shortage of Philadelphia No Bake Cheesecake. In Q3, an additional assortment will be launched which should improve the situation.\n\nDept. 90:\u00a0In week 9 (March 28 \u2013 April 3), ricotta cheese moved from the Cultured modular to the Cheese modular."
     },
     {
       "event_id": "5e5ebcae-1ac3-42b9-a90c-71d6216b2d08",
       "store_area": "Frontend",
       "title": "Frontend: How to Prevent Financial Services Scams and Fraud",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "How to Prevent Financial Services Scams and Fraud\n\nPreventing fraud and protecting Financial Services customers is a critical part of your Money Center associates job. This message gives associates resources for learning to prevent Financial Services scams and fraud."
+      "summary_text": "Preventing fraud and protecting Financial Services customers is a critical part of your Money Center associate's job. This message gives associates resources for learning to prevent Financial Services scams and fraud."
     },
     {
       "event_id": "182f632a-7381-42bb-a512-55435a8f0b7e",
@@ -60,7 +81,7 @@
       "store_area": "Total Store",
       "title": "Balancing Over-the-Phone Ticket Support",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Balancing Over-the-Phone Ticket Support\n\nAll associates who answer the store phone should understand that technology support agents may call regarding open incidents or tickets. After reading this message, phone operators will know how to authenticate and validate if the person calling is a Walmart technology agent. They will also learn how to report suspicious activity."
+      "summary_text": "Balancing Over-the-Phone Ticket Support.\n\nAll associates who answer the store phone should understand that technology support agents may call regarding open incidents or tickets. After reading this message, phone operators will know how to authenticate and validate if the person calling is a Walmart technology agent. They will also learn how to report suspicious activity."
     }
   ],
   "events_without_summary": []

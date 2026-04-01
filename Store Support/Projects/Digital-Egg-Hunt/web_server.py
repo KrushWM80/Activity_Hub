@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Web Server for Digital Egg Hunt Frontend
 Serves the frontend interface and assets on port 4326
@@ -8,6 +9,11 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 import os
 import sys
+import io
+
+# Fix encoding for Windows console
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
 PORT = 4326
 

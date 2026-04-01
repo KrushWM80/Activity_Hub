@@ -571,7 +571,7 @@ This is an automated alert. Do not reply to this email.
             # Fetch all data from BigQuery
             query = f"""
                 SELECT 
-                    COALESCE(CAST(Intake_Card AS STRING), CAST(PROJECT_ID AS STRING), CONCAT('FAC-', CAST(Facility AS STRING))) as project_id,
+                    COALESCE(CAST(Intake_Card AS STRING), CAST(PROJECT_ID AS STRING), Unique_Key, CONCAT('FAC-', CAST(Facility AS STRING))) as project_id,
                     CAST(Intake_Card AS STRING) as intake_card,
                     CASE
                         WHEN Title IS NOT NULL AND Title != '' THEN Title
@@ -880,7 +880,7 @@ This is an automated alert. Do not reply to this email.
         query = f"""
             SELECT DISTINCT project_id, intake_card, title, project_source, division, region,
                    market, store, facility, phase, wm_week, fy, status, 
-                   store_count, owner, partner, store_area, business_area, health, 
+                   owner, partner, store_area, business_area, health, 
                    business_type, associate_impact, customer_impact, last_updated
             FROM projects
             WHERE {where_clause}
@@ -915,7 +915,7 @@ This is an automated alert. Do not reply to this email.
                 'wm_week': row['wm_week'],
                 'fy': row['fy'],
                 'status': row['status'],
-                'store_count': row['store_count'] or 1,
+                'store_count': 1,
                 'owner': row['owner'],
                 'store_area': row['store_area'],
                 'business_area': row['business_area'],

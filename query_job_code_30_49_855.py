@@ -1,6 +1,13 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
+import sys
 from google.cloud import bigquery
+
+# Fix encoding for Windows console
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r'C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json'
 
@@ -35,7 +42,7 @@ try:
     rows = list(results)
     
     if rows:
-        print(f"✓ FOUND {len(rows)} EMPLOYEES")
+        print(f"FOUND {len(rows)} EMPLOYEES")
         print()
         print("=" * 100)
         for row in rows:
@@ -48,7 +55,7 @@ try:
             print(f"  Employment Type: {row.empl_type_code}")
             print()
     else:
-        print("⚠ NO H/S EMPLOYEES FOUND")
+        print("NO H/S EMPLOYEES FOUND")
         print()
         print("Checking what pay types exist for job code 30-49-855...")
         print()
@@ -72,7 +79,7 @@ try:
             for row in alt_rows:
                 print(f"  {row.worker_payment_type}: {row.employee_count} employees")
         else:
-            print("❌ Job code 30-49-855 NOT FOUND in Polaris data")
+            print("Job code 30-49-855 NOT FOUND in Polaris data")
             
 except Exception as e:
     print(f"ERROR: {e}")

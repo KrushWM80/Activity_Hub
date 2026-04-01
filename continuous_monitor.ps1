@@ -25,7 +25,7 @@ $Services = @(
     @{Name="ProjectsInStores"; Port=8001; HealthURL="http://localhost:8001"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_projects_in_stores_24_7.bat"},
     @{Name="TDAInsights"; Port=5000; HealthURL="http://localhost:5000"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_tda_insights_24_7.bat"},
     @{Name="StoreDashboard"; Port=8081; HealthURL="http://localhost:8081"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_store_dashboard_24_7.bat"},
-    @{Name="MeetingPlanner"; Port=8090; HealthURL="http://localhost:8090"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\AMP\Store Meeting Planners\start-server.bat"},
+    @{Name="MeetingPlanner"; Port=8090; HealthURL="http://localhost:8090"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_meeting_planner_24_7.bat"},
     @{Name="Zorro"; Port=8888; HealthURL="http://localhost:8888"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_zorro_24_7.bat"}
 )
 
@@ -40,33 +40,42 @@ foreach ($service in $Services) {
     if ($portListening.Count -gt 0) {
         Log "$($service.Name) (port $($service.Port)): ✓ RUNNING" "INFO"
     } else {
-        Log "$($service.Name) (port $($service.Port)): ✗ DOWN - Attempting restart..." "WARN"
+        Log "$($service.Name) (port $($service.Port)): ✗ DOWN - Checking bat process..." "WARN"
         $DownServices += $service
-        
-        try {
-            # Start the service in background
-            $process = Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$($service.RestartScript)`"" -PassThru -WindowStyle Hidden -ErrorAction SilentlyContinue
-            Log "$($service.Name): Restart command executed (PID: $($process.Id))" "INFO"
-            
-            # Wait 5 seconds for service to start
-            Start-Sleep -Seconds 5
-            
-            # Check if it's now listening
-            $checkAgain = netstat -ano 2>$null | Select-String ":$($service.Port).*LISTENING" | Measure-Object
-            if ($checkAgain.Count -gt 0) {
-                Log "$($service.Name): Recovery successful, port now listening" "INFO"
-            } else {
-                Log "$($service.Name): Recovery pending, may take additional time to start" "WARN"
+
+        # Check if the bat's restart loop is already running — if so, do NOT launch another copy.
+        # Launching a second bat instance causes the port-kill block to kill the first instance,
+        # creating a death-loop where both instances kill each other indefinitely.
+        $batName = [System.IO.Path]::GetFileName($service.RestartScript)
+        $batAlreadyRunning = @(Get-WmiObject Win32_Process -Filter "Name='cmd.exe'" -ErrorAction SilentlyContinue |
+            Where-Object { $_.CommandLine -like "*$batName*" })
+
+        if ($batAlreadyRunning.Count -gt 0) {
+            Log "$($service.Name): Bat loop already running (PID $($batAlreadyRunning.ProcessId -join ' ')) - port is between restarts, no action needed." "INFO"
+        } else {
+            Log "$($service.Name): Bat not running — launching restart..." "WARN"
+            try {
+                $process = Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$($service.RestartScript)`"" -PassThru -WindowStyle Hidden -ErrorAction SilentlyContinue
+                Log "$($service.Name): Restart command executed (PID: $($process.Id))" "INFO"
+
+                Start-Sleep -Seconds 5
+
+                $checkAgain = netstat -ano 2>$null | Select-String ":$($service.Port).*LISTENING" | Measure-Object
+                if ($checkAgain.Count -gt 0) {
+                    Log "$($service.Name): Recovery successful, port now listening" "INFO"
+                } else {
+                    Log "$($service.Name): Recovery pending, may take additional time to start" "WARN"
+                }
             }
-        }
-        catch {
-            Log "$($service.Name): Failed to restart - $_" "ERROR"
+            catch {
+                Log "$($service.Name): Failed to restart - $_" "ERROR"
+            }
         }
     }
 }
 
 # Summary
-Log "Monitoring cycle complete. Down services: $($DownServices.Count)/6" "INFO"
+Log "Monitoring cycle complete. Down services: $($DownServices.Count)/7" "INFO"
 
 if ($DownServices.Count -gt 0) {
     Log "Services requiring attention: $($DownServices.Name -join ', ')" "WARN"

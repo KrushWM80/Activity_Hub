@@ -1,6 +1,6 @@
 # 📚 Activity Hub - Knowledge Hub & Dependencies Map
 
-**Last Updated**: February 17, 2026  
+**Last Updated**: April 1, 2026  
 **Project**: Walmart Enterprise Activity Hub  
 **Scope**: Complete organizational reference for architecture, dependencies, and institutional knowledge
 
@@ -10,6 +10,7 @@
 
 | Section | Purpose | Link |
 |---------|---------|------|
+| **Live Services** | Running services, ports, auto-start tasks, adding new services | [Live Services & Automation](#️-live-services--automation) |
 | **System Overview** | High-level project understanding | [Architecture Overview](#-architecture-overview) |
 | **Dependencies Map** | Component relationships & imports | [See Dependencies](DEPENDENCIES-MAP.md) |
 | **Module Guide** | Detailed module documentation | [Module Reference](#-module-reference-guide) |
@@ -227,6 +228,67 @@ Individual Tier (7-8) → Specialist, Team Member, Admin
 - **Health Check**: `MONITOR_AND_REPORT.ps1` (daily 6 AM)
 - **Network**: BQ fetch on Eagle WiFi, synthesis on Walmart WiFi (off VPN)
 - **Read First**: [Store Support/Projects/AMP/Zorro/docs/KNOWLEDGE_BASE_AND_DEPENDENCY_MAP.md](../Store%20Support/Projects/AMP/Zorro/docs/KNOWLEDGE_BASE_AND_DEPENDENCY_MAP.md)
+
+---
+
+## 🖥️ Live Services & Automation
+
+**Last Updated**: April 1, 2026  
+**Machine**: WEUS42608431466 | IP: 10.97.114.181 | User: `krush`
+
+### Active Services (7 total)
+
+| Service | Port | URL | Start Script |
+|---------|------|-----|--------------|
+| TDA Insights | 5000 | http://localhost:5000 | `Automation/start_tda_insights_24_7.bat` |
+| VET Dashboard | 5001 | http://localhost:5001/vet_dashboard.html | `Automation/start_vet_dashboard_24_7.bat` |
+| Projects in Stores | 8001 | http://localhost:8001 | `Automation/start_projects_in_stores_24_7.bat` |
+| Job Codes Dashboard | 8080 | http://10.97.114.181:8080 | `Automation/start_jobcodes_server_24_7.bat` |
+| AMP Store Dashboard | 8081 | http://localhost:8081 | `Automation/start_store_dashboard_24_7.bat` |
+| Store Meeting Planner | 8090 | http://weus42608431466:8090/StoreMeetingPlanner | `Automation/start_meeting_planner_24_7.bat` |
+| Zorro Audio Hub | 8888 | http://weus42608431466:8888/Zorro/Audio_Message_Hub | `Automation/start_zorro_24_7.bat` |
+
+### Scheduled Tasks (Windows Task Scheduler)
+
+All tasks registered April 1, 2026. Requires **elevated (admin) terminal** to create/modify.
+
+| Task Name | Trigger | Action |
+|-----------|---------|--------|
+| `Activity_Hub_JobCodes_AutoStart` | On logon | Starts Job Codes (8080) |
+| `Activity_Hub_ProjectsInStores_AutoStart` | On logon | Starts Projects in Stores (8001) |
+| `Activity_Hub_TDA_AutoStart` | On logon | Starts TDA Insights (5000) |
+| `Activity_Hub_Store_Dashboard_AutoStart` | On logon | Starts AMP Dashboard (8081) |
+| `Activity_Hub_StoreMeetingPlanner_AutoStart` | On logon | Starts Meeting Planner (8090) |
+| `Activity_Hub_VETDashboard_AutoStart` | On logon | Starts VET Dashboard (5001) |
+| `Activity_Hub_Zorro_AutoStart` | On logon | Starts Zorro (8888) |
+| `Activity_Hub_Daily_HealthCheck` | Daily 6:00 AM | Runs `MONITOR_AND_REPORT.ps1` — health check + email |
+| `Activity_Hub_TDA_Daily_Email` | Daily 6:00 AM | TDA daily status email |
+| `Activity_Hub_TDA_Weekly_Email` | Weekly | TDA weekly summary email |
+| `Activity_Hub_VET_Daily_Email` | Daily 6:00 AM | VET daily status email |
+
+**Verify tasks are registered:**
+```powershell
+schtasks /query /fo TABLE | Select-String "Activity_Hub"
+```
+
+### Adding a New Service
+
+When a new service/URL is added, do all 3 steps:
+
+**Step 1** — Create a `Automation/start_<servicename>_24_7.bat` using the existing bat files as a template (include the port-kill block before the restart loop).
+
+**Step 2** — Add a line to `Automation/register_tasks_cmd.bat`:
+```bat
+schtasks /create /tn "Activity_Hub_<ServiceName>_AutoStart" /tr "cmd /c \"%BASE%\start_<servicename>_24_7.bat\"" /sc onlogon /rl highest /f
+```
+
+**Step 3** — Run `Automation/register_tasks_cmd.bat` from an **elevated (admin) terminal**:
+```
+Win + X → Terminal (Admin)
+& "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\register_tasks_cmd.bat"
+```
+
+Also add the new service to `MONITOR_AND_REPORT.ps1` so it's included in the daily health check and auto-restart.
 
 ---
 
