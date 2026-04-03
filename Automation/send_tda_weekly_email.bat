@@ -18,6 +18,29 @@ set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\krush\AppData\Roaming\gcloud\applica
 
 echo [%date% %time%] ====== Weekly Email Run Starting ====== >> "%LogFile%"
 
+REM --- Ensure TDA backend (port 5000) is running before generating report ---
+echo [%date% %time%] Checking TDA backend on port 5000... >> "%LogFile%"
+netstat -ano | findstr ":5000 " | findstr "LISTENING" > nul 2>&1
+if %errorlevel% neq 0 (
+    echo [%date% %time%] Backend not running - starting it now... >> "%LogFile%"
+    start /b "" cmd /c "%ProjectRoot%\Automation\start_tda_insights_24_7.bat" > nul 2>&1
+    REM Wait up to 30 seconds for port 5000 to come up
+    set /a attempts=0
+    :wait_tda
+    timeout /t 3 /nobreak > nul
+    netstat -ano | findstr ":5000 " | findstr "LISTENING" > nul 2>&1
+    if %errorlevel% equ 0 goto tda_ready
+    set /a attempts+=1
+    if !attempts! lss 10 goto wait_tda
+    echo [%date% %time%] WARNING: Backend did not start in 30s - report may use fallback data >> "%LogFile%"
+    goto run_report
+    :tda_ready
+    echo [%date% %time%] Backend confirmed running on port 5000 >> "%LogFile%"
+) else (
+    echo [%date% %time%] Backend already running on port 5000 >> "%LogFile%"
+)
+
+:run_report
 cd /d "%TDAPath%"
 
 REM Run the weekly report script

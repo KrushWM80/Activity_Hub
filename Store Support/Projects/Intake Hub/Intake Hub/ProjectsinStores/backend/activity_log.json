@@ -2699,6 +2699,51 @@
       "user_email": "weus42608431466$@homeoffice.wal-mart.com",
       "details": "Logged in via windows_ad",
       "category": "dashboard_main"
+    },
+    {
+      "id": "18c713d1",
+      "timestamp": "2026-04-02 14:38:40",
+      "action": "User Login",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "ca623791",
+      "timestamp": "2026-04-02 14:38:53",
+      "action": "Accessed Main Dashboard",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "4a35726b",
+      "timestamp": "2026-04-02 14:43:11",
+      "action": "Applied Filters",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Source: Realty",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "1719074f",
+      "timestamp": "2026-04-02 14:48:01",
+      "action": "User Login",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "2dd7df9e",
+      "timestamp": "2026-04-02 14:48:03",
+      "action": "Accessed Main Dashboard",
+      "user": "weus42608431466$@homeoffice.wal-mart.com",
+      "user_email": "weus42608431466$@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
     }
   ]
 }

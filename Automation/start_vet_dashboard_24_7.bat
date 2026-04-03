@@ -43,7 +43,7 @@ echo [%date% %time%] Starting V.E.T. Dashboard on port %Port%... >> "%LogFile%"
 echo [%date% %time%] Starting V.E.T. Dashboard...
 
 cd /d "%VETPath%"
-"%PythonExe%" backend.py >> "%LogFile%" 2>&1
+"%PythonExe%" start_server.py >> "%LogFile%" 2>&1
 
 echo [%date% %time%] V.E.T. Dashboard stopped. Restarting in 5 seconds... >> "%LogFile%"
 echo [%date% %time%] Restarting in 5 seconds...

@@ -1356,6 +1356,7 @@
  <th class="metric-column">Unique Users</th>
  <th class="metric-column">Total Clicks</th>
  <th class="metric-column">Engagement %</th>
+ <th class="metric-column">Avg. Engagement</th>
  <th>Status</th>
  </tr>
  </thead>
@@ -2963,7 +2964,23 @@
  });
 
  // Search Function - Calls BigQuery API
- function searchData() {
+ function searchData(pageNum = 1) {
+ // Get current week info for defaults
+ const wmInfo = getCurrentWMWeek();
+ const weekValue = document.getElementById('filterWeek').value;
+ let selectedWeek = wmInfo.week; // Default to current week
+ 
+ // Handle special week values
+ if (weekValue === 'current') {
+ selectedWeek = wmInfo.week;
+ } else if (weekValue === 'next') {
+ selectedWeek = wmInfo.week < 52 ? wmInfo.week + 1 : 1;
+ } else if (weekValue === 'past') {
+ selectedWeek = wmInfo.week > 1 ? wmInfo.week - 1 : 52;
+ } else if (weekValue && weekValue !== '') {
+ selectedWeek = parseInt(weekValue) || wmInfo.week;
+ }
+ 
  const filters = {
  search: document.getElementById('filterSearch').value,
  title: document.getElementById('filterTitle').value,
@@ -2974,8 +2991,10 @@
  market: document.getElementById('filterMarket').value,
  store: document.getElementById('filterStore').value,
  alignment: document.getElementById('filterAlignment').value,
- fy: document.getElementById('filterFY').value || 2027,
- week: parseInt(document.getElementById('filterWeek').value) || 1
+ fy: document.getElementById('filterFY').value || wmInfo.fy,
+ week: selectedWeek,
+ page: pageNum,
+ limit: 25  // 25 rows per page
  };
 
  console.log('Searching with filters:', filters);
@@ -2986,7 +3005,7 @@
  // Show loading state
  document.getElementById('tableBody').innerHTML = `
  <tr>
- <td colspan="9" style="text-align: center; padding: 40px; color: var(--gray-600);">
+ <td colspan="10" style="text-align: center; padding: 40px; color: var(--gray-600);">
  <strong>Loading data from BigQuery...</strong>
  </td>
  </tr>
@@ -2996,9 +3015,9 @@
  // Current: Returns WK 1+ data for specified FY, sorted by Activity_Title
  // Future: Add text search, business area filters, region/market/store hierarchies
  
- // Call BigQuery API with filters - minimum week is 1
- const minWeek = Math.max(filters.week, 1);
- fetch(`/api/amp-data?fy=${filters.fy}&week=${minWeek}`)
+ // Call BigQuery API with filters
+ const offset = (filters.page - 1) * filters.limit;
+ fetch(`/api/amp-data?fy=${filters.fy}&week=${filters.week}&limit=${filters.limit}&offset=${offset}`)
  .then(response => {
  if (!response.ok) {
  throw new Error(`HTTP error! status: ${response.status}`);
@@ -3009,17 +3028,39 @@
  if (!data || !data.data || data.data.length === 0) {
  document.getElementById('tableBody').innerHTML = `
  <tr>
- <td colspan="9" style="text-align: center; padding: 40px; color: var(--gray-600);">
- No activities found for Week ${minWeek}+ in FY ${filters.fy}
+ <td colspan="10" style="text-align: center; padding: 40px; color: var(--gray-600);">
+ No activities found for Week ${filters.week}+ in FY ${filters.fy}
  </td>
  </tr>
  `;
  return;
  }
  
+ // Update backend status indicator
+ const statusIndicator = document.getElementById('status-indicator');
+ const authStatus = document.getElementById('auth-status');
+ if (statusIndicator && authStatus) {
+ statusIndicator.style.background = '#38A169';
+ statusIndicator.style.animation = 'none';
+ authStatus.textContent = '✅ Connected to BigQuery';
+ authStatus.style.color = '#38A169';
+ }
+ 
  // Populate table with API data
  const tableBody = document.getElementById('tableBody');
- tableBody.innerHTML = data.data.map((row, index) => `
+ const uniqueData = [];
+ const seen = new Set();
+ 
+ // Remove duplicates based on Activity_Title + Week combo
+ data.data.forEach(row => {
+ const key = `${row.Week}-${row.Activity_Title}`;
+ if (!seen.has(key)) {
+ seen.add(key);
+ uniqueData.push(row);
+ }
+ });
+ 
+ tableBody.innerHTML = uniqueData.map((row, index) => `
  <tr>
  <td class="text-nowrap font-weight-bold">${row.Week}</td>
  <td><a class="activity-title-link" href="${row.Preview_Link || '#'}" target="_blank">${row.Activity_Title}</a></td>
@@ -3028,17 +3069,47 @@
  <td class="metric-column">${row.Stores_With_Access || 0}</td>
  <td class="metric-column">${row.Total_Impressions?.toLocaleString() || 0}</td>
  <td class="metric-column">${row.Unique_Viewers?.toLocaleString() || 0}</td>
- <td class="metric-column">${row.Engagement_Rate || '-'}</td>
- <td class="metric-column">${row.Completion_Rate || '-'}</td>
+ <td class="metric-column">${row.Engagement_Rate?.toFixed(1) || '-'}%</td>
+ <td class="metric-column">${row.Completion_Rate?.toFixed(1) || '-'}%</td>
  <td><span class="status-badge status-published">${row.Status || 'Published'}</span></td>
  </tr>
  `).join('');
+ 
+ // Add pagination controls
+ const totalPages = Math.ceil((data.total_count || 1000) / filters.limit);
+ let paginationHTML = `<div style="text-align: center; margin-top: 20px; padding: 20px; font-size: 14px; color: var(--text-secondary);">`;
+ 
+ if (filters.page > 1) {
+ paginationHTML += `<a href="#" onclick="searchData(1)" style="margin: 0 8px; color: var(--walmart-blue); text-decoration: none; font-weight: bold;">&lt;</a>`;
+ paginationHTML += `<span>${filters.page} of ${totalPages}</span>`;
+ } else {
+ paginationHTML += `<span style="color: var(--gray-400);">&lt;</span>`;
+ paginationHTML += `<span>${filters.page} of ${totalPages}</span>`;
+ }
+ 
+ if (filters.page < totalPages) {
+ paginationHTML += `<a href="#" onclick="searchData(${filters.page + 1})" style="margin: 0 8px; color: var(--walmart-blue); text-decoration: none; font-weight: bold;">&gt;</a>`;
+ } else {
+ paginationHTML += `<span style="color: var(--gray-400);">&gt;</span>`;
+ }
+ paginationHTML += `</div>`;
+ 
+ // Insert pagination after table
+ tableBody.parentElement.parentElement.insertAdjacentHTML('afterend', paginationHTML);
  })
  .catch(error => {
  console.error('Error fetching data:', error);
+ const statusIndicator = document.getElementById('status-indicator');
+ const authStatus = document.getElementById('auth-status');
+ if (statusIndicator && authStatus) {
+ statusIndicator.style.background = '#E53E3E';
+ statusIndicator.style.animation = 'none';
+ authStatus.textContent = '❌ Connection Error';
+ authStatus.style.color = '#E53E3E';
+ }
  document.getElementById('tableBody').innerHTML = `
  <tr>
- <td colspan="9" style="text-align: center; padding: 40px; color: var(--error);">
+ <td colspan="10" style="text-align: center; padding: 40px; color: var(--error);">
  <strong>Error loading data</strong><br>
  <small>${error.message}</small>
  </td>
@@ -3344,20 +3415,29 @@
  // Calculate and set current WM week
  initializeWMWeekFilter();
  
+ // Set week filter to "current" by default
+ const weekFilter = document.getElementById('filterWeek');
+ if (weekFilter) {
+ weekFilter.value = 'current';
+ }
+ 
  // Calculate stats from actual table data
  updateDashboardStats();
  
  // Initialize filter placeholders
  initFilterPlaceholders();
  
- // Load live BigQuery data (WK 1+) by default
+ // Load live BigQuery data (current week forward) by default
  // TODO (Phase 4): Add loading indicator during initial data fetch
  searchData();
  
  // Add event listener to week filter for real-time stat updates
- const weekFilter = document.getElementById('filterWeek');
- if (weekFilter) {
- weekFilter.addEventListener('change', updateDashboardStats);
+ const wkFilter = document.getElementById('filterWeek');
+ if (wkFilter) {
+ wkFilter.addEventListener('change', function() {
+ updateDashboardStats();
+ searchData();
+ });
  }
  
  // Display data source info
@@ -3448,9 +3528,8 @@
  return resolvedWeeks;
  }
  </script>
- <!-- Backend Connection Checker -->
- <script src="backend-status-checker.js"></script>
-</body>
+ <!-- Backend Connection Checker: Loaded dynamically via searchData() function -->
+  </body>
 </html>
 
 

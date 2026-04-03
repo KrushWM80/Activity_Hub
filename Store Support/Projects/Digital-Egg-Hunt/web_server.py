@@ -15,7 +15,7 @@ import io
 if sys.stdout.encoding != 'utf-8':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-PORT = 4326
+PORT = 8080  # Common alt HTTP port - no admin required, firewall-friendly
 
 class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):

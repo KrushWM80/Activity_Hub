@@ -62,74 +62,102 @@ def get_current_walmart_week():
     return f"WK{weeks:02d}"
 
 
-def fetch_dashboard_data(api_url: str = DASHBOARD_URL) -> tuple:
-    """Fetch all necessary dashboard data, with fallback to sample data"""
+def _fetch_from_bigquery_direct() -> list:
+    """Fallback: query BigQuery directly when API server is unavailable"""
+    _PHASE_MAP = {'POC/POT': 'Vet', 'Mkt Scale': 'Test Markets'}
     try:
-        # Fetch summary
+        from google.cloud import bigquery as bq
+        creds_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS',
+            os.path.join(os.environ.get('APPDATA', ''), 'gcloud', 'application_default_credentials.json'))
+        if creds_path and os.path.exists(creds_path):
+            os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = creds_path
+        bq_client = bq.Client(project='wmt-assetprotection-prod')
+        query = """
+        SELECT
+            tda.Topic AS `Initiative - Project Title`,
+            tda.Health_Update AS `Health Status`,
+            tda.Phase,
+            SUM(CASE WHEN tda.Phase = tda.Facility_Phase THEN tda.Facility ELSE 0 END) AS `# of Stores`,
+            tda.Dallas_POC AS `Executive Notes`,
+            tda.TDA_Ownership,
+            tda.Intake_Card_Nbr AS `Project ID`,
+            tda.Intake_n_Testing AS `Intake & Testing`,
+            tda.Deployment,
+            COALESCE(CAST(MIN(intake.WM_Week) AS STRING), 'TBD') AS `WM Week`
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.Output- TDA Report` tda
+        LEFT JOIN `wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data` intake
+            ON CAST(tda.Intake_Card_Nbr AS STRING) = CAST(intake.Intake_Card AS STRING)
+        WHERE tda.TDA_Ownership IN ('Dallas POC', 'Dallas VET')
+        GROUP BY tda.Topic, tda.Health_Update, tda.Phase, tda.Dallas_POC,
+                 tda.TDA_Ownership, tda.Intake_Card_Nbr, tda.Intake_n_Testing, tda.Deployment
+        ORDER BY tda.Phase ASC, tda.Topic ASC
+        """
+        rows = list(bq_client.query(query).result())
+        data = [dict(r) for r in rows]
+        for row in data:
+            row['Phase'] = _PHASE_MAP.get(row.get('Phase', ''), row.get('Phase', 'Unknown'))
+        print(f"     [OK] Direct BigQuery returned {len(data)} projects")
+        return data
+    except Exception as bq_err:
+        print(f"     [!] Direct BigQuery also failed: {bq_err}")
+        return None
+
+
+def _build_stats(projects: list) -> dict:
+    """Build summary stats dict from a project list"""
+    current_wm_week = get_current_walmart_week()
+    return {
+        'total_projects': len(projects),
+        'total_stores': sum(int(p.get('# of Stores', 0) or 0) for p in projects),
+        'on_track': len([p for p in projects if 'On Track' in str(p.get('Health Status', ''))]),
+        'at_risk': len([p for p in projects if 'At Risk' in str(p.get('Health Status', ''))]),
+        'off_track': len([p for p in projects if 'Off Track' in str(p.get('Health Status', ''))]),
+        'wm_week': current_wm_week,
+    }
+
+
+def fetch_dashboard_data(api_url: str = DASHBOARD_URL) -> tuple:
+    """Fetch dashboard data: API first, then direct BigQuery, then sample data"""
+    # --- Attempt 1: Live API ---
+    try:
         summary_url = f"{api_url}/api/summary"
         with urllib.request.urlopen(summary_url, timeout=5) as response:
             summary_data = json.loads(response.read().decode())
-        
         summary = summary_data.get('summary', {})
-        
-        # Fetch all projects
+
         data_url = f"{api_url}/api/data?phase=All"
         with urllib.request.urlopen(data_url, timeout=5) as response:
             data_response = json.loads(response.read().decode())
-        
         projects = data_response.get('data', [])
-        
-        # If no projects, use sample data as fallback
-        if not projects:
-            print("     [*] No live data, loading sample data...")
-            try:
-                from sample_data import SAMPLE_DATA_49_PROJECTS
-                projects = SAMPLE_DATA_49_PROJECTS
-                # Recalculate summary from sample data
-                summary = {
-                    'total_projects': len(projects),
-                    'total_stores': sum(int(p.get('# of Stores', 0) or 0) for p in projects),
-                    'by_health_status': {
-                        'On Track': len([p for p in projects if 'On Track' in str(p.get('Health Status', ''))]),
-                        'At Risk': len([p for p in projects if 'At Risk' in str(p.get('Health Status', ''))]),
-                        'Off Track': len([p for p in projects if 'Off Track' in str(p.get('Health Status', ''))]),
-                    }
-                }
-            except ImportError:
-                print("     [!] Sample data not available")
-                return None, None
-        
-        current_wm_week = get_current_walmart_week()
-        
-        stats = {
-            'total_projects': summary.get('total_projects', 0),
-            'total_stores': summary.get('total_stores', 0),
-            'on_track': summary.get('by_health_status', {}).get('On Track', 0),
-            'at_risk': summary.get('by_health_status', {}).get('At Risk', 0),
-            'off_track': summary.get('by_health_status', {}).get('Off Track', 0),
-            'wm_week': current_wm_week
-        }
-        
-        return stats, projects
-    
-    except Exception as e:
-        print(f"     [!] Error fetching data: {e}")
-        print("     [*] Attempting to load sample data...")
-        try:
-            from sample_data import SAMPLE_DATA_49_PROJECTS
-            projects = SAMPLE_DATA_49_PROJECTS
+
+        if projects:
             current_wm_week = get_current_walmart_week()
             stats = {
-                'total_projects': len(projects),
-                'total_stores': sum(int(p.get('# of Stores', 0) or 0) for p in projects),
-                'on_track': len([p for p in projects if 'On Track' in str(p.get('Health Status', ''))]),
-                'at_risk': len([p for p in projects if 'At Risk' in str(p.get('Health Status', ''))]),
-                'off_track': len([p for p in projects if 'Off Track' in str(p.get('Health Status', ''))]),
-                'wm_week': current_wm_week
+                'total_projects': summary.get('total_projects', 0),
+                'total_stores': summary.get('total_stores', 0),
+                'on_track': summary.get('by_health_status', {}).get('On Track', 0),
+                'at_risk': summary.get('by_health_status', {}).get('At Risk', 0),
+                'off_track': summary.get('by_health_status', {}).get('Off Track', 0),
+                'wm_week': current_wm_week,
             }
+            print(f"     [OK] API returned {len(projects)} projects")
             return stats, projects
-        except:
-            return None, None
+    except Exception as e:
+        print(f"     [!] API fetch failed: {e}")
+
+    # --- Attempt 2: Direct BigQuery ---
+    print("     [*] Falling back to direct BigQuery query...")
+    projects = _fetch_from_bigquery_direct()
+    if projects:
+        return _build_stats(projects), projects
+
+    # --- Attempt 3: Sample data (last resort) ---
+    print("     [*] Falling back to sample data...")
+    try:
+        from sample_data import SAMPLE_DATA_49_PROJECTS
+        return _build_stats(SAMPLE_DATA_49_PROJECTS), SAMPLE_DATA_49_PROJECTS
+    except Exception:
+        return None, None
 
 
 def build_needs_attention_html(projects: list) -> str:

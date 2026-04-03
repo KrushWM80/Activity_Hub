@@ -318,6 +318,8 @@ class AudioHandler(SimpleHTTPRequestHandler):
                     'phase_completed': result.get('phase_completed'),
                     'event_count': result.get('event_count', 0),
                     'review_no_comm_count': result.get('review_no_comm_count', 0),
+                    'status_breakdown': result.get('status_breakdown', []),
+                    'total_excl_denied': result.get('total_excl_denied', 0),
                     'summarized_count': result.get('summarized_count', 0),
                 }
                 if result.get('output_file'):
@@ -1450,13 +1452,24 @@ class AudioHandler(SimpleHTTPRequestHandler):
                 btn.disabled = false;
                 btn.textContent = '📡 Fetch Data from BigQuery';
                 if (data.success) {
+                    var breakdown = data.status_breakdown || [];
+                    var totalExclDenied = data.total_excl_denied || 0;
+                    var statusRows = '';
+                    breakdown.forEach(function(s) {
+                        var isDenied = s.status && s.status.indexOf('Denied') >= 0;
+                        var style = isDenied ? 'color:#9CA3AF;text-decoration:line-through;' : '';
+                        statusRows += '<tr><td style="padding:3px 0;' + style + '">' + s.status + '</td><td style="padding-left:12px;font-weight:bold;text-align:right;' + style + '">' + s.count + '</td></tr>';
+                    });
                     stepStatus(1,
-                        '<strong>✅ Data Cached!</strong><br>' +
-                        '<table style="margin-top:4px;font-size:0.9em;">' +
-                        '<tr><td>Review for Publish - No Comm:</td><td style="padding-left:8px;font-weight:bold;">' + data.review_no_comm_count + '</td></tr>' +
-                        '<tr><td>With Summarized text:</td><td style="padding-left:8px;font-weight:bold;">' + data.summarized_count + '</td></tr>' +
+                        '<strong>\u2705 Data Cached!</strong>' +
+                        '<div style="margin-top:8px;font-size:0.85em;color:#6B7280;">Excludes: AMP PR Merchandise, Denied</div>' +
+                        '<table style="margin-top:6px;font-size:0.9em;border-collapse:collapse;width:100%;max-width:420px;">' +
+                        '<tr style="border-bottom:2px solid #1D4ED8;"><th style="padding:4px 0;text-align:left;font-weight:700;">Status</th><th style="padding-left:12px;text-align:right;font-weight:700;">Count</th></tr>' +
+                        statusRows +
+                        '<tr style="border-top:2px solid #1D4ED8;"><td style="padding:5px 0;font-weight:700;">Total (excl. Denied)</td><td style="padding-left:12px;font-weight:700;text-align:right;">' + totalExclDenied + '</td></tr>' +
                         '</table>' +
-                        '<br><em>Now switch to Walmart WiFi and run Step 2 ↓</em>',
+                        '<div style="margin-top:8px;font-size:0.9em;">With Summarized text: <strong>' + data.summarized_count + '</strong></div>' +
+                        '<br><em>Now switch to Walmart WiFi and run Step 2 \u2193</em>',
                         'success'
                     );
                 } else {

@@ -228,6 +228,7 @@ def fetch_week_events(client, week, fy):
     WHERE FY = @fy AND WM_Week = @week
       AND Message_Type = 'Merchant Message'
       AND Status = 'Review for Publish review - No Comms'
+      AND Business_Area != 'AMP PR Merchandise'
     ORDER BY Store_Area, Title
     """
     from google.cloud.bigquery import ScalarQueryParameter, QueryJobConfig
@@ -530,12 +531,44 @@ def fetch_and_cache_bq_data(week, fy):
     # Count by status
     review_no_comm = sum(1 for r in events if 'Review for Publish' in (r.Status or ''))
 
+    # Full status breakdown for all Merchant Messages (excl. AMP PR Merchandise)
+    logger.info("Fetching full status breakdown (excl. AMP PR Merchandise)...")
+    from google.cloud.bigquery import ScalarQueryParameter, QueryJobConfig as _QJC
+    status_query = """
+    SELECT Status, COUNT(DISTINCT event_id) as cnt
+    FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2`
+    WHERE FY = @fy AND WM_Week = @week
+      AND Message_Type = 'Merchant Message'
+      AND Business_Area != 'AMP PR Merchandise'
+    GROUP BY Status
+    ORDER BY cnt DESC
+    """
+    status_config = _QJC(query_parameters=[
+        ScalarQueryParameter("fy", "INT64", fy),
+        ScalarQueryParameter("week", "STRING", str(week)),
+    ])
+    status_breakdown = []
+    total_all = 0
+    total_excl_denied = 0
+    try:
+        for row in client.query(status_query, job_config=status_config).result():
+            status_breakdown.append({'status': row.Status, 'count': row.cnt})
+            total_all += row.cnt
+            if 'Denied' not in (row.Status or ''):
+                total_excl_denied += row.cnt
+    except Exception as e:
+        logger.warning(f"Could not fetch status breakdown: {e}")
+
+    logger.info(f"Status breakdown: {len(status_breakdown)} statuses, total (excl. Denied): {total_excl_denied}")
+
     cache_data = {
         'week': week,
         'fy': fy,
         'cached_at': datetime.now().isoformat(),
         'event_count': len(events),
         'review_no_comm_count': review_no_comm,
+        'status_breakdown': status_breakdown,
+        'total_excl_denied': total_excl_denied,
         'summarized_count': len(events_with_summaries),
         'events_with_summaries': events_with_summaries,
         'events_without_summary': events_without,
@@ -868,6 +901,8 @@ def generate_weekly_message_audio(week=None, fy=None, voice="Jenny", rate=0.95, 
             result['success'] = True
             result['event_count'] = cache_data['event_count']
             result['review_no_comm_count'] = cache_data['review_no_comm_count']
+            result['status_breakdown'] = cache_data.get('status_breakdown', [])
+            result['total_excl_denied'] = cache_data.get('total_excl_denied', 0)
             result['summarized_count'] = cache_data['summarized_count']
             result['events_without_summary'] = cache_data.get('events_without_summary', [])
             result['phase_completed'] = 'fetch'

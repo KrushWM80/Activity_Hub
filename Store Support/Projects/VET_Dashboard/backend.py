@@ -11,6 +11,7 @@ from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from google.cloud import bigquery
 import logging
+import sys
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -23,9 +24,16 @@ from sample_data import SAMPLE_DATA_49_PROJECTS
 app = Flask(__name__, static_folder=os.path.dirname(__file__), static_url_path='/static')
 CORS(app)
 
-# Logging
-logging.basicConfig(level=logging.INFO)
+# Logging — send ALL log output to stdout so PowerShell doesn't kill the process
+logging.basicConfig(level=logging.INFO, stream=sys.stdout,
+                    format='%(levelname)s:%(name)s:%(message)s')
 logger = logging.getLogger(__name__)
+
+# Ensure werkzeug/Flask logs also go to stdout
+for _log_name in ('werkzeug', 'google', 'google.auth', 'urllib3'):
+    _l = logging.getLogger(_log_name)
+    _l.handlers = [logging.StreamHandler(sys.stdout)]
+    _l.propagate = False
 
 # Import PPT service (after logger is initialized)
 try:
@@ -43,8 +51,8 @@ FULL_TABLE_ID = f"`{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`"
 FULL_INTAKE_HUB_ID = f"`{PROJECT_ID}.{DATASET_ID}.{INTAKE_HUB_TABLE}`"
 
 # V.E.T. Dashboard specific config
-# BQ data still uses "Dallas POC" as TDA_Ownership value; we query with that but display as "Dallas VET"
-BQ_OWNERSHIP_FILTER = "Dallas POC"
+# BQ data now uses "Dallas VET" as TDA_Ownership value (renamed from "Dallas POC")
+BQ_OWNERSHIP_FILTER = "Dallas VET"
 DISPLAY_OWNERSHIP_NAME = "Dallas VET"
 
 # Phase normalization (until BQ data reflects new names)
@@ -52,30 +60,33 @@ _PHASE_MAP = {'POC/POT': 'Vet', 'Mkt Scale': 'Test Markets'}
 def _normalize_phase(phase):
     return _PHASE_MAP.get(phase, phase)
 
+def _init_bigquery_client():
+    """Try to initialize a BigQuery client. Returns client or None."""
+    _creds_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS',
+        r'C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json')
+    if _creds_path and os.path.exists(_creds_path):
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = _creds_path
+    try:
+        bq_client = bigquery.Client(project=PROJECT_ID)
+        logger.info(f"[OK] BigQuery client initialized for project: {PROJECT_ID}")
+        return bq_client
+    except Exception as e1:
+        logger.warning(f"[WARN] ADC failed: {e1}")
+        if _creds_path and os.path.exists(_creds_path):
+            try:
+                from google.oauth2 import service_account
+                credentials = service_account.Credentials.from_service_account_file(_creds_path)
+                bq_client = bigquery.Client(credentials=credentials, project=PROJECT_ID)
+                logger.info(f"[OK] BigQuery client initialized with service account from: {_creds_path}")
+                return bq_client
+            except Exception as e2:
+                logger.error(f"[ERROR] Service account credentials failed: {e2}")
+    return None
+
 # Initialize BigQuery client
-client = None
-try:
-    # Try Application Default Credentials (gcloud auth application-default login)
-    client = bigquery.Client(project=PROJECT_ID)
-    logger.info(f"✅ BigQuery client initialized with Application Default Credentials for project: {PROJECT_ID}")
-except Exception as e_adc:
-    logger.warning(f"⚠️ Application Default Credentials failed: {e_adc}")
-    client = None
-    
-    # Try GOOGLE_APPLICATION_CREDENTIALS file if set
-    creds_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    if creds_path and os.path.exists(creds_path):
-        try:
-            from google.oauth2 import service_account
-            credentials = service_account.Credentials.from_service_account_file(creds_path)
-            client = bigquery.Client(credentials=credentials, project=PROJECT_ID)
-            logger.info(f"✅ BigQuery client initialized with service account from: {creds_path}")
-        except Exception as e_sa:
-            logger.error(f"❌ Service account credentials failed: {e_sa}")
-            client = None
-    
+client = _init_bigquery_client()
 if not client:
-    logger.warning(f"⚠️ BigQuery not available - falling back to sample data. To use real data, run: gcloud auth application-default login")
+    logger.warning("[WARN] BigQuery not available at startup - will retry on data request")
 
 
 class VETDataManager:
@@ -98,9 +109,11 @@ class VETDataManager:
                     return self._data_cache
         
         if not self.client:
+            # Retry BQ initialization — credentials may now be available
+            self.client = _init_bigquery_client()
+        
+        if not self.client:
             logger.warning(f"BigQuery client not initialized - using {len(SAMPLE_DATA_49_PROJECTS)} sample projects")
-            # Return comprehensive sample data when BigQuery is not available
-            # Normalize phases in sample data
             for row in SAMPLE_DATA_49_PROJECTS:
                 row['Phase'] = _normalize_phase(row.get('Phase', 'Unknown'))
             self._data_cache = SAMPLE_DATA_49_PROJECTS
@@ -529,14 +542,14 @@ def generate_vet_ppt():
         }), 500
 
 
+# Register PPT service routes (must happen at import time, not just in __main__)
+if register_ppt_routes:
+    register_ppt_routes(app)
+    logger.info("PPT service routes registered")
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5001))
     debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
-    
-    # Register PPT service routes
-    if register_ppt_routes:
-        register_ppt_routes(app)
-        logger.info("PPT service routes registered")
     
     logger.info(f"Starting V.E.T. Dashboard backend on port {port} (Dallas VET focus)")
     logger.info(f"BQ Ownership Filter: {BQ_OWNERSHIP_FILTER} (displayed as {DISPLAY_OWNERSHIP_NAME})")

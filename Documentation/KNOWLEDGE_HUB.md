@@ -271,13 +271,63 @@ All tasks registered April 1, 2026. Requires **elevated (admin) terminal** to cr
 schtasks /query /fo TABLE | Select-String "Activity_Hub"
 ```
 
-### Adding a New Service
+---
 
-When a new service/URL is added, do all 3 steps:
+### ⚠️ Critical Operating Rules
 
-**Step 1** — Create a `Automation/start_<servicename>_24_7.bat` using the existing bat files as a template (include the port-kill block before the restart loop).
+#### NEVER use `Stop-Process -Name python -Force`
+This kills **all** Python processes on the machine — every service goes down simultaneously. The bat restart loops will attempt recovery but may not all succeed, especially if the continuous monitor fires during the restart window and triggers the double-launch problem.
 
-**Step 2** — Add a line to `Automation/register_tasks_cmd.bat`:
+**Safe way to kill a specific service by port:**
+```powershell
+# Kill only the process on a specific port (e.g., 5001)
+$pid = (netstat -ano | Select-String ":5001 " | Select-String "LISTENING" | ForEach-Object { ($_ -split "\s+")[-1] }) | Select-Object -First 1
+if ($pid) { taskkill /F /PID $pid }
+```
+
+**Safe way to restart one service:**
+```powershell
+# Stop just that port's process, then let the bat loop restart it
+$pid = (netstat -ano | Select-String ":5001.*LISTENING" | ForEach-Object { ($_ -split "\s+")[-1] }) | Select-Object -First 1
+if ($pid) { taskkill /F /PID $pid }
+# The bat loop detects the exit and restarts automatically within 5-7 seconds
+```
+
+#### BigQuery schema changes can break service data silently
+If a service suddenly shows empty or wrong data, check whether BigQuery column values have been renamed. The query filter in `backend.py` (or equivalent) may need updating. Example: `TDA_Ownership = 'Dallas POC'` was renamed to `'Dallas VET'` on April 2, 2026.
+
+#### Recovery methodology (when multiple services are down)
+1. Do NOT mass-kill Python processes
+2. Check which ports are down: `netstat -ano | Select-String "LISTENING" | Select-String ":5000|:5001|:8001|:8080|:8081|:8090|:8888"`
+3. Start only the specific downed services using their bat file
+4. Wait 15-20 seconds then re-check ports
+5. The 5-minute continuous monitor (`continuous_monitor.ps1`) acts as backup if a bat loop itself dies
+
+---
+
+### Adding a New Service (URL / Dashboard)
+
+When a new service/URL is added, complete **all 5 steps**:
+
+**Step 1** — Create `Automation/start_<servicename>_24_7.bat`  
+Copy an existing bat as template. Required elements:
+- Port-kill block before the restart loop (kills stale process holding the port)
+- Restart loop with `timeout /t 5` between attempts
+- Log file output (`>> "%LogFile%" 2>&1`)
+- `GOOGLE_APPLICATION_CREDENTIALS` set if service uses BigQuery
+
+```bat
+:restart_loop
+for /f "tokens=5" %%a in ('netstat -ano 2^>nul ^| findstr ":%PORT% " ^| findstr "LISTENING"') do (
+    taskkill /F /PID %%a > nul 2>&1
+)
+timeout /t 2 /nobreak > nul
+"%PYTHON_EXE%" main.py >> "%LOG_FILE%" 2>&1
+timeout /t 5 /nobreak > nul
+goto restart_loop
+```
+
+**Step 2** — Add to `Automation/register_tasks_cmd.bat`:
 ```bat
 schtasks /create /tn "Activity_Hub_<ServiceName>_AutoStart" /tr "cmd /c \"%BASE%\start_<servicename>_24_7.bat\"" /sc onlogon /rl highest /f
 ```
@@ -288,7 +338,57 @@ Win + X → Terminal (Admin)
 & "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\register_tasks_cmd.bat"
 ```
 
-Also add the new service to `MONITOR_AND_REPORT.ps1` so it's included in the daily health check and auto-restart.
+**Step 4** — Add to `MONITOR_AND_REPORT.ps1` services list so it is included in the daily 6 AM health check and auto-restart email.
+
+**Step 5** — Add to `continuous_monitor.ps1` services array so it is included in the every-5-minute uptime check:
+```powershell
+@{Name="<ServiceName>"; Port=<PORT>; HealthURL="http://localhost:<PORT>"; RestartScript="...\Automation\start_<servicename>_24_7.bat"}
+```
+
+**Step 6** — Update the service table in this file (`KNOWLEDGE_HUB.md` → Active Services table) with the new port and URL.
+
+---
+
+### Adding a New Email Report
+
+When a new scheduled email report is added, complete **all 4 steps**:
+
+**Step 1** — Create `Automation/send_<reportname>_email.bat`  
+Copy an existing email bat as template. Required elements:
+- Port check for the backend the report depends on **before** running the report script
+- If port is down: start the backend bat and wait up to 30 seconds for it to come up
+- Only run the report script after confirming the backend is alive
+- Log all steps to a log file
+
+```bat
+REM --- Ensure backend (port XXXX) is running before generating report ---
+netstat -ano | findstr ":XXXX " | findstr "LISTENING" > nul 2>&1
+if %errorlevel% neq 0 (
+    start /b "" cmd /c "%ProjectRoot%\Automation\start_<servicename>_24_7.bat" > nul 2>&1
+    set /a attempts=0
+    :wait_loop
+    timeout /t 3 /nobreak > nul
+    netstat -ano | findstr ":XXXX " | findstr "LISTENING" > nul 2>&1
+    if %errorlevel% equ 0 goto ready
+    set /a attempts+=1
+    if !attempts! lss 10 goto wait_loop
+    echo WARNING: Backend did not start in 30s >> "%LogFile%"
+    goto run_report
+    :ready
+)
+:run_report
+"%PythonExe%" send_report.py >> "%LogFile%" 2>&1
+```
+
+**Step 2** — Add a scheduled task to `Automation/register_tasks_cmd.bat`:
+```bat
+schtasks /create /tn "Activity_Hub_<ReportName>_Email" /tr "cmd /c \"%BASE%\send_<reportname>_email.bat\"" /sc daily /st 06:00:00 /rl highest /f
+```
+(Adjust `/sc` and `/st` for the correct schedule — daily, weekly, etc.)
+
+**Step 3** — Run `Automation/register_tasks_cmd.bat` from an **elevated (admin) terminal**.
+
+**Step 4** — Add to the Scheduled Tasks table in this file (`KNOWLEDGE_HUB.md`) with task name, trigger, and action.
 
 ---
 

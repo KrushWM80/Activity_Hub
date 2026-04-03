@@ -1,9 +1,36 @@
 {
   "week": 4,
   "fy": 2027,
-  "cached_at": "2026-03-16T09:17:54.313654",
+  "cached_at": "2026-04-02T16:53:40.917564",
   "event_count": 41,
   "review_no_comm_count": 41,
+  "status_breakdown": [
+    {
+      "status": "Review for Publish review - No Comms",
+      "count": 41
+    },
+    {
+      "status": "Expired - Pending",
+      "count": 5
+    },
+    {
+      "status": "Denied - Pending",
+      "count": 3
+    },
+    {
+      "status": "Expired - Future Send",
+      "count": 1
+    },
+    {
+      "status": "Expired - On Hold",
+      "count": 1
+    },
+    {
+      "status": "Expired - Ready to Review",
+      "count": 1
+    }
+  ],
+  "total_excl_denied": 49,
   "summarized_count": 41,
   "events_with_summaries": [
     {
@@ -25,7 +52,7 @@
       "store_area": "Asset Protection",
       "title": "Select Kingsford Charcoal Items Will Be Delivered on HVDC Trailers",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Backroom and Dept. 16: Select Kingsford Charcoal Items Will Be Delivered on HVDC Trailers Beginning week 5, February 28 through March 6, select Kingsford Charcoal items will transition from RDC to HVDC delivery to support automation and create additional RDC capacity."
+      "summary_text": "Backroom and Dept. 16: Select Kingsford Charcoal Items Will Be Delivered on HVDC Trailers\n\nBeginning week 5, February 28 through March 6, select Kingsford Charcoal items will transition from RDC to HVDC delivery to support automation and create additional RDC capacity."
     },
     {
       "event_id": "bdc8c52f-fdcb-45eb-94b8-6c97cab56404",
@@ -39,175 +66,175 @@
       "store_area": "Backroom and Claims",
       "title": "Join the DSD Office Hours for Real-Time Support",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Backroom: Join the DSD Office Hours for Real-Time Support Join our bi-weekly DSD Office Hours on Tuesday, March third from 2 to 3 p.m. Central on Teams to connect directly with Vendors, Merchants and Operations to resolve issues quickly. If you can\u2019t attend, sessions are held every other Tuesday"
+      "summary_text": "Backroom: Join the DSD Office Hours for Real-Time Support\n\nJoin our\u00a0bi-weekly DSD Office Hours on Tuesday, March third from 2 to 3 p.m. Central on Teams to connect directly with Vendors, Merchants and Operations to resolve issues quickly.\u00a0If you can\u2019t attend, sessions are held every other Tuesday"
     },
     {
       "event_id": "89836763-a27e-40c0-a9bb-431883e46713",
       "store_area": "Consumables",
       "title": "Dept. 13: Tide evo Launch",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 13: Tide evo is a category-defining innovation from the #1 laundry brand, reinventing detergent as a lightweight, waterless sheet with no fillers, no plastic bottles, and sustainable packaging. Backed by 3 billion or more (3B+) national impressions and strong Walmart.com visibility, in-store displays begin March 7 with a full rollout by April 11."
+      "summary_text": "Dept. 13: Tide evo is a category-defining innovation from the #1 laundry brand, reinventing detergent as a lightweight, waterless sheet with no fillers, no plastic bottles, and sustainable packaging. Backed by 3 billion or more (3B+) national impressions and strong Walmart.com visibility, in-store displays begin March 7 with a full\u00a0rollout by April 11."
     },
     {
       "event_id": "2cc518bd-2bbb-4ee3-9be2-4d3e5f1069b4",
       "store_area": "Consumables",
       "title": "Dept. 40: Modularizing of the Health & Wellness Wall",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 40: Modularizing of the Health & Wellness Wall The Health & Wellness Wall is being modularized to create a cohesive, better-merchandised space that improves tracking, maximizes monthly space use, increases sell-through, reduces Nil Picks, and strengthens OPD performance on top categories. Feature Space & Sales (FSS) will be replaced with C110 Modular on the Quarterly Relay starting in March; features will run only in space designated as Dept. 40/Health and Wellness, with store choice available in remaining sections."
+      "summary_text": "Dept. 40: Modularizing of the Health & Wellness Wall\n\nThe Health & Wellness Wall is being modularized to create a cohesive, better-merchandised space that improves tracking, maximizes monthly space use, increases sell-through, reduces Nil Picks, and strengthens OPD performance on top categories. Feature Space & Sales (FSS) will be replaced with C110 Modular on the Quarterly Relay starting in March; features will run only in space designated as Dept. 40/Health and Wellness, with store choice available in remaining sections."
     },
     {
       "event_id": "b6f24130-09ad-4b81-82b5-ed2d1ea0763f",
       "store_area": "Digital",
       "title": "Oversized Picking Safety Update",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Store Fulfillment: Oversized Picking Safety Update When a customer orders a high quantity of a single heavy item like water, mulch or soil, GIF will automatically split the pick walk to reduce strain and promote safer cart handling. If prompted, start the new walk with a new L-cart and follow all on-screen directions."
+      "summary_text": "Store Fulfillment: Oversized Picking Safety Update\n\nWhen a customer orders a high quantity of a single heavy item like water, mulch or soil, GIF will automatically split the pick walk to reduce strain and promote safer cart handling. If prompted, start the new walk with a new L-cart and follow all on-screen directions."
     },
     {
       "event_id": "6c72e678-c325-4d77-9a48-671f59d57932",
       "store_area": "Entertainment",
       "title": "Dept 72: Soundbar Out-of-Stock Solutions",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 72: Three Samsung soundbars are being discontinued with no restock, so starting Feb. 21 stores will receive two JBL replacement models to keep the modular in-stock. Use the lookup tool to confirm which JBL item(s) you\u2019ll get, place them in the former Samsung modular space (double-face as needed), and note pricing is already updated in the system."
+      "summary_text": "Dept. 72: Three Samsung\u00a0soundbars are being discontinued with no restock, so starting Feb. 21 stores will receive two JBL replacement models to keep the modular in-stock. Use the lookup tool to confirm which JBL item(s) you\u2019ll get, place them in the former Samsung modular space (double-face as needed), and note pricing is already updated in the system."
     },
     {
       "event_id": "41c6ee0f-d310-4522-9941-ee04ac3816cf",
       "store_area": "Entertainment",
       "title": "Dept. 72: PC New Software Display, Storage Update",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 72: PC Software Display Setup Week 50 shipment: magnetic frame + scannable insert (set immediately; ignore \u201cHold for Anderson\u201d). Place on Electronics cash wrap near POS; message must face customer. Insert scannable sheet for checkout purchase. Upcoming POS prompt will remind associates to suggest PC software with laptop purchases. Featured SKUs: Norton (VPN & 360 tiers), McAfee Total Protection, HR Block 2025 (Basic & Deluxe). Actions: Install new placemat at cash wrap. Ensure price tags are printed/placed on laptop PC software fixtures."
+      "summary_text": "Dept. 72: PC Software Display Setup\n\nWeek 50 shipment: magnetic frame + scannable insert (set immediately; ignore \u201cHold for Anderson\u201d).\n\nPlace on Electronics cash wrap near POS; message must face customer.\n\nInsert scannable sheet for checkout purchase.\n\nUpcoming POS prompt will remind associates to suggest PC software with laptop purchases.\n\nFeatured SKUs:\n\nNorton (VPN & 360 tiers), McAfee Total Protection, HR Block 2025 (Basic & Deluxe).\n\nActions:\n\nInstall new placemat at cash wrap.\n\nEnsure price tags are printed/placed on laptop PC software fixtures.\n\nQuestions: submit store ticket or email Tyler Jackson.\n\nDept. 72: Digital Storage Update\n\nIndustry-wide inventory constraints on SSDs & PC memory.\n\nWorking to improve in-stocks for Week 16 modulars.\n\nImpacted items (no current restock date) include select:\n\nKingston FURY DDR5 memory\n\nNVIDIA RTX 5070 Ti\n\nSamsung T7/T9 portable SSDs\n\nSamsung 990 EVO/PRO SSDs\n\nSeagate One Touch SSD\n\nSupply improvements ongoing; may pivot to alternative SKUs as needed.\n\nDept. 72: PC New Software Display, Storage Update\n\nSummarized: Dept. 72: Set up the PC Software scan-to-buy display at Electronics checkout now. Digital storage is supply-constrained, and some Solid-State Drive/Personal Computer (SSD/PC) memory SKUs don\u2019t have restock dates yet."
     },
     {
       "event_id": "89277ae6-618d-4e8d-b457-872094e4c5f4",
       "store_area": "Entertainment",
       "title": "Dept. 85: Celebrate Grads with Walmart Photo Essentials!",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 85: Graduation season is here\u2014remind customers Walmart Photo has party essentials like yard signs, banners, signature boards, and mounted prints, with more customizable options at walmart.com/photo."
+      "summary_text": "Dept. 85: Graduation season is here\u2014remind customers\u00a0Walmart Photo has party essentials like yard signs, banners, signature boards, and mounted prints, with more customizable options at walmart.com/photo."
     },
     {
       "event_id": "e79243bc-6676-4242-aeb0-a0608c2c8869",
       "store_area": "Fashion",
       "title": "Dept. 29: Sleepwear Preview",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 29: Sleepwear Preview The week 5 update includes an assortment of licensed short-sleeved shorts sets, new Cloud Core cotton jersey items for the No Boundaries sidewall, and satin cami and short sets from No Boundaries."
+      "summary_text": "Dept. 29: Sleepwear Preview\n\nThe week 5 update includes an assortment of licensed short-sleeved shorts sets, new Cloud Core cotton jersey items for the No Boundaries sidewall, and satin cami and short sets from No Boundaries."
     },
     {
       "event_id": "1b6f3411-b969-459d-9ea8-1d863852fa19",
       "store_area": "Fashion",
       "title": "Dept. 32: Claire's Jewelry Transition",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 32: Claire's Jewelry Transition Dept. 32 has a three phase timeline for the transition to Walmart-owned inventory for Claire's Jewelry, with start dates in weeks 4, 14 and 26. RDS reps will be in stores to access backroom areas, restock and tidy Claire's fixtures, and properly dispose of any damaged Claire\u2019s product."
+      "summary_text": "Dept. 32: Claire's Jewelry Transition\n\nDept. 32 has a three phase timeline for the transition to Walmart-owned inventory for Claire's Jewelry, with start dates in weeks 4, 14 and 26. RDS reps will be in stores to access backroom areas, restock and tidy Claire's fixtures, and properly dispose of any damaged Claire\u2019s product."
     },
     {
       "event_id": "7decbc28-cd3c-43de-ad45-44f4bf865e04",
       "store_area": "Fashion",
       "title": "Dept. 34: Women's\u00a0Plus Core Wall Clarification",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 34: Women's Plus Core Wall Clarification Some stores did not set the Women's Plus Core Wall correctly, so we included specific instructions for adding a jetrail and which items go on which rows."
+      "summary_text": "Dept. 34: Women's\u00a0Plus Core Wall Clarification\n\nSome stores did not set the Women's Plus Core Wall correctly, so we included specific instructions for adding a jetrail and which items go on which rows."
     },
     {
       "event_id": "b79f254b-c1d5-4bf5-a0d0-6da8c0b87e24",
       "store_area": "Fashion",
       "title": "Depts. 24/33: Kids Rack Expansion",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Depts. 24/33: Kids Rack Expansion Select stores should have received one or two additional rack fixtures per department by week 3 for a broader assortment and improved story-telling."
+      "summary_text": "Depts. 24/33: Kids Rack Expansion\n\nSelect stores should have received one or two additional rack fixtures per department by week 3 for a broader assortment and improved story-telling."
     },
     {
       "event_id": "973a2c74-7947-4260-8a7e-d8a7be5eb106",
       "store_area": "Fashion",
       "title": "Fashion: T-Shirt Spinner Graphics",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Fashion: T-Shirt Spinner Graphics Stores can now print t-shirt spinner graphics from Better Way."
+      "summary_text": "Fashion: T-Shirt Spinner Graphics\n\nStores can now print t-shirt spinner graphics from Better Way."
     },
     {
       "event_id": "7d796c54-8ea2-46c9-b97e-190442055bef",
       "store_area": "Fashion",
       "title": "Fashion: Your Part 2 Spring Guides are Here!",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Fashion: Your Part 2 Spring Guides are Here! Updated Fashion guides are now available on Better Way, including everything you need to properly set seasonal Fashion strategies, from shop layouts and volume drivers to mannequin styling and trend highlights."
+      "summary_text": "Fashion: Your Part 2 Spring Guides are Here!\n\nUpdated Fashion guides are now available on Better Way, including everything you need to properly set seasonal Fashion strategies,\u202ffrom shop layouts and volume drivers to mannequin styling and trend highlights."
     },
     {
       "event_id": "f2de70d2-dd8e-4026-8773-193eddc2c641",
       "store_area": "Food",
       "title": "Dept. 90:\u00a0 Fairlife Supply Update",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 90: Fairlife Supply Update Starting Week 5 (Feb. 28\u2013March 6), expect increased Fairlife shipments and better in-stocks in Dept. 90. A new Fairlife production facility is now shipping, boosting capacity to meet demand. Why it matters: Fairlife is one of the category\u2019s fastest growers\u2014up 25% in two years, with another 15% expected this year. Customers want the lower sugar, higher protein, lactose-free benefits."
+      "summary_text": "Dept. 90: Fairlife Supply Update\n\nStarting Week 5 (Feb. 28\u2013March 6), expect increased Fairlife shipments and better in-stocks in Dept. 90. A new Fairlife production facility is now shipping, boosting capacity to meet demand.\n\nWhy it matters: Fairlife is one of the category\u2019s fastest growers\u2014up 25% in two years, with another 15% expected this year. Customers want the lower sugar, higher protein, lactose-free benefits."
     },
     {
       "event_id": "5268c894-d70b-47ab-a481-6bf81ec504bb",
       "store_area": "Food",
       "title": "Dept. 95: Gatorade Is Investing in a Lower EDLP",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 95: Gatorade 20-oz 8-packs \u2014 lower EDLP Gatorade is investing in 20-oz 8-packs, dropping EDLP to $6.98 (from $7.98 ) starting Monday, Feb. 23 . The lower price is designed to reengage customers and drive higher demand for the pack size and the category. To build awareness, an FSS endcap is planned (Plan IDs 230284 and 230288 ). Depending on the store, the feature runs Feb. 21\u2013March 6 or Feb. 21\u2013April 3 . Feature stores will receive an initial PO distribution of 20\u201350 cases across five flavors ."
+      "summary_text": "Dept. 95: Gatorade 20-oz 8-packs \u2014 lower EDLP\n\nGatorade is investing in 20-oz 8-packs, dropping EDLP to\u00a0$6.98\u00a0(from\u00a0$7.98) starting\u00a0Monday, Feb. 23. The lower price is designed to reengage customers and drive higher demand for the pack size and the category.\n\nTo build awareness, an\u00a0FSS endcap\u00a0is planned (Plan IDs\u00a0230284\u00a0and\u00a0230288). Depending on the store, the feature runs\u00a0Feb. 21\u2013March 6\u00a0or\u00a0Feb. 21\u2013April 3. Feature stores will receive an initial PO distribution of\u00a020\u201350 cases\u00a0across\u00a0five flavors.\n\nTake action:\u00a0If you\u2019re an FSS feature store, partner with your Pepsi rep to execute the endcap to plan. If not, identify a strong display location to highlight the new value. Direct questions to your Pepsi rep or the Home Office team."
     },
     {
       "event_id": "1e26f1c7-2c69-4a7a-b06a-f80191bb7fec",
       "store_area": "Food",
       "title": "Dept. 95: Introducing Gatorade Lower Sugar and No\u00a0Artificials",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 95: Introducing Gatorade Lower Sugar and No Artificials Gatorade is launching a Lower Sugar/No Artificials line to address top sports drink concerns: sugar and artificial colors/flavors. Shoppers get the same taste and electrolytes with 75% less sugar and no artificial flavors or colors. Launch is Monday, Feb. 23, supported by major media. Week 5 (Feb. 28\u2013March 6): stores in the FSS plan should build a four-flavor, 28-oz endcap (Plan ID 227476) and will receive DSD PO support."
+      "summary_text": "Dept. 95: Introducing Gatorade Lower Sugar and No\u00a0Artificials\n\nGatorade is launching a Lower Sugar/No Artificials line to address top sports drink concerns: sugar and artificial colors/flavors. Shoppers get the same taste and electrolytes with 75% less sugar and no artificial flavors or colors. Launch is Monday, Feb. 23, supported by major media.\n\nWeek 5 (Feb. 28\u2013March 6): stores in the FSS plan should build a four-flavor, 28-oz endcap (Plan ID 227476) and will receive DSD PO support. If your store opted in, place display-ready pallets on the sales floor during the Week 4, 7 and 11 waves, and complete the 28-oz modular swap to the new items. Direct questions to your Pepsi rep or the Home Office merchant team."
     },
     {
       "event_id": "05acd54c-7369-40ff-86ac-3edf8d75b4ac",
       "store_area": "Food",
       "title": "Dept. 95: Keep On The Border Chips In-stock",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 95: Keep On The Border Chips In-stock On The Border Tortilla Chips (item 598056711) are on Rollback through April and selling fast, but nil picks are rising because product is missing from the sidecounter. While it\u2019s set in the DSD tortilla chip section, it ships through the warehouse and can be missed during stocking. Take action: Have associates check the tortilla chip sidecounter daily and keep it full. If you need more product, order through the Store Feature Order Tool (SFOT)."
+      "summary_text": "Dept. 95: Keep On The Border Chips In-stock\n\nOn The Border Tortilla Chips (item 598056711) are on Rollback through April and selling fast, but nil picks are rising because product is missing from the sidecounter. While it\u2019s set in the DSD tortilla chip section, it ships through the warehouse and can be missed during stocking.\n\nTake action:\u00a0Have associates check the tortilla chip sidecounter daily and keep it full. If you need more product, order through the Store Feature Order Tool (SFOT)."
     },
     {
       "event_id": "8cca373f-09e6-4acd-b1c9-0d98c0ad862f",
       "store_area": "Food",
       "title": "Dept. 95: Poppi Beverages Will Transition to Pepsi DSD",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 95: Poppi to Pepsi DSD (effective Monday, March 2) Starting Monday, March 2, Poppi beverages will transition to Pepsi direct store delivery (DSD). Pepsi will own delivery, ordering, stocking, rotation, merchandising and shelf/display maintenance for all Poppi items, including modular sets, secondary placements and promos. Why it matters: Expect improved in-stocks, faster replenishment, less backroom handling and more consistent on-shelf availability\u2014reducing manual ordering and outs. Take action: Confirm on-hands are accurate and modulars are set correctly."
+      "summary_text": "Dept. 95: Poppi to Pepsi DSD (effective Monday, March 2)\n\nStarting Monday, March 2, Poppi beverages will transition to Pepsi direct store delivery (DSD). Pepsi will own delivery, ordering, stocking, rotation, merchandising and shelf/display maintenance for all Poppi items, including modular sets, secondary placements and promos.\n\nWhy it matters:\u00a0Expect improved in-stocks, faster replenishment, less backroom handling and more consistent on-shelf availability\u2014reducing manual ordering and outs.\n\nTake action:\u00a0Confirm on-hands are accurate and modulars are set correctly. Keep filling shelves and displays with current inventory. Connect with your Pepsi field rep before March 2 to prevent disruptions."
     },
     {
       "event_id": "128f8640-a7f0-4845-b7d7-604c4c316e7a",
       "store_area": "Food",
       "title": "Dept. 95: Updated Energy Sidekicks",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 95: Energy Sidekicks Are Being Updated Beginning Week 3, permanent Energy sidekicks are being updated to increase holding power and add seasonal/LTO space. Monster\u2019s permanent sidekick will transition to Alani+Celsius, using existing Monster fixtures; Monster will not have a permanent sidekick in stores through Week 8. In Week 9, Monster\u2019s permanent sidekick returns to select stores as an add-on \u2014 not a replacement \u2014 alongside existing Red Bull and Alani+Celsius sidekicks. Suppliers are aligned and expected to complete modulars to the new standard."
+      "summary_text": "Dept. 95: Energy Sidekicks Are Being Updated\n\nBeginning Week 3, permanent Energy sidekicks are being updated to increase holding power and add seasonal/LTO space. Monster\u2019s permanent sidekick will transition to Alani+Celsius, using existing Monster fixtures; Monster will not have a permanent sidekick in stores through Week 8.\n\nIn Week 9, Monster\u2019s permanent sidekick returns to select stores as an add-on \u2014 not a replacement \u2014 alongside existing Red Bull and\u00a0Alani+Celsius sidekicks. Suppliers are aligned and expected to complete modulars to the new standard."
     },
     {
       "event_id": "5947d34a-1307-4635-8bac-0d126ef20847",
       "store_area": "Fresh",
       "title": "D80 Prima Della Update",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Prima Della Pre-Sliced Honey Turkey Shortage Temporary shortage: Pre-sliced Prima Della Honey Roasted Turkey Breast (items 578738649, 671139503) is on supplier constraint, so replenishment is temporarily turned off. Bulk Prima Della Honey Roasted Turkey is not impacted, and suppliers will continue shipping pre-sliced product through Week 4. Replenishment is expected to resume between Weeks 8 and 13. Take action: Keep the Deli case full by expanding facings of adjacent pre-sliced turkey items and using bulk product where appropriate."
+      "summary_text": "Prima Della Pre-Sliced Honey Turkey Shortage\n\nTemporary shortage: Pre-sliced Prima Della Honey Roasted Turkey Breast (items 578738649, 671139503) is on supplier constraint, so replenishment is temporarily turned off. Bulk Prima Della Honey Roasted Turkey is not impacted, and suppliers will continue shipping pre-sliced product through Week 4. Replenishment is expected to resume between Weeks 8 and 13.\n\nTake action:\u00a0Keep the Deli case full by expanding facings of adjacent pre-sliced turkey items and using bulk product where appropriate. After recovery, traited stores will receive two cases of Honey Roasted Turkey to help rebuild in-stocks."
     },
     {
       "event_id": "ccdd5e91-7684-4242-89b1-38d718e23393",
       "store_area": "Fresh",
       "title": "Dept. 93: Fish Today, Corned Beef Tomorrow",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 93: Lent focus items Lent is here. Set Dept. 93 up for success by prioritizing 41/60 shrimp, salmon and tilapia. Ensure features are set, aisle locations are signed, and seafood modulars are worked daily to protect in-stocks and capture the seasonal lift. Dept. 93: Item in the spotlight: Great Value tilapia (Rollback) Great Value Frozen Skinless Tilapia Fillets, 4-pound, is on Rollback for $17.47 . With Lent demand, plan for about a 20% lift (roughly 30 units per week ) \u2014 but only if it\u2019s on the floor, full and easy to shop. Stock up and feature it prominently. Dept. 93: St."
+      "summary_text": "Dept. 93: Lent focus items\n\nLent is here. Set Dept. 93 up for success by prioritizing 41/60 shrimp, salmon and tilapia. Ensure features are set, aisle locations are signed, and seafood modulars are worked daily to protect in-stocks and capture the seasonal lift.\n\nDept. 93: Item in the spotlight: Great Value\u00a0tilapia (Rollback)\n\nGreat Value Frozen Skinless Tilapia Fillets, 4-pound, is on Rollback for\u00a0$17.47. With Lent demand, plan for about a\u00a020% lift\u00a0(roughly\u00a030 units per week) \u2014 but only if it\u2019s on the floor, full and easy to shop. Stock up and feature it prominently.\n\nDept. 93: \u00a0St. Patrick\u2019s Day: corned beef\n\nSt. Patrick\u2019s Day is March 17, and corned beef shipments are building now. Feature corned beef and cabbage to cue the holiday. Do not mark down early; shipments will be monitored and adjusted to balance sell-through. Watch for the fast-growing Corned Beef Kit and use the lookup tool to confirm if your store will receive it.\n\nDept. 93: Pork Rollbacks: flag the value\n\nAs grilling season ramps up, pork Rollbacks are a key sales driver \u2014 if customers see the savings. Make sure every Rollback item is clearly flagged in Dept. 93 to convert traffic into units and reinforce value across the assortment."
     },
     {
       "event_id": "5a8d5b20-509a-47b1-b94f-31926603f182",
       "store_area": "Fresh",
       "title": "Dept. 94: Produce Updates",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "1) Produce in-stock risks: Easter basket focus Keep shelves full for Easter basket produce. Bulk plums are pressured due to early Chile season and nonaccepted varieties (get well Week 4). Green onions and cilantro are weather-impacted; cilantro improves around Week 5, green onions around Week 8. Bulk corn is tight after major Florida freeze losses; protect packaged corn. Carrots and organic lettuces/celery are also weather-impacted. Watch March-April risk on watermelons, blueberries and cabbage."
+      "summary_text": "1) Produce in-stock risks: Easter basket focus\n\nKeep shelves full for Easter basket produce. Bulk plums are pressured due to early Chile season and nonaccepted varieties (get well Week 4). Green onions and cilantro are weather-impacted; cilantro improves around Week 5, green onions around Week 8. Bulk corn is tight after major Florida freeze losses; protect packaged corn. Carrots and organic lettuces/celery are also weather-impacted. Watch March-April risk on watermelons, blueberries and cabbage.\n\n2) Corn supply tightening: substitute and protect quality\n\nCorn supply will tighten through early April after historic freezes in Florida, driving intermittent outs and higher nil picks. Expect cosmetic issues like grey or dry husks; confirm the ear is bad before discarding. When bulk is short, substitute with packaged corn when possible. Vendors are prioritizing Walmart; current get-well is about Week 10. Do not accept secondary-market corn due to poor quality, and verify retails weekly as conditions change.\n\n3) Cabbage: cosmetic damage, keep accepting\n\nCold weather caused cosmetic issues on cabbage, but in-stocks should remain above goal and no major quality problems are expected. Continue to accept cabbage that arrives without outer leaves; it does not increase shrink or reduce eating quality. Ensure your store has taken the appropriate retail actions on green cabbage. A backup supply is being secured, with additional shipments sent as availability allows. Get-well is expected by month-end.\n\n4) Carrots: supply risk, protect Easter basket items\n\nWeather in California and the Southeast is pressuring carrot supply, but sourcing is secured across regions and sizing exceptions are in place to keep product flowing. Expect in-stock risk for about three weeks; total category in-stocks are running about 92%-97%. Priority is on baby peeled carrots for Easter baskets, including a Rollback on 2-pound baby peeled carrots at $1.82 from Feb. 23-April 23."
     },
     {
       "event_id": "9e2994fd-8eca-43f3-90f3-23a9765d5b6d",
       "store_area": "Fresh",
       "title": "Week 04 - Dept. 81: Easter Prep and Brown 'N Serve",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 81: Easter Prep and Brown 'N Serve Prep now for Easter staples in Dept. 81, including Brown \u2019N Serve rolls (store-managed). Check the backroom regularly for arrivals and keep the modular home location full. As the holiday nears, plan cross-merchandising by setting 4-way sides or saddlebag displays near the ham section to drive add-on sales."
+      "summary_text": "Dept. 81: Easter Prep and Brown 'N Serve\n\nPrep now for Easter staples in Dept. 81, including Brown \u2019N Serve rolls (store-managed). Check the backroom regularly for arrivals and keep the modular home location full. As the holiday nears, plan cross-merchandising by setting 4-way sides or saddlebag displays near the ham section to drive add-on sales."
     },
     {
       "event_id": "62bbd812-50c4-4591-96da-2799fd050b7a",
       "store_area": "Fresh",
       "title": "Week 04 - Dept. 98: Spring Features and High Margin Items",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 98: Spring Feature Planning and Post-Seasonal Cleanup Spring is a chance to grow baskets with solution-driven, high-margin displays. Spotlight angel food items: the 14-ounce cake ring (item 563001974) for mass displays, the 10-ounce bar (item 662658723) for smaller occasions, and 6-count dessert shells (item 653323529) as a key add-on. Create a seasonal destination \u2014 especially a \u201cStrawberry Shortcake\u201d set \u2014 by cross-merchandising Bakery with fresh strawberries (Produce) and Cool Whip (Dairy/Frozen) across frozen, chilled and ambient areas."
+      "summary_text": "Dept. 98: Spring Feature Planning and Post-Seasonal Cleanup\n\nSpring is a chance to grow baskets with solution-driven, high-margin displays. Spotlight angel food items: the 14-ounce cake ring (item 563001974) for mass displays, the 10-ounce bar (item 662658723) for smaller occasions, and 6-count dessert shells (item 653323529) as a key add-on.\n\nCreate a seasonal destination \u2014 especially a \u201cStrawberry Shortcake\u201d set \u2014 by cross-merchandising Bakery with fresh strawberries (Produce) and Cool Whip (Dairy/Frozen) across frozen, chilled and ambient areas. As the season winds down, stay ahead of end-of-season cleanup: keep the sales floor organized, manage CVPs daily, work markdowns, and clear any lingering Mardi Gras inventory."
     },
     {
       "event_id": "11dfcd84-88b3-4f05-b674-52f388780d70",
       "store_area": "Frontend",
       "title": "Friendliest Front End Spring Edition Will Launch on\u00a0Feb. 28",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Friendliest Front End Spring Edition starts Feb. 28\u2014stores compete to boost CX Scores from a week 4 baseline, with recognition for top improvement."
+      "summary_text": "Friendliest Front End Spring Edition starts\u00a0Feb. 28\u2014stores compete to boost CX Scores from a week 4 baseline, with recognition for top improvement."
     },
     {
       "event_id": "44a6c62a-8198-4089-9750-6d577b2160c6",
@@ -228,42 +255,42 @@
       "store_area": "Hardlines",
       "title": "Dept. 11 Hart Inventory Transition",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 11: Hart inventory is selling down, so flex and relabel to keep the modular full, and don\u2019t remove the Hart endcap until Hyper Tough organizers/sign arrive."
+      "summary_text": "Dept. 11: Hart inventory is selling down, so flex and\u00a0relabel to keep the modular full, and don\u2019t remove the Hart endcap until Hyper Tough organizers/sign arrive."
     },
     {
       "event_id": "b368679c-7589-473b-8b14-8f4be07c6ae0",
       "store_area": "Hardlines",
       "title": "Dept. 11: Water Exchange Retail Updates",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 11: Updated 5-gallon water exchange prices take effect week 4 (Feb. 21 to 27). Make sure your store reflects the new pricing and update signage as needed for a smooth transition and compliance."
+      "summary_text": "Dept. 11: Updated 5-gallon water exchange prices take effect week 4 (Feb. 21 to 27). Make sure your store reflects the new pricing and update\u00a0signage as needed for a smooth transition and compliance."
     },
     {
       "event_id": "752aa3ee-0b1f-4d10-9fd8-4adb3e4e7607",
       "store_area": "Hardlines",
       "title": "Dept. 9: Ball Bin Modular Updates",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 9: Ball Bin modulars were simplified to improve in-stocks. W&B Enterprises-supported stores replenish two core balls plus a store-specific top seller (flex into the Franklin Jr. Football spot), while other stores keep the standard three items. Week 14 removes the Direct Store Delivery (DSD) shipper and sends extra core-ball inventory until the full assortment returns in the second half of the year."
+      "summary_text": "Dept. 9: Ball Bin\u00a0modulars were simplified to improve in-stocks. W&B Enterprises-supported stores replenish two core balls plus a store-specific top seller (flex into the Franklin Jr. Football spot), while other stores keep the standard three items. Week 14 removes the Direct Store Delivery (DSD) shipper and sends extra core-ball inventory until the full assortment returns in the second half of the year."
     },
     {
       "event_id": "e6f2a14c-6710-4e95-8c52-b1c3893c7148",
       "store_area": "Hardlines",
       "title": "Heaters End of Season",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 11: Heaters are selling out and won\u2019t be restocked, so expect gaps until the spring reset week 5 in the South and week 9 in the North. Fill heater space with incoming Lasko and Midea fans over the next four weeks; until then, flex nearby hardware items to keep shelves shoppable."
+      "summary_text": "Dept. 11: Heaters are selling out and won\u2019t be restocked, so expect gaps until the spring reset week 5 in the South and week 9 in the North. Fill heater space with incoming\u00a0Lasko and Midea fans over the next four weeks; until then, flex nearby hardware items to keep shelves shoppable."
     },
     {
       "event_id": "d462be8f-c7f6-46b2-ae0c-37716250aa0e",
       "store_area": "Home",
       "title": "Dept. 74: Get Ready for a Major Reset in Bulk Storage",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 74: Get Ready for a Major Reset in Bulk Storage Stores can expect a significant number of deletes, including all of category 160, as we prepare for a major modular reset in Bulk Storage in week 7."
+      "summary_text": "Dept. 74: Get Ready for a Major Reset in Bulk Storage\n\nStores can expect a significant number of deletes, including all of category 160, as we prepare for a major modular reset in Bulk Storage in week 7."
     },
     {
       "event_id": "d936e844-37f6-4a86-a26f-da6692437ac0",
       "store_area": "Home",
       "title": "Dept. 74: Simplifying Picking With a Label Update",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 74: Simplifying Picking With a Label Update We have updated the lid label for Mainstays 13-gallon swing top trash cans so they are easier to identifier for digital shoppers, resulting in fewer nil picks."
+      "summary_text": "Dept. 74: Simplifying Picking With a Label Update\n\nWe have updated the lid label for Mainstays 13-gallon swing top trash cans so they are easier to identifier for digital shoppers, resulting in fewer nil picks."
     },
     {
       "event_id": "a746942a-4fb3-43e9-9fc5-77c2cb835384",
@@ -277,21 +304,21 @@
       "store_area": "Seasonal",
       "title": "Dept. 18/67: Easter 2026",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 18/67: Easter is earlier with a shorter selling window, so set modulars on time and flex New and Now/extra space to eggs and baskets; eggs and grass may be short on the first shipment but should fill in with a week 5 replenishment. Dept. 67: Coordinate Easter PFS relays with Hallmark/American Greetings, set seasonal features quickly, and follow the standard helium ring-up process; Dabney Lee endcaps are existing-inventory only (some markdowns, no additional shipments)."
+      "summary_text": "Dept. 18/67: Easter is earlier with a shorter selling window, so set\u00a0modulars on time and flex New and Now/extra space to eggs and baskets; eggs and grass may be short on the first shipment but should fill in with a week 5 replenishment. Dept. 67: Coordinate Easter PFS relays with Hallmark/American Greetings, set seasonal features quickly, and follow the standard helium ring-up process; Dabney Lee endcaps are existing-inventory only (some markdowns, no additional shipments)."
     },
     {
       "event_id": "03b6e43e-4ab5-4c93-94b1-5316f7719d10",
       "store_area": "Total Store",
       "title": "Clean Floor Safety",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Clean Floor Safety Clean floors prevent slips, trips, and falls. Clean spills immediately, or guard the area and get help. Never leave spills unattended. Keep aisles clear, remove debris, and report wet spots, damaged flooring, or repeat hazards right away."
+      "summary_text": "Clean Floor Safety\n\nClean floors prevent slips, trips, and falls. Clean spills immediately, or guard the area and get help. Never leave spills unattended. Keep aisles clear, remove debris, and report wet spots, damaged flooring, or repeat hazards right away."
     },
     {
       "event_id": "29d7f3f5-41f7-4705-86f9-74d6aa451320",
       "store_area": "Total Store",
       "title": "Dept. 79: Baby Days",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 79: Spring Baby Days runs Feb. 16 to April 17, featuring extended in-store/digital features, strong omni Rollbacks and newness like Wonder Nation baby fashion. Set signage/features on time and keep item locations updated to support pickup and delivery."
+      "summary_text": "Dept. 79: Spring Baby Days runs Feb. 16 to April 17, featuring extended in-store/digital features, strong omni Rollbacks and newness like Wonder Nation baby fashion. Set\u00a0signage/features on time and keep item locations updated to support pickup and delivery."
     }
   ],
   "events_without_summary": []

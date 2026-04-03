@@ -1,8 +1,43 @@
 # V.E.T. Dashboard Executive Report
 
+> **Last Updated**: April 2, 2026
+
+## ⚠️ Known Issues & Fixes (April 2, 2026)
+
+### BigQuery Ownership Column Renamed
+The `TDA_Ownership` filter in BigQuery was renamed from `"Dallas POC"` to `"Dallas VET"`.  
+`backend.py` has been updated: `BQ_OWNERSHIP_FILTER = "Dallas VET"` (147 rows).  
+If data shows empty again, re-check `TDA_Ownership` values in BQ against the filter in `backend.py`.
+
+### Server Startup (PowerShell stderr problem)
+Flask writes log messages to stderr. PowerShell treats **any** stderr output as an error and kills the process.  
+**Do NOT start the server from PowerShell directly.**  
+Always use the bat file: `Automation/start_vet_dashboard_24_7.bat` → which calls `start_server.py` via cmd.exe.
+
+`start_server.py` — purpose-built launcher that:
+- Sets UTF-8 encoding (fixes emoji crash)
+- Redirects Flask logging to stdout
+- Sets GCP credentials
+- Calls `backend.py`
+
+### Email Report — 3-Tier Fallback
+`send_vet_report_final.py` uses: **API (:5001) → Direct BigQuery → Sample data (last resort only)**  
+`Automation/send_vet_daily_email.bat` now checks port 5001 is up before running the report,  
+and starts the backend automatically if it's down.
+
+### Do NOT use `Stop-Process -Name python`
+This kills ALL Python services on the machine. To restart only VET:
+```powershell
+$pid = (netstat -ano | Select-String ":5001.*LISTENING" | ForEach-Object { ($_ -split "\s+")[-1] }) | Select-Object -First 1
+if ($pid) { taskkill /F /PID $pid }
+# Bat loop restarts within 5-7 seconds automatically
+```
+
+---
+
 ## Overview
 
-**V.E.T. Dashboard Executive Report** is a specialized executive dashboard for TDA (Tactical Data Analytics) initiatives with a Dallas POC (Point of Contact) focus. It provides real-time visibility into project health, implementation status, and critical issues requiring immediate attention.
+**V.E.T. Dashboard Executive Report** is a specialized executive dashboard for TDA (Tactical Data Analytics) initiatives with a Dallas VET (formerly "Dallas POC") focus. It provides real-time visibility into project health, implementation status, and critical issues requiring immediate attention.
 
 ### Key Differentiators from TDA Insights
 

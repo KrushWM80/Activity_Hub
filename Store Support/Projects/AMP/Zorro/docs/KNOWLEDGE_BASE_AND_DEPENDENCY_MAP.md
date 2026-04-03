@@ -20,7 +20,9 @@
 | **Voice** | Jenny Neural (en-US) via edge-tts |
 | **Fallback Voice** | SAPI5 (Microsoft David) when VPN blocks edge-tts |
 | **Output Dir** | `output/Audio/` |
-| **Automation** | `Automation/start_zorro_24_7.bat` (auto-restart) |
+| **Automation** | `Automation/start_zorro_24_7.bat` (port-kill block + auto-restart loop) |
+| **Scheduled Task** | `Activity_Hub_Zorro_AutoStart` — on logon |
+| **Monitor** | `continuous_monitor.ps1` — every 5 min backup check |
 | **Health Check** | `MONITOR_AND_REPORT.ps1` (daily 6 AM, port 8888 check) |
 | **BQ Source** | `wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2` |
 | **BQ Filter** | `Message_Type = 'Merchant Message' AND Status = 'Review for Publish review - No Comms'` |

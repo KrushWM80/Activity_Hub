@@ -24,6 +24,7 @@ $Services = @(
     @{Name="JobCodes"; Port=8080; HealthURL="http://10.97.114.181:8080"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_jobcodes_server_24_7.bat"},
     @{Name="ProjectsInStores"; Port=8001; HealthURL="http://localhost:8001"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_projects_in_stores_24_7.bat"},
     @{Name="TDAInsights"; Port=5000; HealthURL="http://localhost:5000"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_tda_insights_24_7.bat"},
+    @{Name="VETDashboard"; Port=5001; HealthURL="http://localhost:5001"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_vet_dashboard_24_7.bat"},
     @{Name="StoreDashboard"; Port=8081; HealthURL="http://localhost:8081"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_store_dashboard_24_7.bat"},
     @{Name="MeetingPlanner"; Port=8090; HealthURL="http://localhost:8090"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_meeting_planner_24_7.bat"},
     @{Name="Zorro"; Port=8888; HealthURL="http://localhost:8888"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_zorro_24_7.bat"}

@@ -698,7 +698,7 @@
         <!-- Summary Stats -->
         <div class="summary-section" id="summary-section">
             <div class="stat-card">
-                <div class="stat-label">Total Projects</div>
+                <div class="stat-label">Total Initiatives</div>
                 <div class="stat-value" id="stat-projects">0</div>
             </div>
             <div class="stat-card">
@@ -1441,133 +1441,162 @@
                 if (header) header.style.display = 'none';
                 
                 // Process each ownership → phase section
-                for (const section of sections) {
-                    console.log(`[PPT] Processing section: ${section.ownership} / ${section.phase}, items: ${section.rows.length}`);
-                    if (section.rows.length === 0) continue;
+                // COMBINE small sections onto the same slide when they fit
+                
+                // Helper: build HTML for one section's page (banner + table)
+                function buildSectionPageHtml(phase, pageRows) {
+                    const columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'WM Week', '# of Stores', 'Executive Notes'];
+                    let html = `<div style="margin-bottom: 10px;">`;
+                    html += `<div style="background: #3B82F6; color: white; padding: 10px 20px; font-size: 16px; font-weight: 600; text-align: center; border-radius: 4px 4px 0 0;">Phase: ${phase}</div>`;
+                    html += `<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
+                                <thead style="background-color: #F5F5F5; border-bottom: 2px solid #E5E5E5;">
+                                <tr>`;
+                    columns.forEach(col => {
+                        html += `<th style="padding: 16px 24px; text-align: left; font-weight: 600; color: #212121; white-space: nowrap;">${col}</th>`;
+                    });
+                    html += '</tr></thead><tbody>';
                     
-                    // Pack rows for this section
-                    const pages = packRowsIntoPages(section.rows);
-                    console.log(`[PPT] Packed ${section.ownership}/${section.phase} into ${pages.length} pages`);
-                    
-                    for (let pageIdx = 0; pageIdx < pages.length; pageIdx++) {
-                        const pageRows = pages[pageIdx];
-                        const pageNum = screenshots.length + 1;
-                        totalPages++;
-                        
-                        btn.textContent = `[Wait] Capturing ${section.ownership} / ${section.phase} page ${pageIdx + 1}/${pages.length}...`;
-                        
-                        // Render this phase/page's table with optimized columns
-                        const columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'WM Week', '# of Stores', 'Executive Notes'];
-                        let html = `<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
-                                    <thead style="background-color: #F5F5F5; border-bottom: 2px solid #E5E5E5;">
-                                    <tr>`;
+                    pageRows.forEach(row => {
+                        html += '<tr>';
                         columns.forEach(col => {
-                            html += `<th style="padding: 16px 24px; text-align: left; font-weight: 600; color: #212121; white-space: nowrap;">${col}</th>`;
-                        });
-                        html += '</tr></thead><tbody>';
-                        
-                        pageRows.forEach(row => {
-                            html += '<tr>';
-                            columns.forEach(col => {
-                                let value = row[col] ?? '';
-                                let cellStyle = 'padding: 16px 24px; border-bottom: 1px solid #E5E5E5; text-align: left;';
-                                
-                                if (col === 'Health Status') {
-                                    const status = String(value).toLowerCase();
-                                    let badgeBg = '#f0f0f0';
-                                    let badgeColor = '#333';
-                                    if (status.includes('on track')) {
-                                        badgeBg = 'rgba(16, 124, 16, 0.2)';
-                                        badgeColor = '#107C10';
-                                    } else if (status.includes('at risk')) {
-                                        badgeBg = 'rgba(247, 99, 12, 0.2)';
-                                        badgeColor = '#F7630C';
-                                    } else if (status.includes('off track')) {
-                                        badgeBg = 'rgba(220, 53, 69, 0.2)';
-                                        badgeColor = '#DC3545';
-                                    }
-                                    html += `<td style="${cellStyle}"><span style="display: inline-block; padding: 4px 10px; background-color: ${badgeBg}; color: ${badgeColor}; border-radius: 12px; font-weight: 600; font-size: 12px; white-space: nowrap;">${value}</span></td>`;
-                                } else if (col === 'Phase') {
-                                    html += `<td style="${cellStyle}"><span style="display: inline-block; padding: 4px 10px; background-color: #DBEAFE; color: #1E3A8A; border-radius: 4px; font-weight: 500; font-size: 12px;">${value}</span></td>`;
-                                } else if (col === '# of Stores') {
-                                    html += `<td style="${cellStyle} font-weight: 600; color: #0071CE;">${value}</td>`;
-                                } else if (col === 'Initiative - Project Title') {
-                                    const projectId = row['Project ID'];
-                                    if (projectId) {
-                                        html += `<td style="${cellStyle}"><a href="https://hoops.wal-mart.com/intake-hub/projects/${projectId}" style="color: #0071CE; text-decoration: none; font-weight: 500;">${value}</a></td>`;
-                                    } else {
-                                        html += `<td style="${cellStyle}">${value}</td>`;
-                                    }
+                            let value = row[col] ?? '';
+                            let cellStyle = 'padding: 16px 24px; border-bottom: 1px solid #E5E5E5; text-align: left;';
+                            
+                            if (col === 'Health Status') {
+                                const status = String(value).toLowerCase();
+                                let badgeBg = '#f0f0f0';
+                                let badgeColor = '#333';
+                                if (status.includes('on track')) {
+                                    badgeBg = 'rgba(16, 124, 16, 0.2)';
+                                    badgeColor = '#107C10';
+                                } else if (status.includes('at risk')) {
+                                    badgeBg = 'rgba(247, 99, 12, 0.2)';
+                                    badgeColor = '#F7630C';
+                                } else if (status.includes('off track')) {
+                                    badgeBg = 'rgba(220, 53, 69, 0.2)';
+                                    badgeColor = '#DC3545';
+                                }
+                                html += `<td style="${cellStyle}"><span style="display: inline-block; padding: 4px 10px; background-color: ${badgeBg}; color: ${badgeColor}; border-radius: 12px; font-weight: 600; font-size: 12px; white-space: nowrap;">${value}</span></td>`;
+                            } else if (col === 'Phase') {
+                                html += `<td style="${cellStyle}"><span style="display: inline-block; padding: 4px 10px; background-color: #DBEAFE; color: #1E3A8A; border-radius: 4px; font-weight: 500; font-size: 12px;">${value}</span></td>`;
+                            } else if (col === '# of Stores') {
+                                html += `<td style="${cellStyle} font-weight: 600; color: #0071CE;">${value}</td>`;
+                            } else if (col === 'Initiative - Project Title') {
+                                const projectId = row['Project ID'];
+                                if (projectId) {
+                                    html += `<td style="${cellStyle}"><a href="https://hoops.wal-mart.com/intake-hub/projects/${projectId}" style="color: #0071CE; text-decoration: none; font-weight: 500;">${value}</a></td>`;
                                 } else {
                                     html += `<td style="${cellStyle}">${value}</td>`;
                                 }
-                            });
-                            html += '</tr>';
+                            } else {
+                                html += `<td style="${cellStyle}">${value}</td>`;
+                            }
                         });
-                        
-                        
-                        html += '</tbody></table>';
-                        
-                        console.log(`[PPT] Section: ${section.ownership} / ${section.phase}, Page: ${pageIdx + 1}, Rows: ${pageRows.length}, HTML length: ${html.length}`);
-                        
-                        wrapper.innerHTML = html;
-                        paginationControls.style.display = 'none';
-                        
-                        // Add phase banner only (no TDA Ownership banner)
-                        let titleHtml = `<div style="background: #3B82F6; color: white; padding: 10px 20px; font-size: 16px; font-weight: 600; text-align: center; border-radius: 4px 4px 0 0;">Phase: ${section.phase}</div>`;
-                        wrapper.innerHTML = titleHtml + wrapper.innerHTML;
-                        wrapper.style.display = 'block';
-                        wrapper.style.visibility = 'visible';
-                        wrapper.style.opacity = '1';
-                        
-                        // Ensure wrapper is visible and has layout
-                        console.log(`[PPT] Wrapper element:`, wrapper, `offsetHeight: ${wrapper.offsetHeight}, innerHTML length: ${wrapper.innerHTML.length}`);
-                        
-                        // Don't zoom - it can break html2canvas
-                        // document.body.style.zoom = '1.3';
-                        
-                        // Wait for DOM to fully render
-                        await new Promise(resolve => setTimeout(resolve, 800));
-                        
-                        // Verify wrapper has content before capture
-                        const tableElement = wrapper.querySelector('table');
-                        if (!tableElement) {
-                            console.error(`[PPT ERROR] No table element found in wrapper!`);
-                            throw new Error(`No table element found for ${section.ownership}/${section.phase} page ${pageIdx + 1}`);
-                        }
-                        console.log(`[PPT] Table element found, rows in tbody: ${tableElement.querySelectorAll('tbody tr').length}`);
-                        
-                        // Capture the wrapper with specific options
-                        let canvas;
-                        try {
-                            canvas = await html2canvas(wrapper, {
-                                scale: 1.5,
-                                backgroundColor: '#ffffff',
-                                allowTaint: true,
-                                useCORS: true,
-                                scrollY: 0,
-                                scrollX: 0
-                            });
-                            console.log(`[PPT] Screenshot captured successfully, canvas size: ${canvas.width}x${canvas.height}`);
-                        } catch (captureError) {
-                            console.error(`[PPT ERROR] html2canvas failed:`, captureError);
-                            throw new Error(`Screenshot capture failed for ${section.ownership}/${section.phase}: ${captureError.message}`);
-                        }
-                        
-                        // Reset zoom
-                        document.body.style.zoom = '1';
-                        
-                        screenshots.push({
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    return html;
+                }
+                
+                // First pass: build all section page blocks
+                const slideBlocks = [];
+                for (const section of sections) {
+                    if (section.rows.length === 0) continue;
+                    const pages = packRowsIntoPages(section.rows);
+                    console.log(`[PPT] Packed ${section.ownership}/${section.phase} into ${pages.length} pages`);
+                    for (let pageIdx = 0; pageIdx < pages.length; pageIdx++) {
+                        slideBlocks.push({
                             ownership: section.ownership,
                             phase: section.phase,
-                            page: pageIdx + 1,
-                            header: `${section.ownership} — ${section.phase}`,
-                            imageData: canvas.toDataURL('image/png')
+                            pageIdx,
+                            totalPages: pages.length,
+                            rows: pages[pageIdx]
                         });
-                        
-                        // Small delay between pages
-                        await new Promise(resolve => setTimeout(resolve, 200));
                     }
+                }
+                
+                // Second pass: combine small blocks onto same slide, measure to fit
+                const MAX_SLIDE_PX = 720;
+                let pendingHtml = '';
+                let pendingLabels = [];
+                
+                async function captureSlide(htmlContent, labels) {
+                    wrapper.innerHTML = htmlContent;
+                    wrapper.style.display = 'block';
+                    wrapper.style.visibility = 'visible';
+                    wrapper.style.opacity = '1';
+                    paginationControls.style.display = 'none';
+                    
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    const tableEl = wrapper.querySelector('table');
+                    if (!tableEl) throw new Error(`No table found for slide: ${labels.join(', ')}`);
+                    
+                    const canvas = await html2canvas(wrapper, {
+                        scale: 1.5,
+                        backgroundColor: '#ffffff',
+                        allowTaint: true,
+                        useCORS: true,
+                        scrollY: 0,
+                        scrollX: 0
+                    });
+                    console.log(`[PPT] Captured slide [${labels.join(' + ')}], canvas: ${canvas.width}x${canvas.height}`);
+                    
+                    totalPages++;
+                    screenshots.push({
+                        ownership: labels[0],
+                        phase: labels.join(' + '),
+                        page: totalPages,
+                        header: labels.join(' + '),
+                        imageData: canvas.toDataURL('image/png')
+                    });
+                    
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+                
+                for (let i = 0; i < slideBlocks.length; i++) {
+                    const block = slideBlocks[i];
+                    const blockHtml = buildSectionPageHtml(block.phase, block.rows);
+                    const label = `${block.phase}` + (block.totalPages > 1 ? ` (${block.pageIdx + 1}/${block.totalPages})` : '');
+                    
+                    btn.textContent = `[Wait] Processing ${label}...`;
+                    
+                    if (!pendingHtml) {
+                        // First block on this slide
+                        pendingHtml = blockHtml;
+                        pendingLabels = [label];
+                        continue;
+                    }
+                    
+                    // Try combining with pending — measure if it fits
+                    const testHtml = pendingHtml + blockHtml;
+                    wrapper.innerHTML = testHtml;
+                    wrapper.style.display = 'block';
+                    wrapper.style.visibility = 'visible';
+                    wrapper.style.opacity = '1';
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                    const combinedHeight = wrapper.offsetHeight;
+                    console.log(`[PPT] Combined height for [${pendingLabels.join('+')} + ${label}]: ${combinedHeight}px (max: ${MAX_SLIDE_PX})`);
+                    
+                    if (combinedHeight <= MAX_SLIDE_PX) {
+                        // Fits — combine onto same slide
+                        pendingHtml = testHtml;
+                        pendingLabels.push(label);
+                    } else {
+                        // Doesn't fit — capture pending, start new slide with this block
+                        btn.textContent = `[Wait] Capturing ${pendingLabels.join(' + ')}...`;
+                        await captureSlide(pendingHtml, pendingLabels);
+                        pendingHtml = blockHtml;
+                        pendingLabels = [label];
+                    }
+                }
+                
+                // Capture remaining slide
+                if (pendingHtml) {
+                    btn.textContent = `[Wait] Capturing ${pendingLabels.join(' + ')}...`;
+                    await captureSlide(pendingHtml, pendingLabels);
                 }
                 
                 // Restore hidden elements
@@ -1607,7 +1636,7 @@
                     throw new Error(`Backend error: ${response.status} - ${errorText.substring(0, 200)}`);
                 }
                 
-                // Download the PPT file
+                // Download the PPT file as blob
                 const contentDisposition = response.headers.get('content-disposition');
                 let filename = 'VET_Executive_Report.pptx';
                 if (contentDisposition) {

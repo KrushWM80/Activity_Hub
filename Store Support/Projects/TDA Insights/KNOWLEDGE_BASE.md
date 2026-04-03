@@ -459,17 +459,46 @@ python backend_simple.py
 
 ---
 
-## Scheduled Tasks
+## Automation & Recovery
+
+### Scheduled Tasks
 
 | Task Name | Schedule | Purpose |
 |-----------|----------|--------|
-| `Activity_Hub_TDA_AutoStart` | On system start | Starts backend_simple.py on port 5000 (runs as SYSTEM) |
-| `Activity_Hub_TDA_Weekly_Email` | Thursdays 11:00 AM | Runs send_weekly_report.py → BQ fetch → PPT → Outlook email |
+| `Activity_Hub_TDA_AutoStart` | On logon | Starts `start_tda_insights_24_7.bat` → `backend_simple.py` on port 5000 |
+| `Activity_Hub_TDA_Daily_Email` | Daily 6:00 AM | Runs `send_tda_weekly_email.bat` |
+| `Activity_Hub_TDA_Weekly_Email` | Thursdays 11:00 AM | Runs `send_tda_weekly_email.bat` → BQ → PPT → Outlook |
+| `Activity_Hub_TDA_Watchdog` | Every 5 minutes | Checks port 5000 → auto-restarts `backend_simple.py` if down. Logs to `watchdog.log` |
 
-Batch files in `Automation/`:
-- `start_tda_insights_24_7.bat` — Server auto-start with restart loop
-- `send_tda_weekly_email.bat` — Weekly email wrapper with logging to `weekly_email.log`
+### Bat Files (`Automation/`)
+- `start_tda_insights_24_7.bat` — Port-kill block + restart loop. Primary crash recovery (5-7 sec downtime)
+- `send_tda_weekly_email.bat` — Checks port 5000 is UP before running report; starts backend if down, waits 30s
 - `create_weekly_email_task.ps1` — Admin script to recreate the scheduled task
+
+### Recovery Layers
+1. **Bat restart loop** — primary (5-7 sec recovery on crash)
+2. **TDA Watchdog task** — backup, fires every 5 min if bat loop itself dies
+3. **Continuous monitor** (`continuous_monitor.ps1`) — checks all 7 services every 5 min; only launches new bat if bat process is not already running
+4. **Email fallback** — `send_tda_weekly_email.bat` starts backend automatically if port 5000 is down at email time
+
+### ⚠️ NEVER use `Stop-Process -Name python`
+This kills ALL Python processes on the machine — all 7 services go down.
+
+**Safe way to restart only TDA (port 5000):**
+```powershell
+$p = (netstat -ano | Select-String ":5000.*LISTENING" | ForEach-Object { ($_ -split "\s+")[-1] }) | Select-Object -First 1
+if ($p) { taskkill /F /PID $p }
+# Bat loop restarts automatically within 5-7 seconds
+```
+
+### Adding/Changing This Service
+If the port, entry point, or bat file changes, update ALL of:
+1. `Automation/start_tda_insights_24_7.bat`
+2. `Automation/register_tasks_cmd.bat`
+3. `continuous_monitor.ps1` services array
+4. `MONITOR_AND_REPORT.ps1` services list
+5. `Documentation/KNOWLEDGE_HUB.md` Active Services table
+6. This file
 
 ---
 

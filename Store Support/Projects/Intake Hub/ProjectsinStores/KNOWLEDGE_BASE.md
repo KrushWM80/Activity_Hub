@@ -1,5 +1,41 @@
 # 📚 Knowledge Base & Dependency Mapping
 
+## ⚠️ Automation & Recovery (April 2, 2026)
+
+### Scheduled Tasks
+
+| Task Name | Schedule | Purpose |
+|-----------|----------|--------|
+| `Activity_Hub_ProjectsInStores_AutoStart` | On logon | Starts `start_projects_in_stores_24_7.bat` → backend on port 8001 |
+
+### Bat Files (`Automation/`)
+- `start_projects_in_stores_24_7.bat` — Port-kill block + restart loop. Primary crash recovery (5-7 sec downtime)
+
+### Recovery Layers
+1. **Bat restart loop** — primary (5-7 sec recovery on crash)
+2. **Continuous monitor** (`continuous_monitor.ps1`) — checks all 7 services every 5 min
+
+### ⚠️ NEVER use `Stop-Process -Name python`
+This kills ALL Python processes on the machine — all 7 services go down.
+
+**Safe way to restart only Projects in Stores (port 8001):**
+```powershell
+$p = (netstat -ano | Select-String ":8001.*LISTENING" | ForEach-Object { ($_ -split "\s+")[-1] }) | Select-Object -First 1
+if ($p) { taskkill /F /PID $p }
+# Bat loop restarts automatically within 5-7 seconds
+```
+
+### Adding/Changing This Service
+If the port, entry point, or bat file changes, update ALL of:
+1. `Automation/start_projects_in_stores_24_7.bat`
+2. `Automation/register_tasks_cmd.bat`
+3. `continuous_monitor.ps1` services array
+4. `MONITOR_AND_REPORT.ps1` services list
+5. `Documentation/KNOWLEDGE_HUB.md` Active Services table
+6. This file
+
+---
+
 ## System Overview
 
 **Projects in Stores Dashboard** is a full-stack web application that displays project inventory across Walmart stores using real-time data from Google BigQuery.

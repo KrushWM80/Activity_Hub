@@ -1,10 +1,25 @@
 {
   "week": 10,
   "fy": 2027,
-  "cached_at": "2026-04-01T08:26:53.918615",
-  "event_count": 11,
-  "review_no_comm_count": 11,
-  "summarized_count": 11,
+  "cached_at": "2026-04-02T16:53:59.610036",
+  "event_count": 41,
+  "review_no_comm_count": 41,
+  "status_breakdown": [
+    {
+      "status": "Review for Publish review - No Comms",
+      "count": 41
+    },
+    {
+      "status": "Review for Publish review - Pending",
+      "count": 1
+    },
+    {
+      "status": "Denied - Pending",
+      "count": 1
+    }
+  ],
+  "total_excl_denied": 42,
+  "summarized_count": 35,
   "events_with_summaries": [
     {
       "event_id": "7b53a0cd-cb56-4325-928e-d77d71603689",
@@ -21,11 +36,32 @@
       "summary_text": "Dept. 46: Inkbox is exiting, so pull all product now and process dispose claims in the Claims app by end of week 11 to receive credit."
     },
     {
+      "event_id": "a795811a-af3c-4d23-bd14-24627f4f1c68",
+      "store_area": "Asset Protection",
+      "title": "Easter Safety Sprint",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "The Easter Safety Sprint runs April 3 through 6. With holiday traffic picking up, let\u2019s keep the store safe and ready. Do quick safety sweeps, check and restock spill stations and\u00a0PPE, and review spring weather readiness on every shift. Be sure to share your participation on Workvivo with the hashtag eastersafety."
+    },
+    {
+      "event_id": "075e9d2f-b6e8-4b6e-8398-86918503bf17",
+      "store_area": "Asset Protection",
+      "title": "Fresh Step and Scoop Away Cat Litter Move to HVDC Deliveries",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Backroom and Department 8:\u00a0Starting week 11, select Fresh Step and Scoop Away items move to HVDC\u00a0delivery, freeing RDC capacity for automation; most shipments arrive on full pallets, with occasional mixed pallets."
+    },
+    {
       "event_id": "a71c7feb-75c8-4fea-8594-b04fcb25e4e4",
       "store_area": "Asset Protection",
       "title": "Handling Excess Pennies",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Handling excess pennies.\n\nAs cash transactions in stores are now rounded to the nearest nickel, associates need to monitor the amount of pennies in registers and self-checkouts, and know how to process the excess pennies. This message includes instruction on dealing with excess pennies."
+      "summary_text": "Front End: As cash transactions in stores are now rounded to the nearest nickel, associates need to monitor the amount of pennies in registers and self-checkouts and know how to process the excess pennies. This message includes instruction on dealing with excess pennies."
+    },
+    {
+      "event_id": "a6af6d4b-0e02-4e56-b44e-d7008670e059",
+      "store_area": "Asset Protection",
+      "title": "Profit Protection Framework: April Modular Updates (Action Required)",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Profit Protection Framework: April Modular Updates (Action Required)\n\nProfit Protection is expanding from April through June. Use the lookup tool to confirm whether it applies to your store, then unlock the identified categories and set modulars as drawn, using the required AP fixtures where noted."
     },
     {
       "event_id": "10690871-30a6-4259-b53e-9b36e746a35c",
@@ -33,6 +69,13 @@
       "title": "Dept. 12: Moving Boxes Feature And Inventory",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Dept. 12: An 8-foot Moving Supplies train is rolling out to 2,500 stores in April through September, and regular deep out scans on boxes are needed to maintain in-stock for customers."
+    },
+    {
+      "event_id": "37f46eb1-7bf2-49f9-a14c-531d61d22e08",
+      "store_area": "Backroom and Claims",
+      "title": "Best Practices-Pallet Use",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Backroom: Ensure pooled pallets are used only for freight. Do not use them for displays or storage. Return them promptly to support operations, reduce costs and maintain compliance."
     },
     {
       "event_id": "66817c03-5c67-4329-9a61-8ca8a00653dd",
@@ -49,25 +92,102 @@
       "summary_text": "Dept. 46: Expect a planned L\u2019Oreal inventory build through early April to protect in-stocks, then a gradual return to normal by early June with flow stabilizing by July 4."
     },
     {
+      "event_id": "c4e2b1cb-cb7c-422b-891c-3cc848ebcda1",
+      "store_area": "Consumables",
+      "title": "Dept. 79: Cat. 172 Fresh Baby Cooler Reset",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 79: Cat. 172 reset adds Once Upon a Farm refrigerated meat pouches to the Fresh Baby cooler and requires stores to make space now, request any missing shelves and ensure the full assortment is stocked and represented."
+    },
+    {
+      "event_id": "0c930659-2c81-414e-848b-5a916d11c07e",
+      "store_area": "Consumables",
+      "title": "Dept. 79: Parent\u2019s Choice and Modern Moments Relaunch",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Cat. 90 and Cat. 95 will fully reset in week 11, relaunching Parent\u2019s Choice and Modern Moments in Cat. 90 and introducing a new toddler brand in Cat. 95."
+    },
+    {
+      "event_id": "2b2913c7-cc0d-454f-a5dd-1a70b2a13242",
+      "store_area": "Consumables",
+      "title": "Dept. 8: Pet Health and Wellness \u2014 Pet Honesty Permanent Fixture",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Week 7 Pet Health and Wellness modulars in Categories 105, 73, 75 and 15 received Pet Honesty permanent fixtures that must be set and stocked to maintain modular integrity."
+    },
+    {
+      "event_id": "3bccfd05-7956-404b-a1ce-47a1de84336b",
+      "store_area": "Entertainment",
+      "title": "Dept. 72: Week 10 Samsung TV Item Swap",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 72 will receive new 2026 Samsung 43\" and 50\" TVs in week 9-10 to support a week 10 modular item swap, with clearance markdowns on the outgoing 2025 models and setup of the new models on the Medium TV modular."
+    },
+    {
+      "event_id": "62d50817-0d95-49cd-8151-6eee7e21e4da",
+      "store_area": "Fashion",
+      "title": "Dept. 23: Get Ready for a Wrangler Rollback",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Wrangler cargo shorts are going on Rollback to just $18.98, so we will send extra inventory. Stores are encouraged to keep their Wrangler cargo shorts pallet clean and well-stocked."
+    },
+    {
+      "event_id": "f89f089c-b2de-4bb8-92eb-ff3930e83bd3",
+      "store_area": "Fashion",
+      "title": "Dept. 32: Guidelines for Week 10 Fine Jewelry Reset",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Due to a\u00a0delay in planogram booklets, we are sending guidelines for setting the week 10 modular in Department 32 with a reminder that we are reducing our assortment for a cleaner, more elevated shopping experience."
+    },
+    {
+      "event_id": "0d6ee13f-b4a2-4720-8c77-f007f12b545f",
+      "store_area": "Fashion",
+      "title": "Dept. 32: Jewelry Customer Service Number is Changing",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "The Jewelry customer service phone number has changed to 501-268-4271, extension 6047."
+    },
+    {
+      "event_id": "84cb1bca-c1f1-4c93-8977-3864ced20e59",
+      "store_area": "Fashion",
+      "title": "Dept. 34: Women's Swimwear S1 Markdown Strategy ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 34 has a new markdown strategy for Women's Swimwear this year, with in-season markdowns and resets so\u00a0stores can refresh the assortment and highlight trends."
+    },
+    {
       "event_id": "674e0c1a-9d6c-4c62-a631-3a78122a9dc1",
       "store_area": "Food",
       "title": "Dept. 90: Cream Cheese and\u00a0Ricotta Cheese Move to Cheese Mod",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 90:\u00a0There is currently a supply shortage of Philadelphia No Bake Cheesecake. In Q3, an additional assortment will be launched which should improve the situation.\n\nDept. 90:\u00a0In week 9 (March 28 \u2013 April 3), ricotta cheese moved from the Cultured modular to the Cheese modular."
+      "summary_text": "Department 90: There is currently a supply shortage of Philadelphia No Bake Cheesecake. In Q3, an additional assortment will be launched which should improve the situation.\n\nDepartment 90: In week 9 (March 28 \u2013 April 3), ricotta cheese moved from the Cultured modular to the Cheese modular."
+    },
+    {
+      "event_id": "894f9e13-1e5d-45ef-9f79-f43d6a222879",
+      "store_area": "Fresh",
+      "title": "Dept. 93: Easter Week is Here!",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Easter Week is Here! Let\u2019s Finish Strong\n\nEaster week is here and we need to deliver a strong finish for customers. Focus on Easter favorites: turkeys, hams, Cornish hens, boneless rib roasts and whole tenderloins. Keep bunkers full and stocked throughout the day to drive sales. Hold steady on Easter hams: The Saturday before Easter is one of the biggest sales days of the season with the average store turning the Marketside ham bunker about five times, so stock strategically. Avoid early markdowns on fresh turkeys: Merchants will monitor sell-through and support post-Easter pricing as needed, with whole fresh turkeys dropping to fifty cents per pound after Easter. Finally, protect quality with tight temperature control: Target 30 degrees; at 34 degrees, shelf life starts to drop, losing one day for each degree the temp raises. If browning or leaks are visible, check the temperatures. Review the time-lapse temperature video for examples."
+    },
+    {
+      "event_id": "9771b539-118b-45aa-820f-5c1cca587588",
+      "store_area": "Fresh",
+      "title": "Dept. 98 & 81: WK10 Bakery & Bread Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 98: Fresh Bakery Easter Sell-Through,\u00a0Markdowns and Inventory Management\n\nKeep Easter items full through Sunday, April 5, then on Monday, April 6 transition back to your core assortment and set strong everyday features. Adjust production levels down so not to overproduce and be sure to keep your presentation clean during the conversion. Shift features to high-velocity strong core sellers. Consider featuring Freshness Guaranteed 10-count cookies, 8-count cinnamon rolls, and 6-inch cheesecakes and 4-count\u00a0Marketside muffins.\n\nDept. 81: Commercial Bread Post-Easter Recovery\n\nReturn features and displays back to normal levels on Monday, April 6. Work with your DSD suppliers to adjust bread/roll inventory levels down according to your everyday customer demand. Finally, be sure to keep the Brown & Serve Rolls home location full, and don't over stock."
     },
     {
       "event_id": "5e5ebcae-1ac3-42b9-a90c-71d6216b2d08",
       "store_area": "Frontend",
       "title": "Frontend: How to Prevent Financial Services Scams and Fraud",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Preventing fraud and protecting Financial Services customers is a critical part of your Money Center associate's job. This message gives associates resources for learning to prevent Financial Services scams and fraud."
+      "summary_text": "Front End: Preventing fraud and protecting Financial Services customers is a critical part of your Money Center associate's job. This message gives associates resources for learning to prevent Financial Services scams and fraud."
+    },
+    {
+      "event_id": "9447d6b1-e807-4b25-b046-498bcea71801",
+      "store_area": "Hardlines",
+      "title": "Dept. 9: Cat 360 Ball Bin Simplification",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Beginning in week 14, stores will transition ball bin replenishment to two core $8.88 items shipped in traditional case packs (no PDQ shippers), with higher shelf caps to keep bins full and replenished through the system."
     },
     {
       "event_id": "182f632a-7381-42bb-a512-55435a8f0b7e",
       "store_area": "Hardlines",
       "title": "Dept. 9: Speedo Week 10 Launch Kit",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Dept. 9: Launches\u00a0Speedo in week 10, and store associates should set the shipped signage kit on time, following the included instructions, to ensure a clean, easy-to-shop presentation."
+      "summary_text": "Dept. 9: Launches the Speedo brand in week 10, and store associates should set the shipped\u00a0signage kit on time, following the included instructions, to ensure a clean, easy-to-shop presentation."
     },
     {
       "event_id": "16d66431-5236-40a5-aebd-ca5e757b73de",
@@ -77,12 +197,112 @@
       "summary_text": "Dept. 9: Week 10 GM Pad: Delays in Water Sports, Swim, Pools and Water Toys see the table for impacted items and get-well dates."
     },
     {
+      "event_id": "cc88b599-42ed-4942-819b-7ef01c12d026",
+      "store_area": "Home",
+      "title": "Dept. 14: BHG Flatware Sets on the Summer Home Pad",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Department 14, some store modulars did not include BHG flatware, so our Weekly Message includes an update planogram and notes for properly setting the modular."
+    },
+    {
+      "event_id": "c76237dc-8f7a-49f5-b7ab-f93398ccfdda",
+      "store_area": "Home",
+      "title": "Dept. 14: Glass Bakeware Instock Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 14 continues to experience inventory outs for Glass Bakeware, so stores received supplemental inventory."
+    },
+    {
+      "event_id": "0a41cffd-0d25-40da-b6ca-f7976d0ba744",
+      "store_area": "Home",
+      "title": "Dept. 14: Mainstays Metal Bakeware Instocks",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Supplemental Metal Bakeware inventory is arriving in stores for Department 14."
+    },
+    {
+      "event_id": "7ddc1a7d-6371-4a17-9ac0-ea2a1a35b6d3",
+      "store_area": "People",
+      "title": "AI Tip of the Week",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Keep Calm and Ask My Assistant - AI Tip of the Week\n\nEnter a real, specific problem into My Assistant and ask for solutions. AI works better when given a real issue, not just generic questions.\n\nExample: \"Our store has long checkout lines between 5-7 p.m. and limited staff. What are five practical ways we can improve checkout flow without adding more associates?\""
+    },
+    {
+      "event_id": "945935d6-b85d-447c-b3f4-24856e949309",
+      "store_area": "Total Store",
+      "title": "Associate to Driver Program: Applications Now Open",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Total Store: Associate to Driver applications are open April 4-10. Selected associates begin training July 14 and receive a Private Fleet driver offer upon graduation. Review the toolkit before applying."
+    },
+    {
       "event_id": "fbee7e10-b32e-4ad5-8e1e-200d6839c5d3",
       "store_area": "Total Store",
       "title": "Balancing Over-the-Phone Ticket Support",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Balancing Over-the-Phone Ticket Support.\n\nAll associates who answer the store phone should understand that technology support agents may call regarding open incidents or tickets. After reading this message, phone operators will know how to authenticate and validate if the person calling is a Walmart technology agent. They will also learn how to report suspicious activity."
+      "summary_text": "Front End:\u00a0All associates who answer the store phone should understand that technology support agents may call regarding open incidents or tickets. After reading this message, phone operators will know how to authenticate and validate if the person calling is a Walmart technology agent. They will also learn how to report suspicious activity."
+    },
+    {
+      "event_id": "19dfd63b-2af6-4a00-984b-f3636a5e47c3",
+      "store_area": "Total Store",
+      "title": "Dept. 16: Patio Furniture: New Brands and Signage Kits",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 16: Highlight new patio brands with priority floor sets, set digital extended-assortment signage with clear pricing, and stock required Lawn and\u00a0Garden bag patches. Order more through MyGNFR, if needed."
+    },
+    {
+      "event_id": "1bfe48d1-e948-4e1c-a5c7-57708d50282a",
+      "store_area": "Total Store",
+      "title": "New Restroom Disinfectant and Soap Dispenser Test Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Backroom:\n\nRestroom disinfectant is shifting from Oxivir to TB disinfectant. Orders for Oxivir have stopped, and remaining supply should be used before fully transitioning by April 15 or as inventory runs out.\n\nThe Diversey soap dispenser test has ended. Dispensers in select stores should be removed and replaced with Ecolab units. Stores should confirm their status and follow up with Ecolab if replacements are not complete. Use the lookup tool on the Weekly Message page to verify if your store was part of this test."
+    },
+    {
+      "event_id": "0373c53d-ee14-4648-8d6d-1e672a93515a",
+      "store_area": "Total Store",
+      "title": "Open Office Hours for the New Incident Intake",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Walmart Claims Services is hosting open office hours to help with the new Incident Intake system, which replaces the Accident app and IRS. Join Mondays and Thursdays from April 6 through April 30, 2 to 3 p.m. Central. Drop in anytime with questions or issues."
+    },
+    {
+      "event_id": "561f0e7f-ad1e-4095-8880-e044af317009",
+      "store_area": "Total Store",
+      "title": "Total Fresh: Prep for April Fresh Cost Inventory",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Prep for April Fresh Cost Inventory\n\nFresh Cost Inventory is Tuesday, April 28. There are three tasks for salaried managers to complete. First, ensure\u00a0proper staffing is in place to conduct Fresh Cost Inventory counts and provide post-inventory customer service. Second, visit the Fresh OneWalmart page. Here, you'll need to access the Ops Portal Inventory Tracking Report (ITR) to identify any potential errors, and develop a plan to resolve them. At the bottom of the page, you'll find your beginning inventory numbers (which are\u00a0updated the Saturday prior to Cost Inventory). Finally, refer to the\u00a0Cost Inventory section of the Fresh Better Way guide to learn more about inventory preparation, how to count, digital finalization rules for truck invoices, the finalization process, the inventory schedule and proper execution. If you have any process questions, email\u00a0eomifs@email.wal-mart.com. For technical issues, submit a ticket in the\u00a0MyWalmart app under Facility Management and select the Walmart Cost Inventory app."
     }
   ],
-  "events_without_summary": []
+  "events_without_summary": [
+    {
+      "event_id": "147a4733-5810-4d78-985f-e60c21170282",
+      "title": "From Baskets to Basics \u2013 Let\u2019s Transition Strong!",
+      "area": "Digital",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "a62c2849-9365-4282-8cdb-407a25bd141a",
+      "title": "Fashion: Markdown and Clearance Standards",
+      "area": "Fashion",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "2ed13bde-9e02-4d92-8b2a-8b5bfb406ab5",
+      "title": "Fashion: Price Change Visibility in Fashion Intelligence Hub",
+      "area": "Fashion",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "915696ad-38ad-4cd8-9efc-88a65950af38",
+      "title": "Fashion: RFID Confinement Bay Now Available",
+      "area": "Fashion",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "26256387-02ad-46c2-8839-83dd63a04de7",
+      "title": "Dept. 80: Deli Meat & Cheese",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "706e9ff8-ee0e-45e7-81bd-59765948c7b6",
+      "title": "Dept. 22: Action Plan for Beach Towel Delays",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    }
+  ]
 }

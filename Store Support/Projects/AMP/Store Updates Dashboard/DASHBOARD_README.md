@@ -1,5 +1,44 @@
 # 🚀 Store Updates Dashboard - Quick Start
 
+## ⚠️ Automation & Recovery (April 2, 2026)
+
+### Scheduled Tasks
+
+| Task Name | Schedule | Purpose |
+|-----------|----------|--------|
+| `Activity_Hub_Store_Dashboard_AutoStart` | On logon | Starts `start_store_dashboard_24_7.bat` → `amp_backend_server.py` on port 8081 |
+
+### Bat Files (`Automation/`)
+- `start_store_dashboard_24_7.bat` — Port-kill block + restart loop. Primary crash recovery (5-7 sec downtime)
+
+### Known Issue
+Server binds to `127.0.0.1:8081` (localhost only). Network users cannot reach it directly. Needs `host='0.0.0.0'` in `amp_backend_server.py` to be accessible from other machines.
+
+### Recovery Layers
+1. **Bat restart loop** — primary (5-7 sec recovery on crash)
+2. **Continuous monitor** (`continuous_monitor.ps1`) — checks all 7 services every 5 min
+
+### ⚠️ NEVER use `Stop-Process -Name python`
+This kills ALL Python processes — all 7 services go down.
+
+**Safe way to restart only AMP Dashboard (port 8081):**
+```powershell
+$p = (netstat -ano | Select-String ":8081.*LISTENING" | ForEach-Object { ($_ -split "\s+")[-1] }) | Select-Object -First 1
+if ($p) { taskkill /F /PID $p }
+# Bat loop restarts automatically within 5-7 seconds
+```
+
+### Adding/Changing This Service
+If the port, entry point, or bat file changes, update ALL of:
+1. `Automation/start_store_dashboard_24_7.bat`
+2. `Automation/register_tasks_cmd.bat`
+3. `continuous_monitor.ps1` services array
+4. `MONITOR_AND_REPORT.ps1` services list
+5. `Documentation/KNOWLEDGE_HUB.md` Active Services table
+6. This file
+
+---
+
 ## Starting the Server
 
 ### Method 1: Double-click the batch file

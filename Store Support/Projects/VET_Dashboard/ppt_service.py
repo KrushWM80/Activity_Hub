@@ -11,7 +11,7 @@ import os
 import base64
 from io import BytesIO
 from pptx import Presentation
-from pptx.util import Inches
+from pptx.util import Inches, Emu
 from PIL import Image
 
 logger = logging.getLogger(__name__)
@@ -325,35 +325,20 @@ def generate_ppt_from_screenshots():
                 blank_slide_layout = prs.slide_layouts[6]  # Blank layout
                 slide = prs.slides.add_slide(blank_slide_layout)
                 
-                # Add image to slide with proper aspect ratio (don't stretch)
-                # Image is positioned at top-left with margins, maintaining aspect ratio
+                # Add image preserving aspect ratio (matches 6 AM email approach)
+                # Full width, proportional height — white space at bottom for short content
+                pil_img = Image.open(image_stream)
+                img_w, img_h = pil_img.size
+                aspect = img_h / img_w if img_w > 0 else 0.5625
+                final_w = prs.slide_width
+                final_h = Emu(int(prs.slide_width * aspect))
+                if final_h > prs.slide_height:
+                    final_h = prs.slide_height
+                
                 image_stream.seek(0)
-                pil_image = Image.open(image_stream)
-                img_width_px, img_height_px = pil_image.size
-                
-                # Calculate dimensions that maintain aspect ratio
-                # Slide is 9.6" x 7.2", leave 0.2" margin on top/left, 0.4" on right
-                max_width_inches = 9.2  # 9.6 - 0.4 for margins
-                max_height_inches = 6.8  # 7.2 - 0.2 top - 0.2 bottom
-                
-                aspect_ratio = img_width_px / img_height_px
-                
-                # Determine which dimension is limiting WITHOUT specifying both
-                # Specifying only one dimension lets python-pptx auto-calculate the other
-                left = Inches(0.2)
-                top = Inches(0.2)
-                
-                if aspect_ratio > (max_width_inches / max_height_inches):
-                    # Image is wider proportionally - constrain by width only
-                    image_stream.seek(0)
-                    slide.shapes.add_picture(image_stream, left, top, width=Inches(max_width_inches))
-                else:
-                    # Image is taller proportionally - constrain by height only
-                    image_stream.seek(0)
-                    slide.shapes.add_picture(image_stream, left, top, height=Inches(max_height_inches))
-                
+                slide.shapes.add_picture(image_stream, Emu(0), Emu(0), final_w, final_h)
                 slides_added += 1
-                logger.info(f"Added screenshot for page {page_num} (original: {img_width_px}x{img_height_px}px)")
+                logger.info(f"Added screenshot for page {page_num} ({img_w}x{img_h}px, aspect {aspect:.3f})")
             except Exception as e:
                 logger.error(f"Error processing screenshot for page {page_num}: {e}")
                 continue

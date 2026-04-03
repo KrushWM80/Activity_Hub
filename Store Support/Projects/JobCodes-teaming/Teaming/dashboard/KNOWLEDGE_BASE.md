@@ -1,5 +1,45 @@
 # Job Code Teaming Dashboard - Knowledge Base
 
+## ⚠️ Automation & Recovery (April 2, 2026)
+
+### Scheduled Tasks
+
+| Task Name | Schedule | Purpose |
+|-----------|----------|--------|
+| `Activity_Hub_JobCodes_AutoStart` | On logon | Starts `start_jobcodes_server_24_7.bat` → `main.py` on port 8080 |
+
+### Bat Files (`Automation/`)
+- `start_jobcodes_server_24_7.bat` — Port-kill block + restart loop. Primary crash recovery (5-7 sec downtime)
+- Log: `Automation/jobcodes_server.log`
+
+### Recovery Layers
+1. **Bat restart loop** — primary (5-7 sec recovery on crash)
+2. **Continuous monitor** (`continuous_monitor.ps1`) — checks all 7 services every 5 min; only launches new bat if bat process is not already running
+
+### Known Issue (ongoing)
+Job Codes exits with code 1 immediately on startup — crash loop. The bat keeps retrying every 5 seconds. Check `Automation/jobcodes_server.log` for the Python traceback.
+
+### ⚠️ NEVER use `Stop-Process -Name python`
+This kills ALL Python processes on the machine — all 7 services go down.
+
+**Safe way to restart only Job Codes (port 8080):**
+```powershell
+$p = (netstat -ano | Select-String ":8080.*LISTENING" | ForEach-Object { ($_ -split "\s+")[-1] }) | Select-Object -First 1
+if ($p) { taskkill /F /PID $p }
+# Bat loop restarts automatically within 5-7 seconds
+```
+
+### Adding/Changing This Service
+If the port, entry point, or bat file changes, update ALL of:
+1. `Automation/start_jobcodes_server_24_7.bat`
+2. `Automation/register_tasks_cmd.bat`
+3. `continuous_monitor.ps1` services array
+4. `MONITOR_AND_REPORT.ps1` services list
+5. `Documentation/KNOWLEDGE_HUB.md` Active Services table
+6. This file
+
+---
+
 ## Project Overview
 
 The Job Code Teaming Dashboard is a **FastAPI web application** that manages job code assignments to teams. It runs locally and is accessible to team members on the Walmart VPN.

@@ -97,7 +97,7 @@ def serve_logo():
 @app.route('/api/amp-data', methods=['GET'])
 def get_amp_data():
     """
-    Fetch AMP data from BigQuery with optional filters
+    Fetch AMP data from BigQuery with optional filters and pagination
     
     Query Parameters:
     - fy: Fiscal year (e.g., 2027)
@@ -109,8 +109,8 @@ def get_amp_data():
     - activity_type: Filter by activity type
     - store_area: Filter by store area
     - keyword: Search in title/type/area
-    - days: Number of days back (default: 90)
-    - limit: Max results (default: 1000)
+    - limit: Results per page (default: 25)
+    - offset: Number of records to skip (default: 0)
     """
     try:
         if not client:
@@ -118,7 +118,9 @@ def get_amp_data():
 
         # Get query parameters
         fy = request.args.get('fy', '2027')
-        week = request.args.get('week', '1')
+        week = request.args.get('week', '2')
+        limit = int(request.args.get('limit', 25))
+        offset = int(request.args.get('offset', 0))
         
         filters = {
             'fy': fy,
@@ -133,13 +135,17 @@ def get_amp_data():
         }
         
         days = int(request.args.get('days', 90))
-        limit = int(request.args.get('limit', 1000))
 
-        # Build query
-        query = build_amp_query(filters, days, limit)
+        # Build count query to get total records
+        count_query = build_amp_count_query(filters, days)
+        count_result = client.query(count_query).result()
+        total_count = next(count_result)[0]
+        
+        # Build data query with LIMIT and OFFSET
+        query = build_amp_query(filters, days, limit, offset)
         
         logger.info(f"📋 Executing BigQuery query with filters: {filters}")
-        logger.info(f"Query: {query[:200]}...")
+        logger.info(f"   Limit: {limit}, Offset: {offset}, Total Results: {total_count}")
         
         # Execute query
         query_job = client.query(query)
@@ -156,9 +162,13 @@ def get_amp_data():
 
         logger.info(f"✅ Retrieved {len(data)} records from BigQuery for FY{fy} WK{week}")
         
+        # Cap total_count at 10000 for pagination purposes
+        display_total = min(total_count, 10000)
+        
         return jsonify({
             'success': True,
             'count': len(data),
+            'total_count': display_total,
             'data': data,
             'filters_applied': filters,
             'timestamp': datetime.utcnow().isoformat()
@@ -292,7 +302,7 @@ def get_filter_options():
         }), 500
 
 
-def build_amp_query(filters, days, limit):
+def build_amp_query(filters, days, limit, offset=0):
     """Build BigQuery SQL query with filters - WK 1+ for current FY"""
     
     # Extract fiscal year and week
@@ -301,48 +311,84 @@ def build_amp_query(filters, days, limit):
     
     query = f"""
         SELECT 
-            CAST(EXTRACT(WEEK FROM msg_start_dt) AS INT64) as Week,
-            actv_title_home_ofc_nm as Activity_Title,
-            actv_type_nm as Activity_Type,
-            bus_domain_nm as Business_Area,
-            ARRAY_LENGTH(trgt_store_nbr_array) as Stores_With_Access,
-            CAST(RAND() * 150000 AS INT64) as Total_Impressions,
-            CAST(RAND() * 10000 AS INT64) as Unique_Viewers,
-            ROUND(RAND() * 5, 1) as Engagement_Rate,
+            Week,
+            Activity_Title,
+            Activity_Type,
+            Business_Area,
+            COALESCE(Store_Cnt, 0) as Stores_With_Access,
+            COALESCE(Count, 0) as Total_Impressions,
+            CAST(RAND() * COALESCE(Count, 1000) AS INT64) as Unique_Viewers,
+            ROUND(RAND() * 100, 1) as Engagement_Rate,
             ROUND(RAND() * 100, 1) as Completion_Rate,
-            msg_status_id = 'PUBLISHED' as Published,
-            msg_start_dt,
-            msg_end_dt,
-            preview_url as Preview_Link,
-            msg_status_id as Status
+            COALESCE(Status, Message_Status, 'DRAFT') as Status,
+            COALESCE(Web_Preview, Link, '') as Preview_Link,
+            Start_Date,
+            End_Date
         FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
         WHERE 1=1
-            AND EXTRACT(YEAR FROM msg_start_dt) = {fy}
-            AND EXTRACT(WEEK FROM msg_start_dt) >= {min_week}
-            AND msg_start_dt >= DATE_SUB(CURRENT_DATE(), INTERVAL {days} DAY)
+            AND FY = CAST({fy} AS INT64)
+            AND Week >= {min_week}
+            AND Activity_Title IS NOT NULL
+            AND Activity_Type IS NOT NULL
     """
 
     # Add dynamic filters
     if filters.get('division'):
-        query += f" AND division = '{filters['division']}'"
+        query += f" AND Division = '{filters['division']}'"
     if filters.get('region'):
-        query += f" AND region = '{filters['region']}'"
+        query += f" AND Region = '{filters['region']}'"
     if filters.get('market'):
-        query += f" AND market = '{filters['market']}'"
+        query += f" AND Market = '{filters['market']}'"
     if filters.get('facility'):
-        query += f" AND facility = '{filters['facility']}'"
+        query += f" AND Facility = '{filters['facility']}'"
     if filters.get('activity_type'):
-        query += f" AND actv_type_nm = '{filters['activity_type']}'"
+        query += f" AND Activity_Type = '{filters['activity_type']}'"
     if filters.get('store_area'):
-        query += f" AND bus_domain_nm = '{filters['store_area']}'"
+        query += f" AND Business_Area = '{filters['store_area']}'"
     if filters.get('keyword'):
-        keyword = filters['keyword'].lower()
-        query += f" AND (LOWER(actv_title_home_ofc_nm) LIKE '%{keyword}%' OR LOWER(actv_type_nm) LIKE '%{keyword}%' OR LOWER(bus_domain_nm) LIKE '%{keyword}%')"
+        keyword = filters['keyword'].replace("'", "\\'")
+        query += f" AND (LOWER(Activity_Title) LIKE '%{keyword.lower()}%' OR LOWER(Activity_Type) LIKE '%{keyword.lower()}%' OR LOWER(Business_Area) LIKE '%{keyword.lower()}%')"
 
     query += f"""
         ORDER BY Week DESC, Activity_Title
-        LIMIT {limit}
+        LIMIT {limit} OFFSET {offset}
     """
+
+    return query
+
+
+def build_amp_count_query(filters, days):
+    """Build BigQuery count query"""
+    
+    fy = filters.get('fy', '2027')
+    min_week = int(filters.get('week', 1))
+    
+    query = f"""
+        SELECT COUNT(*) as total
+        FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
+        WHERE 1=1
+            AND FY = CAST({fy} AS INT64)
+            AND Week >= {min_week}
+            AND Activity_Title IS NOT NULL
+            AND Activity_Type IS NOT NULL
+    """
+
+    # Add dynamic filters
+    if filters.get('division'):
+        query += f" AND Division = '{filters['division']}'"
+    if filters.get('region'):
+        query += f" AND Region = '{filters['region']}'"
+    if filters.get('market'):
+        query += f" AND Market = '{filters['market']}'"
+    if filters.get('facility'):
+        query += f" AND Facility = '{filters['facility']}'"
+    if filters.get('activity_type'):
+        query += f" AND Activity_Type = '{filters['activity_type']}'"
+    if filters.get('store_area'):
+        query += f" AND Business_Area = '{filters['store_area']}'"
+    if filters.get('keyword'):
+        keyword = filters['keyword'].replace("'", "\\'")
+        query += f" AND (LOWER(Activity_Title) LIKE '%{keyword.lower()}%' OR LOWER(Activity_Type) LIKE '%{keyword.lower()}%' OR LOWER(Business_Area) LIKE '%{keyword.lower()}%')"
 
     return query
 

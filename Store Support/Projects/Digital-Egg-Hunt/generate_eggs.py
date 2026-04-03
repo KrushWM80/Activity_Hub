@@ -27,7 +27,7 @@ EGG_COLORS = [
     "#FFD3B6",  # Peach
 ]
 
-def get_qr_code_url(egg_id, size=300, app_url="http://10.97.114.181:4326/Digital_Egg_Hunt"):
+def get_qr_code_url(egg_id, size=300, app_url="http://10.97.114.181:8080/Digital_Egg_Hunt"):
     """
     Get QR code URL from qr-server.com API
     This generates a QR code that when scanned directs to the app with egg ID

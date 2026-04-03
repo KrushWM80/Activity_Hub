@@ -220,17 +220,21 @@ def load_job_code_data():
     if os.path.exists(TEAMING_DATA_FILE):
         try:
             print(f"Loading Teaming data from: {TEAMING_DATA_FILE}")
-            teaming_df = pd.read_excel(TEAMING_DATA_FILE)
+            # Load CSV or Excel based on file extension
+            if TEAMING_DATA_FILE.endswith('.csv'):
+                teaming_df = pd.read_csv(TEAMING_DATA_FILE)
+            else:
+                teaming_df = pd.read_excel(TEAMING_DATA_FILE)
             
             # Check which columns are available
             available_cols = list(teaming_df.columns)
             print(f"Available Teaming columns: {available_cols}")
             
-            # Create composite key from available columns
+            # Create composite key from available columns (divNumber-deptNumber-jobCode)
             teaming_df['composite_job_code'] = (
-                teaming_df['divNumber'].fillna(0).astype(int).astype(str) + '-' +
-                teaming_df['deptNumber'].fillna(0).astype(int).astype(str) + '-' +
-                teaming_df['jobCode'].fillna(0).astype(int).astype(str)
+                teaming_df['divNumber'].astype(str).str.strip() + '-' +
+                teaming_df['deptNumber'].astype(str).str.strip() + '-' +
+                teaming_df['jobCode'].astype(str).str.strip()
             )
             
             # Check if teaming has full columns needed for aggregation
@@ -307,7 +311,11 @@ def get_team_options():
     """Get available teams from teaming data"""
     if not os.path.exists(TEAMING_DATA_FILE):
         raise FileNotFoundError(f"Teaming data file not found: {TEAMING_DATA_FILE}")
-    teaming_df = pd.read_excel(TEAMING_DATA_FILE)
+    # Load CSV or Excel based on file extension
+    if TEAMING_DATA_FILE.endswith('.csv'):
+        teaming_df = pd.read_csv(TEAMING_DATA_FILE)
+    else:
+        teaming_df = pd.read_excel(TEAMING_DATA_FILE)
     
     # Check if team columns exist
     team_cols = ['teamName', 'teamId', 'workgroupName', 'workgroupId']
@@ -1257,14 +1265,23 @@ def load_job_codes_master():
     if os.path.exists(TEAMING_DATA_FILE):
         print(f"Loading team/workgroup data from Teaming: {TEAMING_DATA_FILE}")
         try:
-            teaming_df = pd.read_excel(TEAMING_DATA_FILE)
-            # Group by jobCode and aggregate team/workgroup info
+            # Load CSV or Excel based on file extension
+            if TEAMING_DATA_FILE.endswith('.csv'):
+                teaming_df = pd.read_csv(TEAMING_DATA_FILE)
+            else:
+                teaming_df = pd.read_excel(TEAMING_DATA_FILE)
+            # Combine divNumber-deptNumber-jobCode to match Polaris format
             for _, row in teaming_df.iterrows():
+                div_num = str(row.get('divNumber', '')).strip()
+                dept_num = str(row.get('deptNumber', '')).strip()
                 job_code = str(row.get('jobCode', '')).strip()
-                if job_code and pd.notna(job_code):
+                
+                if div_num and dept_num and job_code and pd.notna(row.get('divNumber')) and pd.notna(row.get('deptNumber')) and pd.notna(row.get('jobCode')):
+                    # Combine into hierarchical format: divNumber-deptNumber-jobCode
+                    combined_code = f"{div_num}-{dept_num}-{job_code}"
                     # Use first team/workgroup assignment if multiple exist
-                    if job_code not in teaming_data:
-                        teaming_data[job_code] = {
+                    if combined_code not in teaming_data:
+                        teaming_data[combined_code] = {
                             'Team': str(row.get('teamName', '')) if pd.notna(row.get('teamName')) else '',
                             'Workgroup': str(row.get('workgroupName', '')) if pd.notna(row.get('workgroupName')) else '',
                             'Dept Number': str(row.get('deptNumber', '')) if pd.notna(row.get('deptNumber')) else '',
