@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour Guides Platform - Executive Vision</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --walmart-navy: #1E3A8A;
+            --walmart-blue: #3B82F6;
+            --walmart-yellow: #FFCC00;
+            --walmart-gray: #F3F4F6;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1F2937;
+            background: #FFFFFF;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue) 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        section {
+            padding: 60px 40px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        section:last-of-type {
+            border-bottom: none;
+        }
+        
+        h2 {
+            color: var(--walmart-navy);
+            font-size: 2em;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 40px;
+            background: var(--walmart-yellow);
+            border-radius: 4px;
+        }
+        
+        .value-props {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .value-card {
+            background: var(--walmart-gray);
+            padding: 30px;
+            border-radius: 8px;
+            border-left: 4px solid var(--walmart-blue);
+        }
+        
+        .value-card h3 {
+            color: var(--walmart-navy);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .workflow-diagram {
+            background: var(--walmart-gray);
+            padding: 40px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .workflow-step {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin: 10px 0;
+        }
+        
+        .step-box {
+            background: var(--walmart-blue);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            min-width: 180px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        
+        .step-arrow {
+            color: var(--walmart-yellow);
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .demo-screen {
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .demo-header {
+            background: var(--walmart-navy);
+            color: white;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .demo-content {
+            padding: 30px;
+            background: #FAFBFC;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--walmart-navy);
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #D1D5DB;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .btn {
+            background: var(--walmart-blue);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .btn:hover {
+            background: var(--walmart-navy);
+        }
+        
+        .btn-secondary {
+            background: #6B7280;
+        }
+        
+        .chat-bubble {
+            margin: 15px 0;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        
+        .chat-from-user {
+            background: var(--walmart-blue);
+            color: white;
+            margin-left: 40px;
+            text-align: right;
+        }
+        
+        .chat-from-reviewer {
+            background: #E0E7FF;
+            color: var(--walmart-navy);
+            margin-right: 40px;
+        }
+        
+        .mention {
+            background: var(--walmart-yellow);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .metric-card {
+            background: var(--walmart-gray);
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--walmart-blue);
+            margin: 10px 0;
+        }
+        
+        .metric-label {
+            font-size: 0.85em;
+            color: #6B7280;
+            font-weight: 600;
+        }
+        
+        .timeline {
+            margin: 30px 0;
+        }
+        
+        .timeline-item {
+            margin-left: 40px;
+            padding-left: 30px;
+            padding-bottom: 30px;
+            border-left: 3px solid var(--walmart-blue);
+            position: relative;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            background: var(--walmart-yellow);
+            border-radius: 50%;
+            border: 3px solid var(--walmart-blue);
+        }
+        
+        .timeline-item h4 {
+            color: var(--walmart-navy);
+            margin-bottom: 5px;
+        }
+        
+        .timeline-item p {
+            color: #6B7280;
+            font-size: 0.95em;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .status-draft {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        .status-review {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .status-approved {
+            background: #DCFCE7;
+            color: #166534;
+        }
+        
+        .status-published {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .image-placeholder {
+            background: var(--walmart-gray);
+            border: 2px dashed #D1D5DB;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            color: #9CA3AF;
+            font-size: 0.95em;
+        }
+        
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        footer {
+            background: var(--walmart-navy);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .highlight {
+            background: rgba(255, 204, 0, 0.2);
+            padding: 2px 4px;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .metrics-grid { grid-template-columns: 1fr 1fr; }
+            .two-col { grid-template-columns: 1fr; }
+            header h1 { font-size: 1.8em; }
+        }
+    </style>
+</head>
+<body>
+    <header style="position: relative;">
+        <img src="../../General Setup/Design/Spark Blank.png" alt="Spark Logo" style="height: 60px; position: absolute; left: 40px; top: 20px;">
+        <h1 style="margin: 0; padding-top: 10px;">Tour Guides Platform</h1>
+        <p>Enterprise-Wide Process Enablement for Store Associates</p>
+    </header>
+    
+    <div class="container">
+        <!-- SIF PRESENTATION -->
+        <section>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <img src="./data/SIF Presentation.png" alt="SIF Presentation" style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #E5E7EB;" />
+            </div>
+        </section>
+        
+        <!-- OVERVIEW & VALUE PROPS -->
+        <section>
+            <h2>Strategic Vision</h2>
+            <p style="font-size: 1.1em; color: #374151; margin-bottom: 30px;">
+                A <span class="highlight">centralized, approval-driven platform</span> enabling Business Owners to submit process guides, 
+                build interactive tours, and publish to 4,000+ stores via MyWalmart Notes—with real-time feedback loops and performance analytics 
+                to measure departmental metric improvement.
+            </p>
+            
+            <div class="value-props">
+                <div class="value-card">
+                    <h3>📋 Single Intake</h3>
+                    <p>One submission form for all business processes—Store Refresh, EOC, performance improvement, training—eliminating duplicate systems.</p>
+                </div>
+                <div class="value-card">
+                    <h3>⚡ Scalable Delivery</h3>
+                    <p>Template-based creation with cloning for recurring tours. Deploy to 4,000+ stores in one action with tracked rollout.</p>
+                </div>
+                <div class="value-card">
+                    <h3>📊 Data-Driven</h3>
+                    <p>Connect tours to needed data for automation, department KPIs, and metrics that impact sales, labor, shrink, and compliance.</p>
+                </div>
+                <div class="value-card">
+                    <h3>🔄 Feedback Loop</h3>
+                    <p>Live associate feedback from stores. Continuous improvement cycle with real-time store performance analytics.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- WORKFLOW DIAGRAM -->
+        <section>
+            <h2>Workflow & Approval Process</h2>
+            <p style="margin-bottom: 20px;">Follows AMP Platform methodology for status tracking and multi-stage reviews.</p>
+            
+            <div class="workflow-diagram">
+                <div style="overflow-x: auto;">
+                    <div style="white-space: nowrap; font-size: 0.9em;">
+                        <div class="workflow-step">
+                            <div class="step-box" style="background: #EC4899;">DRAFT</div>
+                            <div class="step-arrow">→</div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-box" style="background: #F59E0B;">SUBMITTED</div>
+                            <div class="step-arrow">→</div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-box" style="background: #8B5CF6;">ACTIVITY MGR<br>REVIEW</div>
+                            <div class="step-arrow">→</div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-box" style="background: #06B6D4;">DEVELOPMENT</div>
+                            <div class="step-arrow">→</div>
+                        </div>
+                    </div>
+                    <div style="white-space: nowrap; font-size: 0.9em; margin-top: 15px;">
+                        <div class="workflow-step">
+                            <div class="step-box" style="background: #0891B2;">COMMS<br>REVIEW</div>
+                            <div class="step-arrow">→</div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-box" style="background: #059669;">LEGAL<br>REVIEW</div>
+                            <div class="step-arrow">→</div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-box" style="background: #7C3AED;">ATC<br>REVIEW</div>
+                            <div class="step-arrow">→</div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-box" style="background: #10B981;">PUBLISHED</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <p style="margin-top: 20px; color: #6B7280; font-size: 0.95em;">
+                <strong>Key Feature:</strong> Built-in chat with <span class="mention">@mentions</span> at each stage. 
+                Notifications automatically routed to assigned teams via Activity Hub. No manual email chasing needed.
+            </p>
+        </section>
+        
+        <!-- SUBMISSION SCREEN -->
+        <section>
+            <h2>1. Business Owner Submission</h2>
+            <p style="margin-bottom: 20px;">Simple, guided intake form—captures all required context in 5 minutes.</p>
+            
+            <div class="demo-screen">
+                <div class="demo-header">New Tour Guide Request Form</div>
+                <div class="demo-content">
+                    <div style="max-width: 600px;">
+                        <div class="form-group">
+                            <label class="form-label">Tour Title *</label>
+                            <input type="text" class="form-input" placeholder="e.g., Friday Cash Handling Refresh - Q2 2026" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Business Need *</label>
+                            <textarea class="form-textarea" placeholder="Describe the problem or process improvement needed..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Affected Store Areas (From AMP) *</label>
+                            <input type="text" class="form-input" value="Store Operations, Cash Office, Front End" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Timeline</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label class="form-label" style="font-size: 0.85em;">Start Date</label>
+                                    <input type="date" class="form-input" />
+                                </div>
+                                <div>
+                                    <label class="form-label" style="font-size: 0.85em;">Recurrence</label>
+                                    <select class="form-input">
+                                        <option>One-Time</option>
+                                        <option>Weekly</option>
+                                        <option>Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #E5E7EB;">
+                            <button class="btn">Submit Request</button>
+                            <button class="btn btn-secondary" style="margin-left: 10px;">Save as Draft</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <p style="margin-top: 20px; color: #6B7280; font-size: 0.95em;">
+                <strong>Auto-Generated:</strong> Platform creates "Store Impact Picture" summary showing affected stores/departments/users for Activity Manager review.
+            </p>
+        </section>
+        
+        <!-- ACTIVITY MANAGER REVIEW -->
+        <section>
+            <h2>2. Activity Manager Review & Chat</h2>
+            <p style="margin-bottom: 20px;">Reviewers receive automated notifications. Inline chat with <span class="mention">@mentions</span> for collaboration.</p>
+            
+            <div class="demo-screen">
+                <div class="demo-header">Tour Request #TG-0042 | Status: AWAITING_ACTIVITY_APPROVAL</div>
+                <div class="demo-content">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <div>
+                            <h4 style="color: var(--walmart-navy); margin-bottom: 15px;">Request Details</h4>
+                            <p><strong>Title:</strong> EOC - Hurricane Preparedness Checklist</p>
+                            <p><strong>Submitter:</strong> Chris Sanders (Store Operations)</p>
+                            <p><strong>Stores Affected:</strong> 4,460</p>
+                            <p><strong>Submitted:</strong> Apr 1, 2026</p>
+                            <p style="margin-top: 15px;">
+                                <span class="status-badge status-review">AWAITING_ACTIVITY_APPROVAL</span>
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h4 style="color: var(--walmart-navy); margin-bottom: 10px;">Chat & Comments</h4>
+                            <div class="chat-bubble chat-from-user">
+                                Need clarity on the evacuation procedures—reference material or links included?
+                            </div>
+                            <div class="chat-bubble chat-from-reviewer" style="margin-top: 10px;">
+                                <span class="mention">@Chris Sanders</span> Great question. Yes, we'll link to FEMA resources. Also, can you clarify when this needs deployment?
+                            </div>
+                            <p style="margin-top: 15px; font-size: 0.85em; color: #6B7280;">
+                                <strong>Notification sent to:</strong> Chris Sanders (email + Teams)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- DEVELOPMENT PHASE -->
+        <section>
+            <h2>3. Development Phase (In-Platform Builder)</h2>
+            <p style="margin-bottom: 20px;">Define questions, data sources, user interaction, needed photos, and Sidekick actions—all in one place. Then we build demo version to verify design and output to MyWalmart Notes.</p>
+            
+            <div class="demo-screen">
+                <div class="demo-header">Development Builder | Tour: EOC - Hurricane Preparedness Checklist</div>
+                <div class="demo-content">
+                    <div style="background: white; padding: 20px; border: 1px solid #E5E7EB; border-radius: 6px; margin-bottom: 20px;">
+                        <h4 style="color: var(--walmart-navy); margin-bottom: 15px;">Question 1: Hurricane Evacuation Checklist</h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Question Type</label>
+                            <select class="form-input">
+                                <option>Test Input (user types answer)</option>
+                                <option>Data-Generated (auto-filled from store data)</option>
+                                <option>Multiple Choice</option>
+                                <option>Open Response</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Question Text</label>
+                            <textarea class="form-textarea">Have you secured all emergency supplies and reviewed evacuation routes with your team?</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Response Options (if multiple choice)</label>
+                            <input type="text" class="form-input" placeholder="Yes, all ready" />
+                            <input type="text" class="form-input" placeholder="Need to complete setup" style="margin-top: 8px;" />
+                            <input type="text" class="form-input" placeholder="In progress" style="margin-top: 8px;" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" /> Generate Picture (show reference image)
+                            </label>
+                            <label class="form-label" style="margin-top: 10px;">
+                                <input type="checkbox" /> Create Sidekick Action (assign task to associate)
+                            </label>
+                        </div>
+                        
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #E5E7EB;">
+                            <button class="btn" style="font-size: 0.85em;">+ Add Question</button>
+                            <button class="btn" style="margin-left: 10px; background: #10B981; font-size: 0.85em;">Preview Demo Tour</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <p style="margin-top: 20px; color: #6B7280; font-size: 0.95em;">
+                <strong>Mock-First Approach:</strong> Build demo version in platform first, get stakeholder approval before real Sidekick/data integration.
+            </p>
+        </section>
+        
+        <!-- APPROVAL STAGES -->
+        <section>
+            <h2>4. Multi-Stage Approvals (Comms, Legal, ATC)</h2>
+            <p style="margin-bottom: 25px;">Same process as Activity Manager—automated notifications route to each team, built-in chat, move forward when approved.</p>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>Stage 1: Activity Manager</h4>
+                    <p>Reviews for completeness, business alignment. Time: 1-2 business days</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Stage 2: Development Phase</h4>
+                    <p>Questions, data sources, Sidekick actions defined. Build demo version. Time: 3-5 business days</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Stage 3: Communications Review</h4>
+                    <p>Tone, messaging, brand alignment. Coordinate rollout communications. Time: 1-2 business days</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Stage 4: Legal Review</h4>
+                    <p>Compliance, policies, risk assessment. Time: 1-3 business days</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Stage 5: ATC Final Review</h4>
+                    <p>Final approval before publishing. Time: 1 business day</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Stage 6: Publish to AMP/MyWalmart Notes</h4>
+                    <p>Automatic push to AMP. Associates see tour in MyWalmart Notes immediately.</p>
+                </div>
+            </div>
+            
+            <p style="margin-top: 25px; background: #F0FDF4; padding: 15px; border-left: 4px solid #10B981; border-radius: 4px; color: #166534;">
+                <strong>Total Time:</strong> Draft to Published in ~20 business days (4 weeks). Chat collaboration can compress to 2-3 weeks for urgent initiatives.
+            </p>
+        </section>
+        
+        <!-- AMP INTEGRATION & PUBLISHING -->
+        <section>
+            <h2>5. Publishing to MyWalmart Notes</h2>
+            <p style="margin-bottom: 20px;">Once ATC approves, platform automatically pushes approved tour structure to AMP for ingestion into MyWalmart Notes.</p>
+            
+            <div style="margin-bottom: 30px;">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
+                    <img src="./data/Mobile Screen 1.png" alt="Mobile Screen 1" style="width: 100%; border-radius: 6px; border: 1px solid #E5E7EB;" />
+                    <img src="./data/Mobile Screen 2.png" alt="Mobile Screen 2" style="width: 100%; border-radius: 6px; border: 1px solid #E5E7EB;" />
+                    <img src="./data/Mobile Screen 3.png" alt="Mobile Screen 3" style="width: 100%; border-radius: 6px; border: 1px solid #E5E7EB;" />
+                    <img src="./data/Mobile Screen 4.png" alt="Mobile Screen 4" style="width: 100%; border-radius: 6px; border: 1px solid #E5E7EB;" />
+                </div>
+                <p style="font-size: 0.9em; color: #6B7280; text-align: center;">Tour guides displayed in MyWalmart Notes mobile app</p>
+            </div>
+            
+            <h4 style="color: var(--walmart-navy); margin-bottom: 15px;">Store Dashboard (Built by Tour Guides)</h4>
+            <ul style="margin-left: 20px; line-height: 2; margin-bottom: 15px;">
+                <li><strong>Tour Completion Rate</strong> - % of associates completed</li>
+                <li><strong>Time to Complete</strong> - avg duration (mobile)</li>
+                <li><strong>Associate Feedback</strong> - 5-star rating, comments</li>
+                <li><strong>Task Completion</strong> - Sidekick action execution rate</li>
+                <li><strong>Department Impact</strong> - Cash handling accuracy ↑, EOD time ↓</li>
+            </ul>
+        </section>
+        
+        <!-- REPORTING & ANALYTICS -->
+        <section>
+            <h2>6. Home Office Analytics & Reporting</h2>
+            <p style="margin-bottom: 25px;">Executive dashboard showing request lifecycle, approval performance, and tour impact metrics.</p>
+            
+            <h3 style="color: var(--walmart-navy); font-size: 1.4em; margin: 30px 0 20px 0;">Tour Guides Impact Metrics</h3>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Active Requests</div>
+                    <div class="metric-value">24</div>
+                    <p style="font-size: 0.8em; color: #059669;">+8 in stage</p>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Avg Approval Time</div>
+                    <div class="metric-value">18 days</div>
+                    <p style="font-size: 0.8em; color: #6B7280;">vs 20 days target</p>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Published Tours</div>
+                    <div class="metric-value">156</div>
+                    <p style="font-size: 0.8em; color: #6B7280;">across all areas</p>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Avg Completion Rate</div>
+                    <div class="metric-value">87%</div>
+                    <p style="font-size: 0.8em; color: #059669;">associates in stores</p>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: var(--walmart-navy); font-size: 1.4em; margin: 30px 0 20px 0;">Tours Performance Metrics</h3>
+                <img src="./data/Store Refresh Reporting Dashboard.png" alt="Store Refresh Reporting Dashboard" style="width: 100%; max-width: 100%; height: auto; border-radius: 6px; border: 1px solid #E5E7EB; margin-bottom: 15px; image-rendering: crisp-edges; display: block; object-fit: contain;" />
+                <p style="font-size: 0.9em; color: #6B7280; text-align: center;">Tour Guides will follow this established reporting pattern: store coverage, regional performance, completion metrics, and KPI impact</p>
+            </div>
+            
+            <p style="color: #6B7280; font-size: 0.95em;">
+                <strong>Combines with Store Data:</strong> AMP provides store-level feedback + engagement metrics. 
+                Platform overlays with department KPIs to measure tour impact on sales, labor, shrink, compliance.
+            </p>
+        </section>
+        
+        <!-- REQUEST CLONING -->
+        <section>
+            <h2>7. Recurring Tours & Request Cloning</h2>
+            <p style="margin-bottom: 20px;">For weekly or yearly recurring tours, submitters can clone previous approved request instead of starting from scratch.</p>
+            
+            <div class="demo-screen">
+                <div class="demo-header">Create New Tour Guide Request</div>
+                <div class="demo-content">
+                    <div style="max-width: 600px;">
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: var(--walmart-navy); margin-bottom: 15px;">Start from:</h4>
+                            <div style="display: flex; gap: 15px;">
+                                <label style="flex: 1; padding: 15px; border: 2px solid var(--walmart-blue); border-radius: 4px; cursor: pointer; background: #F0F9FF;">
+                                    <input type="radio" name="start" checked /> <strong>Clone from Previous</strong>
+                                    <p style="font-size: 0.8em; color: #6B7280; margin-top: 5px;">Pre-fill from existing tour</p>
+                                </label>
+                                <label style="flex: 1; padding: 15px; border: 2px solid #E5E7EB; border-radius: 4px; cursor: pointer;">
+                                    <input type="radio" name="start" /> <strong>New Request</strong>
+                                    <p style="font-size: 0.8em; color: #6B7280; margin-top: 5px;">Start fresh</p>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Previous Tour</label>
+                            <select class="form-input">
+                                <option>— Select a tour —</option>
+                                <option selected>✓ Cash Office Refresh (Published Feb 2026)</option>
+                                <option>✓ Friday EOC Procedures (Published Jan 2026)</option>
+                                <option>✓ Summer Labor Scheduling (Published Jun 2025)</option>
+                            </select>
+                        </div>
+                        
+                        <p style="color: #6B7280; font-size: 0.9em; margin-bottom: 15px;">
+                            <strong>Estimated Time:</strong> 2 minutes to customize vs 5 minutes for new request
+                        </p>
+                        
+                        <button class="btn">Continue with Selected Tour</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- IMPLEMENTATION PHASES -->
+        <section>
+            <h2>Implementation Roadmap</h2>
+            <p style="margin-bottom: 25px;">Phased approach to build, test, and scale.</p>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>Phase 1: Core Submission & Review (4-6 weeks)</h4>
+                    <p>Business Owner form, Activity Manager review, basic chat. Internal pilot with 3-5 tour requests.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Phase 2: Development Builder (4-6 weeks)</h4>
+                    <p>Question templating UI, data source mapping, Sidekick action integration, demo preview capability.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Phase 3: Full Approval Workflow (3-4 weeks)</h4>
+                    <p>Multi-stage reviews (Comms, Legal, ATC). @mention notifications. Activity Hub integration.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Phase 4: AMP & MyWalmart Notes Integration (3-4 weeks)</h4>
+                    <p>Automatic push to AMP. Store-level dashboard in MyWalmart Notes. Feedback loop.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Phase 5: Reporting & Analytics (2-3 weeks)</h4>
+                    <p>HO dashboard, tour performance metrics, department KPI correlation.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Phase 6: Cloning & Templates (1-2 weeks)</h4>
+                    <p>Request cloning, recurring tour support, template library.</p>
+                </div>
+            </div>
+            
+            <p style="margin-top: 25px; background: #DBEAFE; padding: 15px; border-left: 4px solid var(--walmart-blue); border-radius: 4px;">
+                <strong>Total Timeline:</strong> 18-25 weeks to full production. Can go live with Phase 1 (submission) in 4 weeks for early pilot validation.
+            </p>
+        </section>
+        
+        <!-- KEY BENEFITS -->
+        <section>
+            <h2>Expected Business Impact</h2>
+            <p style="margin-bottom: 25px;">Measurable outcomes from deployment.</p>
+            
+            <div class="value-props">
+                <div class="value-card">
+                    <h3>⏱️ Faster Deployment</h3>
+                    <p>From 30+ days to 20 days avg. Urgent initiatives compress to 1-2 weeks with chat collaboration.</p>
+                </div>
+                <div class="value-card">
+                    <h3>🎯 Higher Quality</h3>
+                    <p>Built-in review gates + dev preview ensure tours are approved design before associates see them.</p>
+                </div>
+                <div class="value-card">
+                    <h3>📈 Measurable ROI</h3>
+                    <p>Direct correlation between tour completion and department metric improvement (cash handling accuracy, labor adherence, etc.).</p>
+                </div>
+                <div class="value-card">
+                    <h3>🔁 Scalability</h3>
+                    <p>One platform for all process tours across all business areas. Cloning + templates = reusable, sustainable model.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- CALL TO ACTION / ASKS -->
+    <section style="background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue) 100%); color: white; padding: 60px 40px;">
+        <div class="container">
+            <h2 style="color: white; margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+                <span style="font-size: 2em;">📋</span> What We're Asking
+            </h2>
+            <p style="font-size: 1.1em; margin-bottom: 40px; opacity: 0.95;">
+                To launch this enterprise-wide platform and deliver sustainable process excellence across 4,000+ stores, we need alignment on three critical areas:
+            </p>
+            
+            <div class="value-props" style="margin-top: 30px;">
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 8px; border-left: 4px solid var(--walmart-yellow); backdrop-filter: blur(10px);">
+                    <h3 style="color: white; margin-bottom: 15px; font-size: 1.3em;">🤝 Visibility & Collaboration</h3>
+                    <p style="color: rgba(255, 255, 255, 0.95);">Create a common goal across all stakeholders—Store Operations, Learning & Development, Communications, Legal, ATC, and Store Leadership. This isn't one team's project; it's an enterprise-wide enablement initiative requiring alignment on process, governance, and delivery.</p>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 8px; border-left: 4px solid var(--walmart-yellow); backdrop-filter: blur(10px);">
+                    <h3 style="color: white; margin-bottom: 15px; font-size: 1.3em;">👑 Leadership & Executive Sponsorship</h3>
+                    <p style="color: rgba(255, 255, 255, 0.95);">Secure executive champion(s) to champion this initiative. Tour Guides Platform will drive organizational change and require removal of blockers, cross-functional prioritization, and sustained momentum through Phase 1–6 delivery.</p>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 8px; border-left: 4px solid var(--walmart-yellow); backdrop-filter: blur(10px);">
+                    <h3 style="color: white; margin-bottom: 15px; font-size: 1.3em;">💼 Dedicated Resources (3 Platforms)</h3>
+                    <p style="color: rgba(255, 255, 255, 0.95);">
+                        <strong>Tour Guides Platform Development</strong><br>
+                        Backend API, frontend UI, database schema, notification integration<br>
+                        <br>
+                        <strong>AMP Updates & Integration</strong><br>
+                        Data ingestion schema, API endpoints for tour push<br>
+                        <br>
+                        <strong>MyWalmart Notes Development</strong><br>
+                        Ingest and Visualization to Store Associates with Store dashboard, feedback capture, & engagement metrics
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <h3 style="margin-bottom: 15px;">Tour Guides Platform</h3>
+        <p>Enabling Store Excellence Through Scalable Process Guidance</p>
+        <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+            For questions or to schedule a demo, contact the Tour Guides Platform team.
+        </p>
+    </footer>
+</body>
+</html>

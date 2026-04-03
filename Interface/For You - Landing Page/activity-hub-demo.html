@@ -1175,13 +1175,13 @@
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
-                <a href="#" class="nav-item active" data-view="dashboard">For You</a>
-                <a href="#" class="nav-item" data-embed="iframe" data-url="http://127.0.0.1:8001/">Projects</a>
-                <a href="#" class="nav-item">Reporting</a>
-                <a href="#" class="nav-item">Teams</a>
-                <a href="#" class="nav-item">My Work</a>
-                <a href="#" class="nav-item">Settings</a>
-                <a href="./../Admin/admin-dashboard.html" class="nav-item" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
+                <a href="/activity-hub/for-you" class="nav-item active" data-view="dashboard">For You</a>
+                <a href="/activity-hub/projects" class="nav-item" data-embed="iframe" data-url="http://127.0.0.1:8001/">Projects</a>
+                <a href="/activity-hub/reporting" class="nav-item">Reporting</a>
+                <a href="/activity-hub/teams" class="nav-item">Teams</a>
+                <a href="/activity-hub/my-work" class="nav-item">My Work</a>
+                <a href="/activity-hub/settings" class="nav-item">Settings</a>
+                <a href="/activity-hub/admin" class="nav-item" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
             </nav>
             <div class="user-section">
                 <div class="notification-bell">
@@ -1659,7 +1659,7 @@
                     const dataView = this.getAttribute('data-view');
                     const dataUrl = this.getAttribute('data-url');
                     
-                    // Handle iframe embedding
+                    // Handle iframe embedding (Projects)
                     if (dataEmbed === 'iframe' && dataUrl) {
                         e.preventDefault();
                         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
@@ -1670,8 +1670,8 @@
                         document.getElementById('iframe-content').classList.add('active');
                         document.getElementById('embedded-frame').src = dataUrl;
                     }
-                    // Handle returning to dashboard view
-                    else if (dataView === 'dashboard' || href === '#') {
+                    // Handle returning to dashboard view (For You)
+                    else if (dataView === 'dashboard') {
                         e.preventDefault();
                         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                         this.classList.add('active');
@@ -1681,7 +1681,7 @@
                         document.getElementById('iframe-content').classList.remove('active');
                         document.getElementById('embedded-frame').src = '';
                     }
-                    // Allow real navigation for actual links
+                    // All other nav items navigate to their href (real routes)
                 });
             });
         }

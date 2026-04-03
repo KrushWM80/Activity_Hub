@@ -60,6 +60,22 @@ class AudioHandler(SimpleHTTPRequestHandler):
         if path.startswith("/Zorro/Audio_Message_Hub"):
             path = path[len("/Zorro/Audio_Message_Hub"):] or "/"
         
+        # Serve favicon (reuse Spark logo PNG)
+        if path == "/favicon.ico":
+            logo = Path(__file__).parent / "Spark_Blank.png"
+            if logo.exists():
+                data = logo.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "image/png")
+                self.send_header("Content-Length", str(len(data)))
+                self.send_header("Cache-Control", "public, max-age=86400")
+                self.end_headers()
+                self.wfile.write(data)
+            else:
+                self.send_response(204)
+                self.end_headers()
+            return
+
         # Serve Spark logo
         if path == "/Spark_Blank.png":
             logo = Path(__file__).parent / "Spark_Blank.png"
@@ -320,6 +336,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
                     'review_no_comm_count': result.get('review_no_comm_count', 0),
                     'status_breakdown': result.get('status_breakdown', []),
                     'total_excl_denied': result.get('total_excl_denied', 0),
+                    'bq_last_updated': result.get('bq_last_updated'),
                     'summarized_count': result.get('summarized_count', 0),
                 }
                 if result.get('output_file'):
@@ -360,6 +377,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jenny Neural - Summarized Audio Generator</title>
+    <link rel="icon" type="image/png" href="/Spark_Blank.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -806,6 +824,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Message Hub - Zorro Activity Hub</title>
+    <link rel="icon" type="image/png" href="/Spark_Blank.png">
     <style>
         * {
             margin: 0;
@@ -1469,6 +1488,7 @@ class AudioHandler(SimpleHTTPRequestHandler):
                         '<tr style="border-top:2px solid #1D4ED8;"><td style="padding:5px 0;font-weight:700;">Total (excl. Denied)</td><td style="padding-left:12px;font-weight:700;text-align:right;">' + totalExclDenied + '</td></tr>' +
                         '</table>' +
                         '<div style="margin-top:8px;font-size:0.9em;">With Summarized text: <strong>' + data.summarized_count + '</strong></div>' +
+                        (data.bq_last_updated ? '<div style="margin-top:6px;font-size:0.82em;color:#6B7280;">&#128340; AMP ALL 2 Last Refreshed: <strong>' + new Date(data.bq_last_updated).toLocaleString() + '</strong></div>' : '') +
                         '<br><em>Now switch to Walmart WiFi and run Step 2 \u2193</em>',
                         'success'
                     );

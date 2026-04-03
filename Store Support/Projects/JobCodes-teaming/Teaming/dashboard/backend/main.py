@@ -753,7 +753,7 @@ async def lookup_job_code_employees(request: Request):
         """
         
         print(f"[LOOKUP] Querying for job_code='{job_code}', pay_types={pay_types}")
-        results = client.query(query).result()
+        results = client.query(query, project="polaris-analytics-prod").result()
         rows = [dict(row) for row in results]
         
         # Convert to list of dictionaries

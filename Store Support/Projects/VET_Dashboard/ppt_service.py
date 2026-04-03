@@ -19,25 +19,36 @@ logger = logging.getLogger(__name__)
 
 def get_walmart_week():
     """
-    Calculate current Walmart fiscal week (WK01-WK13)
-    Walmart fiscal year starts Feb 1 with 13 periods of 28 days each
+    Get current Walmart fiscal week from BQ Cal_Dim_Data (source of truth).
+    Falls back to local calculation if BQ is unavailable.
     """
+    # Try BQ first
+    try:
+        import os as _os
+        from google.cloud import bigquery as _bq
+        _client = _bq.Client(project='wmt-assetprotection-prod')
+        _q = """SELECT WM_WEEK_NBR FROM `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data`
+                WHERE CALENDAR_DATE = CURRENT_DATE() LIMIT 1"""
+        for r in _client.query(_q).result():
+            wk = int(r.WM_WEEK_NBR)
+            logger.info(f"WM Week from BQ Cal_Dim: WK{wk:02d}")
+            return f"WK{wk:02d}"
+    except Exception as e:
+        logger.warning(f"BQ Cal_Dim lookup failed, using fallback: {e}")
+    
+    # Fallback: Walmart fiscal year starts Saturday nearest Feb 1
     today = datetime.now()
+    if today.month >= 2:
+        year_start = datetime(today.year, 2, 1)
+    else:
+        year_start = datetime(today.year - 1, 2, 1)
     
-    # Walmart fiscal year starts Feb 1
-    fiscal_year_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
-    
-    # Days since start of fiscal year
-    days_elapsed = (today - fiscal_year_start).days
-    
-    # Each Walmart period is 28 days
-    # WK01 = days 0-27, WK02 = days 28-55, etc
-    week_num = (days_elapsed // 28) + 1
-    
-    # Ensure week is between 1-13
-    week_num = max(1, min(13, week_num))
-    
-    return f"WK{week_num:02d}"
+    days_until_saturday = (5 - year_start.weekday()) % 7
+    from datetime import timedelta
+    first_saturday = year_start + timedelta(days=days_until_saturday)
+    days_diff = (today - first_saturday).days
+    weeks = max(1, (days_diff // 7) + 1)
+    return f"WK{weeks:02d}"
 
 
 # Create Blueprint

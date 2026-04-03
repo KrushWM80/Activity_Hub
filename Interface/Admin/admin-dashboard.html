@@ -1132,13 +1132,13 @@
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
-                <a href="../For You - Landing Page/activity-hub-demo.html" class="nav-item">For You</a>
-                <a href="#" class="nav-item">Projects</a>
-                <a href="#" class="nav-item">Reporting</a>
-                <a href="#" class="nav-item">Teams</a>
-                <a href="#" class="nav-item">My Work</a>
-                <a href="#" class="nav-item">Settings</a>
-                <a href="#" class="nav-item active" style="background: var(--walmart-yellow); color: var(--gray-900);">🔒 Admin</a>
+                <a href="/activity-hub/for-you" class="nav-item">For You</a>
+                <a href="/activity-hub/projects" class="nav-item">Projects</a>
+                <a href="/activity-hub/reporting" class="nav-item">Reporting</a>
+                <a href="/activity-hub/teams" class="nav-item">Teams</a>
+                <a href="/activity-hub/my-work" class="nav-item">My Work</a>
+                <a href="/activity-hub/settings" class="nav-item">Settings</a>
+                <a href="/activity-hub/admin" class="nav-item active" style="background: var(--walmart-yellow); color: var(--gray-900);">🔒 Admin</a>
             </nav>
             <div class="user-section">
                 <div class="notification-bell">
@@ -2398,7 +2398,7 @@
                     let rawSchema = null;
                     if (window.location.protocol !== 'file:') {
                         try {
-                            const response = await fetch('Data-Bridge/Schemas/projects-schema.json');
+                            const response = await fetch('/activity-hub/static/admin/Data-Bridge/Schemas/projects-schema.json');
                             if (response.ok) {
                                 rawSchema = await response.json();
                                 console.log('Loaded schema from file');
@@ -3371,6 +3371,6 @@
         // ==========================================
 
     </script>
-    <script src="admin-links-api.js"></script>
+    <script src="/activity-hub/static/admin/admin-links-api.js"></script>
 </body>
 </html>

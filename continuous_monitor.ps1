@@ -27,7 +27,8 @@ $Services = @(
     @{Name="VETDashboard"; Port=5001; HealthURL="http://localhost:5001"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_vet_dashboard_24_7.bat"},
     @{Name="StoreDashboard"; Port=8081; HealthURL="http://localhost:8081"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_store_dashboard_24_7.bat"},
     @{Name="MeetingPlanner"; Port=8090; HealthURL="http://localhost:8090"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_meeting_planner_24_7.bat"},
-    @{Name="Zorro"; Port=8888; HealthURL="http://localhost:8888"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_zorro_24_7.bat"}
+    @{Name="Zorro"; Port=8888; HealthURL="http://localhost:8888"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_zorro_24_7.bat"},
+    @{Name="ActivityHub"; Port=8088; HealthURL="http://localhost:8088/activity-hub/"; RestartScript="C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_activity_hub_24_7.bat"}
 )
 
 Log "===== CONTINUOUS MONITORING CYCLE ====="

@@ -1,11 +1,12 @@
 # Activity Hub Services - Quick Reference Guide
 
-## Service Inventory (Updated March 24, 2026)
+## Service Inventory (Updated April 3, 2026)
 
 ### Core Infrastructure Services
 
 | Service | Port | URL | Type | Status Check |
 |---------|------|-----|------|--------------|
+| **Activity Hub** | 8088 | http://weus42608431466:8088/activity-hub/ | Flask | netstat :8088 |
 | **Job Codes Dashboard** | 8080 | http://10.97.114.181:8080/static/index.html# | FastAPI | netstat :8080 |
 | **Projects in Stores** | 8001 | http://10.97.114.181:8001/ | Teaming | netstat :8001 |
 | **TDA Insights** | 5000 | http://localhost:5000/dashboard.html | Flask | netstat :5000 |
@@ -26,6 +27,7 @@ Every 6 Hours (Background)  → Automatic restart if services offline
 ```
 
 ### What Gets Monitored
+✅ Activity Hub (Port 8088)  
 ✅ Job Codes (Port 8080)  
 ✅ Projects in Stores (Port 8001)  
 ✅ TDA Insights (Port 5000)  
@@ -45,6 +47,7 @@ When monitoring detects a service is offline:
 4. **Zorro** → Starts `podcast_server.py` via `start_zorro_24_7.bat`
 5. **V.E.T. Dashboard** → Starts `backend.py` via `start_vet_dashboard_24_7.bat`
 6. **Store Meeting Planner** → Starts `main.py` via `start_meeting_planner_24_7.bat`
+7. **Activity Hub** → Starts `activity_hub_server.py` via `start_activity_hub_24_7.bat`
 
 Each service:
 - Auto-restarts on crash (5-second interval)

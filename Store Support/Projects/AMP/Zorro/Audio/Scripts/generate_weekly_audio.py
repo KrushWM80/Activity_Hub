@@ -561,10 +561,21 @@ def fetch_and_cache_bq_data(week, fy):
 
     logger.info(f"Status breakdown: {len(status_breakdown)} statuses, total (excl. Denied): {total_excl_denied}")
 
+    # Get BQ table refresh timestamp (when ETL last wrote to the table)
+    bq_last_updated = None
+    try:
+        table_ref = client.get_table('wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2')
+        if table_ref.modified:
+            bq_last_updated = table_ref.modified.isoformat()
+        logger.info(f"BQ table last modified: {bq_last_updated}")
+    except Exception as e:
+        logger.warning(f"Could not fetch table modified time: {e}")
+
     cache_data = {
         'week': week,
         'fy': fy,
         'cached_at': datetime.now().isoformat(),
+        'bq_last_updated': bq_last_updated,
         'event_count': len(events),
         'review_no_comm_count': review_no_comm,
         'status_breakdown': status_breakdown,
@@ -903,6 +914,7 @@ def generate_weekly_message_audio(week=None, fy=None, voice="Jenny", rate=0.95, 
             result['review_no_comm_count'] = cache_data['review_no_comm_count']
             result['status_breakdown'] = cache_data.get('status_breakdown', [])
             result['total_excl_denied'] = cache_data.get('total_excl_denied', 0)
+            result['bq_last_updated'] = cache_data.get('bq_last_updated')
             result['summarized_count'] = cache_data['summarized_count']
             result['events_without_summary'] = cache_data.get('events_without_summary', [])
             result['phase_completed'] = 'fetch'

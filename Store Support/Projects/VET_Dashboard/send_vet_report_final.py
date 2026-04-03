@@ -47,7 +47,26 @@ COLORS = {
 
 
 def get_current_walmart_week():
-    """Calculate current Walmart Week (WK format)"""
+    """Get current Walmart Week from BQ Cal_Dim_Data (source of truth), with local fallback"""
+    # Try BQ first
+    try:
+        import os as _os
+        _creds = _os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', '')
+        if not _creds or not _os.path.exists(_creds):
+            _os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = _os.path.join(
+                _os.environ.get('APPDATA', ''), 'gcloud', 'application_default_credentials.json')
+        from google.cloud import bigquery as _bq
+        _client = _bq.Client(project='wmt-assetprotection-prod')
+        _q = """SELECT WM_WEEK_NBR FROM `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data`
+                WHERE CALENDAR_DATE = CURRENT_DATE() LIMIT 1"""
+        for r in _client.query(_q).result():
+            wk = int(r.WM_WEEK_NBR)
+            print(f"     [OK] WM Week from BQ Cal_Dim: WK{wk:02d}")
+            return f"WK{wk:02d}"
+    except Exception as e:
+        print(f"     [!] BQ Cal_Dim lookup failed: {e}")
+    
+    # Fallback: Walmart fiscal year starts Saturday nearest Feb 1
     today = datetime.now().date()
     if today.month >= 2:
         year_start = datetime(today.year, 2, 1).date()
@@ -58,7 +77,7 @@ def get_current_walmart_week():
     first_saturday = year_start + timedelta(days=days_until_saturday)
     days_diff = (today - first_saturday).days
     weeks = max(1, (days_diff // 7) + 1)
-    
+    print(f"     [!] Using local fallback: WK{weeks:02d}")
     return f"WK{weeks:02d}"
 
 
@@ -163,76 +182,171 @@ def fetch_dashboard_data(api_url: str = DASHBOARD_URL) -> tuple:
 def build_needs_attention_html(projects: list) -> str:
     """Build HTML for Needs Attention section (at-risk initiatives)"""
     
-    at_risk_items = [p for p in projects if str(p.get('Health Status', '')).lower() == 'at risk']
+    at_risk_items = [p for p in projects if str(p.get('Health Status', '')).lower() in ('at risk', 'off track')]
     
     if not at_risk_items:
         return None
     
-    # Needs Attention header
-    html = '''<!DOCTYPE html><html><head><meta charset="utf-8">
-<style>*{margin:0;padding:0;box-sizing:border-box;} body{background:#fffbeb;padding:20px;}</style>
-</head><body>
-<div style="background:#FFF3CD;border-left:6px solid #DC3545;border-radius:8px;padding:20px;margin-bottom:20px;">
-<div style="color:#DC3545;font-size:24px;font-weight:700;margin-bottom:16px;">Needs Attention</div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
-'''
-    
+    cards_html = ''
     for item in at_risk_items:
         title = escape(item.get('Initiative - Project Title', 'Unknown'))
         stores = item.get('# of Stores', 0)
         notes = escape(item.get('Executive Notes', 'No notes provided'))
         phase = escape(item.get('Phase', 'Unknown'))
         wm_week = escape(str(item.get('WM Week', 'N/A')))
+        status_label = escape(str(item.get('Health Status', 'At Risk')))
+        deployment = escape(str(item.get('Deployment', 'No Note Provided')))
         
-        html += f'''<div style="background:white;border:1px solid #DC3545;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(220,53,69,0.1);">
-<div style="display:inline-block;background:#DC3545;color:white;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:700;margin-bottom:8px;">At Risk</div>
-<div style="font-size:14px;font-weight:700;color:#212121;margin-bottom:8px;">{title}</div>
-<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #DC3545;">
-<strong>Phase:</strong> {phase}
+        cards_html += f'''<div style="background:white;border:1px solid #dc3545;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(220,53,69,0.1);">
+<div style="margin-bottom:8px;">
+  <div style="display:inline-block;background:#dc3545;color:white;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:600;margin-bottom:4px;">{status_label}</div>
+  <div style="font-size:12px;color:#666;margin-top:4px;">Phase: {phase}</div>
 </div>
-<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #DC3545;">
-<strong>Stores:</strong> {stores}
-</div>
-<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #DC3545;">
-<strong>WM Week:</strong> {wm_week}
-</div>
-<div style="font-size:12px;color:#333;margin:8px 0;line-height:1.4;">
-<strong>Notes:</strong> {notes[:200]}...
-</div>
-</div>
-'''
+<div style="font-weight:700;color:#212121;margin-bottom:8px;font-size:14px;">{title}</div>
+<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Stores:</strong> {stores}</div>
+<div style="font-size:12px;color:#333;margin:8px 0;line-height:1.4;padding-left:8px;border-left:2px solid #dc3545;"><strong>Notes:</strong> {notes}</div>
+<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>WM Week:</strong> {wm_week}</div>
+<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Status:</strong> {deployment}</div>
+</div>'''
     
-    html += '</div></div></body></html>'
+    html = f'''<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>*{{margin:0;padding:0;box-sizing:border-box;}} body{{background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;}}</style>
+</head><body>
+<div style="background:#fff3cd;border-left:6px solid #dc3545;border-radius:8px;padding:20px;box-shadow:0 2px 4px rgba(220,53,69,0.15);">
+  <div style="color:#dc3545;font-size:18px;font-weight:700;margin-bottom:16px;">🚨 Needs Attention</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;">
+    {cards_html}
+  </div>
+</div>
+</body></html>'''
     
     return html
 
 
+def build_executive_summary_html(stats: dict, projects: list) -> str:
+    """Build HTML for the Executive Summary slide — matches dashboard layout exactly.
+    Includes: header bar + stats cards + needs attention section.
+    """
+    total = stats.get('total_projects', 0)
+    stores = stats.get('total_stores', 0)
+    on_track = stats.get('on_track', 0)
+    at_risk = stats.get('at_risk', 0)
+    off_track = stats.get('off_track', 0)
+    continuous = stats.get('continuous', 0) if 'continuous' in stats else 0
+    
+    # At-risk items for Needs Attention
+    at_risk_items = [p for p in projects if str(p.get('Health Status', '')).lower() in ('at risk', 'off track')]
+    
+    cards_html = ''
+    for item in at_risk_items:
+        title = escape(item.get('Initiative - Project Title', 'Unknown'))
+        stores_val = item.get('# of Stores', 0)
+        notes = escape(item.get('Executive Notes', 'No notes provided'))
+        phase = escape(item.get('Phase', 'Unknown'))
+        wm_week = escape(str(item.get('WM Week', 'N/A')))
+        status_label = escape(str(item.get('Health Status', 'At Risk')))
+        deployment = escape(str(item.get('Deployment', 'No Note Provided')))
+        
+        cards_html += f'''<div style="background:white;border:1px solid #dc3545;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(220,53,69,0.1);">
+<div style="margin-bottom:8px;">
+  <div style="display:inline-block;background:#dc3545;color:white;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:600;">{status_label}</div>
+  <div style="font-size:12px;color:#666;margin-top:4px;">Phase: {phase}</div>
+</div>
+<div style="font-weight:700;color:#212121;margin-bottom:8px;font-size:14px;">{title}</div>
+<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Stores:</strong> {stores_val}</div>
+<div style="font-size:12px;color:#333;margin:8px 0;line-height:1.4;padding-left:8px;border-left:2px solid #dc3545;"><strong>Notes:</strong> {notes}</div>
+<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>WM Week:</strong> {wm_week}</div>
+<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Status:</strong> {deployment}</div>
+</div>'''
+    
+    needs_attention_section = ''
+    if cards_html:
+        needs_attention_section = f'''
+<div style="background:#fff3cd;border-left:6px solid #dc3545;border-radius:8px;padding:20px;margin-top:20px;box-shadow:0 2px 4px rgba(220,53,69,0.15);">
+  <div style="color:#dc3545;font-size:18px;font-weight:700;margin-bottom:16px;">🚨 Needs Attention</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+    {cards_html}
+  </div>
+</div>'''
+    
+    html = f'''<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>
+*{{margin:0;padding:0;box-sizing:border-box;}}
+body{{background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;}}
+</style>
+</head><body>
+
+<!-- Header Bar -->
+<div style="background:linear-gradient(135deg,#1E3A8A 0%,#2563EB 100%);padding:20px 30px;display:flex;align-items:center;gap:16px;">
+  <div style="width:40px;height:40px;background:#FFC220;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+    <span style="font-size:20px;">✦</span>
+  </div>
+  <div>
+    <div style="color:white;font-size:22px;font-weight:700;">V.E.T. Executive Report</div>
+    <div style="color:rgba(255,255,255,0.8);font-size:13px;">TDA Initiatives - Dallas VET Focus</div>
+  </div>
+</div>
+
+<!-- Stats Cards Row -->
+<div style="display:flex;gap:0;border:1px solid #e5e5e5;margin:20px 0;">
+  <div style="flex:1;text-align:center;padding:16px;border-right:1px solid #e5e5e5;">
+    <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;">Total Initiatives</div>
+    <div style="font-size:28px;font-weight:700;color:#212121;">{total}</div>
+  </div>
+  <div style="flex:1;text-align:center;padding:16px;border-right:1px solid #e5e5e5;">
+    <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;">Total Stores Impacted</div>
+    <div style="font-size:28px;font-weight:700;color:#212121;">{stores:,}</div>
+  </div>
+  <div style="flex:1;text-align:center;padding:16px;border-right:1px solid #e5e5e5;">
+    <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;">On Track</div>
+    <div style="font-size:28px;font-weight:700;color:#107C10;">{on_track}</div>
+  </div>
+  <div style="flex:1;text-align:center;padding:16px;border-right:1px solid #e5e5e5;">
+    <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;">At Risk</div>
+    <div style="font-size:28px;font-weight:700;color:#F7630C;">{at_risk}</div>
+  </div>
+  <div style="flex:1;text-align:center;padding:16px;border-right:1px solid #e5e5e5;">
+    <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;">Off Track</div>
+    <div style="font-size:28px;font-weight:700;color:#DC3545;">{off_track}</div>
+  </div>
+  <div style="flex:1;text-align:center;padding:16px;">
+    <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;">Continuous</div>
+    <div style="font-size:28px;font-weight:700;color:#212121;">{continuous}</div>
+  </div>
+</div>
+
+<!-- Needs Attention -->
+{needs_attention_section}
+
+</body></html>'''
+    
+    return html
+    return html
+
+
 def build_phase_html(phase: str, rows: list) -> str:
-    """Build HTML for a phase section with ALL columns from dashboard"""
+    """Build HTML for a phase section — matches dashboard Generate PPT styling exactly"""
     
     columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'WM Week', '# of Stores', 'Executive Notes']
     
-    # Phase banner
-    banner = f'''<div style="background:#1E3A8A;color:white;padding:15px 20px;font-size:18px;font-weight:700;text-align:center;border-radius:4px 4px 0 0;">
-    {escape(phase)} ({len(rows)} Projects)
-</div>'''
+    # Phase banner — matches dashboard blue (#3B82F6)
+    banner = f'''<div style="background:#3B82F6;color:white;padding:10px 20px;font-size:16px;font-weight:600;text-align:center;border-radius:4px 4px 0 0;">Phase: {escape(phase)}</div>'''
     
-    # Build table with all columns
-    table = '<table style="width:100%;border-collapse:collapse;font-size:12px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Helvetica Neue\',Arial,sans-serif;">'
+    # Build table matching dashboard styling (14px font, 16px 24px padding)
+    table = '<table style="width:100%;border-collapse:collapse;font-size:14px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Helvetica Neue\',Arial,sans-serif;">'
     table += '<thead style="background-color:#F5F5F5;border-bottom:2px solid #E5E5E5;"><tr>'
     
     for col in columns:
-        table += f'<th style="padding:12px;text-align:left;font-weight:600;color:#212121;white-space:nowrap;border-bottom:2px solid #E5E5E5;font-size:11px;">{escape(col)}</th>'
+        table += f'<th style="padding:16px 24px;text-align:left;font-weight:600;color:#212121;white-space:nowrap;">{escape(col)}</th>'
     
     table += '</tr></thead><tbody>'
     
-    for i, row in enumerate(rows):
-        bg = '#ffffff' if i % 2 == 0 else '#fafafa'
-        table += f'<tr style="background:{bg};">'
+    for row in rows:
+        table += '<tr>'
         
         for col in columns:
             value = str(row.get(col, '') or '')
-            cell_style = 'padding:12px;border-bottom:1px solid #E5E5E5;text-align:left;font-size:11px;'
+            cell_style = 'padding:16px 24px;border-bottom:1px solid #E5E5E5;text-align:left;'
             
             if col == 'Health Status':
                 status = value.lower()
@@ -244,7 +358,10 @@ def build_phase_html(phase: str, rows: list) -> str:
                 elif 'off track' in status:
                     bg_color, color = 'rgba(220,53,69,0.2)', '#DC3545'
                 
-                table += f'<td style="{cell_style}"><span style="display:inline-block;padding:4px 8px;background-color:{bg_color};color:{color};border-radius:12px;font-weight:600;font-size:10px;white-space:nowrap;">{escape(value)}</span></td>'
+                table += f'<td style="{cell_style}"><span style="display:inline-block;padding:4px 10px;background-color:{bg_color};color:{color};border-radius:12px;font-weight:600;font-size:12px;white-space:nowrap;">{escape(value)}</span></td>'
+            
+            elif col == 'Phase':
+                table += f'<td style="{cell_style}"><span style="display:inline-block;padding:4px 10px;background-color:#DBEAFE;color:#1E3A8A;border-radius:4px;font-weight:500;font-size:12px;">{escape(value)}</span></td>'
             
             elif col == '# of Stores':
                 try:
@@ -254,10 +371,14 @@ def build_phase_html(phase: str, rows: list) -> str:
                     pass
                 table += f'<td style="{cell_style}font-weight:600;color:#0071CE;">{escape(value)}</td>'
             
+            elif col == 'Initiative - Project Title':
+                project_id = row.get('Project ID', '')
+                if project_id:
+                    table += f'<td style="{cell_style}"><a href="https://hoops.wal-mart.com/intake-hub/projects/{escape(str(project_id))}" style="color:#0071CE;text-decoration:none;font-weight:500;">{escape(value)}</a></td>'
+                else:
+                    table += f'<td style="{cell_style}">{escape(value)}</td>'
+            
             else:
-                # Truncate long text for Executive Notes
-                if col == 'Executive Notes' and len(value) > 100:
-                    value = value[:97] + '...'
                 table += f'<td style="{cell_style}">{escape(value)}</td>'
         
         table += '</tr>'
@@ -267,9 +388,68 @@ def build_phase_html(phase: str, rows: list) -> str:
     # Wrap in document
     full_html = f'''<!DOCTYPE html><html><head><meta charset="utf-8">
 <style>*{{margin:0;padding:0;box-sizing:border-box;}} body{{background:white;}}</style>
-</head><body>{banner}{table}</body></html>'''
+</head><body><div style="margin-bottom:10px;">{banner}{table}</div></body></html>'''
     
     return full_html
+
+
+def build_combined_phases_html(phase_sections: list) -> str:
+    """Build HTML combining multiple small phases onto one page.
+    phase_sections: list of (phase_name, rows_list) tuples
+    """
+    columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'WM Week', '# of Stores', 'Executive Notes']
+    
+    body = ''
+    for phase, rows in phase_sections:
+        banner = f'''<div style="background:#3B82F6;color:white;padding:10px 20px;font-size:16px;font-weight:600;text-align:center;border-radius:4px 4px 0 0;">Phase: {escape(phase)}</div>'''
+        
+        table = '<table style="width:100%;border-collapse:collapse;font-size:14px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Helvetica Neue\',Arial,sans-serif;">'
+        table += '<thead style="background-color:#F5F5F5;border-bottom:2px solid #E5E5E5;"><tr>'
+        for col in columns:
+            table += f'<th style="padding:16px 24px;text-align:left;font-weight:600;color:#212121;white-space:nowrap;">{escape(col)}</th>'
+        table += '</tr></thead><tbody>'
+        
+        for row in rows:
+            table += '<tr>'
+            for col in columns:
+                value = str(row.get(col, '') or '')
+                cell_style = 'padding:16px 24px;border-bottom:1px solid #E5E5E5;text-align:left;'
+                
+                if col == 'Health Status':
+                    status = value.lower()
+                    bg_color, color = '#f0f0f0', '#333'
+                    if 'on track' in status:
+                        bg_color, color = 'rgba(16,124,16,0.2)', '#107C10'
+                    elif 'at risk' in status:
+                        bg_color, color = 'rgba(247,99,12,0.2)', '#F7630C'
+                    elif 'off track' in status:
+                        bg_color, color = 'rgba(220,53,69,0.2)', '#DC3545'
+                    table += f'<td style="{cell_style}"><span style="display:inline-block;padding:4px 10px;background-color:{bg_color};color:{color};border-radius:12px;font-weight:600;font-size:12px;white-space:nowrap;">{escape(value)}</span></td>'
+                elif col == 'Phase':
+                    table += f'<td style="{cell_style}"><span style="display:inline-block;padding:4px 10px;background-color:#DBEAFE;color:#1E3A8A;border-radius:4px;font-weight:500;font-size:12px;">{escape(value)}</span></td>'
+                elif col == '# of Stores':
+                    try:
+                        stores = int(row.get(col, 0) or 0)
+                        value = f"{stores:,}"
+                    except:
+                        pass
+                    table += f'<td style="{cell_style}font-weight:600;color:#0071CE;">{escape(value)}</td>'
+                elif col == 'Initiative - Project Title':
+                    project_id = row.get('Project ID', '')
+                    if project_id:
+                        table += f'<td style="{cell_style}"><a href="https://hoops.wal-mart.com/intake-hub/projects/{escape(str(project_id))}" style="color:#0071CE;text-decoration:none;font-weight:500;">{escape(value)}</a></td>'
+                    else:
+                        table += f'<td style="{cell_style}">{escape(value)}</td>'
+                else:
+                    table += f'<td style="{cell_style}">{escape(value)}</td>'
+            table += '</tr>'
+        
+        table += '</tbody></table>'
+        body += f'<div style="margin-bottom:20px;">{banner}{table}</div>'
+    
+    return f'''<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>*{{margin:0;padding:0;box-sizing:border-box;}} body{{background:white;}}</style>
+</head><body>{body}</body></html>'''
 
 
 def capture_html_screenshot(html_content: str, output_png: str, width: int = 1280) -> bool:
@@ -317,14 +497,14 @@ def capture_html_screenshot(html_content: str, output_png: str, width: int = 128
         return False
 
 
-def generate_report_pptx(needs_attention_html: str, sections: list) -> tuple:
-    """Generate PPTX: Title + Needs Attention + Phase slides"""
+def generate_report_pptx(executive_summary_html: str, sections: list) -> tuple:
+    """Generate PPTX: Title + Executive Summary + Phase slides"""
     try:
         print("     [*] Generating PPT from dashboard screenshots...")
         
         prs = Presentation()
-        prs.slide_width = Inches(10)
-        prs.slide_height = Inches(7.5)
+        prs.slide_width = Inches(9.6)
+        prs.slide_height = Inches(7.2)
         SLIDE_WIDTH = prs.slide_width
         SLIDE_HEIGHT = prs.slide_height
         
@@ -335,7 +515,7 @@ def generate_report_pptx(needs_attention_html: str, sections: list) -> tuple:
         fill.solid()
         fill.fore_color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
         
-        txBox = slide.shapes.add_textbox(Inches(0.5), Inches(2.5), Inches(9), Inches(1.8))
+        txBox = slide.shapes.add_textbox(Inches(0.5), Inches(2.5), Inches(8.6), Inches(1.8))
         p = txBox.text_frame.paragraphs[0]
         p.alignment = PP_ALIGN.CENTER
         run = p.add_run()
@@ -344,7 +524,7 @@ def generate_report_pptx(needs_attention_html: str, sections: list) -> tuple:
         run.font.bold = True
         run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
         
-        txBox2 = slide.shapes.add_textbox(Inches(0.5), Inches(4.2), Inches(9), Inches(0.8))
+        txBox2 = slide.shapes.add_textbox(Inches(0.5), Inches(4.2), Inches(8.6), Inches(0.8))
         p2 = txBox2.text_frame.paragraphs[0]
         p2.alignment = PP_ALIGN.CENTER
         run2 = p2.add_run()
@@ -352,7 +532,7 @@ def generate_report_pptx(needs_attention_html: str, sections: list) -> tuple:
         run2.font.size = Pt(20)
         run2.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
         
-        accent = slide.shapes.add_shape(1, Emu(0), Inches(7.0), SLIDE_WIDTH, Inches(0.5))
+        accent = slide.shapes.add_shape(1, Emu(0), Inches(6.7), SLIDE_WIDTH, Inches(0.5))
         accent.fill.solid()
         accent.fill.fore_color.rgb = RGBColor(0xFF, 0xC2, 0x20)
         accent.line.fill.background()
@@ -360,12 +540,12 @@ def generate_report_pptx(needs_attention_html: str, sections: list) -> tuple:
         screenshots = []
         temp_files = []
         
-        # ── Needs Attention Slide (if available) ──
-        if needs_attention_html:
-            png_path = OUTPUT_DIR / "temp_needs_attention.png"
+        # ── Executive Summary Slide ──
+        if executive_summary_html:
+            png_path = OUTPUT_DIR / "temp_executive_summary.png"
             temp_files.append(png_path)
             
-            if capture_html_screenshot(needs_attention_html, str(png_path)):
+            if capture_html_screenshot(executive_summary_html, str(png_path)):
                 if Path(png_path).exists():
                     png_bytes = Path(png_path).read_bytes()
                     img = Image.open(io.BytesIO(png_bytes))
@@ -378,7 +558,7 @@ def generate_report_pptx(needs_attention_html: str, sections: list) -> tuple:
                     
                     slide = prs.slides.add_slide(prs.slide_layouts[6])
                     slide.shapes.add_picture(io.BytesIO(png_bytes), Emu(0), Emu(0), final_w, final_h)
-                    screenshots.append(("Needs Attention", png_bytes))
+                    screenshots.append(("Executive Summary", png_bytes))
         
         # ── Phase Slides ──
         for section_name, html_content in sections:
@@ -448,8 +628,15 @@ def generate_report_pdf(screenshots: list) -> bytes:
         return None
 
 
-def send_vet_report_email(recipient_email: str = "kendall.rush@walmart.com", test_mode: bool = False):
+def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False):
     """Main email generation and sending"""
+    
+    if recipient_emails is None:
+        recipient_emails = [
+            "kendall.rush@walmart.com",
+            "Matthew.Farnworth@walmart.com",
+            "Tina.Budnaitis@walmart.com"
+        ]
     
     print("=" * 90)
     print("V.E.T. EXECUTIVE REPORT - FINAL VERSION")
@@ -473,16 +660,13 @@ def send_vet_report_email(recipient_email: str = "kendall.rush@walmart.com", tes
         print(f"       * WM Week: {stats['wm_week']}")
         print()
         
-        # Step 2: Build Needs Attention HTML
-        print("[2/6] Building Needs Attention section...")
-        needs_attention_html = build_needs_attention_html(projects)
-        if needs_attention_html:
-            print("     [OK] Needs Attention section captured")
-        else:
-            print("     [!] No at-risk items found")
+        # Step 2: Build Executive Summary (header + stats + needs attention)
+        print("[2/6] Building Executive Summary slide...")
+        executive_summary_html = build_executive_summary_html(stats, projects)
+        print("     [OK] Executive Summary built (header + stats + needs attention)")
         print()
         
-        # Step 3: Build Phase sections
+        # Step 3: Build Phase sections — combine small phases onto one slide
         print("[3/6] Capturing dashboard phase tables...")
         phases_dict = {}
         for proj in projects:
@@ -491,15 +675,83 @@ def send_vet_report_email(recipient_email: str = "kendall.rush@walmart.com", tes
                 phases_dict[phase] = []
             phases_dict[phase].append(proj)
         
-        sections = []
+        # Build ordered list of (phase, rows) tuples
         phase_order = ['Pending', 'Vet', 'Test', 'Test Markets', 'Roll/Deploy']
+        ordered_phases = []
         for phase in phase_order:
-            if phase not in phases_dict or not phases_dict[phase]:
-                continue
-            html = build_phase_html(phase, phases_dict[phase])
-            sections.append((phase, html))
+            if phase in phases_dict and phases_dict[phase]:
+                ordered_phases.append((phase, phases_dict[phase]))
         
-        print(f"     [OK] Captured {len(sections)} phase sections")
+        # Combine small phases (≤ 5 rows each, ≤ 10 rows combined) onto one slide
+        # Split large phases into pages of MAX_ROWS_PER_PAGE rows each
+        MAX_ROWS_PER_PAGE = 8
+        MAX_ROWS_TO_COMBINE = 5
+        MAX_ROWS_COMBINED_TOTAL = 10
+        sections = []
+        pending_combine = []
+        pending_rows = 0
+        
+        for phase, rows in ordered_phases:
+            # Split large phases into pages first
+            if len(rows) > MAX_ROWS_PER_PAGE:
+                # Flush pending combines first
+                if pending_combine:
+                    if len(pending_combine) == 1:
+                        html = build_phase_html(pending_combine[0][0], pending_combine[0][1])
+                        sections.append((pending_combine[0][0], html))
+                    else:
+                        html = build_combined_phases_html(pending_combine)
+                        names = ' + '.join(p[0] for p in pending_combine)
+                        sections.append((names, html))
+                    pending_combine = []
+                    pending_rows = 0
+                
+                # Paginate large phase
+                for i in range(0, len(rows), MAX_ROWS_PER_PAGE):
+                    page_rows = rows[i:i + MAX_ROWS_PER_PAGE]
+                    page_num = (i // MAX_ROWS_PER_PAGE) + 1
+                    total_pages = -(-len(rows) // MAX_ROWS_PER_PAGE)  # ceil division
+                    label = f"{phase} ({page_num}/{total_pages})" if total_pages > 1 else phase
+                    html = build_phase_html(phase, page_rows)
+                    sections.append((label, html))
+            elif len(rows) <= MAX_ROWS_TO_COMBINE and pending_rows + len(rows) <= MAX_ROWS_COMBINED_TOTAL:
+                # Small enough to combine
+                pending_combine.append((phase, rows))
+                pending_rows += len(rows)
+            else:
+                # Flush any pending combined sections first
+                if pending_combine:
+                    if len(pending_combine) == 1:
+                        html = build_phase_html(pending_combine[0][0], pending_combine[0][1])
+                        sections.append((pending_combine[0][0], html))
+                    else:
+                        html = build_combined_phases_html(pending_combine)
+                        names = ' + '.join(p[0] for p in pending_combine)
+                        sections.append((names, html))
+                    pending_combine = []
+                    pending_rows = 0
+                
+                # This phase is too big to combine — make it its own slide
+                if len(rows) <= MAX_ROWS_TO_COMBINE:
+                    pending_combine.append((phase, rows))
+                    pending_rows = len(rows)
+                else:
+                    html = build_phase_html(phase, rows)
+                    sections.append((phase, html))
+        
+        # Flush remaining
+        if pending_combine:
+            if len(pending_combine) == 1:
+                html = build_phase_html(pending_combine[0][0], pending_combine[0][1])
+                sections.append((pending_combine[0][0], html))
+            else:
+                html = build_combined_phases_html(pending_combine)
+                names = ' + '.join(p[0] for p in pending_combine)
+                sections.append((names, html))
+        
+        print(f"     [OK] Built {len(sections)} slide sections (combined small phases)")
+        for name, _ in sections:
+            print(f"       * {name}")
         print()
         
         # Step 4: Generate PPT
@@ -511,7 +763,7 @@ def send_vet_report_email(recipient_email: str = "kendall.rush@walmart.com", tes
         pptx_path = OUTPUT_DIR / pptx_filename
         pdf_path = OUTPUT_DIR / pdf_filename
         
-        pptx_data, screenshots = generate_report_pptx(needs_attention_html, sections)
+        pptx_data, screenshots = generate_report_pptx(executive_summary_html, sections)
         
         if pptx_data:
             pptx_path.write_bytes(pptx_data)
@@ -541,7 +793,7 @@ def send_vet_report_email(recipient_email: str = "kendall.rush@walmart.com", tes
         mode_text = "DRAFT" if test_mode else "SEND"
         print(f"     Email Configuration:")
         print(f"       * Mode: {mode_text}")
-        print(f"       * Recipient: {recipient_email}")
+        print(f"       * Recipients: {', '.join(recipient_emails)}")
         print(f"       * Subject: V.E.T. Executive Report - {wk}")
         
         attachments = [str(pptx_path)]
@@ -553,11 +805,11 @@ def send_vet_report_email(recipient_email: str = "kendall.rush@walmart.com", tes
         
         # Prepare report data with dashboard HTML
         report_data = stats.copy()
-        report_data['dashboard_html'] = needs_attention_html  # Pass needs attention HTML
+        report_data['dashboard_html'] = executive_summary_html  # Pass executive summary HTML
         
         # Send
         success = email_service.send_report_email(
-            to_recipients=[recipient_email],
+            to_recipients=recipient_emails,
             report_data=report_data,
             attachment_paths=attachments,
             test_mode=test_mode
@@ -569,7 +821,7 @@ def send_vet_report_email(recipient_email: str = "kendall.rush@walmart.com", tes
             print("[OK] EMAIL SENT SUCCESSFULLY")
             print("=" * 90)
             print()
-            print(f"   Recipient: {recipient_email}")
+            print(f"   Recipients: {', '.join(recipient_emails)}")
             print(f"   Subject: V.E.T. Executive Report - {wk}")
             print(f"   Data: {stats['total_projects']} projects, {stats['total_stores']:,} stores")
             print()
@@ -590,7 +842,7 @@ def send_vet_report_email(recipient_email: str = "kendall.rush@walmart.com", tes
 
 def main():
     """Main entry point"""
-    recipient = "kendall.rush@walmart.com"
+    recipients = None  # Uses default list: Kendall, Matthew, Tina
     test_mode = False
     
     for arg in sys.argv[1:]:
@@ -599,9 +851,9 @@ def main():
         elif arg == '--email':
             idx = sys.argv.index(arg)
             if idx + 1 < len(sys.argv):
-                recipient = sys.argv[idx + 1]
+                recipients = [sys.argv[idx + 1]]
     
-    success = send_vet_report_email(recipient_email=recipient, test_mode=test_mode)
+    success = send_vet_report_email(recipient_emails=recipients, test_mode=test_mode)
     sys.exit(0 if success else 1)
 
 
