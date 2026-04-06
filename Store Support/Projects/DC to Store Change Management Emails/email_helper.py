@@ -337,75 +337,71 @@ class EmailHelper:
 """
         return html
     
-    def send_email_via_outlook(self, to: List[str], subject: str, body_html: str, from_email: str = None) -> bool:
+    def send_email_via_outlook(self, to: List[str], subject: str, body_html: str, from_email: str = None, bcc: List[str] = None) -> bool:
         """
-        Send email via Outlook COM automation (same as seasonal dashboard).
-        This works automatically when Outlook is installed on Windows.
+        Send email via Outlook COM automation with optional BCC.
         
         Args:
             to: List of recipient email addresses
             subject: Email subject
             body_html: HTML body content
-            from_email: Optional - send from specific account (e.g., shared mailbox)
+            from_email: Optional - override FROM address
+            bcc: Optional - List of BCC recipient email addresses
         
         Returns:
             True if sent successfully
         """
         try:
-            import win32com.client
+            import win32com.client as win32
+            
+            outlook = win32.Dispatch("Outlook.Application")
+            mail = outlook.CreateItem(0)  # 0 = mail item
+            
+            mail.Subject = subject
+            mail.HTMLBody = body_html
+            mail.To = '; '.join(to)
+            
+            if bcc:
+                mail.BCC = '; '.join(bcc)
+            
+            # Try to use shared mailbox if available
+            try:
+                if from_email:
+                    # Create from specified email
+                    sender_account = None
+                    for account in outlook.Session.Accounts:
+                        if account.SmtpAddress.lower() == from_email.lower():
+                            sender_account = account
+                            break
+                    
+                    if sender_account:
+                        mail._oleobj_.Invoke(*(64209, 0, 8, 0, sender_account))
+                    else:
+                        # Account not found, use default
+                        print(f"[WARNING] Shared mailbox folder not found, using default account")
+            except:
+                print(f"[WARNING] Could not set shared mailbox, using default account")
             
             print(f"\n[EMAIL] Sending via Outlook COM automation:")
             print(f"  To: {', '.join(to)}")
+            if bcc:
+                print(f"  BCC: {', '.join(bcc)}")
             print(f"  Subject: {subject}")
             if from_email:
                 print(f"  From: {from_email}")
             
-            # Create Outlook application object
-            outlook = win32com.client.Dispatch('Outlook.Application')
-            
-            # Create new email
-            mail = outlook.CreateItem(0)  # 0 = olMailItem
-            
-            # Set email properties
-            mail.To = '; '.join(to)
-            mail.Subject = subject
-            mail.HTMLBody = body_html
-            
-            # Try to set the sending account/folder if specified
-            if from_email and "supplychainops" in from_email.lower():
-                try:
-                    # Try to find shared mailbox folder
-                    namespace = outlook.GetNamespace("MAPI")
-                    shared_found = False
-                    
-                    for i in range(1, namespace.Folders.Count + 1):
-                        folder = namespace.Folders.Item(i)
-                        if "supply chain" in folder.Name.lower():
-                            # Set sent items folder to shared mailbox
-                            mail.SaveSentMessageFolder = folder.Folders("Sent Items")
-                            # Set the From field by using the folder's default sender
-                            mail.SentOnBehalfOfName = "supplychainops@email.wal-mart.com"
-                            print(f"  [OK] Set sent items folder: {folder.Name}")
-                            shared_found = True
-                            break
-                    
-                    if not shared_found:
-                        print(f"  [WARNING] Shared mailbox folder not found, using default account")
-                except Exception as e:
-                    print(f"  [WARNING] Could not set shared mailbox: {e}")
-            
-            # Send immediately
             mail.Send()
             
             print(f"  [OK] Email sent successfully!\n")
             return True
             
         except ImportError:
-            print(f"  [ERROR] win32com.client not available")
-            print(f"  [INFO] Install with: pip install pywin32\n")
+            print(f"[ERROR] pywin32 not installed. Cannot send via Outlook COM.\n")
             return False
         except Exception as e:
             print(f"  [ERROR] Failed to send email: {e}\n")
+            import traceback
+            traceback.print_exc()
             return False
     
     def send_email_via_msgraph(self, to: List[str], subject: str, body_html: str) -> bool:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 TDA Insights Weekly Email Report
-Generates a PPT of all projects and sends via Outlook.
+Generates a PPT of all projects and sends via Walmart internal SMTP.
 Scheduled for Thursdays at 11:00 AM Central Time.
 
 Usage:
@@ -671,16 +671,35 @@ def generate_report_pdf(pptx_screenshots):
 
 
 def send_outlook_email(html_body, attachments, recipients):
-    """Send email via Outlook with PPT attachment"""
-    import win32com.client
-    outlook = win32com.client.Dispatch('Outlook.Application')
-    mail = outlook.CreateItem(0)  # 0 = olMailItem
-    mail.Subject = SUBJECT
-    mail.HTMLBody = html_body
-    mail.To = '; '.join(recipients)
+    """Send email via Walmart internal SMTP (no Outlook dependency)"""
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from email.mime.base import MIMEBase
+    from email import encoders
+    from pathlib import Path
+
+    SMTP_SERVER = "smtp-gw1.homeoffice.wal-mart.com"
+    SMTP_PORT = 25
+    FROM_EMAIL = "kendall.rush@walmart.com"
+
+    msg = MIMEMultipart('mixed')
+    msg['From'] = FROM_EMAIL
+    msg['To'] = '; '.join(recipients)
+    msg['Subject'] = SUBJECT
+    msg.attach(MIMEText(html_body, 'html', 'utf-8'))
+
     for att in attachments:
-        mail.Attachments.Add(str(att))
-    mail.Send()
+        att_path = Path(att)
+        with open(att_path, 'rb') as f:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(f.read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f'attachment; filename="{att_path.name}"')
+        msg.attach(part)
+
+    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=30) as server:
+        server.sendmail(FROM_EMAIL, recipients, msg.as_string())
     print(f"[OK] Email sent to: {', '.join(recipients)}")
 
 

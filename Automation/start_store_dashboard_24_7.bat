@@ -23,7 +23,7 @@ set LogFile=%DashboardPath%\store_dashboard_server.log
 set Port=8081
 
 REM Set up Google Cloud credentials for BigQuery access
-set GOOGLE_APPLICATION_CREDENTIALS=%APPDATA%\gcloud\application_default_credentials.json
+set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json
 
 echo.
 echo ================================================================

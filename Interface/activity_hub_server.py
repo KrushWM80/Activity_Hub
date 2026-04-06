@@ -5,6 +5,7 @@ URL: http://weus42608431466:8088/activity-hub/
 """
 
 import os
+import requests
 from flask import Flask, send_from_directory, send_file, abort
 
 app = Flask(__name__)
@@ -107,6 +108,49 @@ def static_store_support(filename):
 
 
 # ──────────────────────────────────────────────
+# Logic Rules Engine API Proxy Routes
+# ──────────────────────────────────────────────
+
+SCHEDULER_SERVICE_URL = 'http://localhost:5011'
+
+@app.route('/api/logic/metrics')
+def get_logic_metrics():
+    """Proxy Logic Rules Engine metrics for dashboard display."""
+    try:
+        response = requests.get(f'{SCHEDULER_SERVICE_URL}/api/v1/logic-metrics', timeout=5)
+        if response.status_code == 200:
+            return response.json()
+        return {'error': 'Service unavailable'}, 503
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+@app.route('/api/logic/notifications/today')
+def get_notifications_today():
+    """Proxy Logic Rules Engine notifications for today."""
+    try:
+        response = requests.get(f'{SCHEDULER_SERVICE_URL}/api/v1/notifications/today', timeout=5)
+        if response.status_code == 200:
+            return response.json()
+        return {'error': 'Service unavailable'}, 503
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+@app.route('/api/logic/requests')
+def get_logic_requests(status=None):
+    """Proxy Logic Requests with optional status filter."""
+    try:
+        url = f'{SCHEDULER_SERVICE_URL}/api/v1/logic-requests'
+        if status:
+            url += f'?status={status}'
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            return response.json()
+        return {'error': 'Service unavailable'}, 503
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+
+# ──────────────────────────────────────────────
 # Coming Soon Template
 # ──────────────────────────────────────────────
 
@@ -138,7 +182,7 @@ def _coming_soon(page_name):
         .header {{ background: linear-gradient(135deg, #0071ce, #004f9a); color: white; padding: 0 2rem; height: 64px; display: flex; align-items: center; }}
         .header-content {{ display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1400px; margin: 0 auto; }}
         .logo-section {{ display: flex; align-items: center; gap: 12px; }}
-        .spark-logo {{ width: 32px; height: 32px; background: var(--walmart-yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--gray-900); }}
+        .spark-logo {{ width: 32px; height: 32px; object-fit: contain; }}
         .nav-items {{ display: flex; gap: 1.5rem; }}
         .nav-item {{ color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; padding: 0.5rem 0; }}
         .nav-item:hover {{ color: white; }}
@@ -153,7 +197,7 @@ def _coming_soon(page_name):
     <header class="header">
         <div class="header-content">
             <div class="logo-section">
-                <div class="spark-logo">★</div>
+                <img src="/activity-hub/static/store-support/General Setup/Design/Spark Blank.png" alt="Spark" class="spark-logo">
                 <h1 style="font-size: 1.25rem;">Activity Hub</h1>
             </div>
             <nav class="nav-items">{nav_html}</nav>

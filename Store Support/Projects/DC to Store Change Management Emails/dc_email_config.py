@@ -23,13 +23,24 @@ SEND_FROM_NAME = "ELM Manager Change Tracking System"
 USE_BCC = True
 
 # Test mode - send all emails to these recipients for validation
-TEST_MODE = True  # Set to False when ready for production
+TEST_MODE = False  # Set to False when ready for production
 TEST_RECIPIENTS = [
     "Kristine.Torres@walmart.com",
     "Matthew.Farnworth@walmart.com",
     "Kendall.Rush@walmart.com"
 ]  # 3-person test group
 TEST_RECIPIENT = TEST_RECIPIENTS[0]  # Backward compatibility
+
+# ============================================================================
+# PRODUCTION BCC CONFIGURATION
+# ============================================================================
+# Users who receive all emails in BCC (hidden from recipient view)
+# These users monitor the system but are not primary recipients
+BCC_RECIPIENTS = [
+    "Kristine.Torres@walmart.com",
+    "Matthew.Farnworth@walmart.com",
+    "Kendall.Rush@walmart.com"
+]
 
 # Admin email - ALWAYS receives error and no-change notifications (even in production)
 ADMIN_EMAIL = "jhendr6@homeoffice.wal-mart.com"

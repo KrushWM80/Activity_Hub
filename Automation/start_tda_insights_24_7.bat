@@ -55,7 +55,7 @@ timeout /t 2 /nobreak > nul
 echo [%date% %time%] Launching TDA Insights (backend_simple.py)... >> "%LogFile%"
 echo Launching TDA Insights on port %Port%...
 
-"%PythonExe%" backend_simple.py 2>> "%LogFile%"
+"%PythonExe%" backend_simple.py >> "%LogFile%" 2>&1
 
 REM If process exits, log it and wait before restarting
 echo [%date% %time%] Process exited with code !ERRORLEVEL! >> "%LogFile%"

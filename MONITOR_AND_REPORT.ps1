@@ -543,18 +543,24 @@ function Check-And-RestartMeetingPlanner {
     }
 }
 
-# Send email via Outlook
+# Send email via Walmart internal SMTP (no Outlook dependency)
 function Send-StatusEmail {
     param($Subject, $HTMLBody)
     
     try {
-        $outlook = New-Object -ComObject Outlook.Application
-        $mail = $outlook.CreateItem(0)
-        
-        $mail.To = $EmailAddresses -join ";"
-        $mail.Subject = $Subject
-        $mail.HTMLBody = $HTMLBody
-        $mail.Send()
+        $smtp = New-Object System.Net.Mail.SmtpClient("smtp-gw1.homeoffice.wal-mart.com", 25)
+        $smtp.DeliveryMethod = [System.Net.Mail.SmtpDeliveryMethod]::Network
+        $smtp.EnableSsl = $false
+
+        $msg = New-Object System.Net.Mail.MailMessage
+        $msg.From = "kendall.rush@walmart.com"
+        foreach ($addr in $EmailAddresses) { $msg.To.Add($addr) }
+        $msg.Subject = $Subject
+        $msg.Body = $HTMLBody
+        $msg.IsBodyHtml = $true
+
+        $smtp.Send($msg)
+        $msg.Dispose()
         
         Write-Host "✓ Email sent successfully" -ForegroundColor Green
         Write-Host "  To: $($EmailAddresses -join ', ')" -ForegroundColor Green

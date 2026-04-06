@@ -79,15 +79,9 @@
         }
 
         .spark-logo {
-            width: 32px;
-            height: 32px;
-            background: var(--walmart-yellow);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: var(--gray-900);
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
         }
 
         .nav-items {
@@ -1110,6 +1104,58 @@
             .form-grid { grid-template-columns: 1fr; }
         }
 
+        /* Form Styles for Logic Request */
+        .form-group label {
+            display: block;
+            margin-bottom: var(--space-2);
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: var(--font-primary);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: var(--space-2);
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .checkbox-label span {
+            color: var(--gray-700);
+        }
+
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -1128,7 +1174,7 @@
     <header class="header">
         <div class="header-content">
             <div class="logo-section">
-                <div class="spark-logo">★</div>
+                <img src="/activity-hub/static/store-support/General Setup/Design/Spark Blank.png" alt="Spark" class="spark-logo">
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
@@ -1338,13 +1384,13 @@
                 </div>
                 <div id="logic-overview" class="sub-content active">
                     <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-number">24</div><div class="stat-label">Active Rules</div></div>
-                        <div class="stat-card"><div class="stat-number">156</div><div class="stat-label">Notifications Today</div></div>
-                        <div class="stat-card"><div class="stat-number">89%</div><div class="stat-label">Task Completion</div></div>
-                        <div class="stat-card"><div class="stat-number">12</div><div class="stat-label">Next Steps Templates</div></div>
+                        <div class="stat-card"><div class="stat-number">0</div><div class="stat-label">Active Rules</div></div>
+                        <div class="stat-card"><div class="stat-number">0</div><div class="stat-label">Notifications Today</div></div>
+                        <div class="stat-card"><div class="stat-number">0</div><div class="stat-label">Pending Approvals</div></div>
+                        <div class="stat-card"><div class="stat-number">0</div><div class="stat-label">Total Logic Requests</div></div>
                     </div>
                     <div class="management-section full-width">
-                        <div class="section-header"><h3 class="section-title">Logic Configuration Areas</h3></div>
+                        <div class="section-header"><h3 class="section-title">Logic Configuration Areas</h3><button class="btn-primary" onclick="showModal('createLogicRequestModal')">+ Create New Logic Request</button></div>
                         <div class="item-list">
                             <div class="list-item" onclick="showSubTab('logic', 'task-logic')" style="cursor: pointer;"><div class="item-info"><h4>⚙️ Task Logic</h4><p>Configure task assignments, priorities, and automation rules</p></div><div style="color: var(--walmart-blue);">→</div></div>
                             <div class="list-item" onclick="showSubTab('logic', 'notification-alerts')" style="cursor: pointer;"><div class="item-info"><h4>🔔 Notification Alerts</h4><p>Manage alert triggers, delivery channels, and escalations</p></div><div style="color: var(--walmart-blue);">→</div></div>
@@ -1362,11 +1408,31 @@
                     </div>
                 </div>
                 <div id="notification-alerts" class="sub-content">
+                    <!-- Pending Approvals Section -->
                     <div class="management-section full-width">
-                        <div class="section-header"><h3 class="section-title">Notification Alert Rules</h3><button class="btn-primary">+ Add Alert</button></div>
-                        <div class="item-list">
-                            <div class="list-item"><div class="item-info"><h4>Project Deadline Reminder</h4><p>Send reminder 3 days before project deadline</p></div><div class="item-actions"><span style="color: var(--success);">Email, In-App</span><button class="action-btn edit-btn">Edit</button></div></div>
-                            <div class="list-item"><div class="item-info"><h4>New Task Assignment</h4><p>Notify user when a new task is assigned</p></div><div class="item-actions"><span style="color: var(--success);">In-App, Push</span><button class="action-btn edit-btn">Edit</button></div></div>
+                        <div class="section-header">
+                            <h3 class="section-title">⏳ Pending Logic Request Approvals <span style="font-size: 12px; background: var(--error); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 8px;" id="pending-count">0</span></h3>
+                        </div>
+                        
+                        <!-- Custom Trigger Validation Info -->
+                        <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: var(--space-3); margin-bottom: var(--space-4); border-radius: 4px;">
+                            <p style="margin: 0; font-size: 13px; color: #92400e;">
+                                <strong>⚠️ Custom Trigger Workflow:</strong> Requests with custom triggers require validation. 
+                                Admin approval confirms the trigger requirement; backend implementation adds it to the data layer; 
+                                trigger then becomes a standard option in future requests. <a href="#" style="color: #d97706; text-decoration: underline;">Learn more</a>
+                            </p>
+                        </div>
+                        
+                        <div class="item-list" id="pending-approvals-list">
+                            <p style="color: var(--gray-600); padding: var(--space-4);">No pending approvals</p>
+                        </div>
+                    </div>
+
+                    <!-- Active Rules List -->
+                    <div class="management-section full-width">
+                        <div class="section-header"><h3 class="section-title">Active Notification Logic Rules</h3></div>
+                        <div class="item-list" id="active-rules-list">
+                            <p style="color: var(--gray-600); padding: var(--space-4);">No active rules yet. Create and approve a Logic Request to see rules here.</p>
                         </div>
                     </div>
                 </div>
@@ -1803,6 +1869,218 @@
     </div>
 
     <!-- Modals -->
+    <!-- Create Logic Request Modal -->
+    <div id="createLogicRequestModal" class="modal">
+        <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3>Create New Logic Request</h3>
+                <button class="close-btn" onclick="hideModal('createLogicRequestModal')">×</button>
+            </div>
+            <form id="logic-request-form" style="display: grid; gap: var(--space-4); padding: var(--space-4);">
+                            
+                <!-- Basic Info -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                    <div class="form-group">
+                        <label for="request-name">Request Name *</label>
+                        <input type="text" id="request-name" name="name" placeholder="e.g., SIF Meeting Notification for New Projects" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="trigger-type">Trigger Type *</label>
+                        <select id="trigger-type" name="trigger_type" required onchange="toggleCustomTrigger(this.value)">
+                            <option value="">-- Select Trigger --</option>
+                            <option value="new_project">New Project Created</option>
+                            <option value="project_status_changed">Project Status Changed</option>
+                            <option value="task_assigned">Task Assigned</option>
+                            <option value="task_overdue">Task Overdue</option>
+                            <option value="custom">Custom Trigger... (Requires Implementation)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Custom Trigger Input (hidden until Custom is selected) -->
+                <div id="custom-trigger-section" style="display: none; border: 1px solid #f59e0b; border-radius: 6px; padding: var(--space-4); background: #fffbeb;">
+                    <div class="form-group">
+                        <label for="custom-trigger-text">Custom Trigger Description *</label>
+                        <input type="text" id="custom-trigger-text" name="custom_trigger_text" placeholder="e.g., Project has not had a note in more than 30 days" required />
+                        <small style="color: var(--gray-600); display: block; margin-top: var(--space-2);">
+                            <strong>⚠️ Requires Implementation:</strong> Your custom trigger will be reviewed for approval, but full activation requires backend implementation. Validation steps:
+                            <ol style="margin-top: var(--space-2); margin-bottom: 0; padding-left: 20px;">
+                                <li>Admin approves Logic Request</li>
+                                <li>Backend developer implements trigger detection SQL in TriggerDetector</li>
+                                <li>Trigger becomes standard option in dropdown (no longer "Custom")</li>
+                                <li>Logic Request fully activates with standard trigger</li>
+                            </ol>
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="request-description">Description</label>
+                    <textarea id="request-description" name="description" placeholder="Describe what this Logic Request does..." style="min-height: 80px;"></textarea>
+                </div>
+
+                <!-- Component Selection -->
+                <div style="border: 1px solid var(--gray-300); border-radius: 6px; padding: var(--space-4); background: var(--gray-100);">
+                    <h4 style="margin-bottom: var(--space-3); color: var(--walmart-blue);">Include Components</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4);">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="component-notification" name="has_notification_component" />
+                            <span>🔔 Notification</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="component-task" name="has_task_component" />
+                            <span>📋 Task Logic</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="component-nextstep" name="has_nextstep_component" />
+                            <span>🎯 Next Steps</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Notification Component (conditional) -->
+                <div id="notification-component-section" style="display: none; border: 1px solid var(--walmart-blue-light); border-radius: 6px; padding: var(--space-4); background: var(--blue-lightest, #f0f9ff);">
+                    <h4 style="margin-bottom: var(--space-3); color: var(--walmart-blue);">🔔 Notification Component</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                        <div class="form-group">
+                            <label for="notif-category">Category *</label>
+                            <select id="notif-category" name="notification_category">
+                                <option value="">-- Select Category --</option>
+                                <option value="PROJECT_LIFECYCLE">Project Lifecycle</option>
+                                <option value="TASK_WORK">Task & Work</option>
+                                <option value="URGENT">Urgent & Escalation</option>
+                                <option value="COMPLIANCE">Compliance</option>
+                                <option value="ORG_CHANGE">Organization Change</option>
+                                <option value="SYSTEM">System</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="notif-schedule">Schedule *</label>
+                            <select id="notif-schedule" name="notification_schedule">
+                                <option value="immediate">Immediate</option>
+                                <option value="delay_1h">Delay 1 Hour</option>
+                                <option value="daily_8am">Daily at 8 AM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notif-title">Notification Title *</label>
+                        <input type="text" id="notif-title" name="notification_title" placeholder="e.g., SIF Meeting Required: {project_name}" />
+                        <small style="color: var(--gray-600);">Use {variable} for dynamic content like {project_name}, {owner}, etc.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notif-message">Message (HTML okay)</label>
+                        <textarea id="notif-message" name="notification_message" placeholder="Notification message content..." style="min-height: 100px; font-family: monospace; font-size: 12px;"></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                        <div class="form-group">
+                            <label for="notif-recipients">Recipients</label>
+                            <select id="notif-recipients" name="notification_recipients">
+                                <option value="owner">Project Owner</option>
+                                <option value="users">Specific Users</option>
+                                <option value="manager">Manager</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Channels</label>
+                            <div style="display: flex; gap: var(--space-3);">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="notification_channel_email" value="email" />
+                                    <span>Email</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="notification_channel_inapp" value="in_app" checked />
+                                    <span>In-App</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="notification_channel_teams" value="teams" />
+                                    <span>Teams (Phase 2)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Logic Component (conditional) -->
+                <div id="task-component-section" style="display: none; border: 1px solid #fbbf24; border-radius: 6px; padding: var(--space-4); background: #fffbeb;">
+                    <h4 style="margin-bottom: var(--space-3); color: #d97706;">📋 Task Logic Component</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                        <div class="form-group">
+                            <label for="task-title">Task Title *</label>
+                            <input type="text" id="task-title" name="task_title" placeholder="e.g., Schedule SIF Meeting Discussion" />
+                        </div>
+                        <div class="form-group">
+                            <label for="task-priority">Priority</label>
+                            <select id="task-priority" name="task_priority">
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-description">Description</label>
+                        <textarea id="task-description" name="task_description" placeholder="What needs to be done..." style="min-height: 80px;"></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                        <div class="form-group">
+                            <label for="task-assignment">Assign To</label>
+                            <select id="task-assignment" name="task_assignment">
+                                <option value="owner">Project Owner</option>
+                                <option value="manager">Manager</option>
+                                <option value="team">Team Members</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-duedate">Due Date</label>
+                            <input type="date" id="task-duedate" name="task_duedate" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Steps Component (conditional) -->
+                <div id="nextstep-component-section" style="display: none; border: 1px solid #06b6d4; border-radius: 6px; padding: var(--space-4); background: #ecf0f1;">
+                    <h4 style="margin-bottom: var(--space-3); color: #0891b2;">🎯 Next Steps Component</h4>
+                    
+                    <div class="form-group">
+                        <label for="nextstep-title">Suggested Next Steps Title *</label>
+                        <input type="text" id="nextstep-title" name="nextstep_title" placeholder="e.g., Follow-up Actions After Project Creation" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nextstep-steps">Steps (one per line)</label>
+                        <textarea id="nextstep-steps" name="nextstep_steps" placeholder="Step 1: First action&#10;Step 2: Second action&#10;Step 3: Third action..." style="min-height: 100px; font-family: monospace;"></textarea>
+                        <small style="color: var(--gray-600);">Enter each step on a new line. These appear as recommended actions in the UI.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nextstep-displaywhen">Display When</label>
+                        <select id="nextstep-displaywhen" name="nextstep_displaywhen">
+                            <option value="always">Always</option>
+                            <option value="status_active">When Project Status = Active</option>
+                            <option value="status_pending">When Project Status = Pending</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div style="display: flex; gap: var(--space-3); justify-content: flex-end; padding-top: var(--space-4); border-top: 1px solid var(--gray-300);">
+                    <button type="button" class="btn-secondary" onclick="hideModal('createLogicRequestModal')">Cancel</button>
+                    <button type="reset" class="btn-secondary">Clear</button>
+                    <button type="submit" class="btn-primary">Submit for Approval</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="addLinkModal" class="modal">
         <div class="modal-content">
             <div class="modal-header"><h3>Add New Link</h3><button class="close-btn" onclick="hideModal('addLinkModal')">Ã—</button></div>
@@ -1939,6 +2217,21 @@
     </div>
 
     <script>
+        // ==========================================
+        // LOGIC REQUEST HANDLING
+        // ==========================================
+        function toggleCustomTrigger(selectedValue) {
+            const customSection = document.getElementById('custom-trigger-section');
+            const customInput = document.getElementById('custom-trigger-text');
+            if (selectedValue === 'custom') {
+                customSection.style.display = 'block';
+                customInput.required = true;
+            } else {
+                customSection.style.display = 'none';
+                customInput.required = false;
+            }
+        }
+
         // ==========================================
         // AUDIT LOG SYSTEM
         // ==========================================
@@ -2100,15 +2393,18 @@
                 fetchAndRenderActivityLog();
             }
         };
-        const origNavigateToTab = navigateToTab;
-        navigateToTab = function(tabName) {
-            origNavigateToTab(tabName);
-            if (tabName === 'activity-log') {
-                updateActivityStats();
-                fetchAndRenderActivityLog();
-            }
-        };
         document.addEventListener('DOMContentLoaded', function() {
+            // Wrap navigateToTab to load activity log when that tab is accessed
+            const origNavigateToTab = navigateToTab;
+            window.navigateToTab = function(tabName) {
+                origNavigateToTab(tabName);
+                if (tabName === 'activity-log') {
+                    updateActivityStats();
+                    fetchAndRenderActivityLog();
+                }
+            };
+
+            // Update activity stats on initial load
             setTimeout(() => {
                 updateActivityStats();
                 fetchAndRenderActivityLog();
@@ -2206,6 +2502,142 @@
 
         function showModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
         function hideModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+
+        // ==========================================
+        // LOGIC REQUEST FORM - MODAL FUNCTIONALITY
+        // ==========================================
+        function toggleCustomTrigger(selectedValue) {
+            const customSection = document.getElementById('custom-trigger-section');
+            const customInput = document.getElementById('custom-trigger-text');
+            if (selectedValue === 'custom') {
+                customSection.style.display = 'block';
+                if (customInput) customInput.required = true;
+            } else {
+                customSection.style.display = 'none';
+                if (customInput) {
+                    customInput.required = false;
+                    customInput.value = '';
+                }
+            }
+        }
+
+        // Initialize logic request form on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up component checkbox listeners
+            const componentCheckboxes = {
+                'component-notification': 'notification-component-section',
+                'component-task': 'task-component-section',
+                'component-nextstep': 'nextstep-component-section'
+            };
+
+            Object.entries(componentCheckboxes).forEach(([checkboxId, sectionId]) => {
+                const checkbox = document.getElementById(checkboxId);
+                const section = document.getElementById(sectionId);
+                if (checkbox && section) {
+                    checkbox.addEventListener('change', function() {
+                        section.style.display = this.checked ? 'block' : 'none';
+                    });
+                }
+            });
+
+            // Set up form submission handler
+            const form = document.getElementById('logic-request-form');
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    // Collect form data
+                    const formData = new FormData(form);
+                    const payload = {
+                        name: formData.get('name'),
+                        trigger_type: formData.get('trigger_type'),
+                        description: formData.get('description'),
+                        custom_trigger_text: formData.get('custom_trigger_text') || null,
+                        has_notification_component: document.getElementById('component-notification').checked,
+                        has_task_component: document.getElementById('component-task').checked,
+                        has_nextstep_component: document.getElementById('component-nextstep').checked
+                    };
+
+                    // Add notification component data if selected
+                    if (payload.has_notification_component) {
+                        payload.notification_rule = {
+                            category: formData.get('notification_category'),
+                            schedule: formData.get('notification_schedule'),
+                            title: formData.get('notification_title'),
+                            message: formData.get('notification_message'),
+                            recipients: formData.get('notification_recipients'),
+                            channels: [
+                                formData.get('notification_channel_email') ? 'email' : null,
+                                formData.get('notification_channel_inapp') ? 'in_app' : null,
+                                formData.get('notification_channel_teams') ? 'teams' : null
+                            ].filter(c => c !== null)
+                        };
+                    }
+
+                    // Add task component data if selected
+                    if (payload.has_task_component) {
+                        payload.task_rule = {
+                            title: formData.get('task_title'),
+                            priority: formData.get('task_priority'),
+                            description: formData.get('task_description'),
+                            assignment: formData.get('task_assignment'),
+                            due_date: formData.get('task_duedate')
+                        };
+                    }
+
+                    // Add next steps component data if selected
+                    if (payload.has_nextstep_component) {
+                        payload.nextstep_rule = {
+                            title: formData.get('nextstep_title'),
+                            steps: formData.get('nextstep_steps')
+                                .split('\n')
+                                .map(s => s.trim())
+                                .filter(s => s),
+                            display_when: formData.get('nextstep_displaywhen')
+                        };
+                    }
+
+                    try {
+                        // Submit to Scheduler Service API
+                        const response = await fetch('http://localhost:5011/api/v1/logic-requests', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.detail || `API error: ${response.status}`);
+                        }
+
+                        const result = await response.json();
+                        
+                        // Success feedback
+                        alert(`✓ Logic Request submitted successfully!\nRequest ID: ${result.request_id}\n\nStatus: Pending Approval`);
+                        
+                        // Reset and close modal
+                        form.reset();
+                        Object.entries(componentCheckboxes).forEach(([checkboxId, sectionId]) => {
+                            document.getElementById(sectionId).style.display = 'none';
+                        });
+                        hideModal('createLogicRequestModal');
+                        
+                        // Refresh pending approvals list if visible
+                        if (document.getElementById('pending-approvals-list')) {
+                            loadPendingApprovals();
+                        }
+                    } catch (error) {
+                        console.error('Form submission error:', error);
+                        alert(`❌ Error: ${error.message}`);
+                    }
+                });
+            }
+        }, { once: true });
+
+        function loadPendingApprovals() {
+            // TODO: Fetch pending approvals from /api/v1/logic-requests?status=pending_approval
+            // and populate #pending-approvals-list
+        }
 
         function submitLink(event) {
             event.preventDefault();
@@ -3018,89 +3450,47 @@
             setTimeout(() => notification.remove(), 3000);
         }
 
-        // Load schema when Data Bridge tab is shown
-        const originalShowTab = showTab;
-        showTab = function(tabName) {
-            originalShowTab(tabName);
-            if (tabName === 'data-bridge') {
-                loadProjectsSchema();
-            }
-        };
-        
-        // Also hook into navigateToTab for landing card clicks
-        const originalNavigateToTab = navigateToTab;
-        navigateToTab = function(tabName) {
-            originalNavigateToTab(tabName);
-            if (tabName === 'data-bridge') {
-                loadProjectsSchema();
-            }
-        };
-        
-        // Also hook into showSubTab to load schema when clicking Field Configuration
-        const originalShowSubTab = showSubTab;
-        showSubTab = function(parentTab, subTabName) {
-            originalShowSubTab(parentTab, subTabName);
-            if (parentTab === 'data-bridge' && !projectsSchema) {
-                loadProjectsSchema();
-            }
-        };
-        
-        // Hook showTab to refresh Activity Log when shown
-        // Simple fallback AuditLog for when backend is unavailable
-        const AuditLog = {
-            updateStats: function() {
-                // Silently fail if backend unavailable
-            },
-            renderLog: function() {
-                // Silently fail if backend unavailable
-            }
-        };
-
-        const baseShowTab = showTab;
-        showTab = function(tabName) {
-            baseShowTab(tabName);
-            if (tabName === 'activity-log') {
-                try {
-                    AuditLog.updateStats();
-                    AuditLog.renderLog();
-                } catch (e) {
-                    // Silently ignore errors
-                }
-            }
-        };
-        
-        // Hook navigateToTab too
-        const baseNavigateToTab = navigateToTab;
-        navigateToTab = function(tabName) {
-            baseNavigateToTab(tabName);
-            if (tabName === 'activity-log') {
-                try {
-                    AuditLog.updateStats();
-                    AuditLog.renderLog();
-                } catch (e) {
-                    // Silently ignore errors
-                }
-            }
-        };
-        
-        // Auto-load on page ready
+        // All function overrides and hooks will be set up in DOMContentLoaded to ensure functions exist
         document.addEventListener('DOMContentLoaded', function() {
+            // Load Logic Dashboard Metrics
+            loadLogicMetrics();
+            
+            // Load schema when Data Bridge tab is shown
+            const originalShowTab = showTab;
+            window.showTab = function(tabName) {
+                originalShowTab(tabName);
+                if (tabName === 'data-bridge') {
+                    loadProjectsSchema();
+                }
+            };
+            
+            // Hook into navigateToTab for landing card clicks
+            const originalNavigateToTab = window.navigateToTab || navigateToTab;
+            window.navigateToTab = function(tabName) {
+                originalNavigateToTab(tabName);
+                if (tabName === 'data-bridge') {
+                    loadProjectsSchema();
+                }
+            };
+            
+            // Hook into showSubTab to load schema when clicking Field Configuration
+            const originalShowSubTab = showSubTab;
+            window.showSubTab = function(parentTab, subTabName) {
+                originalShowSubTab(parentTab, subTabName);
+                if (parentTab === 'data-bridge' && !projectsSchema) {
+                    loadProjectsSchema();
+                }
+            };
+
             // Pre-load the schema so it's ready when user clicks Data Bridge
             setTimeout(() => loadProjectsSchema(), 500);
             
-            // Initialize audit log stats (with error handling)
-            try {
-                AuditLog.updateStats();
-            } catch (e) {
-                // Silently ignore
-            }
-
-            // Initialize Projects sync UI
+            // Initialize Projects sync UI (after everything else is ready)
             setTimeout(() => {
                 loadProjectsStats();
                 setupProjectsPolling();
             }, 1000);
-        });
+        }, { once: true });
 
         // ==========================================
         // PROJECTS SYNC ADMIN CONTROLS
@@ -3365,6 +3755,275 @@
                 } catch (e) {
                     // Ignore if the audit system isn't available
                 }
+            }
+        }
+
+        // ==========================================
+        // LOGIC REQUEST FORM HANDLING
+        // ==========================================
+
+        // Toggle notification component visibility based on checkbox
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationCheckbox = document.getElementById('component-notification');
+            const notificationSection = document.getElementById('notification-component-section');
+            const taskCheckbox = document.getElementById('component-task');
+            const taskSection = document.getElementById('task-component-section');
+            const nextstepCheckbox = document.getElementById('component-nextstep');
+            const nextstepSection = document.getElementById('nextstep-component-section');
+            
+            // Handle component visibility
+            if (notificationCheckbox && notificationSection) {
+                notificationCheckbox.addEventListener('change', function() {
+                    notificationSection.style.display = this.checked ? 'block' : 'none';
+                });
+            }
+            
+            if (taskCheckbox && taskSection) {
+                taskCheckbox.addEventListener('change', function() {
+                    taskSection.style.display = this.checked ? 'block' : 'none';
+                });
+            }
+            
+            if (nextstepCheckbox && nextstepSection) {
+                nextstepCheckbox.addEventListener('change', function() {
+                    nextstepSection.style.display = this.checked ? 'block' : 'none';
+                });
+            }
+
+            // Handle Logic Request form submission
+            const logicRequestForm = document.getElementById('logic-request-form');
+            if (logicRequestForm) {
+                logicRequestForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    try {
+                        // Gather form data
+                        const formData = new FormData(this);
+                        
+                        // Handle custom trigger type
+                        let triggerType = formData.get('trigger_type');
+                        if (triggerType === 'custom') {
+                            triggerType = formData.get('custom_trigger_text');
+                        }
+                        
+                        const logicRequest = {
+                            name: formData.get('name'),
+                            description: formData.get('description'),
+                            trigger_type: triggerType,
+                            has_notification_component: document.getElementById('component-notification').checked,
+                            has_task_component: document.getElementById('component-task').checked,
+                            has_nextstep_component: document.getElementById('component-nextstep').checked,
+                            notification_rule: null,
+                            task_rule: null,
+                            nextstep_rule: null
+                        };
+
+                        // If notification component selected, gather its data
+                        if (logicRequest.has_notification_component) {
+                            const channels = [];
+                            if (formData.get('notification_channel_email')) channels.push('email');
+                            if (formData.get('notification_channel_inapp')) channels.push('in_app');
+                            if (formData.get('notification_channel_teams')) channels.push('teams');
+
+                            logicRequest.notification_rule = {
+                                category: formData.get('notification_category'),
+                                trigger_event: formData.get('trigger_type'),
+                                title_template: formData.get('notification_title'),
+                                message_template: formData.get('notification_message'),
+                                recipient_rule: JSON.stringify({type: formData.get('notification_recipients')}),
+                                channels: channels,
+                                schedule: formData.get('notification_schedule')
+                            };
+                        }
+
+                        // If task component selected, gather its data
+                        if (logicRequest.has_task_component) {
+                            logicRequest.task_rule = {
+                                title: formData.get('task_title'),
+                                description: formData.get('task_description'),
+                                priority: formData.get('task_priority'),
+                                assignment: formData.get('task_assignment'),
+                                due_date: formData.get('task_duedate')
+                            };
+                        }
+
+                        // If next steps component selected, gather its data
+                        if (logicRequest.has_nextstep_component) {
+                            const steps = formData.get('nextstep_steps')
+                                .split('\n')
+                                .filter(s => s.trim())
+                                .map(s => s.trim());
+                            
+                            logicRequest.nextstep_rule = {
+                                title: formData.get('nextstep_title'),
+                                steps: steps,
+                                display_when: formData.get('nextstep_displaywhen')
+                            };
+                        }
+
+                        // Submit to Scheduler Service API
+                        console.log('Submitting Logic Request:', logicRequest);
+                        
+                        const response = await fetch('http://localhost:5011/api/v1/logic-requests', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(logicRequest)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`API returned ${response.status}: ${await response.text()}`);
+                        }
+
+                        const result = await response.json();
+                        console.log('Logic Request created:', result);
+                        
+                        alert('✅ Logic Request submitted for approval!\n\nRequest ID: ' + result.request_id + '\n\nAdmin will review and approve shortly.');
+                        document.getElementById('logic-request-form').reset();
+                        document.getElementById('notification-component-section').style.display = 'none';
+                        document.getElementById('task-component-section').style.display = 'none';
+                        document.getElementById('nextstep-component-section').style.display = 'none';
+                        
+                    } catch (error) {
+                        console.error('Error submitting Logic Request:', error);
+                        alert('❌ Error submitting Logic Request: ' + error.message);
+                    }
+                });
+            }
+
+            // Load pending approvals on tab switch
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (this.getAttribute('onclick') && this.getAttribute('onclick').includes('logic')) {
+                        loadPendingApprovals();
+                    }
+                });
+            });
+        });
+
+        // Load pending approvals from Scheduler Service
+        async function loadPendingApprovals() {
+            const container = document.getElementById('pending-approvals-list');
+            if (!container) return;
+
+            try {
+                // TODO: Call Scheduler Service API: GET /api/v1/logic-requests?status=pending_approval
+                // For now, show a placeholder with implementation notes
+                container.innerHTML = `
+                    <div style="padding: var(--space-4); background: #f3f4f6; border-radius: 6px; color: var(--gray-700);">
+                        <p style="margin: 0; font-size: 13px;">
+                            <strong>Backend Integration Pending:</strong> Awaiting connection to Scheduler Service API.
+                        </p>
+                        <p style="margin: var(--space-2) 0 0 0; font-size: 12px; color: var(--gray-600);">
+                            When connected, this will show Logic Requests pending approval. Custom triggers will display implementation requirements.
+                        </p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading pending approvals:', error);
+                container.innerHTML = '<p style="color: var(--error); padding: var(--space-4);">Error loading approvals</p>';
+            }
+        }
+
+        // Load Logic Dashboard Metrics from Activity Hub API
+        async function loadLogicMetrics() {
+            try {
+                // Try Flask proxy first (http://localhost:8088/api/logic/metrics)
+                // Falls back to direct Scheduler Service if proxy unavailable
+                const urls = [
+                    '/api/logic/metrics',  // Relative path (works in Flask context)
+                    'http://localhost:8088/api/logic/metrics',  // Explicit Flask server
+                    'http://localhost:5011/api/v1/logic-metrics'  // Direct Scheduler Service
+                ];
+
+                let data = null;
+                for (let url of urls) {
+                    try {
+                        const response = await fetch(url, { timeout: 5000 });
+                        if (response.ok) {
+                            data = await response.json();
+                            console.log('Metrics loaded from:', url);
+                            break;
+                        }
+                    } catch (e) {
+                        // Try next URL
+                        continue;
+                    }
+                }
+
+                if (!data) {
+                    console.warn('Could not load metrics from any source');
+                    return;
+                }
+                
+                // Update stat cards in Logic Overview
+                const activeRulesCard = document.querySelector('.stat-card:nth-child(1) .stat-number');
+                const notificationsCard = document.querySelector('.stat-card:nth-child(2) .stat-number');
+                const pendingApprovalsCard = document.querySelector('.stat-card:nth-child(3) .stat-number');
+                const totalRequestsCard = document.querySelector('.stat-card:nth-child(4) .stat-number');
+                
+                if (activeRulesCard) activeRulesCard.textContent = data.activeRules || 0;
+                if (notificationsCard) notificationsCard.textContent = data.notificationsToday || 0;
+                if (pendingApprovalsCard) {
+                    pendingApprovalsCard.textContent = data.pendingApprovals || 0;
+                    // Also update the pending-count badge
+                    const badge = document.getElementById('pending-count');
+                    if (badge) badge.textContent = data.pendingApprovals || 0;
+                }
+                if (totalRequestsCard) totalRequestsCard.textContent = data.totalLogicRequests || 0;
+                
+                console.log('Logic metrics loaded:', data);
+            } catch (error) {
+                console.warn('Error loading Logic metrics:', error.message);
+                // Keep mock data as fallback
+            }
+        }
+
+        // Render a pending approval card (for future use when API is connected)
+        function renderApprovalCard(logicRequest) {
+            const customTriggerFlag = logicRequest.trigger_type === 'custom' ? '⚠️ ' : '';
+            const customInfo = logicRequest.trigger_type === 'custom' 
+                ? `<div style="margin-top: var(--space-2); padding: var(--space-2); background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 4px;">
+                     <p style="margin: 0; font-size: 12px; color: #92400e;">
+                         <strong>Custom Trigger (Requires Implementation):</strong><br/>
+                         "${logicRequest.custom_trigger_text}"<br/>
+                         <em style="font-size: 11px;">Backend developer must implement trigger detection SQL</em>
+                     </p>
+                   </div>`
+                : '';
+            
+            return `
+                <div class="list-item" style="border-left: 4px solid #f59e0b;">
+                    <div class="item-info">
+                        <h4>${customTriggerFlag}${logicRequest.name}</h4>
+                        <p>${logicRequest.description || '(No description)'}</p>
+                        <div style="font-size: 12px; color: var(--gray-600); margin-top: var(--space-2);">
+                            <span style="background: var(--blue-light); padding: 2px 8px; border-radius: 3px; margin-right: var(--space-2);">
+                                ${logicRequest.trigger_type === 'custom' ? '🔧 ' : ''}${logicRequest.trigger_type}
+                            </span>
+                            <span>${new Date(logicRequest.created_at).toLocaleDateString()}</span>
+                        </div>
+                        ${customInfo}
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn" style="background: #10b981; color: white;" onclick="approveLogicRequest('${logicRequest.request_id}')">Approve</button>
+                        <button class="action-btn" style="background: #ef4444; color: white;" onclick="rejectLogicRequest('${logicRequest.request_id}')">Reject</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function approveLogicRequest(requestId) {
+            alert(`✓ Approval submitted for ${requestId}\n\nFor custom triggers:\n1. Admin has approved the trigger requirement\n2. Backend must implement detection SQL\n3. Trigger will become standard option when implemented`);
+            // TODO: Call Scheduler Service API: POST /api/v1/logic-requests/{requestId}/approve
+        }
+
+        function rejectLogicRequest(requestId) {
+            const reason = prompt('Rejection reason:');
+            if (reason) {
+                alert(`Logic Request rejected: ${reason}`);
+                // TODO: Call Scheduler Service API: POST /api/v1/logic-requests/{requestId}/reject
             }
         }
             

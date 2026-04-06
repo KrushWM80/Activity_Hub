@@ -1,13 +1,22 @@
 """
 V.E.T. Executive Report Email Service
-Sends V.E.T. Dashboard reports via Outlook with HTML formatting
+Sends V.E.T. Dashboard reports via Walmart internal SMTP (no Outlook dependency)
 """
 
 import logging
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any
 import json
+
+SMTP_SERVER = "smtp-gw1.homeoffice.wal-mart.com"
+SMTP_PORT = 25
+FROM_EMAIL = "kendall.rush@walmart.com"
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -19,25 +28,7 @@ class VETEmailService:
     
     def __init__(self):
         """Initialize email service"""
-        self.from_email = None
-        self.outlook = None
-        self.namespace = None
-        self._initialize_outlook()
-    
-    def _initialize_outlook(self):
-        """Initialize Outlook COM automation"""
-        try:
-            import win32com.client
-            self.outlook = win32com.client.Dispatch('Outlook.Application')
-            self.namespace = self.outlook.GetNamespace("MAPI")
-            logger.info("✅ Outlook initialized successfully")
-            return True
-        except ImportError:
-            logger.error("❌ pywin32 not installed. Cannot send emails.")
-            return False
-        except Exception as e:
-            logger.error(f"❌ Error initializing Outlook: {e}")
-            return False
+        self.from_email = FROM_EMAIL
     
     def generate_html_body(self, report_data: Dict[str, Any], ppt_filename: str) -> str:
         """
@@ -178,10 +169,6 @@ class VETEmailService:
             True if successful, False otherwise
         """
         
-        if not self.outlook:
-            logger.error("❌ Outlook not initialized. Cannot send email.")
-            return False
-        
         try:
             # Support both old single ppt_file_path and new attachment_paths list
             if attachment_paths is None:
@@ -218,25 +205,30 @@ class VETEmailService:
             logger.info(f"  Subject: {subject}")
             logger.info(f"  Attachments: {attachment_info}")
             
-            # Create email
-            mail = self.outlook.CreateItem(0)  # 0 = olMailItem
-            mail.To = '; '.join(to_recipients)
-            mail.Subject = subject
-            mail.HTMLBody = html_body
+            # Build MIME message
+            msg = MIMEMultipart('mixed')
+            msg['From'] = FROM_EMAIL
+            msg['To'] = '; '.join(to_recipients)
+            msg['Subject'] = subject
+            msg.attach(MIMEText(html_body, 'html', 'utf-8'))
             
             # Attach all files
             for attachment_file in valid_attachments:
-                mail.Attachments.Add(attachment_file)
+                with open(attachment_file, 'rb') as f:
+                    part = MIMEBase('application', 'octet-stream')
+                    part.set_payload(f.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f'attachment; filename="{Path(attachment_file).name}"')
+                msg.attach(part)
                 logger.info(f"✓ Attached: {Path(attachment_file).name}")
             
-            # In test mode, just save as draft without sending
             if test_mode:
-                mail.Save()
-                logger.info("📝 [TEST MODE] Email saved as draft (not sent)")
+                logger.info("📝 [TEST MODE] Email built but not sent")
                 return True
             
-            # Send email
-            mail.Send()
+            # Send via Walmart internal SMTP (no auth required)
+            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=30) as server:
+                server.sendmail(FROM_EMAIL, to_recipients, msg.as_string())
             logger.info(f"✅ Email sent successfully to {len(to_recipients)} recipient(s)")
             return True
             

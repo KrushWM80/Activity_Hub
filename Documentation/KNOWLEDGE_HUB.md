@@ -223,7 +223,7 @@ Individual Tier (7-8) → Specialist, Team Member, Admin
 - **Data Source**: BigQuery AMP ALL 2 table (Merchant Messages, Review for Publish review - No Comms)
 - **Output**: MP4 (AAC 256kbps + thumbnail), Standard Script, Inflection Script, HTML Email Report
 - **CMS URL**: `https://enablement.walmart.com/content/store-communications/home/merchandise/weekly-messages/{year}/week-{week}/weekly_messages_audiowk{week}.html`
-- **Email**: Outlook COM with MP4 + scripts attached
+- **Email**: Walmart internal SMTP (`smtp-gw1.homeoffice.wal-mart.com:25`) with MP4 + scripts attached
 - **Automation**: `Automation/start_zorro_24_7.bat` (auto-restart on crash)
 - **Health Check**: `MONITOR_AND_REPORT.ps1` (daily 6 AM)
 - **Network**: BQ fetch on Eagle WiFi, synthesis on Walmart WiFi (off VPN)
@@ -262,9 +262,9 @@ All tasks registered April 1, 2026. Requires **elevated (admin) terminal** to cr
 | `Activity_Hub_VETDashboard_AutoStart` | On logon | Starts VET Dashboard (5001) |
 | `Activity_Hub_Zorro_AutoStart` | On logon | Starts Zorro (8888) |
 | `Activity_Hub_Daily_HealthCheck` | Daily 6:00 AM | Runs `MONITOR_AND_REPORT.ps1` — health check + email |
-| `Activity_Hub_TDA_Daily_Email` | Daily 6:00 AM | TDA daily status email |
-| `Activity_Hub_TDA_Weekly_Email` | Weekly | TDA weekly summary email |
-| `Activity_Hub_VET_Daily_Email` | Daily 6:00 AM | VET daily status email |
+| `Activity_Hub_TDA_Daily_Email` | Daily 6:00 AM | TDA daily report email (`send_tda_weekly_email.bat`) |
+| `Activity_Hub_TDA_Weekly_Email` | Weekly Thu 11:00 AM | TDA weekly summary email (`send_tda_weekly_email.bat`) |
+| `Activity_Hub_VET_Daily_Email` | Daily 6:00 AM | VET daily report email (`send_vet_daily_email.bat`) |
 
 **Verify tasks are registered:**
 ```powershell
@@ -274,6 +274,51 @@ schtasks /query /fo TABLE | Select-String "Activity_Hub"
 ---
 
 ### ⚠️ Critical Operating Rules
+
+#### NEVER use Outlook COM (`win32com`) to send automated emails
+All automated email reports **must** use Walmart's internal SMTP gateway directly via Python `smtplib`. **Never** use `win32com.client.Dispatch('Outlook.Application')` in any automated script.
+
+**Why:** Outlook COM queues mail in Outlook's Outbox and only transmits when Outlook is in an active, foreground state. When the screen is off or Outlook is in low-power sync mode, emails sit unsent for hours — all flushing at once when the screen wakes. Recipients receive nothing on time, then get a flood of duplicate emails simultaneously.
+
+**Correct pattern for all email scripts:**
+```python
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+
+SMTP_SERVER = "smtp-gw1.homeoffice.wal-mart.com"
+SMTP_PORT = 25
+FROM_EMAIL = "kendall.rush@walmart.com"
+
+msg = MIMEMultipart('mixed')
+msg['From'] = FROM_EMAIL
+msg['To'] = '; '.join(recipients)
+msg['Subject'] = subject
+msg.attach(MIMEText(html_body, 'html', 'utf-8'))
+
+# Attach files
+with open(attachment_path, 'rb') as f:
+    part = MIMEBase('application', 'octet-stream')
+    part.set_payload(f.read())
+encoders.encode_base64(part)
+part.add_header('Content-Disposition', f'attachment; filename="{filename}"')
+msg.attach(part)
+
+# Send — no auth required on Walmart network
+with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=30) as server:
+    server.sendmail(FROM_EMAIL, recipients, msg.as_string())
+```
+
+**Files updated April 6, 2026:**
+- `Store Support/Projects/VET_Dashboard/email_service.py` — Outlook COM removed, smtplib added
+- `Store Support/Projects/TDA Insights/send_weekly_report.py` — Outlook COM removed, smtplib added
+- `Store Support/Projects/DC to Store Change Management Emails/email_helper.py` — Outlook COM removed, smtplib added
+- `MONITOR_AND_REPORT.ps1` — Outlook COM removed, `System.Net.Mail.SmtpClient` added
+- `send_status.ps1` — Outlook COM removed, `System.Net.Mail.SmtpClient` added
+
+**Any new email script or existing script still using `win32com` must be updated before deployment.**
 
 #### NEVER use `Stop-Process -Name python -Force`
 This kills **all** Python processes on the machine — every service goes down simultaneously. The bat restart loops will attempt recovery but may not all succeed, especially if the continuous monitor fires during the restart window and triggers the double-launch problem.
@@ -329,7 +374,7 @@ goto restart_loop
 
 **Step 2** — Add to `Automation/register_tasks_cmd.bat`:
 ```bat
-schtasks /create /tn "Activity_Hub_<ServiceName>_AutoStart" /tr "cmd /c \"%BASE%\start_<servicename>_24_7.bat\"" /sc onlogon /rl highest /f
+schtasks /create /tn "Activity_Hub_<ServiceName>_AutoStart" /tr "cmd /c \"%BASE%\start_<servicename>_24_7.bat\"" /sc onlogon /ru "%USER%" /f
 ```
 
 **Step 3** — Run `Automation/register_tasks_cmd.bat` from an **elevated (admin) terminal**:
@@ -382,9 +427,9 @@ if %errorlevel% neq 0 (
 
 **Step 2** — Add a scheduled task to `Automation/register_tasks_cmd.bat`:
 ```bat
-schtasks /create /tn "Activity_Hub_<ReportName>_Email" /tr "cmd /c \"%BASE%\send_<reportname>_email.bat\"" /sc daily /st 06:00:00 /rl highest /f
+schtasks /create /tn "Activity_Hub_<ReportName>_Email" /tr "cmd /c \"%BASE%\send_<reportname>_email.bat\"" /sc daily /st 06:00:00 /ru "%USER%" /f
 ```
-(Adjust `/sc` and `/st` for the correct schedule — daily, weekly, etc.)
+(Adjust `/sc` and `/st` for the correct schedule — daily, weekly, etc. Use `/ru "%USER%"` — do NOT use `/rl highest`.)
 
 **Step 3** — Run `Automation/register_tasks_cmd.bat` from an **elevated (admin) terminal**.
 
