@@ -808,6 +808,7 @@ This is an automated alert. Do not reply to this email.
     def get_projects(self, filters: Dict[str, Any] = None, limit: int = None, 
                      title_search: str = None) -> List[Dict]:
         """Get projects from SQLite cache with optional filters"""
+        print(f"[Cache] get_projects called with limit={limit}, filters={filters}")
         conn = self._get_connection()
         cursor = conn.cursor()
         
@@ -876,14 +877,38 @@ This is an automated alert. Do not reply to this email.
         
         where_clause = " AND ".join(conditions)
         
-        # Build query with DISTINCT to deduplicate rows
+        # Build query: get unique projects, not distinct rows
+        # For proper deduplication, we need to:
+        # - For Operations: GROUP BY project_id (unique project identifier)
+        # - For Realty: GROUP BY title (since Realty uses title as unique project ID)
+        # Using MIN() aggregate to get one row per project with consistent metadata
         query = f"""
-            SELECT DISTINCT project_id, intake_card, title, project_source, division, region,
-                   market, store, facility, phase, wm_week, fy, status, 
-                   owner, partner, store_area, business_area, health, 
-                   business_type, associate_impact, customer_impact, last_updated
+            SELECT 
+                project_id, 
+                MIN(intake_card) as intake_card, 
+                MIN(title) as title, 
+                project_source, 
+                MIN(division) as division, 
+                MIN(region) as region,
+                MIN(market) as market, 
+                MIN(store) as store, 
+                MIN(facility) as facility, 
+                MIN(phase) as phase, 
+                MIN(wm_week) as wm_week, 
+                MIN(fy) as fy, 
+                MIN(status) as status,
+                MIN(owner) as owner, 
+                MIN(partner) as partner, 
+                MIN(store_area) as store_area, 
+                MIN(business_area) as business_area, 
+                MIN(health) as health,
+                MIN(business_type) as business_type, 
+                MIN(associate_impact) as associate_impact, 
+                MIN(customer_impact) as customer_impact, 
+                MAX(last_updated) as last_updated
             FROM projects
             WHERE {where_clause}
+            GROUP BY project_id, project_source
             ORDER BY title, wm_week
         """
         
@@ -897,6 +922,7 @@ This is an automated alert. Do not reply to this email.
         cursor.execute(query, params)
         rows = cursor.fetchall()
         conn.close()
+        print(f"[Cache] Query returned {len(rows)} rows")
         
         # Convert to list of dicts
         projects = []
@@ -917,6 +943,7 @@ This is an automated alert. Do not reply to this email.
                 'status': row['status'],
                 'store_count': 1,
                 'owner': row['owner'],
+                'partner': row['partner'],
                 'store_area': row['store_area'],
                 'business_area': row['business_area'],
                 'health': row['health'],
@@ -926,6 +953,7 @@ This is an automated alert. Do not reply to this email.
                 'last_updated': row['last_updated']
             })
         
+        print(f"[Cache] Returning {len(projects)} projects")
         return projects
     
     def get_summary(self) -> Dict:

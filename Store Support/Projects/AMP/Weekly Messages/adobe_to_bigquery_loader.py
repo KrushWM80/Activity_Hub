@@ -94,7 +94,169 @@ def init_bigquery_client(project_id: str, logger: logging.Logger) -> bigquery.Cl
 # WEEKLY MESSAGES PARSING
 # ============================================================================
 
-def parse_weekly_messages_file(file_path: str, logger: logging.Logger) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def find_latest_csv_file(folder_path: str, logger: logging.Logger) -> str:
+    """Find the most recently modified CSV file in a folder."""
+    logger.info(f"Searching for CSV files in: {folder_path}")
+    
+    folder = Path(folder_path)
+    if not folder.exists():
+        raise FileNotFoundError(f"Folder not found: {folder_path}")
+    
+    csv_files = sorted(folder.glob("*.csv"), key=lambda x: x.stat().st_mtime, reverse=True)
+    
+    if not csv_files:
+        raise FileNotFoundError(f"No CSV files found in: {folder_path}")
+    
+    latest_file = str(csv_files[0])
+    logger.info(f"Using latest CSV file: {latest_file} (modified: {datetime.fromtimestamp(csv_files[0].stat().st_mtime)})")
+    return latest_file
+
+def parse_weekly_messages_excel(file_path: str, logger: logging.Logger) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Parse Weekly Messages Area Reports FY27 Excel file using Windows COM.
+    Extracts device-level page views and aggregated metrics.
+    Returns two DataFrames: devices and metrics.
+    """
+    logger.info(f"Parsing Weekly Messages Excel file: {file_path}")
+    
+    if not Path(file_path).exists():
+        raise FileNotFoundError(f"Weekly Messages Excel file not found: {file_path}")
+    
+    devices_rows = []
+    metrics_rows = []
+    report_date = datetime.now().date()
+    extracted_date = datetime.now()
+    
+    try:
+        import win32com.client as win32
+        logger.info("Using Windows COM to read Weekly Messages Excel...")
+        
+        excel = win32.gencache.EnsureDispatch('Excel.Application')
+        excel.Visible = False
+        workbook = excel.Workbooks.Open(file_path)
+        worksheet = workbook.Sheets(1)  # First sheet
+        
+        usedRange = worksheet.UsedRange
+        rows = usedRange.Rows.Count
+        cols = usedRange.Columns.Count
+        
+        logger.info(f"Sheet dimensions: {rows} rows × {cols} cols")
+        
+        # --- PARSE DEVICE DATA (starts at row 14 per file structure) ---
+        # Column headers at row 12-13: Tablets, Desktop, Store Devices, Mobile, XCover
+        # Data rows start at 14
+        
+        data_start_row = 14
+        metrics_start_row = 30  # Approximate - will find by looking for "Unique Users" header
+        
+        device_headers = []
+        for col in range(2, cols + 1):  # Skip first column (page names)
+            cell_val = worksheet.Cells(13, col).Value
+            if cell_val:
+                device_headers.append((col, str(cell_val).strip()))
+        
+        logger.info(f"Device columns: {[h[1] for h in device_headers]}")
+        
+        # Read device data rows
+        for row in range(data_start_row, min(data_start_row + 100, metrics_start_row)):
+            page_name = worksheet.Cells(row, 1).Value
+            if not page_name or pd.isna(page_name) or str(page_name).strip() == '':
+                break
+            
+            page_name = str(page_name).strip()
+            
+            # Skip header rows
+            if page_name.startswith('#') or 'Table' in page_name:
+                break
+            
+            device_values = {}
+            total = 0
+            
+            for col_idx, col_name in device_headers:
+                cell_val = worksheet.Cells(row, col_idx).Value
+                try:
+                    val = float(cell_val) if cell_val and str(cell_val) != '' else 0
+                    device_values[col_name] = int(val)
+                    total += int(val)
+                except (ValueError, TypeError):
+                    device_values[col_name] = 0
+            
+            # Extract category from page name (first part before colon)
+            category = 'Weekly Messages'
+            if ':' in page_name:
+                category = page_name.split(':')[0].strip()
+            
+            devices_rows.append({
+                'report_date': report_date,
+                'category': category,
+                'page_name': page_name,
+                'tablets_page_views': device_values.get('Tablets Excluding Store Device', device_values.get('Tablets', 0)),
+                'desktop_page_views': device_values.get('Desktop', 0),
+                'store_devices_page_views': device_values.get('Store Devices', device_values.get('Store Device', 0)),
+                'mobile_phones_page_views': device_values.get('Mobile Phones Excluding Store', device_values.get('Mobile', 0)),
+                'xcover_devices_page_views': device_values.get('XCover Devices', device_values.get('XCover', 0)),
+                'total_page_views': total,
+                'extracted_date': extracted_date
+            })
+        
+        # --- PARSE METRICS DATA (starts around row 30) ---
+        # This table has: Unique Users, Average Time on Site, Visits, etc.
+        
+        metrics_data_start = 31  # Row after headers
+        
+        for row in range(metrics_data_start, min(metrics_data_start + 100, rows + 1)):
+            page_name = worksheet.Cells(row, 1).Value
+            if not page_name or pd.isna(page_name) or str(page_name).strip() == '':
+                break
+            
+            page_name = str(page_name).strip()
+            
+            # Skip header rows
+            if page_name.startswith('#') or 'Table' in page_name or page_name == '':
+                break
+            
+            try:
+                page_views = float(worksheet.Cells(row, 2).Value or 0)
+                unique_users = float(worksheet.Cells(row, 3).Value or 0)
+                avg_time = float(worksheet.Cells(row, 4).Value or 0)
+                visits = float(worksheet.Cells(row, 5).Value or 0)
+                
+                # Extract category from page name
+                category = 'Weekly Messages'
+                if ':' in page_name:
+                    category = page_name.split(':')[0].strip()
+                
+                metrics_rows.append({
+                    'report_date': report_date,
+                    'category': category,
+                    'page_name': page_name,
+                    'page_views': int(page_views),
+                    'unique_users': unique_users,
+                    'average_time_on_site': avg_time,
+                    'visits': int(visits),
+                    'extracted_date': extracted_date
+                })
+            except (ValueError, TypeError):
+                continue
+        
+        workbook.Close(False)
+        excel.Quit()
+        
+        logger.info(f"Weekly Messages Excel parsed: {len(devices_rows)} device rows, {len(metrics_rows)} metric rows")
+        
+    except ImportError:
+        logger.warning("win32com not available - cannot parse Weekly Messages Excel on non-Windows system")
+        raise
+    except Exception as e:
+        logger.error(f"Error parsing Weekly Messages Excel: {e}", exc_info=True)
+        raise
+    
+    devices_df = pd.DataFrame(devices_rows) if devices_rows else pd.DataFrame()
+    metrics_df = pd.DataFrame(metrics_rows) if metrics_rows else pd.DataFrame()
+    
+    return devices_df, metrics_df
+
+def parse_weekly_messages_csv(csv_path: str, logger: logging.Logger) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Parse Weekly Messages FY27 Excel file.
     Returns two DataFrames: devices and metrics.
@@ -212,6 +374,7 @@ def parse_weekly_messages_file(file_path: str, logger: logging.Logger) -> Tuple[
 def parse_playbook_hub_file(file_path: str, logger: logging.Logger) -> pd.DataFrame:
     """
     Parse Playbook Hub FY27 Excel file.
+    Try using Windows COM first (no openpyxl dependency), then fall back to pandas.
     Returns DataFrame with playbook metrics.
     """
     logger.info(f"Parsing Playbook Hub file: {file_path}")
@@ -219,12 +382,146 @@ def parse_playbook_hub_file(file_path: str, logger: logging.Logger) -> pd.DataFr
     if not Path(file_path).exists():
         raise FileNotFoundError(f"Playbook Hub file not found: {file_path}")
     
+    # Try using Windows COM first (no external dependencies needed)
     try:
-        xl_file = pd.ExcelFile(file_path)
-        logger.info(f"Excel file loaded. Sheet count: {len(xl_file.sheet_names)}")
-    except Exception as e:
-        logger.error(f"Failed to read Playbook Hub file: {e}", exc_info=True)
-        raise
+        import win32com.client as win32
+        logger.info("Using Windows COM to read Excel file...")
+        
+        excel = win32.gencache.EnsureDispatch('Excel.Application')
+        excel.Visible = False
+        workbook = excel.Workbooks.Open(file_path)
+        
+        playbook_rows = []
+        report_date = datetime.now().date()
+        extracted_date = datetime.now()
+        playbook_categories = ['Playbook Hub', 'Valentines', 'Baby Days', 'Easter']
+        
+        # Read all sheets
+        for sheet_index in range(1, workbook.Sheets.Count + 1):
+            worksheet = workbook.Sheets(sheet_index)
+            sheet_name = worksheet.Name
+            
+            # Try to match to category
+            matched_category = None
+            for cat in playbook_categories:
+                if cat.lower() in sheet_name.lower():
+                    matched_category = cat
+                    break
+            
+            if not matched_category:
+                logger.debug(f"Skipping sheet (no category match): {sheet_name}")
+                continue
+            
+            # Scan for actual data table (skip metadata rows starting with #)
+            usedRange = worksheet.UsedRange
+            rows = usedRange.Rows.Count
+            
+            # Find first data row (not metadata starting with #)
+            data_start = 1
+            for row_idx in range(1, min(rows + 1, 20)):  # Check first 20 rows
+                cell_val = str(worksheet.Cells(row_idx, 1).Value or "")
+                if not cell_val.startswith("#"):
+                    data_start = row_idx
+                    break
+            
+            logger.info(f"Sheet {sheet_name}: data starts at row {data_start}")
+            
+            # Read actual data from data_start onwards
+            data = usedRange.Value
+            
+            if not data or len(data) < data_start + 1:
+                continue
+            
+            # Skip metadata, extract just data rows
+            try:
+                # Get headers from the data_start row
+                header_row = None
+                data_rows = []
+                
+                for row_idx in range(data_start, len(data) + 1):
+                    row_data = data[row_idx - 1] if row_idx <= len(data) else None
+                    if not row_data:
+                        break
+                    
+                    first_col = str(row_data[0] or "").strip()
+                    
+                    # Skip rows that are clearly not data
+                    if first_col.startswith("#") or not first_col:
+                        if header_row is None:  # Capture first non-comment row as headers
+                            header_row = row_data
+                        continue
+                    
+                    # This is a data row
+                    if header_row is None:
+                        header_row = ['Page Name', 'Total Page Views', 'Store Salary Assoc', 'Store Hourly Assoc']
+                    
+                    data_rows.append(row_data)
+                
+                # Convert to DataFrame
+                if header_row and data_rows:
+                    df = pd.DataFrame(data_rows, columns=header_row[:len(data_rows[0])] if data_rows else [])
+                    
+                    # Extract playbook data
+                    for idx, row in df.iterrows():
+                        page_name = str(row.iloc[0] or "").strip() if len(row) > 0 else None
+                        if not page_name or page_name.startswith("#"):
+                            continue
+                        
+                        try:
+                            total_views = int(float(row.iloc[1])) if len(row) > 1 and pd.notna(row.iloc[1]) else 0
+                            salary_views = int(float(row.iloc[2])) if len(row) > 2 and pd.notna(row.iloc[2]) else 0
+                            hourly_views = int(float(row.iloc[3])) if len(row) > 3 and pd.notna(row.iloc[3]) else 0
+                            
+                            playbook_rows.append({
+                                'report_date': report_date,
+                                'playbook_category': matched_category,
+                                'page_name': page_name,
+                                'total_page_views': total_views,
+                                'store_salary_associates_views': salary_views,
+                                'store_hourly_associates_views': hourly_views,
+                                'report_period_start': None,
+                                'report_period_end': None,
+                                'extracted_date': extracted_date
+                            })
+                        except (ValueError, TypeError) as e:
+                            logger.debug(f"Skipping row with parsing error: {page_name} - {e}")
+                            continue
+            except Exception as e:
+                logger.warning(f"Error processing sheet {sheet_name}: {e}")
+                continue
+        
+        workbook.Close(False)
+        excel.Quit()
+        
+        playbook_df = pd.DataFrame(playbook_rows)
+        
+        # Ensure proper data types
+        if not playbook_df.empty:
+            playbook_df['report_date'] = pd.to_datetime(playbook_df['report_date']).dt.date
+            playbook_df['extracted_date'] = pd.to_datetime(playbook_df['extracted_date'])
+            playbook_df['total_page_views'] = playbook_df['total_page_views'].astype('int64')
+            playbook_df['store_salary_associates_views'] = playbook_df['store_salary_associates_views'].astype('int64')
+            playbook_df['store_hourly_associates_views'] = playbook_df['store_hourly_associates_views'].astype('int64')
+            
+            # Remove exact duplicates
+            playbook_df = playbook_df.drop_duplicates(subset=['report_date', 'playbook_category', 'page_name'], keep='first')
+        
+        logger.info(f"Playbook Hub parsed via COM: {len(playbook_df)} rows")
+        return playbook_df
+    
+    except ImportError:
+        logger.info("win32com not available, trying pandas...")
+        try:
+            xl_file = pd.ExcelFile(file_path, engine='openpyxl')
+            logger.info(f"Excel file loaded. Sheet count: {len(xl_file.sheet_names)}")
+        except ImportError:
+            logger.warning("openpyxl not available, attempting with built-in engine...")
+            try:
+                xl_file = pd.ExcelFile(file_path)
+                logger.info(f"Excel file loaded with fallback engine. Sheet count: {len(xl_file.sheet_names)}")
+            except Exception as e:
+                logger.error(f"Failed to read Playbook Hub file: {e}", exc_info=True)
+                raise
     
     playbook_categories = ['Playbook Hub', 'Valentines', 'Baby Days', 'Easter']
     playbook_rows = []
@@ -301,11 +598,26 @@ def load_to_bigquery(
         return 0
     
     try:
-        # Create temporary table
+        # Create temporary table with explicit schema
         temp_table_id = f"{table_id}_temp_{int(datetime.now().timestamp())}"
         job_config = bigquery.LoadJobConfig()
         job_config.write_disposition = bigquery.WriteDisposition.WRITE_TRUNCATE
         
+        # Build schema explicitly to avoid type inference issues
+        schema = []
+        for col in df.columns:
+            if col == 'extracted_date':
+                schema.append(bigquery.SchemaField(col, "TIMESTAMP"))
+            elif col in {'report_date', 'report_period_start', 'report_period_end'}:
+                schema.append(bigquery.SchemaField(col, "DATE"))
+            elif col in {'page_views', 'visits', 'total_page_views', 'store_salary_associates_views', 'store_hourly_associates_views', 'tablets_page_views', 'desktop_page_views', 'store_devices_page_views', 'mobile_phones_page_views', 'xcover_devices_page_views'}:
+                schema.append(bigquery.SchemaField(col, "INT64"))
+            elif col in {'unique_users', 'average_time_on_site'}:
+                schema.append(bigquery.SchemaField(col, "FLOAT64"))
+            else:
+                schema.append(bigquery.SchemaField(col, "STRING"))
+        
+        job_config.schema = schema
         logger.info(f"Loading {len(df)} rows to temp table {temp_table_id}")
         load_job = client.load_table_from_dataframe(df, temp_table_id, job_config=job_config)
         load_job.result()
@@ -367,49 +679,74 @@ def main():
         # Initialize BigQuery client
         client = init_bigquery_client(config['gcp']['project_id'], logger)
         
-        # Parse Excel files
-        logger.info("\n--- PHASE 1: PARSING EXCEL FILES ---")
-        weekly_devices, weekly_metrics = parse_weekly_messages_file(
-            config['source_files']['weekly_messages_path'],
-            logger
-        )
-        playbook_hub = parse_playbook_hub_file(
-            config['source_files']['playbook_hub_path'],
-            logger
-        )
+        # Parse data from source files
+        logger.info("\n--- PHASE 1: PARSING SOURCE FILES ---")
+        
+        # Weekly Messages: Parse Excel file (new source)
+        weekly_devices = pd.DataFrame()
+        weekly_metrics = pd.DataFrame()
+        
+        try:
+            weekly_messages_excel = config['source_files']['weekly_messages_excel_path']
+            weekly_devices, weekly_metrics = parse_weekly_messages_excel(weekly_messages_excel, logger)
+        except FileNotFoundError as e:
+            logger.warning(f"Weekly Messages Excel file not available: {e}")
+            logger.info("Continuing - will load when available")
+        except Exception as e:
+            logger.warning(f"Error parsing Weekly Messages Excel: {e}")
+        
+        # Playbook Hub: Parse Excel file
+        playbook_hub = pd.DataFrame()
+        try:
+            playbook_hub = parse_playbook_hub_file(
+                config['source_files']['playbook_hub_path'],
+                logger
+            )
+        except FileNotFoundError as e:
+            logger.warning(f"Playbook Hub file not available: {e}")
         
         # Load to BigQuery
         logger.info("\n--- PHASE 2: LOADING TO BIGQUERY ---")
-        
-        # Construct full table IDs (use Store_Support_Dev as parent dataset)
         project = config['gcp']['project_id']
-        dataset_weekly = config['bigquery']['datasets']['weekly_messages']
-        dataset_playbook = config['bigquery']['datasets']['playbook_hub']
+        dataset_id = config['bigquery']['dataset_id']
         
-        weekly_devices_table = f"{project}.{dataset_weekly}.{config['bigquery']['tables']['weekly_devices']}"
-        weekly_metrics_table = f"{project}.{dataset_weekly}.{config['bigquery']['tables']['weekly_metrics']}"
-        playbook_table = f"{project}.{dataset_playbook}.{config['bigquery']['tables']['playbook']}"
+        weekly_devices_table = f"{project}.{dataset_id}.{config['bigquery']['tables']['weekly_devices']}"
+        weekly_metrics_table = f"{project}.{dataset_id}.{config['bigquery']['tables']['weekly_metrics']}"
+        playbook_table = f"{project}.{dataset_id}.{config['bigquery']['tables']['playbook']}"
         
         logger.info(f"Target tables:")
         logger.info(f"  - {weekly_devices_table}")
         logger.info(f"  - {weekly_metrics_table}")
         logger.info(f"  - {playbook_table}")
         
-        # Load each table
-        devices_count = load_to_bigquery(
-            client, weekly_devices, weekly_devices_table,
-            ['report_date', 'category', 'page_name'], logger
-        )
+        # Load each table if data is available
+        devices_count = 0
+        metrics_count = 0
+        playbook_count = 0
         
-        metrics_count = load_to_bigquery(
-            client, weekly_metrics, weekly_metrics_table,
-            ['report_date', 'category', 'page_name'], logger
-        )
+        if not weekly_devices.empty:
+            devices_count = load_to_bigquery(
+                client, weekly_devices, weekly_devices_table,
+                ['report_date', 'category', 'page_name'], logger
+            )
+        else:
+            logger.info(f"Weekly Messages Devices: No data to load (CSV not available yet)")
         
-        playbook_count = load_to_bigquery(
-            client, playbook_hub, playbook_table,
-            ['report_date', 'playbook_category', 'page_name'], logger
-        )
+        if not weekly_metrics.empty:
+            metrics_count = load_to_bigquery(
+                client, weekly_metrics, weekly_metrics_table,
+                ['report_date', 'category', 'page_name'], logger
+            )
+        else:
+            logger.info(f"Weekly Messages Metrics: No data to load (CSV not available yet)")
+        
+        if not playbook_hub.empty:
+            playbook_count = load_to_bigquery(
+                client, playbook_hub, playbook_table,
+                ['report_date', 'playbook_category', 'page_name'], logger
+            )
+        else:
+            logger.info(f"Playbook Hub: No data to load")
         
         # Summary
         logger.info("\n--- SUMMARY ---")

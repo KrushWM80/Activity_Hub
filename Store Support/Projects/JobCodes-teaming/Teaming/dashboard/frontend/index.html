@@ -179,6 +179,112 @@
         .sortable.desc i.bi-sort-down {
             opacity: 1;
         }
+        
+        /* Improved Multi-Select Dropdown Pattern */
+        .dropdown-multi {
+            position: relative;
+            width: 100%;
+        }
+        
+        .dropdown-multi-btn {
+            width: 100%;
+            padding: 10px 36px 10px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: white;
+            font-size: 0.95rem;
+            color: #333;
+            text-align: left;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-multi-btn::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: #999;
+            pointer-events: none;
+        }
+        
+        .dropdown-multi-btn:hover {
+            border-color: var(--walmart-blue);
+            background-color: #f8f9fa;
+        }
+        
+        .dropdown-multi-btn:focus {
+            outline: none;
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 3px rgba(0, 83, 226, 0.1);
+        }
+        
+        .dropdown-multi-panel {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+        
+        .dropdown-search {
+            width: calc(100% - 24px);
+            margin: 6px 12px;
+            padding: 6px 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+        
+        .dropdown-search:focus {
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 2px rgba(0, 83, 226, 0.15);
+        }
+        
+        .dropdown-multi-panel.open {
+            display: block;
+        }
+        
+        .dropdown-multi-panel label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #333;
+            transition: background 0.15s;
+            margin: 0;
+        }
+        
+        .dropdown-multi-panel label:hover {
+            background: #f8f9fa;
+        }
+        
+        .dropdown-multi-panel input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--walmart-blue);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -360,16 +466,14 @@
                     <span class="text-white me-3">
                         <i class="bi bi-person-circle"></i> <span id="currentUserName"></span>
                     </span>
-                    <button class="btn btn-outline-light btn-sm" onclick="logout()">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </button>
                 </div>
             </div>
         </nav>
 
         <div class="container-fluid px-4">
-            <!-- Navigation Tabs -->
-            <ul class="nav nav-tabs mb-4" id="mainTabs">
+            <!-- Navigation Tabs with Feedback Button -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0;">
+                <ul class="nav nav-tabs mb-0" id="mainTabs" style="flex: 1;">
                 <li class="nav-item">
                     <a class="nav-link active" href="#" onclick="showTab('jobcodes')">
                         <i class="bi bi-code-square"></i> Job Codes
@@ -390,7 +494,12 @@
                         <i class="bi bi-gear"></i> Admin
                     </a>
                 </li>
-            </ul>
+                </ul>
+                <button class="btn btn-outline-primary btn-sm" onclick="openFeedbackModal()" title="Send feedback about this dashboard" style="margin-left: 16px; white-space: nowrap;">
+                    <i class="bi bi-chat-left-heart"></i> Feedback
+                </button>
+            </div>
+            <hr style="margin: 0 0 20px 0;">
 
             <!-- Job Codes Tab -->
             <div id="jobcodesTab">
@@ -437,6 +546,7 @@
                                     <option value="">All Categories</option>
                                     <option value="Hourly">Hourly</option>
                                     <option value="Salary">Salary</option>
+                                    <option value="Both">Both</option>
                                     <option value="Invalid">Invalid</option>
                                 </select>
                             </div>
@@ -830,66 +940,23 @@
                             </div>
                         </div>
 
-                        <!-- Banner Codes (Multi-select) -->
+                        <!-- Banner Codes (Multi-select Dropdown) -->
                         <div class="mb-3">
                             <label class="form-label">Banner Codes <small class="text-muted">(Select all that apply)</small></label>
-                            <div class="border rounded p-2" style="max-height: 120px; overflow-y: auto;">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="WAL" id="banner_WAL">
-                                    <label class="form-check-label" for="banner_WAL">WAL - Walmart Supercenter</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="DIV1" id="banner_DIV1">
-                                    <label class="form-check-label" for="banner_DIV1">DIV1 - Walmart Div 1</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="NHM" id="banner_NHM">
-                                    <label class="form-check-label" for="banner_NHM">NHM - Neighborhood Market</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="SAM" id="banner_SAM">
-                                    <label class="form-check-label" for="banner_SAM">SAM - Sam's Club</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="HTO" id="banner_HTO">
-                                    <label class="form-check-label" for="banner_HTO">HTO - Hometown</label>
-                                </div>
+                            <div class="dropdown-multi" id="banner-codes-dropdown">
+                                <button type="button" class="dropdown-multi-btn" id="banner-codes-dropdown-btn">All Selected</button>
+                                <div class="dropdown-multi-panel" id="banner-codes-dropdown-panel"></div>
                             </div>
                         </div>
 
-                        <!-- Merch Dept Numbers (Multi-select) -->
+                        <!-- Merch Dept Numbers (Multi-select Dropdown) -->
                         <div class="mb-3">
                             <label class="form-label">Merch Dept Numbers <small class="text-muted">(Select all that apply)</small></label>
-                            <select class="form-select" id="assignMerchDepts" multiple style="height: 120px;">
-                                <option value="1">1 - Produce</option>
-                                <option value="2">2 - Meat & Seafood</option>
-                                <option value="3">3 - Deli/Bakery</option>
-                                <option value="4">4 - Dairy</option>
-                                <option value="5">5 - Frozen</option>
-                                <option value="38">38 - Pharmacy</option>
-                                <option value="90">90 - Grocery</option>
-                                <option value="91">91 - Candy & Tobacco</option>
-                                <option value="92">92 - Health & Beauty</option>
-                                <option value="93">93 - Pharmacy</option>
-                                <option value="94">94 - Pets & Paper Goods</option>
-                                <option value="95">95 - Chemicals</option>
-                                <option value="96">96 - Cosmetics</option>
-                                <option value="10">10 - Action Alley</option>
-                                <option value="11">11 - Apparel</option>
-                                <option value="12">12 - Shoes</option>
-                                <option value="14">14 - Jewelry</option>
-                                <option value="16">16 - Optical</option>
-                                <option value="17">17 - Toys</option>
-                                <option value="18">18 - Sporting Goods</option>
-                                <option value="19">19 - Automotive</option>
-                                <option value="20">20 - Home & Garden</option>
-                                <option value="21">21 - Paint & Hardware</option>
-                                <option value="22">22 - Home Decor</option>
-                                <option value="23">23 - Furniture</option>
-                                <option value="72">72 - Electronics</option>
-                                <option value="87">87 - Wireless</option>
-                            </select>
-                            <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple departments</small>
+                            <div class="dropdown-multi" id="merch-depts-dropdown">
+                                <button type="button" class="dropdown-multi-btn" id="merch-depts-dropdown-btn">All Selected</button>
+                                <div class="dropdown-multi-panel" id="merch-depts-dropdown-panel"></div>
+                            </div>
+                            <small class="form-text text-muted">Multiple selection supported with checkboxes</small>
                         </div>
 
                         <!-- Role Assignment -->
@@ -909,12 +976,11 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Access Level</label>
-                                <select class="form-select" id="assignAccessLevel">
-                                    <option value="">-- Select Access Level --</option>
-                                    <option value="Hourly">Hourly</option>
-                                    <option value="Salary">Salary</option>
-                                </select>
+                                <label class="form-label">Access Level <small class="text-muted">(Select all that apply)</small></label>
+                                <div class="dropdown-multi" id="access-level-dropdown">
+                                    <button type="button" class="dropdown-multi-btn" id="access-level-dropdown-btn">All Selected</button>
+                                    <div class="dropdown-multi-panel" id="access-level-dropdown-panel"></div>
+                                </div>
                             </div>
                         </div>
 
@@ -1166,6 +1232,7 @@
                                     <option value="">-- Select --</option>
                                     <option value="Hourly">Hourly</option>
                                     <option value="Salary">Salary</option>
+                                    <option value="Both">Both</option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
@@ -1751,17 +1818,27 @@
             // Auto-populate dept/div numbers from job code
             populateJobCodeInfo(jobCode);
             
+            // Initialize dropdowns
+            const bannerCodeOptions = ['WAL - Walmart Supercenter', 'DIV1 - Walmart Div 1', 'NHM - Neighborhood Market', 'SAM - Sam\'s Club', 'HTO - Hometown'];
+            const merchDeptOptions = ['1 - Produce', '2 - Meat & Seafood', '3 - Deli/Bakery', '4 - Dairy', '5 - Frozen', '38 - Pharmacy', '90 - Grocery', '91 - Candy & Tobacco', '92 - Health & Beauty', '93 - Pharmacy', '94 - Pets & Paper Goods', '95 - Chemicals', '96 - Cosmetics', '10 - Action Alley', '11 - Apparel', '12 - Shoes', '14 - Jewelry', '16 - Optical', '17 - Toys', '18 - Sporting Goods', '19 - Automotive', '20 - Home & Garden', '21 - Paint & Hardware', '22 - Home Decor', '23 - Furniture', '72 - Electronics', '87 - Wireless'];
+            const accessLevelOptions = ['Hourly', 'Salary'];
+            
+            populateDropdown('banner-codes-dropdown', bannerCodeOptions);
+            populateDropdown('merch-depts-dropdown', merchDeptOptions);
+            populateDropdown('access-level-dropdown', accessLevelOptions);
+            
             // Clear edit mode
             delete document.getElementById('assignTeamForm').dataset.editRequestId;
             new bootstrap.Modal(document.getElementById('assignTeamModal')).show();
         }
 
         function populateJobCodeInfo(jobCode) {
-            // Extract dept and div numbers from job code format (div-dept-code)
+            // Extract dept, div, and base division code from job code format (div-dept-code)
             const parts = jobCode.split('-');
             if (parts.length >= 3) {
                 document.getElementById('assignDivNumber').value = parts[0] || '';
                 document.getElementById('assignDeptNumber').value = parts[1] || '';
+                document.getElementById('assignBaseDivisionCode').value = parts[2] || '';
             }
             
             // Generate action based on current vs new assignment
@@ -1798,6 +1875,125 @@
             }
         });
 
+        // Dropdown Management Functions
+        function populateDropdown(dropdownId, options) {
+            const panel = document.getElementById(dropdownId + '-panel');
+            const btn = document.getElementById(dropdownId + '-btn');
+            panel.innerHTML = '';
+            const hasSearch = (dropdownId === 'merch-depts-dropdown');
+
+            // Add search input for dropdown with many items
+            if (hasSearch) {
+                const searchInput = document.createElement('input');
+                searchInput.type = 'text';
+                searchInput.placeholder = 'Search departments...';
+                searchInput.className = 'dropdown-search';
+                searchInput.addEventListener('input', () => {
+                    const term = searchInput.value.toLowerCase();
+                    panel.querySelectorAll('label[data-option]').forEach(lbl => {
+                        lbl.style.display = lbl.dataset.option.toLowerCase().includes(term) ? '' : 'none';
+                    });
+                });
+                panel.appendChild(searchInput);
+            }
+
+            // Add "All" toggle at top
+            const allLabel = document.createElement('label');
+            allLabel.style.borderBottom = '1px solid #ddd';
+            allLabel.style.paddingBottom = '6px';
+            allLabel.style.marginBottom = '4px';
+            allLabel.style.fontWeight = '600';
+            const allCb = document.createElement('input');
+            allCb.type = 'checkbox';
+            allCb.checked = false;
+            allCb.dataset.selectAll = 'true';
+            allCb.addEventListener('change', () => {
+                const checked = allCb.checked;
+                // Only toggle visible options
+                panel.querySelectorAll('label[data-option]').forEach(lbl => {
+                    if (lbl.style.display !== 'none') {
+                        const cb = lbl.querySelector('input[type="checkbox"]');
+                        if (cb) cb.checked = checked;
+                    }
+                });
+                updateDropdownLabel(dropdownId, options.length);
+            });
+            allLabel.appendChild(allCb);
+            allLabel.appendChild(document.createTextNode('All'));
+            panel.appendChild(allLabel);
+            
+            options.forEach((option) => {
+                const label = document.createElement('label');
+                label.dataset.option = option;
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = option;
+                cb.checked = false;
+                cb.addEventListener('change', () => {
+                    // Update "All" checkbox state
+                    const allCheckboxes = panel.querySelectorAll('label[data-option]:not([style*="display: none"]) input[type="checkbox"]');
+                    const allChecked = Array.from(allCheckboxes).every(c => c.checked);
+                    const allCb = panel.querySelector('input[data-select-all]');
+                    if (allCb) allCb.checked = allChecked;
+                    updateDropdownLabel(dropdownId, options.length);
+                });
+                label.appendChild(cb);
+                label.appendChild(document.createTextNode(option));
+                panel.appendChild(label);
+            });
+            
+            updateDropdownLabel(dropdownId, options.length);
+        }
+
+        // Update dropdown button text based on selections
+        function updateDropdownLabel(dropdownId, totalCount) {
+            const panel = document.getElementById(dropdownId + '-panel');
+            const btn = document.getElementById(dropdownId + '-btn');
+            if (!panel || !btn) return;
+            
+            const checked = panel.querySelectorAll('input[type="checkbox"]:checked:not([data-select-all])');
+            
+            if (checked.length === 0) {
+                btn.textContent = 'None selected';
+            } else if (checked.length === totalCount) {
+                btn.textContent = 'All Selected';
+            } else if (checked.length <= 2) {
+                btn.textContent = Array.from(checked).map(cb => cb.value).join(', ');
+            } else {
+                btn.textContent = `${checked.length} of ${totalCount} selected`;
+            }
+        }
+
+        // Get selected filter values (array)
+        function getSelectedValues(dropdownId) {
+            const panel = document.getElementById(dropdownId + '-panel');
+            if (!panel) return [];
+            
+            const checked = panel.querySelectorAll('input[type="checkbox"]:checked:not([data-select-all])');
+            return Array.from(checked).map(cb => cb.value);
+        }
+
+        // Event delegation for dropdown buttons and panels
+        (function initDropdownDelegation() {
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.dropdown-multi-btn');
+                const panel = e.target.closest('.dropdown-multi-panel');
+                if (btn) {
+                    const siblingPanel = btn.nextElementSibling;
+                    // Close other dropdowns
+                    document.querySelectorAll('.dropdown-multi-panel.open').forEach(p => {
+                        if (p !== siblingPanel) p.classList.remove('open');
+                    });
+                    siblingPanel.classList.toggle('open');
+                } else if (panel) {
+                    // Clicking inside a panel — do nothing (keep it open)
+                } else {
+                    // Clicking outside — close all dropdowns
+                    document.querySelectorAll('.dropdown-multi-panel.open').forEach(p => p.classList.remove('open'));
+                }
+            });
+        })();
+
         async function submitComprehensiveTeamingRequest() {
             const form = document.getElementById('assignTeamForm');
             const teamSelect = document.getElementById('assignTeamSelect');
@@ -1813,15 +2009,26 @@
                 return;
             }
             
-            // Collect banner codes
-            const bannerCodes = [];
-            document.querySelectorAll('input[type="checkbox"][id^="banner_"]:checked').forEach(cb => {
-                bannerCodes.push(cb.value);
-            });
+            // Collect banner codes using new dropdown function
+            const bannerCodes = getSelectedValues('banner-codes-dropdown');
+            if (bannerCodes.length === 0) {
+                showToast('Please select at least one Banner Code', 'error');
+                return;
+            }
             
-            // Collect merch dept numbers
-            const merchDepts = Array.from(document.getElementById('assignMerchDepts').selectedOptions)
-                .map(option => option.value);
+            // Collect merch dept numbers using new dropdown function
+            const merchDepts = getSelectedValues('merch-depts-dropdown');
+            if (merchDepts.length === 0) {
+                showToast('Please select at least one Merchandise Department', 'error');
+                return;
+            }
+            
+            // Collect access levels using new dropdown function
+            const accessLevels = getSelectedValues('access-level-dropdown');
+            if (accessLevels.length === 0) {
+                showToast('Please select at least one Access Level', 'error');
+                return;
+            }
             
             const requestData = {
                 job_code: document.getElementById('assignJobCode').value,
@@ -1836,7 +2043,7 @@
                 banner_codes: bannerCodes,
                 merch_dept_numbers: merchDepts,
                 role: document.getElementById('assignRole').value,
-                access_level: document.getElementById('assignAccessLevel').value,
+                access_level: accessLevels,
                 tl_job_code: document.getElementById('assignTlJobCode').value,
                 tl_job_title: document.getElementById('assignTlJobTitle').value,
                 tl_dept_number: document.getElementById('assignTlDeptNumber').value,
@@ -2772,6 +2979,86 @@
             }
         }
 
+        // Feedback Modal Management
+        function openFeedbackModal() {
+            const modal = document.getElementById('feedbackModal');
+            modal.style.display = 'flex';
+            document.getElementById('feedbackStep1').style.display = 'block';
+            document.getElementById('feedbackStep2').style.display = 'none';
+            document.getElementById('feedbackStep3').style.display = 'none';
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').style.display = 'none';
+            resetFeedbackForm();
+        }
+
+        function nextFeedbackStep() {
+            const selectedCategory = document.querySelector('input[name="feedbackCategory"]:checked');
+            if (!selectedCategory) {
+                showToast('Please select a feedback category', 'error');
+                return;
+            }
+            document.getElementById('feedbackStep1').style.display = 'none';
+            document.getElementById('feedbackStep2').style.display = 'block';
+        }
+
+        function prevFeedbackStep() {
+            document.getElementById('feedbackStep1').style.display = 'block';
+            document.getElementById('feedbackStep2').style.display = 'none';
+        }
+
+        async function submitFeedback() {
+            const selectedCategory = document.querySelector('input[name="feedbackCategory"]:checked');
+            const selectedRating = document.querySelector('input[name="feedbackRating"]:checked');
+            const comments = document.getElementById('feedbackComments').value;
+
+            if (!selectedCategory || !selectedRating) {
+                showToast('Please complete all fields (category and rating required)', 'error');
+                return;
+            }
+
+            try {
+                const response = await api('/submit-feedback', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        category: selectedCategory.value,
+                        rating: parseInt(selectedRating.value),
+                        comments: comments,
+                        page: 'job-codes-dashboard',
+                        user: document.getElementById('currentUserName')?.textContent || 'Unknown'
+                    })
+                });
+
+                if (response.success) {
+                    document.getElementById('feedbackStep2').style.display = 'none';
+                    document.getElementById('feedbackStep3').style.display = 'block';
+                    setTimeout(() => {
+                        closeFeedbackModal();
+                    }, 2000);
+                } else {
+                    showToast('Failed to submit feedback: ' + (response.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showToast('Error submitting feedback: ' + error.message, 'error');
+            }
+        }
+
+        function resetFeedbackForm() {
+            document.getElementById('feedbackForm').reset();
+            document.getElementById('feedbackStep1').style.display = 'block';
+            document.getElementById('feedbackStep2').style.display = 'none';
+            document.getElementById('feedbackStep3').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('feedbackModal');
+            if (event.target === modal) {
+                closeFeedbackModal();
+            }
+        });
+
         // Event listeners for job code management
         document.getElementById('searchJobCodeMaster').addEventListener('input', renderJobCodesMaster);
         document.getElementById('filterCategory').addEventListener('change', renderJobCodesMaster);
@@ -2779,5 +3066,99 @@
         // Initialize
         checkAuth();
     </script>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 500px; width: 90%; padding: 0;">
+            <!-- Step 1: Category Selection -->
+            <div id="feedbackStep1" style="display: block; padding: 32px 24px;">
+                <h3 style="margin: 0 0 24px; font-weight: 600; color: #1a202c;">Send Us Your Feedback</h3>
+                <p style="color: #718096; margin: 0 0 20px; font-size: 0.95rem;">Help us improve the Job Codes Dashboard by sharing your feedback</p>
+                
+                <form id="feedbackForm">
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer;">
+                            <input type="radio" name="feedbackCategory" value="Dashboard UI" style="width: 18px; height: 18px; accent-color: #0053e2;">
+                            <span style="color: #1a202c;">Dashboard UI</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer;">
+                            <input type="radio" name="feedbackCategory" value="Teaming Functions" style="width: 18px; height: 18px; accent-color: #0053e2;">
+                            <span style="color: #1a202c;">Teaming Functions</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer;">
+                            <input type="radio" name="feedbackCategory" value="Data Display" style="width: 18px; height: 18px; accent-color: #0053e2;">
+                            <span style="color: #1a202c;">Data Display</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer;">
+                            <input type="radio" name="feedbackCategory" value="Performance" style="width: 18px; height: 18px; accent-color: #0053e2;">
+                            <span style="color: #1a202c;">Performance</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 0; cursor: pointer;">
+                            <input type="radio" name="feedbackCategory" value="Other" style="width: 18px; height: 18px; accent-color: #0053e2;">
+                            <span style="color: #1a202c;">Other</span>
+                        </label>
+                    </div>
+                </form>
+                
+                <div style="display: flex; gap: 12px; margin-top: 28px;">
+                    <button onclick="closeFeedbackModal()" style="flex: 1; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 4px; background: white; color: #1a202c; cursor: pointer; font-weight: 500; transition: all 0.2s;">Cancel</button>
+                    <button onclick="nextFeedbackStep()" style="flex: 1; padding: 10px 16px; border: none; border-radius: 4px; background: #0053e2; color: white; cursor: pointer; font-weight: 500; transition: all 0.2s;">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Rating & Comments -->
+            <div id="feedbackStep2" style="display: none; padding: 32px 24px;">
+                <h3 style="margin: 0 0 24px; font-weight: 600; color: #1a202c;">Rate & Comment</h3>
+                
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 500; color: #1a202c;">How would you rate your experience?</label>
+                    <div style="display: flex; gap: 12px; justify-content: space-between;">
+                        <label style="flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px solid transparent; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0053e2'; this.style.background='#f0f7ff';" onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
+                            <input type="radio" name="feedbackRating" value="1" style="display: block; margin: 0 auto 8px; width: 18px; height: 18px; cursor: pointer; accent-color: #0053e2;">
+                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">😞</span>
+                            <span style="font-size: 0.8rem; color: #718096; display: block;">Poor</span>
+                        </label>
+                        <label style="flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px solid transparent; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0053e2'; this.style.background='#f0f7ff';" onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
+                            <input type="radio" name="feedbackRating" value="2" style="display: block; margin: 0 auto 8px; width: 18px; height: 18px; cursor: pointer; accent-color: #0053e2;">
+                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">😕</span>
+                            <span style="font-size: 0.8rem; color: #718096; display: block;">Fair</span>
+                        </label>
+                        <label style="flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px solid transparent; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0053e2'; this.style.background='#f0f7ff';" onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
+                            <input type="radio" name="feedbackRating" value="3" style="display: block; margin: 0 auto 8px; width: 18px; height: 18px; cursor: pointer; accent-color: #0053e2;">
+                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">😐</span>
+                            <span style="font-size: 0.8rem; color: #718096; display: block;">OK</span>
+                        </label>
+                        <label style="flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px solid transparent; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0053e2'; this.style.background='#f0f7ff';" onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
+                            <input type="radio" name="feedbackRating" value="4" style="display: block; margin: 0 auto 8px; width: 18px; height: 18px; cursor: pointer; accent-color: #0053e2;">
+                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">😊</span>
+                            <span style="font-size: 0.8rem; color: #718096; display: block;">Good</span>
+                        </label>
+                        <label style="flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px solid transparent; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0053e2'; this.style.background='#f0f7ff';" onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
+                            <input type="radio" name="feedbackRating" value="5" style="display: block; margin: 0 auto 8px; width: 18px; height: 18px; cursor: pointer; accent-color: #0053e2;">
+                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">🤩</span>
+                            <span style="font-size: 0.8rem; color: #718096; display: block;">Great</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #1a202c;">Additional comments (optional)</label>
+                    <textarea id="feedbackComments" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 4px; font-family: inherit; font-size: 0.95rem; resize: vertical; min-height: 100px;" placeholder="Tell us more about your feedback..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="prevFeedbackStep()" style="flex: 1; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 4px; background: white; color: #1a202c; cursor: pointer; font-weight: 500;">← Back</button>
+                    <button onclick="submitFeedback()" style="flex: 1; padding: 10px 16px; border: none; border-radius: 4px; background: #0053e2; color: white; cursor: pointer; font-weight: 500;">Submit</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Success -->
+            <div id="feedbackStep3" style="display: none; padding: 48px 24px; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 16px;">✅</div>
+                <h3 style="margin: 0 0 12px; font-weight: 600; color: #1a202c;">Thank You!</h3>
+                <p style="color: #718096; margin: 0;">Your feedback has been submitted successfully and will help us improve.</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -119,12 +119,14 @@ def get_amp_data():
         # Get query parameters
         fy = request.args.get('fy', '2027')
         week = request.args.get('week', '2')
+        weeks = request.args.get('weeks', '')  # Support for multiple weeks
         limit = int(request.args.get('limit', 25))
         offset = int(request.args.get('offset', 0))
         
         filters = {
             'fy': fy,
             'week': week,
+            'weeks': weeks,  # Add weeks parameter to filters
             'division': request.args.get('division'),
             'region': request.args.get('region'),
             'market': request.args.get('market'),
@@ -303,23 +305,38 @@ def get_filter_options():
 
 
 def build_amp_query(filters, days, limit, offset=0):
-    """Build BigQuery SQL query with filters - WK 1+ for current FY"""
+    """Build BigQuery SQL query with filters - support multiple weeks"""
     
-    # Extract fiscal year and week
+    # Extract fiscal year and weeks
     fy = filters.get('fy', '2027')
-    min_week = int(filters.get('week', 1))
+    selected_week = int(filters.get('week', 2))
+    weeks_param = filters.get('weeks', '')
+    
+    # Handle multiple weeks from comma-separated parameter
+    selected_weeks = []
+    if weeks_param:
+        try:
+            selected_weeks = [int(w.strip()) for w in weeks_param.split(',') if w.strip()]
+        except ValueError:
+            selected_weeks = [selected_week]
+    else:
+        selected_weeks = [selected_week]
+    
+    # Build WHERE clause for weeks - support multiple weeks
+    weeks_list = ', '.join(map(str, selected_weeks))
     
     query = f"""
-        SELECT 
+        SELECT DISTINCT
+            AMP_ID,
             Week,
             Activity_Title,
             Activity_Type,
             Business_Area,
             COALESCE(Store_Cnt, 0) as Stores_With_Access,
-            COALESCE(Count, 0) as Total_Impressions,
-            CAST(RAND() * COALESCE(Count, 1000) AS INT64) as Unique_Viewers,
-            ROUND(RAND() * 100, 1) as Engagement_Rate,
-            ROUND(RAND() * 100, 1) as Completion_Rate,
+            COALESCE(Count, 0) as Unique_Users,
+            COALESCE(Count, 0) as Total_Clicks,
+            COALESCE(Count, 0) as Engagement_Rate,
+            COALESCE(Count, 0) as Completion_Rate,
             COALESCE(Status, Message_Status, 'DRAFT') as Status,
             COALESCE(Web_Preview, Link, '') as Preview_Link,
             Start_Date,
@@ -327,9 +344,10 @@ def build_amp_query(filters, days, limit, offset=0):
         FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
         WHERE 1=1
             AND FY = CAST({fy} AS INT64)
-            AND Week >= {min_week}
+            AND Week IN ({weeks_list})
             AND Activity_Title IS NOT NULL
             AND Activity_Type IS NOT NULL
+            AND COALESCE(Status, Message_Status) = 'Published - Published'
     """
 
     # Add dynamic filters
@@ -350,7 +368,7 @@ def build_amp_query(filters, days, limit, offset=0):
         query += f" AND (LOWER(Activity_Title) LIKE '%{keyword.lower()}%' OR LOWER(Activity_Type) LIKE '%{keyword.lower()}%' OR LOWER(Business_Area) LIKE '%{keyword.lower()}%')"
 
     query += f"""
-        ORDER BY Week DESC, Activity_Title
+        ORDER BY Activity_Title
         LIMIT {limit} OFFSET {offset}
     """
 
@@ -358,19 +376,34 @@ def build_amp_query(filters, days, limit, offset=0):
 
 
 def build_amp_count_query(filters, days):
-    """Build BigQuery count query"""
+    """Build BigQuery count query - support multiple weeks"""
     
     fy = filters.get('fy', '2027')
-    min_week = int(filters.get('week', 1))
+    selected_week = int(filters.get('week', 2))
+    weeks_param = filters.get('weeks', '')
+    
+    # Handle multiple weeks from comma-separated parameter
+    selected_weeks = []
+    if weeks_param:
+        try:
+            selected_weeks = [int(w.strip()) for w in weeks_param.split(',') if w.strip()]
+        except ValueError:
+            selected_weeks = [selected_week]
+    else:
+        selected_weeks = [selected_week]
+    
+    # Build WHERE clause for weeks - support multiple weeks
+    weeks_list = ', '.join(map(str, selected_weeks))
     
     query = f"""
-        SELECT COUNT(*) as total
+        SELECT COUNT(DISTINCT AMP_ID) as total
         FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
         WHERE 1=1
             AND FY = CAST({fy} AS INT64)
-            AND Week >= {min_week}
+            AND Week IN ({weeks_list})
             AND Activity_Title IS NOT NULL
             AND Activity_Type IS NOT NULL
+            AND COALESCE(Status, Message_Status) = 'Published - Published'
     """
 
     # Add dynamic filters

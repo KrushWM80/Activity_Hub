@@ -77,7 +77,7 @@ foreach ($service in $Services) {
 }
 
 # Summary
-Log "Monitoring cycle complete. Down services: $($DownServices.Count)/7" "INFO"
+Log "Monitoring cycle complete. Down services: $($DownServices.Count)/8" "INFO"
 
 if ($DownServices.Count -gt 0) {
     Log "Services requiring attention: $($DownServices.Name -join ', ')" "WARN"

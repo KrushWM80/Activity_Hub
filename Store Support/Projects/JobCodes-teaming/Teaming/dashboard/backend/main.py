@@ -29,6 +29,9 @@ try:
 except ImportError:
     HAS_BIGQUERY = False
 
+# SQLite Cache for job codes
+from sqlite_cache import get_cache, init_cache
+
 # Fix Unicode encoding for Windows console output
 import io
 if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
@@ -66,7 +69,6 @@ REJECTION_HISTORY_FILE = os.path.join(DATA_DIR, "rejection_history.json")
 
 # Data source files (in Teaming folder)
 TEAMING_DATA_FILE = os.path.join(TEAMING_DIR, "TMS_Data_3_converted.csv")
-TEAMING_DATA_FILE_FALLBACK = os.path.join(TEAMING_DIR, "TMS Data (3).xlsx")
 POLARIS_DATA_FILE = os.path.join(TEAMING_DIR, "polaris_job_codes.csv")
 USER_COUNTS_FILE = os.path.join(TEAMING_DIR, "polaris_user_counts.csv")
 
@@ -95,6 +97,61 @@ app.add_middleware(
 )
 
 security = HTTPBasic()
+
+# ============================================================
+# CACHE INITIALIZATION
+# ============================================================
+
+# Initialize cache on startup
+cache = init_cache()
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize cache and start sync thread on startup"""
+    print("Initializing Job Code Cache...")
+    
+    # Try to load Polaris data - CSV is the primary fallback
+    polaris_data = None
+    
+    # First attempt: Load from CSV
+    try:
+        print(f"Loading Polaris data from CSV: {POLARIS_DATA_FILE}")
+        if os.path.exists(POLARIS_DATA_FILE):
+            polaris_data = pd.read_csv(POLARIS_DATA_FILE)
+            print(f"Successfully loaded {len(polaris_data)} job codes from CSV")
+    except Exception as e:
+        print(f"Error loading Polaris CSV: {e}")
+    
+    # Second attempt: Load user counts
+    try:
+        if os.path.exists(USER_COUNTS_FILE):
+            user_counts_df = pd.read_csv(USER_COUNTS_FILE)
+            if polaris_data is not None and 'job_code' in user_counts_df.columns:
+                user_counts_df['job_code'] = user_counts_df['job_code'].str.strip()
+                polaris_data = polaris_data.merge(user_counts_df, on='job_code', how='left')
+                polaris_data['user_count'] = polaris_data['user_count'].fillna(0).astype(int)
+                print(f"Merged user counts into Polaris data")
+    except Exception as e:
+        print(f"Error loading user counts: {e}")
+        if polaris_data is not None and 'user_count' not in polaris_data.columns:
+            polaris_data['user_count'] = 0
+    
+    # Sync to cache
+    if polaris_data is not None:
+        cache.sync_polaris_data(polaris_data)
+        print(f"Cache synced with {len(polaris_data)} job codes")
+    else:
+        print("WARNING: No polaris data loaded")
+    
+    # Start background sync thread (will attempt BigQuery every 30 min)
+    cache.start_sync_thread(sync_polaris_from_bigquery if HAS_BIGQUERY else None)
+    print("Cache initialized and sync thread started")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Stop cache sync thread on shutdown"""
+    print("Stopping cache sync thread...")
+    cache.stop_sync_thread()
 
 # ============================================================
 # USER MANAGEMENT
@@ -171,6 +228,46 @@ def require_admin(request: Request):
 import numpy as np
 import math
 
+def sync_polaris_from_bigquery():
+    """
+    Sync Polaris job code data from BigQuery
+    
+    Returns:
+        Pandas DataFrame with columns: job_code, job_nm, user_count
+        Returns None if sync fails
+    """
+    if not HAS_BIGQUERY:
+        print("BigQuery not available, skipping sync")
+        return None
+    
+    try:
+        client = bigquery.Client()
+        
+        # Query polaris data - adjust this query to your actual BigQuery schema
+        query = """
+        SELECT DISTINCT
+            UPPER(TRIM(job_code)) as job_code,
+            job_nm,
+            COUNT(DISTINCT worker_id) as user_count
+        FROM `polaris-analytics-prod.us_walmart.vw_polaris_current_schedule`
+        WHERE job_code IS NOT NULL
+        GROUP BY job_code, job_nm
+        ORDER BY job_code
+        """
+        
+        print("Querying BigQuery for Polaris data...")
+        query_job = client.query(query)
+        results = query_job.result()
+        
+        # Convert to DataFrame
+        df = results.to_dataframe()
+        print(f"Successfully retrieved {len(df)} job codes from BigQuery")
+        
+        return df
+    except Exception as e:
+        print(f"Error syncing from BigQuery: {e}")
+        return None
+
 def to_json_safe(val):
     """Convert numpy types and NaN to JSON-safe Python types"""
     if val is None:
@@ -215,7 +312,7 @@ def load_job_code_data():
     # Try to load teaming data (optional)
     teaming_df = None
     merged = polaris_df.copy()
-    has_team_data = False
+    has_team_data = False  # Initialize BEFORE try block
     
     if os.path.exists(TEAMING_DATA_FILE):
         try:
@@ -254,29 +351,44 @@ def load_job_code_data():
                     'deptNumber': 'first',
                     'jobCode': 'first'
                 }).reset_index()
+                
+                # Merge with Polaris
+                merged = polaris_df.merge(
+                    teaming_summary,
+                    left_on='job_code',
+                    right_on='composite_job_code',
+                    how='left'
+                )
             else:
                 print(f"Partial teaming data - only {available_cols} available")
                 # Just use the basic columns for division/department mapping
                 teaming_summary = teaming_df[['composite_job_code', 'divNumber', 'deptNumber', 'jobCode']].drop_duplicates()
-            
-            # Merge with Polaris
-            merged = polaris_df.merge(
-                teaming_summary,
-                left_on='job_code',
-                right_on='composite_job_code',
-                how='left'
-            )
+                
+                # Merge with Polaris
+                merged = polaris_df.merge(
+                    teaming_summary,
+                    left_on='job_code',
+                    right_on='composite_job_code',
+                    how='left'
+                )
             
         except ImportError as e:
             print(f"⚠️  WARNING: Cannot load Excel teaming data: {e}")
             print("   Proceeding without teaming data (openpyxl not installed)")
-            teaming_df = pd.DataFrame()  # Empty dataframe
+            teaming_df = pd.DataFrame()
+            merged = polaris_df.copy()  # Start fresh with just Polaris data
+            has_team_data = False  # Explicitly set to False
         except Exception as e:
             print(f"⚠️  WARNING: Error loading teaming data: {e}")
-            teaming_df = pd.DataFrame()  # Empty dataframe
+            import traceback
+            traceback.print_exc()
+            teaming_df = pd.DataFrame()
+            merged = polaris_df.copy()  # Start fresh with just Polaris data
+            has_team_data = False  # Explicitly set to False
     else:
         print(f"Teaming data file not found at {TEAMING_DATA_FILE}, using Polaris data only")
-        teaming_df = pd.DataFrame()  # Empty dataframe
+        teaming_df = pd.DataFrame()
+        has_team_data = False  # Explicitly set to False
     
     # Mark status
     merged['status'] = merged.apply(
@@ -309,38 +421,66 @@ def load_job_code_data():
 
 def get_team_options():
     """Get available teams from teaming data"""
-    if not os.path.exists(TEAMING_DATA_FILE):
-        raise FileNotFoundError(f"Teaming data file not found: {TEAMING_DATA_FILE}")
-    # Load CSV or Excel based on file extension
-    if TEAMING_DATA_FILE.endswith('.csv'):
-        teaming_df = pd.read_csv(TEAMING_DATA_FILE)
-    else:
-        teaming_df = pd.read_excel(TEAMING_DATA_FILE)
+    try:
+        print(f"[GET /api/teams] Starting get_team_options()")
+        
+        if not os.path.exists(TEAMING_DATA_FILE):
+            print(f"[GET /api/teams] ERROR: Teaming data file not found: {TEAMING_DATA_FILE}")
+            raise FileNotFoundError(f"Teaming data file not found: {TEAMING_DATA_FILE}")
+        
+        print(f"[GET /api/teams] Loading file: {TEAMING_DATA_FILE}")
+        
+        # Load CSV or Excel based on file extension
+        if TEAMING_DATA_FILE.endswith('.csv'):
+            teaming_df = pd.read_csv(TEAMING_DATA_FILE)
+        else:
+            teaming_df = pd.read_excel(TEAMING_DATA_FILE)
+        
+        print(f"[GET /api/teams] Loaded {len(teaming_df)} rows with columns: {list(teaming_df.columns)}")
+        
+        # Check if team columns exist
+        team_cols = ['teamName', 'teamId', 'workgroupName', 'workgroupId']
+        available_cols = [col for col in team_cols if col in teaming_df.columns]
+        
+        print(f"[GET /api/teams] Available team columns: {available_cols}")
+        
+        if not available_cols:
+            # No team data available - return empty list
+            print(f"[GET /api/teams] WARNING: No team columns found in teaming data")
+            return []
+        
+        # Only use available columns
+        teams = teaming_df[available_cols].drop_duplicates()
+        print(f"[GET /api/teams] Found {len(teams)} unique team combinations")
+        
+        # Convert to JSON-safe format
+        result = []
+        for idx, (_, row) in enumerate(teams.iterrows()):
+            try:
+                team_entry = {}
+                for col in available_cols:
+                    try:
+                        val = row[col]
+                        if col == 'teamId' or col == 'workgroupId':
+                            team_entry[col] = to_json_safe(val)
+                        else:
+                            team_entry[col] = str(val) if pd.notna(val) else ""
+                    except Exception as e:
+                        print(f"[GET /api/teams] ERROR processing column {col} for row {idx}: {type(e).__name__}: {e}")
+                        team_entry[col] = None
+                result.append(team_entry)
+            except Exception as e:
+                print(f"[GET /api/teams] ERROR processing row {idx}: {type(e).__name__}: {e}")
+                continue
+        
+        print(f"[GET /api/teams] Successfully created {len(result)} team entries")
+        return result
     
-    # Check if team columns exist
-    team_cols = ['teamName', 'teamId', 'workgroupName', 'workgroupId']
-    available_cols = [col for col in team_cols if col in teaming_df.columns]
-    
-    if not available_cols:
-        # No team data available - return empty list
-        print(f"No team columns found in teaming data. Available: {list(teaming_df.columns)}")
-        return []
-    
-    # Only use available columns
-    teams = teaming_df[available_cols].drop_duplicates()
-    
-    # Convert to JSON-safe format
-    result = []
-    for _, row in teams.iterrows():
-        team_entry = {}
-        for col in available_cols:
-            if col == 'teamId' or col == 'workgroupId':
-                team_entry[col] = to_json_safe(row[col])
-            else:
-                team_entry[col] = str(row[col]) if pd.notna(row[col]) else ""
-        result.append(team_entry)
-    
-    return result
+    except Exception as e:
+        print(f"[GET /api/teams] FATAL ERROR in get_team_options(): {type(e).__name__}: {e}")
+        import traceback
+        print(f"[GET /api/teams] Traceback: {traceback.format_exc()}")
+        raise
 
 # ============================================================
 # UPDATE REQUESTS
@@ -654,38 +794,124 @@ async def get_me(request: Request):
 
 @app.get("/api/job-codes")
 async def get_job_codes(request: Request):
-    """Get all job codes with teaming status"""
+    """Get all job codes with enrichment data from cache and master table"""
     user = require_auth(request)
     
-    merged_df, _ = load_job_code_data()
-    
-    result = []
-    for _, row in merged_df.iterrows():
-        teams = row["teamName"] if isinstance(row["teamName"], list) else []
-        team_ids = row["teamId"] if isinstance(row["teamId"], list) else []
-        workgroups = row["workgroupName"] if isinstance(row["workgroupName"], list) else []
+    try:
+        print("[GET /api/job-codes] Starting endpoint")
+        # Get merged data from cache (Polaris + Master)
+        job_codes = cache.get_job_codes()
+        print(f"[GET /api/job-codes] Got {len(job_codes) if job_codes else 0} job codes from cache")
         
-        result.append({
-            "job_code": str(row["job_code"]) if pd.notna(row["job_code"]) else "",
-            "job_name": str(row["job_nm"]) if pd.notna(row["job_nm"]) else "",
-            "job_title": str(row["job_title"]) if pd.notna(row["job_title"]) else "",
-            "status": str(row["status"]) if pd.notna(row["status"]) else "Unknown",
-            "teams": [str(t) for t in teams if pd.notna(t)],
-            "team_ids": [to_json_safe(t) for t in team_ids if pd.notna(t)],
-            "workgroups": [str(w) for w in workgroups if pd.notna(w)],
-            "division": to_json_safe(row.get("divNumber")),
-            "department": to_json_safe(row.get("deptNumber")),
-            "user_count": to_json_safe(row.get("user_count", 0)),
-        })
-    
-    return {"job_codes": result, "total": len(result)}
+        if not job_codes:
+            return {"job_codes": [], "total": 0}
+        
+        # Merge with Teaming data if available (optional)
+        teaming_map = {}
+        try:
+            print("[GET /api/job-codes] Loading Teaming data...")
+            merged_df, _ = load_job_code_data()
+            print(f"[GET /api/job-codes] Loaded teaming data: {len(merged_df) if merged_df is not None else 0} rows")
+            
+            if merged_df is not None and len(merged_df) > 0:
+                print(f"[GET /api/job-codes] Processing {len(merged_df)} teaming rows")
+                for idx, (_, row) in enumerate(merged_df.iterrows()):
+                    try:
+                        # Use bracket notation for pandas Series, not .get()
+                        jc = str(row['job_code']).strip() if pd.notna(row['job_code']) else ""
+                        
+                        if jc:
+                            # Extract team data safely
+                            teams = row['teamName'] if 'teamName' in row.index and pd.notna(row['teamName']) else []
+                            if not isinstance(teams, list):
+                                teams = [teams] if teams else []
+                            
+                            team_ids = row['teamId'] if 'teamId' in row.index and pd.notna(row['teamId']) else []
+                            if not isinstance(team_ids, list):
+                                team_ids = [team_ids] if team_ids else []
+                            
+                            workgroups = row['workgroupName'] if 'workgroupName' in row.index and pd.notna(row['workgroupName']) else []
+                            if not isinstance(workgroups, list):
+                                workgroups = [workgroups] if workgroups else []
+                            
+                            teaming_map[jc] = {
+                                "teams": teams,
+                                "team_ids": team_ids,
+                                "workgroups": workgroups,
+                                "division": to_json_safe(row['divNumber']) if 'divNumber' in row.index else None,
+                                "department": to_json_safe(row['deptNumber']) if 'deptNumber' in row.index else None,
+                            }
+                    except Exception as row_error:
+                        print(f"[GET /api/job-codes] Warning: Error processing row {idx}: {row_error}")
+                        import traceback
+                        traceback.print_exc()
+                        continue
+                print(f"[GET /api/job-codes] Built teaming map for {len(teaming_map)} job codes")
+        except Exception as e:
+            print(f"[GET /api/job-codes] Warning: Could not load Teaming data: {e}")
+            import traceback
+            traceback.print_exc()
+            teaming_map = {}
+        
+        # Build result
+        print(f"[GET /api/job-codes] Building result from {len(job_codes)} job codes")
+        result = []
+        for idx, jc in enumerate(job_codes):
+            try:
+                job_code_str = jc.get("job_code", "")
+                teaming_info = teaming_map.get(job_code_str, {})
+                result.append({
+                    "job_code": job_code_str,
+                    "job_title": jc.get("job_nm", ""),
+                    "job_name": jc.get("job_nm", ""),
+                    "status": "Assigned" if jc.get("updated_at") else "Missing",
+                    "teams": teaming_info.get("teams", []),
+                    "team_ids": teaming_info.get("team_ids", []),
+                    "workgroups": teaming_info.get("workgroups", []),
+                    "division": teaming_info.get("division"),
+                    "department": teaming_info.get("department"),
+                    "user_count": to_json_safe(jc.get("user_count", 0)),
+                    # Master table fields
+                    "workday_code": jc.get("workday_code", ""),
+                    "category": jc.get("category", ""),
+                    "job_family": jc.get("job_family", ""),
+                    "pg_level": jc.get("pg_level", ""),
+                    "supervisor": jc.get("supervisor", False),
+                    "notes": jc.get("notes", ""),
+                })
+            except Exception as e:
+                print(f"[GET /api/job-codes] Error processing job code {idx}: {e}")
+                import traceback
+                traceback.print_exc()
+                continue
+        
+        print(f"[GET /api/job-codes] SUCCESS: Returning {len(result)} job codes")
+        return {"job_codes": result, "total": len(result)}
+        
+    except Exception as e:
+        print(f"[GET /api/job-codes] ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error retrieving job codes: {str(e)}")
 
 @app.get("/api/teams")
 async def get_teams(request: Request):
     """Get available teams"""
-    user = require_auth(request)
-    teams = get_team_options()
-    return {"teams": teams}
+    try:
+        print("[GET /api/teams] Endpoint called")
+        user = require_auth(request)
+        print(f"[GET /api/teams] Auth passed for user: {user.get('username')}")
+        teams = get_team_options()
+        print(f"[GET /api/teams] Returning {len(teams)} teams")
+        return {"teams": teams}
+    except HTTPException as e:
+        print(f"[GET /api/teams] HTTPException: {e.status_code} - {e.detail}")
+        raise
+    except Exception as e:
+        print(f"[GET /api/teams] UNHANDLED EXCEPTION: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error retrieving teams: {str(e)}")
 
 @app.post("/api/job-codes/lookup")
 async def lookup_job_code_employees(request: Request):
@@ -1015,17 +1241,29 @@ async def export_comprehensive_requests(request: Request):
 @app.get("/api/requests")
 async def get_requests(request: Request, status: Optional[str] = None):
     """Get update requests"""
-    user = require_auth(request)
-    requests_list = load_requests()
-    
-    # Non-admins can only see their own requests
-    if user["role"] != "admin":
-        requests_list = [r for r in requests_list if r["requested_by"] == user["username"]]
-    
-    if status:
-        requests_list = [r for r in requests_list if r["status"] == status]
-    
-    return {"requests": requests_list}
+    try:
+        print("[GET /api/requests] Endpoint called")
+        user = require_auth(request)
+        print(f"[GET /api/requests] Auth passed for user: {user.get('username')}")
+        requests_list = load_requests()
+        
+        # Non-admins can only see their own requests
+        if user["role"] != "admin":
+            requests_list = [r for r in requests_list if r["requested_by"] == user["username"]]
+        
+        if status:
+            requests_list = [r for r in requests_list if r["status"] == status]
+        
+        print(f"[GET /api/requests] Returning {len(requests_list)} requests")
+        return {"requests": requests_list}
+    except HTTPException as e:
+        print(f"[GET /api/requests] HTTPException: {e.status_code} - {e.detail}")
+        raise
+    except Exception as e:
+        print(f"[GET /api/requests] UNHANDLED EXCEPTION: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error retrieving requests: {str(e)}")
 
 @app.put("/api/requests/{request_id}")
 async def update_request(request_id: int, request: Request):
@@ -1402,45 +1640,78 @@ def save_job_code_requests(requests):
 
 @app.get("/api/job-codes-master")
 async def get_job_codes_master(request: Request):
-    """Get all job codes from Polaris (source of truth) with user counts"""
+    """Get all job codes from cache with master enrichment data"""
     user = get_current_user(request)
-    # Always load fresh from Polaris
-    data = load_job_codes_master()
-    return data
+    job_codes = cache.get_job_codes()
+    return {"job_codes": job_codes, "total": len(job_codes)}
+
+@app.get("/api/job-codes/{job_code}")
+async def get_job_code_detail(job_code: str, request: Request):
+    """Get detailed information for a specific job code"""
+    user = require_auth(request)
+    job_code_data = cache.get_job_code(job_code)
+    
+    if not job_code_data:
+        raise HTTPException(status_code=404, detail=f"Job code {job_code} not found")
+    
+    return job_code_data
+
+@app.post("/api/job-codes-master/{job_code}")
+async def update_job_code_master(job_code: str, request: Request):
+    """Update job code master data (user-entered enrichment)"""
+    user = require_admin(request)
+    
+    data = await request.json()
+    data['updated_by'] = user.get('username', 'unknown')
+    
+    if not cache.update_master_data(job_code, data):
+        raise HTTPException(status_code=400, detail=f"Failed to update job code {job_code}")
+    
+    # Return updated record
+    updated = cache.get_job_code(job_code)
+    return {"success": True, "job_code": updated}
 
 @app.post("/api/job-codes-master/{job_code}/notes")
 async def update_job_code_notes(job_code: str, request: Request):
-    """Update notes for a specific job code (admin only)"""
+    """Update notes for a specific job code"""
     user = require_admin(request)
+    
     data = await request.json()
     notes = data.get('notes', '')
     
-    # Load Excel to update notes
-    if not os.path.exists(JOB_CODE_MASTER_EXCEL):
-        raise HTTPException(status_code=404, detail="Excel file not found")
-    
-    df = pd.read_excel(JOB_CODE_MASTER_EXCEL)
-    
-    # Find and update the job code
-    mask = df['SMART Job Code'].astype(str).str.strip() == job_code.strip()
-    if mask.any():
-        df.loc[mask, 'Notes'] = notes
-    else:
-        # Add new row if not exists
-        new_row = {'SMART Job Code': job_code, 'Notes': notes}
-        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-    
-    # Save back to Excel
-    df.to_excel(JOB_CODE_MASTER_EXCEL, index=False)
+    if not cache.update_master_data(job_code, {'notes': notes, 'updated_by': user.get('username', 'unknown')}):
+        raise HTTPException(status_code=400, detail=f"Failed to update notes for {job_code}")
     
     return {"success": True, "message": "Notes updated successfully"}
 
+@app.get("/api/cache-status")
+async def get_cache_status(request: Request):
+    """Get cache synchronization status (admin only)"""
+    user = require_admin(request)
+    status = cache.get_sync_status()
+    return status
+
+@app.post("/api/cache/sync-now")
+async def trigger_cache_sync(request: Request):
+    """Manually trigger cache sync from BigQuery (admin only)"""
+    user = require_admin(request)
+    
+    try:
+        if HAS_BIGQUERY:
+            polaris_data = sync_polaris_from_bigquery()
+            if polaris_data is not None and cache.sync_polaris_data(polaris_data):
+                return {"success": True, "message": "Cache synced successfully"}
+            else:
+                raise HTTPException(status_code=500, detail="Sync failed")
+        else:
+            raise HTTPException(status_code=503, detail="BigQuery not available")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Sync error: {str(e)}")
+
 @app.post("/api/job-codes-master/sync")
 async def sync_job_codes_master(request: Request):
-    """Sync job codes from Excel (admin only)"""
-    user = require_admin(request)
-    data = sync_job_codes_from_excel()
-    return {"success": True, "data": data}
+    """Trigger cache sync (admin only) - legacy endpoint for compatibility"""
+    return await trigger_cache_sync(request)
 
 @app.post("/api/job-codes-master/request")
 async def request_job_code_change(request: Request):
@@ -1723,6 +1994,107 @@ async def serve_static(full_path: str):
         return FileResponse(index_path, media_type="text/html")
     
     raise HTTPException(status_code=404, detail="File not found")
+
+# ============================================================
+# FEEDBACK ENDPOINTS
+# ============================================================
+
+FEEDBACK_FILE = os.path.join(DATA_DIR, "feedback.json")
+
+def load_feedback():
+    """Load feedback from file"""
+    if not os.path.exists(FEEDBACK_FILE):
+        return []
+    try:
+        with open(FEEDBACK_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        return []
+
+def save_feedback(feedback_list):
+    """Save feedback to file"""
+    with open(FEEDBACK_FILE, 'w', encoding='utf-8') as f:
+        json.dump(feedback_list, f, indent=2, ensure_ascii=False)
+
+@app.post("/api/submit-feedback")
+async def submit_feedback(request: Request):
+    """Submit feedback from Job Codes Dashboard"""
+    try:
+        data = await request.json()
+        
+        feedback_entry = {
+            "id": int(datetime.now().timestamp() * 1000),
+            "timestamp": datetime.now().isoformat(),
+            "category": data.get("category"),
+            "rating": data.get("rating"),
+            "comments": data.get("comments"),
+            "page": data.get("page", "job-codes-dashboard"),
+            "user": data.get("user", "Unknown")
+        }
+        
+        # Load existing feedback
+        feedback_list = load_feedback()
+        feedback_list.append(feedback_entry)
+        save_feedback(feedback_list)
+        
+        # Send email notification
+        send_feedback_notification(feedback_entry)
+        
+        return {"success": True, "message": "Feedback submitted successfully"}
+    except Exception as e:
+        print(f"❌ Error submitting feedback: {str(e)}")
+        return {"success": False, "error": str(e)}
+
+@app.get("/api/feedback")
+async def get_feedback(request: Request):
+    """Get all feedback (admin endpoint)"""
+    try:
+        # Check if user is authenticated
+        user = get_current_user(request)
+        if not user:
+            raise HTTPException(status_code=403, detail="Unauthorized")
+        
+        feedback_list = load_feedback()
+        return {"feedback": feedback_list}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+def send_feedback_notification(feedback_entry):
+    """Send email notification when feedback is submitted"""
+    try:
+        recipients = ["ATCteamsupport@walmart.com", "Kendall.rush@walmart.com"]
+        
+        subject = f"New Feedback: {feedback_entry['category']} - {feedback_entry['user']}"
+        
+        body = f"""
+Job Codes Dashboard - New Feedback Submission
+
+Category: {feedback_entry['category']}
+Rating: {feedback_entry['rating']}/5
+Page: {feedback_entry['page']}
+User: {feedback_entry['user']}
+Time: {feedback_entry['timestamp']}
+
+Comments:
+{feedback_entry['comments'] or 'No additional comments'}
+
+---
+This is an automated notification from the Job Codes Teaming Dashboard.
+        """
+        
+        msg = MIMEMultipart()
+        msg['From'] = FROM_EMAIL
+        msg['To'] = ", ".join(recipients)
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain', 'utf-8'))
+        
+        # Send via Walmart SMTP
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.sendmail(FROM_EMAIL, recipients, msg.as_string())
+        
+        print(f"✅ Feedback notification sent to {', '.join(recipients)}")
+    except Exception as e:
+        print(f"⚠️ Failed to send feedback notification: {str(e)}")
 
 # ============================================================
 # MAIN

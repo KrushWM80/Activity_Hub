@@ -1153,6 +1153,365 @@
                 margin-right: 0;
             }
         }
+
+        /* ─── Widget Edit Mode ─── */
+        .dashboard-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: var(--space-4);
+            position: relative;
+        }
+
+        .settings-gear {
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .settings-gear:hover {
+            border-color: var(--walmart-blue);
+            background: var(--walmart-blue-lightest);
+            transform: rotate(45deg);
+        }
+
+        .gear-dropdown {
+            display: none;
+            position: absolute;
+            top: 44px;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 60;
+            min-width: 200px;
+            overflow: hidden;
+        }
+
+        .gear-dropdown.show {
+            display: block;
+        }
+
+        .gear-dropdown-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gear-dropdown-item:hover {
+            background: var(--walmart-blue-lightest);
+            color: var(--walmart-blue);
+        }
+
+        /* Edit Mode Toolbar */
+        .edit-toolbar {
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--walmart-blue-lightest) 0%, #EBF5FF 100%);
+            border: 2px solid var(--walmart-blue);
+            border-radius: 10px;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: var(--space-4);
+        }
+
+        .edit-toolbar.show {
+            display: flex;
+        }
+
+        .edit-toolbar-title {
+            font-weight: 600;
+            color: var(--walmart-blue-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .edit-toolbar-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .edit-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .edit-btn-done {
+            background: var(--walmart-blue);
+            color: var(--white);
+        }
+
+        .edit-btn-done:hover {
+            background: var(--walmart-blue-dark);
+        }
+
+        .edit-btn-reset {
+            background: var(--white);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .edit-btn-reset:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .edit-btn-add {
+            background: var(--walmart-yellow);
+            color: var(--gray-900);
+        }
+
+        .edit-btn-add:hover {
+            background: var(--walmart-yellow-dark);
+        }
+
+        /* Widget edit controls overlay */
+        .widget-edit-controls {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            background: rgba(30, 58, 138, 0.9);
+            padding: 0.4rem 0.5rem;
+            border-radius: 12px 12px 0 0;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.edit-mode .widget-edit-controls {
+            display: flex;
+        }
+
+        body.edit-mode .widget {
+            position: relative;
+            border: 2px dashed var(--walmart-blue);
+            cursor: grab;
+        }
+
+        body.edit-mode .widget:hover {
+            transform: none;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25);
+        }
+
+        body.edit-mode .widget.dragging {
+            opacity: 0.4;
+            cursor: grabbing;
+        }
+
+        body.edit-mode .widget.drag-over {
+            border-color: var(--walmart-yellow);
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .widget-ctrl-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: var(--white);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+
+        .widget-ctrl-btn:hover {
+            background: rgba(255,255,255,0.35);
+        }
+
+        .widget-ctrl-btn.remove-btn:hover {
+            background: rgba(239, 68, 68, 0.8);
+        }
+
+        .widget-ctrl-label {
+            color: var(--white);
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0.9;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .widget-ctrl-group {
+            display: flex;
+            gap: 0.3rem;
+            align-items: center;
+        }
+
+        /* Hidden widget placeholder */
+        body.edit-mode .widget.widget-hidden {
+            display: none;
+        }
+
+        .widget.widget-hidden {
+            display: none;
+        }
+
+        /* Add Widget button at bottom of grid */
+        .add-widget-placeholder {
+            display: none;
+            grid-column: span 12;
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255,255,255,0.5);
+        }
+
+        body.edit-mode .add-widget-placeholder {
+            display: block;
+        }
+
+        .add-widget-placeholder:hover {
+            border-color: var(--walmart-blue);
+            background: var(--walmart-blue-lightest);
+        }
+
+        .add-widget-placeholder-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        /* Add Widget Modal */
+        .add-widget-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .add-widget-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-widget-modal-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            animation: slideUp 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .add-widget-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.15s ease;
+        }
+
+        .add-widget-list-item:hover {
+            border-color: var(--walmart-blue);
+            background: var(--walmart-blue-lightest);
+        }
+
+        .add-widget-list-item .widget-item-name {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .add-widget-list-item .widget-item-size {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+
+        .request-widget-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--gray-300);
+        }
+
+        /* ─── Links Sidebar Categories ─── */
+        .sidebar-category {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .sidebar-category-header:hover {
+            background: var(--gray-100);
+        }
+
+        .sidebar-category-chevron {
+            font-size: 0.6rem;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar-category.collapsed .sidebar-category-chevron {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar-category-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.2s ease;
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        .sidebar-category.collapsed .sidebar-category-links {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -1194,11 +1553,36 @@
 
     <!-- Main Content -->
     <div id="dashboard-content" class="main-container">
+        <!-- Settings Gear -->
+        <div class="dashboard-header">
+            <button class="settings-gear" onclick="toggleGearDropdown()" title="Page Settings">⚙️</button>
+            <div id="gearDropdown" class="gear-dropdown">
+                <div class="gear-dropdown-item" onclick="enterEditMode()">✏️ Edit For You Page</div>
+            </div>
+        </div>
+
+        <!-- Edit Mode Toolbar -->
+        <div id="editToolbar" class="edit-toolbar">
+            <div class="edit-toolbar-title">✏️ Editing For You Page</div>
+            <div class="edit-toolbar-actions">
+                <button class="edit-btn edit-btn-add" onclick="openAddWidgetModal()">+ Add Widget</button>
+                <button class="edit-btn edit-btn-reset" onclick="resetWidgetLayout()">↩ Reset to Default</button>
+                <button class="edit-btn edit-btn-done" onclick="exitEditMode()">✓ Done Editing</button>
+            </div>
+        </div>
+
         <!-- Dashboard Grid -->
-        <main class="dashboard">
+        <main class="dashboard" id="widgetGrid">
             <!-- Row 1: My Tasks + Performance Metrics -->
             <!-- My Tasks Widget -->
-            <div class="widget task-widget widget-large">
+            <div class="widget task-widget widget-large" data-widget-id="my-tasks" data-widget-name="My Tasks" data-default-size="widget-large" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">My Tasks</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="resizeWidget('my-tasks')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('my-tasks')" title="Remove">✕</button>
+                    </div>
+                </div>
                 <div class="widget-header">
                     📋 My Tasks
                     <button style="background: #3B82F6; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer;">+ Add</button>
@@ -1238,7 +1622,14 @@
             </div>
 
             <!-- Performance Metrics -->
-            <div class="widget widget-large">
+            <div class="widget widget-large" data-widget-id="performance" data-widget-name="Performance Metrics" data-default-size="widget-large" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">Performance</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="resizeWidget('performance')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('performance')" title="Remove">✕</button>
+                    </div>
+                </div>
                 <div class="widget-header" style="background: linear-gradient(135deg, #38A169 0%, #2F855A 100%); color: white;">
                     📈 Performance Metrics
                 </div>
@@ -1271,7 +1662,14 @@
 
             <!-- Row 2: Next Steps + Projects Feed -->
             <!-- Next Steps Widget -->
-            <div class="widget action-widget widget-large">
+            <div class="widget action-widget widget-large" data-widget-id="next-steps" data-widget-name="Next Steps & Action Items" data-default-size="widget-large" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">Next Steps</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="resizeWidget('next-steps')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('next-steps')" title="Remove">✕</button>
+                    </div>
+                </div>
                 <div class="widget-header">
                     🎯 Next Steps & Action Items
                     <span class="ai-badge">AI</span>
@@ -1297,7 +1695,14 @@
             </div>
 
             <!-- Projects Feed -->
-            <div class="widget activity-widget widget-large">
+            <div class="widget activity-widget widget-large" data-widget-id="projects-feed" data-widget-name="Projects Feed" data-default-size="widget-large" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">Projects Feed</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="resizeWidget('projects-feed')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('projects-feed')" title="Remove">✕</button>
+                    </div>
+                </div>
                 <div class="widget-header">
                     📁 Projects Feed
                 </div>
@@ -1328,7 +1733,14 @@
 
             <!-- Row 3: Notifications + Project Dashboard -->
             <!-- Notifications Widget -->
-            <div class="widget notification-widget widget-medium">
+            <div class="widget notification-widget widget-medium" data-widget-id="notifications" data-widget-name="Notifications & Alerts" data-default-size="widget-medium" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">Notifications</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="resizeWidget('notifications')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('notifications')" title="Remove">✕</button>
+                    </div>
+                </div>
                 <div class="widget-header">
                     🔔 Notifications & Alerts
                     <span class="notification-count">5</span>
@@ -1356,7 +1768,14 @@
             </div>
 
             <!-- Project Dashboard Widget -->
-            <div class="widget project-widget widget-extra-large">
+            <div class="widget project-widget widget-extra-large" data-widget-id="project-dashboard" data-widget-name="Project Alpha Dashboard" data-default-size="widget-extra-large" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">Project Alpha</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="resizeWidget('project-dashboard')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('project-dashboard')" title="Remove">✕</button>
+                    </div>
+                </div>
                 <div class="widget-header">
                     📊 Project Alpha Dashboard
                     <span style="font-size: 0.875rem; opacity: 0.9;">Updated <span class="loading"></span></span>
@@ -1389,7 +1808,35 @@
             </div>
 
             <!-- For You - Subscribed Links Widget REMOVED FROM HERE - MOVED TO RIGHT SIDEBAR -->
+
+            <!-- Add Widget Placeholder (visible in edit mode) -->
+            <div class="add-widget-placeholder" onclick="openAddWidgetModal()">
+                <div class="add-widget-placeholder-text">+ Add Widget</div>
+            </div>
         </main>
+    </div>
+
+    <!-- Add Widget Modal -->
+    <div id="addWidgetModal" class="add-widget-modal">
+        <div class="add-widget-modal-content">
+            <div class="nested-modal-header">
+                <h2>➕ Add Widget</h2>
+                <button class="nested-modal-close" onclick="closeAddWidgetModal()">✕</button>
+            </div>
+            <p style="color: var(--gray-600); margin-bottom: 1rem;">Select a widget to add back to your dashboard:</p>
+            <div id="addWidgetList"></div>
+            <div class="request-widget-section">
+                <h3 style="font-size: 1rem; color: var(--walmart-navy); margin-bottom: 0.75rem;">💡 Request a Widget</h3>
+                <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.75rem;">Have an idea for a new widget? Submit a request:</p>
+                <div class="form-group">
+                    <input type="text" id="requestWidgetName" placeholder="Widget name (e.g., Calendar, Weather)">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="requestWidgetDesc" placeholder="Brief description of what it should show">
+                </div>
+                <button class="btn-primary" onclick="submitWidgetRequest()">Submit Request</button>
+            </div>
+        </div>
     </div>
 
     <!-- RIGHT SIDEBAR - Links -->
@@ -1398,19 +1845,8 @@
             🔗 Links
             <button class="sidebar-add-btn" onclick="openLinksModal()">+</button>
         </div>
-        <div class="sidebar-links">
-            <div class="sidebar-link-card" onclick="window.open('https://confluence.walmart.com', '_blank')">
-                <div class="sidebar-link-name">Confluence</div>
-            </div>
-            <div class="sidebar-link-card" onclick="window.open('https://github.com', '_blank')">
-                <div class="sidebar-link-name">GitHub</div>
-            </div>
-            <div class="sidebar-link-card" onclick="window.open('https://jira.walmart.com', '_blank')">
-                <div class="sidebar-link-name">Jira</div>
-            </div>
-            <div class="sidebar-link-card" onclick="alert('This link needs attention')">
-                <div class="sidebar-link-name">Help Desk</div>
-            </div>
+        <div class="sidebar-links" id="sidebarLinksContainer">
+            <!-- Dynamically rendered by renderCategorizedSidebar() -->
         </div>
     </div>
 
@@ -1583,6 +2019,276 @@
     </div>
 
     <script>
+        // ──────────────────────────────────────────────
+        // Widget Configuration & Persistence
+        // ──────────────────────────────────────────────
+        const WIDGET_CONFIG_KEY = 'activity-hub-widget-config';
+        const LINK_COLLAPSE_KEY = 'activity-hub-link-collapse';
+
+        const DEFAULT_WIDGET_ORDER = ['my-tasks', 'performance', 'next-steps', 'projects-feed', 'notifications', 'project-dashboard'];
+        const DEFAULT_WIDGET_SIZES = {
+            'my-tasks': 'widget-large',
+            'performance': 'widget-large',
+            'next-steps': 'widget-large',
+            'projects-feed': 'widget-large',
+            'notifications': 'widget-medium',
+            'project-dashboard': 'widget-extra-large'
+        };
+
+        const SIZE_CYCLE = ['widget-small', 'widget-medium', 'widget-large', 'widget-extra-large'];
+        const SIZE_LABELS = { 'widget-small': 'Small (3)', 'widget-medium': 'Medium (4)', 'widget-large': 'Large (6)', 'widget-extra-large': 'XL (8)' };
+
+        let isEditMode = false;
+        let draggedWidget = null;
+
+        function getWidgetConfig() {
+            try {
+                const saved = localStorage.getItem(WIDGET_CONFIG_KEY);
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return null;
+        }
+
+        function saveWidgetConfig() {
+            const grid = document.getElementById('widgetGrid');
+            const widgets = grid.querySelectorAll('.widget[data-widget-id]');
+            const order = [];
+            const sizes = {};
+            const hidden = [];
+
+            widgets.forEach(w => {
+                const id = w.dataset.widgetId;
+                order.push(id);
+                // Find the current size class
+                SIZE_CYCLE.forEach(sc => {
+                    if (w.classList.contains(sc)) sizes[id] = sc;
+                });
+                if (w.classList.contains('widget-hidden')) hidden.push(id);
+            });
+
+            localStorage.setItem(WIDGET_CONFIG_KEY, JSON.stringify({ order, sizes, hidden }));
+        }
+
+        function applyWidgetConfig() {
+            const config = getWidgetConfig();
+            if (!config) return;
+
+            const grid = document.getElementById('widgetGrid');
+            const placeholder = grid.querySelector('.add-widget-placeholder');
+
+            // Reorder
+            config.order.forEach(id => {
+                const w = grid.querySelector('[data-widget-id="' + id + '"]');
+                if (w) grid.insertBefore(w, placeholder);
+            });
+
+            // Resize
+            Object.entries(config.sizes).forEach(([id, size]) => {
+                const w = grid.querySelector('[data-widget-id="' + id + '"]');
+                if (w) {
+                    SIZE_CYCLE.forEach(sc => w.classList.remove(sc));
+                    w.classList.add(size);
+                }
+            });
+
+            // Hide
+            if (config.hidden) {
+                config.hidden.forEach(id => {
+                    const w = grid.querySelector('[data-widget-id="' + id + '"]');
+                    if (w) w.classList.add('widget-hidden');
+                });
+            }
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Gear Dropdown
+        // ──────────────────────────────────────────────
+        function toggleGearDropdown() {
+            document.getElementById('gearDropdown').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking elsewhere
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dashboard-header')) {
+                document.getElementById('gearDropdown').classList.remove('show');
+            }
+        });
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Enter / Exit
+        // ──────────────────────────────────────────────
+        function enterEditMode() {
+            isEditMode = true;
+            document.body.classList.add('edit-mode');
+            document.getElementById('gearDropdown').classList.remove('show');
+            document.getElementById('editToolbar').classList.add('show');
+
+            // Enable dragging on widgets
+            document.querySelectorAll('.widget[data-widget-id]').forEach(w => {
+                w.setAttribute('draggable', 'true');
+            });
+        }
+
+        function exitEditMode() {
+            isEditMode = false;
+            document.body.classList.remove('edit-mode');
+            document.getElementById('editToolbar').classList.remove('show');
+
+            // Disable dragging
+            document.querySelectorAll('.widget[data-widget-id]').forEach(w => {
+                w.setAttribute('draggable', 'false');
+                w.classList.remove('dragging', 'drag-over');
+            });
+
+            saveWidgetConfig();
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Resize Widget
+        // ──────────────────────────────────────────────
+        function resizeWidget(widgetId) {
+            const w = document.querySelector('[data-widget-id="' + widgetId + '"]');
+            if (!w) return;
+
+            let currentSize = null;
+            SIZE_CYCLE.forEach(sc => { if (w.classList.contains(sc)) currentSize = sc; });
+            const nextIndex = (SIZE_CYCLE.indexOf(currentSize) + 1) % SIZE_CYCLE.length;
+            const nextSize = SIZE_CYCLE[nextIndex];
+
+            SIZE_CYCLE.forEach(sc => w.classList.remove(sc));
+            w.classList.add(nextSize);
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Remove Widget
+        // ──────────────────────────────────────────────
+        function removeWidget(widgetId) {
+            const w = document.querySelector('[data-widget-id="' + widgetId + '"]');
+            if (w) w.classList.add('widget-hidden');
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Add Widget Modal
+        // ──────────────────────────────────────────────
+        function openAddWidgetModal() {
+            const list = document.getElementById('addWidgetList');
+            const hiddenWidgets = document.querySelectorAll('.widget.widget-hidden[data-widget-id]');
+
+            if (hiddenWidgets.length === 0) {
+                list.innerHTML = '<p style="color: var(--gray-600); padding: 1rem; text-align: center;">All widgets are currently on your dashboard.</p>';
+            } else {
+                let html = '';
+                hiddenWidgets.forEach(w => {
+                    const id = w.dataset.widgetId;
+                    const name = w.dataset.widgetName;
+                    html += '<div class="add-widget-list-item">' +
+                        '<div><div class="widget-item-name">' + name + '</div></div>' +
+                        '<button class="btn-primary" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" onclick="restoreWidget(\'' + id + '\')">+ Add</button>' +
+                        '</div>';
+                });
+                list.innerHTML = html;
+            }
+
+            document.getElementById('addWidgetModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAddWidgetModal() {
+            document.getElementById('addWidgetModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function restoreWidget(widgetId) {
+            const w = document.querySelector('[data-widget-id="' + widgetId + '"]');
+            if (w) w.classList.remove('widget-hidden');
+            closeAddWidgetModal();
+        }
+
+        function submitWidgetRequest() {
+            const name = document.getElementById('requestWidgetName').value.trim();
+            const desc = document.getElementById('requestWidgetDesc').value.trim();
+            if (!name) { alert('Please enter a widget name'); return; }
+            alert('✅ Widget request submitted!\n\nName: ' + name + '\nDescription: ' + (desc || 'N/A') + '\n\nThe Activity Hub team will review your request.');
+            document.getElementById('requestWidgetName').value = '';
+            document.getElementById('requestWidgetDesc').value = '';
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Reset to Default
+        // ──────────────────────────────────────────────
+        function resetWidgetLayout() {
+            if (!confirm('Reset the For You Page to the default layout? This will undo all customizations.')) return;
+
+            localStorage.removeItem(WIDGET_CONFIG_KEY);
+
+            const grid = document.getElementById('widgetGrid');
+            const placeholder = grid.querySelector('.add-widget-placeholder');
+
+            // Restore order
+            DEFAULT_WIDGET_ORDER.forEach(id => {
+                const w = grid.querySelector('[data-widget-id="' + id + '"]');
+                if (w) {
+                    grid.insertBefore(w, placeholder);
+                    w.classList.remove('widget-hidden');
+                    SIZE_CYCLE.forEach(sc => w.classList.remove(sc));
+                    w.classList.add(DEFAULT_WIDGET_SIZES[id]);
+                }
+            });
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Drag and Drop
+        // ──────────────────────────────────────────────
+        document.addEventListener('dragstart', function(e) {
+            if (!isEditMode) return;
+            const widget = e.target.closest('.widget[data-widget-id]');
+            if (!widget) return;
+            draggedWidget = widget;
+            widget.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', widget.dataset.widgetId);
+        });
+
+        document.addEventListener('dragend', function(e) {
+            if (draggedWidget) {
+                draggedWidget.classList.remove('dragging');
+                draggedWidget = null;
+            }
+            document.querySelectorAll('.widget.drag-over').forEach(w => w.classList.remove('drag-over'));
+        });
+
+        document.addEventListener('dragover', function(e) {
+            if (!isEditMode || !draggedWidget) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            const target = e.target.closest('.widget[data-widget-id]');
+            if (target && target !== draggedWidget) {
+                document.querySelectorAll('.widget.drag-over').forEach(w => w.classList.remove('drag-over'));
+                target.classList.add('drag-over');
+            }
+        });
+
+        document.addEventListener('drop', function(e) {
+            if (!isEditMode || !draggedWidget) return;
+            e.preventDefault();
+
+            const target = e.target.closest('.widget[data-widget-id]');
+            if (target && target !== draggedWidget) {
+                const grid = document.getElementById('widgetGrid');
+                const allWidgets = Array.from(grid.querySelectorAll('.widget[data-widget-id]'));
+                const draggedIndex = allWidgets.indexOf(draggedWidget);
+                const targetIndex = allWidgets.indexOf(target);
+
+                if (draggedIndex < targetIndex) {
+                    grid.insertBefore(draggedWidget, target.nextSibling);
+                } else {
+                    grid.insertBefore(draggedWidget, target);
+                }
+            }
+
+            document.querySelectorAll('.widget.drag-over').forEach(w => w.classList.remove('drag-over'));
+        });
         // Simulate real-time updates
         function updateNotificationCount() {
             const badge = document.querySelector('.notification-badge');
@@ -1685,7 +2391,8 @@
         let userLinks = [
             { name: 'Confluence Portal', url: 'https://confluence.walmart.com/display/home', category: 'Documentation', privacy: 'public' },
             { name: 'GitHub Repos', url: 'https://github.com/walmart', category: 'Tools', privacy: 'shared' },
-            { name: 'Jira Board', url: 'https://jira.walmart.com/projects', category: 'Tools', privacy: 'private' }
+            { name: 'Jira Board', url: 'https://jira.walmart.com/projects', category: 'Tools', privacy: 'private' },
+            { name: 'Help Desk', url: 'https://helpdesk.walmart.com', category: 'Internal', privacy: 'public' }
         ];
 
         // Sync links to sessionStorage for admin dashboard access
@@ -1695,6 +2402,72 @@
         
         // Initialize storage on page load
         syncLinksToStorage();
+
+        // ──────────────────────────────────────────────
+        // Links Sidebar: Categorized Rendering
+        // ──────────────────────────────────────────────
+        function getLinkCollapseState() {
+            try {
+                const saved = localStorage.getItem(LINK_COLLAPSE_KEY);
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return {};
+        }
+
+        function saveLinkCollapseState(state) {
+            localStorage.setItem(LINK_COLLAPSE_KEY, JSON.stringify(state));
+        }
+
+        function renderCategorizedSidebar() {
+            const container = document.getElementById('sidebarLinksContainer');
+            if (!container) return;
+
+            const collapseState = getLinkCollapseState();
+
+            // Group links by category
+            const categories = {};
+            userLinks.forEach(link => {
+                const cat = link.category || 'Other';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(link);
+            });
+
+            // Fixed category order
+            const catOrder = ['Tools', 'Documentation', 'Resources', 'Internal'];
+            const sortedCats = catOrder.filter(c => categories[c]).concat(
+                Object.keys(categories).filter(c => !catOrder.includes(c))
+            );
+
+            let html = '';
+            sortedCats.forEach(cat => {
+                const isCollapsed = collapseState[cat] === true;
+                html += '<div class="sidebar-category' + (isCollapsed ? ' collapsed' : '') + '" data-category="' + cat + '">';
+                html += '<div class="sidebar-category-header" onclick="toggleCategory(\'' + cat + '\')">';
+                html += '<span>' + cat + '</span>';
+                html += '<span class="sidebar-category-chevron">▼</span>';
+                html += '</div>';
+                html += '<div class="sidebar-category-links">';
+
+                categories[cat].forEach(link => {
+                    html += '<div class="sidebar-link-card" onclick="window.open(\'' + link.url.replace(/'/g, "\\'") + '\', \'_blank\')">';
+                    html += '<div class="sidebar-link-name">' + link.name + '</div>';
+                    html += '</div>';
+                });
+
+                html += '</div></div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleCategory(category) {
+            const state = getLinkCollapseState();
+            state[category] = !state[category];
+            saveLinkCollapseState(state);
+
+            const catEl = document.querySelector('.sidebar-category[data-category="' + category + '"]');
+            if (catEl) catEl.classList.toggle('collapsed');
+        }
 
         function openLinksModal() {
             document.getElementById('linksModal').classList.add('show');
@@ -1799,21 +2572,11 @@
         }
 
         function addLinkToSidebar(name, url) {
-            const sidebarLinks = document.querySelector('.sidebar-links');
-            const newCard = document.createElement('div');
-            newCard.className = 'sidebar-link-card';
-            newCard.onclick = function() { window.open(url, '_blank'); };
-            newCard.innerHTML = '<div class="sidebar-link-name">' + name + '</div>';
-            sidebarLinks.appendChild(newCard);
+            renderCategorizedSidebar();
         }
 
         function removeLinkFromSidebar(name) {
-            const cards = document.querySelectorAll('.sidebar-link-card');
-            cards.forEach(card => {
-                if (card.textContent.trim() === name) {
-                    card.remove();
-                }
-            });
+            renderCategorizedSidebar();
         }
 
         function demoCreateNewLink() {
@@ -1876,19 +2639,13 @@
             const createModal = document.getElementById('createLinkModal');
             const manageModal = document.getElementById('manageLinksModal');
             const browseModal = document.getElementById('browseLinksModal');
+            const addWidgetModal = document.getElementById('addWidgetModal');
             
-            if (event.target == mainModal) {
-                closeLinksModal();
-            }
-            if (event.target == createModal) {
-                closeCreateLinkModal();
-            }
-            if (event.target == manageModal) {
-                closeManageLinksModal();
-            }
-            if (event.target == browseModal) {
-                closeBrowseLinksModal();
-            }
+            if (event.target == mainModal) closeLinksModal();
+            if (event.target == createModal) closeCreateLinkModal();
+            if (event.target == manageModal) closeManageLinksModal();
+            if (event.target == browseModal) closeBrowseLinksModal();
+            if (event.target == addWidgetModal) closeAddWidgetModal();
         }
 
         // Link Management Demo Functions
@@ -2001,6 +2758,8 @@
 
         // Initialize demo
         document.addEventListener('DOMContentLoaded', function() {
+            applyWidgetConfig();
+            renderCategorizedSidebar();
             updateNotificationCount();
             updateProgress();
             addInteractivity();

@@ -285,13 +285,14 @@ def _background_cache_init():
                 print(f"[Background] Cache sync complete with {sqlite_cache.get_record_count()} records")
         
         # Start periodic background sync (every 15 minutes)
-        if db_service.client:
-            sqlite_cache.start_background_sync(
-                db_service.client,
-                db_service.project_id,
-                db_service.dataset,
-                db_service.table
-            )
+        # TEMPORARILY DISABLED - sync causes SQLite locking issues
+        # if db_service.client:
+        #     sqlite_cache.start_background_sync(
+        #         db_service.client,
+        #         db_service.project_id,
+        #         db_service.dataset,
+        #         db_service.table
+        #     )
     except Exception as e:
         print(f"[Background] Error during cache initialization: {e}")
         # Don't fail startup if cache init fails
@@ -572,7 +573,23 @@ async def get_project_titles():
             print(f"[API] BigQuery fallback also failed: {bq_error}")
             raise HTTPException(status_code=500, detail="Failed to get project titles")
 
-@app.get("/api/projects", response_model=List[ProjectResponse])
+@app.get("/api/projects-debug")
+async def get_projects_debug(limit: int = 10):
+    """Debug endpoint - returns cached projects with minimal processing."""
+    try:
+        print(f"[DEBUG] get_projects_debug called with limit={limit}")
+        projects = sqlite_cache.get_projects(limit=limit)
+        print(f"[DEBUG] Retrieved {len(projects)} projects from cache")
+        result = list(projects)  # Convert to list if needed
+        print(f"[DEBUG] Converted to list, {len(result)} items")
+        return result
+    except Exception as e:
+        print(f"[DEBUG] ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"error": str(e)}
+
+@app.get("/api/projects")
 async def get_projects(
     tribe: Optional[str] = None,
     division: Optional[str] = None,
@@ -596,13 +613,17 @@ async def get_projects(
     include_location: bool = False,
     limit: Optional[int] = 50000
 ):
-    """Get filtered list of projects. Uses SQLite cache for fast response. Set include_location=true to fetch store lat/long data (slower). Use limit to cap results (default: 50000 to capture all unique projects across sources)."""
+    """Get filtered list of projects. Uses SQLite cache for fast response."""
+    import sys
+    print(f"[API] ENDPOINT START: /api/projects called", flush=True, file=sys.stderr)
     try:
         # Try SQLite cache first (fast - milliseconds)
-        # Use cache if it has data (protection by smart validation prevents bad data contamination)
-        if sqlite_cache.get_record_count() > 0 and not include_location:
+        print(f"[API] About to call get_record_count()", flush=True, file=sys.stderr)
+        record_count = sqlite_cache.get_record_count()
+        print(f"[API] /api/projects: Cache record_count={record_count}, include_location={include_location}", flush=True, file=sys.stderr)
+        if record_count > 0 and not include_location:
             try:
-                print("[API] Using SQLite cache for /api/projects")
+                print("[API] [CACHE ATTEMPT] Using SQLite cache for /api/projects")
                 cache_filters = {
                     'division': division,
                     'region': region,
@@ -641,6 +662,7 @@ async def get_projects(
                     limit=limit,
                     title_search=title
                 )
+                print(f"[API] Got {len(cached_projects)} projects from cache")
                 
                 # Filter by partner intake cards if partner filter was applied
                 if partner_intake_cards:
@@ -650,54 +672,20 @@ async def get_projects(
                         if p.get('intake_card') in partner_set
                     ]
                 
-                results = []
-                skipped = 0
-                for p in cached_projects:
-                    pid = p['project_id'] or ''
-                    if not pid:
-                        skipped += 1
-                        continue
-                    results.append(ProjectResponse(
-                        project_id=pid,
-                        project_source=p['project_source'] or 'Unknown',
-                        title=p['title'] or '',
-                        division=p['division'] or '',
-                        region=p['region'] or '',
-                        market=p['market'] or '',
-                        store=p['store'] or '',
-                        phase=p['phase'] or '',
-                        tribe='',
-                        wm_week=p['wm_week'] or '',
-                        fy=p['fy'] or '',
-                        status=p['status'] or 'Active',
-                        store_count=p['store_count'] or 1,
-                        owner=p.get('owner'),
-                        partner=partner if partner else (p.get('partner') or ''),
-                        store_area=p.get('store_area'),
-                        business_area=p.get('business_area'),
-                        health=p.get('health'),
-                        business_type=p.get('business_type'),
-                        associate_impact=p.get('associate_impact'),
-                        customer_impact=p.get('customer_impact'),
-                        description=None,
-                        latitude=None,
-                        longitude=None,
-                        store_address=None,
-                        city=None,
-                        state=None,
-                        zip_code=None
-                    ))
-                if skipped:
-                    print(f"[API] Skipped {skipped} records with NULL project_id")
-                return results
+                # Return cached projects directly - no ProjectResponse validation (causes crashes with large datasets)
+                print(f"[API] [CACHE SUCCESS] Returning {len(cached_projects)} dicts to client")
+                return cached_projects
             except Exception as cache_error:
                 import traceback
-                print(f"[API] SQLite cache error: {cache_error}")
+                error_msg = f"[API] CACHE ERROR: {cache_error}"
+                print(error_msg)
+                print("[API] Traceback:")
                 traceback.print_exc()
                 print("[API] Falling back to BigQuery...")
+
         
         # Fall back to BigQuery (slower)
-        print("[API] Using BigQuery for /api/projects (cache miss or include_location=true)")
+        print("[API] [BIGQUERY FALLBACK] Using BigQuery for /api/projects (cache miss, disabled, or error)")
         filters = FilterCriteria()
         filters.status = ProjectStatus(status)
         
@@ -724,41 +712,53 @@ async def get_projects(
         
         projects = await db_service.get_projects(filters, include_location=include_location, limit=limit, title_search=title)
         
-        return [
-            ProjectResponse(
-                project_id=p.project_id,
-                project_source=p.project_source.value,
-                title=p.title,
-                division=p.division,
-                region=p.region,
-                market=p.market,
-                store=p.store,
-                phase=p.phase,
-                tribe=p.tribe,
-                wm_week=p.wm_week,
-                fy=p.fy,
-                status=p.status.value,
-                store_count=p.store_count,
-                owner=p.owner,
-                partner=p.partner,
-                store_area=p.store_area,
-                business_area=p.business_area,
-                health=p.health,
-                business_type=p.business_type,
-                associate_impact=p.associate_impact,
-                customer_impact=p.customer_impact,
-                description=p.description,
-                latitude=p.latitude,
-                longitude=p.longitude,
-                store_address=p.store_address,
-                city=p.city,
-                state=p.state,
-                zip_code=p.zip_code
-            )
-            for p in projects
-        ]
+        print(f"[API] Got {len(projects)} projects from BigQuery, converting to dicts...")
+        results = []
+        for p in projects:
+            try:
+                # Convert Project model to dict instead of ProjectResponse (avoids validation crashes)
+                results.append({
+                    'project_id': p.project_id,
+                    'project_source': p.project_source.value if hasattr(p.project_source, 'value') else str(p.project_source),
+                    'title': p.title,
+                    'division': p.division,
+                    'region': p.region,
+                    'market': p.market,
+                    'store': p.store,
+                    'phase': p.phase,
+                    'tribe': p.tribe,
+                    'wm_week': p.wm_week,
+                    'fy': p.fy,
+                    'status': p.status.value if hasattr(p.status, 'value') else str(p.status),
+                    'store_count': p.store_count,
+                    'owner': p.owner,
+                    'partner': p.partner,
+                    'store_area': p.store_area,
+                    'business_area': p.business_area,
+                    'health': p.health,
+                    'business_type': p.business_type,
+                    'associate_impact': p.associate_impact,
+                    'customer_impact': p.customer_impact,
+                    'description': p.description,
+                    'latitude': p.latitude,
+                    'longitude': p.longitude,
+                    'store_address': p.store_address,
+                    'city': p.city,
+                    'state': p.state,
+                    'zip_code': p.zip_code
+                })
+            except Exception as proj_error:
+                print(f"[API] Error converting project: {proj_error}")
+                # Skip this project and continue
+                continue
+        
+        print(f"[API] Successfully converted {len(results)} projects to dicts, returning...")
+        return results
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"[API] ERROR in /api/projects endpoint: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
 
 @app.get("/api/summary", response_model=ProjectSummaryResponse)
 async def get_summary(
@@ -1316,20 +1316,20 @@ def extract_device_info(user_agent: str) -> str:
     # Strong mobile indicators (OS-level)
     mobile_os = ["iphone", "ipad", "android", "windows phone", "blackberry", "kindle", "playbook"]
     if any(os in user_agent_lower for os in mobile_os):
-        print(f"[Device Detection] ✓ MOBILE detected (OS pattern): {user_agent[:100]}")
+        print(f"[Device Detection] [+] MOBILE detected (OS pattern): {user_agent[:100]}")
         return "Mobile"
     
     # Mobile browser indicators (includes AirWatch which is a managed mobile browser)
     mobile_browsers = ["mobi", "mobile", "tablet", "webos", "opera mini", "opera mobi", "airwatch"]
     if any(browser in user_agent_lower for browser in mobile_browsers):
-        print(f"[Device Detection] ✓ MOBILE detected (Browser pattern): {user_agent[:100]}")
+        print(f"[Device Detection] [+] MOBILE detected (Browser pattern): {user_agent[:100]}")
         return "Mobile"
     
     # Detect screens with small viewport (mobile specific patterns)
     # e.g., "Nexus" devices, "SM-" Samsung, etc.
     mobile_devices = ["nexus", "sm-", "gt-", "moto", "sgh-", "huawei", "oneplus"]
     if any(device in user_agent_lower for device in mobile_devices):
-        print(f"[Device Detection] ✓ MOBILE detected (Device pattern): {user_agent[:100]}")
+        print(f"[Device Detection] [+] MOBILE detected (Device pattern): {user_agent[:100]}")
         return "Mobile"
     
     # Check for common mobile browsers with specific patterns
@@ -1337,11 +1337,11 @@ def extract_device_info(user_agent: str) -> str:
         # Chrome on Linux without "mobile" might be a mobile, but we need more indicators
         # Check for absence of typical desktop indicators
         if not any(desktop_indicator in user_agent_lower for desktop_indicator in ["x11", "windows", "macintosh"]):
-            print(f"[Device Detection] ✓ MOBILE detected (Chrome pattern): {user_agent[:100]}")
+            print(f"[Device Detection] [+] MOBILE detected (Chrome pattern): {user_agent[:100]}")
             return "Mobile"
     
     # Default to Desktop for traditional computers
-    print(f"[Device Detection] ⚠ Desktop/Unknown device: {user_agent[:100]}")
+    print(f"[Device Detection] [?] Desktop/Unknown device: {user_agent[:100]}")
     return "Desktop"
 
 def log_activity(action: str, user: str = "Anonymous", details: str = "", category: str = "general", session_id: str = None, device_info: str = None):

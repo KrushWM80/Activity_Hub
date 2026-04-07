@@ -1215,6 +1215,7 @@
                 <button class="nav-tab" onclick="showTab('data-bridge')">Data Bridge</button>
                 <button class="nav-tab" onclick="showTab('activity-log')">Activity Log</button>
                 <button class="nav-tab" onclick="showTab('analytics')">Analytics</button>
+                <button class="nav-tab" onclick="showTab('feedback')">💬 Feedback</button>
             </div>
 
             <!-- Admin Home Tab -->
@@ -1861,6 +1862,50 @@
                         <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
                             <div class="stat-card"><div class="stat-number">4.7/5</div><div class="stat-label">Satisfaction</div></div>
                             <div class="stat-card"><div class="stat-number">47</div><div class="stat-label">Feedback This Month</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Tab -->
+            <div id="feedback" class="tab-content">
+                <div class="management-grid">
+                    <div class="management-section" style="grid-column: 1 / -1;">
+                        <div class="section-header">
+                            <h3 class="section-title">💬 Feedback Management</h3>
+                            <p style="color: var(--gray-600); margin-top: 8px;">Monitor and manage user feedback from all Activity Hub dashboards</p>
+                        </div>
+
+                        <!-- Feedback Stats -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+                            <div class="stat-card">
+                                <div class="stat-number" id="total-feedback-count">0</div>
+                                <div class="stat-label">Total Feedback Entries</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="avg-rating">0</div>
+                                <div class="stat-label">Average Rating</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="feedback-this-month">0</div>
+                                <div class="stat-label">This Month</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="feedback-this-week">0</div>
+                                <div class="stat-label">This Week</div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback List -->
+                        <div style="background: white; border-radius: 8px; padding: var(--space-4);">
+                            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4);">
+                                <input type="text" id="feedback-search" placeholder="Search feedback by category or keywords..." style="flex: 1; padding: 10px 12px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.95rem;" onkeyup="filterFeedbackList();">
+                                <button onclick="loadFeedbackData()" style="padding: 10px 16px; background: var(--walmart-blue-dark); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">🔄 Refresh</button>
+                            </div>
+
+                            <div id="feedback-list" style="border-top: 1px solid var(--gray-300); max-height: 600px; overflow-y: auto;">
+                                <div style="padding: var(--space-4); text-align: center; color: var(--gray-600);">Loading feedback...</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4028,6 +4073,97 @@
         }
             
         // ==========================================
+        // Feedback Management Functions
+        // ==========================================
+        
+        async function loadFeedbackData() {
+            try {
+                const response = await fetch('/api/feedback');
+                const data = await response.json();
+                
+                const feedbackList = data.feedback || [];
+                
+                // Update stats
+                document.getElementById('total-feedback-count').textContent = feedbackList.length;
+                document.getElementById('avg-rating').textContent = feedbackList.length > 0 
+                    ? (feedbackList.reduce((sum, f) => sum + (f.rating || 0), 0) / feedbackList.length).toFixed(1)
+                    : '0';
+                
+                // Calculate this month and this week
+                const now = new Date();
+                const thisMonth = feedbackList.filter(f => {
+                    const fDate = new Date(f.timestamp);
+                    return fDate.getMonth() === now.getMonth() && fDate.getFullYear() === now.getFullYear();
+                }).length;
+                const thisWeek = feedbackList.filter(f => {
+                    const fDate = new Date(f.timestamp);
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    return fDate >= weekAgo;
+                }).length;
+                
+                document.getElementById('feedback-this-month').textContent = thisMonth;
+                document.getElementById('feedback-this-week').textContent = thisWeek;
+                
+                // Render feedback list
+                renderFeedbackList(feedbackList);
+            } catch (error) {
+                console.error('Error loading feedback:', error);
+                document.getElementById('feedback-list').innerHTML = '<div style="padding: var(--space-4); color: var(--error);">Error loading feedback data</div>';
+            }
+        }
+        
+        function renderFeedbackList(feedbackList) {
+            if (feedbackList.length === 0) {
+                document.getElementById('feedback-list').innerHTML = '<div style="padding: var(--space-4); text-align: center; color: var(--gray-600);">No feedback entries yet</div>';
+                return;
+            }
+            
+            const html = feedbackList.map(f => `
+                <div style="padding: var(--space-4); border-bottom: 1px solid var(--gray-300); display: grid; grid-template-columns: 50px 1fr 80px 100px; gap: var(--space-4); align-items: center;">
+                    <div style="text-align: center; font-size: 1.5rem;">
+                        ${getRatingEmoji(f.rating)}
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--gray-900);">${f.category}</div>
+                        <div style="font-size: 0.85rem; color: var(--gray-600); margin-top: 4px;">${f.comments || 'No additional comments'}</div>
+                        <div style="font-size: 0.75rem; color: var(--gray-500); margin-top: 4px;">From: ${f.user} | ${new Date(f.timestamp).toLocaleDateString()}</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <span style="font-weight: 600; color: var(--walmart-blue);">${f.rating}/5</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 0.75rem; color: var(--gray-500); background: #f0f0f0; padding: 4px 8px; border-radius: 4px; display: inline-block;">${f.page || 'Job Codes'}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('feedback-list').innerHTML = html;
+        }
+        
+        function getRatingEmoji(rating) {
+            const emojis = { 1: '😞', 2: '😕', 3: '😐', 4: '😊', 5: '🤩' };
+            return emojis[rating] || '❓';
+        }
+        
+        function filterFeedbackList() {
+            const searchTerm = document.getElementById('feedback-search').value.toLowerCase();
+            document.querySelectorAll('#feedback-list > div').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+        
+        // Load feedback data when feedback tab is opened
+        document.addEventListener('DOMContentLoaded', () => {
+            // Override showTab to load feedback when tab is shown
+            const originalShowTab = window.showTab;
+            window.showTab = function(tabName) {
+                originalShowTab.call(this, tabName);
+                if (tabName === 'feedback') {
+                    loadFeedbackData();
+                }
+            };
+        });
 
     </script>
     <script src="/activity-hub/static/admin/admin-links-api.js"></script>

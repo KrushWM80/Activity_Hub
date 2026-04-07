@@ -1022,8 +1022,20 @@
  </style>
 </head>
 <body>
-    <!-- Backend Connection Status -->
-    <div id="google-auth-ui" style="margin: 16px 0; padding: 12px 16px; background: #F0F8FF; border-radius: 4px; display: flex; align-items: center; gap: 12px;\">\n        <div id=\"backend-status\" style=\"display: flex; align-items: center; gap: 8px;\">\n            <span id=\"status-indicator\" style=\"display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #D69E2E; animation: pulse 2s infinite;\"></span>\n            <span id=\"auth-status\" style=\"color: #718096; font-size: 13px;\">Connecting to backend...</span>\n        </div>\n    </div>\n    <style>\n        @keyframes pulse {\n            0%, 100% { opacity: 1; }\n            50% { opacity: 0.5; }\n        }\n    </style>\n <!-- Header -->
+ <!-- Backend Connection Status -->
+ <div id="google-auth-ui" style="margin: 16px 0; padding: 12px 16px; background: #F0F8FF; border-radius: 4px; display: flex; align-items: center; gap: 12px;">
+ <div id="backend-status" style="display: flex; align-items: center; gap: 8px;">
+ <span id="status-indicator" style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #D69E2E; animation: pulse 2s infinite;"></span>
+ <span id="auth-status" style="color: #718096; font-size: 13px;">Connecting to backend...</span>
+ </div>
+ </div>
+ <style>
+ @keyframes pulse {
+ 0%, 100% { opacity: 1; }
+ 50% { opacity: 0.5; }
+ }
+ </style>
+ <!-- Header -->
  <div class="header">
  <div class="header-top">
  <div>
@@ -1244,11 +1256,11 @@
  <label for="filterWeek">WM Week</label>
  <select id="filterWeek" multiple size="1" style="height: 38px;">
  <option value="">All</option>
- <option value="current">Current Week</option>
+ <option value="current" selected>Current Week</option>
  <option value="next">Next Week</option>
  <option value="past">Past Week</option>
  <option value="1">1</option>
- <option value="2" selected>2</option>
+ <option value="2">2</option>
  <option value="3">3</option>
  <option value="4">4</option>
  <option value="5">5</option>
@@ -1353,10 +1365,9 @@
  <th>Activity Type</th>
  <th>Store Area</th>
  <th class="metric-column">Total Stores</th>
- <th class="metric-column">Unique Users</th>
- <th class="metric-column">Total Clicks</th>
- <th class="metric-column">Engagement %</th>
- <th class="metric-column">Avg. Engagement</th>
+ <th class="metric-column" style="text-align: center;">Unique Users</th>
+ <th class="metric-column" style="text-align: center;">Total Clicks</th>
+ <th class="metric-column" style="text-align: center;">Engagement %</th>
  <th>Status</th>
  </tr>
  </thead>
@@ -2967,34 +2978,50 @@
  function searchData(pageNum = 1) {
  // Get current week info for defaults
  const wmInfo = getCurrentWMWeek();
- const weekValue = document.getElementById('filterWeek').value;
- let selectedWeek = wmInfo.week; // Default to current week
+ const weekFilter = document.getElementById('filterWeek');
  
- // Handle special week values
- if (weekValue === 'current') {
- selectedWeek = wmInfo.week;
- } else if (weekValue === 'next') {
- selectedWeek = wmInfo.week < 52 ? wmInfo.week + 1 : 1;
- } else if (weekValue === 'past') {
- selectedWeek = wmInfo.week > 1 ? wmInfo.week - 1 : 52;
- } else if (weekValue && weekValue !== '') {
- selectedWeek = parseInt(weekValue) || wmInfo.week;
+ // Get ALL selected weeks (multi-select)
+ let selectedWeeks = [];
+ if (weekFilter && weekFilter.selectedOptions) {
+ Array.from(weekFilter.selectedOptions).forEach(opt => {
+ if (opt.value && opt.value !== '') {
+ if (opt.value === 'current') {
+ selectedWeeks.push(String(wmInfo.week));
+ } else if (opt.value === 'next') {
+ selectedWeeks.push(String(wmInfo.week < 52 ? wmInfo.week + 1 : 1));
+ } else if (opt.value === 'past') {
+ selectedWeeks.push(String(wmInfo.week > 1 ? wmInfo.week - 1 : 52));
+ } else {
+ selectedWeeks.push(opt.value);
+ }
+ }
+ });
+ } else {
+ // Fallback to current week if no selection
+ selectedWeeks.push(String(wmInfo.week));
  }
  
+ console.log('🔍 searchData() called with page:', pageNum, 'weeks:', selectedWeeks);
+ 
+ const getFilterValue = (id) => {
+ const el = document.getElementById(id);
+ return el ? el.value : '';
+ };
+ 
  const filters = {
- search: document.getElementById('filterSearch').value,
- title: document.getElementById('filterTitle').value,
- activityType: document.getElementById('filterActivityType').value,
- storeArea: document.getElementById('filterStoreArea').value,
- division: document.getElementById('filterDivision').value,
- region: document.getElementById('filterRegion').value,
- market: document.getElementById('filterMarket').value,
- store: document.getElementById('filterStore').value,
- alignment: document.getElementById('filterAlignment').value,
- fy: document.getElementById('filterFY').value || wmInfo.fy,
- week: selectedWeek,
+ search: getFilterValue('filterSearch'),
+ title: getFilterValue('filterTitle'),
+ activityType: getFilterValue('filterActivityType'),
+ storeArea: getFilterValue('filterStoreArea'),
+ division: getFilterValue('filterDivision'),
+ region: getFilterValue('filterRegion'),
+ market: getFilterValue('filterMarket'),
+ store: getFilterValue('filterStore'),
+ alignment: getFilterValue('filterAlignment'),
+ fy: getFilterValue('filterFY') || wmInfo.fy,
+ weeks: selectedWeeks,
  page: pageNum,
- limit: 25  // 25 rows per page
+ limit: parseInt(getFilterValue('filterRowsPerPage') || '10')
  };
 
  console.log('Searching with filters:', filters);
@@ -3002,14 +3029,25 @@
  // Hide search suggestions
  document.getElementById('searchSuggestions').style.display = 'none';
  
- // Show loading state
+ // Show loading state with spinner
  document.getElementById('tableBody').innerHTML = `
  <tr>
- <td colspan="10" style="text-align: center; padding: 40px; color: var(--gray-600);">
- <strong>Loading data from BigQuery...</strong>
+ <td colspan="10" style="text-align: center; padding: 40px;">
+ <div style="display: inline-block; text-align: center;">
+ <div style="border: 4px solid var(--gray-300); border-top: 4px solid var(--walmart-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 12px;"></div>
+ <strong style="color: var(--gray-600);">Loading data from BigQuery...</strong>
+ </div>
  </td>
  </tr>
  `;
+ 
+ // Add CSS animation for spinner
+ if (!document.getElementById('spinnerStyle')) {
+ const style = document.createElement('style');
+ style.id = 'spinnerStyle';
+ style.textContent = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+ document.head.appendChild(style);
+ }
  
  // TODO (Phase 2): Implement advanced filtering by Title, Keyword_Tags, Message_Body
  // Current: Returns WK 1+ data for specified FY, sorted by Activity_Title
@@ -3017,12 +3055,45 @@
  
  // Call BigQuery API with filters
  const offset = (filters.page - 1) * filters.limit;
- fetch(`/api/amp-data?fy=${filters.fy}&week=${filters.week}&limit=${filters.limit}&offset=${offset}`)
+ let apiUrl = `/api/amp-data?fy=${filters.fy}&limit=${filters.limit}&offset=${offset}`;
+ 
+ // Add all selected weeks as comma-separated parameter
+ if (filters.weeks && filters.weeks.length > 0) {
+ apiUrl += `&weeks=${filters.weeks.join(',')}`;
+ }
+ 
+ // Add optional filter parameters if provided
+ if (filters.division && filters.division !== 'All Divisions') {
+ apiUrl += `&division=${encodeURIComponent(filters.division)}`;
+ }
+ if (filters.region && filters.region !== 'All Regions') {
+ apiUrl += `&region=${encodeURIComponent(filters.region)}`;
+ }
+ if (filters.market && filters.market !== 'All Markets') {
+ apiUrl += `&market=${encodeURIComponent(filters.market)}`;
+ }
+ if (filters.activityType && filters.activityType !== 'All Types') {
+ apiUrl += `&activity_type=${encodeURIComponent(filters.activityType)}`;
+ }
+ if (filters.storeArea && filters.storeArea !== 'All Areas') {
+ apiUrl += `&store_area=${encodeURIComponent(filters.storeArea)}`;
+ }
+ if (filters.search && filters.search.trim()) {
+ apiUrl += `&keyword=${encodeURIComponent(filters.search)}`;
+ }
+ 
+ console.log('📡 Fetching:', apiUrl);
+ fetch(apiUrl)
  .then(response => {
+ console.log('📬 Response status:', response.status);
  if (!response.ok) {
- throw new Error(`HTTP error! status: ${response.status}`);
+ throw new Error(`HTTP ${response.status}`);
  }
  return response.json();
+ })
+ .then(json => {
+ console.log('✅ API response received:', json.count, 'rows');
+ return json;
  })
  .then(data => {
  if (!data || !data.data || data.data.length === 0) {
@@ -3036,75 +3107,99 @@
  return;
  }
  
- // Update backend status indicator
+ // Update backend status indicator immediately
  const statusIndicator = document.getElementById('status-indicator');
  const authStatus = document.getElementById('auth-status');
  if (statusIndicator && authStatus) {
  statusIndicator.style.background = '#38A169';
  statusIndicator.style.animation = 'none';
- authStatus.textContent = '✅ Connected to BigQuery';
+ authStatus.innerHTML = '✅ <strong>Connected</strong> - ' + data.count + ' records loaded';
  authStatus.style.color = '#38A169';
+ authStatus.style.fontWeight = 'bold';
  }
  
  // Populate table with API data
  const tableBody = document.getElementById('tableBody');
- const uniqueData = [];
- const seen = new Set();
  
- // Remove duplicates based on Activity_Title + Week combo
- data.data.forEach(row => {
- const key = `${row.Week}-${row.Activity_Title}`;
- if (!seen.has(key)) {
- seen.add(key);
- uniqueData.push(row);
- }
- });
+ console.log(`📊 Loaded ${data.data.length} activities from Week ${data.data.length > 0 ? data.data[0].Week : 'N/A'}`);
  
- tableBody.innerHTML = uniqueData.map((row, index) => `
+ tableBody.innerHTML = data.data.map((row, index) => {
+ const users = parseInt(row.Unique_Users) || 0;
+ const clicks = parseInt(row.Total_Clicks) || 0;
+ const engagement = users > 0 ? ((clicks / users) * 100).toFixed(1) : '-';
+ return `
  <tr>
- <td class="text-nowrap font-weight-bold">${row.Week}</td>
+ <td class="text-nowrap font-weight-bold" style="text-align: center;">${row.Week}</td>
  <td><a class="activity-title-link" href="${row.Preview_Link || '#'}" target="_blank">${row.Activity_Title}</a></td>
  <td>${row.Activity_Type || '-'}</td>
  <td>${row.Business_Area || '-'}</td>
  <td class="metric-column">${row.Stores_With_Access || 0}</td>
- <td class="metric-column">${row.Total_Impressions?.toLocaleString() || 0}</td>
- <td class="metric-column">${row.Unique_Viewers?.toLocaleString() || 0}</td>
- <td class="metric-column">${row.Engagement_Rate?.toFixed(1) || '-'}%</td>
- <td class="metric-column">${row.Completion_Rate?.toFixed(1) || '-'}%</td>
+ <td class="metric-column">${row.Unique_Users?.toLocaleString() || 0}</td>
+ <td class="metric-column">${row.Total_Clicks?.toLocaleString() || 0}</td>
+ <td class="metric-column">${engagement}${engagement !== '-' ? '%' : ''}</td>
  <td><span class="status-badge status-published">${row.Status || 'Published'}</span></td>
  </tr>
- `).join('');
+ `;
+ }).join('');
+ 
+ // Update dashboard stats based on ALL filtered data (not just visible page)
+ updateDashboardStats(data.data, data.total_count);
  
  // Add pagination controls
  const totalPages = Math.ceil((data.total_count || 1000) / filters.limit);
- let paginationHTML = `<div style="text-align: center; margin-top: 20px; padding: 20px; font-size: 14px; color: var(--text-secondary);">`;
+ let paginationHTML = `<div id="paginationControls" style="text-align: center; margin-top: 20px; padding: 20px; font-size: 14px; color: var(--text-secondary);">`;
  
  if (filters.page > 1) {
- paginationHTML += `<a href="#" onclick="searchData(1)" style="margin: 0 8px; color: var(--walmart-blue); text-decoration: none; font-weight: bold;">&lt;</a>`;
- paginationHTML += `<span>${filters.page} of ${totalPages}</span>`;
+ paginationHTML += `<a href="#" onclick="searchData(1); return false;" style="margin: 0 8px; color: var(--walmart-blue); text-decoration: none; font-weight: bold;">&lt;</a>`;
+ paginationHTML += `<span style="margin: 0 16px;"><strong>${filters.page}</strong> of ${totalPages}</span>`;
  } else {
- paginationHTML += `<span style="color: var(--gray-400);">&lt;</span>`;
- paginationHTML += `<span>${filters.page} of ${totalPages}</span>`;
+ paginationHTML += `<span style="color: var(--gray-400); margin: 0 8px;">&lt;</span>`;
+ paginationHTML += `<span style="margin: 0 16px;"><strong>${filters.page}</strong> of ${totalPages}</span>`;
  }
  
  if (filters.page < totalPages) {
- paginationHTML += `<a href="#" onclick="searchData(${filters.page + 1})" style="margin: 0 8px; color: var(--walmart-blue); text-decoration: none; font-weight: bold;">&gt;</a>`;
+ paginationHTML += `<a href="#" onclick="searchData(${filters.page + 1}); return false;" style="margin: 0 8px; color: var(--walmart-blue); text-decoration: none; font-weight: bold;">&gt;</a>`;
  } else {
- paginationHTML += `<span style="color: var(--gray-400);">&gt;</span>`;
+ paginationHTML += `<span style="color: var(--gray-400); margin: 0 8px;">&gt;</span>`;
  }
  paginationHTML += `</div>`;
  
- // Insert pagination after table
- tableBody.parentElement.parentElement.insertAdjacentHTML('afterend', paginationHTML);
+ // Create pagination + rows-per-page controls
+ const paginationWrapper = `
+ <div style="text-align: center; margin-top: 20px; padding: 20px;">
+ <div id="paginationControls" style="margin-bottom: 15px; font-size: 14px; color: var(--text-secondary);">
+ ${paginationHTML}
+ </div>
+ <div style="font-size: 13px; color: var(--text-secondary);">
+ <label for="filterRowsPerPage" style="margin-right: 8px;">Rows per page:</label>
+ <select id="filterRowsPerPage" style="padding: 6px 12px; border: 1px solid #CBD5E0; border-radius: 4px; font-size: 13px; cursor: pointer;">
+ <option value="10" ${filters.limit === 10 ? 'selected' : ''}>10</option>
+ <option value="20" ${filters.limit === 20 ? 'selected' : ''}>20</option>
+ <option value="30" ${filters.limit === 30 ? 'selected' : ''}>30</option>
+ <option value="40" ${filters.limit === 40 ? 'selected' : ''}>40</option>
+ <option value="50" ${filters.limit === 50 ? 'selected' : ''}>50</option>
+ </select>
+ </div>
+ </div>
+ `;
+ 
+ // Insert or replace pagination
+ const wrapper = tableBody.parentElement.parentElement;
+ let existingWrapper = wrapper.nextElementSibling;
+ if (existingWrapper && existingWrapper.style && existingWrapper.style.textAlign === 'center') {
+ existingWrapper.outerHTML = paginationWrapper;
+ } else {
+ wrapper.insertAdjacentHTML('afterend', paginationWrapper);
+ }
  })
  .catch(error => {
- console.error('Error fetching data:', error);
+ console.error('❌ Error fetching data:', error);
  const statusIndicator = document.getElementById('status-indicator');
  const authStatus = document.getElementById('auth-status');
  if (statusIndicator && authStatus) {
  statusIndicator.style.background = '#E53E3E';
  statusIndicator.style.animation = 'none';
- authStatus.textContent = '❌ Connection Error';
+ authStatus.textContent = '❌ ' + error.message;
  authStatus.style.color = '#E53E3E';
  }
  document.getElementById('tableBody').innerHTML = `
@@ -3221,113 +3316,74 @@
  // window.open(previewUrl, '_blank');
  }
 
- // Calculate stats from table data
+ // Calculate stats from ALL filtered data (not just visible page)
  // Formulas:
- // - Total Records: Count of activities in the table
- // - Store Avg: Total Stores / Total Records (avg stores per activity)
- // - Total Clicks: Sum of all total_opens (clicks) 
- // Stats Calculations:
- // - Store Avg: Average distinct events per store = Sum(store touchpoints) / Total unique stores
- // - Avg Clicks: Total Clicks / Total Records (avg clicks per activity)
- // - Engagement %: (Total Clicks / Total Unique Users) * 100 (click rate per user)
- // - Avg Engagement: Average of per-activity engagement rates
- function updateDashboardStats() {
- const tableBody = document.getElementById('tableBody');
- const rows = tableBody.querySelectorAll('tr');
- 
- // Historical baseline: max unique users for any single event ID from last year
- // This is used to benchmark engagement per event
- const MAX_UNIQUE_USERS_PER_EVENT_HISTORICAL = 145000; // Historical max unique users for a single event from "Audience Breakdown Historical"
- // This constant should be updated if any current event exceeds this benchmark
- 
- // Get selected weeks for filtering
- const weekFilter = document.getElementById('filterWeek');
- let selectedWeeks = [];
- 
- if (weekFilter) {
- const selectedOptions = Array.from(weekFilter.selectedOptions || []);
- selectedOptions.forEach(opt => {
- if (opt.value && opt.value !== '') {
- // Handle relative dates
- if (opt.value === 'current' || opt.value === 'next' || opt.value === 'past') {
- const wmInfo = getCurrentWMWeek();
- const currentWeek = wmInfo.week;
- if (opt.value === 'current') selectedWeeks.push(String(currentWeek));
- else if (opt.value === 'next') selectedWeeks.push(String(currentWeek < 52 ? currentWeek + 1 : 1));
- else if (opt.value === 'past') selectedWeeks.push(String(currentWeek > 1 ? currentWeek - 1 : 52));
- } else {
- selectedWeeks.push(opt.value);
- }
- }
- });
+ // - Total Activity: Count of all matching activities (from API total_count)
+ // - Total Stores: Sum of all store counts across all activities
+ // - Total Clicks: Sum of all clicks across all activities
+ // - Avg Clicks: Total Clicks / Total Activities
+ // - Unique Users: Sum of all unique users across all activities
+ // - Engagement %: (Total Clicks / Total Unique Users) × 100 for ALL selected activities
+ // - Avg Engagement: Average of per-activity engagement rates = AVG((Clicks ÷ Users) × 100)
+ function updateDashboardStats(apiData, totalCount) {
+ if (!apiData || apiData.length === 0) {
+ document.getElementById('recordCount').textContent = '0';
+ document.getElementById('storeHigh').textContent = '0';
+ document.getElementById('storeLow').textContent = '0';
+ document.getElementById('storeAvg').textContent = '0';
+ document.getElementById('totalClicks').textContent = '0';
+ document.getElementById('avgClicks').textContent = '0';
+ document.getElementById('engagementPct').textContent = '0%';
+ document.getElementById('avgEngagement').textContent = '0%';
+ return;
  }
  
- const TOTAL_UNIQUE_STORES = 4601; // Total stores in network
+ const STORE_HIGH_ACTIVITIES = 33;
+ const STORE_LOW_ACTIVITIES = 1;
+ const STORE_AVG_ACTIVITIES = 18.01;
  
- // Store-level metrics calculated from Facility aggregation (Week 2, FY 2027)
- // These are queried from: SELECT COUNT(DISTINCT activity_id) per Facility
- const STORE_HIGH_ACTIVITIES = 33;  // Max activities per store
- const STORE_LOW_ACTIVITIES = 1;    // Min activities per store
- const STORE_AVG_ACTIVITIES = 18.01; // Avg activities per store
- 
- let recordCount = 0;
  let totalClicks = 0;
  let totalUniqueUsers = 0;
- let totalStoreTouchpoints = 0; // Sum of all store-activity pairs
- let engagementSum = 0; // Sum of per-activity engagement %
- let validEngagementRows = 0;
- let storeCountsPerRow = []; // Track each row's store count for high/low
+ let totalStores = 0;
+ let engagementRates = []; // Array of per-activity engagement rates
  
- rows.forEach(row => {
- const cells = row.querySelectorAll('td');
- if (cells.length >= 7) {
- const weekValue = cells[0].textContent.trim(); // Column 0 = WM_Week
+ // Calculate totals from API data
+ apiData.forEach(row => {
+ const clicks = parseInt(row.Total_Clicks) || 0;
+ const users = parseInt(row.Unique_Users) || 0;
+ const stores = parseInt(row.Stores_With_Access) || 0;
  
- // Check if this row matches selected weeks (or if no weeks selected, include all)
- const matchesWeekFilter = selectedWeeks.length === 0 || selectedWeeks.includes(weekValue);
- if (!matchesWeekFilter) return;
- 
- // Column 4 = Total Stores, Column 5 = Unique Users, Column 6 = Total Clicks
- const stores = parseInt(cells[4].textContent.replace(/[^0-9]/g, '')) || 0;
- const uniqueUsers = parseInt(cells[5].textContent.replace(/,/g, '')) || 0;
- const clicks = parseInt(cells[6].textContent.replace(/,/g, '')) || 0;
- 
- recordCount++;
- totalStoreTouchpoints += stores;
- totalUniqueUsers += uniqueUsers;
  totalClicks += clicks;
- storeCountsPerRow.push(stores);
+ totalUniqueUsers += users;
+ totalStores += stores;
  
- // Calculate per-event engagement: unique users per event normalized to historical baseline
- if (uniqueUsers > 0) {
- const engagementPercent = (uniqueUsers / MAX_UNIQUE_USERS_PER_EVENT_HISTORICAL) * 100;
- engagementSum += engagementPercent;
- validEngagementRows++;
- }
+ // Per-activity engagement = (Clicks / Users) * 100
+ if (users > 0) {
+ const activityEngagement = (clicks / users) * 100;
+ engagementRates.push(activityEngagement);
  }
  });
  
- // Store High/Low calculation from aggregated store-level data
- // Store High = Maximum activities per store (highest count from any single store)
- // Store Low = Minimum activities per store (lowest count from any single store)
- // These values are aggregated from Facility/store-level counts
- let storeHigh = STORE_HIGH_ACTIVITIES;
- let storeLow = STORE_LOW_ACTIVITIES;
+ // Total Activity = API total_count (all matching records whether paginated or not)
+ const recordCount = totalCount || apiData.length;
  
- // Store Avg = Average activities per store (from aggregated store-level data)
- let storeAvg = STORE_AVG_ACTIVITIES;
+ // Store metrics (static from aggregated data)
+ const storeHigh = STORE_HIGH_ACTIVITIES;
+ const storeLow = STORE_LOW_ACTIVITIES;
+ const storeAvg = STORE_AVG_ACTIVITIES;
  
- // Avg Clicks = Total Clicks / Total Records
- let avgClicks = recordCount > 0 ? Math.round(totalClicks / recordCount) : 0;
+ // Avg Clicks = Total Clicks / Total Activities
+ const avgClicks = recordCount > 0 ? Math.round(totalClicks / recordCount) : 0;
  
- // Engagement % = Average unique users per event, normalized to historical baseline (capped at 100%)
- let avgUniqueUsersPerEvent = recordCount > 0 ? totalUniqueUsers / recordCount : 0;
- let engagementPct = avgUniqueUsersPerEvent > 0 ? ((avgUniqueUsersPerEvent / MAX_UNIQUE_USERS_PER_EVENT_HISTORICAL) * 100).toFixed(1) : 0;
- engagementPct = Math.min(engagementPct, 100); // Cap at 100% if exceeds historical baseline
+ // Engagement % = (Total Clicks / Total Unique Users) × 100 for ALL activities
+ const engagementPct = totalUniqueUsers > 0 
+ ? Math.min(((totalClicks / totalUniqueUsers) * 100).toFixed(1), 100)
+ : 0;
  
- // Avg Engagement = Average of per-event engagement rates (normalized to historical max unique users)
- // This already contains the normalized engagement from the forEach loop above
- let avgEngagement = validEngagementRows > 0 ? Math.min((engagementSum / validEngagementRows).toFixed(1), 100) : 0;
+ // Avg Engagement = Average of per-activity engagement rates
+ const avgEngagement = engagementRates.length > 0
+ ? (engagementRates.reduce((a, b) => a + b, 0) / engagementRates.length).toFixed(1)
+ : 0;
  
  document.getElementById('recordCount').textContent = recordCount.toLocaleString();
  document.getElementById('storeHigh').textContent = storeHigh.toLocaleString();
@@ -3412,50 +3468,109 @@
 
  // Initialize
  document.addEventListener('DOMContentLoaded', function() {
+ console.log('🚀 Page loaded, initializing dashboard...');
+ 
  // Calculate and set current WM week
  initializeWMWeekFilter();
- 
- // Set week filter to "current" by default
- const weekFilter = document.getElementById('filterWeek');
- if (weekFilter) {
- weekFilter.value = 'current';
- }
- 
- // Calculate stats from actual table data
- updateDashboardStats();
  
  // Initialize filter placeholders
  initFilterPlaceholders();
  
  // Load live BigQuery data (current week forward) by default
- // TODO (Phase 4): Add loading indicator during initial data fetch
- searchData();
+ console.log('📊 Loading initial data...');
+ searchData(1);
  
- // Add event listener to week filter for real-time stat updates
+ // Add event listeners to filters
  const wkFilter = document.getElementById('filterWeek');
  if (wkFilter) {
  wkFilter.addEventListener('change', function() {
- updateDashboardStats();
- searchData();
+ console.log('🔄 Week filter changed');
+ searchData(1); // Reset to page 1 when filter changes
  });
  }
  
- // Display data source info
- console.log('Dashboard Data Sources:');
- console.log(' - Primary: wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2');
- console.log(' - Audience: wmt-assetprotection-prod.Store_Support_Dev.Audience Breakdown Cur');
- console.log(' - Device: wmt-assetprotection-prod.Store_Support_Dev.Device Types Cur');
- console.log(' - Time: wmt-assetprotection-prod.Store_Support_Dev.Time Spent Cur');
+ // Add change listeners to other filters
+ ['filterSearch', 'filterActivityType', 'filterStoreArea', 'filterDivision', 'filterRegion', 'filterMarket'].forEach(id => {
+ const el = document.getElementById(id);
+ if (el) {
+ el.addEventListener('change', () => {
+ console.log(`🔄 ${id} changed`);
+ searchData(1);
  });
+ }
+ });
+ 
+ // Add listener for rows-per-page selector
+ const rowsPerPageEl = document.getElementById('filterRowsPerPage');
+ if (rowsPerPageEl) {
+ rowsPerPageEl.addEventListener('change', () => {
+ console.log(`🔄 Rows per page changed to: ${rowsPerPageEl.value}`);
+ searchData(1); // Reset to page 1 when rows-per-page changes
+ });
+ }
+ 
+ // Initialize rows-per-page change listener here too
+ setTimeout(() => {
+ const rowsPerPageEl = document.getElementById('filterRowsPerPage');
+ if (rowsPerPageEl && !rowsPerPageEl.hasListener) {
+ rowsPerPageEl.addEventListener('change', () => {
+ console.log(`🔄 Rows per page changed to: ${rowsPerPageEl.value}`);
+ searchData(1);
+ });
+ rowsPerPageEl.hasListener = true;
+ }
+ }, 100);
+ 
+ // Set up "All" checkbox functionality for multi-select filters (NOT filterWeek - it's a regular dropdown)
+ setupMultiSelectAll(['filterActivityType', 'filterStoreArea', 'filterDivision', 'filterRegion', 'filterMarket']);
+ 
+ // Display data source info
+ console.log('📋 Dashboard Data Sources:');
+ console.log(' - Primary: wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2');
+ console.log('✅ Dashboard initialized');
+ });
+ 
+ // Handle "All" checkbox functionality for multi-select dropdowns
+ function setupMultiSelectAll(selectIds) {
+ selectIds.forEach(selectId => {
+ const select = document.getElementById(selectId);
+ if (!select) return;
+ 
+ select.addEventListener('change', function() {
+ const allOption = this.querySelector('option[value=""]');
+ if (!allOption) return;
+ 
+ const selectedOptions = Array.from(this.selectedOptions);
+ const nonAllOptions = Array.from(this.options).filter(opt => opt.value !== '');
+ const isAllSelected = allOption.selected;
+ 
+ if (isAllSelected) {
+ // "All" is selected: select all other options
+ nonAllOptions.forEach(opt => opt.selected = true);
+ } else {
+ // Check if user deselected "All" when all items were selected
+ const allOthersSelected = selectedOptions.length > 0 && 
+ selectedOptions.every(opt => opt.value !== '');
+ 
+ if (!allOthersSelected) {
+ // Deselect all if "All" was deselected
+ nonAllOptions.forEach(opt => opt.selected = false);
+ }
+ }
+ 
+ // Trigger change event for the filter
+ this.dispatchEvent(new Event('change', { bubbles: true }));
+ });
+ });
+ }
  
  // Calculate current Walmart fiscal week
  // Walmart FY starts first Saturday of February
  function getCurrentWMWeek() {
- const today = new Date(2026, 1, 13); // Feb 13, 2026 = Week 2
+ const today = new Date(2026, 3, 7); // Apr 7, 2026 = Week 10, FY2027
  const year = today.getFullYear();
  
  // Walmart fiscal week mapping for FY2027 (starts Feb 2026)
- // Based on business: Feb 13, 2026 = Week 2
  const fyStart = new Date(2026, 0, 31); // Jan 31, 2026 (first Saturday of Feb FY)
  
  if (today < fyStart) {

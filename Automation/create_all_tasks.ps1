@@ -1,4 +1,4 @@
-$ProjectRoot = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub"
+﻿$ProjectRoot = "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub"
 
 # Check if running as admin
 if (-NOT ([Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544") {
@@ -52,7 +52,7 @@ Write-Host "Creating Task 5: Store Meeting Planner Auto-Start..."
 $action5 = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$ProjectRoot\Automation\start_meeting_planner_24_7.bat`""
 $trigger5 = New-ScheduledTaskTrigger -AtLogon
 $settings5 = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
-$principal5 = New-ScheduledTaskPrincipal -RunLevel Highest
+$principal5 = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -RunLevel Highest
 Register-ScheduledTask -TaskName "Activity_Hub_StoreMeetingPlanner_AutoStart" -Action $action5 -Trigger $trigger5 -Settings $settings5 -Principal $principal5 -Force | Out-Null
 Write-Host "   ✓ Activity_Hub_StoreMeetingPlanner_AutoStart" -ForegroundColor Green
 
@@ -73,6 +73,24 @@ $settings7 = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGo
 $principal7 = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 Register-ScheduledTask -TaskName "Activity_Hub_Daily_HealthCheck" -Action $action7 -Trigger $trigger7 -Settings $settings7 -Principal $principal7 -Force | Out-Null
 Write-Host "   ✓ Activity_Hub_Daily_HealthCheck" -ForegroundColor Green
+
+# Task 8: Activity Hub Server
+Write-Host "Creating Task 8: Activity Hub Server Auto-Start..."
+$action8 = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$ProjectRoot\Automation\start_activity_hub_24_7.bat`""
+$trigger8 = New-ScheduledTaskTrigger -AtStartup
+$settings8 = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+$principal8 = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+Register-ScheduledTask -TaskName "Activity_Hub_Server_AutoStart" -Action $action8 -Trigger $trigger8 -Settings $settings8 -Principal $principal8 -Force | Out-Null
+Write-Host "   ✓ Activity_Hub_Server_AutoStart" -ForegroundColor Green
+
+# Task 9: Logic Scheduler Service
+Write-Host "Creating Task 9: Logic Scheduler Service Auto-Start..."
+$action9 = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$ProjectRoot\Automation\start_logic_scheduler_24_7.bat`""
+$trigger9 = New-ScheduledTaskTrigger -AtStartup
+$settings9 = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+$principal9 = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+Register-ScheduledTask -TaskName "Activity_Hub_LogicScheduler_AutoStart" -Action $action9 -Trigger $trigger9 -Settings $settings9 -Principal $principal9 -Force | Out-Null
+Write-Host "   ✓ Activity_Hub_LogicScheduler_AutoStart" -ForegroundColor Green
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green

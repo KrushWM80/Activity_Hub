@@ -261,6 +261,7 @@ All tasks registered April 1, 2026. Requires **elevated (admin) terminal** to cr
 | `Activity_Hub_StoreMeetingPlanner_AutoStart` | On logon | Starts Meeting Planner (8090) |
 | `Activity_Hub_VETDashboard_AutoStart` | On logon | Starts VET Dashboard (5001) |
 | `Activity_Hub_Zorro_AutoStart` | On logon | Starts Zorro (8888) |
+| `Activity_Hub_ActivityHub_AutoStart` | On logon | Starts Activity Hub (8088) |
 | `Activity_Hub_Daily_HealthCheck` | Daily 6:00 AM | Runs `MONITOR_AND_REPORT.ps1` — health check + email |
 | `Activity_Hub_TDA_Daily_Email` | Daily 6:00 AM | TDA daily report email (`send_tda_weekly_email.bat`) |
 | `Activity_Hub_TDA_Weekly_Email` | Weekly Thu 11:00 AM | TDA weekly summary email (`send_tda_weekly_email.bat`) |
@@ -343,7 +344,7 @@ If a service suddenly shows empty or wrong data, check whether BigQuery column v
 
 #### Recovery methodology (when multiple services are down)
 1. Do NOT mass-kill Python processes
-2. Check which ports are down: `netstat -ano | Select-String "LISTENING" | Select-String ":5000|:5001|:8001|:8080|:8081|:8090|:8888"`
+2. Check which ports are down: `netstat -ano | Select-String "LISTENING" | Select-String ":5000|:5001|:8001|:8080|:8081|:8088|:8090|:8888"`
 3. Start only the specific downed services using their bat file
 4. Wait 15-20 seconds then re-check ports
 5. The 5-minute continuous monitor (`continuous_monitor.ps1`) acts as backup if a bat loop itself dies
@@ -434,6 +435,42 @@ schtasks /create /tn "Activity_Hub_<ReportName>_Email" /tr "cmd /c \"%BASE%\send
 **Step 3** — Run `Automation/register_tasks_cmd.bat` from an **elevated (admin) terminal**.
 
 **Step 4** — Add to the Scheduled Tasks table in this file (`KNOWLEDGE_HUB.md`) with task name, trigger, and action.
+
+---
+
+## ☁️ GCP Project — wmt-storesupport-prod
+
+**Last Updated**: April 7, 2026  
+**YAML**: `Store Support/General Setup/BigQueryProject/06-GCP-Setup/wmt-storesupport-prod.yaml`
+
+### Confirmed Values (updated in YAML)
+
+| Field | Value |
+|-------|-------|
+| Project ID | `wmt-storesupport-prod` |
+| Billing Account | `01FF90-22DB49-E911B6` |
+| Cost Center | `7858` (label: `US07858`) |
+| APM ID | `APM0022933` |
+| SSP ID | `SSP00004633` (Allen Still's approved project) |
+| TR Product ID | `4639` |
+
+### Confirmed AD Groups
+
+| Group | Role |
+|-------|------|
+| `gcp-storesupport-prod-admin@walmart.com` | Owner / BigQuery Admin |
+| `gcp-storesupport-dev-admin@walmart.com` | Editor / BigQuery DataEditor |
+| `gcp-storesupport-prod-viewer@walmart.com` | Viewer |
+
+### PR Submission Status
+
+- ✅ AD groups confirmed and aligned across docs and YAML
+- ✅ APM ID confirmed: `APM0022933`
+- ✅ SSP ID confirmed: `SSP00004633`
+- ✅ Billing account filled in YAML: `01FF90-22DB49-E911B6`
+- ✅ Cost center filled in YAML: `US07858`
+- ✅ TR Product ID filled in YAML: `4639`
+- ✅ Roadmap status updated to Phase 2 in progress
 
 ---
 

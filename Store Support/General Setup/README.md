@@ -70,6 +70,13 @@ Software and environment assessment tools and documentation.
 
 ---
 
+## 🧩 Reusable UI Patterns
+
+### **[Multi-Select Dropdown Filters](MULTI_SELECT_DROPDOWN_PATTERN.md)**
+Complete copy-paste pattern for adding multi-select dropdown filters to any dashboard. Includes HTML structure, CSS, JavaScript (populate, label updates, event delegation IIFE, search input), API integration, and wiring. Originally built for TDA Insights — reusable across all projects.
+
+---
+
 ## 🎯 Quick Start Guides
 
 ### For New Projects:

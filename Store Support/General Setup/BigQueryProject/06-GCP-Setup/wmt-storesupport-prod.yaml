@@ -13,15 +13,15 @@ projects:
 
       #################################################################
       # *REQUIRED* - Billing Account
-      # To be filled with actual Walmart billing account ID
+      # Confirmed April 7, 2026
       # Format: XXXXXX-XXXXXX-XXXXXX
-      billing_account: '[STORE-SUPPORT-BILLING-ACCOUNT-ID]'
+      billing_account: '01FF90-22DB49-E911B6'
       #################################################################
 
       #################################################################
       # Project Labels for Governance and Cost Tracking
       labels:
-        costcenter: 'US07858'                                # Store Support cost center
+        costcenter: 'US07858'                                # Store Support cost center (confirmed)
         notificationdistlist: 'group:gcp-storesupport-prod-admin@walmart.com'
         teamname: 'store-support'                            # Store Support team
         applicationname: 'store-support-platform'            # Application name
@@ -29,6 +29,9 @@ projects:
         owner: 'group:gcp-storesupport-prod-admin@walmart.com'
         businessunit: 'store-operations'                     # Business unit
         purpose: 'software-product-development'              # Purpose
+        apm-id: 'APM0022933'                                 # Confirmed APM ID
+        ssp-id: 'SSP00004633'                                # Confirmed SSP ID (Allen Still's approved project)
+        tr-product-id: '[4639]'                              # TR Product ID - still needed for PR
       #################################################################
 
       #################################################################

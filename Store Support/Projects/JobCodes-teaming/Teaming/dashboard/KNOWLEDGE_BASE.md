@@ -59,30 +59,28 @@ The Job Code Teaming Dashboard is a **FastAPI web application** that manages job
 ┌──────────────────▼──────────────────────────────────────────┐
 │                  FastAPI Backend Server                      │
 │                     Port: 8080                               │
-│                   main.py (1584 lines)                      │
+│                   main.py (1700+ lines)                     │
 │                                                              │
 │  ├─ Authentication (HTTPBasic)                             │
 │  ├─ User Management (users.json)                           │
 │  ├─ Request Processing (update_requests.json)              │
 │  ├─ Session Management (sessions.json)                     │
-│  ├─ Job Code Data (job_codes_master.json)                  │
+│  ├─ Job Code Cache (SQLite)  ← NEW                        │
+│  ├─ Job Code Master DB (SQLite)  ← NEW                    │
+│  ├─ BigQuery Sync (Background Thread)  ← NEW              │
 │  ├─ Email Notifications (SMTP)                             │
 │  └─ Static File Serving                                    │
 └──────────────────┬──────────────────────────────────────────┘
                    │
-                   └─ Reads/Writes
+                   ├─ Reads/Writes JSON files (users, sessions, requests)
                    │
-           ┌───────▼────────┐
-           │  Data Files    │
-           │   (data/)      │
-           ├─ users.json    │
-           ├─ sessions.json │
-           ├─ update_requests.json
-           ├─ job_code_requests.json
-           ├─ job_codes_master.json
-           ├─ email_queue.json
-           ├─ email_config.json
-           └─ rejection_history.json
+                   ├─ SQLite Cache (jobcodes_cache.db)
+                   │   ├─ polaris_job_codes table
+                   │   ├─ job_code_master table
+                   │   └─ sync_history table
+                   │
+                   └─ BigQuery (auto-sync every 30 min)
+                       └─ polaris-analytics-prod.us_walmart
 ```
 
 ---
@@ -128,33 +126,84 @@ This is **better than IP addresses** because:
 
 ---
 
+## Data Architecture (Updated - April 7, 2026)
+
+### 3-Tier Data System
+
+**Tier 1: Polaris Cache (SQLite)**
+- Table: `polaris_job_codes` (source of truth from BigQuery)
+- Auto-syncs every 30 minutes from BigQuery
+- Fallback snapshots if sync fails
+- Replaces: `polaris_job_codes.csv` (static file)
+
+**Tier 2: Job Code Master (SQLite)**
+- Table: `job_code_master` (platform-managed enrichment)
+- User-entered data via dashboard (Job Codes Tab)
+- Columns: workday_code, category, job_family, pg_level, supervisor, notes, etc.
+- Replaces: `Job_Code_Master_Table.xlsx` (Excel file)
+
+**Tier 3: Job Code Complete (Runtime Merge)**
+- Endpoint: `GET /api/job-codes`
+- Merges: Polaris (base) + Master (enrichment) + Teaming (assignments)
+- Frontend displays unified view
+
+### Sync Architecture
+
+```
+BigQuery (Polaris Source)
+       ↓ (every 30 min)
+SQLite Cache (polaris_job_codes table)
+       ↓
+Backend /api/job-codes endpoint
+       ↓
+Frontend displays merged data
+```
+
 ## Data Flow
 
-### 1. **Initialization**
+### 1. **Startup Initialization**
 ```
-Startup → Load TMS Data (3).xlsx → Load polaris_job_codes.csv 
-→ Merge into job_codes_master.json → Web server ready
-```
-
-### 2. **User Submits Request**
-```
-Browser → Select Job Code + Team → POST /update-request 
-→ Stored in update_requests.json → Admin notified via email
+Server starts
+  ├─ Initialize SQLite cache (create tables if not exist)
+  ├─ Perform initial BigQuery sync (if HAS_BIGQUERY)
+  └─ Start background sync thread (30-min interval)
 ```
 
-### 3. **Admin Approves**
+### 2. **User Views Job Codes**
 ```
-Admin approval → DELETE job code from "Missing" list → 
-Export ready for TMS API
+GET /api/job-codes
+  ├─ Query: polaris_job_codes table (Polaris base data)
+  ├─ Join: job_code_master table (User enrichment data)
+  ├─ Join: TMS Data (Teaming assignments) if available
+  └─ Return merged result to frontend
 ```
 
-### 4. **Data Sources**
-| File | Purpose | Location | Updated By |
-|------|---------|----------|------------|
-| `TMS Data (3).xlsx` | Current teaming assignments | Parent folder | TMS system |
-| `polaris_job_codes.csv` | Job codes in use (from BigQuery) | Parent folder | BigQuery query |
-| `polaris_user_counts.csv` | User counts per job code | Parent folder | BigQuery query |
-| `job_codes_master.json` | Combined, ready-to-use data | data/ folder | Dashboard (on startup) |
+### 3. **User Updates Job Code Metadata**
+```
+POST /api/job-codes-master/{job_code}
+  ├─ Admin user update data
+  ├─ INSERT/UPDATE job_code_master table
+  └─ Return updated record with timestamp
+```
+
+### 4. **Background Sync Process**
+```
+Every 30 minutes (background thread)
+  ├─ Query BigQuery for latest Polaris data
+  ├─ Validate minimum record count (>100)
+  ├─ REPLACE polaris_job_codes table
+  ├─ Log sync in sync_history table
+  ├─ Save snapshot JSON as fallback
+  └─ Alert admin if sync fails
+```
+
+### 5. **Data Sources Summary**
+| Source | Purpose | Method | Updated |
+|--------|---------|--------|---------|
+| BigQuery | Job codes, user counts | Auto-sync | Every 30 min |
+| SQLite Cache | Fast local queries | Auto-indexed | Real-time |
+| Job Code Master | Enrichment (category, family, etc.) | Dashboard UI | On-demand |
+| Teaming Excel | Team assignments | Manual upload | When updated |
 
 ---
 
@@ -167,27 +216,49 @@ Export ready for TMS API
    - Password hashing with SHA256
    - Session token management
 
-2. **User Management** (`main.py` - lines 201-400)
+2. **Cache Management** (`sqlite_cache.py` - NEW)
+   - SQLite database for Polaris job codes
+   - Job code master table for enrichment data
+   - Background sync from BigQuery (30-min interval)
+   - Snapshot fallback for resilience
+   - Fast queries via local database
+
+3. **User Management** (`main.py` - lines 201-400)
    - Load/save users.json
    - Role-based access control (Admin/User)
    - User registration workflow
 
-3. **Job Code Processing** (`main.py` - lines 400-800)
-   - Load TMS data (Excel)
-   - Load Polaris data (CSV)
-   - Merge and deduplicate
-   - Generate master job code list
+4. **Job Code Processing** (`main.py` - lines 400-800)
+   - Query Polaris cache (SQLite)
+   - Merge with master table data
+   - Merge with Teaming assignments
+   - Generate complete job code view
 
-4. **Request Handling** (`main.py` - lines 800-1200)
+5. **Request Handling** (`main.py` - lines 800-1200)
    - Process update requests
    - Admin approval/rejection
    - Export functionality
    - Email notifications
 
-5. **Session Management** (`main.py` - lines 1200+)
+6. **Session Management** (`main.py` - lines 1200+)
    - Track active sessions
    - Timeout handling
    - User state management
+
+### Key Endpoints
+
+**Job Code Queries:**
+- `GET /api/job-codes` - All job codes with enrichment
+- `GET /api/job-codes/{job_code}` - Single job code detail
+- `GET /api/job-codes-master` - Master data only
+
+**Master Data Management:**
+- `POST /api/job-codes-master/{job_code}` - Update master data
+- `POST /api/job-codes-master/{job_code}/notes` - Update notes
+
+**Cache Administration:**
+- `GET /api/cache-status` - Sync status and health
+- `POST /api/cache/sync-now` - Manual BigQuery sync trigger
 
 ---
 
@@ -203,13 +274,14 @@ Located in parent folder (`../`):
 
 ### `polaris_comparison.py`
 - **Purpose**: Compare Polaris (BigQuery) vs Teaming data
-- **Input**: polaris_job_codes.csv + TMS Data (3).xlsx
+- **Input**: polaris_job_codes.csv + TMS Data (3).xlsx (for reference only now - uses cache)
 - **Output**: Missing_From_Teaming_POLARIS.csv, Teaming_Not_In_Polaris.csv
 - **Run**: `python polaris_comparison.py`
 
 ### `get_user_ids.py`, `get_user_details_bigquery.py`, `get_worker_names_stores.py`
 - **Purpose**: Extract data from BigQuery and HR systems
 - **Used to collect**: Job codes, user counts, department details
+- **Note**: Cache auto-syncs now, manual extraction less necessary
 
 ---
 
@@ -218,12 +290,15 @@ Located in parent folder (`../`):
 ### Admin
 ```
 ✅ View all job codes (entire list)
+✅ Update job code master data (enrichment fields)
 ✅ View all user requests (all submissions)
 ✅ Approve/reject user registrations
 ✅ Approve/reject teaming update requests
 ✅ Export approved requests (for TMS upload)
 ✅ Change user roles
 ✅ View analytics/reports
+✅ Trigger manual cache sync
+✅ View cache sync status
 ```
 
 ### User

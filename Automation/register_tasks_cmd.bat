@@ -9,6 +9,7 @@ schtasks /create /tn "Activity_Hub_Store_Dashboard_AutoStart" /tr "cmd /c \"%BAS
 schtasks /create /tn "Activity_Hub_StoreMeetingPlanner_AutoStart" /tr "cmd /c \"%BASE%\start_meeting_planner_24_7.bat\"" /sc onlogon /ru "%USER%" /f
 schtasks /create /tn "Activity_Hub_VETDashboard_AutoStart" /tr "cmd /c \"%BASE%\start_vet_dashboard_24_7.bat\"" /sc onlogon /ru "%USER%" /f
 schtasks /create /tn "Activity_Hub_Zorro_AutoStart" /tr "cmd /c \"%BASE%\start_zorro_24_7.bat\"" /sc onlogon /ru "%USER%" /f
+schtasks /create /tn "Activity_Hub_ActivityHub_AutoStart" /tr "cmd /c \"%BASE%\start_activity_hub_24_7.bat\"" /sc onlogon /ru "%USER%" /f
 schtasks /create /tn "Activity_Hub_Daily_HealthCheck" /tr "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\MONITOR_AND_REPORT.ps1\"" /sc daily /st 06:00:00 /f
 
 echo.

@@ -2,7 +2,8 @@
 # Path: Store Support\Projects\AMP\Weekly Messages\adobe_config.yaml
 
 source_files:
-  weekly_messages_path: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Weekly Messages Area Reports - Tables FY27.xlsx"
+  weekly_messages_folder: "C:\\Users\\krush\\Documents\\VSCode\\AMP\\Weekly Messages\\Docs\\"
+  weekly_messages_excel_path: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Weekly Messages Area Reports - Tables FY27.xlsx"
   playbook_hub_path: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Playbook Hub and Active Playbooks - Weekly Report.xlsx"
 
 gcp:
@@ -10,9 +11,7 @@ gcp:
   location: "US"
 
 bigquery:
-  datasets:
-    weekly_messages: "Weekly_Message_FY27"
-    playbook_hub: "Playbook_Hub_Data"
+  dataset_id: "Store_Support_Dev"
   tables:
     weekly_devices: "bq_weekly_messages_devices"
     weekly_metrics: "bq_weekly_messages_metrics"

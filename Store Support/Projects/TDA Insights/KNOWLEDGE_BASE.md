@@ -192,13 +192,29 @@ When BigQuery is unavailable, serves 5 hardcoded projects:
 - Connection status indicator
 - Last updated timestamp
 
-### Multi-Select Filter Logic
+### Multi-Select Filter Pattern
 
+> **Full reusable reference:** [`Store Support/General Setup/MULTI_SELECT_DROPDOWN_PATTERN.md`](../../General%20Setup/MULTI_SELECT_DROPDOWN_PATTERN.md)
+
+**Summary:**
 - Custom dropdown with checkbox list (not native `<select>`)
 - "All Selected" toggle at top
 - Individual checkbox per option
 - Display label updates (e.g., "3 of 5 selected")
-- Click outside to close
+- Click outside to close (event delegation IIFE — survives DOM rebuilds)
+- Optional search input for long lists (e.g., Project Titles)
+
+**HTML naming convention:** `{name}-dropdown` wrapper, `{name}-dropdown-btn` button, `{name}-dropdown-panel` panel.
+
+**Core JS functions:**
+| Function | Purpose |
+|----------|---------|
+| `populateDropdown(dropdownId, options)` | Builds panel: optional search, "All" toggle, checkboxes per option |
+| `updateDropdownLabel(dropdownId, totalCount)` | Button text: "None selected" / "All Selected" / "3 of 5 selected" |
+| `getSelectedValues(dropdownId)` | Returns array of checked values (excludes "All" checkbox) |
+| `initDropdownDelegation()` (IIFE) | Single document click handler — open/close/outside-close |
+
+**Data flow:** `loadFilters()` fetches options from API → `populateDropdown()` per dropdown → user selects → `loadData()` reads `getSelectedValues()` → appends to URL query params → fetch filtered data → render.
 
 ### Summary Card Calculations
 
