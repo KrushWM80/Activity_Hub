@@ -625,6 +625,7 @@ async def get_projects(
             try:
                 print("[API] [CACHE ATTEMPT] Using SQLite cache for /api/projects")
                 cache_filters = {
+                    'status': status,
                     'division': division,
                     'region': region,
                     'market': market,
@@ -657,10 +658,15 @@ async def get_projects(
                 # Remove None values
                 cache_filters = {k: v for k, v in cache_filters.items() if v is not None}
                 
-                cached_projects = sqlite_cache.get_projects(
-                    filters=cache_filters,
-                    limit=limit,
-                    title_search=title
+                import asyncio
+                loop = asyncio.get_event_loop()
+                cached_projects = await loop.run_in_executor(
+                    None,
+                    lambda: sqlite_cache.get_projects(
+                        filters=cache_filters,
+                        limit=limit,
+                        title_search=title
+                    )
                 )
                 print(f"[API] Got {len(cached_projects)} projects from cache")
                 

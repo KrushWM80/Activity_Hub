@@ -1922,7 +1922,7 @@
                 <button class="close-btn" onclick="hideModal('createLogicRequestModal')">×</button>
             </div>
             <form id="logic-request-form" style="display: grid; gap: var(--space-4); padding: var(--space-4);">
-                            
+                <p class="pci-notice" style="font-size: 0.8rem; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 0.5rem 0.75rem;">🔒 Do not enter payment card information in any field.</p>
                 <!-- Basic Info -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
                     <div class="form-group">
@@ -2263,6 +2263,25 @@
 
     <script>
         // ==========================================
+        // PCI COMPLIANCE: PAN INPUT PREVENTION
+        // ==========================================
+        function containsPAN(text) {
+            const stripped = text.replace(/[\s\-\.]/g, '');
+            return /\d{13,19}/.test(stripped);
+        }
+        function validateNoPAN(container) {
+            const inputs = (container || document).querySelectorAll('input[type="text"], textarea');
+            for (const input of inputs) {
+                if (containsPAN(input.value)) {
+                    alert('⚠️ Payment card numbers are not permitted in any field.\nPlease remove any card data before submitting.');
+                    input.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // ==========================================
         // LOGIC REQUEST HANDLING
         // ==========================================
         function toggleCustomTrigger(selectedValue) {
@@ -2590,6 +2609,7 @@
             if (form) {
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();
+                    if (!validateNoPAN(form)) return;
                     
                     // Collect form data
                     const formData = new FormData(form);
@@ -2713,6 +2733,7 @@
         }
 
         function submitFeedback() {
+            if (!validateNoPAN(document.getElementById('feedbackModal'))) return;
             const rating = document.querySelector('input[name="feedback-rating"]:checked');
             if (!rating) { alert('Please select a rating'); return; }
             document.getElementById('feedback-step2').classList.remove('active');
@@ -3368,6 +3389,7 @@
         
         function saveFieldChanges(event) {
             event.preventDefault();
+            if (!validateNoPAN(document.getElementById('editFieldModal'))) return;
             
             const fieldKey = document.getElementById('edit-field-key').value;
             if (!fieldKey || !projectsSchema?.columns[fieldKey]) {

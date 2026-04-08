@@ -137,6 +137,7 @@ class SQLiteCache:
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_business_area ON projects(business_area)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_health ON projects(health)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_business_type ON projects(business_type)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_status ON projects(status)")
         
         # Metadata table for sync tracking
         cursor.execute("""
@@ -865,6 +866,9 @@ This is an automated alert. Do not reply to this email.
             if filters.get('customer_impact'):
                 conditions.append("customer_impact = ?")
                 params.append(filters['customer_impact'])
+            if filters.get('status'):
+                conditions.append("status = ?")
+                params.append(filters['status'])
         
         if title_search:
             conditions.append("(LOWER(title) LIKE ? OR LOWER(project_id) LIKE ?)")

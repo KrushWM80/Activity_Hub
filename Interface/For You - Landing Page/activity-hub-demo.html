@@ -1828,6 +1828,7 @@
             <div class="request-widget-section">
                 <h3 style="font-size: 1rem; color: var(--walmart-navy); margin-bottom: 0.75rem;">💡 Request a Widget</h3>
                 <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.75rem;">Have an idea for a new widget? Submit a request:</p>
+                <p class="pci-notice" style="font-size: 0.75rem; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 0.4rem 0.6rem; margin-bottom: 0.75rem;">🔒 Do not enter payment card information in any field.</p>
                 <div class="form-group">
                     <input type="text" id="requestWidgetName" placeholder="Widget name (e.g., Calendar, Weather)">
                 </div>
@@ -1885,6 +1886,7 @@
                 <button class="nested-modal-close" onclick="closeCreateLinkModal()">✕</button>
             </div>
             <div class="link-form" style="background: transparent; padding: 0;">
+                <p class="pci-notice" style="font-size: 0.75rem; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 0.4rem 0.6rem; margin-bottom: 0.75rem;">🔒 Do not enter payment card information in any field.</p>
                 <div id="createDuplicateError" class="error-message">⚠️ Error: URL already exists in the system. Please use a different URL.</div>
                 <div id="createSuccessMessage" class="success-message">✅ Link created successfully!</div>
                 
@@ -1900,7 +1902,7 @@
                     <div class="form-group">
                         <label>Category</label>
                         <select id="createLinkCategory">
-                            <option value="Documentation">Documentation</option>
+                            <option value="Docs">Docs</option>
                             <option value="Tools">Tools</option>
                             <option value="Resources">Resources</option>
                             <option value="Internal">Internal</option>
@@ -1987,38 +1989,87 @@
                 <button class="nested-modal-close" onclick="closeBrowseLinksModal()">✕</button>
             </div>
             <div style="margin-bottom: 1rem;">
-                <input type="text" placeholder="Search links..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 6px;">
+                <input type="text" id="browseLinksSearch" placeholder="Search links..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 6px;" oninput="filterBrowseLinks()">
             </div>
-            <div class="available-links-grid">
-                <div class="available-link-item" onclick="addLink('Slack')">
-                    <div class="available-link-name">💬 Slack</div>
-                    <div class="available-link-desc">Team Communication</div>
+            <div id="browseLinksContainer">
+                <!-- Tools -->
+                <div class="browse-category" data-browse-cat="Tools">
+                    <h4 style="color: var(--walmart-navy); margin: 0.75rem 0 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">🔧 Tools</h4>
+                    <div class="available-links-grid">
+                        <div class="available-link-item" onclick="addLink('Slack')">
+                            <div class="available-link-name">💬 Slack</div>
+                            <div class="available-link-desc">Team Communication</div>
+                        </div>
+                        <div class="available-link-item" onclick="addLink('Salesforce')">
+                            <div class="available-link-name">☁️ Salesforce</div>
+                            <div class="available-link-desc">CRM Platform</div>
+                        </div>
+                        <div class="available-link-item" onclick="addLink('Tableau')">
+                            <div class="available-link-name">📊 Tableau</div>
+                            <div class="available-link-desc">Analytics & BI</div>
+                        </div>
+                        <div class="available-link-item" onclick="addLink('ServiceNow')">
+                            <div class="available-link-name">🎫 ServiceNow</div>
+                            <div class="available-link-desc">IT Service Mgmt</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="available-link-item" onclick="addLink('Salesforce')">
-                    <div class="available-link-name">☁️ Salesforce</div>
-                    <div class="available-link-desc">CRM Platform</div>
+                <!-- Docs -->
+                <div class="browse-category" data-browse-cat="Docs">
+                    <h4 style="color: var(--walmart-navy); margin: 0.75rem 0 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">📄 Docs</h4>
+                    <div class="available-links-grid">
+                        <div class="available-link-item" onclick="addLink('SharePoint')">
+                            <div class="available-link-name">📁 SharePoint</div>
+                            <div class="available-link-desc">Document Library</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="available-link-item" onclick="addLink('Tableau')">
-                    <div class="available-link-name">📊 Tableau</div>
-                    <div class="available-link-desc">Analytics & BI</div>
+                <!-- Resources -->
+                <div class="browse-category" data-browse-cat="Resources">
+                    <h4 style="color: var(--walmart-navy); margin: 0.75rem 0 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">📚 Resources</h4>
+                    <div class="available-links-grid">
+                        <div class="available-link-item" onclick="addLink('Workday')">
+                            <div class="available-link-name">👥 Workday</div>
+                            <div class="available-link-desc">HR Platform</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="available-link-item" onclick="addLink('Sap')">
-                    <div class="available-link-name">📦 SAP</div>
-                    <div class="available-link-desc">ERP System</div>
-                </div>
-                <div class="available-link-item" onclick="addLink('Workday')">
-                    <div class="available-link-name">👥 Workday</div>
-                    <div class="available-link-desc">HR Platform</div>
-                </div>
-                <div class="available-link-item" onclick="addLink('ServiceNow')">
-                    <div class="available-link-name">🖛 ServiceNow</div>
-                    <div class="available-link-desc">IT Service Mgmt</div>
+                <!-- Internal -->
+                <div class="browse-category" data-browse-cat="Internal">
+                    <h4 style="color: var(--walmart-navy); margin: 0.75rem 0 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">🏢 Internal</h4>
+                    <div class="available-links-grid">
+                        <div class="available-link-item" onclick="addLink('SAP')">
+                            <div class="available-link-name">📦 SAP</div>
+                            <div class="available-link-desc">ERP System</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // ──────────────────────────────────────────────
+        // PCI Compliance: PAN Input Prevention
+        // ──────────────────────────────────────────────
+        function containsPAN(text) {
+            // Detect 13-19 digit sequences (credit card number pattern)
+            const stripped = text.replace(/[\s\-\.]/g, '');
+            return /\d{13,19}/.test(stripped);
+        }
+        function validateNoPAN() {
+            // Check all text inputs and textareas in visible modals/forms
+            const inputs = document.querySelectorAll('input[type="text"], textarea');
+            for (const input of inputs) {
+                if (containsPAN(input.value)) {
+                    alert('⚠️ Payment card numbers are not permitted in any field.\nPlease remove any card data before submitting.');
+                    input.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+
         // ──────────────────────────────────────────────
         // Widget Configuration & Persistence
         // ──────────────────────────────────────────────
@@ -2205,6 +2256,7 @@
         }
 
         function submitWidgetRequest() {
+            if (!validateNoPAN()) return;
             const name = document.getElementById('requestWidgetName').value.trim();
             const desc = document.getElementById('requestWidgetDesc').value.trim();
             if (!name) { alert('Please enter a widget name'); return; }
@@ -2389,7 +2441,7 @@
         // Link Management Modal Functions
         // Initialize user links storage
         let userLinks = [
-            { name: 'Confluence Portal', url: 'https://confluence.walmart.com/display/home', category: 'Documentation', privacy: 'public' },
+            { name: 'Confluence Portal', url: 'https://confluence.walmart.com/display/home', category: 'Docs', privacy: 'public' },
             { name: 'GitHub Repos', url: 'https://github.com/walmart', category: 'Tools', privacy: 'shared' },
             { name: 'Jira Board', url: 'https://jira.walmart.com/projects', category: 'Tools', privacy: 'private' },
             { name: 'Help Desk', url: 'https://helpdesk.walmart.com', category: 'Internal', privacy: 'public' }
@@ -2433,7 +2485,7 @@
             });
 
             // Fixed category order
-            const catOrder = ['Tools', 'Documentation', 'Resources', 'Internal'];
+            const catOrder = ['Tools', 'Docs', 'Resources', 'Internal'];
             const sortedCats = catOrder.filter(c => categories[c]).concat(
                 Object.keys(categories).filter(c => !catOrder.includes(c))
             );
@@ -2519,9 +2571,10 @@
                 'Slack': { url: 'https://slack.com', category: 'Tools', privacy: 'shared' },
                 'Salesforce': { url: 'https://salesforce.com', category: 'Tools', privacy: 'public' },
                 'Tableau': { url: 'https://tableau.com', category: 'Tools', privacy: 'public' },
-                'Sap': { url: 'https://sap.com', category: 'Tools', privacy: 'public' },
-                'Workday': { url: 'https://workday.com', category: 'Tools', privacy: 'public' },
-                'ServiceNow': { url: 'https://servicenow.com', category: 'Tools', privacy: 'shared' }
+                'ServiceNow': { url: 'https://servicenow.com', category: 'Tools', privacy: 'shared' },
+                'SharePoint': { url: 'https://sharepoint.walmart.com', category: 'Docs', privacy: 'public' },
+                'Workday': { url: 'https://workday.com', category: 'Resources', privacy: 'public' },
+                'SAP': { url: 'https://sap.com', category: 'Internal', privacy: 'public' }
             };
             
             if (availableLinkMap[linkName]) {
@@ -2580,6 +2633,7 @@
         }
 
         function demoCreateNewLink() {
+            if (!validateNoPAN()) return;
             const name = document.getElementById('createLinkName').value;
             const url = document.getElementById('createLinkUrl').value;
             const category = document.getElementById('createLinkCategory').value;
@@ -2628,7 +2682,7 @@
         function resetCreateLinkForm() {
             document.getElementById('createLinkName').value = '';
             document.getElementById('createLinkUrl').value = '';
-            document.getElementById('createLinkCategory').value = 'Documentation';
+            document.getElementById('createLinkCategory').value = 'Docs';
             document.getElementById('createLinkPrivacy').value = 'private';
             document.getElementById('createLinkDescription').value = '';
         }
@@ -2711,7 +2765,7 @@
         function resetLinkForm() {
             document.getElementById('linkName').value = '';
             document.getElementById('linkUrl').value = '';
-            document.getElementById('linkCategory').value = 'Documentation';
+            document.getElementById('linkCategory').value = 'Docs';
             document.getElementById('linkPrivacy').value = 'private';
             document.getElementById('linkDescription').value = '';
             document.getElementById('duplicateError').classList.remove('show');

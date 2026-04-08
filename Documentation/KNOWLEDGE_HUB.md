@@ -604,6 +604,33 @@ Located in [Platform/Documents/Compliance/](Platform/Documents/Compliance/)
 - Security frameworks
 - Enterprise governance
 
+### **PCI DSS Scoping**
+- [PCI DSS Scoping Checklist](PCI_DSS_SCOPING_CHECKLIST.md) — 10-section questionnaire (40+ questions)
+- [PCI DSS Scoping Analysis](PCI_DSS_SCOPING_ANALYSIS.md) — Activity Hub scoping result: **Out of Scope**
+- [Network Segmentation Confirmation](PCI_NETWORK_SEGMENTATION_CONFIRMATION.md) — Diagram, route table, segmentation scan, TCP port scan evidence
+
+**Activity Hub PCI Status:** Out of Scope (no CHD/SAD, no MIDs, no CDE connectivity, no payment processing)
+
+**PCI Standards Enforced:**
+1. **PAN Input Prevention** — All free-text forms include client-side validation rejecting 13-19 digit numeric sequences and display "Do not enter payment card information" notices
+2. **Log Hygiene** — Flask/Werkzeug logging captures only HTTP metadata (timestamp, method, path, status). Request bodies, file contents, and user-submitted text are never logged
+3. **No Payment Data in Data Sources** — All data feeds (BigQuery, internal APIs) confirmed to contain no CHD, PAN tokens, or PCI-originated data
+4. **No Payment Data in Outputs** — Automated emails and reports draw exclusively from non-PCI data sources
+
+**Change-in-Scope Triggers** — The following events require immediate PCI re-scoping (contact Compliance team):
+- Adding payment processing, checkout, or MID association to any Activity Hub feature
+- Integrating with a payment gateway, processor, or tokenization service
+- Consuming data feeds from PCI-scoped systems
+- Sharing infrastructure (servers, databases, network segments) with PCI-scoped systems
+- Providing authentication, logging, or security services to PCI-scoped systems
+
+**Trigger Response Process:**
+1. Development team identifies potential scope trigger
+2. Notify Solution Owner → Compliance team within **5 business days**
+3. Compliance team initiates re-scoping using [PCI DSS Scoping Checklist](PCI_DSS_SCOPING_CHECKLIST.md)
+4. If in scope: engage QSA/ISA for formal scoping determination
+5. Annual re-validation per PCI DSS Requirement 12.5.2
+
 ### **Git & Version Control**
 - [Git Repository Setup](GIT_REPOSITORY_SETUP.md)
 - [Git Setup Guide](GIT_SETUP_GUIDE.md)

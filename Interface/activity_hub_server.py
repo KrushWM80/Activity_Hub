@@ -5,8 +5,21 @@ URL: http://weus42608431466:8088/activity-hub/
 """
 
 import os
+import logging
 import requests
 from flask import Flask, send_from_directory, send_file, abort
+
+# ──────────────────────────────────────────────
+# Logging: metadata only (PCI compliance)
+# Never log request bodies, file contents, or user-submitted text
+# ──────────────────────────────────────────────
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+# Suppress Werkzeug request body dumping in any mode
+logging.getLogger('werkzeug').setLevel(logging.WARNING)
 
 app = Flask(__name__)
 

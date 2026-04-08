@@ -23,6 +23,7 @@
         <div id="create" class="tab-content active">
             <div class="card">
                 <h2>Create New IH Project Record</h2>
+                <p class="pci-notice" style="font-size: 0.8rem; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 1rem;">🔒 Do not enter payment card information in any field.</p>
                 <form id="createForm" class="form-grid">
                     <div class="form-group">
                         <label for="projectId">Project ID *</label>
@@ -204,6 +205,33 @@
         <div id="statusMessage" class="status-message"></div>
     </div>
 
+    <script>
+        // PCI Compliance: PAN Input Prevention
+        function containsPAN(text) {
+            const stripped = text.replace(/[\s\-\.]/g, '');
+            return /\d{13,19}/.test(stripped);
+        }
+        function validateNoPAN(form) {
+            const inputs = (form || document).querySelectorAll('input[type="text"], textarea');
+            for (const input of inputs) {
+                if (containsPAN(input.value)) {
+                    alert('⚠️ Payment card numbers are not permitted in any field.\nPlease remove any card data before submitting.');
+                    input.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+        // Intercept form submissions
+        document.addEventListener('DOMContentLoaded', function() {
+            ['createForm', 'updateForm'].forEach(function(id) {
+                var f = document.getElementById(id);
+                if (f) f.addEventListener('submit', function(e) {
+                    if (!validateNoPAN(f)) e.preventDefault();
+                });
+            });
+        });
+    </script>
     <script src="/activity-hub/static/projects/script.js"></script>
 </body>
 </html>

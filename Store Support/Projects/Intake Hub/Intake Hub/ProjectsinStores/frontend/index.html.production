@@ -1431,7 +1431,7 @@
             filtered.sort((a, b) => {
                 const titleCompare = (a.title || '').localeCompare(b.title || '');
                 if (titleCompare !== 0) return titleCompare;
-                return (a.wm_week || '').localeCompare(b.wm_week || '');
+                return String(a.wm_week || '').localeCompare(String(b.wm_week || ''));
             });
             
             // Only recalculate summary if filters are applied, otherwise use backend summary
@@ -1725,7 +1725,7 @@
             
             // Sort projects by title, then by store
             const sortedProjects = [...projects].sort((a, b) => {
-                const titleCompare = a.title.localeCompare(b.title);
+                const titleCompare = (a.title || '').localeCompare(b.title || '');
                 if (titleCompare !== 0) return titleCompare;
                 return (a.store || 0) - (b.store || 0);
             });

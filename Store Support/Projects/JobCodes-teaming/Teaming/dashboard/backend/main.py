@@ -143,6 +143,63 @@ async def startup_event():
     else:
         print("WARNING: No polaris data loaded")
     
+    # Load and sync Job Code Master (Excel or JSON fallback) to cache
+    master_records = []
+    
+    # First try: Load from Excel (requires openpyxl)
+    try:
+        print(f"Loading Job Code Master from Excel: {JOB_CODE_MASTER_EXCEL}")
+        if os.path.exists(JOB_CODE_MASTER_EXCEL):
+            master_df = pd.read_excel(JOB_CODE_MASTER_EXCEL)
+            master_records = master_df.to_dict('records')
+            print(f"✓ Loaded {len(master_records)} enrichment records from Excel")
+    except Exception as e:
+        print(f"⚠️ Could not load Excel (openpyxl not available or file error): {e}")
+        master_records = []
+    
+    # Second try: Load from JSON fallback (created by convert_excel_to_json.py)
+    if not master_records:
+        json_fallback_path = os.path.join(BASE_DIR, "job_codes_master.json")
+        try:
+            print(f"Attempting JSON fallback: {json_fallback_path}")
+            if os.path.exists(json_fallback_path):
+                with open(json_fallback_path, 'r', encoding='utf-8') as f:
+                    json_data = json.load(f)
+                    master_records = json_data.get('job_codes', [])
+                    print(f"✓ Loaded {len(master_records)} enrichment records from JSON fallback")
+            else:
+                print(f"ℹ JSON fallback not found. Run: python convert_excel_to_json.py")
+        except Exception as e:
+            print(f"⚠️ Could not load JSON fallback: {e}")
+    
+    # Sync all loaded master records to cache
+    if master_records:
+        synced_count = 0
+        for idx, row in enumerate(master_records):
+            # Handle both SMART Job Code and job_code field names
+            job_code = str(row.get('SMART Job Code') or row.get('job_code') or '').strip()
+            if job_code:
+                try:
+                    cache.update_master_data(job_code, {
+                        'workday_code': str(row.get('Workday Job Code', '') or ''),
+                        'category': str(row.get('Category', '') or ''),
+                        'job_family': str(row.get('Job Family', '') or ''),
+                        'pg_level': str(row.get('PG Level', '') or ''),
+                        'supervisor': bool(row.get('Supervisor?') == 'Yes' if row.get('Supervisor?') else False),
+                        'reports_to': str(row.get('Reports to Title', '') or ''),
+                        'position_mgmt': str(row.get('Position Mgmt or Job Mgmt', '') or ''),
+                        'notes': str(row.get('Notes', '') or ''),
+                        'created_by': 'system_startup',
+                        'updated_by': 'system_startup',
+                    })
+                    synced_count += 1
+                except Exception as e:
+                    if idx < 5:  # Only log first 5 errors to avoid spam
+                        print(f"Warning: Failed to sync job code {job_code}: {e}")
+        print(f"✓ Synced {synced_count} job codes from master data to cache")
+    else:
+        print(f"ℹ No master enrichment data loaded (job codes will show without details)")
+    
     # Start background sync thread (will attempt BigQuery every 30 min)
     cache.start_sync_thread(sync_polaris_from_bigquery if HAS_BIGQUERY else None)
     print("Cache initialized and sync thread started")
@@ -821,23 +878,45 @@ async def get_job_codes(request: Request):
                         jc = str(row['job_code']).strip() if pd.notna(row['job_code']) else ""
                         
                         if jc:
-                            # Extract team data safely
-                            teams = row['teamName'] if 'teamName' in row.index and pd.notna(row['teamName']) else []
-                            if not isinstance(teams, list):
-                                teams = [teams] if teams else []
+                            # Extract team data safely - handle lists/arrays from aggregation
+                            if 'teamName' in row.index:
+                                teams = row['teamName']
+                                # Check if it's a list or numpy array
+                                if isinstance(teams, (list, np.ndarray)):
+                                    teams = list(teams) if isinstance(teams, np.ndarray) else teams
+                                elif not pd.isna(teams):
+                                    teams = [teams]
+                                else:
+                                    teams = []
+                            else:
+                                teams = []
                             
-                            team_ids = row['teamId'] if 'teamId' in row.index and pd.notna(row['teamId']) else []
-                            if not isinstance(team_ids, list):
-                                team_ids = [team_ids] if team_ids else []
+                            if 'teamId' in row.index:
+                                team_ids = row['teamId']
+                                if isinstance(team_ids, (list, np.ndarray)):
+                                    team_ids = list(team_ids) if isinstance(team_ids, np.ndarray) else team_ids
+                                elif not pd.isna(team_ids):
+                                    team_ids = [team_ids]
+                                else:
+                                    team_ids = []
+                            else:
+                                team_ids = []
                             
-                            workgroups = row['workgroupName'] if 'workgroupName' in row.index and pd.notna(row['workgroupName']) else []
-                            if not isinstance(workgroups, list):
-                                workgroups = [workgroups] if workgroups else []
+                            if 'workgroupName' in row.index:
+                                workgroups = row['workgroupName']
+                                if isinstance(workgroups, (list, np.ndarray)):
+                                    workgroups = list(workgroups) if isinstance(workgroups, np.ndarray) else workgroups
+                                elif not pd.isna(workgroups):
+                                    workgroups = [workgroups]
+                                else:
+                                    workgroups = []
+                            else:
+                                workgroups = []
                             
                             teaming_map[jc] = {
-                                "teams": teams,
-                                "team_ids": team_ids,
-                                "workgroups": workgroups,
+                                "teams": [to_json_safe(t) for t in teams],
+                                "team_ids": [to_json_safe(t) for t in team_ids],
+                                "workgroups": [to_json_safe(w) for w in workgroups],
                                 "division": to_json_safe(row['divNumber']) if 'divNumber' in row.index else None,
                                 "department": to_json_safe(row['deptNumber']) if 'deptNumber' in row.index else None,
                             }
@@ -1640,9 +1719,32 @@ def save_job_code_requests(requests):
 
 @app.get("/api/job-codes-master")
 async def get_job_codes_master(request: Request):
-    """Get all job codes from cache with master enrichment data"""
+    """Get all job codes from cache with master enrichment data - mapped to frontend field names"""
     user = get_current_user(request)
-    job_codes = cache.get_job_codes()
+    raw_job_codes = cache.get_job_codes()
+    
+    # Transform field names to match frontend expectations
+    job_codes = []
+    for jc in raw_job_codes:
+        transformed = {
+            'SMART Job Code': jc.get('job_code'),  # Map job_code -> SMART Job Code
+            'Job Title': jc.get('job_nm'),          # Map job_nm -> Job Title
+            'Workday Code': jc.get('workday_code', ''),
+            'Category': jc.get('category', ''),
+            'Job Family': jc.get('job_family', ''),
+            'Workgroup': '',  # Not in current schema, placeholder
+            'Team': '',       # Not in current schema, placeholder
+            'PG Level': jc.get('pg_level', ''),
+            'Supervisor?': 'Yes' if jc.get('supervisor') else 'No',
+            'Reports to Title': jc.get('reports_to', ''),
+            'Position Mgmt or Job Mgmt': jc.get('position_mgmt', ''),
+            'Notes': jc.get('notes', ''),
+            'user_count': jc.get('user_count', 0),
+            'created_by': jc.get('created_by', ''),
+            'updated_at': jc.get('updated_at'),
+        }
+        job_codes.append(transformed)
+    
     return {"job_codes": job_codes, "total": len(job_codes)}
 
 @app.get("/api/job-codes/{job_code}")
