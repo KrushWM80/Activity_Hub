@@ -250,6 +250,13 @@ data_manager = VETDataManager(client)
 
 
 # Root route - serve the V.E.T. Dashboard HTML
+@app.route('/favicon.ico')
+def favicon():
+    logo = os.path.join(os.path.dirname(__file__), 'Spark_Blank.png')
+    if os.path.exists(logo):
+        return send_file(logo, mimetype='image/png', max_age=86400)
+    return '', 204
+
 @app.route('/', methods=['GET'])
 @app.route('/VET_Executive_Report', methods=['GET'])
 def show_dashboard():

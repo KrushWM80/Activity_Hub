@@ -134,6 +134,13 @@ data_manager = TDADataManager(client)
 
 # API Routes
 
+@app.route('/favicon.ico')
+def favicon():
+    logo = os.path.join(os.path.dirname(__file__), 'Spark_Blank.png')
+    if os.path.exists(logo):
+        return send_file(logo, mimetype='image/png', max_age=86400)
+    return '', 204
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""

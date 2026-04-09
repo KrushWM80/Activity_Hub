@@ -3221,6 +3221,114 @@
       "user_email": "krush@homeoffice.wal-mart.com",
       "details": "Source: Realty",
       "category": "dashboard_main"
+    },
+    {
+      "id": "3f9bbb60",
+      "timestamp": "2026-04-09 07:38:39",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "8a0db5d3",
+      "timestamp": "2026-04-09 09:04:06",
+      "action": "Applied Filters",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Source: Realty",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "80e5c7d6",
+      "timestamp": "2026-04-09 09:04:40",
+      "action": "Applied Filters",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Source: Operations",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "8cf1bdbf",
+      "timestamp": "2026-04-09 09:08:31",
+      "action": "Applied Filters",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Source: Operations",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "d1886fb5",
+      "timestamp": "2026-04-09 14:03:33",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "a318ac03",
+      "timestamp": "2026-04-09 14:03:34",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "96f53c82",
+      "timestamp": "2026-04-09 14:12:44",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "3a6402fc",
+      "timestamp": "2026-04-09 14:12:45",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "19d27982",
+      "timestamp": "2026-04-09 14:58:16",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "d0ff8732",
+      "timestamp": "2026-04-09 14:58:17",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "78cce3b6",
+      "timestamp": "2026-04-09 15:35:59",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "590312a0",
+      "timestamp": "2026-04-09 15:36:00",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
     }
   ]
 }

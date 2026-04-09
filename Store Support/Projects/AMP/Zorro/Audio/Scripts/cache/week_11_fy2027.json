@@ -1,0 +1,236 @@
+{
+  "week": 11,
+  "fy": 2027,
+  "cached_at": "2026-04-09T14:56:00.368816",
+  "bq_last_updated": "2026-04-09T19:55:02.387000+00:00",
+  "event_count": 26,
+  "review_no_comm_count": 26,
+  "status_breakdown": [
+    {
+      "status": "Review for Publish review - No Comms",
+      "count": 26
+    },
+    {
+      "status": "Review for Publish review - Pending",
+      "count": 6
+    },
+    {
+      "status": "Review for Publish review - Future Send",
+      "count": 3
+    },
+    {
+      "status": "Draft - Pending",
+      "count": 2
+    },
+    {
+      "status": "ATC final review - Pending",
+      "count": 2
+    },
+    {
+      "status": "Denied - Pending",
+      "count": 1
+    },
+    {
+      "status": "Expired - Pending",
+      "count": 1
+    },
+    {
+      "status": "Awaiting ATC Approval - Pending",
+      "count": 1
+    },
+    {
+      "status": "Awaiting Legal Approval - Pending",
+      "count": 1
+    },
+    {
+      "status": "Expired - Future Send",
+      "count": 1
+    }
+  ],
+  "total_excl_denied": 43,
+  "summarized_count": 24,
+  "events_with_summaries": [
+    {
+      "event_id": "461f7bd1-7a3f-4b53-a369-4123816caf7e",
+      "store_area": "Asset Protection",
+      "title": "Identifying the correct Styrofoam type for recycling",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Backroom: Sending the wrong Styrofoam to Used Asset Centers increases costs and risks contaminating recyclable materials. Use a simple bend test at the store \u2013 rigid pieces should be returned, while flexible pieces should be disposed of on site."
+    },
+    {
+      "event_id": "d24bae95-92e9-40e7-9765-e0f93943b098",
+      "store_area": "Auto Care",
+      "title": "Dept. 10: New Oil Filters and Modular Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 10:\u00a0Select stores will receive Ecogard and Premium Guard oil filters for ACC bay use only to improve in-stocks and reduce service delays, with an expanded air and cabin filter modular arriving in week 16."
+    },
+    {
+      "event_id": "db3556e2-2fa4-4590-9052-a1c1f7604c90",
+      "store_area": "Backroom and Claims",
+      "title": "Dept. 46: Glamnetic Nail Care Graphic Audit",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 46:\u00a0A secondary shipment of Glamnetic bullnose graphic kits is on the way to about 600 stores that missed them during the reset. Use the Graphics Store List Lookup Tool, locate and install the kit, and verify items are stocked and tagged to standard."
+    },
+    {
+      "event_id": "e5d1f5de-fa48-4b37-a364-953a0f870d69",
+      "store_area": "Backroom and Claims",
+      "title": "Dept. 95 \\| Oreo Stuf of Legends Removal",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 95 and Backroom: Oreo Stuf of Legends is exiting the assortment. Mondel\u0113z will lead the pull, but stores must confirm all product is removed and credited by April 17.\u00a0Verify all units are cleared, ensure accurate receiving and dispose of product after credit to maintain inventory accuracy and secure store credit."
+    },
+    {
+      "event_id": "e588a104-4d6d-4594-9e91-26e91aad240d",
+      "store_area": "Consumables",
+      "title": "Dept. 13: Air Care - Upcoming Modular Changes (Anderson Support)",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 13: Anderson will support Air Care modular updates in week 12 at Supercenters\u00a0and week 14 at Neighborhood Markets, including item removals, shelf/price tag resets, and discontinued product clearance support."
+    },
+    {
+      "event_id": "a36bd052-eb96-46cb-a42b-b87cfffa9ff6",
+      "store_area": "Entertainment",
+      "title": "Dept. 72: Week 12 Samsung TV Item Swap",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 72: We\u2019ll receive the new 2026 Samsung 55\" TVs in weeks 11 and 12 to support a week 12 modular item swap. The outgoing 2025 55\" model will be marked down for clearance. The new model will be set on the Medium TV modular, including updating the display."
+    },
+    {
+      "event_id": "a1dbc75e-ad72-46a1-9a6c-13abb44e9a4c",
+      "store_area": "Food",
+      "title": "Dept. 92: Fight Hunger. Spark Change. Is Off to a Great Start",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 92: The fight hunger spark change campaign is off to a great start. In the second week of the campaign, stores should focus on keeping the features and seasonal aisle full and maintained."
+    },
+    {
+      "event_id": "8c89d48f-398b-493c-8257-61db1cb2a0fc",
+      "store_area": "Food",
+      "title": "Dept. 92: Item Spotlight \u2013 Nissin Cup Noodles 6-pack Cups",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 92: Nissin Cup Soup 6-pack has a new low price of $2.97 and is a great VPI choice for store associates. The new low price along with the week 10 feature will drive units and increase sales."
+    },
+    {
+      "event_id": "95d72a91-d996-462e-bf4e-55a3ddbac88b",
+      "store_area": "Food",
+      "title": "Dept. 92: The Great American Grill Out \u2013 Celebrating America's Birthday",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 92: To celebrate America's 250th birthday, stores will have a new and improved Grilling Train. Items will include buns, Coca-Cola and Frito Lay chips along with a selection of core condiments. Many of the items are on Rollback and will be a featured through May and June."
+    },
+    {
+      "event_id": "eacefbe3-1a8c-45e2-9deb-155b4b1478df",
+      "store_area": "Food",
+      "title": "Dept. 92: This Is the Year of the Taco",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 92: The year of the taco will kick-off in week 12 with the Tacos, Enchiladas and Salsa modular relay. This set is all about making Walmart the go-to destination for taco night with exclusive items, new innovation and globally inspired products."
+    },
+    {
+      "event_id": "d55da34f-80bd-4d4f-8cd7-e125f0674b83",
+      "store_area": "Food",
+      "title": "Dept. 95: Gatorade Gatorlyte 12oz 6pk Multipack Delay  ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 95: Gatorade is launching a Gatorlyte 12oz, 6-pack multi-pack with Strawberry Kiwi and Orange flavors, but this product will not be available for the week 9 modular relay. The AMP message contains an item swap that stores should execute until the product is available."
+    },
+    {
+      "event_id": "53d254ec-25b1-412e-9bfa-d8666531c653",
+      "store_area": "Food",
+      "title": "Dept. 95: Pepsi 12-Pack and 1.25 Liter Rollbacks",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 95: Pepsi and Mountain Dew branded 12oz, 12-pack cans are going on Rollback for $6, and the 1.25 liter bottles will be on Rollback for $1. Stores should work with their Pepsi representatives to make sure the have proper inventory levels for both the features and side counter."
+    },
+    {
+      "event_id": "68ccb111-23f4-4bfd-a535-f15b767b8588",
+      "store_area": "Food",
+      "title": "Dept. 95: Select Bubly 12oz Cans Will Move to Warehouse Delivery",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 95: Beginning Monday,\u00a0April 13, select Bubly 12oz, 8-pack cans will transition from Pepsi DSD to Walmart warehouse delivery. Walmart will assume full ownership of delivery, merchandising and shelf maintenance for all Bubly 8-pack items."
+    },
+    {
+      "event_id": "750c598a-b443-4728-8e3f-0e44327de777",
+      "store_area": "Food",
+      "title": "Submit Cooler Shelf Depth Measurement",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Departments 80 and 97: Measure cooler shelf depth using only the shelf surface to improve modular execution and availability, then submit results in the Cooler Shelving Size Survey."
+    },
+    {
+      "event_id": "3fb8ac5e-fb63-4acd-9f24-7a6082fe3f99",
+      "store_area": "Fresh",
+      "title": "Dept. 97: Dinner Solutions Supply Interruptions",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "We are experiencing supply issues with select Marketside and Freshness Guaranteed items, including Freshness Guaranteed chilled chicken and Marketside foil bakes, orange chicken, chicken teriyaki, and for some DCs, ultimate and supreme\u00a0pizzas. Recovery is expected over the next two to four weeks. In the interim, fill the empty shelves with adjacent items to fill assortment gaps until items return to full recovery. Check Fresh Weekly Messages each week for updates."
+    },
+    {
+      "event_id": "57c34076-9144-4827-990b-6cf3988970d8",
+      "store_area": "Fresh",
+      "title": "Dept. 98 and 81: Week 11 Bakery and Bread Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Fully reset the Bakery Department back to core assortment, keep it clean and full, and be sure to feature Mini Muffins and 28-count Cookie Box Rollbacks. In Commercial Bread, work through the Buns and Rolls markdowns ahead of the week 13 modular (category 103) and keep tortillas full and priced correctly for upcoming events: Cinco de Mayo (Tuesday, May 5), Memorial Day (Monday, May 25), graduations (late May),\u00a0A250 (Saturday, July 4) and the FIFA World Cup (Thursday, June 11 to Sunday, July 19)."
+    },
+    {
+      "event_id": "ba2de3bd-2241-42d0-a67a-3a9868475bf3",
+      "store_area": "Frontend",
+      "title": "Check It Out: Front End Training for New Associates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "New Front End Training Guides, with exportable checklists, are now available to support Front End associates' growth and success."
+    },
+    {
+      "event_id": "224a933e-820c-4ecb-8b58-cbdced3aceb7",
+      "store_area": "Frontend",
+      "title": "Frontend: Your Front End Operations Resolution Team is Here to Help!",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "The Front End Operations Resolution Team is available to answer store questions about the Front End and Financial Services offered in stores."
+    },
+    {
+      "event_id": "036a2765-c65b-4ca2-bd0b-c0dab7edb9ab",
+      "store_area": "Hardlines",
+      "title": "Dept. 19: Cat. 350 Yarn Changes",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Cat. 350 Yarn Changes: Boye tool inventory is recovering later than planned because of supplier constraints. Some airfreight is expected to arrive in stores in weeks 13-16. Full recovery is now expected by week 20. We will delete 28 items in week 29 as we transition suppliers."
+    },
+    {
+      "event_id": "714a820c-6e7f-4dc0-a9a5-8f63f73211c5",
+      "store_area": "Hardlines",
+      "title": "Dept. 9: Camping Pallet Train Delay",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "The Dept. 9 camping pallet train is delayed, so stores should hold the planned space, avoid ordering extra product, set the feature immediately upon arrival and note rollbacks are extended through July 20."
+    },
+    {
+      "event_id": "8c479081-e571-46f1-83bd-fe1107b3f4c2",
+      "store_area": "Hardlines",
+      "title": "Dept. 9: Turkey Season",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 9: Stock\u00a0Stoeger turkey guns and .410 TSS turkey ammo for customers now, prepare for week 16 clearance and the modular transition, and post online-pickup ammo signage only if your store is activated."
+    },
+    {
+      "event_id": "3af56747-a804-4bca-833c-00acedbc5b74",
+      "store_area": "People",
+      "title": "AI Tip of the Week",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Keep Calm and Ask My Assistant. AI Tip of the Week.\n\nYour days are busy, and it can be easy to forget a task or when something is due. Ask My Assistant to create a weekly and, or monthly checklist to follow. This can help keep you organized and not miss any steps."
+    },
+    {
+      "event_id": "9902f4a3-f0a9-4c21-a6ba-941ecf699992",
+      "store_area": "People",
+      "title": "Update: Attendance Authorization Reason",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Update, Attendance Authorization Reason.\n\nBeginning Saturday, April 18, when managers authorize an exception in the Global Time and Attendance system using Protected Paid Time off, an updated authorization reason will display protected by associate balance, ppto and or sick.\n\nThis update will not change ppto eligibility, accruals or how associates can protect their attendance exceptions. Review the attendance authorize reason guide for more information."
+    },
+    {
+      "event_id": "47d44fb7-7895-4eb7-a07e-6c9d188e44b3",
+      "store_area": "Total Store",
+      "title": "Dept. 56: Watering Guide and Best Practices",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 56:\u00a0Use proper wand and water mat practices and water twice daily using the correct procedure to prevent under- or over-watering that can damage plants."
+    }
+  ],
+  "events_without_summary": [
+    {
+      "event_id": "11b1ae6d-e355-48dc-9419-6283732fe8b5",
+      "title": "Dept. 71: Action Required - Replace Xavier TV Stand",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "50b6d2b8-37ae-4e1e-8b1e-60e89d72efe9",
+      "title": "Home: Mainstays Kids Brand Launch \u2013 Key Updates\u00a0",
+      "area": "Home",
+      "status": "Review for Publish review - No Comms"
+    }
+  ]
+}

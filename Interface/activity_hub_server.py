@@ -90,6 +90,14 @@ def static_for_you(filename):
     return send_from_directory(os.path.join(BASE_DIR, 'For You - Landing Page'), filename)
 
 
+@app.route('/favicon.ico')
+def favicon():
+    logo = os.path.join(BASE_DIR, 'Spark_Blank.png')
+    if os.path.exists(logo):
+        return send_file(logo, mimetype='image/png', max_age=86400)
+    return '', 204
+
+
 @app.route('/activity-hub/static/projects/<path:filename>')
 def static_projects(filename):
     """CSS/JS for Projects pages."""

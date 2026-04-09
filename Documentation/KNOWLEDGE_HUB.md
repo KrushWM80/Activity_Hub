@@ -393,6 +393,39 @@ Win + X → Terminal (Admin)
 
 **Step 6** — Update the service table in this file (`KNOWLEDGE_HUB.md` → Active Services table) with the new port and URL.
 
+**Step 7** — Add the Spark favicon (two-part requirement — both are mandatory):
+
+*Part A — HTML `<head>` tag* (in **every** HTML file served by the service):
+```html
+<link rel="icon" type="image/png" href="/Spark_Blank.png">
+```
+Place immediately after `<meta name="viewport" ...>`.
+
+*Part B — Server route* (in the Python server file):
+
+**FastAPI:**
+```python
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    logo = Path(__file__).parent / "Spark_Blank.png"
+    if logo.exists():
+        return FileResponse(str(logo), media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
+    from fastapi.responses import Response
+    return Response(status_code=204)
+```
+
+**Flask:**
+```python
+@app.route('/favicon.ico')
+def favicon():
+    logo = os.path.join(os.path.dirname(__file__), 'Spark_Blank.png')
+    if os.path.exists(logo):
+        return send_file(logo, mimetype='image/png', max_age=86400)
+    return '', 204
+```
+
+*File placement:* Copy `Spark_Blank.png` from `Store Support\General Setup\Design\Spark Blank.png` to the server's root directory (same folder as the server `.py` file, or the `frontend/` folder for services that serve HTML from a subdirectory). Chrome accepts PNG favicons — no `.ico` file required.
+
 ---
 
 ### Adding a New Email Report

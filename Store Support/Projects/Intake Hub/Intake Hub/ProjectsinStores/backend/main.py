@@ -423,6 +423,23 @@ async def spark_logo():
         return FileResponse(logo_path, media_type="image/png")
     raise HTTPException(status_code=404, detail="Logo not found")
 
+@app.get("/Spark_Blank.png")
+async def spark_blank_png():
+    """Serve Spark favicon PNG"""
+    logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "Spark_Blank.png")
+    if os.path.exists(logo_path):
+        return FileResponse(logo_path, media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
+    raise HTTPException(status_code=404, detail="Logo not found")
+
+@app.get("/favicon.ico")
+async def favicon():
+    """Serve favicon"""
+    logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "Spark_Blank.png")
+    if os.path.exists(logo_path):
+        return FileResponse(logo_path, media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
+    from fastapi.responses import Response
+    return Response(status_code=204)
+
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint"""

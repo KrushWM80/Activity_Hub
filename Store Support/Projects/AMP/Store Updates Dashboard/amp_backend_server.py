@@ -93,6 +93,14 @@ def serve_logo():
         logger.error(f"Error serving logo: {e}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/favicon.ico', methods=['GET'])
+def favicon():
+    """Serve Spark favicon"""
+    logo_path = Path(__file__).parent / 'Spark_Blank.png'
+    if logo_path.exists():
+        return send_file(logo_path, mimetype='image/png', max_age=86400)
+    return '', 204
+
 
 @app.route('/api/amp-data', methods=['GET'])
 def get_amp_data():

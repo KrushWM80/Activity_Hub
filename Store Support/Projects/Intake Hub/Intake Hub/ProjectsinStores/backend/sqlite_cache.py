@@ -813,7 +813,7 @@ This is an automated alert. Do not reply to this email.
         conn = self._get_connection()
         cursor = conn.cursor()
         
-        # Build WHERE clause
+        # Build WHERE clause - EXCLUDE project_source, handle separately for UNION
         conditions = ["1=1"]
         params = []
         
@@ -839,9 +839,7 @@ This is an automated alert. Do not reply to this email.
             if filters.get('wm_week'):
                 conditions.append("wm_week = ?")
                 params.append(filters['wm_week'])
-            if filters.get('project_source'):
-                conditions.append("project_source = ?")
-                params.append(filters['project_source'])
+            # NOTE: project_source is handled separately below for UNION, not here
             if filters.get('owner'):
                 conditions.append("owner = ?")
                 params.append(filters['owner'])
@@ -881,40 +879,195 @@ This is an automated alert. Do not reply to this email.
         
         where_clause = " AND ".join(conditions)
         
-        # Build query: get unique projects, not distinct rows
-        # For proper deduplication, we need to:
-        # - For Operations: GROUP BY project_id (unique project identifier)
-        # - For Realty: GROUP BY title (since Realty uses title as unique project ID)
-        # Using MIN() aggregate to get one row per project with consistent metadata
-        query = f"""
-            SELECT 
-                project_id, 
-                MIN(intake_card) as intake_card, 
-                MIN(title) as title, 
-                project_source, 
-                MIN(division) as division, 
-                MIN(region) as region,
-                MIN(market) as market, 
-                MIN(store) as store, 
-                MIN(facility) as facility, 
-                MIN(phase) as phase, 
-                MIN(wm_week) as wm_week, 
-                MIN(fy) as fy, 
-                MIN(status) as status,
-                MIN(owner) as owner, 
-                MIN(partner) as partner, 
-                MIN(store_area) as store_area, 
-                MIN(business_area) as business_area, 
-                MIN(health) as health,
-                MIN(business_type) as business_type, 
-                MIN(associate_impact) as associate_impact, 
-                MIN(customer_impact) as customer_impact, 
-                MAX(last_updated) as last_updated
-            FROM projects
-            WHERE {where_clause}
-            GROUP BY project_id, project_source
-            ORDER BY title, wm_week
-        """
+        # Handle project_source filter separately - it's hardcoded into ops_where/realty_where, not in params
+        # CRITICAL: Operations and Realty use different unique identifiers:
+        # - Operations: GROUP BY project_id (unique project identifier)  
+        # - Realty: GROUP BY title (since there are 3,714 facility codes but only 239 unique projects)
+        
+        # If user filtered by a specific source, only query that source
+        project_source_filter = filters.get('project_source') if filters else None
+        
+        if project_source_filter == 'Realty':
+            # Only get Realty projects
+            query = f"""
+                SELECT 
+                    MIN(project_id) as project_id, 
+                    MIN(intake_card) as intake_card, 
+                    title, 
+                    project_source, 
+                    MIN(division) as division, 
+                    MIN(region) as region,
+                    MIN(market) as market, 
+                    MIN(store) as store, 
+                    MIN(facility) as facility, 
+                    MIN(phase) as phase, 
+                    MIN(wm_week) as wm_week, 
+                    MIN(fy) as fy, 
+                    MIN(status) as status,
+                    MIN(owner) as owner, 
+                    MIN(partner) as partner, 
+                    MIN(store_area) as store_area, 
+                    MIN(business_area) as business_area, 
+                    MIN(health) as health,
+                    MIN(business_type) as business_type, 
+                    MIN(associate_impact) as associate_impact, 
+                    MIN(customer_impact) as customer_impact, 
+                    MAX(last_updated) as last_updated
+                FROM projects
+                WHERE {where_clause} AND project_source = 'Realty'
+                GROUP BY title, project_source
+                ORDER BY title, wm_week
+            """
+        elif project_source_filter == 'Operations':
+            # Only get Operations projects
+            query = f"""
+                SELECT 
+                    project_id, 
+                    MIN(intake_card) as intake_card, 
+                    MIN(title) as title, 
+                    project_source, 
+                    MIN(division) as division, 
+                    MIN(region) as region,
+                    MIN(market) as market, 
+                    MIN(store) as store, 
+                    MIN(facility) as facility, 
+                    MIN(phase) as phase, 
+                    MIN(wm_week) as wm_week, 
+                    MIN(fy) as fy, 
+                    MIN(status) as status,
+                    MIN(owner) as owner, 
+                    MIN(partner) as partner, 
+                    MIN(store_area) as store_area, 
+                    MIN(business_area) as business_area, 
+                    MIN(health) as health,
+                    MIN(business_type) as business_type, 
+                    MIN(associate_impact) as associate_impact, 
+                    MIN(customer_impact) as customer_impact, 
+                    MAX(last_updated) as last_updated
+                FROM projects
+                WHERE {where_clause} AND project_source IN ('Operations', 'Intake Hub')
+                GROUP BY project_id, project_source
+                ORDER BY title, wm_week
+            """
+        else:
+            # Get both Operations and Realty with UNION ALL
+            # Operations: unique by (project_id, project_source)
+            ops_query = f"""
+                SELECT 
+                    project_id, 
+                    MIN(intake_card) as intake_card, 
+                    MIN(title) as title, 
+                    project_source, 
+                    MIN(division) as division, 
+                    MIN(region) as region,
+                    MIN(market) as market, 
+                    MIN(store) as store, 
+                    MIN(facility) as facility, 
+                    MIN(phase) as phase, 
+                    MIN(wm_week) as wm_week, 
+                    MIN(fy) as fy, 
+                    MIN(status) as status,
+                    MIN(owner) as owner, 
+                    MIN(partner) as partner, 
+                    MIN(store_area) as store_area, 
+                    MIN(business_area) as business_area, 
+                    MIN(health) as health,
+                    MIN(business_type) as business_type, 
+                    MIN(associate_impact) as associate_impact, 
+                    MIN(customer_impact) as customer_impact, 
+                    MAX(last_updated) as last_updated
+                FROM projects
+                WHERE {where_clause} AND project_source IN ('Operations', 'Intake Hub')
+                GROUP BY project_id, project_source
+            """
+            
+            # Realty: unique by (title, project_source) since Realty has 3,714 facility codes but only 239 projects
+            realty_query = f"""
+                SELECT 
+                    MIN(project_id) as project_id, 
+                    MIN(intake_card) as intake_card, 
+                    title, 
+                    project_source, 
+                    MIN(division) as division, 
+                    MIN(region) as region,
+                    MIN(market) as market, 
+                    MIN(store) as store, 
+                    MIN(facility) as facility, 
+                    MIN(phase) as phase, 
+                    MIN(wm_week) as wm_week, 
+                    MIN(fy) as fy, 
+                    MIN(status) as status,
+                    MIN(owner) as owner, 
+                    MIN(partner) as partner, 
+                    MIN(store_area) as store_area, 
+                    MIN(business_area) as business_area, 
+                    MIN(health) as health,
+                    MIN(business_type) as business_type, 
+                    MIN(associate_impact) as associate_impact, 
+                    MIN(customer_impact) as customer_impact, 
+                    MAX(last_updated) as last_updated
+                FROM projects
+                WHERE {where_clause} AND project_source = 'Realty'
+                GROUP BY title, project_source
+            """
+            
+            # Combine both queries with UNION ALL (no ORDER BY in subqueries for SQLite)
+            query = f"""
+                SELECT 
+                    project_id, 
+                    MIN(intake_card) as intake_card, 
+                    MIN(title) as title, 
+                    project_source, 
+                    MIN(division) as division, 
+                    MIN(region) as region,
+                    MIN(market) as market, 
+                    MIN(store) as store, 
+                    MIN(facility) as facility, 
+                    MIN(phase) as phase, 
+                    MIN(wm_week) as wm_week, 
+                    MIN(fy) as fy, 
+                    MIN(status) as status,
+                    MIN(owner) as owner, 
+                    MIN(partner) as partner, 
+                    MIN(store_area) as store_area, 
+                    MIN(business_area) as business_area, 
+                    MIN(health) as health,
+                    MIN(business_type) as business_type, 
+                    MIN(associate_impact) as associate_impact, 
+                    MIN(customer_impact) as customer_impact, 
+                    MAX(last_updated) as last_updated
+                FROM projects
+                WHERE {where_clause} AND project_source IN ('Operations', 'Intake Hub')
+                GROUP BY project_id, project_source
+                UNION ALL
+                SELECT 
+                    MIN(project_id) as project_id, 
+                    MIN(intake_card) as intake_card, 
+                    title, 
+                    project_source, 
+                    MIN(division) as division, 
+                    MIN(region) as region,
+                    MIN(market) as market, 
+                    MIN(store) as store, 
+                    MIN(facility) as facility, 
+                    MIN(phase) as phase, 
+                    MIN(wm_week) as wm_week, 
+                    MIN(fy) as fy, 
+                    MIN(status) as status,
+                    MIN(owner) as owner, 
+                    MIN(partner) as partner, 
+                    MIN(store_area) as store_area, 
+                    MIN(business_area) as business_area, 
+                    MIN(health) as health,
+                    MIN(business_type) as business_type, 
+                    MIN(associate_impact) as associate_impact, 
+                    MIN(customer_impact) as customer_impact, 
+                    MAX(last_updated) as last_updated
+                FROM projects
+                WHERE {where_clause} AND project_source = 'Realty'
+                GROUP BY title, project_source
+                ORDER BY title, wm_week
+            """
         
         if limit:
             query += f" LIMIT {limit}"

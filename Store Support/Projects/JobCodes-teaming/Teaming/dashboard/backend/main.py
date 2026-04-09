@@ -2071,9 +2071,9 @@ if os.path.exists(FRONTEND_PATH):
 @app.get("/favicon.ico")
 async def favicon():
     """Serve favicon"""
-    favicon_path = os.path.join(FRONTEND_PATH, "favicon.ico")
+    favicon_path = os.path.join(FRONTEND_PATH, "Spark_Blank.png")
     if os.path.exists(favicon_path):
-        return FileResponse(favicon_path, media_type="image/x-icon")
+        return FileResponse(favicon_path, media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
     return FileResponse(os.path.join(FRONTEND_PATH, "index.html"), media_type="text/html")
 
 @app.get("/static/{full_path:path}")

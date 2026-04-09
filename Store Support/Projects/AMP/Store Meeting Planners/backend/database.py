@@ -19,6 +19,7 @@ REQUEST_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.store_meeting_request_data`"
 CAL_DIM_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.Cal_Dim_Data`"
 STORE_CUR_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.Store_Cur_Data`"
 COSMOS_TABLE = "`wmt-edw-prod.WW_SOA_DL_VM.STORE_OPS_APPLN_ACTV_MGMT_PLAN_MSG_EVENT`"
+NOTIFICATION_LOG_TABLE = f"`{PROJECT_ID}.{DATASET_ID}.meeting_planner_notification_log`"
 
 # msg_type_nm mapping in AMP2 Data (raw Cosmos)
 # 0 = Calendar Events, 1 = Store Updates
@@ -74,9 +75,15 @@ class DatabaseService:
     def __init__(self):
         self.client = None
         self._amp_table_status = None  # None=unchecked, 'primary', 'fallback'
+        self._last_connect_attempt = None  # back-off: don't retry more than once/minute
         self._connect()
 
     def _connect(self):
+        # Back-off: skip reconnect if we already tried within the last 60 seconds
+        now = datetime.utcnow()
+        if self._last_connect_attempt and (now - self._last_connect_attempt).total_seconds() < 60:
+            return
+        self._last_connect_attempt = now
         try:
             creds_path = os.getenv(
                 "GOOGLE_APPLICATION_CREDENTIALS",
@@ -88,9 +95,31 @@ class DatabaseService:
             # Quick connectivity check
             list(self.client.query("SELECT 1").result())
             print(f"[DB] Connected to BigQuery project: {PROJECT_ID}")
+            self._last_connect_attempt = None  # reset on success
+            self._ensure_notification_log_table()
         except Exception as e:
             print(f"[DB] BigQuery connection error: {e}")
             self.client = None
+
+    def _ensure_notification_log_table(self):
+        """Create the notification log table if it doesn't exist."""
+        try:
+            create_sql = f"""
+                CREATE TABLE IF NOT EXISTS {NOTIFICATION_LOG_TABLE} (
+                    ID STRING,
+                    Notification_Type STRING,
+                    Recipient STRING,
+                    Subject STRING,
+                    Details STRING,
+                    Request_ID STRING,
+                    Sent_By STRING,
+                    Sent_At STRING,
+                    Status STRING
+                )
+            """
+            self.client.query(create_sql).result()
+        except Exception as e:
+            print(f"[DB] Notification log table check: {e}")
 
     def is_connected(self) -> bool:
         if not self.client:
@@ -174,7 +203,7 @@ class DatabaseService:
                     MAX(Web_Preview) as preview_url
                 FROM {AMP_TABLE}
                 WHERE Message_Type = 'Calendar Events'
-                  AND Message_Status IN ({AMP_ACTIVE_STATUSES})
+                  AND Message_Status = 'Review for Publish review - No Comms'
                   AND Start_Date <= @end_date
                   AND End_Date >= @start_date
                 GROUP BY Activity_Title, Start_Date, End_Date
@@ -207,9 +236,67 @@ class DatabaseService:
             bigquery.ScalarQueryParameter("end_date", "DATE", end_date),
         ]
         rows = self._run_query(query, params)
+        # Known single-day holidays/events: pin to actual date, not full WM week
+        _SINGLE_DAY_HOLIDAYS = {
+            "mother's day": "sunday",  # 2nd Sunday of May
+            "mothers day": "sunday",
+            "father's day": "sunday",  # 3rd Sunday of June
+            "fathers day": "sunday",
+            "memorial day": "monday",  # last Monday of May
+            "labor day": "monday",     # 1st Monday of September
+            "independence day": "2",   # July 4 (day-of-month)
+            "july 4th": "2",
+            "4th of july": "2",
+            "thanksgiving": "thursday",# 4th Thursday of November
+            "black friday": "friday",
+            "christmas": "3",          # Dec 25 (day-of-month)
+            "new year": "0",           # Jan 1 / Dec 31 (day-of-month 1)
+            "easter": "sunday",
+            "valentine's day": "2",    # Feb 14
+            "valentines day": "2",
+            "halloween": "2",          # Oct 31
+            "veterans day": "2",       # Nov 11
+        }
+        import calendar as _cal
         for row in rows:
             title = (row.get("title") or "").lower()
             row["is_protected_week"] = "protected week" in title
+            # Check if this is a single-day holiday spanning a full week
+            sd = row.get("start_date")
+            ed = row.get("end_date")
+            if sd and ed:
+                sd_str = str(sd)[:10]
+                ed_str = str(ed)[:10]
+                try:
+                    sd_dt = datetime.strptime(sd_str, "%Y-%m-%d").date()
+                    ed_dt = datetime.strptime(ed_str, "%Y-%m-%d").date()
+                except Exception:
+                    continue
+                span = (ed_dt - sd_dt).days
+                if span >= 5:  # Only adjust events that span 5+ days
+                    for keyword, rule in _SINGLE_DAY_HOLIDAYS.items():
+                        if keyword in title:
+                            # Find the actual day within this date range
+                            pin_date = None
+                            if rule in ("sunday", "monday", "tuesday", "wednesday",
+                                        "thursday", "friday", "saturday"):
+                                day_map = {"monday": 0, "tuesday": 1, "wednesday": 2,
+                                           "thursday": 3, "friday": 4, "saturday": 5, "sunday": 6}
+                                target_wd = day_map[rule]
+                                d = sd_dt
+                                while d <= ed_dt:
+                                    if d.weekday() == target_wd:
+                                        pin_date = d
+                                        break
+                                    d += timedelta(days=1)
+                            else:
+                                # rule is a day-of-month indicator; just keep as-is
+                                # For holidays like July 4th, find the specific date in range
+                                pass
+                            if pin_date:
+                                row["start_date"] = pin_date.isoformat()
+                                row["end_date"] = pin_date.isoformat()
+                            break
         return rows
 
     def get_protected_weeks(self, fiscal_year: int) -> list:
@@ -651,6 +738,40 @@ class DatabaseService:
         self._run_query(query, params)
         return {"id": request_id, "updated": True}
 
+    def log_notification(self, notification_type: str, recipient: str, subject: str,
+                         details: str = "", request_id: str = "", sent_by: str = "") -> None:
+        """Log a notification to the Activity Hub Notification Log table."""
+        try:
+            log_id = str(uuid.uuid4())
+            table_ref = f"{PROJECT_ID}.{DATASET_ID}.meeting_planner_notification_log"
+            row = {
+                "ID": log_id,
+                "Notification_Type": notification_type,
+                "Recipient": recipient,
+                "Subject": subject,
+                "Details": details,
+                "Request_ID": request_id,
+                "Sent_By": sent_by,
+                "Sent_At": datetime.utcnow().isoformat(),
+                "Status": "Sent",
+            }
+            errors = self.client.insert_rows_json(table_ref, [row])
+            if errors:
+                print(f"[Notification Log] Insert errors: {errors}")
+        except Exception as e:
+            print(f"[Notification Log] Error logging notification: {e}")
+
+    def get_request_by_id(self, request_id: str) -> dict:
+        """Get a single request by ID."""
+        query = f"""
+            SELECT ID, Title, Name, Email, Status, `AMP Activity URL` as AMP_Activity_URL
+            FROM {REQUEST_TABLE}
+            WHERE ID = @request_id
+        """
+        params = [bigquery.ScalarQueryParameter("request_id", "STRING", request_id)]
+        rows = self._run_query(query, params)
+        return rows[0] if rows else {}
+
     def complete_pending_request(self, request_id: str, updates: dict, user_email: str) -> dict:
         """User completes missing fields on a Pending request."""
         set_clauses = ["Modified = @modified", "`Modified By` = @user_email"]
@@ -1006,13 +1127,17 @@ class DatabaseService:
 
             expanded_rows.append(row)
 
-        # Sort expanded rows: fiscal year DESC, wm_week DESC, date ASC
+        # Sort expanded rows: Type ASC, Day (date) ASC, Highest Store Count DESC
+        _day_order = {"saturday": 0, "sunday": 1, "monday": 2, "tuesday": 3,
+                      "wednesday": 4, "thursday": 5, "friday": 6}
         def sort_key(r):
-            fy = r.get("fiscal_year") or 0
-            wk = r.get("wm_week") or 0
+            typ = (r.get("type_of_meeting") or "").lower()
             d = str(r.get("date") or "")[:10]
-            t = r.get("time") or ""
-            return (-fy, -wk, d, t)
+            day_name = (r.get("day") or "").lower()
+            day_idx = _day_order.get(day_name, 99)
+            sc = r.get("store_count")
+            store_val = -(sc if sc is not None and isinstance(sc, (int, float)) else 0)
+            return (typ, d, day_idx, store_val)
         expanded_rows.sort(key=sort_key)
 
         # Remove end_date_raw from output
@@ -1068,8 +1193,20 @@ class DatabaseService:
     # content that lack a Meeting Planner request
     # -------------------------------------------------
 
-    def scan_compliance_gaps(self) -> dict:
-        """Scan AMP Store Updates for meetings missing from Meeting Planner."""
+    def scan_compliance_gaps(self, scan_start: str = None, scan_end: str = None) -> dict:
+        """Scan AMP Store Updates for meetings missing from Meeting Planner.
+        Default: current WM week start (last Saturday) through future events."""
+        # Default timeframe: current week start (Saturday) through +6 months future
+        if not scan_start:
+            today = date.today()
+            # Find the most recent Saturday (WM week start)
+            days_since_sat = (today.weekday() + 2) % 7  # Saturday = 5
+            current_week_start = today - timedelta(days=days_since_sat)
+            scan_start = current_week_start.isoformat()
+        if not scan_end:
+            scan_end_dt = date.today() + timedelta(days=180)
+            scan_end = scan_end_dt.isoformat()
+
         source = self._check_amp_table()
         # Step 1: Get distinct AMP events (Store Updates + Calendar Events)
         if source == 'primary':
@@ -1085,7 +1222,8 @@ class DatabaseService:
                     CAST(a.End_Date AS STRING) AS End_Date,
                     a.Business_Area
                 FROM {AMP_TABLE} a
-                WHERE a.Start_Date >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+                WHERE a.Start_Date >= @scan_start
+                  AND a.Start_Date <= @scan_end
                   AND a.Message_Type IN ('Store Updates', 'Calendar Events')
                   AND a.Message_Status IN ({AMP_ACTIVE_STATUSES})
                   AND a.event_id IS NOT NULL
@@ -1103,12 +1241,17 @@ class DatabaseService:
                     CAST(a.msg_end_dt AS STRING) AS End_Date,
                     a.bus_domain_nm AS Business_Area
                 FROM {AMP_RAW_TABLE} a
-                WHERE a.msg_start_dt >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+                WHERE a.msg_start_dt >= @scan_start
+                  AND a.msg_start_dt <= @scan_end
                   AND a.msg_type_nm IN ('0', '1')
                   AND a.msg_leg_status_nm IN ('APPROVED', 'REQUESTED')
                   AND a.event_id IS NOT NULL
             """
-        events = self._run_query(q_events)
+        scan_params = [
+            bigquery.ScalarQueryParameter("scan_start", "DATE", scan_start),
+            bigquery.ScalarQueryParameter("scan_end", "DATE", scan_end),
+        ]
+        events = self._run_query(q_events, scan_params)
         event_map = {}
         for e in events:
             eid = e.get("event_id")
@@ -1209,15 +1352,20 @@ class DatabaseService:
                     "body_preview": f"[Title match] {title}",
                 })
 
-        # Step 4: Exclude events already tracked in Meeting Planner
-        # Match by title (fuzzy) and by AMP Activity URL (event_id in URL)
+        # Step 4: Check events against Request Queue and Meeting Tracker Report
+        # Exact match by AMP URL/event_id = exclude entirely (already tracked)
+        # Similar title or same author+timeframe = downgrade to MEDIUM
         q_existing = f"""
             SELECT DISTINCT LOWER(TRIM(Title)) as title_lower,
-                   `AMP Activity URL` as amp_url
+                   `AMP Activity URL` as amp_url,
+                   LOWER(TRIM(Email)) as author_email_lower,
+                   CAST(`Start Date` AS STRING) as start_date,
+                   CAST(`End Date` AS STRING) as end_date
             FROM {REQUEST_TABLE}
         """
         existing_titles = set()
         existing_event_ids = set()
+        existing_author_dates = set()  # (author_email, start_date_prefix)
         for r in self._run_query(q_existing):
             t = r.get("title_lower")
             if t:
@@ -1227,20 +1375,33 @@ class DatabaseService:
             eid_match = re.search(r'/(message|preview)/([a-f0-9-]{36})/', url)
             if eid_match:
                 existing_event_ids.add(eid_match.group(2))
+            # Track author + date window for fuzzy match
+            auth_email = r.get("author_email_lower") or ""
+            sd = str(r.get("start_date") or "")[:10]
+            if auth_email and sd:
+                existing_author_dates.add((auth_email, sd[:7]))  # author + YYYY-MM
 
         missing = []
         for f in flagged:
-            # Check if event_id is already tracked via AMP URL
+            # Check if event_id is already tracked via AMP URL — skip entirely
             if f["event_id"] in existing_event_ids:
                 continue
             # Check title fuzzy match
             title_l = f["title"].strip().lower()
-            tracked = any(
+            title_tracked = any(
                 title_l in et or et in title_l
                 for et in existing_titles
             )
-            if not tracked:
-                missing.append(f)
+            # Check same author + similar timeframe
+            f_author = (f.get("author") or "").strip().lower()
+            f_start_month = str(f.get("start_date") or "")[:7]
+            author_date_match = (f_author, f_start_month) in existing_author_dates if f_author and f_start_month else False
+
+            if title_tracked or author_date_match:
+                # Downgrade confidence to MEDIUM instead of excluding
+                f["confidence"] = "MEDIUM"
+                f["matched_patterns"].append("[Similar title or author+timeframe in Request Queue]")
+            missing.append(f)
 
         return {
             "flagged": missing,
@@ -1248,4 +1409,6 @@ class DatabaseService:
             "total_with_bodies": len(body_map),
             "total_flagged_before_filter": len(flagged),
             "scan_date": datetime.utcnow().isoformat(),
+            "scan_start": scan_start,
+            "scan_end": scan_end,
         }

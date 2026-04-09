@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/Spark_Blank.png">
     <title>Store Meeting Planner | Activity Hub</title>
     <style>
         /* ================================= */
@@ -593,6 +594,27 @@
 <body>
 
 <!-- ======================================= -->
+<!-- LOGIN MODAL                             -->
+<!-- ======================================= -->
+<div id="loginOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:12px;padding:2rem;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);text-align:center;">
+        <div style="margin-bottom:1.5rem;">
+            <img src="/StoreMeetingPlanner/static/spark.png" alt="Walmart Spark" style="width:48px;height:48px;margin-bottom:0.5rem;">
+            <h2 style="margin:0;color:var(--walmart-blue);font-size:1.3rem;">Store Meeting Planner</h2>
+            <p style="margin:0.5rem 0 0;color:var(--gray-500);font-size:0.85rem;">Enter your Windows username to continue</p>
+        </div>
+        <div style="text-align:left;margin-bottom:1rem;">
+            <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:4px;">Windows Username</label>
+            <input type="text" id="loginUsername" placeholder="e.g. jsmith" autocomplete="username"
+                   style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:1rem;box-sizing:border-box;"
+                   onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div id="loginError" style="color:#dc3545;font-size:0.85rem;margin-bottom:0.75rem;display:none;"></div>
+        <button onclick="doLogin()" style="width:100%;padding:10px;background:var(--walmart-blue);color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:600;cursor:pointer;">Sign In</button>
+    </div>
+</div>
+
+<!-- ======================================= -->
 <!-- HEADER                                  -->
 <!-- ======================================= -->
 <header class="header">
@@ -605,6 +627,7 @@
     <div class="header-right">
         <span id="userDisplay" class="user-badge">Loading...</span>
         <span id="adminBadge" class="admin-badge" style="display:none">ADMIN</span>
+        <button id="logoutBtn" onclick="doLogout()" style="display:none;background:none;border:1px solid var(--gray-300);border-radius:4px;padding:2px 8px;font-size:0.75rem;color:var(--gray-500);cursor:pointer;">Logout</button>
     </div>
 </header>
 
@@ -724,6 +747,7 @@
                         <th>Type</th>
                         <th>Status</th>
                         <th>Source</th>
+                        <th>AMP</th>
                     </tr>
                 </thead>
                 <tbody id="adminRequestsBody"></tbody>
@@ -756,9 +780,18 @@
                 <button class="btn btn-primary btn-sm" onclick="runComplianceScan()" id="complianceScanBtn">🔍 Run Scan</button>
             </div>
             <p style="color:#666;font-size:0.85rem;margin-bottom:1rem;">
-                Scans AMP Store Updates &amp; Calendar Events from the last 6 months for meeting content
-                (Meeting IDs, Passcodes, Zoom/Teams links) that wasn't submitted through Meeting Planner.
+                Scans AMP Store Updates &amp; Calendar Events for meeting content
+                (Meeting IDs, Passcodes, Zoom/Teams links) not submitted through Meeting Planner.
+                Default: Current week and future. Events already in Request Queue (by AMP URL/Event ID)
+                are excluded; similar title or same author+timeframe are marked MEDIUM.
             </p>
+            <div class="filters-bar" style="margin-bottom:1rem;">
+                <label style="font-size:0.85rem;font-weight:600">Scan From:</label>
+                <input type="date" id="complianceScanStart" style="padding:4px 8px;border:1px solid #ddd;border-radius:4px">
+                <label style="font-size:0.85rem;font-weight:600">To:</label>
+                <input type="date" id="complianceScanEnd" style="padding:4px 8px;border:1px solid #ddd;border-radius:4px">
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('complianceScanStart').value='';document.getElementById('complianceScanEnd').value='';">Reset to Default</button>
+            </div>
             <div id="complianceLoading" style="display:none"><div class="spinner"></div><p style="text-align:center;color:#666">Scanning Cosmos message bodies...</p></div>
             <div id="complianceResults"></div>
         </div>
@@ -907,25 +940,85 @@ let calendarData = { events: [], slots: [] };
 // INIT
 // =============================================
 async function init() {
-    await loadUser();
+    const loggedIn = await loadUser();
     setupTabs();
-    renderCalendar();
-    loadCalendarData();
-    loadMyRequests();
+    if (loggedIn) {
+        renderCalendar();
+        loadCalendarData();
+        loadMyRequests();
+    }
 }
 
 async function loadUser() {
     try {
         const res = await fetch(API + '/api/user');
         currentUser = await res.json();
+        if (!currentUser.logged_in) {
+            // Not logged in — show login modal
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('userDisplay').textContent = 'Not signed in';
+            document.getElementById('loginUsername').focus();
+            return false;
+        }
+        document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('userDisplay').textContent = currentUser.email || currentUser.username;
+        document.getElementById('logoutBtn').style.display = '';
         if (currentUser.is_admin) {
             document.getElementById('adminBadge').style.display = '';
             document.getElementById('adminTab').classList.remove('hidden');
+        } else {
+            document.getElementById('adminBadge').style.display = 'none';
+            document.getElementById('adminTab').classList.add('hidden');
         }
+        return true;
     } catch (e) {
         document.getElementById('userDisplay').textContent = 'Not connected';
+        return false;
     }
+}
+
+async function doLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const errorEl = document.getElementById('loginError');
+    if (!username || username.length < 2) {
+        errorEl.textContent = 'Please enter your Windows username (e.g. jsmith)';
+        errorEl.style.display = '';
+        return;
+    }
+    try {
+        const res = await fetch(API + '/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username }),
+        });
+        if (res.ok) {
+            errorEl.style.display = 'none';
+            const loggedIn = await loadUser();
+            if (loggedIn) {
+                loadCalendarData();
+                loadMyRequests();
+            }
+        } else {
+            const data = await res.json();
+            errorEl.textContent = data.detail || 'Login failed';
+            errorEl.style.display = '';
+        }
+    } catch (e) {
+        errorEl.textContent = 'Network error — is the server running?';
+        errorEl.style.display = '';
+    }
+}
+
+async function doLogout() {
+    await fetch(API + '/api/logout', { method: 'POST' });
+    currentUser = {};
+    document.getElementById('adminBadge').style.display = 'none';
+    document.getElementById('adminTab').classList.add('hidden');
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('userDisplay').textContent = 'Not signed in';
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginUsername').focus();
 }
 
 // =============================================
@@ -1037,7 +1130,12 @@ function renderCalendar() {
                     inner += '<div style="margin-top:2px">';
                     dayEvents.slice(0, 3).forEach(ev => {
                         const labelClass = ev.is_protected_week ? 'event-label protected-label' : 'event-label';
-                        inner += `<span class="${labelClass}" title="${esc(ev.title || '')}">${esc(ev.title || 'Event')}</span>`;
+                        if (ev.event_id) {
+                            const ampUrl = `https://amp2-cms.prod.walmart.com/message/${ev.event_id}/10/2027`;
+                            inner += `<a href="${ampUrl}" target="_blank" onclick="event.stopPropagation()" style="text-decoration:none"><span class="${labelClass}" title="${esc(ev.title || '')} — Click to view in AMP">${esc(ev.title || 'Event')}</span></a>`;
+                        } else {
+                            inner += `<span class="${labelClass}" title="${esc(ev.title || '')}">${esc(ev.title || 'Event')}</span>`;
+                        }
                     });
                     if (dayEvents.length > 3) inner += `<span style="font-size:0.6rem;color:var(--gray-500)">+${dayEvents.length - 3} more</span>`;
                     inner += '</div>';
@@ -1219,6 +1317,7 @@ async function loadAdminRequests() {
                 <td>${esc(r.Meeting_Type) || '—'}</td>
                 <td><span class="status-badge status-${(r.Status||'').replace(/\s/g,'')}">${esc(r.Status)}</span></td>
                 <td>${r.source || '—'}</td>
+                <td>${r.AMP_Activity_URL ? `<a href="${r.AMP_Activity_URL}" target="_blank" onclick="event.stopPropagation()" style="color:var(--walmart-blue);font-size:0.8rem">View ↗</a>` : '—'}</td>
             </tr>
         `).join('');
         document.getElementById('adminRequestsTable').style.display = '';
@@ -1252,20 +1351,27 @@ async function runComplianceScan() {
     loading.style.display = '';
     results.innerHTML = '';
     try {
-        const res = await fetch(`${API}/api/reports/compliance-scan`);
+        let url = `${API}/api/reports/compliance-scan?`;
+        const scanStart = document.getElementById('complianceScanStart').value;
+        const scanEnd = document.getElementById('complianceScanEnd').value;
+        if (scanStart) url += `start_date=${scanStart}&`;
+        if (scanEnd) url += `end_date=${scanEnd}&`;
+        const res = await fetch(url);
         const data = await res.json();
         const flagged = data.flagged || [];
+        const scanRange = data.scan_start && data.scan_end ? ` &bull; Range: ${data.scan_start} to ${data.scan_end}` : '';
         let html = `<div style="margin-bottom:1rem;padding:10px;background:#f0f4ff;border-radius:8px;font-size:0.85rem;">
             Scanned <strong>${data.total_scanned}</strong> AMP events &bull;
             <strong>${data.total_with_bodies}</strong> bodies checked &bull;
-            <strong>${flagged.length}</strong> flagged as missing meeting request
+            <strong>${flagged.length}</strong> flagged as missing meeting request${scanRange}
         </div>`;
         if (flagged.length === 0) {
             html += '<div style="text-align:center;padding:2rem;color:#28a745;font-weight:600;">✅ No compliance gaps found — all meetings have requests.</div>';
         } else {
-            html += '<table class="data-table"><thead><tr><th>Confidence</th><th>Title</th><th>Type</th><th>Dates</th><th>Author</th><th>Stores</th><th>Preview</th></tr></thead><tbody>';
+            html += '<table class="data-table"><thead><tr><th>Confidence</th><th>Title</th><th>Type</th><th>Dates</th><th>Author</th><th>Stores</th><th>AMP Link</th><th>Preview</th></tr></thead><tbody>';
             flagged.forEach(f => {
                 const confClass = f.confidence === 'HIGH' ? 'color:#dc3545;font-weight:700' : 'color:#ffc107;font-weight:600';
+                const ampLink = f.event_id ? `<a href="https://amp2-cms.prod.walmart.com/message/${f.event_id}/10/2027" target="_blank" style="color:var(--walmart-blue);font-size:0.8rem">View ↗</a>` : '—';
                 html += `<tr>
                     <td style="${confClass}">${esc(f.confidence)}</td>
                     <td>${esc(f.title)}</td>
@@ -1273,6 +1379,7 @@ async function runComplianceScan() {
                     <td>${f.start_date} — ${f.end_date}</td>
                     <td>${esc(f.author)}</td>
                     <td>${f.stores || '—'}</td>
+                    <td>${ampLink}</td>
                     <td style="font-size:0.75rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(f.body_preview)}">${esc(f.body_preview.substring(0,80))}...</td>
                 </tr>`;
             });
@@ -1517,13 +1624,14 @@ async function loadReport() {
         const res = await fetch(url);
         const data = await res.json();
         reportData = data.report || [];
-        renderReport(reportData);
+        const generatedAt = data.generated_at ? new Date(data.generated_at + 'Z').toLocaleString() : '';
+        renderReport(reportData, generatedAt);
     } catch {
         document.getElementById('reportContent').innerHTML = '<p style="color:var(--error)">Error loading report</p>';
     }
 }
 
-function renderReport(rows) {
+function renderReport(rows, generatedAt) {
     if (!rows.length) {
         document.getElementById('reportContent').innerHTML = '<p style="color:var(--gray-500);padding:1rem">No approved meetings found for this date range.</p>';
         return;
@@ -1537,6 +1645,9 @@ function renderReport(rows) {
     });
 
     let html = '';
+    if (generatedAt) {
+        html += `<div style="font-size:0.8rem;color:#666;margin-bottom:0.5rem">Report generated: ${generatedAt}</div>`;
+    }
     for (const [week, items] of Object.entries(grouped)) {
         html += `<div class="report-section"><h3>${week}</h3>`;
         html += `<table class="data-table report-table"><thead><tr>

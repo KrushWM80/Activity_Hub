@@ -1,13 +1,13 @@
 {
     "Port8888Listening":  true,
-    "ProjectsInStoresRunning":  false,
+    "ProjectsInStoresRunning":  true,
     "JobCodesBackendTask":  true,
     "VETDashboardRunning":  true,
-    "Port8001Listening":  false,
+    "Port8001Listening":  true,
     "TimeStamp":  {
-                      "value":  "\/Date(1775646013972)\/",
+                      "value":  "\/Date(1775732413759)\/",
                       "DisplayHint":  2,
-                      "DateTime":  "Wednesday, April 8, 2026 6:00:13 AM"
+                      "DateTime":  "Thursday, April 9, 2026 6:00:13 AM"
                   },
     "TDAWeeklyEmailTask":  true,
     "TDARunning":  true,
