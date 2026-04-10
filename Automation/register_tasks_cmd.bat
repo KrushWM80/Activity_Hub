@@ -11,6 +11,7 @@ schtasks /create /tn "Activity_Hub_VETDashboard_AutoStart" /tr "cmd /c \"%BASE%\
 schtasks /create /tn "Activity_Hub_Zorro_AutoStart" /tr "cmd /c \"%BASE%\start_zorro_24_7.bat\"" /sc onlogon /ru "%USER%" /f
 schtasks /create /tn "Activity_Hub_ActivityHub_AutoStart" /tr "cmd /c \"%BASE%\start_activity_hub_24_7.bat\"" /sc onlogon /ru "%USER%" /f
 schtasks /create /tn "Activity_Hub_Daily_HealthCheck" /tr "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\MONITOR_AND_REPORT.ps1\"" /sc daily /st 06:00:00 /f
+schtasks /create /tn "Activity_Hub_ContinuousMonitor" /tr "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"%BASE%\continuous_monitor.ps1\"" /sc minute /mo 5 /f
 
 echo.
 schtasks /query /fo TABLE 2>&1 | findstr "Activity_Hub"

@@ -1,26 +1,26 @@
-# Job Code Teaming Dashboard - Knowledge Base
+﻿# Job Code Teaming Dashboard - Knowledge Base
 
-## ⚠️ Automation & Recovery (April 2, 2026)
+## âš ï¸ Automation & Recovery (April 2, 2026)
 
 ### Scheduled Tasks
 
 | Task Name | Schedule | Purpose |
 |-----------|----------|--------|
-| `Activity_Hub_JobCodes_AutoStart` | On logon | Starts `start_jobcodes_server_24_7.bat` → `main.py` on port 8080 |
+| `Activity_Hub_JobCodes_AutoStart` | On logon | Starts `start_jobcodes_server_24_7.bat` â†’ `main.py` on port 8080 |
 
 ### Bat Files (`Automation/`)
-- `start_jobcodes_server_24_7.bat` — Port-kill block + restart loop. Primary crash recovery (5-7 sec downtime)
+- `start_jobcodes_server_24_7.bat` â€” Port-kill block + restart loop. Primary crash recovery (5-7 sec downtime)
 - Log: `Automation/jobcodes_server.log`
 
 ### Recovery Layers
-1. **Bat restart loop** — primary (5-7 sec recovery on crash)
-2. **Continuous monitor** (`continuous_monitor.ps1`) — checks all 7 services every 5 min; only launches new bat if bat process is not already running
+1. **Bat restart loop** â€” primary (5-7 sec recovery on crash)
+2. **Continuous monitor** (`continuous_monitor.ps1`) â€” checks all 7 services every 5 min; only launches new bat if bat process is not already running
 
 ### Known Issue (ongoing)
-Job Codes exits with code 1 immediately on startup — crash loop. The bat keeps retrying every 5 seconds. Check `Automation/jobcodes_server.log` for the Python traceback.
+Job Codes exits with code 1 immediately on startup â€” crash loop. The bat keeps retrying every 5 seconds. Check `Automation/jobcodes_server.log` for the Python traceback.
 
-### ⚠️ NEVER use `Stop-Process -Name python`
-This kills ALL Python processes on the machine — all 7 services go down.
+### âš ï¸ NEVER use `Stop-Process -Name python`
+This kills ALL Python processes on the machine â€” all 7 services go down.
 
 **Safe way to restart only Job Codes (port 8080):**
 ```powershell
@@ -49,38 +49,38 @@ The Job Code Teaming Dashboard is a **FastAPI web application** that manages job
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Frontend (Browser)                        │
-│              HTML/CSS/JavaScript (Static)                   │
-│             index.html in frontend/ folder                  │
-└──────────────────┬──────────────────────────────────────────┘
-                   │ HTTP Requests
-                   │
-┌──────────────────▼──────────────────────────────────────────┐
-│                  FastAPI Backend Server                      │
-│                     Port: 8080                               │
-│                   main.py (1700+ lines)                     │
-│                                                              │
-│  ├─ Authentication (HTTPBasic)                             │
-│  ├─ User Management (users.json)                           │
-│  ├─ Request Processing (update_requests.json)              │
-│  ├─ Session Management (sessions.json)                     │
-│  ├─ Job Code Cache (SQLite)  ← NEW                        │
-│  ├─ Job Code Master DB (SQLite)  ← NEW                    │
-│  ├─ BigQuery Sync (Background Thread)  ← NEW              │
-│  ├─ Email Notifications (SMTP)                             │
-│  └─ Static File Serving                                    │
-└──────────────────┬──────────────────────────────────────────┘
-                   │
-                   ├─ Reads/Writes JSON files (users, sessions, requests)
-                   │
-                   ├─ SQLite Cache (jobcodes_cache.db)
-                   │   ├─ polaris_job_codes table
-                   │   ├─ job_code_master table
-                   │   └─ sync_history table
-                   │
-                   └─ BigQuery (auto-sync every 30 min)
-                       └─ polaris-analytics-prod.us_walmart
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚                    Frontend (Browser)                        â”‚
+â”‚              HTML/CSS/JavaScript (Static)                   â”‚
+â”‚             index.html in frontend/ folder                  â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                   â”‚ HTTP Requests
+                   â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚                  FastAPI Backend Server                      â”‚
+â”‚                     Port: 8080                               â”‚
+â”‚                   main.py (1700+ lines)                     â”‚
+â”‚                                                              â”‚
+â”‚  â”œâ”€ Authentication (HTTPBasic)                             â”‚
+â”‚  â”œâ”€ User Management (users.json)                           â”‚
+â”‚  â”œâ”€ Request Processing (update_requests.json)              â”‚
+â”‚  â”œâ”€ Session Management (sessions.json)                     â”‚
+â”‚  â”œâ”€ Job Code Cache (SQLite)  â† NEW                        â”‚
+â”‚  â”œâ”€ Job Code Master DB (SQLite)  â† NEW                    â”‚
+â”‚  â”œâ”€ BigQuery Sync (Background Thread)  â† NEW              â”‚
+â”‚  â”œâ”€ Email Notifications (SMTP)                             â”‚
+â”‚  â””â”€ Static File Serving                                    â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                   â”‚
+                   â”œâ”€ Reads/Writes JSON files (users, sessions, requests)
+                   â”‚
+                   â”œâ”€ SQLite Cache (jobcodes_cache.db)
+                   â”‚   â”œâ”€ polaris_job_codes table
+                   â”‚   â”œâ”€ job_code_master table
+                   â”‚   â””â”€ sync_history table
+                   â”‚
+                   â””â”€ BigQuery (auto-sync every 30 min)
+                       â””â”€ polaris-analytics-prod.us_walmart
 ```
 
 ---
@@ -96,9 +96,9 @@ LEUS62315243171.homeoffice.Wal-Mart.com
 ```
 
 This is **better than IP addresses** because:
-- ✅ **Never changes** - Even if your IP address changes, the hostname stays the same
-- ✅ **Team-shareable** - Colleagues on VPN can use the same URL
-- ✅ **Professional** - Works reliably over long periods
+- âœ… **Never changes** - Even if your IP address changes, the hostname stays the same
+- âœ… **Team-shareable** - Colleagues on VPN can use the same URL
+- âœ… **Professional** - Works reliably over long periods
 
 ### Access Methods
 
@@ -113,7 +113,7 @@ This is **better than IP addresses** because:
 ### Prerequisites for Team Access
 
 1. **Server binding**: FastAPI configured to bind to `0.0.0.0` (not localhost)
-   - ✅ Already configured in main.py: `HOST = "0.0.0.0"`
+   - âœ… Already configured in main.py: `HOST = "0.0.0.0"`
 
 2. **Firewall rules**: Port 8080 must allow inbound traffic
    - PowerShell command (run as Admin):
@@ -151,11 +151,11 @@ This is **better than IP addresses** because:
 
 ```
 BigQuery (Polaris Source)
-       ↓ (every 30 min)
+       â†“ (every 30 min)
 SQLite Cache (polaris_job_codes table)
-       ↓
+       â†“
 Backend /api/job-codes endpoint
-       ↓
+       â†“
 Frontend displays merged data
 ```
 
@@ -164,37 +164,37 @@ Frontend displays merged data
 ### 1. **Startup Initialization**
 ```
 Server starts
-  ├─ Initialize SQLite cache (create tables if not exist)
-  ├─ Perform initial BigQuery sync (if HAS_BIGQUERY)
-  └─ Start background sync thread (30-min interval)
+  â”œâ”€ Initialize SQLite cache (create tables if not exist)
+  â”œâ”€ Perform initial BigQuery sync (if HAS_BIGQUERY)
+  â””â”€ Start background sync thread (30-min interval)
 ```
 
 ### 2. **User Views Job Codes**
 ```
 GET /api/job-codes
-  ├─ Query: polaris_job_codes table (Polaris base data)
-  ├─ Join: job_code_master table (User enrichment data)
-  ├─ Join: TMS Data (Teaming assignments) if available
-  └─ Return merged result to frontend
+  â”œâ”€ Query: polaris_job_codes table (Polaris base data)
+  â”œâ”€ Join: job_code_master table (User enrichment data)
+  â”œâ”€ Join: TMS Data (Teaming assignments) if available
+  â””â”€ Return merged result to frontend
 ```
 
 ### 3. **User Updates Job Code Metadata**
 ```
 POST /api/job-codes-master/{job_code}
-  ├─ Admin user update data
-  ├─ INSERT/UPDATE job_code_master table
-  └─ Return updated record with timestamp
+  â”œâ”€ Admin user update data
+  â”œâ”€ INSERT/UPDATE job_code_master table
+  â””â”€ Return updated record with timestamp
 ```
 
 ### 4. **Background Sync Process**
 ```
 Every 30 minutes (background thread)
-  ├─ Query BigQuery for latest Polaris data
-  ├─ Validate minimum record count (>100)
-  ├─ REPLACE polaris_job_codes table
-  ├─ Log sync in sync_history table
-  ├─ Save snapshot JSON as fallback
-  └─ Alert admin if sync fails
+  â”œâ”€ Query BigQuery for latest Polaris data
+  â”œâ”€ Validate minimum record count (>100)
+  â”œâ”€ REPLACE polaris_job_codes table
+  â”œâ”€ Log sync in sync_history table
+  â”œâ”€ Save snapshot JSON as fallback
+  â””â”€ Alert admin if sync fails
 ```
 
 ### 5. **Data Sources Summary**
@@ -289,26 +289,26 @@ Located in parent folder (`../`):
 
 ### Admin
 ```
-✅ View all job codes (entire list)
-✅ Update job code master data (enrichment fields)
-✅ View all user requests (all submissions)
-✅ Approve/reject user registrations
-✅ Approve/reject teaming update requests
-✅ Export approved requests (for TMS upload)
-✅ Change user roles
-✅ View analytics/reports
-✅ Trigger manual cache sync
-✅ View cache sync status
+âœ… View all job codes (entire list)
+âœ… Update job code master data (enrichment fields)
+âœ… View all user requests (all submissions)
+âœ… Approve/reject user registrations
+âœ… Approve/reject teaming update requests
+âœ… Export approved requests (for TMS upload)
+âœ… Change user roles
+âœ… View analytics/reports
+âœ… Trigger manual cache sync
+âœ… View cache sync status
 ```
 
 ### User
 ```
-✅ View all job codes
-✅ Submit teaming update requests
-✅ View own request history
-❌ Approve requests
-❌ Change user roles
-❌ Export data
+âœ… View all job codes
+âœ… Submit teaming update requests
+âœ… View own request history
+âŒ Approve requests
+âŒ Change user roles
+âŒ Export data
 ```
 
 ---
@@ -405,15 +405,15 @@ JOB_CODES_DIR = ../../Job Codes/
 
 ## Security Considerations
 
-⚠️ **Default Credentials**
+âš ï¸ **Default Credentials**
 - Default admin: `admin` / `admin123`
 - **MUST change on first login**
 
-🔐 **Password Storage**
+ðŸ” **Password Storage**
 - Stored as SHA256 hash
 - Never stored in plaintext
 
-🛡️ **Network Access**
+ðŸ›¡ï¸ **Network Access**
 - Only works on Walmart VPN
 - HTTPBasic (username/password)
 - No additional encryption added (rely on VPN security)
@@ -430,9 +430,10 @@ JOB_CODES_DIR = ../../Job Codes/
 
 ## Key Takeaways
 
-✅ **Hostname-based URLs** are stable and team-shareable on VPN
-✅ **FastAPI backend** handles all business logic
-✅ **JSON data files** store users, requests, and session data
-✅ **Email notifications** keep admins updated on new requests
-✅ **Multiple data sources** (TMS, Polaris, HR) are merged and reconciled
-✅ **Firewall rule required** for team access from other machines
+âœ… **Hostname-based URLs** are stable and team-shareable on VPN
+âœ… **FastAPI backend** handles all business logic
+âœ… **JSON data files** store users, requests, and session data
+âœ… **Email notifications** keep admins updated on new requests
+âœ… **Multiple data sources** (TMS, Polaris, HR) are merged and reconciled
+âœ… **Firewall rule required** for team access from other machines
+

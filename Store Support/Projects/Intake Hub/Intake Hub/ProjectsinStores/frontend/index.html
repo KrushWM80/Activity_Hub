@@ -786,6 +786,15 @@
                 updateNavigationButtons(); // Initialize navigation buttons
                 updateHierarchyBreadcrumb(); // Initialize breadcrumb
                 displayDivisions(allProjects);
+                
+                // Clear any stale filter state before showing preview
+                document.getElementById('filter-title').value = '';
+                document.getElementById('filter-source').value = '';
+                // Clear filter object properties (don't reassign - it's const)
+                Object.keys(selectedFilters).forEach(key => {
+                    selectedFilters[key] = [];
+                });
+                
                 updateProjectPreview(); // Show preview on initial load
                 updateLastUpdatedTimestamp(); // Update the "Last Updated" timestamp from BQ data
                 
@@ -1280,6 +1289,11 @@
             
             // Display all projects without recalculating summary
             displayDivisions(allProjects);
+            
+            // CRITICAL: Refresh the Quick Review preview with unfiltered projects
+            updateProjectPreview(null);
+            
+            logDashboardActivity('Reset Filters', 'All filters cleared');
         }
 
         async function filterProjects() {
@@ -1432,8 +1446,22 @@
                 return String(a.wm_week || '').localeCompare(String(b.wm_week || ''));
             });
             
-            // Only recalculate summary if filters are applied, otherwise use backend summary
-            if (hasFilters) {
+            // Handle summary stats: use backend values when filtering by source, otherwise recalculate
+            if (source && backendSummary) {
+                // When filtering by specific source, use backend stats for that source
+                if (source === 'Realty') {
+                    document.getElementById('total-projects').textContent = backendSummary.realty_projects || 0;
+                    document.getElementById('total-stores').textContent = backendSummary.realty_stores || 0;
+                    document.getElementById('intake-projects').textContent = 0;
+                    document.getElementById('realty-projects-initiatives').textContent = backendSummary.realty_projects || 0;
+                } else if (source === 'Operations') {
+                    document.getElementById('total-projects').textContent = backendSummary.intake_hub_projects || 0;
+                    document.getElementById('total-stores').textContent = backendSummary.intake_hub_stores || 0;
+                    document.getElementById('intake-projects').textContent = backendSummary.intake_hub_projects || 0;
+                    document.getElementById('realty-projects-initiatives').textContent = 0;
+                }
+            } else if (hasFilters) {
+                // For non-source filters, recalculate stats from filtered projects
                 updateSummaryStats(filtered);
             } else if (backendSummary) {
                 // Use stored backend summary when no filters applied

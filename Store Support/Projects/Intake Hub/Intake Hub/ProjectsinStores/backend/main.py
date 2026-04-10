@@ -285,14 +285,14 @@ def _background_cache_init():
                 print(f"[Background] Cache sync complete with {sqlite_cache.get_record_count()} records")
         
         # Start periodic background sync (every 15 minutes)
-        # TEMPORARILY DISABLED - sync causes SQLite locking issues
-        # if db_service.client:
-        #     sqlite_cache.start_background_sync(
-        #         db_service.client,
-        #         db_service.project_id,
-        #         db_service.dataset,
-        #         db_service.table
-        #     )
+        # Re-enabled Apr 10, 2026: Successfully synced without locking issues
+        if db_service.client:
+            sqlite_cache.start_background_sync(
+                db_service.client,
+                db_service.project_id,
+                db_service.dataset,
+                db_service.table
+            )
     except Exception as e:
         print(f"[Background] Error during cache initialization: {e}")
         # Don't fail startup if cache init fails
@@ -638,6 +638,22 @@ async def get_projects(
         print(f"[API] About to call get_record_count()", flush=True, file=sys.stderr)
         record_count = sqlite_cache.get_record_count()
         print(f"[API] /api/projects: Cache record_count={record_count}, include_location={include_location}", flush=True, file=sys.stderr)
+        
+        # If cache is empty but BigQuery is available, try a synchronous load
+        if record_count == 0 and db_service.client:
+            print("[API] Cache is empty, attempting synchronous load from BigQuery...", flush=True, file=sys.stderr)
+            try:
+                sqlite_cache.sync_from_bigquery(
+                    db_service.client,
+                    db_service.project_id,
+                    db_service.dataset,
+                    db_service.table
+                )
+                record_count = sqlite_cache.get_record_count()
+                print(f"[API] Sync complete, cache now has {record_count} records", flush=True, file=sys.stderr)
+            except Exception as sync_err:
+                print(f"[API] Sync failed: {sync_err}", flush=True, file=sys.stderr)
+        
         if record_count > 0 and not include_location:
             try:
                 print("[API] [CACHE ATTEMPT] Using SQLite cache for /api/projects")

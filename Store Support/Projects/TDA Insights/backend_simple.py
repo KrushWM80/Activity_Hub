@@ -926,7 +926,29 @@ def handle_request(client_socket, addr):
                 print(f"[ERROR] Failed to load spark logo: {e}")
                 error_response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\nLogo not found"
                 client_socket.sendall(error_response.encode())
-        
+
+        elif path in ('/Spark_Blank.png', '/favicon.ico'):
+            logo_file = SCRIPT_DIR / 'Spark_Blank.png'
+            try:
+                if logo_file.exists():
+                    with open(logo_file, 'rb') as f:
+                        logo_data = f.read()
+                    response = (
+                        f"HTTP/1.1 200 OK\r\n"
+                        f"Content-Type: image/png\r\n"
+                        f"Access-Control-Allow-Origin: *\r\n"
+                        f"Cache-Control: public, max-age=86400\r\n"
+                        f"Content-Length: {len(logo_data)}\r\n"
+                        f"Connection: close\r\n\r\n"
+                    )
+                    client_socket.sendall(response.encode())
+                    client_socket.sendall(logo_data)
+                else:
+                    client_socket.sendall(b"HTTP/1.1 204 No Content\r\nConnection: close\r\n\r\n")
+            except Exception as e:
+                print(f"[ERROR] Failed to load Spark_Blank.png: {e}")
+                client_socket.sendall(b"HTTP/1.1 204 No Content\r\nConnection: close\r\n\r\n")
+
         elif path in ('/dashboard.html', '/', '/tda-initiatives-insights'):
             html_file = SCRIPT_DIR / 'dashboard.html'
             if html_file.exists():

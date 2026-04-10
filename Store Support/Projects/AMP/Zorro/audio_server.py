@@ -1475,17 +1475,17 @@ class AudioHandler(SimpleHTTPRequestHandler):
                     var totalExclDenied = data.total_excl_denied || 0;
                     var statusRows = '';
                     breakdown.forEach(function(s) {
-                        var isDenied = s.status && s.status.indexOf('Denied') >= 0;
+                        var isDenied = s.status && (s.status.indexOf('Denied') >= 0 || s.status.indexOf('Expired') >= 0);
                         var style = isDenied ? 'color:#9CA3AF;text-decoration:line-through;' : '';
                         statusRows += '<tr><td style="padding:3px 0;' + style + '">' + s.status + '</td><td style="padding-left:12px;font-weight:bold;text-align:right;' + style + '">' + s.count + '</td></tr>';
                     });
                     stepStatus(1,
                         '<strong>\u2705 Data Cached!</strong>' +
-                        '<div style="margin-top:8px;font-size:0.85em;color:#6B7280;">Excludes: AMP PR Merchandise, Denied</div>' +
+                        '<div style="margin-top:8px;font-size:0.85em;color:#6B7280;">Excludes: AMP PR Merchandise, Denied, Expired</div>' +
                         '<table style="margin-top:6px;font-size:0.9em;border-collapse:collapse;width:100%;max-width:420px;">' +
                         '<tr style="border-bottom:2px solid #1D4ED8;"><th style="padding:4px 0;text-align:left;font-weight:700;">Status</th><th style="padding-left:12px;text-align:right;font-weight:700;">Count</th></tr>' +
                         statusRows +
-                        '<tr style="border-top:2px solid #1D4ED8;"><td style="padding:5px 0;font-weight:700;">Total (excl. Denied)</td><td style="padding-left:12px;font-weight:700;text-align:right;">' + totalExclDenied + '</td></tr>' +
+                        '<tr style="border-top:2px solid #1D4ED8;"><td style="padding:5px 0;font-weight:700;">Total (excl. Denied/Expired)</td><td style="padding-left:12px;font-weight:700;text-align:right;">' + totalExclDenied + '</td></tr>' +
                         '</table>' +
                         '<div style="margin-top:8px;font-size:0.9em;">With Summarized text: <strong>' + data.summarized_count + '</strong></div>' +
                         (data.bq_last_updated ? '<div style="margin-top:6px;font-size:0.82em;color:#6B7280;">&#128340; AMP ALL 2 Last Refreshed: <strong>' + new Date(data.bq_last_updated).toLocaleString() + '</strong></div>' : '') +

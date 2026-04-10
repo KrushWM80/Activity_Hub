@@ -565,6 +565,7 @@ This is an automated alert. Do not reply to this email.
         
         self._sync_in_progress = True
         start_time = time.time()
+        sync_timestamp = datetime.now().isoformat()  # Use sync time as fallback for NULL timestamps
         
         try:
             print(f"[SQLite] Starting sync from BigQuery...")
@@ -652,7 +653,7 @@ This is an automated alert. Do not reply to this email.
                     row.business_type,
                     row.associate_impact,
                     row.customer_impact,
-                    row.last_updated.isoformat() if row.last_updated else None
+                    row.last_updated.isoformat() if row.last_updated else sync_timestamp
                 ))
                 
                 # Insert in batches of 1000
@@ -1011,6 +1012,12 @@ This is an automated alert. Do not reply to this email.
                 GROUP BY title, project_source
             """
             
+            # CRITICAL FIX: Need to duplicate params for both UNION queries since where_clause is used twice
+            # When executing UNION queries, parameters must be supplied for EACH query part
+            ops_params = params.copy()  # First copy for Operations query
+            realty_params = params.copy()  # Second copy for Realty query
+            combined_params = ops_params + realty_params  # Combine for UNION execution
+            
             # Combine both queries with UNION ALL (no ORDER BY in subqueries for SQLite)
             query = f"""
                 SELECT 
@@ -1068,6 +1075,8 @@ This is an automated alert. Do not reply to this email.
                 GROUP BY title, project_source
                 ORDER BY title, wm_week
             """
+            # Override params with combined list for UNION execution
+            params = combined_params
         
         if limit:
             query += f" LIMIT {limit}"

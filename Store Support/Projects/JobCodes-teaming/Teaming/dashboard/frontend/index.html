@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/Spark_Blank.png">
-    <title>Job Codes & Teaming Dashboard</title>
+    <title>Aligned - Store Impact through Job Codes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -205,7 +205,7 @@
         }
         
         .dropdown-multi-btn::after {
-            content: '▼';
+            content: 'â–¼';
             position: absolute;
             right: 12px;
             top: 50%;
@@ -377,9 +377,7 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <i class="bi bi-diagram-3"></i> Job Codes & Teaming Dashboard
-                </a>
+                <a class="navbar-brand" href="#"><i class="bi bi-diagram-3"></i> Aligned<small class="ms-2" style="font-size: 0.6rem; opacity: 0.9;">Store Impact through Job Codes</small></a>
                 <div class="d-flex align-items-center">
                     <span class="text-white-50 me-3" style="font-size: 0.75rem;">Owner: Kendall Rush</span>
                     <span class="text-white me-3">
@@ -459,9 +457,7 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <i class="bi bi-diagram-3"></i> Job Codes &amp; Teaming Dashboard
-                </a>
+                <a class="navbar-brand" href="#"><i class="bi bi-diagram-3"></i> Aligned<small class="ms-2" style="font-size: 0.6rem; opacity: 0.9;">Store Impact through Job Codes</small></a>
                 <div class="d-flex align-items-center">
                     <span class="text-white-50 me-3" style="font-size: 0.75rem;">Owner: Kendall Rush</span>
                     <span class="text-white me-3">
@@ -1987,9 +1983,9 @@
                     });
                     siblingPanel.classList.toggle('open');
                 } else if (panel) {
-                    // Clicking inside a panel — do nothing (keep it open)
+                    // Clicking inside a panel â€” do nothing (keep it open)
                 } else {
-                    // Clicking outside — close all dropdowns
+                    // Clicking outside â€” close all dropdowns
                     document.querySelectorAll('.dropdown-multi-panel.open').forEach(p => p.classList.remove('open'));
                 }
             });
@@ -2394,7 +2390,7 @@
                         
                         let valueDisplay = '';
                         if (hasChanged) {
-                            valueDisplay = `<span style="text-decoration: line-through; color: #999;">${previousValue}</span> → <strong>${value}</strong> <i class="bi bi-pencil-fill text-warning"></i>`;
+                            valueDisplay = `<span style="text-decoration: line-through; color: #999;">${previousValue}</span> â†’ <strong>${value}</strong> <i class="bi bi-pencil-fill text-warning"></i>`;
                         } else {
                             valueDisplay = `<strong>${value}</strong>`;
                         }
@@ -3103,7 +3099,7 @@
                 
                 <div style="display: flex; gap: 12px; margin-top: 28px;">
                     <button onclick="closeFeedbackModal()" style="flex: 1; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 4px; background: white; color: #1a202c; cursor: pointer; font-weight: 500; transition: all 0.2s;">Cancel</button>
-                    <button onclick="nextFeedbackStep()" style="flex: 1; padding: 10px 16px; border: none; border-radius: 4px; background: #0053e2; color: white; cursor: pointer; font-weight: 500; transition: all 0.2s;">Next →</button>
+                    <button onclick="nextFeedbackStep()" style="flex: 1; padding: 10px 16px; border: none; border-radius: 4px; background: #0053e2; color: white; cursor: pointer; font-weight: 500; transition: all 0.2s;">Next â†’</button>
                 </div>
             </div>
 
@@ -3116,27 +3112,27 @@
                     <div style="display: flex; gap: 12px; justify-content: space-between;">
                         <label style="flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px solid transparent; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0053e2'; this.style.background='#f0f7ff';" onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
                             <input type="radio" name="feedbackRating" value="1" style="display: block; margin: 0 auto 8px; width: 18px; height: 18px; cursor: pointer; accent-color: #0053e2;">
-                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">😞</span>
+                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">ðŸ˜ž</span>
                             <span style="font-size: 0.8rem; color: #718096; display: block;">Poor</span>
                         </label>
                         <label style="flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px solid transparent; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0053e2'; this.style.background='#f0f7ff';" onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
                             <input type="radio" name="feedbackRating" value="2" style="display: block; margin: 0 auto 8px; width: 18px; height: 18px; cursor: pointer; accent-color: #0053e2;">
-                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">😕</span>
+                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">ðŸ˜•</span>
                             <span style="font-size: 0.8rem; color: #718096; display: block;">Fair</span>
                         </label>
                         <label style="flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px solid transparent; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0053e2'; this.style.background='#f0f7ff';" onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
                             <input type="radio" name="feedbackRating" value="3" style="display: block; margin: 0 auto 8px; width: 18px; height: 18px; cursor: pointer; accent-color: #0053e2;">
-                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">😐</span>
+                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">ðŸ˜</span>
                             <span style="font-size: 0.8rem; color: #718096; display: block;">OK</span>
                         </label>
                         <label style="flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px solid transparent; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0053e2'; this.style.background='#f0f7ff';" onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
                             <input type="radio" name="feedbackRating" value="4" style="display: block; margin: 0 auto 8px; width: 18px; height: 18px; cursor: pointer; accent-color: #0053e2;">
-                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">😊</span>
+                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">ðŸ˜Š</span>
                             <span style="font-size: 0.8rem; color: #718096; display: block;">Good</span>
                         </label>
                         <label style="flex: 1; text-align: center; cursor: pointer; padding: 12px; border: 2px solid transparent; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0053e2'; this.style.background='#f0f7ff';" onmouseout="this.style.borderColor='transparent'; this.style.background='transparent';">
                             <input type="radio" name="feedbackRating" value="5" style="display: block; margin: 0 auto 8px; width: 18px; height: 18px; cursor: pointer; accent-color: #0053e2;">
-                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">🤩</span>
+                            <span style="display: block; font-size: 2rem; margin-bottom: 8px;">ðŸ¤©</span>
                             <span style="font-size: 0.8rem; color: #718096; display: block;">Great</span>
                         </label>
                     </div>
@@ -3148,14 +3144,14 @@
                 </div>
                 
                 <div style="display: flex; gap: 12px;">
-                    <button onclick="prevFeedbackStep()" style="flex: 1; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 4px; background: white; color: #1a202c; cursor: pointer; font-weight: 500;">← Back</button>
+                    <button onclick="prevFeedbackStep()" style="flex: 1; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 4px; background: white; color: #1a202c; cursor: pointer; font-weight: 500;">â† Back</button>
                     <button onclick="submitFeedback()" style="flex: 1; padding: 10px 16px; border: none; border-radius: 4px; background: #0053e2; color: white; cursor: pointer; font-weight: 500;">Submit</button>
                 </div>
             </div>
 
             <!-- Step 3: Success -->
             <div id="feedbackStep3" style="display: none; padding: 48px 24px; text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 16px;">✅</div>
+                <div style="font-size: 3rem; margin-bottom: 16px;">âœ…</div>
                 <h3 style="margin: 0 0 12px; font-weight: 600; color: #1a202c;">Thank You!</h3>
                 <p style="color: #718096; margin: 0;">Your feedback has been submitted successfully and will help us improve.</p>
             </div>
@@ -3163,3 +3159,4 @@
     </div>
 </body>
 </html>
+

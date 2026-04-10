@@ -1,54 +1,38 @@
 {
   "week": 11,
   "fy": 2027,
-  "cached_at": "2026-04-09T14:56:00.368816",
-  "bq_last_updated": "2026-04-09T19:55:02.387000+00:00",
-  "event_count": 26,
-  "review_no_comm_count": 26,
+  "cached_at": "2026-04-10T14:17:20.379473",
+  "bq_last_updated": "2026-04-10T19:15:51.768000+00:00",
+  "event_count": 38,
+  "review_no_comm_count": 38,
   "status_breakdown": [
     {
       "status": "Review for Publish review - No Comms",
-      "count": 26
+      "count": 38
     },
     {
-      "status": "Review for Publish review - Pending",
-      "count": 6
+      "status": "Expired - Pending",
+      "count": 5
     },
     {
-      "status": "Review for Publish review - Future Send",
-      "count": 3
+      "status": "Expired - No Comms",
+      "count": 1
     },
     {
-      "status": "Draft - Pending",
-      "count": 2
-    },
-    {
-      "status": "ATC final review - Pending",
-      "count": 2
+      "status": "Expired - Future Send",
+      "count": 1
     },
     {
       "status": "Denied - Pending",
       "count": 1
     },
     {
-      "status": "Expired - Pending",
-      "count": 1
-    },
-    {
-      "status": "Awaiting ATC Approval - Pending",
-      "count": 1
-    },
-    {
       "status": "Awaiting Legal Approval - Pending",
-      "count": 1
-    },
-    {
-      "status": "Expired - Future Send",
       "count": 1
     }
   ],
-  "total_excl_denied": 43,
-  "summarized_count": 24,
+  "total_excl_denied": 39,
+  "summarized_count": 38,
   "events_with_summaries": [
     {
       "event_id": "461f7bd1-7a3f-4b53-a369-4123816caf7e",
@@ -86,11 +70,32 @@
       "summary_text": "Dept. 13: Anderson will support Air Care modular updates in week 12 at Supercenters\u00a0and week 14 at Neighborhood Markets, including item removals, shelf/price tag resets, and discontinued product clearance support."
     },
     {
+      "event_id": "5f2fc725-e5d3-465c-b3e0-08d9b2cf4945",
+      "store_area": "Digital",
+      "title": "FY27\u00a0InHome\u00a0Driver Safety Calendar",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: The FY27 InHome Driver Safety Calendar gives stores and drivers a year-long plan to stay focused on safe delivery practices. Each month features a safety theme based on real-world risks and Lytx insights, with clear actions and in-app messages to reinforce key behaviors. Stores should print the calendar from the Safety Enterprise Hub and post it in the InHome backroom for daily visibility."
+    },
+    {
+      "event_id": "1c03bbfb-43df-4f54-a655-072d9a03a800",
+      "store_area": "Digital",
+      "title": "Trip-Based\u00a0Batching for Orders Delivered by Uber",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: Orders delivered by Uber will soon use trip-based batching, similar to the Spark Driver platform, allowing associates to stage orders by Trip ID for a more efficient workflow. This change reduces extra steps, improves accuracy and creates smoother backroom flow as delivery volume grows. With trip labels and simplified dispensing, teams can prep and hand off orders more quickly while spending more time serving customers."
+    },
+    {
       "event_id": "a36bd052-eb96-46cb-a42b-b87cfffa9ff6",
       "store_area": "Entertainment",
       "title": "Dept. 72: Week 12 Samsung TV Item Swap",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Dept. 72: We\u2019ll receive the new 2026 Samsung 55\" TVs in weeks 11 and 12 to support a week 12 modular item swap. The outgoing 2025 55\" model will be marked down for clearance. The new model will be set on the Medium TV modular, including updating the display."
+    },
+    {
+      "event_id": "0708adde-c320-471a-a40c-12a466ee68f3",
+      "store_area": "Fashion",
+      "title": "Dept. 29:\u00a0Set Joyspun Intimates Week 5 Mods",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 29: Stores are asked to make sure they've set the week 5 mod for Joyspun bras and underwear.\u00a0 Sales are reported at under 80% despite store mod set showing at 98%."
     },
     {
       "event_id": "a1dbc75e-ad72-46a1-9a6c-13abb44e9a4c",
@@ -149,6 +154,27 @@
       "summary_text": "Departments 80 and 97: Measure cooler shelf depth using only the shelf surface to improve modular execution and availability, then submit results in the Cooler Shelving Size Survey."
     },
     {
+      "event_id": "943afc2d-4d90-4a47-908c-c4d5ac87d5f9",
+      "store_area": "Fresh",
+      "title": "D97 Dinner Solutions Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "We are experiencing supply issues with\u00a0Marketside chicken teriyaki bowls, impacting all DCs. Recovery is expected over the next two weeks. In the interim, fill the empty shelves with adjacent items to fill assortment gaps until items return to full recovery. Check Fresh Weekly Messages each week for updates."
+    },
+    {
+      "event_id": "c0f7ca52-472b-4161-bd85-adf5b189d747",
+      "store_area": "Fresh",
+      "title": "Dep. 94: Produce Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Produce, Department 94, some items\u00a0continue to face\u00a0supply constraints (bok choy, broccoli, cilantro, Napa cabbage, carrots, kiwis, lettuce and slicing and Roma tomatoes, with damage caused by harsh weather driving the disruptions across most items. Some items have begun to see yields increase, but most items will be in short supply for several more weeks. Seasonal favorite stone fruits transition from imported crops to domestic crops this week. With this, white nectarines exit, yellow peaches and nectarines begin to flow, and week 16, plums will arrive. Enter a store number in\u00a0the Seasonal Stone Fruit Store Lookup Tool to determine if the store will receive yellow nectarines and/or yellow peaches in bulk or bagged quantities."
+    },
+    {
+      "event_id": "b1f7d2d4-8c3e-4e18-9eea-e90f749203e6",
+      "store_area": "Fresh",
+      "title": "Dept. 93: Week 11 Merch Message",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "This week in Department 93 (Fresh Meat), teams should walk the recently set modulars to protect integrity post-Easter. At a glance, misaligned protein dividers is a quick indicator something is off. Focus on the grilling season with key features of burgers, chicken breasts and wings as summer demand ramps up."
+    },
+    {
       "event_id": "3fb8ac5e-fb63-4acd-9f24-7a6082fe3f99",
       "store_area": "Fresh",
       "title": "Dept. 97: Dinner Solutions Supply Interruptions",
@@ -160,7 +186,14 @@
       "store_area": "Fresh",
       "title": "Dept. 98 and 81: Week 11 Bakery and Bread Updates",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Fully reset the Bakery Department back to core assortment, keep it clean and full, and be sure to feature Mini Muffins and 28-count Cookie Box Rollbacks. In Commercial Bread, work through the Buns and Rolls markdowns ahead of the week 13 modular (category 103) and keep tortillas full and priced correctly for upcoming events: Cinco de Mayo (Tuesday, May 5), Memorial Day (Monday, May 25), graduations (late May),\u00a0A250 (Saturday, July 4) and the FIFA World Cup (Thursday, June 11 to Sunday, July 19)."
+      "summary_text": "Fully reset the Bakery Department back to core assortment, keep it clean and full, and be sure to feature Mini Muffins and 28-count Cookie Box Rollbacks. In Commercial Bread, work through the Buns and Rolls markdowns ahead of the week 13 modular (category 103) and keep tortillas full and priced correctly for upcoming events: Cinco de Mayo (Tuesday, May 5), Mother's Day (Sunday, May 10), Memorial Day (Monday, May 25), graduations (late May), A250 (Saturday, July 4) and the\u00a0FIFA World Cup (Thursday, June 11 to Sunday, July 19)."
+    },
+    {
+      "event_id": "5247be48-1209-42d1-a0eb-878e543d0d21",
+      "store_area": "Fresh",
+      "title": "Prepare for High-Volume Cake Orders Celebrating Mother\u2019s Day and Graduation ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Mother\u2019s Day (Sun, May 10) and late-May graduations will drive a major cake-order surge, with peak demand expected Thu\u2013Sun, May 7\u201310 and potential overlap with graduation events. Last year, stores met ~85% of demand, leaving 15% unfilled. Market managers should ensure stores build modular backstock from Apr 11\u201317 through Week 14 (May 2\u20138) to shift focus to peak-day fulfillment. Recommend staffing support so Cake Decorators can decorate while another associate handles staging, cleaning, customer service and calls. If volume becomes unmanageable, partner with stores to submit a Store Support ticket to pause cake orders."
     },
     {
       "event_id": "ba2de3bd-2241-42d0-a67a-3a9868475bf3",
@@ -175,6 +208,13 @@
       "title": "Frontend: Your Front End Operations Resolution Team is Here to Help!",
       "status": "Review for Publish review - No Comms",
       "summary_text": "The Front End Operations Resolution Team is available to answer store questions about the Front End and Financial Services offered in stores."
+    },
+    {
+      "event_id": "a81c0bd4-b1d9-4591-8eb9-9e038bd8c2ab",
+      "store_area": "Hardlines",
+      "title": "Dept. 11:  Tool World Markdowns",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 11: First markdowns are coming for select week 17 hardware categories. Make sure items are signed with clearance flags but do not move them to the clearance aisle."
     },
     {
       "event_id": "036a2765-c65b-4ca2-bd0b-c0dab7edb9ab",
@@ -198,6 +238,34 @@
       "summary_text": "Dept. 9: Stock\u00a0Stoeger turkey guns and .410 TSS turkey ammo for customers now, prepare for week 16 clearance and the modular transition, and post online-pickup ammo signage only if your store is activated."
     },
     {
+      "event_id": "11b1ae6d-e355-48dc-9419-6283732fe8b5",
+      "store_area": "Home",
+      "title": "Dept. 71: Action Required - Replace Xavier TV Stand",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 71: Stores should focus on selling the black version of the Xavier TV stand as the brown version sells out."
+    },
+    {
+      "event_id": "f8d7b861-c496-4dc5-98c2-522a48cac853",
+      "store_area": "Home",
+      "title": "Dept. 74: Item Delays for Week 12 Mod Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 74: All new modular items will arrive late for the week 12 mod set for Food Storage."
+    },
+    {
+      "event_id": "2cb5b9ef-e2c8-4068-ac72-743e6c966041",
+      "store_area": "Home",
+      "title": "Dept. 74: Week 12 Modular Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 74: Most new\u00a0items for the week 12 modular update are in PDQs. Select stores will get Rubbermaid Pack and Go on the 28-foot Food Storage Modular, replacing Sistema."
+    },
+    {
+      "event_id": "50b6d2b8-37ae-4e1e-8b1e-60e89d72efe9",
+      "store_area": "Home",
+      "title": "Home: Mainstays Kids Brand Launch \u2013 Key Updates\u00a0",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Home, stores are getting ready\u00a0for a second round of markdowns as they prepare for the week 14 Mainstays Kids launch."
+    },
+    {
       "event_id": "3af56747-a804-4bca-833c-00acedbc5b74",
       "store_area": "People",
       "title": "AI Tip of the Week",
@@ -205,11 +273,11 @@
       "summary_text": "Keep Calm and Ask My Assistant. AI Tip of the Week.\n\nYour days are busy, and it can be easy to forget a task or when something is due. Ask My Assistant to create a weekly and, or monthly checklist to follow. This can help keep you organized and not miss any steps."
     },
     {
-      "event_id": "9902f4a3-f0a9-4c21-a6ba-941ecf699992",
-      "store_area": "People",
-      "title": "Update: Attendance Authorization Reason",
+      "event_id": "279cefb5-379d-4162-8007-0b4c8e062c85",
+      "store_area": "Seasonal",
+      "title": "Dept. 18/67: Mother\u2019s Day, Graduation and Patriotic Updates",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Update, Attendance Authorization Reason.\n\nBeginning Saturday, April 18, when managers authorize an exception in the Global Time and Attendance system using Protected Paid Time off, an updated authorization reason will display protected by associate balance, ppto and or sick.\n\nThis update will not change ppto eligibility, accruals or how associates can protect their attendance exceptions. Review the attendance authorize reason guide for more information."
+      "summary_text": "Dept. 18/67: Seasonal update: maintain Mother\u2019s Day modulars, set Graduation/Patriotic, refresh Celebrations Value Wall, and support balloons/cards plus Teacher Appreciation gifts."
     },
     {
       "event_id": "47d44fb7-7895-4eb7-a07e-6c9d188e44b3",
@@ -217,20 +285,21 @@
       "title": "Dept. 56: Watering Guide and Best Practices",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Dept. 56:\u00a0Use proper wand and water mat practices and water twice daily using the correct procedure to prevent under- or over-watering that can damage plants."
-    }
-  ],
-  "events_without_summary": [
-    {
-      "event_id": "11b1ae6d-e355-48dc-9419-6283732fe8b5",
-      "title": "Dept. 71: Action Required - Replace Xavier TV Stand",
-      "area": "Home",
-      "status": "Review for Publish review - No Comms"
     },
     {
-      "event_id": "50b6d2b8-37ae-4e1e-8b1e-60e89d72efe9",
-      "title": "Home: Mainstays Kids Brand Launch \u2013 Key Updates\u00a0",
-      "area": "Home",
-      "status": "Review for Publish review - No Comms"
+      "event_id": "fce6a43e-9c57-4d82-8a00-beb6eee19367",
+      "store_area": "Total Store",
+      "title": "High Heat Weather Notification Emails",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Stores will now get hot weather alert emails when temperatures are forecasted to hit 90 degrees or higher. Leaders should share the alert with the team and follow the Heat Related Illness Prevention Plan to help prevent heat-related illness. Questions? Email BeSafe@walmart.com\u00a0or call 800-530-9923."
+    },
+    {
+      "event_id": "e5edc680-5674-4a68-a5ce-80f5bb003eda",
+      "store_area": "Total Store",
+      "title": "Sales Tax Exemption Validation Changes",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Sales tax exemption validation has changed. Customers will only be tax-exempt if they\u2019re approved in the state where the purchase is made. Otherwise, sales tax will be charged automatically at checkout. Customers can submit or update exemptions online. Individuals can go to\u00a0Walmart.com/tax-exemption, and businesses can go to Business.Walmart.com/GoTaxExempt."
     }
-  ]
+  ],
+  "events_without_summary": []
 }

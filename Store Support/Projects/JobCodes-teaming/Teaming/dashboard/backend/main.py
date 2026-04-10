@@ -1,4 +1,4 @@
-"""
+﻿"""
 Job Code Teaming Dashboard - Backend Server
 Manages job codes and their teaming assignments with user authentication.
 """
@@ -83,8 +83,8 @@ os.makedirs(DATA_DIR, exist_ok=True)
 # ============================================================
 
 app = FastAPI(
-    title="Job Code Teaming Dashboard",
-    description="Manage job codes and teaming assignments",
+    title="Aligned",
+    description="Manage job codes and teaming assignments - Store Impact through Job Codes",
     version="1.0.0"
 )
 
@@ -152,9 +152,9 @@ async def startup_event():
         if os.path.exists(JOB_CODE_MASTER_EXCEL):
             master_df = pd.read_excel(JOB_CODE_MASTER_EXCEL)
             master_records = master_df.to_dict('records')
-            print(f"✓ Loaded {len(master_records)} enrichment records from Excel")
+            print(f"âœ“ Loaded {len(master_records)} enrichment records from Excel")
     except Exception as e:
-        print(f"⚠️ Could not load Excel (openpyxl not available or file error): {e}")
+        print(f"âš ï¸ Could not load Excel (openpyxl not available or file error): {e}")
         master_records = []
     
     # Second try: Load from JSON fallback (created by convert_excel_to_json.py)
@@ -166,11 +166,11 @@ async def startup_event():
                 with open(json_fallback_path, 'r', encoding='utf-8') as f:
                     json_data = json.load(f)
                     master_records = json_data.get('job_codes', [])
-                    print(f"✓ Loaded {len(master_records)} enrichment records from JSON fallback")
+                    print(f"âœ“ Loaded {len(master_records)} enrichment records from JSON fallback")
             else:
-                print(f"ℹ JSON fallback not found. Run: python convert_excel_to_json.py")
+                print(f"â„¹ JSON fallback not found. Run: python convert_excel_to_json.py")
         except Exception as e:
-            print(f"⚠️ Could not load JSON fallback: {e}")
+            print(f"âš ï¸ Could not load JSON fallback: {e}")
     
     # Sync all loaded master records to cache
     if master_records:
@@ -196,9 +196,9 @@ async def startup_event():
                 except Exception as e:
                     if idx < 5:  # Only log first 5 errors to avoid spam
                         print(f"Warning: Failed to sync job code {job_code}: {e}")
-        print(f"✓ Synced {synced_count} job codes from master data to cache")
+        print(f"âœ“ Synced {synced_count} job codes from master data to cache")
     else:
-        print(f"ℹ No master enrichment data loaded (job codes will show without details)")
+        print(f"â„¹ No master enrichment data loaded (job codes will show without details)")
     
     # Start background sync thread (will attempt BigQuery every 30 min)
     cache.start_sync_thread(sync_polaris_from_bigquery if HAS_BIGQUERY else None)
@@ -430,13 +430,13 @@ def load_job_code_data():
                 )
             
         except ImportError as e:
-            print(f"⚠️  WARNING: Cannot load Excel teaming data: {e}")
+            print(f"âš ï¸  WARNING: Cannot load Excel teaming data: {e}")
             print("   Proceeding without teaming data (openpyxl not installed)")
             teaming_df = pd.DataFrame()
             merged = polaris_df.copy()  # Start fresh with just Polaris data
             has_team_data = False  # Explicitly set to False
         except Exception as e:
-            print(f"⚠️  WARNING: Error loading teaming data: {e}")
+            print(f"âš ï¸  WARNING: Error loading teaming data: {e}")
             import traceback
             traceback.print_exc()
             teaming_df = pd.DataFrame()
@@ -757,7 +757,7 @@ def send_email_notification(subject: str, body: str, to_email: str = NOTIFY_EMAI
                 email_sent = True
                 
         except Exception as e:
-            print(f"⚠️ Email sending failed (outside Walmart network?): {e}")
+            print(f"âš ï¸ Email sending failed (outside Walmart network?): {e}")
             print(f"Troubleshooting: Ensure you're on Walmart VPN or network")
             
             # Queue for manual review
@@ -1524,7 +1524,7 @@ async def test_email(request: Request):
         body=f"""
         <html>
         <body style="font-family: Arial, sans-serif;">
-        <h2 style="color: #0071ce;">✅ Email Test Successful!</h2>
+        <h2 style="color: #0071ce;">âœ… Email Test Successful!</h2>
         <p>This is a test email from the Job Code Teaming Dashboard.</p>
         <table border="1" cellpadding="10" style="border-collapse: collapse;">
             <tr><td><strong>Sent by:</strong></td><td>{user['name']} ({user['username']})</td></tr>
@@ -1551,7 +1551,7 @@ def load_job_codes_master():
     """
     # Load Polaris data as source of truth for active job codes
     if not os.path.exists(POLARIS_DATA_FILE):
-        print(f"⚠️ WARNING: Polaris data file not found at {POLARIS_DATA_FILE}")
+        print(f"âš ï¸ WARNING: Polaris data file not found at {POLARIS_DATA_FILE}")
         return {"job_codes": [], "last_synced": None, "source": "none"}
     
     print(f"Loading Job Codes from Polaris: {POLARIS_DATA_FILE}")
@@ -1668,7 +1668,7 @@ def load_job_codes_master():
         "source": "polaris_with_excel_notes"
     }
     
-    print(f"✓ Loaded {len(job_codes)} job codes from Polaris with user counts")
+    print(f"âœ“ Loaded {len(job_codes)} job codes from Polaris with user counts")
     
     return data
 
@@ -1680,7 +1680,7 @@ def save_job_codes_master(job_codes):
 def sync_job_codes_from_excel():
     """Load job codes from Excel master table and sync to JSON"""
     if not os.path.exists(JOB_CODE_MASTER_EXCEL):
-        print(f"⚠️ WARNING: Job Code Master Excel not found at {JOB_CODE_MASTER_EXCEL}")
+        print(f"âš ï¸ WARNING: Job Code Master Excel not found at {JOB_CODE_MASTER_EXCEL}")
         return {"job_codes": [], "last_synced": None}
     
     print(f"Loading Job Code Master from: {JOB_CODE_MASTER_EXCEL}")
@@ -1702,7 +1702,7 @@ def sync_job_codes_from_excel():
     }
     
     save_job_codes_master(data)
-    print(f"✓ Loaded {len(job_codes)} job codes from Excel")
+    print(f"âœ“ Loaded {len(job_codes)} job codes from Excel")
     return data
 
 def load_job_code_requests():
@@ -1963,7 +1963,7 @@ async def approve_job_code_request(request_id: int, request: Request):
         body=f"""
         <html>
         <body style="font-family: Arial, sans-serif;">
-        <h2 style="color: green;">✓ Job Code Request Approved</h2>
+        <h2 style="color: green;">âœ“ Job Code Request Approved</h2>
         <p>Your job code request has been approved by {user['name']}.</p>
         <table border="1" cellpadding="5" style="border-collapse: collapse;">
             <tr><td><strong>Job Code:</strong></td><td>{req.get('job_code', 'New Code')}</td></tr>
@@ -2021,7 +2021,7 @@ async def reject_job_code_request(request_id: int, request: Request):
         body=f"""
         <html>
         <body style="font-family: Arial, sans-serif;">
-        <h2 style="color: red;">✗ Job Code Request Rejected</h2>
+        <h2 style="color: red;">âœ— Job Code Request Rejected</h2>
         <p>Your job code request has been rejected by {user['name']}.</p>
         <table border="1" cellpadding="5" style="border-collapse: collapse;">
             <tr><td><strong>Job Code:</strong></td><td>{req.get('job_code', 'Request')}</td></tr>
@@ -2057,6 +2057,17 @@ async def get_rejection_history_for_job_code(job_code: str, request: Request):
         "teaming_rejections": history.get("teaming", {}).get(job_code, [])
     }
 
+
+
+# ============================================================
+# /aligned ROUTE - Main Entry Point for Aligned App
+# ============================================================
+
+@app.get("/aligned")
+async def serve_aligned():
+    """Serve Aligned app from /aligned path"""
+    return RedirectResponse(url="/static/index.html")
+
 # ============================================================
 # STATIC FILES
 # ============================================================
@@ -2067,6 +2078,15 @@ print(f"\n[STATIC FILES] Frontend path: {FRONTEND_PATH}")
 print(f"[STATIC FILES] Path exists: {os.path.exists(FRONTEND_PATH)}")
 if os.path.exists(FRONTEND_PATH):
     print(f"[STATIC FILES] Files in frontend: {os.listdir(FRONTEND_PATH)}")
+
+@app.get("/Spark_Blank.png")
+async def spark_blank():
+    """Serve Spark favicon PNG"""
+    path = os.path.join(FRONTEND_PATH, "Spark_Blank.png")
+    if os.path.exists(path):
+        return FileResponse(path, media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
+    from fastapi.responses import Response
+    return Response(status_code=204)
 
 @app.get("/favicon.ico")
 async def favicon():
@@ -2144,7 +2164,7 @@ async def submit_feedback(request: Request):
         
         return {"success": True, "message": "Feedback submitted successfully"}
     except Exception as e:
-        print(f"❌ Error submitting feedback: {str(e)}")
+        print(f"âŒ Error submitting feedback: {str(e)}")
         return {"success": False, "error": str(e)}
 
 @app.get("/api/feedback")
@@ -2194,9 +2214,9 @@ This is an automated notification from the Job Codes Teaming Dashboard.
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.sendmail(FROM_EMAIL, recipients, msg.as_string())
         
-        print(f"✅ Feedback notification sent to {', '.join(recipients)}")
+        print(f"âœ… Feedback notification sent to {', '.join(recipients)}")
     except Exception as e:
-        print(f"⚠️ Failed to send feedback notification: {str(e)}")
+        print(f"âš ï¸ Failed to send feedback notification: {str(e)}")
 
 # ============================================================
 # MAIN
@@ -2207,10 +2227,10 @@ def check_pending_requests():
     users = load_users()
     pending = [u for u, data in users.items() if not data.get('approved', False) and u != 'admin']
     if pending:
-        print(f"\n🔔 PENDING ACCESS REQUESTS: {len(pending)}")
+        print(f"\nðŸ”” PENDING ACCESS REQUESTS: {len(pending)}")
         for username in pending:
             user_data = users[username]
-            print(f"   • {user_data.get('name', username)} ({username}) - registered {user_data.get('registered', 'unknown')}")
+            print(f"   â€¢ {user_data.get('name', username)} ({username}) - registered {user_data.get('registered', 'unknown')}")
         print(f"   Go to Admin tab to approve/deny these requests.\n")
     return pending
 
@@ -2223,19 +2243,19 @@ def verify_data_files():
     print(f"    Exists: {os.path.exists(POLARIS_DATA_FILE)}")
     
     if not os.path.exists(TEAMING_DATA_FILE):
-        print(f"  ⚠️ WARNING: Teaming data file not found!")
+        print(f"  âš ï¸ WARNING: Teaming data file not found!")
     if not os.path.exists(POLARIS_DATA_FILE):
-        print(f"  ⚠️ WARNING: Polaris data file not found!")
+        print(f"  âš ï¸ WARNING: Polaris data file not found!")
 
 if __name__ == "__main__":
     print(f"""
-╔══════════════════════════════════════════════════════════════╗
-║         JOB CODE TEAMING DASHBOARD                           ║
-╠══════════════════════════════════════════════════════════════╣
-║  Server running at: http://localhost:{PORT}                   ║
-║  Default login: admin / admin123                             ║
-║  (Change password immediately!)                              ║
-╚══════════════════════════════════════════════════════════════╝
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘         JOB CODE TEAMING DASHBOARD                           â•‘
+â• â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•£
+â•‘  Server running at: http://localhost:{PORT}                   â•‘
+â•‘  Default login: admin / admin123                             â•‘
+â•‘  (Change password immediately!)                              â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     """)
     
     # Verify data files exist
@@ -2245,3 +2265,5 @@ if __name__ == "__main__":
     check_pending_requests()
     
     uvicorn.run(app, host=HOST, port=PORT)
+
+

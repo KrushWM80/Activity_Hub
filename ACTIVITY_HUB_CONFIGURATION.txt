@@ -1,4 +1,4 @@
-# Activity Hub Complete Service Configuration
+﻿# Activity Hub Complete Service Configuration
 # Updated March 12, 2026
 
 The Activity Hub requires FOUR core services to be fully operational:
@@ -13,14 +13,13 @@ The Activity Hub requires FOUR core services to be fully operational:
 - Frontend: http://10.97.114.181:8001/
 - Hostname: leus62315243171.homeoffice.wal-mart.com (DNS currently incorrect - points to 10.97.108.66)
 
-## 2. JOB CODES TEAMING DASHBOARD
+## 2. ALIGNED (Job Codes & Teaming)
 - Location: Store Support/Projects/JobCodes-teaming/Teaming/dashboard/backend/
 - Service: FastAPI Backend
 - Port: 8080
-- Start Command: C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\start_jobcodes_server_24_7.bat
-- Task Name: JobCodes-Backend-Server
-- Auto-Start: YES (on system startup with 15-second delay)
-- Frontend: http://10.97.114.181:8080/static/index.html#
+- Access URL: http://weus42608431466:8080/aligned  PRIMARY
+- Legacy URL: http://10.97.114.181:8080/static/index.html# (compatibility only)
+- Hostname: weus42608431466
 - Hostname: leus62315243171.homeoffice.wal-mart.com (DNS currently incorrect - points to 10.97.108.66)
 - Additional: Daily reconciliation at 2:00 AM (Task: JobCodes-Daily-Reconciliation)
 
@@ -58,3 +57,4 @@ This will:
 - Create all 26 PayCycle automation tasks  
 - Create both daily email tasks
 - Verify all 31 tasks are active
+

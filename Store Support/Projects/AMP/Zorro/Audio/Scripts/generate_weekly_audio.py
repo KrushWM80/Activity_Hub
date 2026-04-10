@@ -17,7 +17,7 @@ import sys
 import json
 import logging
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from html.parser import HTMLParser
 from dataclasses import dataclass, field
 from typing import Optional, List
@@ -94,6 +94,50 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 # AMP message URL pattern
 AMP_MSG_URL = "https://amp2-cms.prod.walmart.com/message/{event_id}/{week}/{fy}"
+
+
+def get_current_wm_week_fy():
+    """Return (week, fy) for today from the Walmart CALENDAR_DIM table in BQ.
+
+    Primary: queries wmt-edw-prod.US_CORE_DIM_VM.CALENDAR_DIM for authoritative
+    WM_WEEK_NBR and FISCAL_YEAR_NBR.
+    Fallback: local Python calculation if BQ is unreachable.
+    """
+    # Primary: BQ CALENDAR_DIM (authoritative source)
+    try:
+        from google.cloud import bigquery
+        client = bigquery.Client(project='wmt-assetprotection-prod')
+        q = (
+            "SELECT WM_WEEK_NBR, FISCAL_YEAR_NBR "
+            "FROM `wmt-edw-prod.US_CORE_DIM_VM.CALENDAR_DIM` "
+            "WHERE CALENDAR_DATE = CURRENT_DATE() LIMIT 1"
+        )
+        for row in client.query(q).result():
+            week = int(row.WM_WEEK_NBR)
+            fy = int(row.FISCAL_YEAR_NBR)
+            logger.info(f"WM Week from CALENDAR_DIM: Week {week}, FY{fy}")
+            return week, fy
+    except Exception as e:
+        logger.warning(f"CALENDAR_DIM lookup failed, using local fallback: {e}")
+
+    # Fallback: local calculation
+    today = datetime.now().date()
+    if today.month >= 2:
+        fy_start_year = today.year
+    else:
+        fy_start_year = today.year - 1
+    fy = fy_start_year + 1
+    feb1 = datetime(fy_start_year, 2, 1).date()
+    days_since_sat = (feb1.weekday() - 5) % 7
+    if days_since_sat <= 3:
+        first_saturday = feb1 - timedelta(days=days_since_sat)
+    else:
+        first_saturday = feb1 + timedelta(days=7 - days_since_sat)
+    days_diff = (today - first_saturday).days
+    week = max(1, (days_diff // 7) + 1 if days_diff >= 0 else 1)
+    logger.info(f"WM Week from local calc: Week {week}, FY{fy}")
+    return week, fy
+
 
 # ── Segment-based prosody (V2 Enhanced) ─────────────────────────────────────
 
@@ -554,12 +598,12 @@ def fetch_and_cache_bq_data(week, fy):
         for row in client.query(status_query, job_config=status_config).result():
             status_breakdown.append({'status': row.Status, 'count': row.cnt})
             total_all += row.cnt
-            if 'Denied' not in (row.Status or ''):
+            if 'Denied' not in (row.Status or '') and 'Expired' not in (row.Status or ''):
                 total_excl_denied += row.cnt
     except Exception as e:
         logger.warning(f"Could not fetch status breakdown: {e}")
 
-    logger.info(f"Status breakdown: {len(status_breakdown)} statuses, total (excl. Denied): {total_excl_denied}")
+    logger.info(f"Status breakdown: {len(status_breakdown)} statuses, total (excl. Denied/Expired): {total_excl_denied}")
 
     # Get BQ table refresh timestamp (when ETL last wrote to the table)
     bq_last_updated = None

@@ -297,6 +297,14 @@ async def shutdown():
 # FAVICON (prevent 404)
 # =============================================
 
+@app.get("/Spark_Blank.png")
+async def spark_blank():
+    fav_path = Path(__file__).parent.parent / "frontend" / "Spark_Blank.png"
+    if fav_path.exists():
+        return FileResponse(str(fav_path), media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
+    from fastapi.responses import Response
+    return Response(content=b"", media_type="image/png", status_code=204)
+
 @app.get("/favicon.ico")
 async def favicon():
     fav_path = Path(__file__).parent.parent / "frontend" / "Spark_Blank.png"

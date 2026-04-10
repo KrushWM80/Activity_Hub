@@ -34,6 +34,8 @@ function Get-SystemStatus {
         Port5001Listening = $false
         MeetingPlannerRunning = $false
         Port8090Listening = $false
+        RebootPending = $false
+        RebootReasons = ""
     }
     
     # Check Projects in Stores (port 8001)
@@ -100,6 +102,25 @@ function Get-SystemStatus {
     # Check DC Manager Tasks
     $dcTasks = Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object {$_.TaskName -like "DC-EMAIL-PC-*"}
     $status.DCTasksCount = if ($dcTasks) { $dcTasks.Count } else { 0 }
+
+    # Check for pending reboot / Windows Update
+    $rebootPending = $false
+    $rebootReasons = @()
+    if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending") {
+        $rebootPending = $true
+        $rebootReasons += "Windows Update (CBS)"
+    }
+    if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired") {
+        $rebootPending = $true
+        $rebootReasons += "Windows Update (AU)"
+    }
+    $pendingFileRename = (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" -ErrorAction SilentlyContinue).PendingFileRenameOperations
+    if ($pendingFileRename) {
+        $rebootPending = $true
+        $rebootReasons += "Pending file operations"
+    }
+    $status.RebootPending = $rebootPending
+    $status.RebootReasons = if ($rebootReasons.Count -gt 0) { $rebootReasons -join ", " } else { "" }
     
     return $status
 }
@@ -163,6 +184,18 @@ function Build-StatusEmail {
     </div>
 "@
     }
+
+    $rebootAlert = ""
+    if ($CurrentStatus.RebootPending) {
+        $rebootAlert = @"
+    <div style="background-color: #fff3cd; border: 2px solid #ff6f00; padding: 15px; margin: 15px 0; border-radius: 5px;">
+        <h3 style="color: #e65100; margin-top: 0;">&#9888; REBOOT PENDING</h3>
+        <p><strong>Windows has a pending reboot queued.</strong> Services will go offline when the reboot occurs.</p>
+        <p><strong>Reason:</strong> $($CurrentStatus.RebootReasons)</p>
+        <p>Please schedule a maintenance window before leaving for the day.</p>
+    </div>
+"@
+    }
     
     $html = @"
 <!DOCTYPE html>
@@ -188,6 +221,7 @@ function Build-StatusEmail {
 
     $downtimeAlert
     $restartNote
+    $rebootAlert
 
     <div class="section">
         <h3>System Components</h3>

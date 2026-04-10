@@ -1,12 +1,12 @@
-# Job Codes Dashboard - Access Guide
+﻿# Job Codes Dashboard - Access Guide
 
 **Status: March 12, 2026**
 
 ---
 
-## ✅ CURRENT SOLUTION: Use IP Address (WORKING NOW)
+## âœ… CURRENT SOLUTION: Use IP Address (WORKING NOW)
 
-### 🔗 Access URL (IP-Based)
+### ðŸ”— Access URL (IP-Based)
 ```
 http://10.97.114.181:8080/static/index.html#
 ```
@@ -15,19 +15,19 @@ http://10.97.114.181:8080/static/index.html#
 
 ---
 
-## 📋 What's the Issue?
+## ðŸ“‹ What's the Issue?
 
 Your bookmarked URL uses a hostname that currently points to the **wrong IP**:
 
 | Aspect | Current | Issue |
 |--------|---------|-------|
-| **Bookmarked URL** | `http://leus62315243171.homeoffice.wal-mart.com:8080/static/index.html#` | ✗ DNS points to 10.97.108.66 |
-| **Actual Service Location** | `10.97.114.181:8080` | ✓ Service IS running here |
-| **DNS A Record** | Points to 10.97.108.66 | ✗ No service on this IP |
+| **Bookmarked URL** | `http://leus62315243171.homeoffice.wal-mart.com:8080/static/index.html#` | âœ— DNS points to 10.97.108.66 |
+| **Actual Service Location** | `10.97.114.181:8080` | âœ“ Service IS running here |
+| **DNS A Record** | Points to 10.97.108.66 | âœ— No service on this IP |
 
 ---
 
-## 🔧 PERMANENT FIX (Requires IT)
+## ðŸ”§ PERMANENT FIX (Requires IT)
 
 **Contact IT and request:**
 
@@ -40,7 +40,7 @@ Your bookmarked URL uses a hostname that currently points to the **wrong IP**:
 
 ---
 
-## 🚀 IMMEDIATE WORKAROUNDS
+## ðŸš€ IMMEDIATE WORKAROUNDS
 
 ### Option 1: Update Bookmarks (Recommended)
 Replace your bookmark with:
@@ -61,7 +61,7 @@ Add this line to `C:\Windows\System32\drivers\etc\hosts`:
 
 ---
 
-## 📞 IT Escalation Template
+## ðŸ“ž IT Escalation Template
 
 If you need to contact IT, use this information:
 
@@ -81,7 +81,7 @@ Request: Update A record to point to correct IP
 
 ---
 
-## ✨ Configuration Reference
+## âœ¨ Configuration Reference
 
 See [config.py](./config.py) for detailed configuration options:
 - Hostname vs IP switch
@@ -91,7 +91,7 @@ See [config.py](./config.py) for detailed configuration options:
 
 ---
 
-## 📊 Status Dashboard
+## ðŸ“Š Status Dashboard
 
 Current Active Configuration:
 ```python
@@ -105,5 +105,6 @@ ACCESS_DESCRIPTION = "IP Address (Direct - No DNS)"
 ---
 
 **Last Updated:** March 12, 2026
-**Service Status:** ✅ Running
-**Access Status:** ✅ Available via IP
+**Service Status:** âœ… Running
+**Access Status:** âœ… Available via IP
+
