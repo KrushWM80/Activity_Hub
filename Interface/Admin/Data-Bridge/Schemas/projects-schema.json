@@ -65,7 +65,7 @@
           "required": false,
           "description": "Current project phase",
           "validation": {
-            "enum": ["POC/POT", "Test", "Mkt Scale", "Roll/Deploy", "Complete", "Pending", "Planning"]
+            "enum": ["Vet", "Test", "Test Markets", "Roll/Deploy", "Complete", "Pending", "Planning"]
           },
           "aliases": ["Phase", "PROJECT_PHASE", "PROJECT_PHASE_2", "project_phase", "stage"]
         },

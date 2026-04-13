@@ -1,23 +1,25 @@
 {
-    "Port8888Listening":  false,
-    "ProjectsInStoresRunning":  true,
-    "JobCodesBackendTask":  true,
-    "VETDashboardRunning":  true,
-    "Port8001Listening":  true,
-    "TimeStamp":  {
-                      "value":  "\/Date(1775818817648)\/",
-                      "DisplayHint":  2,
-                      "DateTime":  "Friday, April 10, 2026 6:00:17 AM"
-                  },
-    "TDAWeeklyEmailTask":  true,
-    "TDARunning":  false,
-    "Port8090Listening":  true,
-    "StoreActivityDashboardRunning":  false,
+    "Port8001Listening":  false,
     "MeetingPlannerRunning":  true,
-    "JobCodesRunning":  true,
-    "Port8080Listening":  true,
-    "ZorroRunning":  false,
+    "StoreActivityDashboardRunning":  false,
+    "Port5000Listening":  true,
+    "VETDashboardRunning":  true,
+    "TDARunning":  true,
+    "RebootPending":  true,
     "DCTasksCount":  26,
+    "Port8888Listening":  false,
+    "ProjectsInStoresRunning":  false,
+    "Port8090Listening":  true,
+    "JobCodesRunning":  true,
+    "TDAWeeklyEmailTask":  true,
+    "ZorroRunning":  false,
     "Port5001Listening":  true,
-    "Port5000Listening":  false
+    "RebootReasons":  "Pending file operations",
+    "TimeStamp":  {
+                      "value":  "\/Date(1776078015907)\/",
+                      "DisplayHint":  2,
+                      "DateTime":  "Monday, April 13, 2026 6:00:15 AM"
+                  },
+    "JobCodesBackendTask":  true,
+    "Port8080Listening":  true
 }

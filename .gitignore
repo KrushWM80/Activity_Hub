@@ -145,3 +145,7 @@ Repo/
 *_cache.db
 cache.db
 *.cache
+
+# Large diagnostic snapshots - local system only
+**/snapshots/
+Store Support/Projects/Intake Hub/Intake Hub/ProjectsinStores/backend/snapshots/

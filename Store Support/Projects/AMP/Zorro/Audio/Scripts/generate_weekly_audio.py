@@ -139,6 +139,39 @@ def get_current_wm_week_fy():
     return week, fy
 
 
+def get_coming_wm_week_fy():
+    """Return (week, fy) for the COMING week (7 days from today).
+
+    Used by the daily status email so partners see the week they're
+    currently preparing messages for, not the week that's finishing.
+    """
+    # Primary: BQ CALENDAR_DIM — query 7 days ahead
+    try:
+        from google.cloud import bigquery
+        client = bigquery.Client(project='wmt-assetprotection-prod')
+        q = (
+            "SELECT WM_WEEK_NBR, FISCAL_YEAR_NBR "
+            "FROM `wmt-edw-prod.US_CORE_DIM_VM.CALENDAR_DIM` "
+            "WHERE CALENDAR_DATE = DATE_ADD(CURRENT_DATE(), INTERVAL 7 DAY) LIMIT 1"
+        )
+        for row in client.query(q).result():
+            week = int(row.WM_WEEK_NBR)
+            fy = int(row.FISCAL_YEAR_NBR)
+            logger.info(f"Coming WM Week from CALENDAR_DIM: Week {week}, FY{fy}")
+            return week, fy
+    except Exception as e:
+        logger.warning(f"CALENDAR_DIM coming-week lookup failed, using local fallback: {e}")
+
+    # Fallback: current week + 1
+    week, fy = get_current_wm_week_fy()
+    week += 1
+    if week > 52:
+        week = 1
+        fy += 1
+    logger.info(f"Coming WM Week from local calc: Week {week}, FY{fy}")
+    return week, fy
+
+
 # ── Segment-based prosody (V2 Enhanced) ─────────────────────────────────────
 
 @dataclass

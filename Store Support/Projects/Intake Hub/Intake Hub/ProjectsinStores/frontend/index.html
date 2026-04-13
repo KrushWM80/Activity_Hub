@@ -831,7 +831,7 @@
             
             // Populate phase filter with custom order
             if (filters.phases && Array.isArray(filters.phases)) {
-                const phaseOrder = ['Pending', 'POC/POT', 'Test', 'Mkt Scale', 'Roll/Deploy', 'Complete', 'Realty'];
+                const phaseOrder = ['Pending', 'Vet', 'Test', 'Test Markets', 'Roll/Deploy', 'Complete', 'Realty'];
                 const sortedPhases = phaseOrder.filter(p => filters.phases.includes(p));
                 // Add any phases not in the custom order at the end
                 const otherPhases = filters.phases.filter(p => !phaseOrder.includes(p));

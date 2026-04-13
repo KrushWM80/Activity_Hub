@@ -1131,7 +1131,7 @@ function renderCalendar() {
                     dayEvents.slice(0, 3).forEach(ev => {
                         const labelClass = ev.is_protected_week ? 'event-label protected-label' : 'event-label';
                         if (ev.event_id) {
-                            const ampUrl = `https://amp2-cms.prod.walmart.com/message/${ev.event_id}/10/2027`;
+                            const ampUrl = `https://amp2-cms.prod.walmart.com/message/${ev.event_id}/${ev.wm_week}/${ev.wm_year}`;
                             inner += `<a href="${ampUrl}" target="_blank" onclick="event.stopPropagation()" style="text-decoration:none"><span class="${labelClass}" title="${esc(ev.title || '')} — Click to view in AMP">${esc(ev.title || 'Event')}</span></a>`;
                         } else {
                             inner += `<span class="${labelClass}" title="${esc(ev.title || '')}">${esc(ev.title || 'Event')}</span>`;
@@ -1371,7 +1371,7 @@ async function runComplianceScan() {
             html += '<table class="data-table"><thead><tr><th>Confidence</th><th>Title</th><th>Type</th><th>Dates</th><th>Author</th><th>Stores</th><th>AMP Link</th><th>Preview</th></tr></thead><tbody>';
             flagged.forEach(f => {
                 const confClass = f.confidence === 'HIGH' ? 'color:#dc3545;font-weight:700' : 'color:#ffc107;font-weight:600';
-                const ampLink = f.event_id ? `<a href="https://amp2-cms.prod.walmart.com/message/${f.event_id}/10/2027" target="_blank" style="color:var(--walmart-blue);font-size:0.8rem">View ↗</a>` : '—';
+                const ampLink = f.event_id ? `<a href="https://amp2-cms.prod.walmart.com/message/${f.event_id}/${f.wm_week}/${f.wm_year}" target="_blank" style="color:var(--walmart-blue);font-size:0.8rem">View ↗</a>` : '—';
                 html += `<tr>
                     <td style="${confClass}">${esc(f.confidence)}</td>
                     <td>${esc(f.title)}</td>

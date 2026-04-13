@@ -1,6 +1,6 @@
 # 📚 Activity Hub - Knowledge Hub & Dependencies Map
 
-**Last Updated**: April 1, 2026  
+**Last Updated**: April 13, 2026  
 **Project**: Walmart Enterprise Activity Hub  
 **Scope**: Complete organizational reference for architecture, dependencies, and institutional knowledge
 
@@ -233,10 +233,34 @@ Individual Tier (7-8) → Specialist, Team Member, Admin
 
 ## 🖥️ Live Services & Automation
 
-**Last Updated**: April 1, 2026  
+**Last Updated**: April 13, 2026  
 **Machine**: WEUS42608431466 | IP: 10.97.114.181 | User: `krush`
 
-### Active Services (7 total)
+---
+
+### System Resilience Architecture (Ways of Working)
+
+Four layers keep services running. **All four must be healthy** — each layer is a fallback for the one above it.
+
+| Layer | How It Works | Current State |
+|-------|-------------|---------------|
+| **Layer 1 — No crash** | Bat restart loops run forever, restart within 5s of any crash | ✅ All 8 services have bat loops |
+| **Layer 2 — Reboot recovery** | `onlogon` scheduled tasks launch bat loops at every login | ✅ All 8 AutoStart tasks registered (April 13, 2026) |
+| **Layer 3 — Health monitoring** | `continuous_monitor.ps1` every 5 min, checks all 8 ports, restarts any down bat loop | ✅ Built and registered as `Activity_Hub_ContinuousMonitor` |
+| **Layer 4 — Daily email** | `MONITOR_AND_REPORT.ps1` at 6 AM — health report + reboot-pending warning | ✅ Running, reboot-pending alert added April 10, 2026 |
+
+**⚠️ Important — the 3 AM JobCodes forced restart:**  
+`Activity_Hub_JobCodes_AutoStart` includes a nightly 3 AM restart. This is a **workaround** for a historical memory leak / BigQuery token expiry issue on that service — it is **not** a pattern to apply to other services. A forced nightly restart hides degradation instead of fixing it. Do not copy this to other bat files.
+
+**Re-registering all tasks** (required after any Windows Update reboot that clears tasks):  
+From an **admin terminal** (Win+X → Terminal Admin):
+```
+& "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Automation\register_tasks_cmd.bat"
+```
+
+---
+
+### Active Services (8 total)
 
 | Service | Port | URL | Start Script |
 |---------|------|-----|--------------|
@@ -247,10 +271,11 @@ Individual Tier (7-8) → Specialist, Team Member, Admin
 | AMP Store Dashboard | 8081 | http://localhost:8081 | `Automation/start_store_dashboard_24_7.bat` |
 | Store Meeting Planner | 8090 | http://weus42608431466:8090/StoreMeetingPlanner | `Automation/start_meeting_planner_24_7.bat` |
 | Zorro Audio Hub | 8888 | http://weus42608431466:8888/Zorro/Audio_Message_Hub | `Automation/start_zorro_24_7.bat` |
+| Activity Hub | 8088 | http://weus42608431466:8088/activity-hub/ | `Automation/start_activity_hub_24_7.bat` |
 
 ### Scheduled Tasks (Windows Task Scheduler)
 
-All tasks registered April 1, 2026. Requires **elevated (admin) terminal** to create/modify.
+All tasks last registered April 13, 2026. Requires **elevated (admin) terminal** to create/modify.
 
 | Task Name | Trigger | Action |
 |-----------|---------|--------|
@@ -266,6 +291,8 @@ All tasks registered April 1, 2026. Requires **elevated (admin) terminal** to cr
 | `Activity_Hub_TDA_Daily_Email` | Daily 6:00 AM | TDA daily report email (`send_tda_weekly_email.bat`) |
 | `Activity_Hub_TDA_Weekly_Email` | Weekly Thu 11:00 AM | TDA weekly summary email (`send_tda_weekly_email.bat`) |
 | `Activity_Hub_VET_Daily_Email` | Daily 6:00 AM | VET daily report email (`send_vet_daily_email.bat`) |
+| `Activity_Hub_ContinuousMonitor` | Every 5 minutes | Checks all 8 ports, restarts any down bat loop (`Automation/continuous_monitor.ps1`) |
+| `Activity_Hub_Audio_Daily_Status` | Daily 6:00 AM | Zorro audio status email (`Automation/send_audio_status_email.bat`) |
 
 **Verify tasks are registered:**
 ```powershell
@@ -347,7 +374,7 @@ If a service suddenly shows empty or wrong data, check whether BigQuery column v
 2. Check which ports are down: `netstat -ano | Select-String "LISTENING" | Select-String ":5000|:5001|:8001|:8080|:8081|:8088|:8090|:8888"`
 3. Start only the specific downed services using their bat file
 4. Wait 15-20 seconds then re-check ports
-5. The 5-minute continuous monitor (`continuous_monitor.ps1`) acts as backup if a bat loop itself dies
+5. If a bat loop itself dies, `Activity_Hub_ContinuousMonitor` (every 5 min) will detect the down port and restart it via `Automation/continuous_monitor.ps1`
 
 ---
 
@@ -636,6 +663,40 @@ Located in [Platform/Documents/Compliance/](Platform/Documents/Compliance/)
 - Data privacy and handling
 - Security frameworks
 - Enterprise governance
+
+### **System Security Plan (SSP)**
+- **SSP ID:** SSP00004633
+- **APM ID:** APM0022933
+- **Team:** Store Support
+- **Go Live:** 9/21/2026 (Phase 1)
+- **Type:** Implementation SSP (NOT MSO-SSP)
+- **Submitted:** April 13, 2026
+- **Data Classification:** Highly Sensitive
+- **Data Categorization:** PII, System of Record, Financial Data, SOX, Business Information
+
+**SSP Questionnaire Answers:**
+| # | Question | Answer |
+|---|----------|--------|
+| 1 | Committed delivery date? | Yes — 9/21/2026 |
+| 2 | Team owns solution? | Yes |
+| 3 | Team maintains security controls? | Yes |
+| 4 | Require customers to reference SSP? | No (not an MSO) |
+| 5 | Hosting | Walmart GCP + Walmart Store/DC |
+| 6 | External 3rd party data? | No |
+| 7 | Vendor direct network access? | No |
+| 8 | Internet/public networks? | No |
+| 9 | New unapproved tech? | No |
+| 10 | IoT? | No |
+| 11 | OT? | No |
+| 12 | External consumers? | No |
+| 13 | Restricted vendors? | No |
+| 14 | Hourly associate access? | No |
+| 15 | Mobile devices/apps? | No |
+| 16 | NDA/Confidential? | No |
+
+**MSO Determination:** NOT MSO — Sub-platforms (TDA, Job Codes, Projects in Stores, Meeting Planner, Zorro, VET) are components of Activity Hub under the same SSP.
+
+**Agreement:** "We (Store Support) agree that the plan question responses provided are accurate and understand that incorrect responses could lead to cancellation of this SSP."
 
 ### **PCI DSS Scoping**
 - [PCI DSS Scoping Checklist](PCI_DSS_SCOPING_CHECKLIST.md) — 10-section questionnaire (40+ questions)

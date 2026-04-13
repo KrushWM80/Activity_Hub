@@ -1464,6 +1464,34 @@
             border-top: 2px solid var(--gray-300);
         }
 
+        .request-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0.75rem;
+            border-bottom: 2px solid var(--gray-300);
+        }
+        .request-tab {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .request-tab.active {
+            color: var(--walmart-navy);
+            border-bottom-color: var(--walmart-navy);
+        }
+        .request-tab:hover:not(.active) {
+            color: var(--gray-900);
+        }
+        .request-tab-content { display: none; }
+        .request-tab-content.active { display: block; }
+
         /* ─── Links Sidebar Categories ─── */
         .sidebar-category {
             margin-bottom: 0.5rem;
@@ -1769,41 +1797,79 @@
             </div>
 
             <!-- Project Dashboard Widget -->
-            <div class="widget project-widget widget-extra-large" data-widget-id="project-dashboard" data-widget-name="Project Alpha Dashboard" data-default-size="widget-extra-large" draggable="false">
+            <div class="widget project-widget widget-extra-large" data-widget-id="project-dashboard" data-widget-name="Project Work Status" data-default-size="widget-extra-large" draggable="false">
                 <div class="widget-edit-controls">
-                    <span class="widget-ctrl-label">Project Alpha</span>
+                    <span class="widget-ctrl-label">Project Work Status</span>
                     <div class="widget-ctrl-group">
                         <button class="widget-ctrl-btn" onclick="resizeWidget('project-dashboard')" title="Resize">↔ Resize</button>
                         <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('project-dashboard')" title="Remove">✕</button>
                     </div>
                 </div>
                 <div class="widget-header">
-                    📊 Project Alpha Dashboard
-                    <span style="font-size: 0.875rem; opacity: 0.9;">Updated <span class="loading"></span></span>
+                    📊 Project Work Status
+                    <span style="font-size: 0.875rem; opacity: 0.9;">My Projects</span>
                 </div>
                 <div class="widget-content">
                     <div class="metrics-grid">
                         <div class="metric-card">
-                            <div class="metric-value">73%</div>
+                            <div class="metric-value" id="pws-total-count">6</div>
+                            <div class="metric-label">Total Projects</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="pws-active-count">4</div>
+                            <div class="metric-label">Active</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="pws-complete-count">2</div>
                             <div class="metric-label">Complete</div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-value">12</div>
-                            <div class="metric-label">Team Members</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 100px; font-size: 0.85rem; font-weight: 500; color: #4A5568;">Pending</span>
+                            <div style="flex: 1; background: #E2E8F0; border-radius: 6px; height: 22px; position: relative; overflow: hidden;">
+                                <div style="width: 10%; height: 100%; background: #A0AEC0; border-radius: 6px; transition: width 0.5s;"></div>
+                            </div>
+                            <span style="width: 32px; text-align: right; font-size: 0.8rem; color: #718096;">10%</span>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-value">5</div>
-                            <div class="metric-label">Days Left</div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 100px; font-size: 0.85rem; font-weight: 500; color: #4A5568;">Vet</span>
+                            <div style="flex: 1; background: #E2E8F0; border-radius: 6px; height: 22px; position: relative; overflow: hidden;">
+                                <div style="width: 22%; height: 100%; background: #7C3AED; border-radius: 6px; transition: width 0.5s;"></div>
+                            </div>
+                            <span style="width: 32px; text-align: right; font-size: 0.8rem; color: #718096;">22%</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 100px; font-size: 0.85rem; font-weight: 500; color: #4A5568;">Test</span>
+                            <div style="flex: 1; background: #E2E8F0; border-radius: 6px; height: 22px; position: relative; overflow: hidden;">
+                                <div style="width: 40%; height: 100%; background: #3B82F6; border-radius: 6px; transition: width 0.5s;"></div>
+                            </div>
+                            <span style="width: 32px; text-align: right; font-size: 0.8rem; color: #718096;">40%</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 100px; font-size: 0.85rem; font-weight: 500; color: #4A5568;">Test Markets</span>
+                            <div style="flex: 1; background: #E2E8F0; border-radius: 6px; height: 22px; position: relative; overflow: hidden;">
+                                <div style="width: 60%; height: 100%; background: #F59E0B; border-radius: 6px; transition: width 0.5s;"></div>
+                            </div>
+                            <span style="width: 32px; text-align: right; font-size: 0.8rem; color: #718096;">60%</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 100px; font-size: 0.85rem; font-weight: 500; color: #4A5568;">Roll/Deploy</span>
+                            <div style="flex: 1; background: #E2E8F0; border-radius: 6px; height: 22px; position: relative; overflow: hidden;">
+                                <div style="width: 80%; height: 100%; background: #10B981; border-radius: 6px; transition: width 0.5s;"></div>
+                            </div>
+                            <span style="width: 32px; text-align: right; font-size: 0.8rem; color: #718096;">80%</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 100px; font-size: 0.85rem; font-weight: 500; color: #4A5568;">Complete</span>
+                            <div style="flex: 1; background: #E2E8F0; border-radius: 6px; height: 22px; position: relative; overflow: hidden;">
+                                <div style="width: 100%; height: 100%; background: #38A169; border-radius: 6px; transition: width 0.5s;"></div>
+                            </div>
+                            <span style="width: 32px; text-align: right; font-size: 0.8rem; color: #718096;">100%</span>
                         </div>
                     </div>
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <strong>Overall Progress</strong>
-                            <span>73%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 73%"></div>
-                        </div>
+                    <div style="margin-top: 14px; padding: 8px 12px; background: #F7FAFC; border-radius: 6px; font-size: 0.8rem; color: #4A5568; display: flex; align-items: center; gap: 6px;">
+                        <span>📋</span> <strong>SIF Meeting:</strong> <span style="color: #38A169;">Scheduled</span> — Indicates project review milestone
                     </div>
                 </div>
             </div>
@@ -1827,16 +1893,40 @@
             <p style="color: var(--gray-600); margin-bottom: 1rem;">Select a widget to add back to your dashboard:</p>
             <div id="addWidgetList"></div>
             <div class="request-widget-section">
-                <h3 style="font-size: 1rem; color: var(--walmart-navy); margin-bottom: 0.75rem;">💡 Request a Widget</h3>
-                <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.75rem;">Have an idea for a new widget? Submit a request:</p>
+                <h3 style="font-size: 1rem; color: var(--walmart-navy); margin-bottom: 0.75rem;">💡 Widget Requests</h3>
                 <p class="pci-notice" style="font-size: 0.75rem; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 0.4rem 0.6rem; margin-bottom: 0.75rem;">🔒 Do not enter payment card information in any field.</p>
-                <div class="form-group">
-                    <input type="text" id="requestWidgetName" placeholder="Widget name (e.g., Calendar, Weather)">
+                <div class="request-tabs">
+                    <button class="request-tab active" onclick="showRequestTab('new-widget')">New Widget</button>
+                    <button class="request-tab" onclick="showRequestTab('update-widget')">Update Widget</button>
                 </div>
-                <div class="form-group">
-                    <input type="text" id="requestWidgetDesc" placeholder="Brief description of what it should show">
+                <div id="new-widget" class="request-tab-content active">
+                    <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.75rem;">Have an idea for a new widget? Submit a request:</p>
+                    <div class="form-group">
+                        <input type="text" id="requestWidgetName" placeholder="Widget name (e.g., Calendar, Weather)">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="requestWidgetDesc" placeholder="Brief description of what it should show">
+                    </div>
+                    <button class="btn-primary" onclick="submitWidgetRequest()">Submit Request</button>
                 </div>
-                <button class="btn-primary" onclick="submitWidgetRequest()">Submit Request</button>
+                <div id="update-widget" class="request-tab-content">
+                    <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.75rem;">Suggest an update to a current widget:</p>
+                    <div class="form-group">
+                        <select id="updateWidgetSelect" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 0.9rem; font-family: var(--font-primary);">
+                            <option value="">-- Select a Widget --</option>
+                            <option value="my-tasks">My Tasks</option>
+                            <option value="performance">Performance Metrics</option>
+                            <option value="next-steps">Next Steps & Action Items</option>
+                            <option value="projects-feed">Projects Feed</option>
+                            <option value="notifications">Notifications & Alerts</option>
+                            <option value="project-dashboard">Project Work Status</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="updateWidgetDesc" placeholder="Describe the update you'd like to see">
+                    </div>
+                    <button class="btn-primary" onclick="submitWidgetUpdateRequest()">Submit Update Request</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2261,9 +2351,56 @@
             const name = document.getElementById('requestWidgetName').value.trim();
             const desc = document.getElementById('requestWidgetDesc').value.trim();
             if (!name) { alert('Please enter a widget name'); return; }
+
+            // Persist to localStorage for admin review
+            let requests = [];
+            try { requests = JSON.parse(localStorage.getItem('activity-hub-widget-requests') || '[]'); } catch {}
+            requests.push({
+                name: name,
+                description: desc || '',
+                status: 'pending',
+                submittedAt: new Date().toISOString(),
+                submittedBy: 'Current User'
+            });
+            localStorage.setItem('activity-hub-widget-requests', JSON.stringify(requests));
+
             alert('✅ Widget request submitted!\n\nName: ' + name + '\nDescription: ' + (desc || 'N/A') + '\n\nThe Activity Hub team will review your request.');
             document.getElementById('requestWidgetName').value = '';
             document.getElementById('requestWidgetDesc').value = '';
+        }
+
+        function showRequestTab(tabName) {
+            document.querySelectorAll('.request-tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.request-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            if (event && event.target) event.target.classList.add('active');
+        }
+
+        function submitWidgetUpdateRequest() {
+            if (!validateNoPAN()) return;
+            const widgetId = document.getElementById('updateWidgetSelect').value;
+            const desc = document.getElementById('updateWidgetDesc').value.trim();
+            if (!widgetId) { alert('Please select a widget'); return; }
+            if (!desc) { alert('Please describe the update you\u0027d like'); return; }
+
+            const widgetName = document.getElementById('updateWidgetSelect').selectedOptions[0].text;
+
+            let requests = [];
+            try { requests = JSON.parse(localStorage.getItem('activity-hub-widget-requests') || '[]'); } catch {}
+            requests.push({
+                type: 'update',
+                name: widgetName,
+                widgetId: widgetId,
+                description: desc,
+                status: 'pending',
+                submittedAt: new Date().toISOString(),
+                submittedBy: 'Current User'
+            });
+            localStorage.setItem('activity-hub-widget-requests', JSON.stringify(requests));
+
+            alert('\u2705 Widget update request submitted!\n\nWidget: ' + widgetName + '\nUpdate: ' + desc + '\n\nThe Activity Hub team will review your request.');
+            document.getElementById('updateWidgetSelect').value = '';
+            document.getElementById('updateWidgetDesc').value = '';
         }
 
         // ──────────────────────────────────────────────

@@ -712,7 +712,7 @@ const ColumnMapper = {
                     description: "Project status and health indicators",
                     fields: [
                         { name: "status", type: "string", required: true, aliases: ["Status", "PROJECT_STATUS"], validation: { enum: ["Active", "Archived", "Pending", "Cancelled", "Complete"] } },
-                        { name: "phase", type: "string", required: false, aliases: ["Phase", "PROJECT_PHASE"], validation: { enum: ["POC/POT", "Test", "Mkt Scale", "Roll/Deploy", "Complete", "Pending", "Planning"] } },
+                        { name: "phase", type: "string", required: false, aliases: ["Phase", "PROJECT_PHASE"], validation: { enum: ["Vet", "Test", "Test Markets", "Roll/Deploy", "Complete", "Pending", "Planning"] } },
                         { name: "health", type: "string", required: false, aliases: ["Health", "PROJECT_HEALTH"], validation: { enum: ["On Track", "Off Track", "At Risk", "Continuous"] } },
                         { name: "project_source", type: "string", required: true, autoPopulate: true, aliases: ["Project_Source", "source"], validation: { enum: ["Operations", "Realty", "Intake Hub", "Manual Upload", "API"] } }
                     ]

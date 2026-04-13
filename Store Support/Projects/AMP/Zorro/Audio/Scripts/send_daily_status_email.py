@@ -2,7 +2,7 @@
 """
 Daily Weekly Messages Audio Status Email
 ==========================================
-Sends a daily status email showing BQ data breakdown for the current WM week.
+Sends a daily status email showing BQ data breakdown for the COMING WM week.
 Partners can see how many messages are cached, summarized, and when BQ last refreshed.
 
 Usage:
@@ -20,7 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from generate_weekly_audio import (
-    get_current_wm_week_fy,
+    get_coming_wm_week_fy,
     fetch_and_cache_bq_data,
     AMP_MSG_URL,
     logger,
@@ -301,13 +301,26 @@ def main():
     if args.week and args.fy:
         week, fy = args.week, args.fy
     else:
-        week, fy = get_current_wm_week_fy()
-    logger.info(f"Daily status email for WK{week} FY{fy}")
+        week, fy = get_coming_wm_week_fy()
+    logger.info(f"Daily status email for coming week: WK{week} FY{fy}")
 
     # Fetch fresh BQ data
     logger.info("Fetching BQ data...")
     cache_data = fetch_and_cache_bq_data(week, fy)
-    if 'error' in cache_data:
+
+    # If no events exist yet for the coming week, build an empty dataset
+    # (this is normal early in the prep cycle)
+    if 'error' in cache_data and 'No Weekly Messages' in cache_data.get('error', ''):
+        logger.info(f"No events for WK{week} FY{fy} yet — sending status email with zero counts")
+        cache_data = {
+            'event_count': 0,
+            'total_excl_denied': 0,
+            'summarized_count': 0,
+            'status_breakdown': [],
+            'events_without_summary': [],
+            'bq_last_updated': '',
+        }
+    elif 'error' in cache_data:
         logger.error(f"BQ fetch failed: {cache_data['error']}")
         sys.exit(1)
 

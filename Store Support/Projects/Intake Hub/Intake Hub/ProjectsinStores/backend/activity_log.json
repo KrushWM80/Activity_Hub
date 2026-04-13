@@ -3761,6 +3761,69 @@
       "user_email": "weus42608431466$@homeoffice.wal-mart.com",
       "details": "All filters cleared",
       "category": "dashboard_main"
+    },
+    {
+      "id": "33c31200",
+      "timestamp": "2026-04-13 08:18:17",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "f1a17f91",
+      "timestamp": "2026-04-13 08:18:18",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "f3764acc",
+      "timestamp": "2026-04-13 08:59:14",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "2e53f850",
+      "timestamp": "2026-04-13 08:59:41",
+      "action": "Applied Filters",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Source: Realty",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "7d1852c6",
+      "timestamp": "2026-04-13 08:59:47",
+      "action": "Applied Filters",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Source: Operations",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "b5d85a06",
+      "timestamp": "2026-04-13 09:42:22",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "43636ddf",
+      "timestamp": "2026-04-13 09:42:23",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
     }
   ]
 }

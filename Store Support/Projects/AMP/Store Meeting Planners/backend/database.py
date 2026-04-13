@@ -203,7 +203,7 @@ class DatabaseService:
                     MAX(Web_Preview) as preview_url
                 FROM {AMP_TABLE}
                 WHERE Message_Type = 'Calendar Events'
-                  AND Message_Status = 'Review for Publish review - No Comms'
+                  AND Message_Status IN ({AMP_ACTIVE_STATUSES})
                   AND Start_Date <= @end_date
                   AND End_Date >= @start_date
                 GROUP BY Activity_Title, Start_Date, End_Date

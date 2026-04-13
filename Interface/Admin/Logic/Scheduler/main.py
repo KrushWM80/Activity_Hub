@@ -18,6 +18,7 @@ import uuid
 from typing import List, Dict, Optional
 import asyncio
 from contextlib import asynccontextmanager
+import time
 
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.responses import JSONResponse
@@ -35,6 +36,19 @@ PORT = 5011
 DEBUG = True
 SCHEDULER_INSTANCE_ID = str(uuid.uuid4())[:8]  # Unique ID for this instance
 TRIGGER_CHECK_INTERVAL = 300  # Check for triggers every 5 minutes (in seconds)
+
+# Cache Configuration
+METRICS_CACHE = {
+    "data": None,
+    "timestamp": None,
+    "ttl": 60  # Cache for 60 seconds
+}
+
+NOTIFICATIONS_CACHE = {
+    "data": None,
+    "timestamp": None,
+    "ttl": 30  # Cache notifications for 30 seconds
+}
 
 # BigQuery Configuration
 PROJECT_ID = "wmt-assetprotection-prod"
@@ -687,8 +701,19 @@ async def get_execution_log(limit: int = 100):
 
 @app.get("/api/v1/logic-metrics", tags=["Dashboard"])
 async def get_logic_metrics():
-    """Get dashboard metrics for Logic Rules Engine"""
+    """Get dashboard metrics for Logic Rules Engine (with caching)"""
     try:
+        # Check cache first
+        current_time = time.time()
+        if METRICS_CACHE["data"] is not None and METRICS_CACHE["timestamp"] is not None:
+            cache_age = current_time - METRICS_CACHE["timestamp"]
+            if cache_age < METRICS_CACHE["ttl"]:
+                logger.info(f"Returning cached metrics (age: {cache_age:.1f}s)")
+                return METRICS_CACHE["data"]
+        
+        # Cache miss or expired - query BigQuery
+        logger.info("Cache miss - querying BigQuery for metrics")
+        
         # Metric 1: Active Rules (notification_logic_rules with is_active=true)
         active_rules_query = f"""
         SELECT COUNT(*) as count
@@ -722,21 +747,41 @@ async def get_logic_metrics():
         pending_approvals_result = list(bq_client.query(pending_approvals_query).result())
         total_requests_result = list(bq_client.query(total_requests_query).result())
         
-        return {
+        # Build response
+        response_data = {
             "activeRules": active_rules_result[0].count if active_rules_result else 0,
             "notificationsToday": notifications_today_result[0].count if notifications_today_result else 0,
             "pendingApprovals": pending_approvals_result[0].count if pending_approvals_result else 0,
             "totalLogicRequests": total_requests_result[0].count if total_requests_result else 0,
-            "timestamp": datetime.utcnow().isoformat() + "Z"
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "cached": False
         }
+        
+        # Update cache
+        METRICS_CACHE["data"] = response_data
+        METRICS_CACHE["timestamp"] = current_time
+        logger.info("Metrics cached for 60 seconds")
+        
+        return response_data
     except Exception as e:
         logger.error(f"Error getting logic metrics: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/v1/notifications/today", tags=["Notifications"])
 async def get_notifications_today():
-    """Get notifications sent today (for display on For You, My Work, etc)"""
+    """Get notifications sent today (with caching) - for display on For You, My Work, etc"""
     try:
+        # Check cache first
+        current_time = time.time()
+        if NOTIFICATIONS_CACHE["data"] is not None and NOTIFICATIONS_CACHE["timestamp"] is not None:
+            cache_age = current_time - NOTIFICATIONS_CACHE["timestamp"]
+            if cache_age < NOTIFICATIONS_CACHE["ttl"]:
+                logger.info(f"Returning cached notifications (age: {cache_age:.1f}s)")
+                return NOTIFICATIONS_CACHE["data"]
+        
+        # Cache miss or expired - query BigQuery
+        logger.info("Cache miss - querying BigQuery for notifications")
+        
         query = f"""
         SELECT 
             notification_id,
@@ -757,10 +802,18 @@ async def get_notifications_today():
         results = bq_client.query(query).result()
         notifications = [dict(row) for row in results]
         
-        return {
+        response_data = {
             "count": len(notifications),
-            "notifications": notifications
+            "notifications": notifications,
+            "cached": False
         }
+        
+        # Update cache
+        NOTIFICATIONS_CACHE["data"] = response_data
+        NOTIFICATIONS_CACHE["timestamp"] = current_time
+        logger.info(f"Notifications cached for 30 seconds ({len(notifications)} items)")
+        
+        return response_data
     except Exception as e:
         logger.error(f"Error getting notifications: {e}")
         raise HTTPException(status_code=500, detail=str(e))

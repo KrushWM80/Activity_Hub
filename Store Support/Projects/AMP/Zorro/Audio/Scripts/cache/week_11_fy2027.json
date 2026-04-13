@@ -1,25 +1,21 @@
 {
   "week": 11,
   "fy": 2027,
-  "cached_at": "2026-04-10T14:17:20.379473",
-  "bq_last_updated": "2026-04-10T19:15:51.768000+00:00",
-  "event_count": 38,
-  "review_no_comm_count": 38,
+  "cached_at": "2026-04-13T06:00:23.981136",
+  "bq_last_updated": "2026-04-12T22:59:30.632000+00:00",
+  "event_count": 39,
+  "review_no_comm_count": 39,
   "status_breakdown": [
     {
       "status": "Review for Publish review - No Comms",
-      "count": 38
+      "count": 39
     },
     {
       "status": "Expired - Pending",
-      "count": 5
+      "count": 6
     },
     {
       "status": "Expired - No Comms",
-      "count": 1
-    },
-    {
-      "status": "Expired - Future Send",
       "count": 1
     },
     {
@@ -27,12 +23,12 @@
       "count": 1
     },
     {
-      "status": "Awaiting Legal Approval - Pending",
+      "status": "Expired - Future Send",
       "count": 1
     }
   ],
   "total_excl_denied": 39,
-  "summarized_count": 38,
+  "summarized_count": 37,
   "events_with_summaries": [
     {
       "event_id": "461f7bd1-7a3f-4b53-a369-4123816caf7e",
@@ -154,13 +150,6 @@
       "summary_text": "Departments 80 and 97: Measure cooler shelf depth using only the shelf surface to improve modular execution and availability, then submit results in the Cooler Shelving Size Survey."
     },
     {
-      "event_id": "943afc2d-4d90-4a47-908c-c4d5ac87d5f9",
-      "store_area": "Fresh",
-      "title": "D97 Dinner Solutions Update",
-      "status": "Review for Publish review - No Comms",
-      "summary_text": "We are experiencing supply issues with\u00a0Marketside chicken teriyaki bowls, impacting all DCs. Recovery is expected over the next two weeks. In the interim, fill the empty shelves with adjacent items to fill assortment gaps until items return to full recovery. Check Fresh Weekly Messages each week for updates."
-    },
-    {
       "event_id": "c0f7ca52-472b-4161-bd85-adf5b189d747",
       "store_area": "Fresh",
       "title": "Dep. 94: Produce Updates",
@@ -221,7 +210,7 @@
       "store_area": "Hardlines",
       "title": "Dept. 19: Cat. 350 Yarn Changes",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Cat. 350 Yarn Changes: Boye tool inventory is recovering later than planned because of supplier constraints. Some airfreight is expected to arrive in stores in weeks 13-16. Full recovery is now expected by week 20. We will delete 28 items in week 29 as we transition suppliers."
+      "summary_text": "Dept. 19: Category 350 Yarn Changes:\u00a0Boye tool inventory is recovering later than planned because of supplier constraints. Some airfreight is expected to arrive in stores in weeks 13-16. Full recovery is now expected by week 20. We will delete 28 items in week 29 as we transition suppliers."
     },
     {
       "event_id": "714a820c-6e7f-4dc0-a9a5-8f63f73211c5",
@@ -301,5 +290,18 @@
       "summary_text": "Sales tax exemption validation has changed. Customers will only be tax-exempt if they\u2019re approved in the state where the purchase is made. Otherwise, sales tax will be charged automatically at checkout. Customers can submit or update exemptions online. Individuals can go to\u00a0Walmart.com/tax-exemption, and businesses can go to Business.Walmart.com/GoTaxExempt."
     }
   ],
-  "events_without_summary": []
+  "events_without_summary": [
+    {
+      "event_id": "943afc2d-4d90-4a47-908c-c4d5ac87d5f9",
+      "title": "D97 Dinner Solutions Update",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    },
+    {
+      "event_id": "1dc5e76d-3f0b-4b49-b225-2ac1a6b0973f",
+      "title": "Dept. 94: Produce Instock Risk Table",
+      "area": "Fresh",
+      "status": "Review for Publish review - No Comms"
+    }
+  ]
 }
