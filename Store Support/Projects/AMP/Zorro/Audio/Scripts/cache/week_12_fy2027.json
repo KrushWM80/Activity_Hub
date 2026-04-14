@@ -1,0 +1,76 @@
+{
+  "week": 12,
+  "fy": 2027,
+  "cached_at": "2026-04-14T06:00:22.456554",
+  "bq_last_updated": "2026-04-13T23:18:38.704000+00:00",
+  "event_count": 3,
+  "review_no_comm_count": 3,
+  "status_breakdown": [
+    {
+      "status": "ATC final review - Pending",
+      "count": 5
+    },
+    {
+      "status": "Awaiting Business Review - Pending",
+      "count": 3
+    },
+    {
+      "status": "Awaiting Comms Approval - Pending",
+      "count": 3
+    },
+    {
+      "status": "Review for Publish review - Future Send",
+      "count": 3
+    },
+    {
+      "status": "Review for Publish review - No Comms",
+      "count": 3
+    },
+    {
+      "status": "Expired - Pending",
+      "count": 1
+    },
+    {
+      "status": "Awaiting Comms Approval - On Hold",
+      "count": 1
+    },
+    {
+      "status": "Awaiting Legal Approval - Pending",
+      "count": 1
+    },
+    {
+      "status": "Awaiting Comms Approval - In Progress",
+      "count": 1
+    },
+    {
+      "status": "Draft - Pending",
+      "count": 1
+    }
+  ],
+  "total_excl_denied": 21,
+  "summarized_count": 3,
+  "events_with_summaries": [
+    {
+      "event_id": "1fc53b94-0455-41d1-ad5b-391a52a58538",
+      "store_area": "Frontend",
+      "title": "Frontend: Financial Services Daily Knowledge Question\\n",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "The Financial Services Daily Knowledge Question Program provides continued learning opportunities about important financial products. This AMP message explains how affected associates should interact with the Daily Knowledge Question."
+    },
+    {
+      "event_id": "f3a6aaa7-f5f1-4f8a-9c88-413c9b80c1bd",
+      "store_area": "People",
+      "title": "Update: Attendance Authorization Reason",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Update, Attendance Authorization Reason.\n\nBeginning Saturday, April 18, when managers authorize an exception in the Global Time and Attendance system using Protected Paid Time off, an updated authorization reason will display protected by associate balance, ppto and or sick.\n\nThis update will not change ppto eligibility, accruals or how associates can protect their attendance exceptions. Review the attendance authorize reason guide for more information."
+    },
+    {
+      "event_id": "a03a6547-0afd-4ea7-9ca3-4c7bef55c09c",
+      "store_area": "Total Store",
+      "title": "Using Cash Fund Transfer the Right Way",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Front End: This reminder is to clarify when a Cash Fund Transfer (CFT) is appropriate and when another store process must be used instead. Cash Fund Transfers are typically misused for the following store processes: Travel, Store Use, Chamber Dues and Donations."
+    }
+  ],
+  "events_without_summary": []
+}

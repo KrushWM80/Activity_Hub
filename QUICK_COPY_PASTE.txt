@@ -1,0 +1,18 @@
+PACKAGES INSTALLED ✓
+====================
+
+beautifulsoup4 and pywin32 are now ready.
+
+
+NOW CREATE TASKS (MUST be Admin PowerShell):
+
+PASTE COMMAND 1 (Daily Validation - 7:00 AM):
+schtasks /create /tn "AMP-AutoFeed-DailyValidation" /tr "\"C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\platform\bundledpython\python.exe\" 'C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\amp_autofeed_orchestrator.py' daily --log-dir 'C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\amp_validation_logs'" /sc daily /st 07:00 /ru SYSTEM /f
+
+PASTE COMMAND 2 (Weekly Report - Monday 6:00 AM):
+schtasks /create /tn "AMP-AutoFeed-WeeklyReport" /tr "\"C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\platform\bundledpython\python.exe\" 'C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\amp_autofeed_orchestrator.py' csv-report --days 90 --log-dir 'C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\amp_validation_logs'" /sc weekly /d MON /st 06:00 /ru SYSTEM /f
+
+
+VERIFY TASKS CREATED:
+
+schtasks /query /tn "AMP-AutoFeed-*" /v

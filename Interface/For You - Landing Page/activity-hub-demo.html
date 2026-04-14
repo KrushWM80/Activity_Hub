@@ -1558,7 +1558,7 @@
             </div>
             <nav class="nav-items">
                 <a href="/activity-hub/for-you" class="nav-item active" data-view="dashboard">For You</a>
-                <a href="/activity-hub/projects" class="nav-item" data-embed="iframe" data-url="http://127.0.0.1:8001/">Projects</a>
+                <a href="/activity-hub/projects" class="nav-item" data-embed="iframe" data-url="http://weus42608431466:8002/">Projects</a>
                 <a href="/activity-hub/reporting" class="nav-item">Reporting</a>
                 <a href="/activity-hub/teams" class="nav-item">Teams</a>
                 <a href="/activity-hub/my-work" class="nav-item">My Work</a>
@@ -2552,6 +2552,9 @@
                     // Handle iframe embedding (Projects)
                     if (dataEmbed === 'iframe' && dataUrl) {
                         e.preventDefault();
+                        // Update URL in address bar
+                        window.history.pushState({page: 'projects'}, 'Projects', href);
+                        
                         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                         this.classList.add('active');
                         
@@ -2563,6 +2566,9 @@
                     // Handle returning to dashboard view (For You)
                     else if (dataView === 'dashboard') {
                         e.preventDefault();
+                        // Update URL in address bar
+                        window.history.pushState({page: 'dashboard'}, 'For You', href);
+                        
                         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                         this.classList.add('active');
                         
@@ -2577,17 +2583,24 @@
         }
 
         // Link Management Modal Functions
-        // Initialize user links storage
-        let userLinks = [
+        // Initialize user links storage — load from localStorage if saved
+        const DEFAULT_USER_LINKS = [
             { name: 'Confluence Portal', url: 'https://confluence.walmart.com/display/home', category: 'Docs', privacy: 'public' },
             { name: 'GitHub Repos', url: 'https://github.com/walmart', category: 'Tools', privacy: 'shared' },
             { name: 'Jira Board', url: 'https://jira.walmart.com/projects', category: 'Tools', privacy: 'private' },
             { name: 'Help Desk', url: 'https://helpdesk.walmart.com', category: 'Internal', privacy: 'public' }
         ];
+        let userLinks = (function() {
+            try {
+                const saved = localStorage.getItem('activity-hub-links');
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return DEFAULT_USER_LINKS.slice();
+        })();
 
-        // Sync links to sessionStorage for admin dashboard access
+        // Persist links to localStorage
         function syncLinksToStorage() {
-            sessionStorage.setItem('activity-hub-links', JSON.stringify(userLinks));
+            localStorage.setItem('activity-hub-links', JSON.stringify(userLinks));
         }
         
         // Initialize storage on page load
@@ -2731,21 +2744,46 @@
 
         function renderManageLinks() {
             const container = document.getElementById('manageLinksContainer');
-            let html = '<p style="color: var(--gray-600); margin-bottom: 1rem;">Drag to reorder, click Edit to modify, or click Delete to remove</p>';
+            let html = '<p style="color: var(--gray-600); margin-bottom: 1rem;">Click Edit to modify, or click Delete to remove</p>';
             
             userLinks.forEach((link, index) => {
                 const privacyClass = 'link-badge-' + link.privacy;
-                html += '<div class="link-item">' +
+                html += '<div class="link-item" id="link-item-' + index + '">' +
                     '<div class="link-info">' +
                     '<div class="link-title">' + link.name + '</div>' +
                     '<div class="link-url">' + link.url + '</div>' +
                     '<div class="link-meta">' +
                     '<span class="link-badge ' + privacyClass + '">' + (link.privacy.charAt(0).toUpperCase() + link.privacy.slice(1)) + '</span>' +
+                    '<span style="font-size: 0.75rem; color: var(--gray-600); margin-left: 6px;">' + (link.category || 'Other') + '</span>' +
                     '</div>' +
                     '</div>' +
                     '<div class="link-actions">' +
-                    '<button class="link-btn">✏️ Edit</button>' +
+                    '<button class="link-btn" onclick="showEditLinkForm(' + index + ')">✏️ Edit</button>' +
                     '<button class="link-btn" style="color: #EF4444;" onclick="deleteLink(' + index + ')">🗑️ Delete</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div id="edit-link-form-' + index + '" style="display: none; padding: 12px 16px; margin: -4px 0 8px; background: #F7FAFC; border: 1px solid var(--gray-300); border-radius: 8px;">' +
+                    '<div style="display: grid; gap: 10px;">' +
+                    '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Name</label>' +
+                    '<input type="text" id="edit-link-name-' + index + '" value="' + link.name.replace(/"/g, '&quot;') + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;"></div>' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">URL</label>' +
+                    '<input type="url" id="edit-link-url-' + index + '" value="' + link.url.replace(/"/g, '&quot;') + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;"></div>' +
+                    '</div>' +
+                    '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Category</label>' +
+                    '<select id="edit-link-cat-' + index + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;">' +
+                    ['Docs','Tools','Resources','Internal'].map(c => '<option value="' + c + '"' + (link.category === c ? ' selected' : '') + '>' + c + '</option>').join('') +
+                    '</select></div>' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Privacy</label>' +
+                    '<select id="edit-link-priv-' + index + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;">' +
+                    ['private','shared','public'].map(p => '<option value="' + p + '"' + (link.privacy === p ? ' selected' : '') + '>' + p.charAt(0).toUpperCase() + p.slice(1) + '</option>').join('') +
+                    '</select></div>' +
+                    '</div>' +
+                    '<div style="display: flex; gap: 8px; justify-content: flex-end;">' +
+                    '<button onclick="cancelEditLink(' + index + ')" style="padding: 6px 14px; background: var(--gray-300); color: var(--gray-700); border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Cancel</button>' +
+                    '<button onclick="saveEditLink(' + index + ')" style="padding: 6px 14px; background: var(--walmart-blue-dark); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Save</button>' +
+                    '</div>' +
                     '</div>' +
                     '</div>';
             });
@@ -2753,10 +2791,36 @@
             container.innerHTML = html;
         }
 
+        function showEditLinkForm(index) {
+            document.querySelectorAll('[id^="edit-link-form-"]').forEach(f => f.style.display = 'none');
+            document.getElementById('edit-link-form-' + index).style.display = 'block';
+        }
+
+        function cancelEditLink(index) {
+            document.getElementById('edit-link-form-' + index).style.display = 'none';
+        }
+
+        function saveEditLink(index) {
+            const name = document.getElementById('edit-link-name-' + index).value.trim();
+            const url = document.getElementById('edit-link-url-' + index).value.trim();
+            const category = document.getElementById('edit-link-cat-' + index).value;
+            const privacy = document.getElementById('edit-link-priv-' + index).value;
+
+            if (!name || !url) { alert('Name and URL are required'); return; }
+
+            userLinks[index].name = name;
+            userLinks[index].url = url;
+            userLinks[index].category = category;
+            userLinks[index].privacy = privacy;
+            syncLinksToStorage();
+            renderCategorizedSidebar();
+            renderManageLinks();
+        }
+
         function deleteLink(index) {
             const linkName = userLinks[index].name;
             userLinks.splice(index, 1);
-            syncLinksToStorage();  // Sync to sessionStorage
+            syncLinksToStorage();
             removeLinkFromSidebar(linkName);
             renderManageLinks();
             alert('Deleted "' + linkName + '" from your links');
@@ -2806,7 +2870,7 @@
                 privacy: privacy
             });
             
-            syncLinksToStorage();  // Sync to sessionStorage for admin dashboard
+            syncLinksToStorage();
             addLinkToSidebar(name, url);
             
             successMessage.classList.add('show');

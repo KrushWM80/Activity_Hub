@@ -1,0 +1,159 @@
+# AMP AutoFeed Validation - Quick Start
+
+Get up and running in 5 minutes.
+
+## Installation (2 min)
+
+1. **Open PowerShell as Administrator**
+   - Click Start, type "PowerShell", right-click, "Run as administrator"
+
+2. **Run Setup**
+   ```powershell
+   cd "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub"
+   Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser -Force
+   .\setup_amp_autofeed_validation.ps1
+   ```
+
+   Wait for all packages to install. You'll see checkmarks for successful installs.
+
+## CRITICAL: Verify Folder Structure
+
+Before first test, verify your Outlook folder structure:
+
+**Inbox > ATC > Reports > AMP > [TWO FOLDERS]:**
+- ✓ "Quick Base API Response Data"
+- ✓ "Auto Feed"
+
+If your folder names are different, update them in `amp_autofeed_validation.py`.
+
+## First Test (2 min)
+
+```powershell
+python .\amp_autofeed_orchestrator.py daily
+```
+
+You should see:
+```
+======================================================================
+AMP AutoFeed Daily Validation
+======================================================================
+Started: 2026-04-14T...
+
+Fetching QuickBase API Response email...
+Found QuickBase email: [time]
+Fetching AMP AutoFeed Details email...
+Found AMP email: [time]
+
+Validation Status: PASS ✓
+✓ Data match verified
+```
+
+## Analyze Emails (Check Data - 1 min)
+
+To see what columns are being extracted and compared:
+
+```powershell
+python .\analyze_amp_emails.py
+```
+
+This shows you:
+- AutoFeed Ids extracted from each email
+- Message Titles compared
+- Store data aligned
+- Anchor Walmart Weeks matched
+- Status fields validated
+
+## View Results
+
+```powershell
+# Today's detailed report
+cat amp_validation_logs/daily_reports/validation_$(Get-Date -Format 'yyyy-MM-dd').json
+
+# Historical summary
+cat amp_validation_logs/historical_report.txt
+
+# Generate comprehensive CSV reports
+python .\amp_autofeed_orchestrator.py csv-report
+# Results: amp_validation_logs/csv_reports/
+
+# Share reports via CSV
+Start amp_validation_logs/csv_reports/
+```
+
+## That's It!
+
+Your system is now:
+- ✅ Running daily validation at 7:00 AM
+- ✅ Logging all results
+- ✅ Generating weekly reports
+
+Check:
+- `amp_validation_logs/` folder for all reports
+- Scheduled Task Scheduler: Look for `AMP-AutoFeed-DailyValidation` task
+
+## Enable Email Reports (Optional)
+
+If you want to receive validation results via email:
+
+```powershell
+# Set your email
+[Environment]::SetEnvironmentVariable("VALIDATION_SENDER_EMAIL", "your.email@gmail.com", "Machine")
+[Environment]::SetEnvironmentVariable("VALIDATION_SENDER_PASSWORD", "app-password-here", "Machine")
+
+# For Gmail: Use an app-specific password, not your regular password
+# Settings > Security > App Passwords > Create password for "Mail and Windows Device"
+
+# Then test
+python .\amp_autofeed_orchestrator.py daily --send-email --recipient your.email@walmart.com
+```
+
+## CSV Reports for Sharing
+
+Generate comprehensive CSV files for longer-term analysis:
+
+```powershell
+# Generate all CSV reports (last 90 days)
+python .\amp_autofeed_orchestrator.py csv-report
+
+# Or specific period
+python .\amp_autofeed_orchestrator.py csv-report --days 30
+```
+
+**CSV Files Created:**
+1. `daily_summary_[date].csv` - Daily validation results
+2. `discrepancies_[date].csv` - All issues found (can share with team)
+3. `records_comparison_[date].csv` - Record-by-record comparison
+4. `trend_statistics_[date].csv` - Summary metrics and percentages
+
+Open in Excel, filter, analyze, and share with stakeholders.
+
+## Troubleshooting
+
+**"Folder not found" error:**
+- Check Outlook folder path: Inbox > ATC > Reports > AMP > [Quick Base API Response Data + Auto Feed]
+- If different, edit folder names in `amp_autofeed_validation.py`
+
+**"No emails found" error:**
+- Make sure both emails exist in your Outlook folders from today
+- Check email subjects match what the system looks for
+
+**More help:** See `README_AMP_AUTOFEED_VALIDATION.md` for detailed documentation.
+
+## What It Does
+
+**Daily at 7:00 AM:**
+1. Fetches your two emails from separate Outlook folders
+2. Extracts AutoFeed Id, Message Title, Stores, Anchor Walmart Week, Status
+3. Compares them for differences
+4. Logs results with detailed records
+5. (Optional) Sends you an email report
+
+**Weekly Monday 6:00 AM:**
+1. Analyzes last 90 days of validations
+2. Identifies patterns in issues
+3. Generates summary report
+4. Creates CSV exports
+
+---
+
+**Setup complete!** Your validation system is now active.

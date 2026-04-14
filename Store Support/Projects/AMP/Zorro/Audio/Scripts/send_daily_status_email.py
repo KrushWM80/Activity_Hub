@@ -32,12 +32,13 @@ TO_RECIPIENTS = [
     'Collin.Claunch@walmart.com',
     'Sara.Elliott@walmart.com',
     'Matthew.Farnworth@walmart.com',
+    'JohnC.Davis@walmart.com',
+    'LeeAnne.Mills@walmart.com',
 ]
 
 CC_RECIPIENTS = [
     'Tammy.Claunch@walmart.com',
-    'Amber.Girdley@walmart.com',
-    'Kelsey.Kempke@walmart.com',
+    'kendall.rush@walmart.com',
 ]
 
 TEST_RECIPIENT = 'kendall.rush@walmart.com'

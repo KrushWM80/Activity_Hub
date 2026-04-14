@@ -1,5 +1,5 @@
 {
-    "Port8001Listening":  false,
+    "Port8001Listening":  true,
     "MeetingPlannerRunning":  true,
     "StoreActivityDashboardRunning":  false,
     "Port5000Listening":  true,
@@ -7,18 +7,18 @@
     "TDARunning":  true,
     "RebootPending":  true,
     "DCTasksCount":  26,
-    "Port8888Listening":  false,
-    "ProjectsInStoresRunning":  false,
+    "Port8888Listening":  true,
+    "ProjectsInStoresRunning":  true,
     "Port8090Listening":  true,
     "JobCodesRunning":  true,
     "TDAWeeklyEmailTask":  true,
-    "ZorroRunning":  false,
+    "ZorroRunning":  true,
     "Port5001Listening":  true,
     "RebootReasons":  "Pending file operations",
     "TimeStamp":  {
-                      "value":  "\/Date(1776078015907)\/",
+                      "value":  "\/Date(1776164413350)\/",
                       "DisplayHint":  2,
-                      "DateTime":  "Monday, April 13, 2026 6:00:15 AM"
+                      "DateTime":  "Tuesday, April 14, 2026 6:00:13 AM"
                   },
     "JobCodesBackendTask":  true,
     "Port8080Listening":  true

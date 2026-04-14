@@ -40,8 +40,8 @@ def for_you():
 
 @app.route('/activity-hub/projects')
 def projects():
-    """Projects management page."""
-    return send_file(os.path.join(BASE_DIR, 'Projects', 'index.html'))
+    """Projects management page - embedded from port 8002."""
+    return send_file(os.path.join(BASE_DIR, 'Projects', 'projects-wrapper.html'))
 
 
 @app.route('/activity-hub/projects/upload')
