@@ -366,6 +366,39 @@ if ($pid) { taskkill /F /PID $pid }
 # The bat loop detects the exit and restarts automatically within 5-7 seconds
 ```
 
+#### service_manager.ps1 — Preferred tool for all service management
+
+**File:** `service_manager.ps1` (root of Activity Hub)  
+**Purpose:** View PID, memory, uptime for all 8 services. Safely start/stop/restart individual services or all at once. Uses live netstat PID lookup — no stale .pid files.  
+**This is a manual tool — automation (bat loops, continuous_monitor, AutoStart tasks) runs independently of it.**
+
+```powershell
+# From the Activity Hub root directory:
+cd "C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub"
+
+# Check all 8 services — shows Port, Status, PID, Memory, Uptime
+.\service_manager.ps1 -Action status
+
+# Restart a single service safely (stops by port PID, starts bat loop)
+.\service_manager.ps1 -Action restart -Service tda_insights
+.\service_manager.ps1 -Action restart -Service job_codes
+.\service_manager.ps1 -Action restart -Service meeting_planner
+
+# Start or stop a single service
+.\service_manager.ps1 -Action start -Service zorro
+.\service_manager.ps1 -Action stop -Service vet_dashboard
+
+# Start or stop all 8 services
+.\service_manager.ps1 -Action start -Service all
+.\service_manager.ps1 -Action stop -Service all
+```
+
+**Valid service keys:** `activity_hub`, `projects_in_stores`, `job_codes`, `amp_dashboard`, `meeting_planner`, `vet_dashboard`, `tda_insights`, `zorro`
+
+**How it works internally:** calls `Get-PortPid` (netstat lookup) for live PID — never relies on saved .pid files. Stop uses `taskkill /F /PID /T` which kills the bat loop parent AND its Python child together. Start launches the bat loop via `cmd.exe /c` hidden window — identical to what the AutoStart scheduled tasks do.
+
+**DO NOT use `pid_manager.ps1`** — that script starts Python **directly** (no bat loop). If the process crashes, nothing restarts it — you lose Layer 1 (auto-restart on crash). It also only tracks 5 of the 8 services and uses stale .pid files that become wrong after any crash/restart. It was created by an automated session without awareness of the bat-loop architecture. Use `service_manager.ps1` exclusively.
+
 #### BigQuery schema changes can break service data silently
 If a service suddenly shows empty or wrong data, check whether BigQuery column values have been renamed. The query filter in `backend.py` (or equivalent) may need updating. Example: `TDA_Ownership = 'Dallas POC'` was renamed to `'Dallas VET'` on April 2, 2026.
 

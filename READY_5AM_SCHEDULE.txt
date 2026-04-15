@@ -1,0 +1,93 @@
+# AMP AutoFeed Validation - Ready to Deploy
+
+## Schedule (UPDATED April 15, 2026)
+
+| Time | Task |
+|------|------|
+| 4:00 AM | QuickBase and AMP emails arrive |
+| ~4:05 AM | VB extracts email HTML → saves to `amp_autofeed_data/` |
+| **5:00 AM** | **Python runs validation** (AUTOMATED) |
+
+## What Python Does at 5:00 AM
+
+1. Reads: `quickbase_responses.html` and `amp_autofeed.html`
+2. Parses HTML tables using built-in Python HTML parser
+3. Extracts these columns:
+   - AutoFeed Id
+   - Message Title
+   - Stores
+   - Anchor Walmart Week
+   - Status
+4. Matches records by AutoFeed Id
+5. Compares field values (flags differences)
+6. Logs results to: `amp_validation_logs/daily_execution.log`
+
+## VB Script Setup (Your Part)
+
+Create Outlook VB macro that:
+1. Opens "Quick Base API Response Data" email
+2. Extracts the email body as HTML
+3. Saves to: `amp_autofeed_data/quickbase_responses.html`
+4. Opens "Auto Feed" email
+5. Extracts the email body as HTML
+6. Saves to: `amp_autofeed_data/amp_autofeed.html`
+7. Runs at ~4:05 AM (5 minutes after emails arrive)
+
+**Folder Path for VB**:
+```
+C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\amp_autofeed_data\
+```
+
+## Installation Status
+
+✅ Python script: Ready (tested with fallback HTML parser)  
+✅ Scheduled task: Configured for 5:00 AM  
+✅ Log folder: Created  
+⏳ VB script: Needs to be created
+
+## Testing (Quick)
+
+Once you have VB running, test manually:
+
+```powershell
+cd "c:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub"
+& ".\.venv\Scripts\python.exe" amp_autofeed_validation.py
+```
+
+Should show validation results in ~2 seconds.
+
+## Detailed Status
+
+**System Type**: HTML file-based comparison  
+**Execution**: Automated daily via Windows Task Scheduler  
+**Trigger**: Files saved by VB at 4:05 AM  
+**Columns Compared**: 5 (AutoFeed Id, Message Title, Stores, Anchor Walmart Week, Status)  
+**Matching Key**: AutoFeed Id (unique identifier)  
+**Output**: Pass/Fail + field-by-field mismatch report  
+**Log Location**: `amp_validation_logs/daily_execution.log`  
+
+## Next: One Time Setup
+
+1. **Create and test VB macro** (Your responsibility)
+   - Extract HTML from emails
+   - Save to `amp_autofeed_data/`
+   - Test manually first
+
+2. **Run Python manually** (Testing)
+   ```powershell
+   & ".\.venv\Scripts\python.exe" amp_autofeed_validation.py
+   ```
+
+3. **Verify scheduled task** (Optional - already set to 5:00 AM)
+   - Open Task Scheduler
+   - Find "AMP-AutoFeed-DailyValidation"
+   - Right-click > Run to test
+   - Check log file for results
+
+4. **Monitor daily** (Ongoing)
+   - Check `amp_validation_logs/daily_execution.log` each morning
+   - Review mismatches if status = FAIL
+
+---
+
+**Ready to go!** Just waiting for your VB script to extract the HTML files.

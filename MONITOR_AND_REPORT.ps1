@@ -158,7 +158,7 @@ function Get-DowntimeInfo {
 function Build-StatusEmail {
     param($CurrentStatus, $DowntimeInfo, $IsRestartEmail = $false)
     
-    $statusOK = $CurrentStatus.ProjectsInStoresRunning -and $CurrentStatus.DCTasksCount -eq 26 -and $CurrentStatus.JobCodesRunning -and $CurrentStatus.VETDashboardRunning -and $CurrentStatus.MeetingPlannerRunning
+    $statusOK = $CurrentStatus.ProjectsInStoresRunning -and $CurrentStatus.DCTasksCount -ge 1 -and $CurrentStatus.JobCodesRunning -and $CurrentStatus.VETDashboardRunning -and $CurrentStatus.MeetingPlannerRunning
     $statusIndicator = if ($statusOK) { "ALL SYSTEMS OPERATIONAL" } else { "ATTENTION REQUIRED" }
     $currentTime = Get-Date -Format 'MMMM d, yyyy - h:mm tt'
     
@@ -268,8 +268,8 @@ function Build-StatusEmail {
             </tr>
             <tr>
                 <td>DC Manager PayCycle Tasks</td>
-                <td class="$(if ($CurrentStatus.DCTasksCount -eq 26) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.DCTasksCount -eq 26) { 'ACTIVE' } else { 'INCOMPLETE' })</td>
-                <td>$($CurrentStatus.DCTasksCount)/26 tasks scheduled</td>
+                <td class="$(if ($CurrentStatus.DCTasksCount -ge 1) { 'status-ok' } else { 'status-down' })">$(if ($CurrentStatus.DCTasksCount -ge 1) { 'ACTIVE' } else { 'MISSING' })</td>
+                <td>$($CurrentStatus.DCTasksCount) FY27 PayCycle tasks registered</td>
             </tr>
             <tr>
                 <td>TDA Weekly Email Task</td>

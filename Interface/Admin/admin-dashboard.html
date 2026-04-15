@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1175,7 +1175,7 @@
     <header class="header">
         <div class="header-content">
             <div class="logo-section">
-                <img src="/activity-hub/static/store-support/General Setup/Design/Spark Blank.png" alt="Spark" class="spark-logo">
+                <img src="/Spark_Blank.png" alt="Spark" class="spark-logo" onerror="this.src='/activity-hub/static/store-support/General%20Setup/Design/Spark%20Blank.png'">
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
@@ -1994,6 +1994,7 @@
                                             <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--gray-700);">Default Size</th>
                                             <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--gray-700);">Available Areas</th>
                                             <th style="padding: 12px 16px; text-align: center; font-weight: 600; color: var(--gray-700);">Active</th>
+                                            <th style="padding: 12px 16px; text-align: center; font-weight: 600; color: var(--gray-700);">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="widgets-table-body">
@@ -2394,7 +2395,63 @@
         </div>
     </div>
 
+    <!-- Edit Widget Modal -->
+    <div id="editWidgetModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>✏️ Edit Widget</h3>
+                <button class="close-btn" onclick="hideModal('editWidgetModal')">×</button>
+            </div>
+            <form style="display: grid; gap: var(--space-4); padding: var(--space-4);">
+                <input type="hidden" id="edit-widget-id">
+                
+                <div class="form-group">
+                    <label for="edit-widget-name">Widget Name *</label>
+                    <input type="text" id="edit-widget-name" placeholder="e.g., My Tasks" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-widget-description">Description *</label>
+                    <textarea id="edit-widget-description" placeholder="Describe this widget..." style="min-height: 80px; resize: vertical;" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-widget-size">Default Size *</label>
+                    <select id="edit-widget-size" required>
+                        <option value="">-- Select Size --</option>
+                        <option value="Small">Small</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Large">Large</option>
+                        <option value="Extra Large">Extra Large</option>
+                    </select>
+                </div>
+
+                <div style="border: 1px solid var(--gray-300); border-radius: 6px; padding: var(--space-4); background: var(--gray-100);">
+                    <h4 style="margin-bottom: var(--space-3); color: var(--walmart-navy);">📍 Available On These Areas *</h4>
+                    <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: var(--space-3);">Select where users can add this widget:</p>
+                    <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+                            <input type="checkbox" id="edit-area-for-you" style="cursor: pointer;">
+                            <span style="font-weight: 500;">📊 For You</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+                            <input type="checkbox" id="edit-area-reporting" style="cursor: pointer;">
+                            <span style="font-weight: 500;">📈 Reporting</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: var(--space-4); justify-content: flex-end; padding-top: var(--space-4); border-top: 1px solid var(--gray-300);">
+                    <button type="button" onclick="hideModal('editWidgetModal')" style="padding: 10px 20px; background: var(--gray-300); color: var(--gray-900); border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">Cancel</button>
+                    <button type="button" onclick="saveWidgetChanges()" style="padding: 10px 20px; background: var(--walmart-blue); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        console.log('===== ADMIN SCRIPT LOADING =====');
+        
         // ==========================================
         // PCI COMPLIANCE: PAN INPUT PREVENTION
         // ==========================================
@@ -2603,35 +2660,8 @@
             }
         }
 
-        // On tab show, load from backend
-        const origShowTab = showTab;
-        showTab = function(tabName) {
-            origShowTab(tabName);
-            if (tabName === 'activity-log') {
-                updateActivityStats();
-                fetchAndRenderActivityLog();
-            }
-        };
-        document.addEventListener('DOMContentLoaded', function() {
-            // Wrap navigateToTab to load activity log when that tab is accessed
-            const origNavigateToTab = navigateToTab;
-            window.navigateToTab = function(tabName) {
-                origNavigateToTab(tabName);
-                if (tabName === 'activity-log') {
-                    updateActivityStats();
-                    fetchAndRenderActivityLog();
-                }
-            };
-
-            // Update activity stats on initial load
-            setTimeout(() => {
-                updateActivityStats();
-                fetchAndRenderActivityLog();
-            }, 500);
-        });
-        
         // ==========================================
-        // TAB NAVIGATION
+        // TAB NAVIGATION (MUST BE DEFINED FIRST)
         // ==========================================
         function showTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -2657,16 +2687,47 @@
             }
         }
 
+        // On tab show, wrap functions to load activity log data when needed
+        const origShowTab = showTab;
+        showTab = function(tabName) {
+            origShowTab(tabName);
+            if (tabName === 'activity-log') {
+                updateActivityStats();
+                fetchAndRenderActivityLog();
+            }
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wrap navigateToTab to load activity log when that tab is accessed
+            const origNavigateToTab = navigateToTab;
+            window.navigateToTab = function(tabName) {
+                origNavigateToTab(tabName);
+                if (tabName === 'activity-log') {
+                    updateActivityStats();
+                    fetchAndRenderActivityLog();
+                }
+            };
+
+            // Update activity stats on initial load
+            setTimeout(() => {
+                updateActivityStats();
+                fetchAndRenderActivityLog();
+            }, 500);
+        });
+
         // ── Widget Management ──────────────────────────────────────
         const PLATFORM_AREAS = ['For You', 'Reporting'];
 
         const WIDGET_REGISTRY = [
             { id: 'my-tasks', name: 'My Tasks', description: 'Personal task list and to-do items', defaultSize: 'Large', defaultAreas: ['For You'] },
-            { id: 'performance', name: 'Performance Metrics', description: 'Key performance indicators and trends', defaultSize: 'Large', defaultAreas: ['For You', 'Reporting'] },
-            { id: 'next-steps', name: 'Next Steps & Action Items', description: 'Upcoming actions and deadlines', defaultSize: 'Large', defaultAreas: ['For You'] },
-            { id: 'projects-feed', name: 'Projects Feed', description: 'Latest project updates and activity', defaultSize: 'Large', defaultAreas: ['For You', 'Reporting'] },
             { id: 'notifications', name: 'Notifications & Alerts', description: 'System alerts and notifications', defaultSize: 'Medium', defaultAreas: ['For You'] },
-            { id: 'project-dashboard', name: 'Project Work Status', description: 'Overview of project phase progress', defaultSize: 'Extra Large', defaultAreas: ['For You', 'Reporting'] }
+            { id: 'next-steps', name: 'Next Steps & Action Items', description: 'Upcoming actions and deadlines', defaultSize: 'Large', defaultAreas: ['For You'] },
+            { id: 'performance', name: 'Performance Metrics', description: 'Key performance indicators and trends', defaultSize: 'Large', defaultAreas: ['For You'] },
+            { id: 'team-activity', name: 'Team Activity Feed', description: 'Latest team member activity and updates', defaultSize: 'Medium', defaultAreas: ['For You'] },
+            { id: 'activity-dashboard', name: 'Activity Dashboard', description: 'Dashboard with key metrics and trends', defaultSize: 'Extra Large', defaultAreas: ['Reporting'] },
+            { id: 'project-reports', name: 'Project Reports', description: 'Status and milestones for all projects', defaultSize: 'Extra Large', defaultAreas: ['Reporting'] },
+            { id: 'key-metrics', name: 'Key Metrics', description: 'Key reporting metrics and analytics', defaultSize: 'Extra Large', defaultAreas: ['Reporting'] },
+            { id: 'my-reports', name: 'My Reports', description: 'Custom reports', defaultSize: 'Extra Large', defaultAreas: ['Reporting'] }
         ];
 
         function getWidgetAreas() {
@@ -2766,12 +2827,27 @@
             return div.innerHTML;
         }
 
+        function getWidgetCustomizations() {
+            try { return JSON.parse(localStorage.getItem('activity-hub-widget-customizations') || '{}'); }
+            catch { return {}; }
+        }
+
+        function getWidgetDisplay(widget) {
+            const custom = getWidgetCustomizations()[widget.id];
+            return {
+                name: custom?.name || widget.name,
+                description: custom?.description || widget.description,
+                defaultSize: custom?.defaultSize || widget.defaultSize
+            };
+        }
+
         function loadWidgetsTable() {
             const tbody = document.getElementById('widgets-table-body');
             if (!tbody) return;
             const widgetConfig = JSON.parse(localStorage.getItem('activity-hub-widget-active') || '{}');
 
             tbody.innerHTML = WIDGET_REGISTRY.map(w => {
+                const display = getWidgetDisplay(w);
                 const isActive = widgetConfig[w.id] !== false;
                 const activeAreas = getAreasForWidget(w.id);
                 const areasHtml = PLATFORM_AREAS.map(area => {
@@ -2785,9 +2861,9 @@
                 }).join('');
 
                 return '<tr style="border-bottom: 1px solid var(--gray-300);">' +
-                    '<td style="padding: 12px 16px; font-weight: 500;">' + escapeHtml(w.name) + '</td>' +
-                    '<td style="padding: 12px 16px; color: var(--gray-600); font-size: 0.9rem;">' + escapeHtml(w.description) + '</td>' +
-                    '<td style="padding: 12px 16px; font-size: 0.9rem;">' + w.defaultSize + '</td>' +
+                    '<td style="padding: 12px 16px; font-weight: 500;">' + escapeHtml(display.name) + '</td>' +
+                    '<td style="padding: 12px 16px; color: var(--gray-600); font-size: 0.9rem;">' + escapeHtml(display.description) + '</td>' +
+                    '<td style="padding: 12px 16px; font-size: 0.9rem;">' + display.defaultSize + '</td>' +
                     '<td style="padding: 12px 16px;">' + areasHtml + '</td>' +
                     '<td style="padding: 12px 16px; text-align: center;">' +
                         '<label style="position: relative; display: inline-block; width: 44px; height: 24px;">' +
@@ -2795,6 +2871,9 @@
                             '<span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: ' + (isActive ? 'var(--success)' : 'var(--gray-300)') + '; border-radius: 24px; transition: 0.3s;"></span>' +
                             '<span style="position: absolute; height: 18px; width: 18px; left: ' + (isActive ? '23px' : '3px') + '; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s;"></span>' +
                         '</label>' +
+                    '</td>' +
+                    '<td style="padding: 12px 16px; text-align: center;">' +
+                        '<button onclick="openEditWidgetModal(\'' + w.id + '\')" style="padding: 6px 12px; background: var(--walmart-blue); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background=\'var(--walmart-blue-dark)\'" onmouseout="this.style.background=\'var(--walmart-blue)\'">✏️ Edit</button>' +
                     '</td>' +
                 '</tr>';
             }).join('');
@@ -2807,62 +2886,144 @@
             loadWidgetsTable();
         }
 
+        function openEditWidgetModal(widgetId) {
+            const widget = WIDGET_REGISTRY.find(w => w.id === widgetId);
+            if (!widget) return;
+            
+            const display = getWidgetDisplay(widget);
+            
+            document.getElementById('edit-widget-id').value = widgetId;
+            document.getElementById('edit-widget-name').value = display.name;
+            document.getElementById('edit-widget-description').value = display.description;
+            document.getElementById('edit-widget-size').value = display.defaultSize;
+            
+            // Set available areas checkboxes
+            const activeAreas = getAreasForWidget(widgetId);
+            PLATFORM_AREAS.forEach(area => {
+                const checkbox = document.getElementById('edit-area-' + area.replace(/\s+/g, '-').toLowerCase());
+                if (checkbox) checkbox.checked = activeAreas.includes(area);
+            });
+            
+            showModal('editWidgetModal');
+        }
+
+        function saveWidgetChanges() {
+            const widgetId = document.getElementById('edit-widget-id').value;
+            const name = document.getElementById('edit-widget-name').value.trim();
+            const description = document.getElementById('edit-widget-description').value.trim();
+            const size = document.getElementById('edit-widget-size').value;
+            
+            if (!name || !description) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Get selected areas
+            const selectedAreas = [];
+            PLATFORM_AREAS.forEach(area => {
+                const checkbox = document.getElementById('edit-area-' + area.replace(/\s+/g, '-').toLowerCase());
+                if (checkbox && checkbox.checked) selectedAreas.push(area);
+            });
+            
+            if (selectedAreas.length === 0) {
+                alert('Please select at least one available area');
+                return;
+            }
+            
+            // Update widget areas in localStorage
+            const allAreas = getWidgetAreas();
+            allAreas[widgetId] = selectedAreas;
+            localStorage.setItem('activity-hub-widget-areas', JSON.stringify(allAreas));
+            
+            // Update widget customizations in localStorage (name, description, size)
+            const customizations = getWidgetCustomizations();
+            customizations[widgetId] = {
+                name: name,
+                description: description,
+                defaultSize: size
+            };
+            localStorage.setItem('activity-hub-widget-customizations', JSON.stringify(customizations));
+            
+            // Reload table to show changes
+            loadWidgetsTable();
+            hideModal('editWidgetModal');
+        }
+
         function loadAdminLinks() {
             const listContainer = document.getElementById('admin-managed-links-list');
             if (!listContainer) return;
             
-            // Try to get links from demo page if available, otherwise use fallback
+            // Load links from shared localStorage key used by For You and Reporting pages
             let links = [];
             
-            // Check if we can access the demo window's userLinks
             try {
-                const demoWindow = window.opener || window.parent;
-                if (demoWindow && demoWindow.userLinks) {
-                    links = demoWindow.userLinks;
-                } else {
-                    // Fallback: load from sessionStorage if available
-                    const stored = sessionStorage.getItem('activity-hub-links');
-                    if (stored) {
-                        links = JSON.parse(stored);
-                    } else {
-                        // Default demo links
-                        links = [
-                            { name: 'Confluence Portal', url: 'https://confluence.walmart.com/display/home', category: 'Documentation', privacy: 'public' },
-                            { name: 'GitHub Repos', url: 'https://github.com/walmart', category: 'Tools', privacy: 'shared' },
-                            { name: 'Jira Board', url: 'https://jira.walmart.com/projects', category: 'Tools', privacy: 'private' }
-                        ];
-                    }
-                }
-            } catch (e) {
-                // If cross-origin, use sessionStorage or defaults
-                const stored = sessionStorage.getItem('activity-hub-links');
+                const stored = localStorage.getItem('activity-hub-links');
                 if (stored) {
                     links = JSON.parse(stored);
+                } else {
+                    // No links saved yet - show empty state
+                    links = [];
                 }
+            } catch (e) {
+                console.error('Error loading links:', e);
+                links = [];
             }
             
             // Render the links
             let html = '';
-            links.forEach((link, index) => {
-                const privacyClass = 'link-badge-' + link.privacy;
-                const privacyLabel = link.privacy.charAt(0).toUpperCase() + link.privacy.slice(1);
-                html += `<div class="list-item">
-                    <div class="item-info">
-                        <h4>${link.name}</h4>
-                        <p><a href="${link.url}" target="_blank" style="color: var(--walmart-blue); text-decoration: none;">${link.url}</a></p>
-                        <p style="color: var(--gray-600); font-size: 0.9rem; margin-top: 0.5rem;">${link.category} • ${link.privacy}</p>
-                    </div>
-                    <div class="item-actions">
-                        <button class="action-btn edit-btn">Edit</button>
-                        <button class="action-btn delete-btn">Remove</button>
-                    </div>
-                </div>`;
-            });
-            
-            if (html) {
-                listContainer.innerHTML = html;
+            if (links.length === 0) {
+                html = '<p style="color: var(--gray-600); font-style: italic;">No links created yet. Links created on the For You page will appear here.</p>';
             } else {
-                listContainer.innerHTML = '<p style="color: var(--gray-600); padding: 1rem;">No links created yet. <a href="#" style="color: var(--walmart-blue);">Create one</a></p>';
+                links.forEach((link, index) => {
+                    const privacyClass = 'link-badge-' + link.privacy;
+                    const privacyLabel = link.privacy.charAt(0).toUpperCase() + link.privacy.slice(1);
+                    html += `<div class="list-item">
+                        <div class="item-info">
+                            <div class="item-name">${link.name}</div>
+                            <div class="item-url" style="font-size: 0.8rem; color: var(--gray-600);">${link.url}</div>
+                            <div style="font-size: 0.75rem; margin-top: 0.25rem;">
+                                <span class="link-badge ${privacyClass}">${privacyLabel}</span>
+                                <span style="color: var(--gray-600); margin-left: 0.5rem;">${link.category || 'Other'}</span>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn-small" onclick="editAdminLink(${index})">Edit</button>
+                            <button class="btn-small btn-danger" onclick="deleteAdminLink(${index})">Delete</button>
+                        </div>
+                    </div>`;
+                });
+            }
+            listContainer.innerHTML = html;
+        }
+        
+        function editAdminLink(index) {
+            try {
+                const links = JSON.parse(localStorage.getItem('activity-hub-links') || '[]');
+                if (links[index]) {
+                    const link = links[index];
+                    document.getElementById('addLinkName').value = link.name;
+                    document.getElementById('addLinkUrl').value = link.url;
+                    document.getElementById('addLinkCategory').value = link.category;
+                    document.getElementById('addLinkPrivacy').value = link.privacy;
+                    document.getElementById('linkEditIndex').value = index;
+                    document.getElementById('addLinkModal').classList.add('show');
+                }
+            } catch (e) {
+                alert('Error editing link');
+            }
+        }
+        
+        function deleteAdminLink(index) {
+            if (confirm('Delete this link? It will be removed from all pages.')) {
+                try {
+                    const links = JSON.parse(localStorage.getItem('activity-hub-links') || '[]');
+                    links.splice(index, 1);
+                    localStorage.setItem('activity-hub-links', JSON.stringify(links));
+                    loadAdminLinks();
+                    alert('Link deleted successfully');
+                } catch (e) {
+                    alert('Error deleting link');
+                }
             }
         }
 
@@ -2872,6 +3033,11 @@
             parentEl.querySelectorAll('.sub-nav-tab').forEach(tab => tab.classList.remove('active'));
             document.getElementById(subTabName).classList.add('active');
             if (event && event.target) event.target.classList.add('active');
+            
+            // Load widget table for manage-widgets sub-tab
+            if (subTabName === 'manage-widgets') {
+                loadWidgetsTable();
+            }
         }
 
         function showModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
@@ -4516,6 +4682,5 @@
         });
 
     </script>
-    <script src="/activity-hub/static/admin/admin-links-api.js"></script>
 </body>
 </html>

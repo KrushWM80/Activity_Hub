@@ -16,10 +16,10 @@ echo ========================================
 echo.
 
 REM Create Daily Validation Task
-echo [1/2] Creating Daily Validation Task (7:00 AM)...
+echo [1/2] Creating Daily Validation Task (5:00 AM)...
 schtasks /create /tn "AMP-AutoFeed-DailyValidation" ^
-  /tr "\"!PYTHON_EXE!\" \"!ORCHESTRATOR!\" daily --log-dir \"!LOG_DIR!\"" ^
-  /sc daily /st 07:00 /ru SYSTEM /f
+  /tr "\"!SCRIPT_DIR!\amp_run_daily.bat\"" ^
+  /sc daily /st 05:00 /ru "HOMEOFFICE\Dev-krush" /f
 
 if %ERRORLEVEL% EQU 0 (
     echo   [OK] Daily task created
@@ -33,8 +33,8 @@ echo.
 REM Create Weekly Report Task
 echo [2/2] Creating Weekly CSV Report Task (Monday 6:00 AM)...
 schtasks /create /tn "AMP-AutoFeed-WeeklyReport" ^
-  /tr "\"!PYTHON_EXE!\" \"!ORCHESTRATOR!\" csv-report --days 90 --log-dir \"!LOG_DIR!\"" ^
-  /sc weekly /d MON /st 06:00 /ru SYSTEM /f
+  /tr "\"!SCRIPT_DIR!\amp_run_weekly.bat\"" ^
+  /sc weekly /d MON /st 06:00 /ru "HOMEOFFICE\Dev-krush" /f
 
 if %ERRORLEVEL% EQU 0 (
     echo   [OK] Weekly task created

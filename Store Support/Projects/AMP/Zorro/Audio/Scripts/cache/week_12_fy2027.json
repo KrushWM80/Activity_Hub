@@ -1,33 +1,53 @@
 {
   "week": 12,
   "fy": 2027,
-  "cached_at": "2026-04-14T06:00:22.456554",
-  "bq_last_updated": "2026-04-13T23:18:38.704000+00:00",
-  "event_count": 3,
-  "review_no_comm_count": 3,
+  "cached_at": "2026-04-15T06:00:24.528479",
+  "bq_last_updated": "2026-04-14T23:55:07.133000+00:00",
+  "event_count": 6,
+  "review_no_comm_count": 6,
   "status_breakdown": [
     {
-      "status": "ATC final review - Pending",
-      "count": 5
+      "status": "Review for Publish review - No Comms",
+      "count": 6
     },
     {
       "status": "Awaiting Business Review - Pending",
-      "count": 3
+      "count": 5
+    },
+    {
+      "status": "Awaiting Comms Approval - Ready to Review",
+      "count": 4
     },
     {
       "status": "Awaiting Comms Approval - Pending",
-      "count": 3
+      "count": 4
+    },
+    {
+      "status": "Review for Publish review - Pending",
+      "count": 4
     },
     {
       "status": "Review for Publish review - Future Send",
       "count": 3
     },
     {
-      "status": "Review for Publish review - No Comms",
+      "status": "ATC final review - Pending",
       "count": 3
     },
     {
+      "status": "Awaiting Comms Approval - In Progress",
+      "count": 2
+    },
+    {
+      "status": "Denied - Pending",
+      "count": 1
+    },
+    {
       "status": "Expired - Pending",
+      "count": 1
+    },
+    {
+      "status": "Awaiting ATC Approval - Pending",
       "count": 1
     },
     {
@@ -35,21 +55,34 @@
       "count": 1
     },
     {
-      "status": "Awaiting Legal Approval - Pending",
-      "count": 1
-    },
-    {
-      "status": "Awaiting Comms Approval - In Progress",
-      "count": 1
-    },
-    {
       "status": "Draft - Pending",
       "count": 1
     }
   ],
-  "total_excl_denied": 21,
-  "summarized_count": 3,
+  "total_excl_denied": 34,
+  "summarized_count": 6,
   "events_with_summaries": [
+    {
+      "event_id": "2ce1ac2d-42b6-487b-9d2d-273962c1b47c",
+      "store_area": "Food",
+      "title": "Dept. 91: Frozen Modular Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 91: Associates should make sure Frozen pizza boxes are standing up and facing forward. This will help increase sales.\n\nDepartment 91: Associates should make sure all Frozen features are set to help drive sales.\n\nDepartment 91: In week 14, Great Value Breakfast Bowls are being added back into the Frozen Breakfast modular.\n\nDepartment 91: Did you know, stores on average sell 240 units of Banquet Chicken Pot Pies per week.\u00a0At $1 each, this is a great inflation buster and meal solution for customers.\n\nDepartment 91: Associates should make sure these four Rollback items are flagged and available for customers: Marie Callender's Dinners, Uncrustables 4ct, 10ct and 15ct, Caulipower Bites and Pillsbury Cinnamon Rolls."
+    },
+    {
+      "event_id": "b890b870-39ee-49a9-9077-3f4d9a148e78",
+      "store_area": "Food",
+      "title": "Dept. 92: Canned Fruit Inventory Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "The Del Monte brand canned fruit has new ownership. Once inventory starts to flow on Friday, April 10, store level recovery will occur as soon as the\u00a0DCs can process orders and load trucks."
+    },
+    {
+      "event_id": "dcbdf300-a79c-454f-acb0-dbfe63a3799f",
+      "store_area": "Frontend",
+      "title": "Dept. 82: Week 12 Modular to Fix an Incorrect Item Swap",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 82: In a recent item swap, the UPC label for\u00a0Great Value Spicy Peachy Ring Gummies printed incorrectly as Nerds Cluster Juicy. Associates need to print and place the correct label and re-confirm the modular ."
+    },
     {
       "event_id": "1fc53b94-0455-41d1-ad5b-391a52a58538",
       "store_area": "Frontend",
@@ -58,11 +91,11 @@
       "summary_text": "The Financial Services Daily Knowledge Question Program provides continued learning opportunities about important financial products. This AMP message explains how affected associates should interact with the Daily Knowledge Question."
     },
     {
-      "event_id": "f3a6aaa7-f5f1-4f8a-9c88-413c9b80c1bd",
-      "store_area": "People",
-      "title": "Update: Attendance Authorization Reason",
+      "event_id": "8abe1226-5f9b-426c-b5c8-1aebad04fb2c",
+      "store_area": "Frontend",
+      "title": "The Moms, Dads and Grads Gift Card Pallet Is Arriving Soon",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Update, Attendance Authorization Reason.\n\nBeginning Saturday, April 18, when managers authorize an exception in the Global Time and Attendance system using Protected Paid Time off, an updated authorization reason will display protected by associate balance, ppto and or sick.\n\nThis update will not change ppto eligibility, accruals or how associates can protect their attendance exceptions. Review the attendance authorize reason guide for more information."
+      "summary_text": "Department 82: Starting week 12 (April 18-24), the Moms, Dads and Grads Gift Card Pallet will arrive in stores. To capture maximum sales, move the pallet to the salesfloor in a high traffic area of the Front End."
     },
     {
       "event_id": "a03a6547-0afd-4ea7-9ca3-4c7bef55c09c",

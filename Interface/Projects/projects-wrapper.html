@@ -124,10 +124,13 @@
 
         .content-area {
             flex: 1;
-            width: calc(100vw - 120px);
+            width: calc(100% - 120px);
+            max-width: calc(100vw - 120px);
             padding: 30px 24px 30px 24px;
             display: block;
             background: #f5f7fa;
+            position: relative;
+            z-index: 500;
         }
 
         /* Right Sidebar */
@@ -136,36 +139,30 @@
             right: 0;
             top: 88px;
             bottom: 0;
-            width: 120px;
+            width: 130px;
             background: white;
             border-left: 2px solid #E2E8F0;
             overflow-y: auto;
-            z-index: 1000;
+            z-index: 1001;
             box-shadow: -2px 0 8px rgba(0,0,0,0.15);
             padding: 1rem 0.5rem;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 0.5rem;
         }
 
-        .sidebar-section {
-            padding: 12px;
-        }
-
-        .sidebar-section h3 {
-            font-size: 10px;
-            font-weight: bold;
-            color: #4A5568;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .sidebar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0;
+            padding: 0.5rem;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
         }
 
-        .sidebar-header-action {
+        .sidebar-add-btn {
             background: #0071CE;
             color: white;
             border: none;
@@ -182,23 +179,69 @@
             padding: 0;
         }
 
-        .sidebar-header-action:hover {
+        .sidebar-add-btn:hover {
             background: #004C91;
             transform: scale(1.1);
         }
 
-        .links-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        /* Link Categories */
+        .sidebar-category {
+            margin-bottom: 0.5rem;
         }
 
-        .link-item {
+        .sidebar-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: #4A5568;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.15s ease;
+            user-select: none;
+            background: #F7FAFC;
+        }
+
+        .sidebar-category-header:hover {
+            background: #E2E8F0;
+        }
+
+        .sidebar-category-chevron {
+            font-size: 0.6rem;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar-category.collapsed .sidebar-category-chevron {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar-category-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.2s ease;
+            max-height: 500px;
+            opacity: 1;
+            padding: 0.4rem 0;
+        }
+
+        .sidebar-category.collapsed .sidebar-category-links {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+        }
+
+        .sidebar-link-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px 6px;
+            padding: 8px 6px;
             border-radius: 6px;
             background: linear-gradient(135deg, #60A5FA 0%, #0071CE 100%);
             text-decoration: none;
@@ -207,33 +250,25 @@
             cursor: pointer;
             border: 2px solid transparent;
             text-align: center;
-            min-height: 60px;
             gap: 4px;
+            font-size: 10px;
         }
 
-        .link-item:hover {
+        .sidebar-link-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             border-color: #FFC220;
         }
 
-        .link-item-icon {
-            font-size: 1.5rem;
+        .sidebar-link-icon {
+            font-size: 1.2rem;
         }
 
-        .link-item-title {
+        .sidebar-link-title {
             font-weight: 600;
-            font-size: 11px;
             margin: 0;
             line-height: 1.1;
             word-wrap: break-word;
-        }
-
-        .link-item-desc {
-            font-size: 9px;
-            color: rgba(255,255,255,0.85);
-            margin: 0;
-            display: none;
         }
 
         /* iframe styles */
@@ -243,6 +278,8 @@
             border: none;
             display: block;
             background: white;
+            position: relative;
+            z-index: 400;
         }
     </style>
 </head>
@@ -283,32 +320,55 @@
         <!-- Right Sidebar -->
         <div class="sidebar">
             <!-- Links Section -->
-            <div class="sidebar-section">
-                <h3>
-                    📎 Links
-                    <button class="sidebar-header-action" title="Add Link">+</button>
-                </h3>
-                <div class="links-list">
-                    <a href="https://confluence.walmart.com/display/home" target="_blank" class="link-item">
-                        <div class="link-item-icon">📄</div>
-                        <div class="link-item-title">Confluence</div>
-                        <div class="link-item-desc">Documentation</div>
-                    </a>
-                    <a href="https://github.com/walmart" target="_blank" class="link-item">
-                        <div class="link-item-icon">🔗</div>
-                        <div class="link-item-title">GitHub</div>
-                        <div class="link-item-desc">Source Code</div>
-                    </a>
-                    <a href="https://jira.walmart.com/projects" target="_blank" class="link-item">
-                        <div class="link-item-icon">📋</div>
-                        <div class="link-item-title">Jira</div>
-                        <div class="link-item-desc">Tracking & Planning</div>
-                    </a>
-                    <a href="https://helpdesk.walmart.com" target="_blank" class="link-item">
-                        <div class="link-item-icon">❓</div>
-                        <div class="link-item-title">Help Desk</div>
-                        <div class="link-item-desc">Support</div>
-                    </a>
+            <div class="sidebar-header">
+                🔗 Links
+                <button class="sidebar-add-btn" title="Manage Links">+</button>
+            </div>
+            <div class="sidebar-links" id="sidebarLinksContainer">
+                <!-- Tools Category -->
+                <div class="sidebar-category">
+                    <div class="sidebar-category-header" onclick="toggleCategory(this)">
+                        Tools
+                        <span class="sidebar-category-chevron">▶</span>
+                    </div>
+                    <div class="sidebar-category-links">
+                        <a href="https://github.com/walmart" target="_blank" class="sidebar-link-item" title="GitHub">
+                            <div class="sidebar-link-icon">🔗</div>
+                            <div class="sidebar-link-title">GitHub</div>
+                        </a>
+                        <a href="https://jira.walmart.com/projects" target="_blank" class="sidebar-link-item" title="Jira">
+                            <div class="sidebar-link-icon">📋</div>
+                            <div class="sidebar-link-title">Jira</div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Docs Category -->
+                <div class="sidebar-category">
+                    <div class="sidebar-category-header" onclick="toggleCategory(this)">
+                        Docs
+                        <span class="sidebar-category-chevron">▶</span>
+                    </div>
+                    <div class="sidebar-category-links">
+                        <a href="https://confluence.walmart.com/display/home" target="_blank" class="sidebar-link-item" title="Confluence">
+                            <div class="sidebar-link-icon">📄</div>
+                            <div class="sidebar-link-title">Confluence</div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Internal Category -->
+                <div class="sidebar-category">
+                    <div class="sidebar-category-header" onclick="toggleCategory(this)">
+                        Internal
+                        <span class="sidebar-category-chevron">▶</span>
+                    </div>
+                    <div class="sidebar-category-links">
+                        <a href="https://helpdesk.walmart.com" target="_blank" class="sidebar-link-item" title="Help Desk">
+                            <div class="sidebar-link-icon">❓</div>
+                            <div class="sidebar-link-title">Help Desk</div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -316,42 +376,58 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Navigation: Allow natural page navigation with full reload
         function navigateTo(event, url) {
             event.preventDefault();
-            // Check if we're navigating away from this page
-            if (!url.includes('/activity-hub/projects')) {
-                // Navigate to different page/tab
-                window.location.href = url;
-            } else {
-                // Stay on projects page, update URL without reload
-                window.history.pushState({}, '', url);
-            }
+            // Always allow full page navigation
+            window.location.href = url;
         }
         
-        // Ensure sidebar is visible on page load - run multiple times to ensure it works
-        function showSidebar() {
+        // Set active nav item based on current URL
+        function setActiveNav() {
+            const currentPath = window.location.pathname;
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href === currentPath) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+        
+        // Toggle sidebar category collapse/expand
+        function toggleCategory(headerElement) {
+            const category = headerElement.closest('.sidebar-category');
+            category.classList.toggle('collapsed');
+        }
+        
+        // Ensure sidebar visibility - properly visible above iframe
+        function ensureSidebarVisible() {
             const sidebar = document.querySelector('.sidebar');
             if (sidebar) {
-                sidebar.style.display = 'flex !important';
+                sidebar.style.display = 'flex';
                 sidebar.style.visibility = 'visible';
-                sidebar.style.zIndex = '1000';
-                console.log('✓ Sidebar is now visible');
+                sidebar.style.position = 'fixed';
+                sidebar.style.right = '0';
+                sidebar.style.top = '88px';
+                sidebar.style.zIndex = '1001';
+                console.log('✓ Sidebar visibility ensured');
             } else {
                 console.log('✗ Sidebar element not found');
             }
         }
         
-        // Try to show sidebar immediately
-        showSidebar();
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setActiveNav();
+            ensureSidebarVisible();
+        });
         
-        // Try again on DOM ready
-        document.addEventListener('DOMContentLoaded', showSidebar);
-        
-        // Try again on window load
-        window.addEventListener('load', showSidebar);
-        
-        // Try one more time after a brief delay
-        setTimeout(showSidebar, 500);
+        // Ensure sidebar stays visible after iframe interaction
+        window.addEventListener('load', ensureSidebarVisible);
     </script>
 </body>
 </html>

@@ -1,0 +1,2457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/Spark_Blank.png">
+    <title>Walmart Activity Hub - Reporting</title>
+    <style>
+        /* Import Walmart Brand Variables */
+        :root {
+            /* Official Walmart Brand Colors */
+            --walmart-navy: #1E3A8A;
+            --walmart-blue-dark: #1D4ED8;
+            --walmart-blue: #3B82F6;
+            --walmart-blue-light: #60A5FA;
+            --walmart-blue-lightest: #DBEAFE;
+            --walmart-yellow: #FFCC00;
+            --walmart-yellow-dark: #E6B800;
+            --walmart-yellow-light: #FFD633;
+            
+            /* Typography */
+            --font-primary: 'Everyday Sans', 'Helvetica Neue', Arial, sans-serif;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            
+            /* Other Variables */
+            --gray-900: #1A202C;
+            --gray-700: #4A5568;
+            --gray-600: #718096;
+            --gray-300: #E2E8F0;
+            --gray-100: #F7FAFC;
+            --white: #FFFFFF;
+            --success: #38A169;
+            --warning: #D69E2E;
+            --error: #E53E3E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--gray-100);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-dark) 100%);
+            color: var(--white);
+            padding: var(--space-4) var(--space-6);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .spark-logo {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: var(--space-6);
+        }
+
+        .nav-item {
+            color: var(--white);
+            text-decoration: none;
+            padding: var(--space-2) var(--space-4);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: var(--walmart-yellow);
+            color: var(--gray-900);
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .notification-bell {
+            position: relative;
+            padding: var(--space-2);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--walmart-yellow);
+            color: var(--gray-900);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-6);
+            display: block;
+            margin-right: 130px;
+        }
+
+        /* Sidebar */
+        .quick-links-sidebar {
+            position: fixed;
+            right: 0;
+            top: 88px;
+            bottom: 0;
+            width: 130px;
+            background: var(--white);
+            border-left: 2px solid var(--gray-300);
+            overflow-y: auto;
+            z-index: 1001;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.15);
+            padding: 0.5rem 0.5rem 1rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-add-btn {
+            background: var(--walmart-blue);
+            color: var(--white);
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .sidebar-add-btn:hover {
+            background: #004C91;
+            transform: scale(1.1);
+        }
+
+        .sidebar-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-category {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.15s ease;
+            user-select: none;
+            background: var(--gray-100);
+        }
+
+        .sidebar-category-header:hover {
+            background: var(--gray-300);
+        }
+
+        .sidebar-category-chevron {
+            font-size: 0.6rem;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar-category.collapsed .sidebar-category-chevron {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar-category-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.2s ease;
+            max-height: 500px;
+            opacity: 1;
+            padding: 0.4rem 0;
+        }
+
+        .sidebar-category.collapsed .sidebar-category-links {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+        }
+
+        .sidebar-link-card {
+            background: linear-gradient(135deg, var(--walmart-blue-light) 0%, var(--walmart-blue) 100%);
+            color: var(--white);
+            padding: 0.75rem 0.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            font-size: 0.85rem;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .sidebar-link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border-color: var(--walmart-yellow);
+        }
+
+        .sidebar-link-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: var(--space-4);
+        }
+
+        /* Widget Base */
+        .widget {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .widget:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .widget-header {
+            padding: var(--space-4) var(--space-6);
+            font-weight: 600;
+            font-size: 1.125rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-content {
+            padding: var(--space-6);
+        }
+
+        /* Widget Sizes */
+        .widget-small { grid-column: span 3; }
+        .widget-medium { grid-column: span 4; }
+        .widget-large { grid-column: span 6; }
+        .widget-extra-large { grid-column: span 8; }
+
+        /* Report Widget */
+        .report-widget .widget-header {
+            background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+            color: var(--white);
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: var(--space-4);
+            background: var(--gray-100);
+            border-radius: 8px;
+            margin-bottom: var(--space-3);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--walmart-blue);
+            margin-bottom: var(--space-1);
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .report-table th {
+            background: var(--gray-100);
+            padding: var(--space-3);
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-900);
+            border-bottom: 2px solid var(--gray-300);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .report-table td {
+            padding: var(--space-3);
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        .report-table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: var(--space-1) var(--space-3);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(56, 161, 105, 0.1);
+            color: var(--success);
+        }
+
+        .status-inactive {
+            background: rgba(214, 158, 46, 0.1);
+            color: var(--warning);
+        }
+
+        .status-completed {
+            background: rgba(56, 161, 105, 0.1);
+            color: var(--success);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--gray-300);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: var(--space-2) 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3B82F6 0%, #60A5FA 100%);
+            transition: width 1s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-container {
+                padding: var(--space-4);
+            }
+            
+            .dashboard {
+                grid-template-columns: repeat(8, 1fr);
+            }
+            
+            .widget-large, .widget-extra-large {
+                grid-column: span 8;
+            }
+        }
+
+        /* ─── Widget Edit Mode ─── */
+        .dashboard-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: var(--space-4);
+            position: relative;
+        }
+
+        .settings-gear {
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .settings-gear:hover {
+            border-color: var(--walmart-blue);
+            background: var(--walmart-blue-lightest);
+            transform: rotate(45deg);
+        }
+
+        .gear-dropdown {
+            display: none;
+            position: absolute;
+            top: 44px;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 60;
+            min-width: 200px;
+            overflow: hidden;
+        }
+
+        .gear-dropdown.show {
+            display: block;
+        }
+
+        .gear-dropdown-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gear-dropdown-item:hover {
+            background: var(--walmart-blue-lightest);
+            color: var(--walmart-blue);
+        }
+
+        /* Edit Mode Toolbar */
+        .edit-toolbar {
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--walmart-blue-lightest) 0%, #EBF5FF 100%);
+            border: 2px solid var(--walmart-blue);
+            border-radius: 10px;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: var(--space-4);
+        }
+
+        .edit-toolbar.show {
+            display: flex;
+        }
+
+        .edit-toolbar-title {
+            font-weight: 600;
+            color: var(--walmart-blue-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .edit-toolbar-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .edit-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .edit-btn-done {
+            background: var(--walmart-blue);
+            color: var(--white);
+        }
+
+        .edit-btn-done:hover {
+            background: var(--walmart-blue-dark);
+        }
+
+        .edit-btn-reset {
+            background: var(--white);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .edit-btn-reset:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .edit-btn-add {
+            background: var(--walmart-yellow);
+            color: var(--gray-900);
+        }
+
+        .edit-btn-add:hover {
+            background: var(--walmart-yellow-dark);
+        }
+
+        /* Widget edit controls overlay */
+        .widget-edit-controls {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            background: rgba(30, 58, 138, 0.9);
+            padding: 0.4rem 0.5rem;
+            border-radius: 12px 12px 0 0;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.edit-mode .widget-edit-controls {
+            display: flex;
+        }
+
+        body.edit-mode .widget {
+            position: relative;
+            border: 2px dashed var(--walmart-blue);
+            cursor: grab;
+        }
+
+        body.edit-mode .widget:hover {
+            transform: none;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25);
+        }
+
+        body.edit-mode .widget.dragging {
+            opacity: 0.4;
+            cursor: grabbing;
+        }
+
+        body.edit-mode .widget.drag-over {
+            border-color: var(--walmart-yellow);
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .widget-ctrl-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: var(--white);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+
+        .widget-ctrl-btn:hover {
+            background: rgba(255,255,255,0.35);
+        }
+
+        .widget-ctrl-btn.remove-btn:hover {
+            background: rgba(239, 68, 68, 0.8);
+        }
+
+        .widget-ctrl-label {
+            color: var(--white);
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0.9;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .widget-ctrl-group {
+            display: flex;
+            gap: 0.3rem;
+            align-items: center;
+        }
+
+        /* Hidden widget placeholder */
+        body.edit-mode .widget.widget-hidden {
+            display: none;
+        }
+
+        .widget.widget-hidden {
+            display: none;
+        }
+
+        /* Add Widget button at bottom of grid */
+        .add-widget-placeholder {
+            display: none;
+            grid-column: span 12;
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255,255,255,0.5);
+        }
+
+        body.edit-mode .add-widget-placeholder {
+            display: block;
+        }
+
+        .add-widget-placeholder:hover {
+            border-color: var(--walmart-blue);
+            background: var(--walmart-blue-lightest);
+        }
+
+        .add-widget-placeholder-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        /* Add Widget Modal */
+        .add-widget-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .add-widget-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-widget-modal-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            animation: slideUp 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .add-widget-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.15s ease;
+        }
+
+        .add-widget-list-item:hover {
+            border-color: var(--walmart-blue);
+            background: var(--walmart-blue-lightest);
+        }
+
+        .add-widget-list-item .widget-item-name {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .add-widget-list-item .widget-item-size {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+
+
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-300);
+            padding-bottom: 1rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.3rem;
+            color: var(--walmart-navy);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--error);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-900);
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-family: var(--font-primary);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 3px var(--walmart-blue-lightest);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .btn-submit {
+            background: var(--walmart-blue);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background: var(--walmart-blue-dark);
+        }
+
+        .btn-cancel {
+            background: var(--gray-200);
+            color: var(--gray-900);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel:hover {
+            background: var(--gray-300);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Request Widget Tabs in Modal */
+        .request-widget-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--gray-300);
+        }
+
+        .request-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0.75rem;
+            border-bottom: 2px solid var(--gray-300);
+        }
+        .request-tab {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .request-tab.active {
+            color: var(--walmart-navy);
+            border-bottom-color: var(--walmart-navy);
+        }
+        .request-tab:hover:not(.active) {
+            color: var(--gray-900);
+        }
+        .request-tab-content { display: none; }
+        .request-tab-content.active { display: block; }
+
+        /* ──────────────────────────────────────────────
+           Links Modal & Form Styling
+           ────────────────────────────────────────────── */
+        .links-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .links-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .links-modal-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .links-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 1rem;
+        }
+
+        .links-modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--walmart-navy);
+            margin: 0;
+        }
+
+        .links-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .links-modal-close:hover {
+            color: var(--error);
+            transform: scale(1.1);
+        }
+
+        .links-modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .links-modal-option {
+            padding: 1.5rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--gray-50);
+        }
+
+        .links-modal-option:hover {
+            border-color: var(--walmart-blue);
+            background: var(--white);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .links-modal-option-icon {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .links-modal-option-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--walmart-navy);
+            margin-bottom: 0.25rem;
+        }
+
+        .links-modal-option-desc {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        /* Nested Modal - Create/Manage/Browse Links */
+        .nested-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .nested-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nested-modal-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 550px;
+            animation: slideUp 0.3s ease;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .nested-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 1rem;
+        }
+
+        .nested-modal-header h2 {
+            font-size: 1.3rem;
+            color: var(--walmart-navy);
+            margin: 0;
+        }
+
+        .nested-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nested-modal-close:hover {
+            color: var(--error);
+        }
+
+        .available-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .available-link-item {
+            padding: 1rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--gray-50);
+        }
+
+        .available-link-item:hover {
+            border-color: var(--walmart-blue);
+            background: var(--white);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .available-link-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .available-link-desc {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+        }
+
+        /* Form Styling */
+        .link-form {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .btn-primary {
+            background: var(--walmart-blue);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--walmart-blue-dark);
+        }
+
+        .error-message {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #EF4444;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #D1FAE5;
+            color: #065F46;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #10B981;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Link Management */
+        .link-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-300);
+            gap: 1rem;
+        }
+
+        .link-item:last-child {
+            border-bottom: none;
+        }
+
+        .link-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .link-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .link-url {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .link-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .link-actions {
+            display: flex;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .link-btn {
+            padding: 0.25rem 0.6rem;
+            border: 1px solid var(--gray-300);
+            background: var(--white);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .link-btn:hover {
+            background: var(--gray-100);
+            border-color: var(--walmart-blue);
+            color: var(--walmart-blue);
+        }
+
+        .link-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .link-badge-private {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .link-badge-shared {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .link-badge-public {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        /* Sidebar categories collapsed state */
+        .sidebar-category {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .sidebar-category-header:hover {
+            background: var(--gray-100);
+        }
+
+        .sidebar-category-chevron {
+            font-size: 0.6rem;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar-category.collapsed .sidebar-category-chevron {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar-category-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.2s ease;
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        .sidebar-category.collapsed .sidebar-category-links {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="/Spark_Blank.png" alt="Spark" class="spark-logo" onerror="this.src='/activity-hub/static/store-support/General%20Setup/Design/Spark%20Blank.png'">
+                <h1>Activity Hub</h1>
+            </div>
+            <nav class="nav-items">
+                <a href="/activity-hub/for-you" class="nav-item" data-view="dashboard">For You</a>
+                <a href="/activity-hub/projects" class="nav-item" data-embed="iframe" data-url="http://weus42608431466:8088/activity-hub/projects">Projects</a>
+                <a href="/activity-hub/reporting" class="nav-item active">Reporting</a>
+                <a href="/activity-hub/teams" class="nav-item">Teams</a>
+                <a href="/activity-hub/my-work" class="nav-item">My Work</a>
+                <a href="/activity-hub/settings" class="nav-item">Settings</a>
+                <a href="/activity-hub/admin" class="nav-item" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
+            </nav>
+            <div class="user-section">
+                <div class="notification-bell">
+                    🔔
+                    <div class="notification-badge">2</div>
+                </div>
+                <span>Krush</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Settings Gear -->
+        <div class="dashboard-header">
+            <button class="settings-gear" onclick="toggleGearDropdown()" title="Page Settings">⚙️</button>
+            <div id="gearDropdown" class="gear-dropdown">
+                <div class="gear-dropdown-item" onclick="enterEditMode()">✏️ Edit Reporting Page</div>
+            </div>
+        </div>
+
+        <!-- Edit Mode Toolbar -->
+        <div id="editToolbar" class="edit-toolbar">
+            <div class="edit-toolbar-title">✏️ Editing Reporting Page</div>
+            <div class="edit-toolbar-actions">
+                <button class="edit-btn edit-btn-add" onclick="openAddWidgetModal()">+ Add Widget</button>
+                <button class="edit-btn edit-btn-reset" onclick="resetWidgetLayout()">↩ Reset to Default</button>
+                <button class="edit-btn edit-btn-done" onclick="exitEditMode()">✓ Done Editing</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <main class="dashboard" id="widgetGrid">
+            <!-- Activity Dashboard Widget -->
+            <div class="widget report-widget widget-extra-large" data-widget-id="activity-dashboard" data-widget-name="Activity Dashboard" data-default-size="widget-extra-large" data-areas="reporting" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">Activity Dashboard</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="resizeWidget('activity-dashboard')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('activity-dashboard')" title="Remove">✕</button>
+                    </div>
+                </div>
+                <div class="widget-header">
+                    📊 Activity Dashboard - Key Metrics & Trends
+                </div>
+                <div class="widget-content">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                        <div class="metric-card">
+                            <div class="metric-value">847</div>
+                            <div class="metric-label">Total Activities</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">92%</div>
+                            <div class="metric-label">Completion Rate</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">1.3K</div>
+                            <div class="metric-label">Participants</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">Trend: Performance</span>
+                            <span style="color: #38A169; font-weight: 600;">↑ +12%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 78%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">Engagement Score</span>
+                            <span style="color: var(--walmart-blue); font-weight: 600;">8.4/10</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 84%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Reports Widget -->
+            <div class="widget report-widget widget-extra-large" data-widget-id="project-reports" data-widget-name="Project Reports" data-default-size="widget-extra-large" data-areas="reporting" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">Project Reports</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="resizeWidget('project-reports')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('project-reports')" title="Remove">✕</button>
+                    </div>
+                </div>
+                <div class="widget-header">
+                    📈 Project Reports - Status & Milestones
+                </div>
+                <div class="widget-content">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Owner</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Store Modernization Alpha</td>
+                                <td><span class="status-badge status-active">Active</span></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="progress-bar" style="flex: 1; margin: 0;">
+                                            <div class="progress-fill" style="width: 65%;"></div>
+                                        </div>
+                                        <span style="font-size: 0.85rem;">65%</span>
+                                    </div>
+                                </td>
+                                <td>Jane Smith</td>
+                            </tr>
+                            <tr>
+                                <td>Digital Transformation Beta</td>
+                                <td><span class="status-badge status-active">Active</span></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="progress-bar" style="flex: 1; margin: 0;">
+                                            <div class="progress-fill" style="width: 48%;"></div>
+                                        </div>
+                                        <span style="font-size: 0.85rem;">48%</span>
+                                    </div>
+                                </td>
+                                <td>Mike Johnson</td>
+                            </tr>
+                            <tr>
+                                <td>Supply Chain Initiative</td>
+                                <td><span class="status-badge status-completed">Completed</span></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="progress-bar" style="flex: 1; margin: 0;">
+                                            <div class="progress-fill" style="width: 100%;"></div>
+                                        </div>
+                                        <span style="font-size: 0.85rem;">100%</span>
+                                    </div>
+                                </td>
+                                <td>Sarah Chen</td>
+                            </tr>
+                            <tr>
+                                <td>Customer Experience Pilot</td>
+                                <td><span class="status-badge status-inactive">On Hold</span></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div class="progress-bar" style="flex: 1; margin: 0;">
+                                            <div class="progress-fill" style="width: 42%;"></div>
+                                        </div>
+                                        <span style="font-size: 0.85rem;">42%</span>
+                                    </div>
+                                </td>
+                                <td>Robert Davis</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Key Reporting Metrics Widget -->
+            <div class="widget report-widget widget-extra-large" data-widget-id="key-metrics" data-widget-name="Key Reporting Metrics" data-default-size="widget-extra-large" data-areas="reporting" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">Key Metrics</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="resizeWidget('key-metrics')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('key-metrics')" title="Remove">✕</button>
+                    </div>
+                </div>
+                <div class="widget-header">
+                    🎯 Key Reporting Metrics
+                </div>
+                <div class="widget-content">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                        <div class="metric-card">
+                            <div class="metric-value">$2.4M</div>
+                            <div class="metric-label">Revenue Impact</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">156</div>
+                            <div class="metric-label">Reports Generated</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">94%</div>
+                            <div class="metric-label">Data Accuracy</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">4.2d</div>
+                            <div class="metric-label">Avg Report Time</div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--gray-50); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--walmart-blue);">
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">📍 Top Report Categories</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+                            <div>• Sales Performance (34%)</div>
+                            <div>• Operational Metrics (28%)</div>
+                            <div>• Financial Analysis (22%)</div>
+                            <div>• Compliance Reports (16%)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MyReports Widget -->
+            <div class="widget report-widget widget-extra-large" data-widget-id="my-reports" data-widget-name="My Reports" data-default-size="widget-extra-large" data-areas="reporting" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">My Reports</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="resizeWidget('my-reports')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('my-reports')" title="Remove">✕</button>
+                    </div>
+                </div>
+                <div class="widget-header">
+                    ⚙️ My Reports - Custom reports
+                </div>
+                <div class="widget-content">
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="padding: 1rem; background: var(--gray-50); border-radius: 8px; border-left: 4px solid var(--walmart-blue);">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">📋 Weekly Activity Summary</div>
+                            <div style="font-size: 0.85rem; color: var(--gray-600);">Last generated: Apr 12, 2026</div>
+                            <button style="margin-top: 0.5rem; background: var(--walmart-blue); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Download</button>
+                        </div>
+
+                        <div style="padding: 1rem; background: var(--gray-50); border-radius: 8px; border-left: 4px solid #6366F1;">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">📊 Department Performance Report</div>
+                            <div style="font-size: 0.85rem; color: var(--gray-600);">Last generated: Apr 10, 2026</div>
+                            <button style="margin-top: 0.5rem; background: #6366F1; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Download</button>
+                        </div>
+
+                        <button onclick="openCustomReportBuilder()" style="margin-top: 0.5rem; background: var(--walmart-yellow); color: var(--gray-900); border: 2px solid var(--gray-300); padding: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%;">+ Create Custom Report</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Widget Placeholder -->
+            <div class="add-widget-placeholder" onclick="openAddWidgetModal()">
+                <div class="add-widget-placeholder-text">+ Add Widget</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Widget Modal (with Widget Requests section) -->
+    <div id="addWidgetModal" class="add-widget-modal">
+        <div class="add-widget-modal-content">
+            <div class="modal-header">
+                <h2>➕ Add Widget</h2>
+                <button class="modal-close" onclick="closeAddWidgetModal()">✕</button>
+            </div>
+            <p style="color: var(--gray-600); margin-bottom: 1rem;">Select a widget to add back to your dashboard:</p>
+            <div id="addWidgetList"></div>
+            <div class="request-widget-section">
+                <h3 style="font-size: 1rem; color: var(--walmart-navy); margin-bottom: 0.75rem;">💡 Widget Requests</h3>
+                <div class="request-tabs">
+                    <button class="request-tab active" onclick="showRequestTab('new-widget')">New Widget</button>
+                    <button class="request-tab" onclick="showRequestTab('update-widget')">Update Widget</button>
+                </div>
+                <div id="new-widget" class="request-tab-content active">
+                    <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.75rem;">Have an idea for a new widget? Submit a request:</p>
+                    <div class="form-group">
+                        <input type="text" id="requestWidgetName" placeholder="Widget name (e.g., Calendar, Forecast)">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="requestWidgetDesc" placeholder="Brief description of what it should show">
+                    </div>
+                    <button class="btn-submit" style="width: 100%;" onclick="submitWidgetRequest()">Submit Request</button>
+                </div>
+                <div id="update-widget" class="request-tab-content">
+                    <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.75rem;">Suggest an update to a current widget:</p>
+                    <div class="form-group">
+                        <select id="updateWidgetSelect" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 0.9rem; font-family: var(--font-primary);">
+                            <option value="">-- Select a Widget --</option>
+                            <option value="key-metrics">Key Reporting Metrics</option>
+                            <option value="activity-dashboard">Activity Dashboard</option>
+                            <option value="project-reports">Project Reports</option>
+                            <option value="my-reports">My Reports</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="updateWidgetDesc" placeholder="Describe the update you'd like to see">
+                    </div>
+                    <button class="btn-submit" style="width: 100%;" onclick="submitWidgetUpdateRequest()">Submit Update Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR - Links -->
+    <!-- Links Sidebar -->
+    <div class="quick-links-sidebar">
+        <div class="sidebar-header">
+            🔗 Links
+            <button class="sidebar-add-btn" onclick="openLinksModal()">+</button>
+        </div>
+        <div class="sidebar-links" id="sidebarLinksContainer">
+            <!-- Dynamically populated by renderCategorizedSidebar() -->
+        </div>
+    </div>
+
+    <!-- Links Management Modal -->
+    <div id="linksModal" class="links-modal">
+        <div class="links-modal-content">
+            <div class="links-modal-header">
+                <h2>Manage Your Links</h2>
+                <button class="links-modal-close" onclick="closeLinksModal()">✕</button>
+            </div>
+            <div class="links-modal-options">
+                <div class="links-modal-option" onclick="selectLinksOption('manage')">
+                    <div class="links-modal-option-icon">📋</div>
+                    <div class="links-modal-option-title">Manage Links</div>
+                    <div class="links-modal-option-desc">Edit, reorder, or remove your existing quick links</div>
+                </div>
+                <div class="links-modal-option" onclick="selectLinksOption('browse')">
+                    <div class="links-modal-option-icon">🔍</div>
+                    <div class="links-modal-option-title">Browse Available Links</div>
+                    <div class="links-modal-option-desc">Discover new links by category and add them to your list</div>
+                </div>
+                <div class="links-modal-option" onclick="selectLinksOption('create')">
+                    <div class="links-modal-option-icon">➕</div>
+                    <div class="links-modal-option-title">Create New Link</div>
+                    <div class="links-modal-option-desc">Add a custom link for your team or department</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nested Modal: Create New Link Form -->
+    <div id="createLinkModal" class="nested-modal">
+        <div class="nested-modal-content">
+            <div class="nested-modal-header">
+                <h2>➕ Create New Link</h2>
+                <button class="nested-modal-close" onclick="closeCreateLinkModal()">✕</button>
+            </div>
+            <div class="link-form" style="background: transparent; padding: 0;">
+                <p class="pci-notice" style="font-size: 0.75rem; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 0.4rem 0.6rem; margin-bottom: 0.75rem;">🔒 Do not enter payment card information in any field.</p>
+                <div id="createDuplicateError" class="error-message">⚠️ Error: URL already exists in the system. Please use a different URL.</div>
+                <div id="createSuccessMessage" class="success-message">✅ Link created successfully!</div>
+                
+                <div class="form-group">
+                    <label>Link Name</label>
+                    <input type="text" id="createLinkName" placeholder="e.g., Confluence Portal">
+                </div>
+                <div class="form-group">
+                    <label>URL</label>
+                    <input type="url" id="createLinkUrl" placeholder="https://example.com">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="createLinkCategory">
+                            <option value="Docs">Docs</option>
+                            <option value="Tools">Tools</option>
+                            <option value="Resources">Resources</option>
+                            <option value="Internal">Internal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Privacy Type</label>
+                        <select id="createLinkPrivacy">
+                            <option value="private">Private</option>
+                            <option value="shared">Shared</option>
+                            <option value="public">Public</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description (optional)</label>
+                    <input type="text" id="createLinkDescription" placeholder="What does this link do?">
+                </div>
+                <div class="form-actions">
+                    <button class="btn-primary" onclick="demoCreateNewLink()">Create Link</button>
+                    <button class="btn-primary" style="background: var(--gray-600);" onclick="resetCreateLinkForm()">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nested Modal: Manage Links -->
+    <div id="manageLinksModal" class="nested-modal">
+        <div class="nested-modal-content">
+            <div class="nested-modal-header">
+                <h2>📋 Manage Your Links</h2>
+                <button class="nested-modal-close" onclick="closeManageLinksModal()">✕</button>
+            </div>
+            <div id="manageLinksContainer">
+                <p style="color: var(--gray-600); margin-bottom: 1rem;">Click Edit to modify, or click Delete to remove</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nested Modal: Browse Available Links -->
+    <div id="browseLinksModal" class="nested-modal">
+        <div class="nested-modal-content">
+            <div class="nested-modal-header">
+                <h2>🔍 Browse Available Links</h2>
+                <button class="nested-modal-close" onclick="closeBrowseLinksModal()">✕</button>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <input type="text" id="browseLinksSearch" placeholder="Search links..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 6px;" oninput="filterBrowseLinks()">
+            </div>
+            <div id="browseLinksContainer">
+                <!-- Tools -->
+                <div class="browse-category" data-browse-cat="Tools">
+                    <h4 style="color: var(--walmart-navy); margin: 0.75rem 0 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">🔧 Tools</h4>
+                    <div class="available-links-grid">
+                        <div class="available-link-item" onclick="addLink('Slack')">
+                            <div class="available-link-name">💬 Slack</div>
+                            <div class="available-link-desc">Team Communication</div>
+                        </div>
+                        <div class="available-link-item" onclick="addLink('Salesforce')">
+                            <div class="available-link-name">☁️ Salesforce</div>
+                            <div class="available-link-desc">CRM Platform</div>
+                        </div>
+                        <div class="available-link-item" onclick="addLink('Tableau')">
+                            <div class="available-link-name">📊 Tableau</div>
+                            <div class="available-link-desc">Analytics & BI</div>
+                        </div>
+                        <div class="available-link-item" onclick="addLink('ServiceNow')">
+                            <div class="available-link-name">🎫 ServiceNow</div>
+                            <div class="available-link-desc">IT Service Mgmt</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Docs -->
+                <div class="browse-category" data-browse-cat="Docs">
+                    <h4 style="color: var(--walmart-navy); margin: 0.75rem 0 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">📄 Docs</h4>
+                    <div class="available-links-grid">
+                        <div class="available-link-item" onclick="addLink('SharePoint')">
+                            <div class="available-link-name">📁 SharePoint</div>
+                            <div class="available-link-desc">Document Library</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Resources -->
+                <div class="browse-category" data-browse-cat="Resources">
+                    <h4 style="color: var(--walmart-navy); margin: 0.75rem 0 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">📚 Resources</h4>
+                    <div class="available-links-grid">
+                        <div class="available-link-item" onclick="addLink('Workday')">
+                            <div class="available-link-name">👥 Workday</div>
+                            <div class="available-link-desc">HR Platform</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Internal -->
+                <div class="browse-category" data-browse-cat="Internal">
+                    <h4 style="color: var(--walmart-navy); margin: 0.75rem 0 0.5rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">🏢 Internal</h4>
+                    <div class="available-links-grid">
+                        <div class="available-link-item" onclick="addLink('SAP')">
+                            <div class="available-link-name">📦 SAP</div>
+                            <div class="available-link-desc">ERP System</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ──────────────────────────────────────────────
+        // Link Management - Initialize user links storage
+        // ──────────────────────────────────────────────
+        const DEFAULT_USER_LINKS = [
+            { name: 'Confluence Portal', url: 'https://confluence.walmart.com/display/home', category: 'Docs', privacy: 'public' },
+            { name: 'GitHub Repos', url: 'https://github.com/walmart', category: 'Tools', privacy: 'shared' },
+            { name: 'Jira Board', url: 'https://jira.walmart.com/projects', category: 'Tools', privacy: 'private' },
+            { name: 'Help Desk', url: 'https://helpdesk.walmart.com', category: 'Internal', privacy: 'public' }
+        ];
+        
+        const LINK_COLLAPSE_KEY = 'activity-hub-reporting-link-collapse';
+        
+        let userLinks = (function() {
+            try {
+                const saved = localStorage.getItem('activity-hub-links');
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return DEFAULT_USER_LINKS.slice();
+        })();
+
+        // Persist links to localStorage
+        function syncLinksToStorage() {
+            localStorage.setItem('activity-hub-links', JSON.stringify(userLinks));
+        }
+        
+        // Initialize storage on page load
+        syncLinksToStorage();
+
+        // Get link collapse state from localStorage
+        function getLinkCollapseState() {
+            try {
+                const saved = localStorage.getItem(LINK_COLLAPSE_KEY);
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return {};
+        }
+
+        function saveLinkCollapseState(state) {
+            localStorage.setItem(LINK_COLLAPSE_KEY, JSON.stringify(state));
+        }
+
+        // ──────────────────────────────────────────────
+        // Links Sidebar: Categorized Rendering
+        // ──────────────────────────────────────────────
+        function renderCategorizedSidebar() {
+            const container = document.getElementById('sidebarLinksContainer');
+            if (!container) return;
+
+            const collapseState = getLinkCollapseState();
+
+            // Group links by category
+            const categories = {};
+            userLinks.forEach(link => {
+                const cat = link.category || 'Other';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(link);
+            });
+
+            // Fixed category order
+            const catOrder = ['Tools', 'Docs', 'Resources', 'Internal'];
+            const sortedCats = catOrder.filter(c => categories[c]).concat(
+                Object.keys(categories).filter(c => !catOrder.includes(c))
+            );
+
+            let html = '';
+            sortedCats.forEach(cat => {
+                const isCollapsed = collapseState[cat] === true;
+                html += '<div class="sidebar-category' + (isCollapsed ? ' collapsed' : '') + '" data-category="' + cat + '">';
+                html += '<div class="sidebar-category-header" onclick="toggleCategory(\'' + cat + '\')">';
+                html += '<span>' + cat + '</span>';
+                html += '<span class="sidebar-category-chevron">▼</span>';
+                html += '</div>';
+                html += '<div class="sidebar-category-links">';
+
+                categories[cat].forEach(link => {
+                    html += '<div class="sidebar-link-card" onclick="window.open(\'' + link.url.replace(/'/g, "\\'") + '\', \'_blank\')">';
+                    html += '<div class="sidebar-link-name">' + link.name + '</div>';
+                    html += '</div>';
+                });
+
+                html += '</div></div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Modal Functions
+        function openLinksModal() {
+            document.getElementById('linksModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLinksModal() {
+            document.getElementById('linksModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function selectLinksOption(option) {
+            closeLinksModal();
+            
+            switch(option) {
+                case 'manage':
+                    renderManageLinks();
+                    document.getElementById('manageLinksModal').classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    break;
+                case 'browse':
+                    document.getElementById('browseLinksModal').classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    break;
+                case 'create':
+                    document.getElementById('createLinkModal').classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    break;
+            }
+        }
+
+        function closeCreateLinkModal() {
+            document.getElementById('createLinkModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeManageLinksModal() {
+            document.getElementById('manageLinksModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeBrowseLinksModal() {
+            document.getElementById('browseLinksModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Add available link
+        function addLink(linkName) {
+            const availableLinkMap = {
+                'Slack': { url: 'https://slack.com', category: 'Tools', privacy: 'shared' },
+                'Salesforce': { url: 'https://salesforce.com', category: 'Tools', privacy: 'public' },
+                'Tableau': { url: 'https://tableau.com', category: 'Tools', privacy: 'public' },
+                'ServiceNow': { url: 'https://servicenow.com', category: 'Tools', privacy: 'shared' },
+                'SharePoint': { url: 'https://sharepoint.walmart.com', category: 'Docs', privacy: 'public' },
+                'Workday': { url: 'https://workday.com', category: 'Resources', privacy: 'public' },
+                'SAP': { url: 'https://sap.com', category: 'Internal', privacy: 'public' }
+            };
+            
+            if (availableLinkMap[linkName]) {
+                const linkData = availableLinkMap[linkName];
+                userLinks.push({
+                    name: linkName,
+                    url: linkData.url,
+                    category: linkData.category,
+                    privacy: linkData.privacy
+                });
+                addLinkToSidebar(linkName, linkData.url);
+                closeBrowseLinksModal();
+                alert('✅ Added "' + linkName + '" to your links sidebar!');
+            }
+        }
+
+        function renderManageLinks() {
+            const container = document.getElementById('manageLinksContainer');
+            let html = '<p style="color: var(--gray-600); margin-bottom: 1rem;">Click Edit to modify, or click Delete to remove</p>';
+            
+            userLinks.forEach((link, index) => {
+                const privacyClass = 'link-badge-' + link.privacy;
+                html += '<div class="link-item" id="link-item-' + index + '">' +
+                    '<div class="link-info">' +
+                    '<div class="link-title">' + link.name + '</div>' +
+                    '<div class="link-url">' + link.url + '</div>' +
+                    '<div class="link-meta">' +
+                    '<span class="link-badge ' + privacyClass + '">' + (link.privacy.charAt(0).toUpperCase() + link.privacy.slice(1)) + '</span>' +
+                    '<span style="font-size: 0.75rem; color: var(--gray-600); margin-left: 6px;">' + (link.category || 'Other') + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="link-actions">' +
+                    '<button class="link-btn" onclick="showEditLinkForm(' + index + ')">✏️ Edit</button>' +
+                    '<button class="link-btn" style="color: #EF4444;" onclick="deleteLink(' + index + ')">🗑️ Delete</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div id="edit-link-form-' + index + '" style="display: none; padding: 12px 16px; margin: -4px 0 8px; background: #F7FAFC; border: 1px solid var(--gray-300); border-radius: 8px;">' +
+                    '<div style="display: grid; gap: 10px;">' +
+                    '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Name</label>' +
+                    '<input type="text" id="edit-link-name-' + index + '" value="' + link.name.replace(/"/g, '&quot;') + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;"></div>' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">URL</label>' +
+                    '<input type="url" id="edit-link-url-' + index + '" value="' + link.url.replace(/"/g, '&quot;') + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;"></div>' +
+                    '</div>' +
+                    '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Category</label>' +
+                    '<select id="edit-link-cat-' + index + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;">' +
+                    ['Docs','Tools','Resources','Internal'].map(c => '<option value="' + c + '"' + (link.category === c ? ' selected' : '') + '>' + c + '</option>').join('') +
+                    '</select></div>' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Privacy</label>' +
+                    '<select id="edit-link-priv-' + index + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;">' +
+                    ['private','shared','public'].map(p => '<option value="' + p + '"' + (link.privacy === p ? ' selected' : '') + '>' + p.charAt(0).toUpperCase() + p.slice(1) + '</option>').join('') +
+                    '</select></div>' +
+                    '</div>' +
+                    '<div style="display: flex; gap: 8px; justify-content: flex-end;">' +
+                    '<button onclick="cancelEditLink(' + index + ')" style="padding: 6px 14px; background: var(--gray-300); color: var(--gray-700); border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Cancel</button>' +
+                    '<button onclick="saveEditLink(' + index + ')" style="padding: 6px 14px; background: var(--walmart-blue-dark); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Save</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function showEditLinkForm(index) {
+            document.querySelectorAll('[id^="edit-link-form-"]').forEach(f => f.style.display = 'none');
+            document.getElementById('edit-link-form-' + index).style.display = 'block';
+        }
+
+        function cancelEditLink(index) {
+            document.getElementById('edit-link-form-' + index).style.display = 'none';
+        }
+
+        function saveEditLink(index) {
+            const name = document.getElementById('edit-link-name-' + index).value.trim();
+            const url = document.getElementById('edit-link-url-' + index).value.trim();
+            const category = document.getElementById('edit-link-cat-' + index).value;
+            const privacy = document.getElementById('edit-link-priv-' + index).value;
+
+            if (!name || !url) { alert('Name and URL are required'); return; }
+
+            userLinks[index].name = name;
+            userLinks[index].url = url;
+            userLinks[index].category = category;
+            userLinks[index].privacy = privacy;
+            syncLinksToStorage();
+            renderCategorizedSidebar();
+            renderManageLinks();
+        }
+
+        function deleteLink(index) {
+            const linkName = userLinks[index].name;
+            userLinks.splice(index, 1);
+            syncLinksToStorage();
+            removeLinkFromSidebar(linkName);
+            renderManageLinks();
+            alert('Deleted "' + linkName + '" from your links');
+        }
+
+        function addLinkToSidebar(name, url) {
+            syncLinksToStorage();
+            renderCategorizedSidebar();
+        }
+
+        function removeLinkFromSidebar(name) {
+            syncLinksToStorage();
+            renderCategorizedSidebar();
+        }
+
+        function demoCreateNewLink() {
+            const name = document.getElementById('createLinkName').value;
+            const url = document.getElementById('createLinkUrl').value;
+            const category = document.getElementById('createLinkCategory').value;
+            const privacy = document.getElementById('createLinkPrivacy').value;
+            
+            if (!name || !url) {
+                alert('Please fill in Link Name and URL');
+                return;
+            }
+            
+            const duplicateError = document.getElementById('createDuplicateError');
+            const successMessage = document.getElementById('createSuccessMessage');
+            
+            duplicateError.classList.remove('show');
+            successMessage.classList.remove('show');
+            
+            // Check for duplicate URLs
+            const isDuplicate = userLinks.some(link => link.url === url);
+            if (isDuplicate) {
+                duplicateError.classList.add('show');
+                setTimeout(() => {
+                    duplicateError.classList.remove('show');
+                }, 3000);
+                return;
+            }
+            
+            // Add link to storage and sidebar
+            userLinks.push({
+                name: name,
+                url: url,
+                category: category,
+                privacy: privacy
+            });
+            
+            syncLinksToStorage();
+            addLinkToSidebar(name, url);
+            
+            successMessage.classList.add('show');
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+                resetCreateLinkForm();
+                closeCreateLinkModal();
+            }, 2000);
+        }
+
+        function resetCreateLinkForm() {
+            document.getElementById('createLinkName').value = '';
+            document.getElementById('createLinkUrl').value = '';
+            document.getElementById('createLinkCategory').value = 'Docs';
+            document.getElementById('createLinkPrivacy').value = 'private';
+            document.getElementById('createLinkDescription').value = '';
+        }
+
+        function filterBrowseLinks() {
+            const searchTerm = document.getElementById('browseLinksSearch').value.toLowerCase();
+            document.querySelectorAll('.browse-category').forEach(cat => {
+                const items = cat.querySelectorAll('.available-link-item');
+                let anyVisible = false;
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        item.style.display = 'block';
+                        anyVisible = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                cat.style.display = anyVisible ? 'block' : 'none';
+            });
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const mainModal = document.getElementById('linksModal');
+            const createModal = document.getElementById('createLinkModal');
+            const manageModal = document.getElementById('manageLinksModal');
+            const browseModal = document.getElementById('browseLinksModal');
+            const addWidgetModal = document.getElementById('addWidgetModal');
+            
+            if (event.target == mainModal) closeLinksModal();
+            if (event.target == createModal) closeCreateLinkModal();
+            if (event.target == manageModal) closeManageLinksModal();
+            if (event.target == browseModal) closeBrowseLinksModal();
+            if (event.target == addWidgetModal) closeAddWidgetModal();
+        }
+
+        // Initialize sidebar on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCategorizedSidebar();
+        });
+
+        // ──────────────────────────────────────────────
+        // Widget Configuration & Persistence
+        // ──────────────────────────────────────────────
+        const WIDGET_CONFIG_KEY = 'activity-hub-reporting-widget-config';
+        const WIDGET_REQUESTS_KEY = 'activity-hub-reporting-widget-requests';
+
+        const DEFAULT_WIDGET_ORDER = ['key-metrics', 'activity-dashboard', 'project-reports', 'my-reports'];
+        const DEFAULT_WIDGET_SIZES = {
+            'key-metrics': 'widget-extra-large',
+            'activity-dashboard': 'widget-large',
+            'project-reports': 'widget-large',
+            'my-reports': 'widget-large'
+        };
+
+        const SIZE_CYCLE = ['widget-small', 'widget-medium', 'widget-large', 'widget-extra-large'];
+
+        let isEditMode = false;
+        let draggedWidget = null;
+
+        function getWidgetConfig() {
+            try {
+                const saved = localStorage.getItem(WIDGET_CONFIG_KEY);
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return null;
+        }
+
+        function saveWidgetConfig() {
+            const grid = document.getElementById('widgetGrid');
+            const widgets = grid.querySelectorAll('.widget[data-widget-id]');
+            const order = [];
+            const sizes = {};
+            const hidden = [];
+
+            widgets.forEach(w => {
+                const id = w.dataset.widgetId;
+                order.push(id);
+                SIZE_CYCLE.forEach(sc => {
+                    if (w.classList.contains(sc)) sizes[id] = sc;
+                });
+                if (w.classList.contains('widget-hidden')) hidden.push(id);
+            });
+
+            localStorage.setItem(WIDGET_CONFIG_KEY, JSON.stringify({ order, sizes, hidden }));
+        }
+
+        function applyWidgetConfig() {
+            const config = getWidgetConfig();
+            if (!config) return;
+
+            const grid = document.getElementById('widgetGrid');
+            const placeholder = grid.querySelector('.add-widget-placeholder');
+
+            config.order.forEach(id => {
+                const w = grid.querySelector('[data-widget-id="' + id + '"]');
+                if (w) grid.insertBefore(w, placeholder);
+            });
+
+            Object.entries(config.sizes).forEach(([id, size]) => {
+                const w = grid.querySelector('[data-widget-id="' + id + '"]');
+                if (w) {
+                    SIZE_CYCLE.forEach(sc => w.classList.remove(sc));
+                    w.classList.add(size);
+                }
+            });
+
+            if (config.hidden) {
+                config.hidden.forEach(id => {
+                    const w = grid.querySelector('[data-widget-id="' + id + '"]');
+                    if (w) w.classList.add('widget-hidden');
+                });
+            }
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Gear Dropdown
+        // ──────────────────────────────────────────────
+        function toggleGearDropdown() {
+            document.getElementById('gearDropdown').classList.toggle('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dashboard-header')) {
+                document.getElementById('gearDropdown').classList.remove('show');
+            }
+        });
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Enter / Exit
+        // ──────────────────────────────────────────────
+        function enterEditMode() {
+            isEditMode = true;
+            document.body.classList.add('edit-mode');
+            document.getElementById('gearDropdown').classList.remove('show');
+            document.getElementById('editToolbar').classList.add('show');
+
+            document.querySelectorAll('.widget[data-widget-id]').forEach(w => {
+                w.setAttribute('draggable', 'true');
+            });
+        }
+
+        function exitEditMode() {
+            isEditMode = false;
+            document.body.classList.remove('edit-mode');
+            document.getElementById('editToolbar').classList.remove('show');
+
+            document.querySelectorAll('.widget[data-widget-id]').forEach(w => {
+                w.setAttribute('draggable', 'false');
+                w.classList.remove('dragging', 'drag-over');
+            });
+
+            saveWidgetConfig();
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Resize Widget
+        // ──────────────────────────────────────────────
+        function resizeWidget(widgetId) {
+            const w = document.querySelector('[data-widget-id="' + widgetId + '"]');
+            if (!w) return;
+
+            let currentSize = null;
+            SIZE_CYCLE.forEach(sc => { if (w.classList.contains(sc)) currentSize = sc; });
+            const nextIndex = (SIZE_CYCLE.indexOf(currentSize) + 1) % SIZE_CYCLE.length;
+            const nextSize = SIZE_CYCLE[nextIndex];
+
+            SIZE_CYCLE.forEach(sc => w.classList.remove(sc));
+            w.classList.add(nextSize);
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Remove Widget
+        // ──────────────────────────────────────────────
+        function removeWidget(widgetId) {
+            const w = document.querySelector('[data-widget-id="' + widgetId + '"]');
+            if (w) w.classList.add('widget-hidden');
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Add Widget Modal
+        // ──────────────────────────────────────────────
+        function openAddWidgetModal() {
+            const list = document.getElementById('addWidgetList');
+            const hiddenWidgets = document.querySelectorAll('.widget.widget-hidden[data-widget-id]');
+
+            if (hiddenWidgets.length === 0) {
+                list.innerHTML = '<p style="color: var(--gray-600); padding: 1rem; text-align: center;">All widgets are currently on your dashboard.</p>';
+            } else {
+                let html = '';
+                hiddenWidgets.forEach(w => {
+                    const id = w.dataset.widgetId;
+                    const name = w.dataset.widgetName;
+                    html += '<div class="add-widget-list-item">' +
+                        '<div><div class="widget-item-name">' + name + '</div></div>' +
+                        '<button class="btn-submit" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" onclick="restoreWidget(\'' + id + '\')">+ Add</button>' +
+                        '</div>';
+                });
+                list.innerHTML = html;
+            }
+
+            document.getElementById('addWidgetModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAddWidgetModal() {
+            document.getElementById('addWidgetModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function restoreWidget(widgetId) {
+            const w = document.querySelector('[data-widget-id="' + widgetId + '"]');
+            if (w) w.classList.remove('widget-hidden');
+            closeAddWidgetModal();
+        }
+
+        // ──────────────────────────────────────────────
+        // Widget Request Tabs (in Add Widget Modal)
+        // ──────────────────────────────────────────────
+        function showRequestTab(tabName) {
+            document.querySelectorAll('.request-tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.request-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            if (event && event.target) event.target.classList.add('active');
+        }
+
+        function submitWidgetRequest() {
+            const name = document.getElementById('requestWidgetName').value.trim();
+            const desc = document.getElementById('requestWidgetDesc').value.trim();
+            
+            if (!name) {
+                alert('Please enter a widget name');
+                return;
+            }
+
+            let requests = [];
+            try {
+                requests = JSON.parse(localStorage.getItem(WIDGET_REQUESTS_KEY) || '[]');
+            } catch(e) {}
+
+            requests.push({
+                name: name,
+                description: desc || '',
+                status: 'pending',
+                submittedAt: new Date().toISOString(),
+                submittedBy: 'Current User'
+            });
+
+            localStorage.setItem(WIDGET_REQUESTS_KEY, JSON.stringify(requests));
+            alert('✅ Widget request submitted!\n\nName: ' + name + '\n\nThe Activity Hub team will review your request.');
+            document.getElementById('requestWidgetName').value = '';
+            document.getElementById('requestWidgetDesc').value = '';
+        }
+
+        function submitWidgetUpdateRequest() {
+            const widgetId = document.getElementById('updateWidgetSelect').value;
+            const desc = document.getElementById('updateWidgetDesc').value.trim();
+            if (!widgetId) { alert('Please select a widget'); return; }
+            if (!desc) { alert('Please describe the update you\'d like'); return; }
+
+            const widgetName = document.getElementById('updateWidgetSelect').selectedOptions[0].text;
+            let requests = [];
+            try { requests = JSON.parse(localStorage.getItem(WIDGET_REQUESTS_KEY) || '[]'); } catch {}
+            requests.push({
+                type: 'update',
+                name: widgetName,
+                widgetId: widgetId,
+                description: desc,
+                status: 'pending',
+                submittedAt: new Date().toISOString(),
+                submittedBy: 'Current User'
+            });
+            localStorage.setItem(WIDGET_REQUESTS_KEY, JSON.stringify(requests));
+            alert('✅ Widget update request submitted!\n\nWidget: ' + widgetName + '\n\nThe Activity Hub team will review your request.');
+            document.getElementById('updateWidgetSelect').value = '';
+            document.getElementById('updateWidgetDesc').value = '';
+        }
+
+        function openCustomReportBuilder() {
+            alert('🔨 Custom Report Builder - Coming Soon!\n\nThis feature will allow you to:\n• Select data sources\n• Choose metrics and filters\n• Schedule automated reports\n• Export in multiple formats');
+        }
+
+        // ──────────────────────────────────────────────
+        // Sidebar Category Toggle
+        // ──────────────────────────────────────────────
+        function toggleCategory(category) {
+            const state = getLinkCollapseState();
+            state[category] = !state[category];
+            saveLinkCollapseState(state);
+
+            const catEl = document.querySelector('.sidebar-category[data-category="' + category + '"]');
+            if (catEl) catEl.classList.toggle('collapsed');
+        }
+
+        // ──────────────────────────────────────────────
+        // Edit Mode: Reset to Default
+        // ──────────────────────────────────────────────
+        function resetWidgetLayout() {
+            if (!confirm('Reset the Reporting Page to the default layout? This will undo all customizations.')) return;
+
+            localStorage.removeItem(WIDGET_CONFIG_KEY);
+
+            const grid = document.getElementById('widgetGrid');
+            const placeholder = grid.querySelector('.add-widget-placeholder');
+
+            DEFAULT_WIDGET_ORDER.forEach(id => {
+                const w = grid.querySelector('[data-widget-id="' + id + '"]');
+                if (w) {
+                    w.classList.remove('widget-hidden');
+                    SIZE_CYCLE.forEach(sc => w.classList.remove(sc));
+                    w.classList.add(DEFAULT_WIDGET_SIZES[id]);
+                    grid.insertBefore(w, placeholder);
+                }
+            });
+        }
+
+        // ──────────────────────────────────────────────
+        // Drag and Drop (Simplified for reordering)
+        // ──────────────────────────────────────────────
+        document.addEventListener('dragstart', function(e) {
+            if (!isEditMode || !e.target.classList.contains('widget')) return;
+            draggedWidget = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+
+        document.addEventListener('dragover', function(e) {
+            if (!isEditMode || !draggedWidget) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        });
+
+        document.addEventListener('drop', function(e) {
+            if (!isEditMode || !draggedWidget) return;
+            e.preventDefault();
+            const grid = document.getElementById('widgetGrid');
+            const targetWidget = e.target.closest('.widget[data-widget-id]');
+            if (targetWidget && targetWidget !== draggedWidget) {
+                grid.insertBefore(draggedWidget, targetWidget);
+            }
+        });
+
+        document.addEventListener('dragend', function(e) {
+            if (draggedWidget) {
+                draggedWidget.classList.remove('dragging', 'drag-over');
+                draggedWidget = null;
+            }
+        });
+
+        // ──────────────────────────────────────────────
+        // Initialize on Page Load
+        // ──────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function() {
+            applyWidgetConfig();
+            // Collapse categories by default for cleaner sidebar
+            document.querySelectorAll('.sidebar-category').forEach((cat, idx) => {
+                if (idx > 0) cat.classList.add('collapsed');
+            });
+        });
+    </script>
+</body>
+</html>

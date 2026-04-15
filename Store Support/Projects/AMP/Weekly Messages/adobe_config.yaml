@@ -4,6 +4,7 @@
 source_files:
   weekly_messages_folder: "C:\\Users\\krush\\Documents\\VSCode\\AMP\\Weekly Messages\\Docs\\"
   weekly_messages_excel_path: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Weekly Messages Area Reports - Tables FY27.xlsx"
+  weekly_messages_audio_csv_path: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Activity Weekly Messages Audio.csv"
   playbook_hub_path: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Playbook Hub and Active Playbooks - Weekly Report.xlsx"
 
 gcp:

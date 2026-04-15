@@ -1,0 +1,7 @@
+{
+  "email": {
+    "smtp_server": "smtp.office365.com",
+    "sender_email": "kendall.rush@walmart.com"
+  },
+  "email_address": "kendall.rush@walmart.com"
+}

@@ -1,7 +1,7 @@
 """
 AMP AutoFeed Validation System
-Compares QuickBase API response data with AMP processed AutoFeed details
-Identifies discrepancies and generates reports for historical analysis
+Reads HTML files extracted by VB from QuickBase and AMP emails
+Compares AutoFeed data and generates comparison reports
 """
 
 import os
@@ -12,83 +12,119 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 import hashlib
 
-# For Outlook integration
-try:
-    from win32com.client import GetObject
-    import win32com.client
-    HAS_WIN32 = True
-except ImportError:
-    HAS_WIN32 = False
-    print("WARNING: win32com not available. Install via: pip install pywin32")
-
 # For HTML parsing
 try:
     from bs4 import BeautifulSoup
     HAS_BS4 = True
 except ImportError:
     HAS_BS4 = False
-    print("WARNING: BeautifulSoup4 not available. Install via: pip install beautifulsoup4")
+    # Fallback to html.parser from standard library
+    from html.parser import HTMLParser
+
+
+class SimpleHTMLTableParser(HTMLParser):
+    """Fallback HTML parser using standard library (when BeautifulSoup not available)"""
+    
+    def __init__(self):
+        super().__init__()
+        self.tables = []
+        self.current_table = None
+        self.current_row = None
+        self.current_cell = None
+        self.in_table = False
+        self.in_row = False
+        self.in_cell = False
+    
+    def handle_starttag(self, tag, attrs):
+        if tag == 'table':
+            self.in_table = True
+            self.current_table = []
+        elif tag == 'tr' and self.in_table:
+            self.in_row = True
+            self.current_row = []
+        elif tag in ['td', 'th'] and self.in_row:
+            self.in_cell = True
+            self.current_cell = []
+    
+    def handle_endtag(self, tag):
+        if tag == 'table' and self.in_table:
+            self.in_table = False
+            if self.current_table:
+                self.tables.append(self.current_table)
+            self.current_table = None
+        elif tag == 'tr' and self.in_row:
+            self.in_row = False
+            if self.current_row is not None:
+                self.current_table.append(self.current_row)
+            self.current_row = None
+        elif tag in ['td', 'th'] and self.in_cell:
+            self.in_cell = False
+            if self.current_cell is not None:
+                cell_text = ''.join(self.current_cell).strip()
+                self.current_row.append(cell_text)
+            self.current_cell = None
+    
+    def handle_data(self, data):
+        if self.in_cell:
+            self.current_cell.append(data)
 
 
 class EmailFetcher:
-    """Fetch emails from Outlook"""
+    """Fetch emails from HTML files extracted by VB"""
     
-    def __init__(self):
-        if not HAS_WIN32:
-            raise RuntimeError("win32com required for Outlook access")
-        self.outlook = win32com.client.GetActiveObject("Outlook.Application")
-        self.namespace = self.outlook.GetNamespace("MAPI")
+    def __init__(self, data_dir: str = "amp_autofeed_data"):
+        """
+        Initialize with path to folder containing HTML files
+        
+        Files expected:
+        - quickbase_responses.html: From "Quick Base API Response Data" email
+        - amp_autofeed.html: From "Auto Feed" email
+        
+        VB saves these daily at ~4:05 AM
+        """
+        self.data_dir = Path(data_dir)
+        self.data_dir.mkdir(exist_ok=True)
+        print(f"✓ Data directory: {self.data_dir}")
     
-    def get_email_by_subject(self, subject_pattern: str, days_back: int = 1, folder_name: str = None) -> List[Dict]:
-        """Get emails matching subject pattern from last N days"""
+    def get_email_by_subject(self, subject_pattern: str = "", days_back: int = 1, folder_name: str = None) -> List[Dict]:
+        """Read HTML file and return as email-like dict"""
         emails = []
-        inbox = self.namespace.Folders.Item(1).Folders.Item("ATC")
         
-        if not inbox:
-            raise ValueError("Folder 'ATC' not found in Outlook")
+        # Map folder names to file names
+        if folder_name == "Quick Base API Response Data":
+            file_name = "quickbase_responses.html"
+        elif folder_name == "Auto Feed":
+            file_name = "amp_autofeed.html"
+        else:
+            print(f"Unknown folder: {folder_name}, expected 'Quick Base API Response Data' or 'Auto Feed'")
+            return []
         
-        # Navigate to Reports > AMP > specific folder
-        # Two separate folders:
-        # - "Quick Base API Response Data" (source data from QuickBase)
-        # - "Auto Feed" (AMP processed data)
+        file_path = self.data_dir / file_name
+        
+        if not file_path.exists():
+            raise FileNotFoundError(
+                f"HTML file not found: {file_path}\n"
+                f"VB should save email HTML bodies here daily at ~4:05 AM\n"
+                f"Expected file: {file_name}"
+            )
+        
+        # Read HTML file
         try:
-            if folder_name is None:
-                # Determine folder based on subject pattern
-                if "Quick Base" in subject_pattern or "QuickBase" in subject_pattern:
-                    folder_name = "Quick Base API Response Data"
-                else:
-                    folder_name = "Auto Feed"
+            with open(file_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
             
-            folder = inbox.Folders.Item("Reports").Folders.Item("AMP").Folders.Item(folder_name)
-        except:
-            print(f"Could not navigate to folder, listing available folders:")
-            try:
-                for f in inbox.Folders:
-                    print(f"  - {f.Name}")
-                    if f.Name == "Reports":
-                        for f2 in f.Folders:
-                            print(f"    - {f2.Name}")
-                            if f2.Name == "AMP":
-                                for f3 in f2.Folders:
-                                    print(f"      - {f3.Name}")
-            except:
-                pass
-            raise
+            emails.append({
+                'subject': f"Email from {folder_name}",
+                'received': datetime.now(),
+                'sender': "vb_extraction@internal",
+                'body': html_content,
+                'html_body': html_content,
+            })
+            print(f"✓ Loaded {file_name} ({len(html_content)} bytes)")
+        except Exception as e:
+            raise RuntimeError(f"Failed to read {file_path}: {e}")
         
-        cutoff_date = datetime.now() - timedelta(days=days_back)
-        
-        for item in folder.Items:
-            if hasattr(item, 'Subject') and subject_pattern.lower() in item.Subject.lower():
-                if item.ReceivedTime >= cutoff_date.timestamp():
-                    emails.append({
-                        'subject': item.Subject,
-                        'received': item.ReceivedTime,
-                        'sender': item.SenderEmailAddress,
-                        'body': item.Body,
-                        'html_body': item.HTMLBody if hasattr(item, 'HTMLBody') else None,
-                    })
-        
-        return sorted(emails, key=lambda x: x['received'], reverse=True)
+        return emails
 
 
 class HTMLEmailParser:
@@ -101,14 +137,9 @@ class HTMLEmailParser:
     def extract_data_from_html(html_content: str, extract_columns: bool = True) -> Dict:
         """
         Extract structured data from HTML email.
-        Look for tables, lists, or data blocks
-        If extract_columns=True, specifically extract target columns from tables
+        Looks for tables with target columns and extracts records.
+        Uses BeautifulSoup if available, falls back to standard library parser.
         """
-        if not HAS_BS4:
-            raise RuntimeError("BeautifulSoup4 required for HTML parsing")
-        
-        soup = BeautifulSoup(html_content, 'html.parser')
-        
         data = {
             'tables': [],
             'text_blocks': [],
@@ -117,41 +148,65 @@ class HTMLEmailParser:
             'records': [],  # Extracted records with target columns
         }
         
-        # Extract tables
-        for table in soup.find_all('table'):
-            rows = []
-            headers = []
-            for i, tr in enumerate(table.find_all('tr')):
-                cells = [td.get_text(strip=True) for td in tr.find_all(['td', 'th'])]
-                if cells:
-                    rows.append(cells)
-                    # First row is likely headers
-                    if i == 0:
-                        headers = cells
+        if HAS_BS4:
+            # Use BeautifulSoup (preferred)
+            soup = BeautifulSoup(html_content, 'html.parser')
             
-            if rows:
-                data['tables'].append(rows)
+            # Extract tables
+            for table in soup.find_all('table'):
+                rows = []
+                headers = []
+                for i, tr in enumerate(table.find_all('tr')):
+                    cells = [td.get_text(strip=True) for td in tr.find_all(['td', 'th'])]
+                    if cells:
+                        rows.append(cells)
+                        # First row is likely headers
+                        if i == 0:
+                            headers = cells
                 
-                # Extract specific columns if this looks like data
-                if extract_columns and headers:
-                    HTMLEmailParser._extract_target_columns(rows, headers, data)
+                if rows:
+                    data['tables'].append(rows)
+                    
+                    # Extract specific columns if this looks like data
+                    if extract_columns and headers:
+                        HTMLEmailParser._extract_target_columns(rows, headers, data)
+            
+            # Extract text blocks (paragraphs with data)
+            for p in soup.find_all('p'):
+                text = p.get_text(strip=True)
+                if text and len(text) > 10:
+                    data['text_blocks'].append(text)
+            
+            # Extract lists
+            for ul in soup.find_all(['ul', 'ol']):
+                items = [li.get_text(strip=True) for li in ul.find_all('li')]
+                if items:
+                    data['lists'].append(items)
+            
+            text = soup.get_text()
         
-        
-        # Extract text blocks (paragraphs with data)
-        for p in soup.find_all('p'):
-            text = p.get_text(strip=True)
-            if text and len(text) > 10:
-                data['text_blocks'].append(text)
-        
-        # Extract lists
-        for ul in soup.find_all(['ul', 'ol']):
-            items = [li.get_text(strip=True) for li in ul.find_all('li')]
-            if items:
-                data['lists'].append(items)
+        else:
+            # Use fallback parser (standard library)
+            parser = SimpleHTMLTableParser()
+            try:
+                parser.feed(html_content)
+            except:
+                pass  # Ignore parsing errors
+            
+            data['tables'] = parser.tables
+            
+            # Extract target columns from tables
+            if extract_columns:
+                for table in parser.tables:
+                    if len(table) > 0:
+                        headers = table[0]
+                        rows = table[1:]
+                        HTMLEmailParser._extract_target_columns(rows, headers, data)
+            
+            # Get text for metrics
+            text = html_content
         
         # Try to extract key metrics
-        text = soup.get_text()
-        
         # Look for patterns like "Total: 123" or "Count: 456"
         patterns = [
             r'Total\s*:?\s*(\d+)',
@@ -173,7 +228,7 @@ class HTMLEmailParser:
     @staticmethod
     def _extract_target_columns(rows: List[List[str]], headers: List[str], data: Dict):
         """
-        Extract specific target columns from table rows
+        Extract specific target columns from table rows.
         Target columns: AutoFeed Id, Message Title, Stores, Anchor Walmart Week, Status
         """
         # Find indices of target columns
@@ -196,311 +251,139 @@ class HTMLEmailParser:
             
             if record:  # Only add if we found at least one target column
                 data['records'].append(record)
-        
 
 
 class AutoFeedValidator:
-    """Main validation logic"""
+    """Validate and compare AutoFeed records from two sources"""
     
-    def __init__(self, log_dir: str = "amp_validation_logs"):
-        self.log_dir = Path(log_dir)
-        self.log_dir.mkdir(exist_ok=True)
+    def __init__(self):
+        self.quickbase_data = []
+        self.amp_data = []
+        self.comparison_results = []
+        self.discrepancies = []
+    
+    def load_data(self, quickbase_html: str, amp_html: str):
+        """Load and parse HTML data from both sources"""
+        # Parse QuickBase data
+        qb_parsed = HTMLEmailParser.extract_data_from_html(quickbase_html)
+        self.quickbase_data = qb_parsed.get('records', [])
+        print(f"✓ QuickBase: {len(self.quickbase_data)} records")
         
-        self.history_file = self.log_dir / "validation_history.json"
-        self.discrepancies_file = self.log_dir / "discrepancies_report.json"
-        self.daily_report_dir = self.log_dir / "daily_reports"
-        self.daily_report_dir.mkdir(exist_ok=True)
-        
-        self.history = self._load_history()
+        # Parse AMP data
+        amp_parsed = HTMLEmailParser.extract_data_from_html(amp_html)
+        self.amp_data = amp_parsed.get('records', [])
+        print(f"✓ AMP AutoFeed: {len(self.amp_data)} records")
     
-    def _load_history(self) -> Dict:
-        """Load validation history from file"""
-        if self.history_file.exists():
-            with open(self.history_file, 'r') as f:
-                return json.load(f)
-        return {}
-    
-    def _save_history(self):
-        """Save validation history to file"""
-        with open(self.history_file, 'w') as f:
-            json.dump(self.history, f, indent=2, default=str)
-    
-    def validate_daily(self) -> Dict:
+    def validate(self) -> Dict:
         """
-        Perform daily validation:
-        1. Get today's QuickBase API Response email from "Quick Base API Response Data" folder
-        2. Get today's AMP AutoFeed email from "Auto Feed" folder
-        3. Compare content
-        4. Log results
+        Compare records from both sources.
+        Key: AutoFeed Id (should be unique identifier)
+        Returns: Validation summary with discrepancies
         """
-        print("\n=== AMP AutoFeed Daily Validation ===")
-        print(f"Timestamp: {datetime.now()}")
-        
-        today = datetime.now().strftime("%Y-%m-%d")
-        
-        try:
-            fetcher = EmailFetcher()
-            
-            # Get today's emails (within last 24 hours) from separate folders
-            print("\nFetching QuickBase API Response email...")
-            qb_emails = fetcher.get_email_by_subject("", days_back=1, folder_name="Quick Base API Response Data")
-            
-            print("Fetching AMP AutoFeed Details email...")
-            amp_emails = fetcher.get_email_by_subject("", days_back=1, folder_name="Auto Feed")
-            
-            if not qb_emails:
-                print("ERROR: No QuickBase email found for today")
-                qb_data = None
-            else:
-                print(f"Found QuickBase email: {qb_emails[0]['received']}")
-                parser = HTMLEmailParser()
-                qb_data = parser.extract_data_from_html(qb_emails[0]['html_body'] or qb_emails[0]['body'])
-            
-            if not amp_emails:
-                print("ERROR: No AMP email found for today")
-                amp_data = None
-            else:
-                print(f"Found AMP email: {amp_emails[0]['received']}")
-                parser = HTMLEmailParser()
-                amp_data = parser.extract_data_from_html(amp_emails[0]['html_body'] or amp_emails[0]['body'])
-            
-            # Compare
-            result = {
-                'date': today,
-                'timestamp': datetime.now().isoformat(),
-                'qb_email_found': qb_emails is not None and len(qb_emails) > 0,
-                'amp_email_found': amp_emails is not None and len(amp_emails) > 0,
-                'qb_data': qb_data,
-                'amp_data': amp_data,
-                'comparison': self._compare_data(qb_data, amp_data),
-                'status': 'PASS' if self._compare_data(qb_data, amp_data).get('match') else 'FAIL',
-            }
-            
-            # Store in history
-            self.history[today] = result
-            self._save_history()
-            
-            # Save daily report
-            daily_report = self.daily_report_dir / f"validation_{today}.json"
-            with open(daily_report, 'w') as f:
-                json.dump(result, f, indent=2, default=str)
-            
-            return result
-            
-        except Exception as e:
-            error_result = {
-                'date': today,
-                'timestamp': datetime.now().isoformat(),
-                'error': str(e),
-                'status': 'ERROR',
-            }
-            self.history[today] = error_result
-            self._save_history()
-            print(f"ERROR: {e}")
-            return error_result
-    
-    def _compare_data(self, qb_data: Optional[Dict], amp_data: Optional[Dict]) -> Dict:
-        """Compare QuickBase and AMP data"""
-        comparison = {
-            'match': True,
-            'differences': [],
-            'qb_record_count': 0,
-            'amp_record_count': 0,
-            'qb_records': [],
-            'amp_records': [],
-            'missing_in_amp': [],
-            'extra_in_amp': [],
+        results = {
+            'total_quickbase': len(self.quickbase_data),
+            'total_amp': len(self.amp_data),
+            'matched': 0,
+            'qb_only': [],
+            'amp_only': [],
+            'field_mismatches': [],
         }
         
-        if qb_data is None or amp_data is None:
-            comparison['match'] = False
-            if qb_data is None:
-                comparison['differences'].append("QuickBase data missing")
-            if amp_data is None:
-                comparison['differences'].append("AMP data missing")
-            return comparison
+        # Create lookup dicts by AutoFeed Id
+        qb_dict = {r.get('AutoFeed Id'): r for r in self.quickbase_data if r.get('AutoFeed Id')}
+        amp_dict = {r.get('AutoFeed Id'): r for r in self.amp_data if r.get('AutoFeed Id')}
         
-        # Extract records from both emails
-        qb_records = qb_data.get('records', [])
-        amp_records = amp_data.get('records', [])
-        
-        comparison['qb_record_count'] = len(qb_records)
-        comparison['amp_record_count'] = len(amp_records)
-        comparison['qb_records'] = qb_records
-        comparison['amp_records'] = amp_records
-        
-        # Compare record counts
-        if len(qb_records) != len(amp_records):
-            comparison['match'] = False
-            comparison['differences'].append(
-                f"Record count mismatch: QB={len(qb_records)}, AMP={len(amp_records)}"
-            )
-        
-        # Create sets of records for comparison (using AutoFeed Id as key)
-        qb_by_id = {str(r.get('AutoFeed Id', '')).strip(): r for r in qb_records}
-        amp_by_id = {str(r.get('AutoFeed Id', '')).strip(): r for r in amp_records}
-        
-        # Find missing and extra records
-        missing_ids = set(qb_by_id.keys()) - set(amp_by_id.keys())
-        extra_ids = set(amp_by_id.keys()) - set(qb_by_id.keys())
-        
-        if missing_ids:
-            comparison['match'] = False
-            comparison['missing_in_amp'] = list(missing_ids)
-            comparison['differences'].append(f"Missing in AMP: {len(missing_ids)} records")
-        
-        if extra_ids:
-            comparison['match'] = False
-            comparison['extra_in_amp'] = list(extra_ids)
-            comparison['differences'].append(f"Extra in AMP: {len(extra_ids)} records")
-        
-        # Compare matching records field by field
-        common_ids = set(qb_by_id.keys()) & set(amp_by_id.keys())
-        field_differences = {}
-        
-        for rec_id in common_ids:
-            qb_rec = qb_by_id[rec_id]
-            amp_rec = amp_by_id[rec_id]
+        # Find matches and mismatches
+        for autofeed_id in set(list(qb_dict.keys()) + list(amp_dict.keys())):
+            qb_record = qb_dict.get(autofeed_id)
+            amp_record = amp_dict.get(autofeed_id)
             
-            for field in HTMLEmailParser.TARGET_COLUMNS:
-                qb_val = str(qb_rec.get(field, '')).strip() if field in qb_rec else ''
-                amp_val = str(amp_rec.get(field, '')).strip() if field in amp_rec else ''
+            if qb_record and amp_record:
+                results['matched'] += 1
                 
-                if qb_val != amp_val:
-                    comparison['match'] = False
-                    if field not in field_differences:
-                        field_differences[field] = []
-                    field_differences[field].append({
-                        'id': rec_id,
-                        'qb_value': qb_val,
-                        'amp_value': amp_val,
-                    })
-        
-        if field_differences:
-            for field, diffs in field_differences.items():
-                comparison['differences'].append(
-                    f"Field '{field}' differs in {len(diffs)} records"
-                )
-            comparison['field_differences'] = field_differences
-        
-        # Compare data hashes for quick change detection
-        qb_hash = hashlib.md5(json.dumps(qb_records, sort_keys=True, default=str).encode()).hexdigest()
-        amp_hash = hashlib.md5(json.dumps(amp_records, sort_keys=True, default=str).encode()).hexdigest()
-        
-        comparison['qb_hash'] = qb_hash
-        comparison['amp_hash'] = amp_hash
-        
-        return comparison
-    
-    def generate_historical_report(self, days: int = 365) -> Dict:
-        """Generate report of historical discrepancies"""
-        print(f"\n=== Historical Validation Report (last {days} days) ===")
-        
-        report = {
-            'generated': datetime.now().isoformat(),
-            'period_days': days,
-            'total_validations': len(self.history),
-            'passed': 0,
-            'failed': 0,
-            'errored': 0,
-            'missing_days': [],
-            'discrepancies': [],
-            'discrepancy_timeline': {},
-        }
-        
-        # Analyze history
-        cutoff_date = datetime.now() - timedelta(days=days)
-        
-        for date_str, result in sorted(self.history.items()):
-            if result.get('status') == 'PASS':
-                report['passed'] += 1
-            elif result.get('status') == 'FAIL':
-                report['failed'] += 1
-                report['discrepancies'].append({
-                    'date': date_str,
-                    'differences': result.get('comparison', {}).get('differences', []),
-                })
-                report['discrepancy_timeline'][date_str] = result.get('comparison', {}).get('differences', [])
-            elif result.get('status') == 'ERROR':
-                report['errored'] += 1
-        
-        # Identify missing days (dates with no validation)
-        validated_dates = set(self.history.keys())
-        current = datetime.now()
-        for i in range(days):
-            check_date = (current - timedelta(days=i)).strftime("%Y-%m-%d")
-            if check_date not in validated_dates:
-                report['missing_days'].append(check_date)
-        
-        # Save report
-        report_file = self.log_dir / "historical_report.json"
-        with open(report_file, 'w') as f:
-            json.dump(report, f, indent=2, default=str)
-        
-        # Also save as readable text
-        report_text_file = self.log_dir / "historical_report.txt"
-        with open(report_text_file, 'w') as f:
-            f.write(f"AMP AutoFeed Validation - Historical Report\n")
-            f.write(f"Generated: {report['generated']}\n")
-            f.write(f"Period: Last {days} days\n")
-            f.write(f"\n=== Summary ===\n")
-            f.write(f"Total Validations: {report['total_validations']}\n")
-            f.write(f"Passed: {report['passed']}\n")
-            f.write(f"Failed: {report['failed']}\n")
-            f.write(f"Errors: {report['errored']}\n")
-            f.write(f"\n=== Discrepancies Found ===\n")
+                # Check field differences
+                for field in HTMLEmailParser.TARGET_COLUMNS:
+                    qb_val = qb_record.get(field, "").strip()
+                    amp_val = amp_record.get(field, "").strip()
+                    
+                    if qb_val != amp_val:
+                        results['field_mismatches'].append({
+                            'autofeed_id': autofeed_id,
+                            'field': field,
+                            'quickbase': qb_val,
+                            'amp': amp_val,
+                        })
             
-            if report['discrepancies']:
-                for disc in report['discrepancies']:
-                    f.write(f"\nDate: {disc['date']}\n")
-                    for diff in disc['differences']:
-                        f.write(f"  - {diff}\n")
-            else:
-                f.write("No discrepancies found!\n")
+            elif qb_record and not amp_record:
+                results['qb_only'].append(autofeed_id)
             
-            if report['missing_days']:
-                f.write(f"\n=== Unvalidated Days ===\n")
-                f.write(f"Total gaps: {len(report['missing_days'])}\n")
-                if len(report['missing_days']) <= 10:
-                    for day in report['missing_days']:
-                        f.write(f"  - {day}\n")
-                else:
-                    f.write(f"  (Too many to list, see JSON report)\n")
+            elif amp_record and not qb_record:
+                results['amp_only'].append(autofeed_id)
         
-        print(f"\nReports saved to: {self.log_dir}")
-        print(f"\nSummary:")
-        print(f"  Passed: {report['passed']}")
-        print(f"  Failed: {report['failed']}")
-        print(f"  Errors: {report['errored']}")
-        
-        return report
+        return results
 
 
-def main():
-    """Run validation"""
-    import argparse
+def validate_daily():
+    """
+    Main validation function - runs daily at 5:00 AM
+    Reads HTML files saved by VB at ~4:05 AM
+    """
+    try:
+        print("\n" + "="*60)
+        print(f"AMP AutoFeed Daily Validation - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("="*60)
+        
+        # Initialize fetcher to read HTML files
+        fetcher = EmailFetcher("amp_autofeed_data")
+        
+        # Get emails from both sources
+        qb_emails = fetcher.get_email_by_subject(folder_name="Quick Base API Response Data")
+        amp_emails = fetcher.get_email_by_subject(folder_name="Auto Feed")
+        
+        if not qb_emails or not amp_emails:
+            print("✗ Missing email data. Both files required:")
+            print("  - amp_autofeed_data/quickbase_responses.html")
+            print("  - amp_autofeed_data/amp_autofeed.html")
+            return False
+        
+        # Extract HTML content
+        qb_html = qb_emails[0]['html_body']
+        amp_html = amp_emails[0]['html_body']
+        
+        # Validate
+        validator = AutoFeedValidator()
+        validator.load_data(qb_html, amp_html)
+        results = validator.validate()
+        
+        # Print results
+        print("\n" + "-"*60)
+        print("VALIDATION RESULTS")
+        print("-"*60)
+        print(f"QuickBase records: {results['total_quickbase']}")
+        print(f"AMP records: {results['total_amp']}")
+        print(f"Matched: {results['matched']}")
+        print(f"QuickBase only: {len(results['qb_only'])}")
+        print(f"AMP only: {len(results['amp_only'])}")
+        print(f"Field mismatches: {len(results['field_mismatches'])}")
+        
+        if results['field_mismatches']:
+            print("\nField Mismatches (first 10):")
+            for mismatch in results['field_mismatches'][:10]:
+                print(f"  AutoFeed {mismatch['autofeed_id']}: {mismatch['field']}")
+                print(f"    QB: {mismatch['quickbase']}")
+                print(f"    AMP: {mismatch['amp']}")
+        
+        print("\nValidation Status: PASS" if len(results['field_mismatches']) == 0 else "Validation Status: FAIL")
+        print("="*60 + "\n")
+        
+        return len(results['field_mismatches']) == 0
     
-    parser = argparse.ArgumentParser(description="AMP AutoFeed Validation System")
-    parser.add_argument('--action', choices=['daily', 'historical', 'both'], 
-                       default='daily', help='Action to perform')
-    parser.add_argument('--days', type=int, default=365, help='Days back for historical analysis')
-    parser.add_argument('--log-dir', default='amp_validation_logs', help='Log directory')
-    
-    args = parser.parse_args()
-    
-    validator = AutoFeedValidator(log_dir=args.log_dir)
-    
-    if args.action in ['daily', 'both']:
-        result = validator.validate_daily()
-        print(f"\nDaily Validation Result: {result['status']}")
-        if result.get('comparison', {}).get('differences'):
-            print("Differences found:")
-            for diff in result['comparison']['differences']:
-                print(f"  - {diff}")
-    
-    if args.action in ['historical', 'both']:
-        report = validator.generate_historical_report(days=args.days)
+    except Exception as e:
+        print(f"✗ Validation failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 
 if __name__ == "__main__":
-    main()
+    validate_daily()

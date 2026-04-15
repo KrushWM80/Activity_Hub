@@ -124,8 +124,10 @@ class ValidationOrchestrator:
             'smtp_server': smtp_server,
             'sender_email': sender_email,
         }
+        # Also save the email address for Exchange/Outlook access
+        self.config['email_address'] = sender_email
         self._save_config()
-        print(f"✓ Email configuration saved")
+        print(f"✓ Email configuration saved: {sender_email}")
     
     def show_status(self):
         """Show current status and recent validations"""

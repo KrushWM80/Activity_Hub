@@ -129,9 +129,21 @@ def parse_weekly_messages_excel(file_path: str, logger: logging.Logger) -> Tuple
     
     try:
         import win32com.client as win32
+        import subprocess
+        import time
+        
         logger.info("Using Windows COM to read Weekly Messages Excel...")
         
-        excel = win32.gencache.EnsureDispatch('Excel.Application')
+        # Kill any existing Excel processes to ensure clean start
+        try:
+            subprocess.run(['taskkill', '/F', '/IM', 'EXCEL.EXE'], 
+                          stderr=subprocess.DEVNULL, timeout=5)
+            time.sleep(2)
+        except:
+            pass
+        
+        # Use dynamic COM binding for flexibility
+        excel = win32.Dispatch('Excel.Application')
         excel.Visible = False
         workbook = excel.Workbooks.Open(file_path)
         worksheet = workbook.Sheets(1)  # First sheet
@@ -373,121 +385,106 @@ def parse_weekly_messages_csv(csv_path: str, logger: logging.Logger) -> Tuple[pd
 
 def parse_playbook_hub_file(file_path: str, logger: logging.Logger) -> pd.DataFrame:
     """
-    Parse Playbook Hub FY27 Excel file.
-    Try using Windows COM first (no openpyxl dependency), then fall back to pandas.
+    Parse Playbook Hub FY27 Excel file using Windows COM.
     Returns DataFrame with playbook metrics.
+    
+    The file structure has all data in one sheet with section headers
+    like "# Playbook Hub", "Valentines", "Baby Days", "Easter"
     """
     logger.info(f"Parsing Playbook Hub file: {file_path}")
     
     if not Path(file_path).exists():
         raise FileNotFoundError(f"Playbook Hub file not found: {file_path}")
     
-    # Try using Windows COM first (no external dependencies needed)
     try:
         import win32com.client as win32
+        import subprocess
+        import time
+        
         logger.info("Using Windows COM to read Excel file...")
         
-        excel = win32.gencache.EnsureDispatch('Excel.Application')
+        # Kill any existing Excel processes
+        try:
+            subprocess.run(['taskkill', '/F', '/IM', 'EXCEL.EXE'], 
+                          stderr=subprocess.DEVNULL, timeout=5)
+            time.sleep(2)  # Increased wait for proper COM cleanup
+        except:
+            pass
+        
+        # Use the proven working pattern from Weekly Messages parsing
+        excel = win32.Dispatch('Excel.Application')
         excel.Visible = False
         workbook = excel.Workbooks.Open(file_path)
+        time.sleep(1)  # Give workbook time to fully initialize
+        worksheet = workbook.Sheets(1)  # Single sheet
+        
+        # Read all data using UsedRange with explicit COM call
+        usedRange = worksheet.UsedRange
+        rows = usedRange.Rows.Count
+        cols = usedRange.Columns.Count
+        
+        logger.info(f"Playbook sheet dimensions: {rows} rows × {cols} columns")
         
         playbook_rows = []
         report_date = datetime.now().date()
         extracted_date = datetime.now()
-        playbook_categories = ['Playbook Hub', 'Valentines', 'Baby Days', 'Easter']
+        current_category = None
         
-        # Read all sheets
-        for sheet_index in range(1, workbook.Sheets.Count + 1):
-            worksheet = workbook.Sheets(sheet_index)
-            sheet_name = worksheet.Name
-            
-            # Try to match to category
-            matched_category = None
-            for cat in playbook_categories:
-                if cat.lower() in sheet_name.lower():
-                    matched_category = cat
-                    break
-            
-            if not matched_category:
-                logger.debug(f"Skipping sheet (no category match): {sheet_name}")
-                continue
-            
-            # Scan for actual data table (skip metadata rows starting with #)
-            usedRange = worksheet.UsedRange
-            rows = usedRange.Rows.Count
-            
-            # Find first data row (not metadata starting with #)
-            data_start = 1
-            for row_idx in range(1, min(rows + 1, 20)):  # Check first 20 rows
-                cell_val = str(worksheet.Cells(row_idx, 1).Value or "")
-                if not cell_val.startswith("#"):
-                    data_start = row_idx
-                    break
-            
-            logger.info(f"Sheet {sheet_name}: data starts at row {data_start}")
-            
-            # Read actual data from data_start onwards
-            data = usedRange.Value
-            
-            if not data or len(data) < data_start + 1:
-                continue
-            
-            # Skip metadata, extract just data rows
+        # Read row by row, tracking category changes
+        for row_idx in range(1, rows + 1):
             try:
-                # Get headers from the data_start row
-                header_row = None
-                data_rows = []
+                cell_val = worksheet.Cells(row_idx, 1).Value
+                if not cell_val:
+                    continue
                 
-                for row_idx in range(data_start, len(data) + 1):
-                    row_data = data[row_idx - 1] if row_idx <= len(data) else None
-                    if not row_data:
-                        break
-                    
-                    first_col = str(row_data[0] or "").strip()
-                    
-                    # Skip rows that are clearly not data
-                    if first_col.startswith("#") or not first_col:
-                        if header_row is None:  # Capture first non-comment row as headers
-                            header_row = row_data
-                        continue
-                    
-                    # This is a data row
-                    if header_row is None:
-                        header_row = ['Page Name', 'Total Page Views', 'Store Salary Assoc', 'Store Hourly Assoc']
-                    
-                    data_rows.append(row_data)
+                cell_str = str(cell_val).strip()
                 
-                # Convert to DataFrame
-                if header_row and data_rows:
-                    df = pd.DataFrame(data_rows, columns=header_row[:len(data_rows[0])] if data_rows else [])
-                    
-                    # Extract playbook data
-                    for idx, row in df.iterrows():
-                        page_name = str(row.iloc[0] or "").strip() if len(row) > 0 else None
-                        if not page_name or page_name.startswith("#"):
-                            continue
+                # Check if this is a category header row
+                if 'Playbook Hub' in cell_str or 'Valentines' in cell_str or 'Baby Days' in cell_str or 'Easter' in cell_str:
+                    # Extract category name
+                    if 'Hub' in cell_str:
+                        current_category = 'Playbook Hub'
+                    elif 'Valentines' in cell_str:
+                        current_category = 'Valentines'
+                    elif 'Baby' in cell_str:
+                        current_category = 'Baby Days'
+                    elif 'Easter' in cell_str:
+                        current_category = 'Easter'
+                    logger.debug(f"Found category at row {row_idx}: {current_category}")
+                    continue
+                
+                # Skip metadata rows (start with # or contain keywords)
+                if cell_str.startswith('#') or 'Table' in cell_str or 'Total' in cell_str or cell_str == '':
+                    continue
+                
+                # This looks like a data row - extract values
+                if current_category:
+                    try:
+                        page_name = cell_str
+                        col2_val = worksheet.Cells(row_idx, 2).Value
+                        col3_val = worksheet.Cells(row_idx, 3).Value
+                        col4_val = worksheet.Cells(row_idx, 4).Value
                         
-                        try:
-                            total_views = int(float(row.iloc[1])) if len(row) > 1 and pd.notna(row.iloc[1]) else 0
-                            salary_views = int(float(row.iloc[2])) if len(row) > 2 and pd.notna(row.iloc[2]) else 0
-                            hourly_views = int(float(row.iloc[3])) if len(row) > 3 and pd.notna(row.iloc[3]) else 0
-                            
-                            playbook_rows.append({
-                                'report_date': report_date,
-                                'playbook_category': matched_category,
-                                'page_name': page_name,
-                                'total_page_views': total_views,
-                                'store_salary_associates_views': salary_views,
-                                'store_hourly_associates_views': hourly_views,
-                                'report_period_start': None,
-                                'report_period_end': None,
-                                'extracted_date': extracted_date
-                            })
-                        except (ValueError, TypeError) as e:
-                            logger.debug(f"Skipping row with parsing error: {page_name} - {e}")
-                            continue
+                        total_views = int(float(col2_val or 0))
+                        salary_views = int(float(col3_val or 0))
+                        hourly_views = int(float(col4_val or 0))
+                        
+                        playbook_rows.append({
+                            'report_date': report_date,
+                            'playbook_category': current_category,
+                            'page_name': page_name,
+                            'total_page_views': total_views,
+                            'store_salary_associates_views': salary_views,
+                            'store_hourly_associates_views': hourly_views,
+                            'report_period_start': None,
+                            'report_period_end': None,
+                            'extracted_date': extracted_date
+                        })
+                    except (ValueError, TypeError):
+                        # Skip rows that don't parse properly
+                        pass
             except Exception as e:
-                logger.warning(f"Error processing sheet {sheet_name}: {e}")
+                logger.debug(f"Error reading row {row_idx}: {e}")
                 continue
         
         workbook.Close(False)
@@ -503,8 +500,11 @@ def parse_playbook_hub_file(file_path: str, logger: logging.Logger) -> pd.DataFr
             playbook_df['store_salary_associates_views'] = playbook_df['store_salary_associates_views'].astype('int64')
             playbook_df['store_hourly_associates_views'] = playbook_df['store_hourly_associates_views'].astype('int64')
             
-            # Remove exact duplicates
-            playbook_df = playbook_df.drop_duplicates(subset=['report_date', 'playbook_category', 'page_name'], keep='first')
+            # Remove duplicates
+            playbook_df = playbook_df.drop_duplicates(
+                subset=['report_date', 'playbook_category', 'page_name'], 
+                keep='first'
+            )
         
         logger.info(f"Playbook Hub parsed via COM: {len(playbook_df)} rows")
         return playbook_df

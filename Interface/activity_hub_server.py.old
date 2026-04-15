@@ -1,0 +1,588 @@
+"""
+Activity Hub Server - Flask application serving all Activity Hub pages.
+Port: 8088
+URL: http://weus42608431466:8088/activity-hub/
+"""
+
+import os
+import logging
+import requests
+from flask import Flask, send_from_directory, send_file, abort, jsonify, request
+from flask_cors import CORS
+from datetime import datetime, timedelta
+
+# ──────────────────────────────────────────────
+# Logging: metadata only (PCI compliance)
+# Never log request bodies, file contents, or user-submitted text
+# ──────────────────────────────────────────────
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+# Suppress Werkzeug request body dumping in any mode
+logging.getLogger('werkzeug').setLevel(logging.WARNING)
+
+app = Flask(__name__)
+
+# Enable CORS for cross-origin requests (admin dashboard via hostname)
+CORS(app, resources={
+    r"/api/*": {"origins": ["*"]},
+    r"/activity-hub/*": {"origins": ["*"]}
+})
+
+# Base directory for all Interface files
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STORE_SUPPORT_DIR = os.path.join(os.path.dirname(BASE_DIR), 'Store Support')
+
+# ──────────────────────────────────────────────
+# Routes
+# ──────────────────────────────────────────────
+
+@app.route('/activity-hub/')
+@app.route('/activity-hub/for-you')
+def for_you():
+    """Main landing page / For You dashboard."""
+    return send_file(os.path.join(BASE_DIR, 'For You - Landing Page', 'activity-hub-demo.html'))
+
+
+@app.route('/activity-hub/projects')
+def projects():
+    """Projects management page - self-contained single file."""
+    return send_file(os.path.join(BASE_DIR, 'projects-page.html'))
+
+
+@app.route('/activity-hub/projects/upload')
+def projects_upload():
+    """Upload Projects page."""
+    return send_file(os.path.join(BASE_DIR, 'Projects', 'Upload Projects', 'index.html'))
+
+
+@app.route('/activity-hub/reporting')
+def reporting():
+    """Reporting page (coming soon)."""
+    return _coming_soon('Reporting')
+
+
+@app.route('/activity-hub/teams')
+def teams():
+    """Teams page (coming soon)."""
+    return _coming_soon('Teams')
+
+
+@app.route('/activity-hub/my-work')
+def my_work():
+    """My Work page (coming soon)."""
+    return _coming_soon('My Work')
+
+
+@app.route('/activity-hub/settings')
+def settings():
+    """Settings page (coming soon)."""
+    return _coming_soon('Settings')
+
+
+@app.route('/activity-hub/admin')
+def admin():
+    """Admin dashboard."""
+    return send_file(os.path.join(BASE_DIR, 'Admin', 'admin-dashboard.html'))
+
+
+# ──────────────────────────────────────────────
+# Static file serving
+# ──────────────────────────────────────────────
+
+@app.route('/activity-hub/static/for-you/<path:filename>')
+def static_for_you(filename):
+    """CSS/JS/images for the For You landing page."""
+    return send_from_directory(os.path.join(BASE_DIR, 'For You - Landing Page'), filename)
+
+
+@app.route('/Spark_Blank.png')
+def spark_blank():
+    logo = os.path.join(BASE_DIR, 'Spark_Blank.png')
+    if os.path.exists(logo):
+        return send_file(logo, mimetype='image/png', max_age=86400)
+    return '', 204
+
+@app.route('/favicon.ico')
+def favicon():
+    logo = os.path.join(BASE_DIR, 'Spark_Blank.png')
+    if os.path.exists(logo):
+        return send_file(logo, mimetype='image/png', max_age=86400)
+    return '', 204
+
+
+@app.route('/activity-hub/static/projects/<path:filename>')
+def static_projects(filename):
+    """CSS/JS for Projects pages."""
+    return send_from_directory(os.path.join(BASE_DIR, 'Projects'), filename)
+
+
+@app.route('/activity-hub/static/projects/upload/<path:filename>')
+def static_projects_upload(filename):
+    """Static assets for Upload Projects."""
+    return send_from_directory(os.path.join(BASE_DIR, 'Projects', 'Upload Projects'), filename)
+
+
+@app.route('/activity-hub/static/admin/<path:filename>')
+def static_admin(filename):
+    """CSS/JS/JSON for Admin dashboard."""
+    return send_from_directory(os.path.join(BASE_DIR, 'Admin'), filename)
+
+
+@app.route('/activity-hub/static/admin/Data-Bridge/<path:filename>')
+def static_admin_data_bridge(filename):
+    """Data-Bridge files under Admin."""
+    return send_from_directory(os.path.join(BASE_DIR, 'Admin', 'Data-Bridge'), filename)
+
+
+@app.route('/activity-hub/static/store-support/<path:filename>')
+def static_store_support(filename):
+    """Serve files from Store Support (e.g., Spark Blank.png logo)."""
+    return send_from_directory(STORE_SUPPORT_DIR, filename)
+
+
+# ──────────────────────────────────────────────
+# Logic Rules Engine API Proxy Routes
+# ──────────────────────────────────────────────
+
+SCHEDULER_SERVICE_URL = 'http://localhost:5011'
+
+@app.route('/api/logic/metrics')
+def get_logic_metrics():
+    """Proxy Logic Rules Engine metrics for dashboard display."""
+    try:
+        response = requests.get(f'{SCHEDULER_SERVICE_URL}/api/v1/logic-metrics', timeout=5)
+        if response.status_code == 200:
+            return response.json()
+        return {'error': 'Service unavailable'}, 503
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+@app.route('/api/logic/notifications/today')
+def get_notifications_today():
+    """Proxy Logic Rules Engine notifications for today."""
+    try:
+        response = requests.get(f'{SCHEDULER_SERVICE_URL}/api/v1/notifications/today', timeout=5)
+        if response.status_code == 200:
+            return response.json()
+        return {'error': 'Service unavailable'}, 503
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+@app.route('/api/logic/requests', methods=['GET', 'POST'])
+def logic_requests(status=None):
+    """Proxy Logic Requests with optional status filter (GET) or create new request (POST)."""
+    try:
+        if request.method == 'GET':
+            # GET: retrieve logic requests with optional status filter
+            url = f'{SCHEDULER_SERVICE_URL}/api/v1/logic-requests'
+            if status:
+                url += f'?status={status}'
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                return response.json()
+            return {'error': 'Service unavailable'}, 503
+        
+        elif request.method == 'POST':
+            # POST: create new logic request, forward to Scheduler Service
+            data = request.get_json()
+            response = requests.post(
+                f'{SCHEDULER_SERVICE_URL}/api/v1/logic-requests',
+                json=data,
+                timeout=5,
+                headers={'Content-Type': 'application/json'}
+            )
+            if response.status_code in [200, 201]:
+                return response.json()
+            else:
+                # Forward error response
+                return response.json() if response.headers.get('content-type') == 'application/json' else {'error': response.text}, response.status_code
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+
+# ──────────────────────────────────────────────
+# Admin Dashboard API Endpoints
+# ──────────────────────────────────────────────
+
+@app.route('/api/admin/activity-log')
+def get_activity_log():
+    """Return admin activity log for audit trail."""
+    # Mock data for now - can be connected to actual audit database later
+    now = datetime.now()
+    activity_log = [
+        {
+            'timestamp': (now - timedelta(hours=2)).isoformat(),
+            'user': 'Kendall Rush',
+            'action': 'Created Logic Request',
+            'resource': 'Project Updates - 30 Days',
+            'status': 'success'
+        },
+        {
+            'timestamp': (now - timedelta(hours=4)).isoformat(),
+            'user': 'Admin User',
+            'action': 'Modified Trigger Rule',
+            'resource': 'SIF Missing - 60 Days',
+            'status': 'success'
+        },
+        {
+            'timestamp': (now - timedelta(hours=8)).isoformat(),
+            'user': 'Kendall Rush',
+            'action': 'Viewed Dashboard',
+            'resource': 'Admin Dashboard',
+            'status': 'success'
+        },
+        {
+            'timestamp': (now - timedelta(hours=24)).isoformat(),
+            'user': 'System',
+            'action': 'Scheduler Run',
+            'resource': 'Logic Rules Engine',
+            'status': 'success'
+        },
+    ]
+    return jsonify({
+        'activity_log': activity_log,
+        'total_count': len(activity_log),
+        'timestamp': now.isoformat()
+    })
+
+
+@app.route('/api/admin/active-users')
+def get_active_users():
+    """Return count and list of currently active users."""
+    # Mock data for now - can be connected to session tracking later
+    active_users = [
+        {'user_id': 'kendall.rush', 'name': 'Kendall Rush', 'role': 'Admin', 'last_activity': datetime.now().isoformat()},
+        {'user_id': 'admin.user', 'name': 'Admin User', 'role': 'Admin', 'last_activity': (datetime.now() - timedelta(minutes=5)).isoformat()}
+    ]
+    return jsonify({
+        'active_users': len(active_users),
+        'users': active_users,
+        'timestamp': datetime.now().isoformat()
+    })
+
+
+# ──────────────────────────────────────────────
+# Projects API - BigQuery Integration
+# ──────────────────────────────────────────────
+
+# Initialize BigQuery client
+BIGQUERY_AVAILABLE = False
+try:
+    from google.cloud import bigquery
+    _bq_client = bigquery.Client(project='wmt-assetprotection-prod')
+    BIGQUERY_AVAILABLE = True
+except Exception as e:
+    logging.warning(f"BigQuery not available: {e}")
+    _bq_client = None
+
+
+def _get_projects_from_bq(business_area=None, health_status=None, status='Active'):
+    """Query projects from BigQuery AH_Projects table"""
+    if not BIGQUERY_AVAILABLE:
+        return []
+    
+    try:
+        # TEST: verify this function is called
+        print(f"[DEBUG] _get_projects_from_bq called with status={status}")
+        logging.info(f"[DEBUG] _get_projects_from_bq called with status={status}")
+        
+        sql = """
+        SELECT 
+            impact_id, title, business_area, owner_name, owner_id,
+            health_status, project_status, created_timestamp, modified_timestamp,
+            latest_update, latest_update_timestamp, current_wm_week_update
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects` p
+        WHERE 1=1
+        """
+        
+        if status != 'All' and status:
+            sql += f" AND p.project_status = '{status}'"
+        if business_area:
+            sql += f" AND p.business_area = '{business_area}'"
+        if health_status:
+            sql += f" AND p.health_status = '{health_status}'"
+        
+        sql += " ORDER BY p.modified_timestamp DESC"
+        
+        logging.info(f"[Projects API] Executing SQL: {sql[:200]}...")
+        
+        results = _bq_client.query(sql).result()
+        projects = []
+        for row in results:
+            projects.append({
+                'impact_id': row.impact_id,
+                'title': row.title,
+                'business_area': row.business_area,
+                'owner_name': row.owner_name,
+                'owner_id': row.owner_id,
+                'health_status': row.health_status,
+                'status': row.project_status,
+                'created_date': row.created_timestamp.isoformat() if row.created_timestamp else None,
+                'updated_date': row.modified_timestamp.isoformat() if row.modified_timestamp else None,
+                'latest_update': row.latest_update,
+                'latest_update_date': row.latest_update_timestamp.isoformat() if row.latest_update_timestamp else None,
+                'current_wm_week_update': str(row.current_wm_week_update).lower() == 'true' or row.current_wm_week_update == True
+            })
+        logging.info(f"[Projects API] Retrieved {len(projects)} projects")
+        return projects
+    
+    except Exception as e:
+        logging.error(f"[Projects API] Error: {str(e)}")
+        raise
+
+
+@app.route('/api/projects', methods=['GET'])
+def api_get_projects():
+    """Get projects from BigQuery with optional filters"""
+    print(f"[DEBUG] api_get_projects called. BIGQUERY_AVAILABLE={BIGQUERY_AVAILABLE}")
+    
+    if not BIGQUERY_AVAILABLE:
+        return jsonify({'error': 'BigQuery service unavailable'}), 503
+    
+    try:
+        from flask import request
+        
+        # Get query parameters
+        business_area = request.args.get('business_area')
+        health_status = request.args.get('health_status')
+        status = request.args.get('status', 'Active')
+        
+        print(f"[DEBUG] About to call _get_projects_from_bq")
+        
+        # Query projects
+        projects = _get_projects_from_bq(
+            business_area=business_area,
+            health_status=health_status,
+            status=status
+        )
+        
+        return jsonify({
+            'projects': projects,
+            'total_count': len(projects),
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    except Exception as e:
+        print(f"[DEBUG] Exception in api_get_projects: {type(e).__name__}: {str(e)[:200]}")
+        logging.error(f"Error fetching projects: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/projects/metrics', methods=['GET'])
+def api_get_projects_metrics():
+    """Get projects dashboard metrics"""
+    if not BIGQUERY_AVAILABLE:
+        return jsonify({'error': 'BigQuery service unavailable'}), 503
+    
+    try:
+        from flask import request
+        status = request.args.get('status', 'Active')
+        
+        # Query metrics inline
+        sql = fr"""
+        SELECT 
+            COUNT(DISTINCT impact_id) as total_projects,
+            COUNT(DISTINCT owner_id) as unique_owners,
+            COUNT(DISTINCT CASE 
+                WHEN DATE_DIFF(CURRENT_DATE(), DATE(modified_timestamp), DAY) <= 7 
+                THEN impact_id 
+            END) as projects_updated_this_week,
+            ROUND(
+                COUNT(DISTINCT CASE 
+                    WHEN DATE_DIFF(CURRENT_DATE(), DATE(modified_timestamp), DAY) <= 7 
+                    THEN impact_id 
+                END) * 100.0 / COUNT(DISTINCT impact_id), 2
+            ) as percent_updated
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        WHERE project_status = '{status}'
+        """
+        
+        results = _bq_client.query(sql).result()
+        for row in results:
+            return jsonify({
+                'metrics': {
+                    'active_projects': int(row.total_projects),
+                    'unique_owners': int(row.unique_owners),
+                    'projects_updated_this_week': int(row.projects_updated_this_week),
+                    'percent_updated': float(row.percent_updated)
+                },
+                'timestamp': datetime.now().isoformat()
+            })
+        
+        return jsonify({
+            'metrics': {
+                'active_projects': 0,
+                'unique_owners': 0,
+                'projects_updated_this_week': 0,
+                'percent_updated': 0
+            },
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    except Exception as e:
+        logging.error(f"Error fetching metrics: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/projects/business-areas', methods=['GET'])
+def api_get_business_areas():
+    """Get list of business areas"""
+    if not BIGQUERY_AVAILABLE:
+        return jsonify({'error': 'BigQuery service unavailable'}), 503
+    
+    try:
+        sql = r"""
+        SELECT DISTINCT business_area
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        WHERE business_area IS NOT NULL
+        ORDER BY business_area
+        """
+        
+        results = _bq_client.query(sql).result()
+        areas = []
+        for row in results:
+            if row.business_area:
+                areas.append(row.business_area)
+        
+        return jsonify({
+            'business_areas': areas,
+            'total': len(areas),
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    except Exception as e:
+        logging.error(f"Error fetching business areas: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/projects/<project_id>', methods=['GET'])
+def api_get_project(project_id):
+    """Get a specific project by ID"""
+    if not BIGQUERY_AVAILABLE:
+        return jsonify({'error': 'BigQuery service unavailable'}), 503
+    
+    try:
+        sql = fr"""
+        SELECT 
+            impact_id, title, business_area, owner_name, owner_id,
+            health_status, project_status, created_timestamp, modified_timestamp,
+            latest_update, latest_update_timestamp, current_wm_week_update
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        WHERE impact_id = '{project_id}'
+        LIMIT 1
+        """
+        
+        results = _bq_client.query(sql).result()
+        for row in results:
+            project = {
+                'impact_id': row.impact_id,
+                'title': row.title,
+                'business_area': row.business_area,
+                'owner_name': row.owner_name,
+                'owner_id': row.owner_id,
+                'health_status': row.health_status,
+                'status': row.project_status,
+                'created_date': row.created_timestamp.isoformat() if row.created_timestamp else None,
+                'updated_date': row.modified_timestamp.isoformat() if row.modified_timestamp else None,
+                'latest_update': row.latest_update,
+                'latest_update_date': row.latest_update_timestamp.isoformat() if row.latest_update_timestamp else None,
+                'current_wm_week_update': str(row.current_wm_week_update).lower() == 'true' or row.current_wm_week_update == True
+            }
+            
+            return jsonify({
+                'project': project,
+                'timestamp': datetime.now().isoformat()
+            })
+        
+        return jsonify({'error': 'Project not found'}), 404
+    
+    except Exception as e:
+        logging.error(f"Error fetching project {project_id}: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+# ──────────────────────────────────────────────
+# Coming Soon Template
+# ──────────────────────────────────────────────
+
+def _coming_soon(page_name):
+    """Generate a coming soon page matching Activity Hub styling."""
+    nav_items = [
+        ('For You', '/activity-hub/for-you', False),
+        ('Projects', '/activity-hub/projects', False),
+        ('Reporting', '/activity-hub/reporting', page_name == 'Reporting'),
+        ('Teams', '/activity-hub/teams', page_name == 'Teams'),
+        ('My Work', '/activity-hub/my-work', page_name == 'My Work'),
+        ('Settings', '/activity-hub/settings', page_name == 'Settings'),
+        ('🔒 Admin', '/activity-hub/admin', False),
+    ]
+    nav_html = '\n'.join(
+        f'<a href="{url}" class="nav-item{" active" if active else ""}">{label}</a>'
+        for label, url, active in nav_items
+    )
+    return f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{page_name} - Activity Hub</title>
+    <style>
+        :root {{ --walmart-blue: #0071ce; --walmart-yellow: #ffc220; --gray-900: #111827; }}
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; }}
+        .header {{ background: linear-gradient(135deg, #0071ce, #004f9a); color: white; padding: 0 2rem; height: 64px; display: flex; align-items: center; }}
+        .header-content {{ display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1400px; margin: 0 auto; }}
+        .logo-section {{ display: flex; align-items: center; gap: 12px; }}
+        .spark-logo {{ width: 32px; height: 32px; object-fit: contain; }}
+        .nav-items {{ display: flex; gap: 1.5rem; }}
+        .nav-item {{ color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; padding: 0.5rem 0; }}
+        .nav-item:hover {{ color: white; }}
+        .nav-item.active {{ color: white; border-bottom: 2px solid var(--walmart-yellow); }}
+        .coming-soon {{ display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 64px); text-align: center; padding: 2rem; }}
+        .coming-soon h1 {{ font-size: 2.5rem; color: var(--gray-900); margin-bottom: 1rem; }}
+        .coming-soon p {{ font-size: 1.1rem; color: #6b7280; max-width: 500px; }}
+        .coming-soon .icon {{ font-size: 4rem; margin-bottom: 1.5rem; }}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="/activity-hub/static/store-support/General Setup/Design/Spark Blank.png" alt="Spark" class="spark-logo">
+                <h1 style="font-size: 1.25rem;">Activity Hub</h1>
+            </div>
+            <nav class="nav-items">{nav_html}</nav>
+        </div>
+    </header>
+    <div class="coming-soon">
+        <div class="icon">🚧</div>
+        <h1>{page_name}</h1>
+        <p>This section is under development and will be available soon.</p>
+    </div>
+</body>
+</html>''', 200
+
+
+# ──────────────────────────────────────────────
+# Redirect root
+# ──────────────────────────────────────────────
+
+@app.route('/')
+def root_redirect():
+    from flask import redirect
+    return redirect('/activity-hub/')
+
+
+# ──────────────────────────────────────────────
+# Main
+# ──────────────────────────────────────────────
+
+if __name__ == '__main__':
+    port = int(os.getenv('PORT', 8088))
+    print(f'Activity Hub starting on port {port}...')
+    print(f'  Local:   http://localhost:{port}/activity-hub/')
+    print(f'  Network: http://weus42608431466:{port}/activity-hub/')
+    app.run(host='0.0.0.0', port=port, debug=False)

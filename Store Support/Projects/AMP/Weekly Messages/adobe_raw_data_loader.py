@@ -107,12 +107,25 @@ def parse_playbook_hub_raw(file_path: str, logger: logging.Logger) -> pd.DataFra
     
     try:
         import win32com.client as win32
+        import subprocess
+        import time
+        
         logger.info("Using Windows COM to read Excel file...")
         
-        excel = win32.gencache.EnsureDispatch('Excel.Application')
+        # Kill any existing Excel processes to ensure clean start
+        try:
+            subprocess.run(['taskkill', '/F', '/IM', 'EXCEL.EXE'], 
+                          stderr=subprocess.DEVNULL, timeout=5)
+            time.sleep(2)
+        except:
+            pass
+        
+        # Use dynamic COM binding (more flexible than gencache)
+        excel = win32.Dispatch('Excel.Application')
         excel.Visible = False
         workbook = excel.Workbooks.Open(file_path)
-        worksheet = workbook.Sheets.Item(1)
+        time.sleep(1)  # Give workbook time to fully initialize
+        worksheet = workbook.Sheets(1)
         
         # Simple approach: read UsedRange as Value
         used_range = worksheet.UsedRange
@@ -165,12 +178,25 @@ def parse_weekly_messages_raw(file_path: str, logger: logging.Logger) -> pd.Data
     
     try:
         import win32com.client as win32
+        import subprocess
+        import time
+        
         logger.info("Using Windows COM to read Excel file...")
         
-        excel = win32.gencache.EnsureDispatch('Excel.Application')
+        # Kill any existing Excel processes to ensure clean start
+        try:
+            subprocess.run(['taskkill', '/F', '/IM', 'EXCEL.EXE'], 
+                          stderr=subprocess.DEVNULL, timeout=5)
+            time.sleep(2)
+        except:
+            pass
+        
+        # Use dynamic COM binding (more flexible than gencache)
+        excel = win32.Dispatch('Excel.Application')
         excel.Visible = False
         workbook = excel.Workbooks.Open(file_path)
-        worksheet = workbook.Sheets.Item(1)
+        time.sleep(1)  # Give workbook time to fully initialize
+        worksheet = workbook.Sheets(1)
         
         # Simple approach: read UsedRange as Value
         used_range = worksheet.UsedRange
@@ -209,6 +235,88 @@ def parse_weekly_messages_raw(file_path: str, logger: logging.Logger) -> pd.Data
         raise
     except Exception as e:
         logger.error(f"Error parsing Weekly Messages: {e}", exc_info=True)
+        raise
+
+# ============================================================================
+# WEEKLY MESSAGES AUDIO CSV PARSING
+# ============================================================================
+
+def parse_weekly_messages_audio_raw(file_path: str, logger: logging.Logger) -> pd.DataFrame:
+    """
+    Parse Weekly Messages Audio CSV file and extract ALL rows/columns as-is.
+    Returns DataFrame with exact CSV structure: F1, F2, F3, F4, F5
+    Uses COM to read CSV like Excel does (handles mixed content).
+    """
+    logger.info(f"Parsing Weekly Messages Audio CSV file: {file_path}")
+    
+    if not Path(file_path).exists():
+        raise FileNotFoundError(f"Weekly Messages Audio CSV file not found: {file_path}")
+    
+    try:
+        import win32com.client as win32
+        import subprocess
+        import time
+        
+        logger.info("Using Windows COM to read CSV file...")
+        
+        # Kill any existing Excel processes to ensure clean start
+        try:
+            subprocess.run(['taskkill', '/F', '/IM', 'EXCEL.EXE'], 
+                          stderr=subprocess.DEVNULL, timeout=5)
+            time.sleep(2)
+        except:
+            pass
+        
+        # Use dynamic COM binding (more flexible than gencache)
+        excel = win32.Dispatch('Excel.Application')
+        excel.Visible = False
+        workbook = excel.Workbooks.Open(file_path)
+        time.sleep(1)  # Give workbook time to fully initialize
+        worksheet = workbook.Sheets(1)
+        
+        # Simple approach: read UsedRange as Value
+        used_range = worksheet.UsedRange
+        all_data = used_range.Value
+        
+        rows_count = len(all_data) if all_data else 0
+        cols_count = len(all_data[0]) if all_data and len(all_data) > 0 else 0
+        
+        logger.info(f"CSV dimensions: {rows_count} rows × {cols_count} columns")
+        
+        # Extract all data row by row (up to 5 columns for Audio CSV)
+        data_rows = []
+        for row_data in all_data:
+            row_dict = {}
+            # Cap at 5 columns for audio data
+            for col_idx in range(min(cols_count, 5)):
+                col_name = f"F{col_idx + 1}"
+                col_val = row_data[col_idx] if col_idx < len(row_data) else None
+                row_dict[col_name] = str(col_val) if col_val is not None else ""
+            data_rows.append(row_dict)
+        
+        workbook.Close(SaveChanges=False)
+        excel.Quit()
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(data_rows)
+        
+        # Ensure exactly 5 columns (F1-F5)
+        for col_num in range(1, 6):
+            col_name = f"F{col_num}"
+            if col_name not in df.columns:
+                df[col_name] = ""
+        
+        # Persist only F1-F5 columns
+        df = df[['F1', 'F2', 'F3', 'F4', 'F5']]
+        
+        # Add extraction timestamp
+        df['extracted_date'] = datetime.now()
+        
+        logger.info(f"Weekly Messages Audio raw data extracted: {len(df)} rows × {len(df.columns)} columns")
+        return df
+    
+    except Exception as e:
+        logger.error(f"Error parsing Weekly Messages Audio CSV: {e}", exc_info=True)
         raise
 
 # ============================================================================
@@ -285,6 +393,7 @@ def main():
         # Parse raw data from Excel files
         playbook_raw = pd.DataFrame()
         weekly_raw = pd.DataFrame()
+        audio_raw = pd.DataFrame()
         
         try:
             playbook_raw = parse_playbook_hub_raw(
@@ -302,6 +411,14 @@ def main():
         except FileNotFoundError as e:
             logger.warning(f"Weekly Messages file not available: {e}")
         
+        try:
+            audio_raw = parse_weekly_messages_audio_raw(
+                config['source_files']['weekly_messages_audio_csv_path'],
+                logger
+            )
+        except FileNotFoundError as e:
+            logger.warning(f"Weekly Messages Audio CSV file not available: {e}")
+        
         logger.info("\n--- PHASE 2: LOADING TO BIGQUERY ---")
         
         project = config['gcp']['project_id']
@@ -309,14 +426,17 @@ def main():
         
         playbook_raw_table = f"{project}.{dataset_id}.bq_playbook_hub_raw"
         weekly_raw_table = f"{project}.{dataset_id}.bq_weekly_messages_raw"
+        audio_raw_table = f"{project}.{dataset_id}.bq_weekly_messages_audio_raw"
         
         logger.info(f"Target raw tables:")
         logger.info(f"  - {playbook_raw_table}")
         logger.info(f"  - {weekly_raw_table}")
+        logger.info(f"  - {audio_raw_table}")
         
         # Load each table if data is available
         playbook_count = 0
         weekly_count = 0
+        audio_count = 0
         
         if not playbook_raw.empty:
             playbook_count = load_raw_to_bigquery(
@@ -332,10 +452,18 @@ def main():
         else:
             logger.info(f"Weekly Messages Raw: No data to load")
         
+        if not audio_raw.empty:
+            audio_count = load_raw_to_bigquery(
+                client, audio_raw, audio_raw_table, logger
+            )
+        else:
+            logger.info(f"Weekly Messages Audio Raw: No data to load")
+        
         # Summary
         logger.info("\n--- SUMMARY ---")
         logger.info(f"Playbook Hub Raw: {playbook_count} rows")
         logger.info(f"Weekly Messages Raw: {weekly_count} rows")
+        logger.info(f"Weekly Messages Audio Raw: {audio_count} rows")
         logger.info("=" * 80)
         logger.info("Adobe Analytics Raw Data Loader - SUCCESS")
         logger.info("=" * 80)

@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/Spark_Blank.png">
+    <title>Projects - Walmart Activity Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ══════════════════════════════════════════════════════════════ */
+        /* WALMART BRAND VARIABLES & GLOBAL STYLES (Match For You Page)  */
+        /* ══════════════════════════════════════════════════════════════ */
+        :root {
+            /* Official Walmart Brand Colors */
+            --walmart-navy: #1E3A8A;
+            --walmart-blue-dark: #1D4ED8;
+            --walmart-blue: #3B82F6;
+            --walmart-blue-light: #60A5FA;
+            --walmart-blue-lightest: #DBEAFE;
+            --walmart-yellow: #FFCC00;
+            --walmart-yellow-dark: #E6B800;
+            --walmart-yellow-light: #FFD633;
+            
+            /* Typography */
+            --font-primary: 'Everyday Sans', 'Helvetica Neue', Arial, sans-serif;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            
+            /* Other Variables */
+            --gray-900: #1A202C;
+            --gray-700: #4A5568;
+            --gray-600: #718096;
+            --gray-300: #E2E8F0;
+            --gray-100: #F7FAFC;
+            --white: #FFFFFF;
+            --success: #38A169;
+            --warning: #D69E2E;
+            --error: #E53E3E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--gray-100);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        /* Hide header when page is loaded in iframe */
+        body.in-iframe .header {
+            display: none;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* HEADER - IDENTICAL TO FOR YOU PAGE                             */
+        /* ═══════════════════════════════════════════════════════════════ */
+        .header {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-dark) 100%);
+            color: var(--white);
+            padding: var(--space-4) var(--space-6);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .spark-logo {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: var(--space-6);
+            margin: 0;
+            list-style: none;
+        }
+
+        .nav-item {
+            color: var(--white);
+            text-decoration: none;
+            padding: var(--space-2) var(--space-4);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: var(--walmart-yellow);
+            color: var(--gray-900);
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            color: var(--white);
+        }
+
+        .notification-bell {
+            position: relative;
+            padding: var(--space-2);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--walmart-yellow);
+            color: var(--gray-900);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* MAIN LAYOUT                                                    */
+        /* ═══════════════════════════════════════════════════════════════ */
+        .container-wrapper {
+            display: flex;
+            gap: 0;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            min-height: calc(100vh - 88px);
+        }
+
+        .content-area {
+            flex: 1;
+            width: calc(100% - 130px);
+            max-width: calc(100vw - 130px);
+            padding: var(--space-6);
+            display: block;
+            background: var(--gray-100);
+            position: relative;
+            z-index: 500;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* RIGHT SIDEBAR - IDENTICAL TO FOR YOU PAGE                      */
+        /* ═══════════════════════════════════════════════════════════════ */
+        .sidebar {
+            position: fixed;
+            right: 0;
+            top: 88px;
+            bottom: 0;
+            width: 130px;
+            background: var(--white);
+            border-left: 2px solid var(--gray-300);
+            overflow-y: auto;
+            z-index: 1001;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.15);
+            padding: 0 0.5rem 1rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-add-btn {
+            background: var(--walmart-blue);
+            color: var(--white);
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .sidebar-add-btn:hover {
+            background: #004C91;
+            transform: scale(1.1);
+        }
+
+        .sidebar-category {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.15s ease;
+            user-select: none;
+            background: var(--gray-100);
+        }
+
+        .sidebar-category-header:hover {
+            background: var(--gray-300);
+        }
+
+        .sidebar-category-chevron {
+            font-size: 0.6rem;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar-category.collapsed .sidebar-category-chevron {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar-category-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.2s ease;
+            max-height: 500px;
+            opacity: 1;
+            padding: 0.4rem 0;
+        }
+
+        .sidebar-category.collapsed .sidebar-category-links {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+        }
+
+        .sidebar-link-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 8px;
+            border-radius: 6px;
+            background: transparent;
+            text-decoration: none;
+            color: var(--gray-700);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .sidebar-link-item:hover {
+            background: var(--gray-100);
+            color: var(--walmart-blue);
+        }
+
+        .sidebar-link-icon {
+            display: none;
+        }
+
+        .sidebar-link-title {
+            font-weight: 500;
+            margin: 0;
+            line-height: 1.1;
+            word-wrap: break-word;
+        }
+
+        /* Sidebar Link Card (For You style) */
+        .sidebar-link-card {
+            background: linear-gradient(135deg, var(--walmart-blue-light) 0%, var(--walmart-blue) 100%);
+            color: var(--white);
+            padding: 0.75rem 0.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            font-size: 0.85rem;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .sidebar-link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border-color: var(--walmart-yellow);
+        }
+
+        .sidebar-link-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* NESTED MODAL STYLES (Links Management)                         */
+        /* ═══════════════════════════════════════════════════════════════ */
+        .nested-modal {
+            display: none;
+            position: fixed;
+            z-index: 1100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .nested-modal.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nested-modal-content {
+            background-color: var(--white);
+            padding: 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .nested-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-300);
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-dark) 100%);
+            color: var(--white);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .nested-modal-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .nested-modal-close {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .nested-modal-close:hover {
+            opacity: 0.8;
+        }
+
+        .nested-modal-body {
+            padding: 1.5rem;
+        }
+
+        .available-link-item {
+            padding: 12px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--white);
+        }
+
+        .available-link-item:hover {
+            background: var(--walmart-blue-lightest);
+            border-color: var(--walmart-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .link-item {
+            padding: 12px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            margin-bottom: 12px;
+            background: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .link-info {
+            flex: 1;
+        }
+
+        .link-title {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .link-url {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            word-break: break-all;
+            margin-bottom: 6px;
+        }
+
+        .link-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+        }
+
+        .link-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        .link-badge-public {
+            background: #E0F2FE;
+            color: #0369A1;
+        }
+
+        .link-badge-shared {
+            background: #FEF08A;
+            color: #854D0E;
+        }
+
+        .link-badge-private {
+            background: #F3E8FF;
+            color: #6B21A8;
+        }
+
+        .link-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 8px;
+        }
+
+        .link-btn {
+            padding: 4px 12px;
+            background: var(--walmart-blue);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .link-btn:hover {
+            background: var(--walmart-blue-dark);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════ */
+        /* PROJECTS DASHBOARD CONTENT STYLES                              */
+        /* ═══════════════════════════════════════════════════════════════ */
+        .projects-header {
+            display: none;
+        }
+
+        .projects-header h1 {
+            color: var(--walmart-blue);
+            font-weight: bold;
+            margin-bottom: var(--space-2);
+            font-size: 32px;
+        }
+
+        .projects-header p {
+            color: var(--gray-600);
+            font-size: 16px;
+        }
+
+        .metrics-container {
+            display: none;
+        }
+
+        .metric-box {
+            background: var(--white);
+            border-radius: 8px;
+            padding: var(--space-6);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 5px solid var(--walmart-blue);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .metric-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+        }
+
+        .metric-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--walmart-blue);
+            margin-bottom: var(--space-1);
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filters-container {
+            background: var(--white);
+            padding: var(--space-6);
+            border-radius: 8px;
+            margin-bottom: var(--space-8);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .table-container {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: var(--space-8);
+        }
+
+        .table {
+            margin: 0;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, #004C91 100%);
+            color: var(--white);
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .health-on-track {
+            background: #d4edda;
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 12px;
+        }
+
+        .health-at-risk {
+            background: #fff3cd;
+            color: #856404;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 12px;
+        }
+
+        .health-off-track {
+            background: #f8d7da;
+            color: var(--error);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 12px;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--space-4);
+            margin-bottom: var(--space-8);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--walmart-blue) !important;
+            border-color: var(--walmart-blue) !important;
+            color: var(--white) !important;
+        }
+
+        .btn-primary:hover {
+            background: #004C91 !important;
+            border-color: #004C91 !important;
+        }
+
+        .btn-secondary {
+            background: var(--gray-600) !important;
+            border-color: var(--gray-600) !important;
+            color: var(--white) !important;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-600);
+        }
+
+        .loading i {
+            font-size: 48px;
+            color: var(--walmart-blue);
+            margin-bottom: 20px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, #004C91 100%);
+            color: var(--white);
+        }
+
+        .pci-notice {
+            font-size: 0.75rem;
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 4px;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- HEADER (IDENTICAL TO FOR YOU PAGE)                               -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="/Spark_Blank.png" alt="Spark" class="spark-logo" onerror="this.src='/activity-hub/static/store-support/General%20Setup/Design/Spark%20Blank.png'>"
+                <h1>Activity Hub</h1>
+            </div>
+            <nav class="nav-items">
+                <a href="/activity-hub/for-you" class="nav-item" onclick="navigateTo(event, '/activity-hub/for-you')">For You</a>
+                <a href="/activity-hub/projects" class="nav-item active" onclick="navigateTo(event, '/activity-hub/projects')">Projects</a>
+                <a href="/activity-hub/reporting" class="nav-item" onclick="navigateTo(event, '/activity-hub/reporting')">Reporting</a>
+                <a href="/activity-hub/teams" class="nav-item" onclick="navigateTo(event, '/activity-hub/teams')">Teams</a>
+                <a href="/activity-hub/my-work" class="nav-item" onclick="navigateTo(event, '/activity-hub/my-work')">My Work</a>
+                <a href="/activity-hub/settings" class="nav-item" onclick="navigateTo(event, '/activity-hub/settings')">Settings</a>
+                <a href="/activity-hub/admin" class="nav-item" onclick="navigateTo(event, '/activity-hub/admin')" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
+            </nav>
+            <div class="user-section">
+                <div class="notification-bell">
+                    🔔
+                    <div class="notification-badge">3</div>
+                </div>
+                <span>Krush</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- MAIN LAYOUT                                                       -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="container-wrapper">
+        <!-- PROJECTS CONTENT AREA -->
+        <div class="content-area">
+            <!-- Header -->
+            <div class="projects-header">
+                <h1><i class="fas fa-project-diagram"></i> Projects Dashboard</h1>
+                <p>Monitor and manage all projects across your organization</p>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-container">
+                <div class="metric-box">
+                    <div class="metric-number" id="metric-projects">0</div>
+                    <div class="metric-label">Active Projects</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-number" id="metric-owners">0</div>
+                    <div class="metric-label">Unique Owners</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-number" id="metric-updated">0</div>
+                    <div class="metric-label">Updated This Week</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-number" id="metric-percent">0%</div>
+                    <div class="metric-label">Percent Updated</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-container">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>Business Area</strong></label>
+                        <select class="form-select" id="filter-business-area" onchange="loadProjects()">
+                            <option value="">All Areas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>Health Status</strong></label>
+                        <select class="form-select" id="filter-health" onchange="loadProjects()">
+                            <option value="">All Health Statuses</option>
+                            <option value="On Track">On Track</option>
+                            <option value="At Risk">At Risk</option>
+                            <option value="Off Track">Off Track</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label"><strong>Status</strong></label>
+                        <select class="form-select" id="filter-status" onchange="loadProjects()">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label"><strong>Owner</strong></label>
+                        <select class="form-select" id="filter-owner" onchange="loadProjects()">
+                            <option value="">All Owners</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <button class="btn btn-outline-secondary w-100" onclick="location.reload()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-warning" onclick="generatePPT()">
+                    <i class="fas fa-file-powerpoint"></i> Generate PPT Report
+                </button>
+                <button class="btn btn-primary" onclick="showAddProjectModal()">
+                    <i class="fas fa-plus"></i> Add Project
+                </button>
+            </div>
+
+            <!-- Projects Table -->
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Project Title</th>
+                            <th style="width: 15%;">Business Area</th>
+                            <th style="width: 12%;">Owner</th>
+                            <th style="width: 10%;">Health</th>
+                            <th style="width: 15%;">Latest Update</th>
+                            <th style="width: 12%;">Week Status</th>
+                            <th style="width: 11%;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projects-table">
+                        <tr>
+                            <td colspan="7" class="loading">
+                                <i class="fas fa-spinner"></i> Loading projects...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDEBAR (IDENTICAL TO FOR YOU PAGE) -->
+        <div class="sidebar">
+            <!-- Links Section -->
+            <div class="sidebar-header">
+                🔗 Links
+                <button class="sidebar-add-btn" title="Manage Links" onclick="openLinksModal()">+</button>
+            </div>
+            <div class="sidebar-links" id="sidebarLinksContainer">
+                <!-- Dynamically rendered by renderCategorizedSidebar() -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- ADD PROJECT MODAL                                                 -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal fade" id="addProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus"></i> Add New Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProjectForm">
+                        <div class="form-group">
+                            <label>Project Title *</label>
+                            <input type="text" class="form-control" id="form-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" id="form-description" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>Owner Name *</label>
+                                <input type="text" class="form-control" id="form-owner-name" required onchange="handleOwnerNameChange(this)">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Owner ID *</label>
+                                <input type="text" class="form-control" id="form-owner-id" required onchange="handleOwnerIdChange(this)">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>Business Area *</label>
+                                <select class="form-select" id="form-business-area" required>
+                                    <option value="">Loading options...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Health Status *</label>
+                                <select class="form-select" id="form-health-status" required>
+                                    <option value="">Select...</option>
+                                    <option value="On Track">On Track</option>
+                                    <option value="At Risk">At Risk</option>
+                                    <option value="Off Track">Off Track</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Latest Update</label>
+                            <textarea class="form-control" id="form-latest-update" rows="3" placeholder="Enter the initial project update..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitProjectForm()">Create Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- EDIT PROJECT MODAL                                                -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal fade" id="editProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit"></i> Edit Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProjectForm">
+                        <div class="form-group">
+                            <label>Project Title *</label>
+                            <input type="text" class="form-control" id="edit-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" id="edit-description" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>Owner Name *</label>
+                                <input type="text" class="form-control" id="edit-owner-name" required onchange="handleOwnerNameChange(this)">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Owner ID *</label>
+                                <input type="text" class="form-control" id="edit-owner-id" required onchange="handleOwnerIdChange(this)">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>Business Area *</label>
+                                <input type="text" class="form-control" id="edit-business-area" required>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Health Status *</label>
+                                <select class="form-select" id="edit-health-status" required>
+                                    <option value="">Select...</option>
+                                    <option value="On Track">On Track</option>
+                                    <option value="At Risk">At Risk</option>
+                                    <option value="Off Track">Off Track</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Latest Update *</label>
+                            <textarea class="form-control" id="edit-latest-update" rows="3" placeholder="Enter the latest project update..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">📋 Previous Updates</label>
+                            <div id="previous-updates-list" style="max-height: 200px; overflow-y: auto; padding: 0.75rem; background: var(--gray-100); border-radius: 6px; border: 1px solid var(--gray-300);">
+                                <div style="color: var(--gray-600); font-style: italic;">Loading update history...</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditProjectForm()">Update Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- PROJECT DETAIL MODAL (View Only with Edit Option)                 -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal fade" id="projectDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-folder"></i> <span id="detail-project-title"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div style="display: grid; gap: 1rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="font-weight: bold; color: var(--gray-700);">Business Area</label>
+                                <div style="padding: 0.75rem; background: var(--gray-100); border-radius: 6px; margin-top: 0.25rem;" id="detail-business-area"></div>
+                            </div>
+                            <div>
+                                <label style="font-weight: bold; color: var(--gray-700);">Health Status</label>
+                                <div style="padding: 0.75rem; background: var(--gray-100); border-radius: 6px; margin-top: 0.25rem;" id="detail-health-status"></div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="font-weight: bold; color: var(--gray-700);">Owner</label>
+                                <div style="padding: 0.75rem; background: var(--gray-100); border-radius: 6px; margin-top: 0.25rem;" id="detail-owner"></div>
+                            </div>
+                            <div>
+                                <label style="font-weight: bold; color: var(--gray-700);">Project Status</label>
+                                <div style="padding: 0.75rem; background: var(--gray-100); border-radius: 6px; margin-top: 0.25rem;" id="detail-status"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-weight: bold; color: var(--gray-700);">Latest Update</label>
+                            <div style="padding: 0.75rem; background: var(--gray-100); border-radius: 6px; margin-top: 0.25rem;" id="detail-latest-update"></div>
+                        </div>
+                        <div id="data-bridge-notice" style="display: none; padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; color: #856404;">
+                            <i class="fas fa-info-circle"></i> <strong>Note:</strong> This project is managed in an external system. You'll need to update it there.
+                            <a href="#" id="data-bridge-link" target="_blank" style="color: #0056b3; text-decoration: underline;">View in Data Bridge</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="detail-edit-btn" onclick="editProject(document.getElementById('detail-project-id').value)">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="detail-project-id">
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- LINKS MODAL (Manage Links - from For You Page)                    -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div id="linksModal" class="nested-modal">
+        <div class="nested-modal-content">
+            <div class="nested-modal-header">
+                <h5>Manage Links</h5>
+                <button class="nested-modal-close" onclick="closeLinksModal()">✕</button>
+            </div>
+            <div class="nested-modal-body">
+                <div style="display: grid; gap: 10px;">
+                    <div class="available-link-item" onclick="selectLinksOption('manage')"><strong>📝 Manage</strong><div style="font-size: 0.85rem; color: #666;">Edit or remove existing links</div></div>
+                    <div class="available-link-item" onclick="selectLinksOption('browse')"><strong>🔗 Browse & Add</strong><div style="font-size: 0.85rem; color: #666;">Browse available tools and add new links</div></div>
+                    <div class="available-link-item" onclick="selectLinksOption('create')"><strong>➕ Create Custom</strong><div style="font-size: 0.85rem; color: #666;">Create a custom link</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Links Modal -->
+    <div id="manageLinksModal" class="nested-modal">
+        <div class="nested-modal-content" style="max-height: 70vh; overflow-y: auto;">
+            <div class="nested-modal-header">
+                <h5>Manage Your Links</h5>
+                <button class="nested-modal-close" onclick="closeManageLinksModal()">✕</button>
+            </div>
+            <div class="nested-modal-body">
+                <div id="manageLinksContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Browse Links Modal -->
+    <div id="browseLinksModal" class="nested-modal">
+        <div class="nested-modal-content">
+            <div class="nested-modal-header">
+                <h5>Browse Available Links</h5>
+                <button class="nested-modal-close" onclick="closeBrowseLinksModal()">✕</button>
+            </div>
+            <div class="nested-modal-body">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                    <div class="available-link-item" onclick="addLink('GitHub Repos')" title="GitHub - Version Control"><i class="fab fa-github"></i><div>GitHub Repos</div></div>
+                    <div class="available-link-item" onclick="addLink('Jira Board')" title="Jira - Issue Tracking"><i class="fab fa-jira"></i><div>Jira Board</div></div>
+                    <div class="available-link-item" onclick="addLink('Confluence Portal')" title="Confluence - Documentation"><i class="fab fa-confluence"></i><div>Confluence</div></div>
+                    <div class="available-link-item" onclick="addLink('Help Desk')" title="Help Desk - Support"><i class="fa fa-headset"></i><div>Help Desk</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Custom Link Modal -->
+    <div id="createLinkModal" class="nested-modal">
+        <div class="nested-modal-content">
+            <div class="nested-modal-header">
+                <h5>Create Custom Link</h5>
+                <button class="nested-modal-close" onclick="closeCreateLinkModal()">✕</button>
+            </div>
+            <div class="nested-modal-body">
+                <div style="display: grid; gap: 12px;">
+                    <div>
+                        <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Link Name *</label>
+                        <input type="text" id="custom-link-name" placeholder="e.g., My Dashboard" style="width: 100%; padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: 4px;">
+                    </div>
+                    <div>
+                        <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">URL *</label>
+                        <input type="url" id="custom-link-url" placeholder="https://example.com" style="width: 100%; padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: 4px;">
+                    </div>
+                    <div>
+                        <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Category</label>
+                        <select id="custom-link-cat" style="width: 100%; padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: 4px;">
+                            <option value="Tools">Tools</option>
+                            <option value="Docs">Docs</option>
+                            <option value="Resources">Resources</option>
+                            <option value="Internal">Internal</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px;">
+                        <button onclick="closeCreateLinkModal()" style="padding: 8px 16px; background: var(--gray-300); color: var(--gray-700); border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+                        <button onclick="saveCustomLink()" style="padding: 8px 16px; background: var(--walmart-blue); color: white; border: none; border-radius: 4px; cursor: pointer;">Create Link</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ══════════════════════════════════════════════════════════════════
+        // NAVIGATION & UI HELPERS                                          
+        // ══════════════════════════════════════════════════════════════════
+        
+        const API_BASE = "/api";
+        const CURRENT_USER_ID = 'krush';  // Current logged-in user
+        let currentEditProjectId = null;
+        let allProjects = [];  // Store all projects for detail modal
+        
+        // Initialize user links - load from localStorage
+        let userLinks = [];
+        function initializeLinks() {
+            const saved = localStorage.getItem('activity-hub-links');
+            if (saved) {
+                try {
+                    userLinks = JSON.parse(saved);
+                } catch (e) {
+                    userLinks = [];
+                }
+            }
+            renderCategorizedSidebar();
+        }
+        
+        // Persist links to localStorage
+        function syncLinksToStorage() {
+            localStorage.setItem('activity-hub-links', JSON.stringify(userLinks));
+        }
+
+        // Navigation handler
+        function navigateTo(event, url) {
+            event.preventDefault();
+            window.location.href = url;
+        }
+
+        // Set active nav item
+        function setActiveNav() {
+            const currentPath = window.location.pathname;
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href === currentPath) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // SIDEBAR LINKS - Matches For You Page                             
+        // ══════════════════════════════════════════════════════════════════
+
+        // Set default links if userLinks is empty (initialized above as let userLinks = [])
+        const defaultLinks = [
+            { name: 'GitHub Repos', url: 'https://github.com/walmart', category: 'Tools', privacy: 'shared' },
+            { name: 'Jira Board', url: 'https://jira.walmart.com/projects', category: 'Tools', privacy: 'private' },
+            { name: 'Confluence Portal', url: 'https://confluence.walmart.com/display/home', category: 'Docs', privacy: 'public' },
+            { name: 'Help Desk', url: 'https://helpdesk.walmart.com', category: 'Internal', privacy: 'public' }
+        ];
+        
+        // If userLinks is empty, populate with defaults
+        if (userLinks.length === 0) {
+            userLinks.push(...defaultLinks);
+        }
+
+        // Render categorized sidebar
+        function renderCategorizedSidebar() {
+            const container = document.getElementById('sidebarLinksContainer');
+            if (!container) return;
+
+            // Group links by category
+            const categories = {};
+            userLinks.forEach(link => {
+                const cat = link.category || 'Other';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(link);
+            });
+
+            // Fixed category order
+            const catOrder = ['Tools', 'Docs', 'Resources', 'Internal'];
+            const sortedCats = catOrder.filter(c => categories[c]).concat(
+                Object.keys(categories).filter(c => !catOrder.includes(c))
+            );
+
+            let html = '';
+            sortedCats.forEach(cat => {
+                html += '<div class="sidebar-category" data-category="' + cat + '">';
+                html += '<div class="sidebar-category-header" onclick="toggleSidebarCategory(\'' + cat + '\')">';
+                html += '<span>' + cat + '</span>';
+                html += '<span class="sidebar-category-chevron">▼</span>';
+                html += '</div>';
+                html += '<div class="sidebar-category-links">';
+
+                categories[cat].forEach(link => {
+                    html += '<div class="sidebar-link-card" onclick="window.open(\'' + link.url.replace(/'/g, "\\'") + '\', \'_blank\')">';
+                    html += '<div class="sidebar-link-name">' + link.name + '</div>';
+                    html += '</div>';
+                });
+
+                html += '</div></div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // LINK MANAGEMENT FUNCTIONS                                        
+        // ══════════════════════════════════════════════════════════════════
+
+        // Open links management modal
+        function openLinksModal() {
+            document.getElementById('linksModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close links modal
+        function closeLinksModal() {
+            document.getElementById('linksModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Select links option (manage, browse, or create)
+        function selectLinksOption(option) {
+            closeLinksModal();
+            
+            switch(option) {
+                case 'manage':
+                    renderManageLinks();
+                    document.getElementById('manageLinksModal').classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    break;
+                case 'browse':
+                    document.getElementById('browseLinksModal').classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    break;
+                case 'create':
+                    document.getElementById('createLinkModal').classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    break;
+            }
+        }
+
+        // Close modals
+        function closeCreateLinkModal() {
+            document.getElementById('createLinkModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeManageLinksModal() {
+            document.getElementById('manageLinksModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeBrowseLinksModal() {
+            document.getElementById('browseLinksModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Add link from browse list
+        function addLink(linkName) {
+            const availableLinkMap = {
+                'GitHub Repos': { url: 'https://github.com/walmart', category: 'Tools', privacy: 'shared' },
+                'Jira Board': { url: 'https://jira.walmart.com/projects', category: 'Tools', privacy: 'private' },
+                'Confluence Portal': { url: 'https://confluence.walmart.com/display/home', category: 'Docs', privacy: 'public' },
+                'Help Desk': { url: 'https://helpdesk.walmart.com', category: 'Internal', privacy: 'public' }
+            };
+            
+            if (availableLinkMap[linkName]) {
+                const linkData = availableLinkMap[linkName];
+                userLinks.push({
+                    name: linkName,
+                    url: linkData.url,
+                    category: linkData.category,
+                    privacy: linkData.privacy
+                });
+                syncLinksToStorage();
+                renderCategorizedSidebar();
+                closeBrowseLinksModal();
+                alert('✅ Added "' + linkName + '" to your links sidebar!');
+            }
+        }
+
+        // Render manage links modal content
+        function renderManageLinks() {
+            const container = document.getElementById('manageLinksContainer');
+            let html = '<p style="color: var(--gray-600); margin-bottom: 1rem;">Click Edit to modify, or click Delete to remove</p>';
+            
+            userLinks.forEach((link, index) => {
+                const privacyClass = 'link-badge-' + link.privacy;
+                html += '<div class="link-item" id="link-item-' + index + '">' +
+                    '<div class="link-info">' +
+                    '<div class="link-title">' + link.name + '</div>' +
+                    '<div class="link-url">' + link.url + '</div>' +
+                    '<div class="link-meta">' +
+                    '<span class="link-badge ' + privacyClass + '">' + (link.privacy.charAt(0).toUpperCase() + link.privacy.slice(1)) + '</span>' +
+                    '<span style="font-size: 0.75rem; color: var(--gray-600); margin-left: 6px;">' + (link.category || 'Other') + '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="link-actions">' +
+                    '<button class="link-btn" onclick="showEditLinkForm(' + index + ')">✏️ Edit</button>' +
+                    '<button class="link-btn" style="color: #EF4444;" onclick="deleteLink(' + index + ')">🗑️ Delete</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div id="edit-link-form-' + index + '" style="display: none; padding: 12px 16px; margin: -4px 0 8px; background: #F7FAFC; border: 1px solid var(--gray-300); border-radius: 8px;">' +
+                    '<div style="display: grid; gap: 10px;">' +
+                    '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Name</label>' +
+                    '<input type="text" id="edit-link-name-' + index + '" value="' + link.name.replace(/"/g, '&quot;') + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;"></div>' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">URL</label>' +
+                    '<input type="url" id="edit-link-url-' + index + '" value="' + link.url.replace(/"/g, '&quot;') + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;"></div>' +
+                    '</div>' +
+                    '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Category</label>' +
+                    '<select id="edit-link-cat-' + index + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;">' +
+                    ['Docs','Tools','Resources','Internal'].map(c => '<option value="' + c + '"' + (link.category === c ? ' selected' : '') + '>' + c + '</option>').join('') +
+                    '</select></div>' +
+                    '<div><label style="font-size: 0.8rem; font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 4px;">Privacy</label>' +
+                    '<select id="edit-link-priv-' + index + '" style="width: 100%; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.85rem;">' +
+                    ['private','shared','public'].map(p => '<option value="' + p + '"' + (link.privacy === p ? ' selected' : '') + '>' + p.charAt(0).toUpperCase() + p.slice(1) + '</option>').join('') +
+                    '</select></div>' +
+                    '</div>' +
+                    '<div style="display: flex; gap: 8px; justify-content: flex-end;">' +
+                    '<button onclick="cancelEditLink(' + index + ')" style="padding: 6px 14px; background: var(--gray-300); color: var(--gray-700); border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Cancel</button>' +
+                    '<button onclick="saveEditLink(' + index + ')" style="padding: 6px 14px; background: var(--walmart-blue-dark); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Save</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Show/hide edit form
+        function showEditLinkForm(index) {
+            document.querySelectorAll('[id^="edit-link-form-"]').forEach(f => f.style.display = 'none');
+            document.getElementById('edit-link-form-' + index).style.display = 'block';
+        }
+
+        function cancelEditLink(index) {
+            document.getElementById('edit-link-form-' + index).style.display = 'none';
+        }
+
+        // Save edited link
+        function saveEditLink(index) {
+            const name = document.getElementById('edit-link-name-' + index).value.trim();
+            const url = document.getElementById('edit-link-url-' + index).value.trim();
+            const category = document.getElementById('edit-link-cat-' + index).value;
+            const privacy = document.getElementById('edit-link-priv-' + index).value;
+
+            if (!name || !url) { alert('Name and URL are required'); return; }
+
+            userLinks[index].name = name;
+            userLinks[index].url = url;
+            userLinks[index].category = category;
+            userLinks[index].privacy = privacy;
+            syncLinksToStorage();
+            renderCategorizedSidebar();
+            renderManageLinks();
+        }
+
+        // Delete link
+        function deleteLink(index) {
+            if (confirm('Are you sure you want to delete "' + userLinks[index].name + '"?')) {
+                userLinks.splice(index, 1);
+                syncLinksToStorage();
+                renderCategorizedSidebar();
+                renderManageLinks();
+            }
+        }
+
+        // Save custom link
+        function saveCustomLink() {
+            const name = document.getElementById('custom-link-name').value.trim();
+            const url = document.getElementById('custom-link-url').value.trim();
+            const category = document.getElementById('custom-link-cat').value;
+
+            if (!name || !url) { alert('Name and URL are required'); return; }
+
+            userLinks.push({
+                name: name,
+                url: url,
+                category: category,
+                privacy: 'private'
+            });
+            syncLinksToStorage();
+            renderCategorizedSidebar();
+            closeCreateLinkModal();
+            document.getElementById('custom-link-name').value = '';
+            document.getElementById('custom-link-url').value = '';
+            alert('✅ Link created successfully!');
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // PROJECTS DASHBOARD LOGIC                                         
+        // ══════════════════════════════════════════════════════════════════
+
+        // Detect if page is in iframe and add class to body
+        if (window.self !== window.top) {
+            document.body.classList.add('in-iframe');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setActiveNav();
+            initializeLinks();  // Load links from localStorage
+            loadProjects();
+            populateBusinessAreaFilter();
+            populateBusinessAreaDropdown();  // Load options for Add Project form
+        });
+
+        // Load projects from API
+        async function loadProjects() {
+            try {
+                const businessArea = document.getElementById('filter-business-area').value;
+                const health = document.getElementById('filter-health').value;
+                const status = document.getElementById('filter-status').value;
+                const owner = document.getElementById('filter-owner').value;
+
+                let url = `${API_BASE}/projects`;
+                const params = new URLSearchParams();
+                
+                if (businessArea) params.append('business_area', businessArea);
+                if (health) params.append('health_status', health);
+                if (status) params.append('status', status);
+                if (owner) params.append('owner_name', owner);
+                
+                if (params.toString()) url += '?' + params.toString();
+
+                const response = await fetch(url);
+                const data = await response.json();
+                const projects = data.projects || data;
+                
+                // Store for detail modal access
+                allProjects = projects;
+
+                // Load metrics
+                const metricsResponse = await fetch(`${API_BASE}/projects/metrics`);
+                const metricsData = await metricsResponse.json();
+                const metrics = metricsData.metrics || metricsData;
+                updateMetrics(metrics);
+
+                // Populate business area filter
+                populateBusinessAreaFilter(projects);
+
+                // Display projects
+                displayProjects(projects);
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                showError('Failed to load projects');
+            }
+        }
+
+        // Update dashboard metrics
+        function updateMetrics(metrics) {
+            document.getElementById('metric-projects').textContent = metrics.active_projects;
+            document.getElementById('metric-owners').textContent = metrics.unique_owners;
+            document.getElementById('metric-updated').textContent = metrics.projects_updated_this_week;
+            document.getElementById('metric-percent').textContent = metrics.percent_updated.toFixed(1) + '%';
+        }
+
+        // Display projects in table
+        function displayProjects(projects) {
+            const table = document.getElementById('projects-table');
+            
+            if (!projects || projects.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p style="margin-top: 10px;">No projects found matching your filters.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Populate owner filter
+            populateOwnerFilter(projects);
+
+            let rows = [];
+            for (let i = 0; i < projects.length; i++) {
+                const project = projects[i];
+                const isOwner = project.owner_id === CURRENT_USER_ID;
+                const actionBtn = isOwner ? 
+                    `<button class="btn btn-sm btn-primary" onclick="editProject('${project.impact_id}')"><i class="fas fa-edit"></i> Edit</button>` :
+                    `<span style="color: #999; font-size: 12px;">Owner only</span>`;
+                
+                rows.push(`
+                    <tr style="cursor: pointer;" data-project-id="${project.impact_id}" data-project-title="${project.title.replace(/"/g, '&quot;')}">
+                        <td><strong>${project.title}</strong></td>
+                        <td>${project.business_area}</td>
+                        <td>${project.owner_name}</td>
+                        <td>${getHealthBadge(project.health_status)}</td>
+                        <td><small>${project.latest_update ? project.latest_update.substring(0,50) : 'N/A'}</small></td>
+                        <td>
+                            ${project.current_wm_week_update ? 
+                                '<span style="background: #d4edda; color: #38A169; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold;"><i class="fas fa-check"></i> Updated</span>' :
+                                '<span style="background: #f8d7da; color: #E53E3E; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold;"><i class="fas fa-exclamation-circle"></i> Not Updated</span>'
+                            }
+                        </td>
+                        <td onclick="event.stopPropagation();">${actionBtn}</td>
+                    </tr>
+                `);
+            }
+            
+            table.innerHTML = rows.join('');
+            
+            // Add click handlers to rows
+            document.querySelectorAll('[data-project-id]').forEach(row => {
+                row.addEventListener('click', function() {
+                    const id = this.getAttribute('data-project-id');
+                    const title = this.getAttribute('data-project-title');
+                    showProjectDetail(id, title);
+                });
+            });
+        }
+
+        // Show project detail modal
+        function showProjectDetail(projectId, projectTitle) {
+            const project = allProjects.find(p => p.impact_id === projectId);
+            if (!project) return;
+
+            // Populate modal
+            document.getElementById('detail-project-id').value = projectId;
+            document.getElementById('detail-project-title').textContent = projectTitle;
+            document.getElementById('detail-business-area').textContent = project.business_area;
+            document.getElementById('detail-health-status').innerHTML = getHealthBadge(project.health_status);
+            document.getElementById('detail-owner').textContent = `${project.owner_name} (${project.owner_id})`;
+            document.getElementById('detail-status').textContent = project.project_status || 'N/A';
+            document.getElementById('detail-latest-update').textContent = project.latest_update || 'N/A';
+
+            // Show/hide Edit button based on ownership
+            const editBtn = document.getElementById('detail-edit-btn');
+            const isOwner = project.owner_id === CURRENT_USER_ID;
+            editBtn.style.display = isOwner ? 'inline-block' : 'none';
+
+            // Show Data Bridge notice if applicable
+            const dataBridgeNotice = document.getElementById('data-bridge-notice');
+            dataBridgeNotice.style.display = 'none';  // Only show if project.source === 'data-bridge'
+
+            // Show modal
+            new bootstrap.Modal(document.getElementById('projectDetailModal')).show();
+        }
+
+        // Get health status badge HTML
+        function getHealthBadge(health) {
+            const healthLower = (health || '').toLowerCase();
+            let className = 'health-on-track';
+            let displayText = 'On Track';
+            
+            if (healthLower.includes('at risk') || healthLower.includes('yellow')) {
+                className = 'health-at-risk';
+                displayText = 'At Risk';
+            } else if (healthLower.includes('off track') || healthLower.includes('red')) {
+                className = 'health-off-track';
+                displayText = 'Off Track';
+            }
+            
+            return `<span class="${className}">${displayText}</span>`;
+        }
+
+        // Populate owner filter
+        function populateOwnerFilter(projects) {
+            const filterSelect = document.getElementById('filter-owner');
+            if (!projects || projects.length === 0) return;
+
+            const owners = [...new Set(projects.map(p => p.owner_name))].sort();
+            const existingValue = filterSelect.value;
+
+            // Keep existing options (first is "All Owners")
+            const currentOptions = Array.from(filterSelect.options).map(o => o.textContent);
+            
+            owners.forEach(owner => {
+                if (!currentOptions.includes(owner)) {
+                    const option = document.createElement('option');
+                    option.value = owner;
+                    option.textContent = owner;
+                    filterSelect.appendChild(option);
+                }
+            });
+
+            filterSelect.value = existingValue;
+        }
+
+        // Populate business area filter
+        function populateBusinessAreaFilter(projects) {
+            const filterSelect = document.getElementById('filter-business-area');
+            if (!projects || projects.length === 0) return;
+
+            const areas = [...new Set(projects.map(p => p.business_area))].sort();
+            const existingValue = filterSelect.value;
+
+            // Keep existing options (first is "All Areas")
+            const currentOptions = Array.from(filterSelect.options).map(o => o.value);
+            
+            areas.forEach(area => {
+                if (!currentOptions.includes(area)) {
+                    const option = document.createElement('option');
+                    option.value = area;
+                    option.textContent = area;
+                    filterSelect.appendChild(option);
+                }
+            });
+
+            filterSelect.value = existingValue;
+        }
+
+        // Load Business Area options from Data Bridge for Add Project form
+        async function populateBusinessAreaDropdown() {
+            const select = document.getElementById('form-business-area');
+            if (!select) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/business-areas`);
+                if (!response.ok) {
+                    console.warn('Could not fetch business areas, falling back to manual entry');
+                    select.innerHTML = '<option value="">Select or enter area...</option>';
+                    return;
+                }
+
+                const data = await response.json();
+                if (!data.business_areas || data.business_areas.length === 0) {
+                    select.innerHTML = '<option value="">No areas available</option>';
+                    return;
+                }
+
+                // Clear and rebuild options
+                select.innerHTML = '<option value="">Select a Business Area...</option>';
+                
+                data.business_areas.forEach(area => {
+                    const option = document.createElement('option');
+                    option.value = area;
+                    option.textContent = area;
+                    select.appendChild(option);
+                });
+
+                console.info(`Loaded ${data.business_areas.length} business areas from API`);
+            } catch (error) {
+                console.error('Error loading business areas:', error);
+                select.innerHTML = '<option value="">Error loading areas</option>';
+            }
+        }
+
+        // Show add project modal
+        function showAddProjectModal() {
+            document.getElementById('form-title').value = '';
+            document.getElementById('form-description').value = '';
+            document.getElementById('form-owner-name').value = 'Kendall Rush';
+            document.getElementById('form-owner-id').value = 'krush';
+            document.getElementById('form-business-area').value = '';
+            document.getElementById('form-health-status').value = '';
+            document.getElementById('form-latest-update').value = '';
+            new bootstrap.Modal(document.getElementById('addProjectModal')).show();
+        }
+
+        // Handle owner name change
+        function handleOwnerNameChange(inputElement) {
+            // Find the corresponding owner-id field
+            const form = inputElement.closest('form');
+            const ownerIdField = form.querySelector('[id$="-owner-id"]');
+            if (ownerIdField) {
+                ownerIdField.value = '';
+                // Could add autocomplete lookup here
+            }
+        }
+
+        // Handle owner ID change
+        function handleOwnerIdChange(inputElement) {
+            // Find the corresponding owner-name field
+            const form = inputElement.closest('form');
+            const ownerNameField = form.querySelector('[id$="-owner-name"]');
+            if (ownerNameField) {
+                ownerNameField.value = '';
+                // Could add autocomplete lookup here
+            }
+        }
+
+        // Submit add project form
+        async function submitProjectForm() {
+            const title = document.getElementById('form-title').value;
+            const description = document.getElementById('form-description').value;
+            const ownerName = document.getElementById('form-owner-name').value;
+            const ownerId = document.getElementById('form-owner-id').value;
+            const businessArea = document.getElementById('form-business-area').value;
+            const healthStatus = document.getElementById('form-health-status').value;
+            const latestUpdate = document.getElementById('form-latest-update').value;
+
+            if (!title || !ownerName || !ownerId || !businessArea || !healthStatus) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/projects`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        owner_name: ownerName,
+                        owner_id: ownerId,
+                        business_area: businessArea,
+                        health_status: healthStatus,
+                        latest_update: latestUpdate
+                    })
+                });
+
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
+                    loadProjects();
+                } else {
+                    throw new Error('Failed to create project');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error creating project');
+            }
+        }
+
+        // Convert health status value for form display
+        function normalizeHealthStatus(status) {
+            const statusLower = (status || '').toLowerCase().trim();
+            if (statusLower.includes('green') || statusLower.includes('track')) return 'On Track';
+            if (statusLower.includes('yellow') || statusLower.includes('risk')) return 'At Risk';
+            if (statusLower.includes('red') || statusLower.includes('off')) return 'Off Track';
+            return status || '';
+        }
+        
+        // Edit project
+        async function editProject(projectId) {
+            try {
+                // Find project in already-loaded allProjects array
+                const project = allProjects.find(p => p.impact_id === projectId);
+                
+                if (!project) {
+                    alert('Project not found');
+                    return;
+                }
+                
+                // Close detail modal first
+                const detailModal = bootstrap.Modal.getInstance(document.getElementById('projectDetailModal'));
+                if (detailModal) {
+                    detailModal.hide();
+                }
+                
+                currentEditProjectId = projectId;
+                document.getElementById('edit-title').value = project.title;
+                document.getElementById('edit-description').value = project.description || '';
+                document.getElementById('edit-owner-name').value = project.owner_name;
+                document.getElementById('edit-owner-id').value = project.owner_id;
+                document.getElementById('edit-business-area').value = project.business_area;
+                // Normalize health status value to match form options
+                document.getElementById('edit-health-status').value = normalizeHealthStatus(project.health_status);
+                document.getElementById('edit-latest-update').value = project.latest_update || '';
+                
+                // Display previous updates (if stored)
+                displayPreviousUpdates(projectId);
+                
+                // Wait a moment for detail modal to close, then show edit modal
+                setTimeout(() => {
+                    const modal = new bootstrap.Modal(document.getElementById('editProjectModal'));
+                    modal.show();
+                }, 200);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error loading project: ' + error.message);
+            }
+        }
+
+        // Submit edit project form
+        async function submitEditProjectForm() {
+            const title = document.getElementById('edit-title').value;
+            const description = document.getElementById('edit-description').value;
+            const ownerName = document.getElementById('edit-owner-name').value;
+            const ownerId = document.getElementById('edit-owner-id').value;
+            const businessArea = document.getElementById('edit-business-area').value;
+            const healthStatus = document.getElementById('edit-health-status').value;
+            const latestUpdate = document.getElementById('edit-latest-update').value;
+
+            if (!title || !ownerName || !ownerId || !businessArea || !healthStatus) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/projects/${currentEditProjectId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        owner_name: ownerName,
+                        owner_id: ownerId,
+                        business_area: businessArea,
+                        health_status: healthStatus,
+                        latest_update: latestUpdate
+                    })
+                });
+
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('editProjectModal')).hide();
+                    loadProjects();
+                } else {
+                    throw new Error('Failed to update project');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error updating project');
+            }
+        }
+        
+        // Display previous updates
+        function displayPreviousUpdates(projectId) {
+            const updatesContainer = document.getElementById('previous-updates-list');
+            if (!updatesContainer) return;
+            
+            // Clear previous content
+            updatesContainer.innerHTML = '';
+            
+            // Get the current project
+            const project = allProjects.find(p => p.impact_id === projectId);
+            if (!project) return;
+            
+            // For now, show the latest update date if available
+            // In the future, this could show full history from a updates_history table
+            if (project.latest_update_date) {
+                const updateDate = new Date(project.latest_update_date).toLocaleDateString();
+                updatesContainer.innerHTML += `
+                    <div style="padding: 0.75rem; background: #f8f9fa; border-left: 3px solid var(--walmart-blue); margin-bottom: 0.5rem; border-radius: 4px;">
+                        <div style="font-weight: 600; color: var(--gray-700);">${updateDate}</div>
+                        <div style="color: var(--gray-600); margin-top: 0.25rem;">${project.latest_update || '(No update text)'}</div>
+                    </div>
+                `;
+            } else {
+                updatesContainer.innerHTML = '<div style="color: var(--gray-600); font-style: italic;">No previous updates</div>';
+            }
+        }
+
+        // Generate PPT report
+        async function generatePPT() {
+            try {
+                const status = document.getElementById('filter-status').value || 'Active';
+                const response = await fetch(`${API_BASE}/generate-ppt?status=${status}`);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `projects-report-${new Date().toISOString().split('T')[0]}.pptx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    const errorText = await response.text();
+                    console.error('PPT Generation Error:', response.status, errorText);
+                    throw new Error(`Failed to generate PPT (${response.status}): ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Error generating PPT:', error);
+                alert('Error generating PPT report: ' + error.message);
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const table = document.getElementById('projects-table');
+            table.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px; color: #E53E3E;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
+                        ${message}
+                    </td>
+                </tr>
+            `;
+        }
+    </script>
+</body>
+</html>
