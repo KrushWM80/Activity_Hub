@@ -1346,7 +1346,7 @@ async def get_requests(request: Request, status: Optional[str] = None):
 
 @app.put("/api/requests/{request_id}")
 async def update_request(request_id: int, request: Request):
-    """Update request - admin can change status, owner can edit details"""
+    """Update request - admin can edit any field with audit log, owner can edit details if pending"""
     user = require_auth(request)
     data = await request.json()
     
@@ -1356,12 +1356,62 @@ async def update_request(request_id: int, request: Request):
             is_admin = user.get("role") == "admin"
             is_owner = req["requested_by"] == user["username"]
             
-            # Admin can change status
-            if is_admin and "status" in data:
+            # Initialize audit log if not present
+            if "audit_log" not in req:
+                req["audit_log"] = []
+            
+            # Initialize admin comments if not present
+            if "admin_comments" not in req:
+                req["admin_comments"] = ""
+            
+            # Admin can edit any field with audit logging
+            if is_admin and data.get("admin_override"):
+                admin_changes = []
+                
+                # Track which fields were changed
+                editable_fields = [
+                    "team_name", "team_id", "workgroup_name", "workgroup_id",
+                    "role", "banner_codes", "merch_dept_numbers", "access_level",
+                    "tl_job_code", "tl_job_title", "tl_dept_number", "tl_div_number",
+                    "sl_job_code", "sl_dept_number", "sl_div_number", "sl_job_title",
+                    "notes", "admin_comments"
+                ]
+                
+                for field in editable_fields:
+                    if field in data and data[field] != req.get(field):
+                        admin_changes.append(f"{field}: {req.get(field)} → {data[field]}")
+                        req[field] = data[field]
+                
+                # Add audit log entry
+                change_reason = data.get("change_reason", "Manual admin adjustment")
+                audit_entry = {
+                    "timestamp": datetime.now().isoformat(),
+                    "user": user["name"],
+                    "action": f"Admin edited request: {change_reason}" if change_reason else "Admin edited request",
+                    "changes": admin_changes,
+                    "comments": data.get("admin_comments", "")
+                }
+                req["audit_log"].append(audit_entry)
+                req["admin_comments"] = data.get("admin_comments", req.get("admin_comments", ""))
+                req["last_edited_by"] = user["username"]
+                req["last_edited_at"] = datetime.now().isoformat()
+            
+            # Admin can also change status
+            if is_admin and "status" in data and data["status"] != req.get("status"):
+                old_status = req.get("status", "pending")
                 req["status"] = data["status"]
                 req["admin_notes"] = data.get("admin_notes", req.get("admin_notes", ""))
                 req["processed_by"] = user["username"]
                 req["processed_at"] = datetime.now().isoformat()
+                
+                # Add status change to audit log
+                status_audit = {
+                    "timestamp": datetime.now().isoformat(),
+                    "user": user["name"],
+                    "action": f"Status changed: {old_status} → {data['status']}",
+                    "reason": data.get("admin_notes", "")
+                }
+                req["audit_log"].append(status_audit)
                 
                 # Add to rejection history if rejected
                 if data["status"] == "rejected":
@@ -1374,18 +1424,35 @@ async def update_request(request_id: int, request: Request):
                         rejected_by=user['name']
                     )
             
-            # Owner can edit team/notes if still pending
-            if is_owner and req["status"] == "pending":
-                if "team_name" in data:
+            # Owner can edit team/notes if still pending (no admin override)
+            if is_owner and req["status"] == "pending" and not data.get("admin_override"):
+                owner_changes = []
+                if "team_name" in data and data["team_name"] != req.get("team_name"):
+                    owner_changes.append(f"team_name: {req.get('team_name')} → {data['team_name']}")
                     req["team_name"] = data["team_name"]
-                if "team_id" in data:
+                if "team_id" in data and data["team_id"] != req.get("team_id"):
+                    owner_changes.append(f"team_id: {req.get('team_id')} → {data['team_id']}")
                     req["team_id"] = data["team_id"]
-                if "workgroup_name" in data:
+                if "workgroup_name" in data and data["workgroup_name"] != req.get("workgroup_name"):
+                    owner_changes.append(f"workgroup_name: {req.get('workgroup_name')} → {data['workgroup_name']}")
                     req["workgroup_name"] = data["workgroup_name"]
-                if "workgroup_id" in data:
+                if "workgroup_id" in data and data["workgroup_id"] != req.get("workgroup_id"):
+                    owner_changes.append(f"workgroup_id: {req.get('workgroup_id')} → {data['workgroup_id']}")
                     req["workgroup_id"] = data["workgroup_id"]
-                if "notes" in data:
+                if "notes" in data and data["notes"] != req.get("notes"):
+                    owner_changes.append(f"notes updated")
                     req["notes"] = data["notes"]
+                
+                # Add audit entry for owner changes
+                if owner_changes:
+                    audit_entry = {
+                        "timestamp": datetime.now().isoformat(),
+                        "user": user["name"],
+                        "action": "Request updated by owner",
+                        "changes": owner_changes
+                    }
+                    req["audit_log"].append(audit_entry)
+                
                 req["updated_at"] = datetime.now().isoformat()
             
             if not is_admin and not is_owner:
@@ -2057,7 +2124,43 @@ async def get_rejection_history_for_job_code(job_code: str, request: Request):
         "teaming_rejections": history.get("teaming", {}).get(job_code, [])
     }
 
+# ============================================================
+# BANNER CODES - ELM Datasource Integration
+# ============================================================
 
+@app.get("/api/banner-codes")
+async def get_banner_codes():
+    """
+    Get banner codes from ELM datasource
+    
+    Returns:
+        List of dicts with banner codes and descriptions
+        Format suitable for dropdown population
+    """
+    try:
+        from banner_codes_manager import get_banner_codes_api
+        return get_banner_codes_api()
+    except ImportError:
+        # Fallback to default banner codes if manager not available
+        default_banners = [
+            {"code": "WAL", "desc": "Walmart Supercenter"},
+            {"code": "NHM", "desc": "Neighborhood Market"},
+            {"code": "SAM", "desc": "Sam's Club"},
+            {"code": "HTO", "desc": "Home Town"},
+            {"code": "DVT", "desc": "Discount"},
+            {"code": "O3", "desc": "Aligned"},
+            {"code": "RX", "desc": "Pharmacy"},
+        ]
+        
+        dropdown_options = [f"{b['code']} - {b['desc']}" for b in default_banners]
+        
+        return {
+            'status': 'ok',
+            'banner_codes': default_banners,
+            'dropdown_options': dropdown_options,
+            'total': len(default_banners),
+            'source': 'default'
+        }
 
 # ============================================================
 # /aligned ROUTE - Main Entry Point for Aligned App

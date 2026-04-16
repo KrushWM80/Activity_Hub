@@ -30,5 +30,13 @@
     "timestamp": "2026-01-28T14:25:11.924744",
     "sent": false,
     "error": "timed out"
+  },
+  {
+    "to": "ATCTEAMSUPPORT@walmart.com",
+    "subject": "Comprehensive Teaming Request - 10-38-1849",
+    "body": "\n    <html>\n    <body style=\"font-family: Arial, sans-serif;\">\n    <h2>New Comprehensive Teaming Request</h2>\n    <table border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse;\">\n        <tr><td><strong>Job Code:</strong></td><td>10-38-1849</td></tr>\n        <tr><td><strong>Job Title:</strong></td><td>CF QA Associate 10-38-1849</td></tr>\n        <tr><td><strong>Requested by:</strong></td><td>Kendall Rush (krush)</td></tr>\n        <tr><td><strong>Team:</strong></td><td>Pharmacy</td></tr>\n        <tr><td><strong>Workgroup:</strong></td><td>Pharmacy</td></tr>\n        <tr><td><strong>Role:</strong></td><td>TA</td></tr>\n        <tr><td><strong>Action:</strong></td><td>Add Job Code</td></tr>\n        <tr><td><strong>Banner Codes:</strong></td><td>HTO - Hometown</td></tr>\n        <tr><td><strong>Merch Depts:</strong></td><td>38 - Pharmacy</td></tr>\n        <tr><td><strong>Time:</strong></td><td>2026-04-16 08:16:21</td></tr>\n    </table>\n    <p>Please review and approve in the dashboard admin panel.</p>\n    </body>\n    </html>\n    ",
+    "timestamp": "2026-04-16T08:16:26.629908",
+    "sent": false,
+    "error": "Connection unexpectedly closed: timed out"
   }
 ]

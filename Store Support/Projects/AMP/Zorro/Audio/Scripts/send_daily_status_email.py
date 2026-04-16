@@ -334,8 +334,26 @@ def main():
         cc = None
         logger.info(f"TEST MODE — sending to {TEST_RECIPIENT} only")
     else:
-        to = TO_RECIPIENTS
-        cc = CC_RECIPIENTS
+        to = list(TO_RECIPIENTS)
+        cc = list(CC_RECIPIENTS)
+
+        # On Fridays, add the on-call person to CC
+        if datetime.now().weekday() == 4:  # 4 = Friday
+            try:
+                from oncall_parser import get_oncall_from_calendar
+                oncall = get_oncall_from_calendar()
+                if oncall:
+                    oncall_email = oncall['email']
+                    all_existing = [e.lower() for e in to + cc]
+                    if oncall_email.lower() not in all_existing:
+                        cc.append(oncall_email)
+                        logger.info(f"Friday — added on-call {oncall['name']} ({oncall_email}) to CC")
+                    else:
+                        logger.info(f"Friday — on-call {oncall['name']} already in recipients")
+                else:
+                    logger.info("Friday — no on-call calendar entry found")
+            except Exception as e:
+                logger.warning(f"On-call lookup failed: {e}")
 
     # Send
     result = send_status_email(week, fy, html_body, to, cc)

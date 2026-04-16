@@ -40,5 +40,59 @@
     "admin_notes": "",
     "processed_by": "krush",
     "processed_at": "2026-01-23T13:13:30.783476"
+  },
+  {
+    "id": 4,
+    "type": "comprehensive_teaming",
+    "status": "pending",
+    "requested_by": "krush",
+    "requested_by_name": "Kendall Rush",
+    "requested_at": "2026-04-16T08:16:21.523564",
+    "previous_values": null,
+    "job_code": "10-38-1849",
+    "job_title": "CF QA Associate 10-38-1849",
+    "dept_number": "38",
+    "div_number": "10",
+    "base_division_code": "1849",
+    "team_name": "Pharmacy",
+    "team_id": "1000121",
+    "workgroup_name": "Pharmacy",
+    "workgroup_id": "1000121",
+    "banner_codes": [
+      "O3 - WM On Campus/RX Facilities"
+    ],
+    "merch_dept_numbers": [
+      "38 - Pharmacy"
+    ],
+    "role": "TA",
+    "access_level": [
+      "Hourly",
+      "Salary"
+    ],
+    "tl_job_code": "",
+    "tl_job_title": "",
+    "tl_dept_number": "",
+    "tl_div_number": "",
+    "sl_job_code": "",
+    "sl_dept_number": "",
+    "sl_div_number": "",
+    "sl_job_title": "",
+    "action": "Add Job Code",
+    "notes": "",
+    "audit_log": [
+      {
+        "timestamp": "2026-04-16T11:48:42.813529",
+        "user": "Kendall Rush",
+        "action": "Admin edited request: Manual admin adjustment",
+        "changes": [
+          "banner_codes: ['HTO - Hometown'] \u2192 ['O3 - WM On Campus/RX Facilities']",
+          "admin_comments:  \u2192 Please update the Team to be Vision Center instead of Pharmacy, @kendall. "
+        ],
+        "comments": "Please update the Team to be Vision Center instead of Pharmacy, @kendall. "
+      }
+    ],
+    "admin_comments": "Please update the Team to be Vision Center instead of Pharmacy, @kendall. ",
+    "last_edited_by": "krush",
+    "last_edited_at": "2026-04-16T11:48:42.813543"
   }
 ]

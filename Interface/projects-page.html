@@ -97,9 +97,9 @@
         }
 
         .header h1 {
-            font-size: 24px;
             font-weight: bold;
             margin: 0;
+            font-size: 2rem;
         }
 
         .nav-items {
@@ -175,13 +175,12 @@
 
         .content-area {
             flex: 1;
-            width: calc(100% - 130px);
-            max-width: calc(100vw - 130px);
+            width: calc(100% - 120px);
+            max-width: calc(100vw - 120px);
             padding: var(--space-6);
             display: block;
             background: var(--gray-100);
             position: relative;
-            z-index: 500;
         }
 
         /* ═══════════════════════════════════════════════════════════════ */
@@ -192,16 +191,13 @@
             right: 0;
             top: 88px;
             bottom: 0;
-            width: 130px;
+            width: 120px;
             background: var(--white);
             border-left: 2px solid var(--gray-300);
             overflow-y: auto;
-            z-index: 1001;
-            box-shadow: -2px 0 8px rgba(0,0,0,0.15);
-            padding: 0 0.5rem 1rem 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            z-index: 40;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.08);
+            padding: 1rem 0.5rem;
         }
 
         .sidebar-header {
@@ -209,10 +205,10 @@
             justify-content: space-between;
             align-items: center;
             padding: 0.5rem;
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--gray-900);
             margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--gray-700);
         }
 
         .sidebar-links {
@@ -225,21 +221,20 @@
             background: var(--walmart-blue);
             color: var(--white);
             border: none;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.75rem;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
-            padding: 0;
         }
 
         .sidebar-add-btn:hover {
-            background: #004C91;
+            background: var(--walmart-blue-dark);
             transform: scale(1.1);
         }
 
@@ -530,24 +525,44 @@
         }
 
         .projects-header h1 {
-            color: var(--walmart-blue);
-            font-weight: bold;
-            margin-bottom: var(--space-2);
-            font-size: 32px;
+            display: none;
         }
 
         .projects-header p {
-            color: var(--gray-600);
-            font-size: 16px;
+            display: none;
         }
 
         .metrics-container {
-            display: none;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .metric-box {
             background: var(--white);
             border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--walmart-blue);
+            text-align: center;
+        }
+
+        .metric-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--walmart-blue);
+            line-height: 1.2;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            margin-top: 10px;
+        }
             padding: var(--space-6);
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             border-left: 5px solid var(--walmart-blue);
@@ -711,6 +726,158 @@
             padding: 0.5rem 0.75rem;
             margin-bottom: 1rem;
         }
+
+        /* Dashboard Action Buttons (Dark Mode / Feedback) */
+        .dashboard-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+            position: relative;
+        }
+
+        .dashboard-action-btn {
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .dashboard-action-btn:hover {
+            border-color: var(--walmart-blue);
+            background: var(--walmart-blue-lightest);
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            --gray-100: #1A202C;
+            --gray-300: #2D3748;
+            --gray-600: #A0AEC0;
+            --gray-700: #CBD5E0;
+            --gray-900: #F7FAFC;
+            --white: #2D3748;
+            background-color: #1A202C;
+            color: #F7FAFC;
+        }
+        body.dark-mode .header {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+        }
+        body.dark-mode .header .nav-item { color: #fff; }
+        body.dark-mode .header .nav-item.active { background: rgba(255,255,255,0.2); }
+        body.dark-mode .header .user-section { color: #fff; }
+        body.dark-mode .header h1 { color: #fff; }
+        body.dark-mode .widget, body.dark-mode .metric-box {
+            background: #2D3748;
+            border-color: #4A5568;
+        }
+        body.dark-mode .dashboard-action-btn {
+            background: #2D3748;
+            border-color: #4A5568;
+            color: #F7FAFC;
+        }
+        body.dark-mode .sidebar, body.dark-mode .quick-links-sidebar {
+            background: #2D3748;
+            border-color: #4A5568;
+        }
+        body.dark-mode .filters-container {
+            background: #2D3748;
+            border-color: #4A5568;
+        }
+        body.dark-mode table thead {
+            background: #1A202C;
+        }
+        body.dark-mode table tbody tr {
+            background: #2D3748;
+            border-color: #4A5568;
+        }
+        body.dark-mode table tbody tr:hover {
+            background: #374151;
+        }
+
+        /* Feedback Modal */
+        .fy-feedback-modal {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 380px;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow: hidden;
+        }
+        .fy-feedback-modal.active { display: block; animation: fySlideUp 0.3s ease; }
+        @keyframes fySlideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .fy-feedback-header {
+            background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue) 100%);
+            color: #fff;
+            padding: var(--space-4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .fy-feedback-header h3 { font-size: 1rem; margin: 0; }
+        .fy-feedback-close {
+            background: rgba(255,255,255,0.2); border: none; color: #fff;
+            width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;
+        }
+        .fy-feedback-body { padding: var(--space-6); }
+        .fy-fb-step { display: none; }
+        .fy-fb-step.active { display: block; }
+        .fy-fb-categories { display: flex; flex-direction: column; gap: var(--space-3); }
+        .fy-fb-cat {
+            display: flex; align-items: center; gap: var(--space-3);
+            padding: var(--space-3) var(--space-4); background: #F7FAFC;
+            border: 2px solid transparent; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+        }
+        .fy-fb-cat:hover { background: #E2E8F0; }
+        .fy-fb-cat.selected { border-color: var(--walmart-blue); background: var(--walmart-blue-lightest); }
+        .fy-fb-cat input { display: none; }
+        .fy-fb-cat span { font-size: 1.2rem; }
+        .fy-fb-rating { display: flex; justify-content: space-between; margin: var(--space-6) 0; }
+        .fy-fb-rate {
+            display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; padding: var(--space-2); border-radius: 8px; transition: all 0.2s;
+        }
+        .fy-fb-rate:hover { background: #F7FAFC; }
+        .fy-fb-rate.selected { background: var(--walmart-blue-lightest); }
+        .fy-fb-rate input { display: none; }
+        .fy-fb-rate .r-emoji { font-size: 1.75rem; margin-bottom: var(--space-1); }
+        .fy-fb-rate .r-label { font-size: 0.7rem; color: #718096; }
+        .fy-fb-actions { display: flex; gap: var(--space-3); margin-top: var(--space-4); }
+        .fy-fb-btn-next {
+            flex: 1; background: var(--walmart-navy); color: #fff; border: none;
+            padding: var(--space-3); border-radius: 8px; font-weight: 500; cursor: pointer;
+        }
+        .fy-fb-btn-next:hover { background: var(--walmart-blue); }
+        .fy-fb-btn-btn-back {
+            background: #F7FAFC; color: #4A5568; border: none;
+            padding: var(--space-3) var(--space-4); border-radius: 8px; cursor: pointer;
+        }
+        .fy-fb-success { text-align: center; padding: var(--space-8) var(--space-4); }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: var(--space-3);
+            }
+            .nav-items {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -720,17 +887,14 @@
     <header class="header">
         <div class="header-content">
             <div class="logo-section">
-                <img src="/Spark_Blank.png" alt="Spark" class="spark-logo" onerror="this.src='/activity-hub/static/store-support/General%20Setup/Design/Spark%20Blank.png'>"
+                <img src="/Spark_Blank.png" alt="Spark" class="spark-logo" onerror="this.src='/activity-hub/static/store-support/General%20Setup/Design/Spark%20Blank.png'">
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
-                <a href="/activity-hub/for-you" class="nav-item" onclick="navigateTo(event, '/activity-hub/for-you')">For You</a>
-                <a href="/activity-hub/projects" class="nav-item active" onclick="navigateTo(event, '/activity-hub/projects')">Projects</a>
-                <a href="/activity-hub/reporting" class="nav-item" onclick="navigateTo(event, '/activity-hub/reporting')">Reporting</a>
-                <a href="/activity-hub/teams" class="nav-item" onclick="navigateTo(event, '/activity-hub/teams')">Teams</a>
-                <a href="/activity-hub/my-work" class="nav-item" onclick="navigateTo(event, '/activity-hub/my-work')">My Work</a>
-                <a href="/activity-hub/settings" class="nav-item" onclick="navigateTo(event, '/activity-hub/settings')">Settings</a>
-                <a href="/activity-hub/admin" class="nav-item" onclick="navigateTo(event, '/activity-hub/admin')" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
+                <a href="/activity-hub/for-you" class="nav-item">For You</a>
+                <a href="/activity-hub/projects" class="nav-item active">Projects</a>
+                <a href="/activity-hub/reporting" class="nav-item">Reporting</a>
+                <a href="/activity-hub/admin" class="nav-item" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
             </nav>
             <div class="user-section">
                 <div class="notification-bell">
@@ -748,6 +912,12 @@
     <div class="container-wrapper">
         <!-- PROJECTS CONTENT AREA -->
         <div class="content-area">
+            <!-- Dashboard Action Buttons -->
+            <div class="dashboard-header">
+                <button class="dashboard-action-btn" onclick="toggleProjectsFeedback()" title="Send Feedback">💬</button>
+                <button class="dashboard-action-btn" onclick="toggleDarkMode()" title="Toggle Light/Dark Mode">🌙</button>
+            </div>
+
             <!-- Header -->
             <div class="projects-header">
                 <h1><i class="fas fa-project-diagram"></i> Projects Dashboard</h1>
@@ -779,13 +949,13 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label"><strong>Business Area</strong></label>
-                        <select class="form-select" id="filter-business-area" onchange="loadProjects()">
+                        <select class="form-select" id="filter-business-area" onchange="loadProjects(); loadMetrics();">
                             <option value="">All Areas</option>
                         </select>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label"><strong>Health Status</strong></label>
-                        <select class="form-select" id="filter-health" onchange="loadProjects()">
+                        <select class="form-select" id="filter-health" onchange="loadProjects(); loadMetrics();">
                             <option value="">All Health Statuses</option>
                             <option value="On Track">On Track</option>
                             <option value="At Risk">At Risk</option>
@@ -794,7 +964,7 @@
                     </div>
                     <div class="col-md-2">
                         <label class="form-label"><strong>Status</strong></label>
-                        <select class="form-select" id="filter-status" onchange="loadProjects()">
+                        <select class="form-select" id="filter-status" onchange="loadProjects(); loadMetrics();">
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
                             <option value="">All</option>
@@ -802,28 +972,26 @@
                     </div>
                     <div class="col-md-2">
                         <label class="form-label"><strong>Owner</strong></label>
-                        <select class="form-select" id="filter-owner" onchange="loadProjects()">
+                        <select class="form-select" id="filter-owner" onchange="loadProjects(); loadMetrics();">
                             <option value="">All Owners</option>
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label">&nbsp;</label>
-                        <button class="btn btn-outline-secondary w-100" onclick="location.reload()">
-                            <i class="fas fa-sync-alt"></i> Refresh
+                    <div class="col-md-2" style="display: flex; gap: 8px; align-items: flex-end;">
+                        <label class="form-label" style="width: 100%; margin-bottom: 0;">&nbsp;</label>
+                        <button class="btn btn-outline-secondary" title="Refresh" onclick="location.reload()" style="padding: 10px 12px; border-radius: 6px;">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn btn-warning" title="Generate PPT Report" onclick="generatePPT()" style="padding: 10px 12px; border-radius: 6px;">
+                            <i class="fas fa-file-powerpoint"></i>
+                        </button>
+                        <button class="btn btn-primary" title="Add Project" onclick="showAddProjectModal()" style="padding: 10px 12px; border-radius: 6px;">
+                            <i class="fas fa-plus"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button class="btn btn-warning" onclick="generatePPT()">
-                    <i class="fas fa-file-powerpoint"></i> Generate PPT Report
-                </button>
-                <button class="btn btn-primary" onclick="showAddProjectModal()">
-                    <i class="fas fa-plus"></i> Add Project
-                </button>
-            </div>
+            <!-- Action Buttons (Moved to filters) -->
 
             <!-- Projects Table -->
             <div class="table-container">
@@ -1434,10 +1602,31 @@
         document.addEventListener('DOMContentLoaded', function() {
             setActiveNav();
             initializeLinks();  // Load links from localStorage
+            loadMetrics();      // Load metrics
             loadProjects();
             populateBusinessAreaFilter();
             populateBusinessAreaDropdown();  // Load options for Add Project form
         });
+
+        // Load metrics from API
+        async function loadMetrics() {
+            try {
+                const status = document.getElementById('filter-status').value || 'Active';
+                const response = await fetch(`${API_BASE}/projects/metrics?status=${status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.metrics) {
+                        document.getElementById('metric-projects').textContent = data.metrics.active_projects || 0;
+                        document.getElementById('metric-owners').textContent = data.metrics.unique_owners || 0;
+                        document.getElementById('metric-updated').textContent = data.metrics.projects_updated_this_week || 0;
+                        document.getElementById('metric-percent').textContent = (data.metrics.percent_updated || 0).toFixed(1) + '%';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading metrics:', error);
+            }
+        }
 
         // Load projects from API
         async function loadProjects() {
@@ -1878,7 +2067,12 @@
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `projects-report-${new Date().toISOString().split('T')[0]}.pptx`;
+                    // Calculate Walmart Week (WM WK) matching server calculation
+                    const today = new Date();
+                    const fyStart = new Date(today.getMonth() >= 1 ? today.getFullYear() : today.getFullYear() - 1, 1, 1);
+                    const daysSinceFY = Math.floor((today - fyStart) / (1000 * 60 * 60 * 24));
+                    const wmWeek = Math.floor(daysSinceFY / 7) + 1;
+                    a.download = `WM WK${wmWeek} Projects Overview.pptx`;
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
@@ -1906,6 +2100,136 @@
                 </tr>
             `;
         }
+
+        // ──────────────────────────────────────────────
+        // Dark Mode Toggle
+        // ──────────────────────────────────────────────
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('activity-hub-dark-mode', isDark ? 'true' : 'false');
+            const btn = document.querySelector('.dashboard-action-btn[title="Toggle Light/Dark Mode"]');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        // Restore on load
+        if (localStorage.getItem('activity-hub-dark-mode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.addEventListener('DOMContentLoaded', function() {
+                const btn = document.querySelector('.dashboard-action-btn[title="Toggle Light/Dark Mode"]');
+                if (btn) btn.textContent = '☀️';
+            });
+        }
+
+        // ──────────────────────────────────────────────
+        // Feedback Modal (Projects Page)
+        // ──────────────────────────────────────────────
+        function toggleProjectsFeedback() {
+            document.getElementById('fyFeedbackModal').classList.toggle('active');
+        }
+
+        function fyFbNext() {
+            const sel = document.querySelector('input[name="fy-fb-category"]:checked');
+            if (!sel) { alert('Please select a category'); return; }
+            document.getElementById('fy-fb-step1').classList.remove('active');
+            document.getElementById('fy-fb-step2').classList.add('active');
+        }
+
+        function fyFbBack() {
+            document.getElementById('fy-fb-step2').classList.remove('active');
+            document.getElementById('fy-fb-step1').classList.add('active');
+        }
+
+        function fyFbSubmit() {
+            const rating = document.querySelector('input[name="fy-fb-rating"]:checked');
+            if (!rating) { alert('Please select a rating'); return; }
+            const category = document.querySelector('input[name="fy-fb-category"]:checked').value;
+            const comments = document.getElementById('fyFbComments').value.trim();
+            let feedbackList = [];
+            try { feedbackList = JSON.parse(localStorage.getItem('activity-hub-feedback') || '[]'); } catch {}
+            feedbackList.push({
+                source: 'Projects',
+                category: category,
+                rating: parseInt(rating.value),
+                comments: comments,
+                submittedAt: new Date().toISOString(),
+                submittedBy: 'Current User'
+            });
+            localStorage.setItem('activity-hub-feedback', JSON.stringify(feedbackList));
+            document.getElementById('fy-fb-step2').classList.remove('active');
+            document.getElementById('fy-fb-step3').classList.add('active');
+        }
+
+        function fyFbReset() {
+            document.querySelectorAll('.fy-fb-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('fy-fb-step1').classList.add('active');
+            document.querySelectorAll('input[name="fy-fb-category"], input[name="fy-fb-rating"]').forEach(i => i.checked = false);
+            document.getElementById('fyFbComments').value = '';
+            document.querySelectorAll('.fy-fb-cat, .fy-fb-rate').forEach(el => el.classList.remove('selected'));
+            toggleProjectsFeedback();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.fy-fb-cat').forEach(cat => {
+                cat.addEventListener('click', function() {
+                    document.querySelectorAll('.fy-fb-cat').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            document.querySelectorAll('.fy-fb-rate').forEach(opt => {
+                opt.addEventListener('click', function() {
+                    document.querySelectorAll('.fy-fb-rate').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+        });
     </script>
+
+    <!-- Feedback Modal -->
+    <div id="fyFeedbackModal" class="fy-feedback-modal">
+        <div class="fy-feedback-header">
+            <h3>💬 Send Feedback</h3>
+            <button class="fy-feedback-close" onclick="toggleProjectsFeedback()">×</button>
+        </div>
+        <div class="fy-feedback-body">
+            <div id="fy-fb-step1" class="fy-fb-step active">
+                <p style="margin-bottom: var(--space-4); color: #718096;">What area would you like to give feedback on?</p>
+                <div class="fy-fb-categories">
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Dashboard UI"><span>🎨</span> Dashboard UI</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Projects"><span>📊</span> Projects</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Navigation"><span>🧭</span> Navigation</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Data"><span>📈</span> Data</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Other"><span>💡</span> Other</label>
+                </div>
+                <div class="fy-fb-actions"><button class="fy-fb-btn-next" onclick="fyFbNext()">Next →</button></div>
+            </div>
+            <div id="fy-fb-step2" class="fy-fb-step">
+                <p style="margin-bottom: var(--space-2); color: #718096;">How would you rate this aspect?</p>
+                <div class="fy-fb-rating">
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="1"><span class="r-emoji">😞</span><span class="r-label">Poor</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="2"><span class="r-emoji">😐</span><span class="r-label">Fair</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="3"><span class="r-emoji">😊</span><span class="r-label">Good</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="4"><span class="r-emoji">😄</span><span class="r-label">Great</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="5"><span class="r-emoji">🤩</span><span class="r-label">Excellent</span></label>
+                </div>
+                <div style="margin-bottom: var(--space-3);">
+                    <label style="font-size: 0.85rem; font-weight: 500; color: #4A5568; display: block; margin-bottom: 4px;">Comments (optional)</label>
+                    <textarea id="fyFbComments" style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.9rem; font-family: inherit; resize: vertical;" placeholder="Tell us more..."></textarea>
+                </div>
+                <p class="pci-notice" style="font-size: 0.7rem; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 0.3rem 0.5rem; margin-bottom: 0.5rem;">🔒 Do not enter payment card information.</p>
+                <div class="fy-fb-actions">
+                    <button class="fy-fb-btn-back" onclick="fyFbBack()">← Back</button>
+                    <button class="fy-fb-btn-next" onclick="fyFbSubmit()">Submit</button>
+                </div>
+            </div>
+            <div id="fy-fb-step3" class="fy-fb-step">
+                <div class="fy-fb-success">
+                    <div style="font-size: 3rem; margin-bottom: var(--space-4);">🎉</div>
+                    <h3 style="margin-bottom: var(--space-2);">Thank you!</h3>
+                    <p style="color: #718096; margin-bottom: var(--space-6);">Your feedback helps us improve.</p>
+                    <button class="fy-fb-btn-next" onclick="fyFbReset()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -1566,7 +1566,7 @@
         <div class="dashboard-header">
             <button class="settings-gear" onclick="toggleGearDropdown()" title="Page Settings">⚙️</button>
             <div id="gearDropdown" class="gear-dropdown">
-                <div class="gear-dropdown-item" onclick="enterEditMode()">✏️ Edit For You Page</div>
+                <div class="gear-dropdown-item" onclick="forYouEnterEditMode()">✏️ Edit For You Page</div>
             </div>
         </div>
 
@@ -1576,7 +1576,7 @@
             <div class="edit-toolbar-actions">
                 <button class="edit-btn edit-btn-add" onclick="openAddWidgetModal()">+ Add Widget</button>
                 <button class="edit-btn edit-btn-reset" onclick="resetWidgetLayout()">↩ Reset to Default</button>
-                <button class="edit-btn edit-btn-done" onclick="exitEditMode()">✓ Done Editing</button>
+                <button class="edit-btn edit-btn-done" onclick="forYouExitEditMode()">✓ Done Editing</button>
             </div>
         </div>
 
@@ -2158,7 +2158,7 @@
         // ──────────────────────────────────────────────
         // Edit Mode: Enter / Exit
         // ──────────────────────────────────────────────
-        function enterEditMode() {
+        function forYouEnterEditMode() {
             isEditMode = true;
             document.body.classList.add('edit-mode');
             document.getElementById('gearDropdown').classList.remove('show');
@@ -2170,7 +2170,7 @@
             });
         }
 
-        function exitEditMode() {
+        function forYouExitEditMode() {
             isEditMode = false;
             document.body.classList.remove('edit-mode');
             document.getElementById('editToolbar').classList.remove('show');
@@ -2182,6 +2182,26 @@
             });
 
             saveWidgetConfig();
+        }
+
+        function resizeActivityDashboard() {
+            const widget = document.querySelector('[data-widget-id="activity-dashboard"]');
+            if (widget) {
+                if (widget.classList.contains('widget-extra-large')) {
+                    widget.classList.remove('widget-extra-large');
+                    widget.classList.add('widget-large');
+                } else if (widget.classList.contains('widget-large')) {
+                    widget.classList.remove('widget-large');
+                    widget.classList.add('widget-extra-large');
+                }
+            }
+        }
+
+        function removeActivityDashboard() {
+            const widget = document.querySelector('[data-widget-id="activity-dashboard"]');
+            if (widget) {
+                widget.classList.add('widget-hidden');
+            }
         }
 
         // ──────────────────────────────────────────────
@@ -2913,6 +2933,110 @@
 
         // Initialize demo
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize widget system first if available
+            if (typeof initializePageWidgets !== 'undefined') {
+                try {
+                    initializeWidgetStorage();
+                    
+                    // Get configured widgets for this page
+                    const configuredWidgets = getActiveWidgetsForArea('For You');
+                    const hardcodedWidgetIds = ['my-tasks', 'notifications', 'next-steps', 'performance', 'team-activity'];
+                    
+                    // Find widgets that are configured but not hardcoded
+                    const additionalWidgets = configuredWidgets.filter(w => !hardcodedWidgetIds.includes(w.id));
+                    
+                    // If there are additional widgets, add them
+                    if (additionalWidgets.length > 0) {
+                        const main = document.querySelector('main');
+                        if (main) {
+                            additionalWidgets.forEach(widget => {
+                                // Special handling for Activity Dashboard
+                                if (widget.id === 'activity-dashboard') {
+                                    const section = document.createElement('div');
+                                    section.className = 'widget widget-extra-large';
+                                    section.setAttribute('data-widget-id', widget.id);
+                                    section.setAttribute('data-widget-name', widget.name);
+                                    section.setAttribute('data-default-size', 'widget-extra-large');
+                                    section.setAttribute('draggable', 'false');
+                                    
+                                    section.innerHTML = `
+                                        <div class="widget-edit-controls">
+                                            <span class="widget-ctrl-label">${widget.name}</span>
+                                            <div class="widget-ctrl-group">
+                                                <button class="widget-ctrl-btn" onclick="resizeActivityDashboard()" title="Resize">↔ Resize</button>
+                                                <button class="widget-ctrl-btn remove-btn" onclick="removeActivityDashboard()" title="Remove">✕</button>
+                                            </div>
+                                        </div>
+                                        <div class="widget-header">
+                                            📊 Activity Dashboard - Key Metrics & Trends
+                                        </div>
+                                        <div class="widget-content">
+                                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                                                <div class="metric-card">
+                                                    <div class="metric-value">847</div>
+                                                    <div class="metric-label">Total Activities</div>
+                                                </div>
+                                                <div class="metric-card">
+                                                    <div class="metric-value">92%</div>
+                                                    <div class="metric-label">Completion Rate</div>
+                                                </div>
+                                                <div class="metric-card">
+                                                    <div class="metric-value">1.3K</div>
+                                                    <div class="metric-label">Participants</div>
+                                                </div>
+                                            </div>
+                                            <div style="margin-bottom: 1.5rem;">
+                                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                                    <span style="font-weight: 600;">Trend: Performance</span>
+                                                    <span style="color: #38A169; font-weight: 600;">↑ +12%</span>
+                                                </div>
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: 78%;"></div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                                    <span style="font-weight: 600;">Engagement Score</span>
+                                                    <span style="color: var(--walmart-blue); font-weight: 600;">8.4/10</span>
+                                                </div>
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: 84%;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                    
+                                    main.appendChild(section);
+                                } else {
+                                    // Other widgets - create placeholder
+                                    let section = document.createElement('div');
+                                    section.style.marginTop = '2rem';
+                                    section.style.padding = '1.5rem';
+                                    section.style.backgroundColor = 'var(--white)';
+                                    section.style.borderRadius = '8px';
+                                    section.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                                    
+                                    const display = getWidgetDisplay(widget);
+                                    section.innerHTML = `
+                                        <div style="margin-bottom: 1rem;">
+                                            <strong style="font-size: 1.1rem;">${display.name}</strong>
+                                            <div style="font-size: 0.9rem; color: var(--gray-600); margin-top: 0.25rem;">${display.description}</div>
+                                        </div>
+                                        <div style="color: var(--gray-600); text-align: center; padding: 2rem;">
+                                            [${widget.id} content would load here]
+                                        </div>
+                                    `;
+                                    
+                                    main.appendChild(section);
+                                }
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Widget system initialization error:', e.message);
+                }
+            }
+            
             applyWidgetConfig();
             renderCategorizedSidebar();
             updateNotificationCount();
@@ -2927,5 +3051,16 @@
             }, 2000);
         });
     </script>
+    
+    <!-- ┌─────────────────────────────────────────────────────────┐ -->
+    <!-- │           WIDGET SYSTEM INTEGRATION                      │ -->
+    <!-- │  Central widget management for Activity Hub             │ -->
+    <!-- │  Provides: Registry, Storage, Page Display Functions    │ -->
+    <!-- │  Last Updated: April 16, 2026                           │ -->
+    <!-- └─────────────────────────────────────────────────────────┘ -->
+    
+    <script src="/Admin/Widgets/widget-registry.js"></script>
+    <script src="/Admin/Widgets/widget-storage.js"></script>
+    <script src="/Admin/Widgets/widget-page-utils.js"></script>
 </body>
 </html>

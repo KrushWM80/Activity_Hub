@@ -636,6 +636,25 @@ def fetch_and_cache_bq_data(week, fy):
     except Exception as e:
         logger.warning(f"Could not fetch status breakdown: {e}")
 
+    # Custom display order for statuses
+    STATUS_ORDER = [
+        'Draft - Pending',
+        'Awaiting ATC Approval - Pending',
+        'Denied - Pending',
+        'Awaiting Comms Approval - Pending',
+        'Awaiting Comms Approval - In Progress',
+        'Awaiting Comms Approval - Ready to Review',
+        'Awaiting Business Review - Pending',
+        'Awaiting Legal Approval - Pending',
+        'ATC final review - Pending',
+        'Review for Publish review - Pending',
+        'Review for Publish review - Future Send',
+        'Expired - Pending',
+        'Review for Publish review - No Comms',
+    ]
+    _order_map = {s: i for i, s in enumerate(STATUS_ORDER)}
+    status_breakdown.sort(key=lambda x: _order_map.get(x.get('status', ''), 999))
+
     logger.info(f"Status breakdown: {len(status_breakdown)} statuses, total (excl. Denied/Expired): {total_excl_denied}")
 
     # Get BQ table refresh timestamp (when ETL last wrote to the table)
@@ -1110,7 +1129,7 @@ def generate_weekly_message_audio(week=None, fy=None, voice="Jenny", rate=0.95, 
     return result
 
 
-def send_audio_report_email(week, fy, to_recipients=None):
+def send_audio_report_email(week, fy, to_recipients=None, cc_recipients=None):
     """Send the Weekly Messages Audio Report via Outlook COM (pywin32).
     
     Attaches the MP4 file and TTS script. Uses the existing HTML report as the
@@ -1120,6 +1139,7 @@ def send_audio_report_email(week, fy, to_recipients=None):
         week: Walmart week number
         fy: Fiscal year
         to_recipients: List of email addresses (default: kendall.rush@walmart.com)
+        cc_recipients: List of CC email addresses (default: None)
     
     Returns:
         dict with success, error, and message fields
@@ -1166,6 +1186,8 @@ def send_audio_report_email(week, fy, to_recipients=None):
                 outlook = win32com.client.Dispatch('Outlook.Application')
                 mail = outlook.CreateItem(0)  # olMailItem
                 mail.To = '; '.join(to_recipients)
+                if cc_recipients:
+                    mail.CC = '; '.join(cc_recipients)
                 mail.Subject = f"Weekly Messages Audio Report - Week {week} FY{fy}"
                 mail.HTMLBody = html_body
 

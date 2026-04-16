@@ -70,12 +70,16 @@ def admin():
 
 @app.route('/<filename>')
 @app.route('/activity-hub/static/<path:filepath>')
-def serve_static(filename=None, filepath=None):
-    """Serve static files like images from Interface directory"""
+@app.route('/<path:subdir>/<filename>')
+def serve_static(filename=None, filepath=None, subdir=None):
+    """Serve static files like images and JS from Interface directory"""
     try:
         if filepath:
             # Handle nested paths for static files
             file_path = os.path.join(BASE_DIR, filepath.replace('/', os.sep))
+        elif subdir and filename:
+            # Handle paths like /Admin/Widgets/widget-registry.js
+            file_path = os.path.join(BASE_DIR, subdir, filename)
         else:
             file_path = os.path.join(BASE_DIR, filename)
         
@@ -504,13 +508,22 @@ def generate_ppt():
         from pptx.dml.color import RGBColor
         from io import BytesIO
         
+        # Calculate Walmart Week (WM WK)
+        today = datetime.now()
+        fiscal_year_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
+        days_since_fy = (today - fiscal_year_start).days
+        wm_week = (days_since_fy // 7) + 1
+        
         # Get filter parameters
         status = request.args.get('status', 'Active')
         
         # Query projects
         sql = """
         SELECT impact_id, title, business_area, owner_name, health_status, latest_update, project_status, 
-               COALESCE(current_wm_week_update, FALSE) as updated_this_week
+               CASE 
+                 WHEN LOWER(current_wm_week_update) = 'true' THEN TRUE
+                 ELSE FALSE
+               END as updated_this_week
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
         WHERE 1=1
         """
@@ -701,7 +714,7 @@ def generate_ppt():
             ppt_file,
             mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation',
             as_attachment=True,
-            download_name=f'projects-report-{datetime.now().strftime("%Y%m%d")}.pptx'
+            download_name=f'WM WK{wm_week} Projects Overview.pptx'
         )
     except ImportError:
         logger.error("python-pptx not installed")
@@ -716,6 +729,13 @@ def get_sample_email():
     try:
         if not bq_client:
             return jsonify({'error': 'BigQuery client not initialized'}), 500
+        
+        # Calculate Walmart Week (WM WK)
+        # Walmart fiscal year: Feb 1 - Jan 31
+        today = datetime.now()
+        fiscal_year_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
+        days_since_fy = (today - fiscal_year_start).days
+        wm_week = (days_since_fy // 7) + 1
         
         # Get sample projects for email
         sql = """
@@ -745,7 +765,7 @@ def get_sample_email():
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Impact Platform - Projects Dashboard</title>
+    <title>Activity Hub - Projects Overview</title>
     <style>
         body {{ font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }}
         .container {{ max-width: 800px; margin: 0 auto; background-color: white; }}
@@ -781,8 +801,8 @@ def get_sample_email():
     <div class="container">
         <!-- HEADER -->
         <div class="header">
-            <h1>Impact Platform</h1>
-            <p>Projects Dashboard Report • {datetime.now().strftime('%B %d, %Y')}</p>
+            <h1>Activity Hub Projects Overview</h1>
+            <p>WM WK {wm_week} • {datetime.now().strftime('%B %d, %Y')}</p>
         </div>
         
         <!-- CONTENT -->
@@ -808,7 +828,7 @@ def get_sample_email():
                 </div>
             </div>
 
-            <h2 class="section-title">Recent Projects</h2>
+            <h2 class="section-title">Projects</h2>
             
             <table class="projects-table">
                 <thead>
@@ -849,7 +869,7 @@ def get_sample_email():
         
         <!-- FOOTER -->
         <div class="footer">
-            <p><strong>Impact Platform</strong> • Walmart Activity Hub</p>
+            <p><strong>Activity Hub</strong> • Walmart Projects Platform</p>
             <p>This is an automated email from the Projects Management System.</p>
             <p>&copy; 2026 Walmart Inc. All rights reserved.</p>
         </div>
@@ -901,11 +921,21 @@ def sync_data_bridge():
         if not bq_client:
             return jsonify({'error': 'BigQuery client not initialized'}), 500
         
-        # Copy from Data Bridge source table to AH_Projects
-        sql = """
-        INSERT INTO `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        (impact_id, title, business_area, owner_name, owner_id, health_status, project_status, 
-         created_timestamp, modified_timestamp, latest_update, latest_update_timestamp, current_wm_week_update)
+        # First, get the list of existing project titles
+        existing_titles_sql = """
+        SELECT DISTINCT title FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        """
+        
+        existing_titles = set()
+        try:
+            results = bq_client.query(existing_titles_sql).result()
+            for row in results:
+                existing_titles.add(row.title)
+        except:
+            pass  # If table doesn't exist yet, that's ok
+        
+        # Get all projects from Data Bridge
+        source_sql = """
         SELECT 
             COALESCE(impact_id, GENERATE_UUID()) as impact_id,
             project_title as title,
@@ -918,23 +948,71 @@ def sync_data_bridge():
             updated_at as modified_timestamp,
             latest_update,
             CURRENT_TIMESTAMP() as latest_update_timestamp,
-            CAST(COALESCE(updated_this_week, false) as BOOL) as current_wm_week_update
+            CASE 
+              WHEN LOWER(updated_this_week) = 'true' THEN 'true'
+              ELSE 'false'
+            END as current_wm_week_update
         FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - Intake Accel Council Data`
-        WHERE NOT EXISTS (
-            SELECT 1 FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects` ap
-            WHERE ap.title = `wmt-assetprotection-prod.Store_Support_Dev.Output - Intake Accel Council Data`.project_title
-        )
         """
         
-        job = bq_client.query(sql)
-        result = job.result()
+        rows_to_insert = []
+        source_results = bq_client.query(source_sql).result()
+        for row in source_results:
+            if row.title not in existing_titles:
+                rows_to_insert.append(row)
         
-        logger.info(f"Data Bridge sync completed: {job.total_rows} rows processed")
-        return jsonify({
-            'success': True,
-            'message': f'Synced {job.total_rows} projects from Data Bridge',
-            'rows_affected': job.total_rows
-        }), 200
+        if rows_to_insert:
+            insert_sql = """
+            INSERT INTO `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+            (impact_id, title, business_area, owner_name, owner_id, health_status, project_status, 
+             created_timestamp, modified_timestamp, latest_update, latest_update_timestamp, current_wm_week_update)
+            VALUES 
+            """
+            using_params = []
+            param_names = []
+            
+            for i, row in enumerate(rows_to_insert):
+                if i > 0:
+                    insert_sql += ", "
+                
+                params = [
+                    bigquery.ScalarQueryParameter(f"p{i}_impact_id", "STRING", row.impact_id or str(__import__('uuid').uuid4())),
+                    bigquery.ScalarQueryParameter(f"p{i}_title", "STRING", row.title),
+                    bigquery.ScalarQueryParameter(f"p{i}_business_area", "STRING", row.business_area),
+                    bigquery.ScalarQueryParameter(f"p{i}_owner_name", "STRING", row.owner_name),
+                    bigquery.ScalarQueryParameter(f"p{i}_owner_id", "STRING", row.owner_id),
+                    bigquery.ScalarQueryParameter(f"p{i}_health_status", "STRING", row.health_status),
+                    bigquery.ScalarQueryParameter(f"p{i}_project_status", "STRING", row.project_status),
+                    bigquery.ScalarQueryParameter(f"p{i}_created_timestamp", "TIMESTAMP", row.created_timestamp),
+                    bigquery.ScalarQueryParameter(f"p{i}_modified_timestamp", "TIMESTAMP", row.modified_timestamp),
+                    bigquery.ScalarQueryParameter(f"p{i}_latest_update", "STRING", row.latest_update),
+                    bigquery.ScalarQueryParameter(f"p{i}_latest_update_timestamp", "TIMESTAMP", row.latest_update_timestamp),
+                    bigquery.ScalarQueryParameter(f"p{i}_current_wm_week_update", "STRING", row.current_wm_week_update),
+                ]
+                
+                using_params.extend(params)
+                insert_sql += f"""(@p{i}_impact_id, @p{i}_title, @p{i}_business_area, @p{i}_owner_name, 
+                              @p{i}_owner_id, @p{i}_health_status, @p{i}_project_status, 
+                              @p{i}_created_timestamp, @p{i}_modified_timestamp, @p{i}_latest_update, 
+                              @p{i}_latest_update_timestamp, @p{i}_current_wm_week_update)"""
+            
+            job_config = bigquery.QueryJobConfig(query_parameters=using_params)
+            job = bq_client.query(insert_sql, job_config=job_config)
+            job.result()
+            
+            logger.info(f"Data Bridge sync completed: {len(rows_to_insert)} new projects synced")
+            return jsonify({
+                'success': True,
+                'message': f'Synced {len(rows_to_insert)} new projects from Data Bridge',
+                'rows_affected': len(rows_to_insert)
+            }), 200
+        else:
+            return jsonify({
+                'success': True,
+                'message': 'No new projects to sync from Data Bridge',
+                'rows_affected': 0
+            }), 200
+            
     except Exception as e:
         logger.error(f"Data Bridge sync error: {str(e)}")
         return jsonify({'error': str(e)}), 500

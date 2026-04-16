@@ -377,7 +377,7 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#"><i class="bi bi-diagram-3"></i> Aligned<small class="ms-2" style="font-size: 0.6rem; opacity: 0.9;">Store Impact through Job Codes</small></a>
+                <a class="navbar-brand" href="#"><img src="/Spark_Blank.png" alt="Spark Logo" style="height: 32px; margin-right: 8px; display: inline-block;"> Aligned<small class="ms-2" style="font-size: 0.6rem; opacity: 0.9;">Store Impact through Job Codes</small></a>
                 <div class="d-flex align-items-center">
                     <span class="text-white-50 me-3" style="font-size: 0.75rem;">Owner: Kendall Rush</span>
                     <span class="text-white me-3">
@@ -457,7 +457,7 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#"><i class="bi bi-diagram-3"></i> Aligned<small class="ms-2" style="font-size: 0.6rem; opacity: 0.9;">Store Impact through Job Codes</small></a>
+                <a class="navbar-brand" href="#"><img src="/Spark_Blank.png" alt="Spark Logo" style="height: 32px; margin-right: 8px; display: inline-block;"> Aligned<small class="ms-2" style="font-size: 0.6rem; opacity: 0.9;">Store Impact through Job Codes</small></a>
                 <div class="d-flex align-items-center">
                     <span class="text-white-50 me-3" style="font-size: 0.75rem;">Owner: Kendall Rush</span>
                     <span class="text-white me-3">
@@ -1042,6 +1042,22 @@
                             <label class="form-label">Notes <small class="text-muted">(optional)</small></label>
                             <textarea class="form-control" id="assignNotes" rows="3" placeholder="Additional context or reasoning for this request..."></textarea>
                         </div>
+
+                        <!-- Comments Section (replaces Admin Override & Comments + Audit Log) -->
+                        <div id="adminCommentsSection" class="border-top pt-3 mt-3" style="display: none;">
+                            <h6 class="text-primary mb-3">💬 Comments</h6>
+                            
+                            <!-- Existing Comments/Audit Trail (readonly) -->
+                            <div id="auditLogContent" class="alert alert-light mb-3" style="max-height: 250px; overflow-y: auto; font-size: 0.875rem; border-left: 4px solid #0071ce;">
+                                <em class="text-muted">No comments yet</em>
+                            </div>
+                            
+                            <!-- New Comment Input (admin only) -->
+                            <div class="mb-3">
+                                <label class="form-label">Add Comment <small class="text-muted">(visible to submitter, use @ to mention)</small></label>
+                                <textarea class="form-control" id="adminComments" rows="3" placeholder="Add a comment or use @username to mention someone and send them a notification..."></textarea>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -1294,7 +1310,8 @@
         let currentUser = null;
         let jobCodes = [];
         let teams = [];
-        let allRequests = [];
+        let allRequests = [];                    // All requests (for managing)
+        let adminRequests = [];                  // Requests for admin view
         let pendingRequests = [];
         let currentFilter = 'all';
         let currentSort = { column: null, direction: 'asc' };
@@ -1815,18 +1832,59 @@
             // Auto-populate dept/div numbers from job code
             populateJobCodeInfo(jobCode);
             
-            // Initialize dropdowns
-            const bannerCodeOptions = ['WAL - Walmart Supercenter', 'DIV1 - Walmart Div 1', 'NHM - Neighborhood Market', 'SAM - Sam\'s Club', 'HTO - Hometown'];
+            // Load banner codes from ELM datasource via API
+            loadBannerCodesAsync();
+            
+            // Initialize other dropdowns
             const merchDeptOptions = ['1 - Produce', '2 - Meat & Seafood', '3 - Deli/Bakery', '4 - Dairy', '5 - Frozen', '38 - Pharmacy', '90 - Grocery', '91 - Candy & Tobacco', '92 - Health & Beauty', '93 - Pharmacy', '94 - Pets & Paper Goods', '95 - Chemicals', '96 - Cosmetics', '10 - Action Alley', '11 - Apparel', '12 - Shoes', '14 - Jewelry', '16 - Optical', '17 - Toys', '18 - Sporting Goods', '19 - Automotive', '20 - Home & Garden', '21 - Paint & Hardware', '22 - Home Decor', '23 - Furniture', '72 - Electronics', '87 - Wireless'];
             const accessLevelOptions = ['Hourly', 'Salary'];
             
-            populateDropdown('banner-codes-dropdown', bannerCodeOptions);
             populateDropdown('merch-depts-dropdown', merchDeptOptions);
             populateDropdown('access-level-dropdown', accessLevelOptions);
             
             // Clear edit mode
             delete document.getElementById('assignTeamForm').dataset.editRequestId;
             new bootstrap.Modal(document.getElementById('assignTeamModal')).show();
+        }
+
+        async function loadBannerCodesAsync() {
+            // Load banner codes from ELM datasource via API
+            // Falls back to defaults if API unavailable
+            try {
+                const response = await fetch('/api/banner-codes');
+                const data = await response.json();
+                
+                if (data.dropdown_options && Array.isArray(data.dropdown_options)) {
+                    populateDropdown('banner-codes-dropdown', data.dropdown_options);
+                    console.log(`✅ Loaded ${data.dropdown_options.length} banner codes from ELM`);
+                } else {
+                    loadBannerCodesDefault();
+                }
+            } catch (error) {
+                console.warn('⚠️  Failed to load banner codes from API:', error);
+                loadBannerCodesDefault();
+            }
+        }
+
+        function loadBannerCodesDefault() {
+            // Load default banner codes if API unavailable
+            // Filtered for Division 1 (WM US Stores) and Division 10 (H&W)
+            const defaultBannerCodeOptions = [
+                'A1 - WM Supercenter',
+                'B2 - Walmart Express',
+                'B4 - Neighborhood Market',
+                'C7 - Wal-Mart',
+                'D7 - Sam\'s Club',
+                'H8 - walmart.com',
+                'H9 - samsclub.com',
+                'N7 - Pharmacy',
+                'O3 - WM On Campus/RX Facilities',
+                'S3 - WALMART NEIGHBORHOOD MARKET',
+                'Z1 - STAND ALONE PICKUP'
+            ];
+            
+            populateDropdown('banner-codes-dropdown', defaultBannerCodeOptions);
+            console.log('Loaded default banner codes (Division 1 & 10)');
         }
 
         function populateJobCodeInfo(jobCode) {
@@ -2053,6 +2111,15 @@
                 notes: document.getElementById('assignNotes').value
             };
             
+            // Add admin fields if admin is making changes
+            if (form.dataset.isAdmin === 'true') {
+                const adminComments = document.getElementById('adminComments').value;
+                if (adminComments) {
+                    requestData.admin_comments = adminComments;
+                    requestData.admin_override = true;
+                }
+            }
+            
             showLoading();
             try {
                 if (editRequestId) {
@@ -2138,9 +2205,10 @@
             try {
                 // Load teaming requests
                 const data = await api('/requests');
+                allRequests = data.requests || [];  // Store all requests globally
                 const tbody = document.getElementById('requestsTableBody');
                 
-                tbody.innerHTML = data.requests.map(r => {
+                tbody.innerHTML = (allRequests || []).map(r => {
                     const isOwner = r.requested_by === currentUser.username;
                     const canEdit = isOwner && r.status === 'pending';
                     return `
@@ -2258,7 +2326,8 @@
                 // All requests table (admin view)
                 const pendingBody = document.getElementById('pendingRequestsTableBody');
                 const allRequestsData = await api('/requests');
-                pendingBody.innerHTML = allRequestsData.requests.map(r => {
+                adminRequests = allRequestsData.requests || [];  // Store for editRequest function
+                pendingBody.innerHTML = (adminRequests || []).map(r => {
                     const statusBadge = r.status === 'approved' ? 'success' : r.status === 'rejected' ? 'danger' : 'warning';
                     const statusIcon = r.status === 'approved' ? 'check-circle' : r.status === 'rejected' ? 'x-circle' : 'hourglass-split';
                     return `
@@ -2548,20 +2617,261 @@
             }
         }
 
+        // Helper function to set selected values in multi-select dropdowns
+        function setSelectedValuesInDropdown(dropdownId, valuesToSelect) {
+            const panel = document.getElementById(dropdownId + '-panel');
+            if (!panel) return;
+            
+            // Ensure valuesToSelect is an array
+            const values = Array.isArray(valuesToSelect) ? valuesToSelect : [valuesToSelect];
+            
+            // First uncheck all
+            panel.querySelectorAll('input[type="checkbox"]:not([data-select-all])').forEach(cb => {
+                cb.checked = false;
+            });
+            
+            // Then check the ones we want
+            values.forEach(value => {
+                const cb = panel.querySelector(`input[type="checkbox"][value="${value}"]`);
+                if (cb) {
+                    cb.checked = true;
+                }
+            });
+            
+            // Update button label
+            const allOptions = panel.querySelectorAll('label[data-option]');
+            updateDropdownLabel(dropdownId, allOptions.length);
+        }
+
+        // @Mention autocomplete for comments
+        function getMentionableUsers() {
+            const mentionableUsers = new Set();
+            
+            // Add all users who submitted requests
+            (allRequests || []).forEach(r => {
+                if (r.requested_by) mentionableUsers.add(r.requested_by);
+            });
+            (adminRequests || []).forEach(r => {
+                if (r.requested_by) mentionableUsers.add(r.requested_by);
+            });
+            
+            // Add current user
+            if (currentUser && currentUser.username) {
+                mentionableUsers.add(currentUser.username);
+            }
+            
+            return Array.from(mentionableUsers).sort();
+        }
+
+        function setupMentionAutocomplete() {
+            const commentInput = document.getElementById('adminComments');
+            if (!commentInput) return;
+            
+            // Create mention dropdown if it doesn't exist
+            if (!document.getElementById('mentionSuggestions')) {
+                const dropdown = document.createElement('div');
+                dropdown.id = 'mentionSuggestions';
+                dropdown.style.cssText = 'position: absolute; background: white; border: 1px solid #ccc; border-radius: 4px; z-index: 1000; display: none; max-height: 200px; overflow-y: auto; min-width: 150px;';
+                document.body.appendChild(dropdown);
+            }
+            
+            commentInput.addEventListener('input', function() {
+                const text = this.value;
+                const lastAtIndex = text.lastIndexOf('@');
+                
+                if (lastAtIndex === -1) {
+                    document.getElementById('mentionSuggestions').style.display = 'none';
+                    return;
+                }
+                
+                const searchTerm = text.substring(lastAtIndex + 1).toLowerCase();
+                
+                // Only show if we're typing after @
+                if (searchTerm.length === 0) {
+                    document.getElementById('mentionSuggestions').style.display = 'none';
+                    return;
+                }
+                
+                const users = getMentionableUsers();
+                const filtered = users.filter(u => u.toLowerCase().includes(searchTerm));
+                
+                const dropdown = document.getElementById('mentionSuggestions');
+                
+                if (filtered.length === 0) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+                
+                // Position dropdown below input
+                const rect = this.getBoundingClientRect();
+                dropdown.style.top = (rect.bottom + 5) + 'px';
+                dropdown.style.left = rect.left + 'px';
+                
+                // Show suggestions
+                dropdown.innerHTML = filtered.map(user => 
+                    `<div data-mention=\"${user}\" style=\"padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee; hover: background-color: #f0f0f0;\">${user}</div>`
+                ).join('');
+                
+                dropdown.style.display = 'block';
+                
+                // Add click handlers
+                dropdown.querySelectorAll('[data-mention]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const mention = this.dataset.mention;
+                        const beforeAt = text.substring(0, lastAtIndex);
+                        const afterAt = text.substring(lastAtIndex);
+                        const restOfLine = afterAt.substring(1 + searchTerm.length);
+                        
+                        commentInput.value = beforeAt + '@' + mention + restOfLine;
+                        dropdown.style.display = 'none';
+                        commentInput.focus();
+                    });
+                });
+            });
+            
+            commentInput.addEventListener('blur', () => {
+                setTimeout(() => {
+                    document.getElementById('mentionSuggestions').style.display = 'none';
+                }, 100);
+            });
+        }
+
         async function editRequest(requestId) {
-            // Find the request
-            const req = allRequests.find(r => r.id === requestId);
-            if (!req) return;
+            // Find the request from either adminRequests or allRequests arrays
+            let req = adminRequests.find(r => r.id === requestId) || allRequests.find(r => r.id === requestId);
             
-            // Open the assign modal with current values
-            document.getElementById('selectedJobCode').value = req.job_code;
-            document.getElementById('assignTeamSelect').value = req.team_id;
+            if (!req) {
+                showToast('Request not found', 'error');
+                return;
+            }
+            
+            // Use global currentUser (already loaded and stored)
+            const isAdmin = currentUser && currentUser.role === 'admin';
+            const isOwner = req.requested_by === (currentUser && currentUser.username);
+            
+            if (!isAdmin && !isOwner) {
+                showToast('You do not have permission to edit this request', 'error');
+                return;
+            }
+            
+            // For pending requests, allow editing
+            if (req.status !== 'pending' && !isAdmin) {
+                showToast('Can only edit pending requests', 'error');
+                return;
+            }
+            
+            // Populate form with current values
+            document.getElementById('assignJobCode').value = req.job_code || '';
+            document.getElementById('assignJobTitle').value = req.job_title || '';
+            document.getElementById('assignTeamSelect').value = req.team_id || '';
+            document.getElementById('assignRole').value = req.role || '';
             document.getElementById('assignNotes').value = req.notes || '';
+            document.getElementById('assignBaseDivisionCode').value = req.base_division_code || '';
             
-            // Store the request ID for update
-            document.getElementById('assignTeamForm').dataset.editRequestId = requestId;
+            // Auto-populate fields from job code
+            const jobCodeParts = req.job_code.split('-');
+            if (jobCodeParts.length >= 2) {
+                document.getElementById('assignDivNumber').value = jobCodeParts[0] || '';
+                document.getElementById('assignDeptNumber').value = jobCodeParts[1] || '';
+            }
+            
+            // Populate Team-related fields
+            document.getElementById('assignTeamId').value = req.team_id || '';
+            document.getElementById('assignWorkgroupName').value = req.workgroup_name || '';
+            document.getElementById('assignWorkgroupId').value = req.workgroup_id || '';
+            
+            // Populate TL information if available
+            document.getElementById('assignTlJobCode').value = req.tl_job_code || '';
+            document.getElementById('assignTlJobTitle').value = req.tl_job_title || '';
+            document.getElementById('assignTlDeptNumber').value = req.tl_dept_number || '';
+            document.getElementById('assignTlDivNumber').value = req.tl_div_number || '';
+            
+            // Populate SL information if available
+            document.getElementById('assignSlJobCode').value = req.sl_job_code || '';
+            document.getElementById('assignSlJobTitle').value = req.sl_job_title || '';
+            document.getElementById('assignSlDeptNumber').value = req.sl_dept_number || '';
+            document.getElementById('assignSlDivNumber').value = req.sl_div_number || '';
+            
+            // Populate merch dept and access level dropdowns (before restoring values)
+            const merchDeptOptions = ['1 - Produce', '2 - Meat & Seafood', '3 - Deli/Bakery', '4 - Dairy', '5 - Frozen', '38 - Pharmacy', '90 - Grocery', '91 - Candy & Tobacco', '92 - Health & Beauty', '93 - Pharmacy', '94 - Pets & Paper Goods', '95 - Chemicals', '96 - Cosmetics', '10 - Action Alley', '11 - Apparel', '12 - Shoes', '14 - Jewelry', '16 - Optical', '17 - Toys', '18 - Sporting Goods', '19 - Automotive', '20 - Home & Garden', '21 - Paint & Hardware', '22 - Home Decor', '23 - Furniture', '72 - Electronics', '87 - Wireless'];
+            const accessLevelOptions = ['Hourly', 'Salary'];
+            populateDropdown('merch-depts-dropdown', merchDeptOptions);
+            populateDropdown('access-level-dropdown', accessLevelOptions);
+            
+            // Load banner codes asynchronously, then restore multi-select values
+            await loadBannerCodesAsync();
+            
+            // Restore multi-select dropdown values
+            if (req.banner_codes && Array.isArray(req.banner_codes)) {
+                setSelectedValuesInDropdown('banner-codes-dropdown', req.banner_codes);
+            }
+            
+            if (req.merch_dept_numbers && Array.isArray(req.merch_dept_numbers)) {
+                setSelectedValuesInDropdown('merch-depts-dropdown', req.merch_dept_numbers);
+            }
+            
+            if (req.access_level && Array.isArray(req.access_level)) {
+                setSelectedValuesInDropdown('access-level-dropdown', req.access_level);
+            }
+            
+            // Store request ID and original values for comparison
+            const form = document.getElementById('assignTeamForm');
+            form.dataset.editRequestId = requestId;
+            form.dataset.isAdmin = isAdmin;
+            form.dataset.originalStatus = req.status;
+            
+            // Update modal title
+            document.querySelector('#assignTeamModal .modal-title').innerText = 
+                `Edit Teaming Request - ID: ${requestId} (${req.status.toUpperCase()})`;
+            
+            // Show admin sections if admin is editing
+            if (isAdmin) {
+                document.getElementById('adminCommentsSection').style.display = 'block';
+                document.getElementById('adminComments').value = '';
+                
+                // Populate audit log + comments in merged section with streamlined format
+                let commentsHtml = '';
+                if (req.audit_log && Array.isArray(req.audit_log) && req.audit_log.length > 0) {
+                    commentsHtml = req.audit_log.map(entry => {
+                        const timestamp = new Date(entry.timestamp);
+                        const dateStr = timestamp.toLocaleDateString();
+                        const timeStr = timestamp.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                        
+                        // Filter out undefined changes
+                        let changesHtml = '';
+                        if (entry.changes && Array.isArray(entry.changes)) {
+                            const validChanges = entry.changes.filter(c => c.field !== 'undefined' && c.from !== 'undefined' && c.to !== 'undefined');
+                            if (validChanges.length > 0) {
+                                changesHtml = '<div class="ms-3" style="font-size: 0.8rem; color: #666;">' + 
+                                    validChanges.map(c => `${c.field}: ${c.from} → ${c.to}`).join('<br>') + 
+                                    '</div>';
+                            }
+                        }
+                        
+                        // Streamlined format: Username - Date Time - Action
+                        let mainLine = `<strong style="color: #0071ce;">${entry.user}</strong> - ${dateStr} ${timeStr} - ${entry.action}`;
+                        
+                        // If there's a comment, add it on a new line
+                        let commentLine = entry.comments ? `<div style="margin-top: 4px; font-style: italic; color: #555;">${entry.comments}</div>` : '';
+                        
+                        return `<div class="mb-2 pb-2 border-bottom" style="font-size: 0.9rem;">
+                                ${mainLine}
+                                ${commentLine}
+                                ${changesHtml}
+                                </div>`;
+                    }).join('');
+                } else {
+                    commentsHtml = '<em class="text-muted">No comments yet</em>';
+                }
+                document.getElementById('auditLogContent').innerHTML = commentsHtml;
+            } else {
+                document.getElementById('adminCommentsSection').style.display = 'none';
+            }
             
             new bootstrap.Modal(document.getElementById('assignTeamModal')).show();
+            
+            // Setup @mention autocomplete for admin comments
+            setTimeout(() => setupMentionAutocomplete(), 100);
         }
 
         async function deleteRequest(requestId) {

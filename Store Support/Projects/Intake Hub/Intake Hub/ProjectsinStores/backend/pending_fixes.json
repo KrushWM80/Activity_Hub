@@ -166,6 +166,42 @@
       ],
       "files_analyzed": [],
       "requires_ai_review": true
+    }
+  ],
+  "history": [
+    {
+      "id": "a89640f6",
+      "priority": "low",
+      "root_cause": "Issue reported in 'Other' category requires detailed analysis.",
+      "resolution": "This feedback requires manual AI review to determine specific root cause and resolution.",
+      "code_changes": null,
+      "user_context": {
+        "current_filters": {
+          "division": [],
+          "region": [],
+          "market": [],
+          "store": [],
+          "wmweek": [],
+          "fy": [],
+          "phase": [],
+          "owner": [],
+          "partner": [],
+          "businessorg": [],
+          "storearea": [],
+          "health": [],
+          "businesstype": [],
+          "associateimpact": [],
+          "customerimpact": []
+        },
+        "projects_displayed": 50000
+      },
+      "investigation_notes": [
+        "No specific pattern matched - flagged for detailed review",
+        "Active filters at time of feedback: {}",
+        "Projects displayed: 50000"
+      ],
+      "files_analyzed": [],
+      "requires_ai_review": true
     },
     {
       "id": "b8af1fbe",
@@ -206,43 +242,14 @@
         "Projects displayed: 50000"
       ],
       "files_analyzed": [],
-      "requires_ai_review": true
-    }
-  ],
-  "history": [
-    {
-      "id": "a89640f6",
-      "priority": "low",
-      "root_cause": "Issue reported in 'Other' category requires detailed analysis.",
-      "resolution": "This feedback requires manual AI review to determine specific root cause and resolution.",
-      "code_changes": null,
-      "user_context": {
-        "current_filters": {
-          "division": [],
-          "region": [],
-          "market": [],
-          "store": [],
-          "wmweek": [],
-          "fy": [],
-          "phase": [],
-          "owner": [],
-          "partner": [],
-          "businessorg": [],
-          "storearea": [],
-          "health": [],
-          "businesstype": [],
-          "associateimpact": [],
-          "customerimpact": []
-        },
-        "projects_displayed": 50000
-      },
-      "investigation_notes": [
-        "No specific pattern matched - flagged for detailed review",
-        "Active filters at time of feedback: {}",
-        "Projects displayed: 50000"
-      ],
-      "files_analyzed": [],
-      "requires_ai_review": true
+      "requires_ai_review": true,
+      "status": "approved",
+      "actioned_by": "krush@homeoffice.wal-mart.com",
+      "actioned_at": "2026-04-16 15:02:07",
+      "implementation_result": {
+        "success": true,
+        "message": ""
+      }
     }
   ]
 }

@@ -148,6 +148,34 @@
         /* Admin Page Title */
         .page-title {
             margin-bottom: var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .page-title-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .page-action-btn {
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .page-action-btn:hover {
+            border-color: var(--walmart-blue);
+            background: var(--walmart-blue-lightest);
         }
 
         .page-title h2 {
@@ -817,6 +845,44 @@
         }
 
         /* Feedback Button */
+        /* Dark Mode */
+        body.dark-mode {
+            --gray-100: #1A202C;
+            --gray-300: #2D3748;
+            --gray-600: #A0AEC0;
+            --gray-700: #CBD5E0;
+            --gray-900: #F7FAFC;
+            --white: #2D3748;
+            background-color: #1A202C;
+            color: #F7FAFC;
+        }
+        body.dark-mode .header {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+        }
+        body.dark-mode .header .nav-item { color: #fff; }
+        body.dark-mode .header .nav-item.active { background: var(--walmart-yellow); color: #1A202C; }
+        body.dark-mode .header .user-section { color: #fff; }
+        body.dark-mode .header h1 { color: #fff; }
+        body.dark-mode .admin-nav {
+            background: #2D3748;
+        }
+        body.dark-mode .stat-card, body.dark-mode .management-section {
+            background: #2D3748;
+            border-color: #4A5568;
+        }
+        body.dark-mode .page-action-btn {
+            background: #2D3748;
+            border-color: #4A5568;
+            color: #F7FAFC;
+        }
+        body.dark-mode .nav-tab {
+            color: #CBD5E0;
+        }
+        body.dark-mode .nav-tab.active {
+            background: var(--walmart-blue);
+            color: #fff;
+        }
+
         .feedback-btn {
             position: fixed;
             bottom: 24px;
@@ -1182,9 +1248,6 @@
                 <a href="/activity-hub/for-you" class="nav-item">For You</a>
                 <a href="/activity-hub/projects" class="nav-item">Projects</a>
                 <a href="/activity-hub/reporting" class="nav-item">Reporting</a>
-                <a href="/activity-hub/teams" class="nav-item">Teams</a>
-                <a href="/activity-hub/my-work" class="nav-item">My Work</a>
-                <a href="/activity-hub/settings" class="nav-item">Settings</a>
                 <a href="/activity-hub/admin" class="nav-item active" style="background: var(--walmart-yellow); color: var(--gray-900);">🔒 Admin</a>
             </nav>
             <div class="user-section">
@@ -1201,8 +1264,14 @@
     <div class="main-container">
         <!-- Page Title -->
         <div class="page-title">
-            <h2>🔒 Admin Dashboard</h2>
-            <p>Manage access, configure business logic, organize links, and design workflows</p>
+            <div>
+                <h2>🔒 Admin Dashboard</h2>
+                <p>Manage access, configure business logic, organize links, and design workflows</p>
+            </div>
+            <div class="page-title-actions">
+                <button class="page-action-btn" onclick="toggleFeedback()" title="Send Feedback">💬</button>
+                <button class="page-action-btn" onclick="toggleAdminDarkMode()" title="Toggle Light/Dark Mode">🌙</button>
+            </div>
         </div>
 
         <!-- Admin Navigation -->
@@ -1981,15 +2050,21 @@
                     <div class="management-grid">
                         <div class="management-section" style="grid-column: 1 / -1;">
                             <div class="section-header">
-                                <h3 class="section-title">⚙️ Active Widgets</h3>
-                                <p style="color: var(--gray-600); margin-top: 8px;">Configure which widgets are available on the Activity Hub dashboard</p>
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <div>
+                                        <h3 class="section-title">⚙️ Active Widgets</h3>
+                                        <p style="color: var(--gray-600); margin-top: 8px;">Configure which widgets are available on the Activity Hub dashboard</p>
+                                    </div>
+                                    <button class="btn-primary" onclick="showCreateWidgetModal()" style="height: fit-content; white-space: nowrap;">+ Create Widget</button>
+                                </div>
                             </div>
 
                             <div style="background: white; border-radius: 8px; overflow: hidden;">
                                 <table style="width: 100%; border-collapse: collapse;">
                                     <thead>
                                         <tr style="background: var(--gray-100); border-bottom: 2px solid var(--gray-300);">
-                                            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--gray-700);">Widget</th>
+                                            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--gray-700);">Widget ID</th>
+                                            <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--gray-700);">Widget Name</th>
                                             <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--gray-700);">Description</th>
                                             <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--gray-700);">Default Size</th>
                                             <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--gray-700);">Available Areas</th>
@@ -2009,6 +2084,57 @@
     </div>
 
     <!-- Modals -->
+    <!-- Create Widget Modal -->
+    <div id="createWidgetModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>➕ Create New Widget</h3>
+                <button class="close-btn" onclick="hideModal('createWidgetModal')">×</button>
+            </div>
+            <form id="create-widget-form" style="display: grid; gap: var(--space-4); padding: var(--space-4);">
+                <div class="form-group">
+                    <label for="widget-id">Widget ID *</label>
+                    <input type="text" id="widget-id" placeholder="e.g., my-custom-widget" required />
+                </div>
+                <div class="form-group">
+                    <label for="widget-name">Widget Name *</label>
+                    <input type="text" id="widget-name" placeholder="e.g., My Custom Widget" required />
+                </div>
+                <div class="form-group">
+                    <label for="widget-description">Description *</label>
+                    <textarea id="widget-description" placeholder="Brief description of what this widget displays" required style="resize: vertical; min-height: 80px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="widget-default-size">Default Size *</label>
+                    <select id="widget-default-size" required>
+                        <option value="">-- Select Size --</option>
+                        <option value="widget-small">Small</option>
+                        <option value="widget-medium">Medium</option>
+                        <option value="widget-large">Large</option>
+                        <option value="widget-extra-large">Extra Large</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Available Areas *</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);">
+                        <label style="display: flex; align-items: center; gap: var(--space-2);">
+                            <input type="checkbox" id="area-for-you" value="For You" />
+                            For You
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--space-2);">
+                            <input type="checkbox" id="area-reporting" value="Reporting" />
+                            Reporting
+                        </label>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-top: var(--space-4);">
+                    <button type="button" class="btn-secondary" onclick="hideModal('createWidgetModal')">Cancel</button>
+                    <button type="button" class="btn-primary" onclick="createNewWidget()">Create Widget</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Create Logic Request Modal -->
     <div id="createLogicRequestModal" class="modal">
         <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
@@ -2715,239 +2841,14 @@
             }, 500);
         });
 
-        // ── Widget Management ──────────────────────────────────────
-        const PLATFORM_AREAS = ['For You', 'Reporting'];
-
-        const WIDGET_REGISTRY = [
-            { id: 'my-tasks', name: 'My Tasks', description: 'Personal task list and to-do items', defaultSize: 'Large', defaultAreas: ['For You'] },
-            { id: 'notifications', name: 'Notifications & Alerts', description: 'System alerts and notifications', defaultSize: 'Medium', defaultAreas: ['For You'] },
-            { id: 'next-steps', name: 'Next Steps & Action Items', description: 'Upcoming actions and deadlines', defaultSize: 'Large', defaultAreas: ['For You'] },
-            { id: 'performance', name: 'Performance Metrics', description: 'Key performance indicators and trends', defaultSize: 'Large', defaultAreas: ['For You'] },
-            { id: 'team-activity', name: 'Team Activity Feed', description: 'Latest team member activity and updates', defaultSize: 'Medium', defaultAreas: ['For You'] },
-            { id: 'activity-dashboard', name: 'Activity Dashboard', description: 'Dashboard with key metrics and trends', defaultSize: 'Extra Large', defaultAreas: ['Reporting'] },
-            { id: 'project-reports', name: 'Project Reports', description: 'Status and milestones for all projects', defaultSize: 'Extra Large', defaultAreas: ['Reporting'] },
-            { id: 'key-metrics', name: 'Key Metrics', description: 'Key reporting metrics and analytics', defaultSize: 'Extra Large', defaultAreas: ['Reporting'] },
-            { id: 'my-reports', name: 'My Reports', description: 'Custom reports', defaultSize: 'Extra Large', defaultAreas: ['Reporting'] }
-        ];
-
-        function getWidgetAreas() {
-            try { return JSON.parse(localStorage.getItem('activity-hub-widget-areas') || '{}'); }
-            catch { return {}; }
-        }
-
-        function getAreasForWidget(widgetId) {
-            const saved = getWidgetAreas();
-            if (saved[widgetId]) return saved[widgetId];
-            const reg = WIDGET_REGISTRY.find(w => w.id === widgetId);
-            return reg ? reg.defaultAreas : [];
-        }
-
-        function toggleWidgetArea(widgetId, area) {
-            const allAreas = getWidgetAreas();
-            const current = getAreasForWidget(widgetId).slice();
-            const idx = current.indexOf(area);
-            if (idx >= 0) current.splice(idx, 1); else current.push(area);
-            allAreas[widgetId] = current;
-            localStorage.setItem('activity-hub-widget-areas', JSON.stringify(allAreas));
-            loadWidgetsTable();
-        }
-
-        function getWidgetRequests() {
-            try { return JSON.parse(localStorage.getItem('activity-hub-widget-requests') || '[]'); }
-            catch { return []; }
-        }
-
-        function saveWidgetRequests(requests) {
-            localStorage.setItem('activity-hub-widget-requests', JSON.stringify(requests));
-        }
-
-        function loadWidgetRequests() {
-            const requests = getWidgetRequests();
-            const filter = document.getElementById('request-status-filter').value;
-            const filtered = filter === 'all' ? requests : requests.filter(r => r.status === filter);
-
-            // Update stats
-            const pending = requests.filter(r => r.status === 'pending').length;
-            const approved = requests.filter(r => r.status === 'approved').length;
-            const denied = requests.filter(r => r.status === 'denied').length;
-            document.getElementById('pending-requests-count').textContent = pending;
-            document.getElementById('approved-requests-count').textContent = approved;
-            document.getElementById('denied-requests-count').textContent = denied;
-            document.getElementById('total-requests-count').textContent = requests.length;
-
-            const list = document.getElementById('widget-requests-list');
-            if (filtered.length === 0) {
-                list.innerHTML = '<div style="padding: var(--space-4); text-align: center; color: var(--gray-600);">No ' + (filter === 'all' ? '' : filter + ' ') + 'widget requests found.</div>';
-                return;
-            }
-
-            list.innerHTML = filtered.map((req, idx) => {
-                const originalIdx = requests.indexOf(req);
-                const statusColors = { pending: '#f59e0b', approved: '#38A169', denied: '#E53E3E' };
-                const statusColor = statusColors[req.status] || '#718096';
-                const dateStr = new Date(req.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                const isUpdate = req.type === 'update';
-                const typeBadge = isUpdate
-                    ? '<span style="padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; background: #DBEAFE; color: #1D4ED8; margin-left: 6px;">Update</span>'
-                    : '<span style="padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; background: #D1FAE5; color: #059669; margin-left: 6px;">New</span>';
-                return '<div style="padding: var(--space-4); border-bottom: 1px solid var(--gray-300); display: flex; justify-content: space-between; align-items: center;">' +
-                    '<div>' +
-                        '<strong>' + escapeHtml(req.name) + '</strong>' + typeBadge +
-                        '<div style="font-size: 0.85rem; color: var(--gray-600); margin-top: 4px;">' + escapeHtml(req.description || 'No description') + '</div>' +
-                        '<div style="font-size: 0.75rem; color: var(--gray-600); margin-top: 4px;">Submitted: ' + dateStr + (req.submittedBy ? ' by ' + escapeHtml(req.submittedBy) : '') + '</div>' +
-                    '</div>' +
-                    '<div style="display: flex; align-items: center; gap: var(--space-2);">' +
-                        '<span style="padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; background: ' + statusColor + '22; color: ' + statusColor + ';">' + req.status.charAt(0).toUpperCase() + req.status.slice(1) + '</span>' +
-                        (req.status === 'pending' ?
-                            '<button onclick="updateRequestStatus(' + originalIdx + ', \'approved\')" style="padding: 6px 12px; background: var(--success); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">✓ Approve</button>' +
-                            '<button onclick="updateRequestStatus(' + originalIdx + ', \'denied\')" style="padding: 6px 12px; background: var(--error); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">✕ Deny</button>'
-                        : '') +
-                    '</div>' +
-                '</div>';
-            }).join('');
-        }
-
-        function filterWidgetRequests() {
-            loadWidgetRequests();
-        }
-
-        function updateRequestStatus(idx, newStatus) {
-            const requests = getWidgetRequests();
-            if (requests[idx]) {
-                requests[idx].status = newStatus;
-                requests[idx].reviewedAt = new Date().toISOString();
-                saveWidgetRequests(requests);
-                loadWidgetRequests();
-            }
-        }
-
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        function getWidgetCustomizations() {
-            try { return JSON.parse(localStorage.getItem('activity-hub-widget-customizations') || '{}'); }
-            catch { return {}; }
-        }
-
-        function getWidgetDisplay(widget) {
-            const custom = getWidgetCustomizations()[widget.id];
-            return {
-                name: custom?.name || widget.name,
-                description: custom?.description || widget.description,
-                defaultSize: custom?.defaultSize || widget.defaultSize
-            };
-        }
-
-        function loadWidgetsTable() {
-            const tbody = document.getElementById('widgets-table-body');
-            if (!tbody) return;
-            const widgetConfig = JSON.parse(localStorage.getItem('activity-hub-widget-active') || '{}');
-
-            tbody.innerHTML = WIDGET_REGISTRY.map(w => {
-                const display = getWidgetDisplay(w);
-                const isActive = widgetConfig[w.id] !== false;
-                const activeAreas = getAreasForWidget(w.id);
-                const areasHtml = PLATFORM_AREAS.map(area => {
-                    const selected = activeAreas.includes(area);
-                    return '<span onclick="toggleWidgetArea(\'' + w.id + '\', \'' + area + '\')" ' +
-                        'style="display: inline-block; padding: 3px 10px; margin: 2px 4px 2px 0; border-radius: 14px; font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.2s; ' +
-                        (selected
-                            ? 'background: var(--walmart-blue); color: white; border: 1px solid var(--walmart-blue);'
-                            : 'background: var(--gray-100); color: var(--gray-600); border: 1px solid var(--gray-300);') +
-                        '">' + escapeHtml(area) + '</span>';
-                }).join('');
-
-                return '<tr style="border-bottom: 1px solid var(--gray-300);">' +
-                    '<td style="padding: 12px 16px; font-weight: 500;">' + escapeHtml(display.name) + '</td>' +
-                    '<td style="padding: 12px 16px; color: var(--gray-600); font-size: 0.9rem;">' + escapeHtml(display.description) + '</td>' +
-                    '<td style="padding: 12px 16px; font-size: 0.9rem;">' + display.defaultSize + '</td>' +
-                    '<td style="padding: 12px 16px;">' + areasHtml + '</td>' +
-                    '<td style="padding: 12px 16px; text-align: center;">' +
-                        '<label style="position: relative; display: inline-block; width: 44px; height: 24px;">' +
-                            '<input type="checkbox" ' + (isActive ? 'checked' : '') + ' onchange="toggleWidgetActive(\'' + w.id + '\', this.checked)" style="opacity: 0; width: 0; height: 0;">' +
-                            '<span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: ' + (isActive ? 'var(--success)' : 'var(--gray-300)') + '; border-radius: 24px; transition: 0.3s;"></span>' +
-                            '<span style="position: absolute; height: 18px; width: 18px; left: ' + (isActive ? '23px' : '3px') + '; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s;"></span>' +
-                        '</label>' +
-                    '</td>' +
-                    '<td style="padding: 12px 16px; text-align: center;">' +
-                        '<button onclick="openEditWidgetModal(\'' + w.id + '\')" style="padding: 6px 12px; background: var(--walmart-blue); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background=\'var(--walmart-blue-dark)\'" onmouseout="this.style.background=\'var(--walmart-blue)\'">✏️ Edit</button>' +
-                    '</td>' +
-                '</tr>';
-            }).join('');
-        }
-
-        function toggleWidgetActive(widgetId, isActive) {
-            const config = JSON.parse(localStorage.getItem('activity-hub-widget-active') || '{}');
-            config[widgetId] = isActive;
-            localStorage.setItem('activity-hub-widget-active', JSON.stringify(config));
-            loadWidgetsTable();
-        }
-
-        function openEditWidgetModal(widgetId) {
-            const widget = WIDGET_REGISTRY.find(w => w.id === widgetId);
-            if (!widget) return;
-            
-            const display = getWidgetDisplay(widget);
-            
-            document.getElementById('edit-widget-id').value = widgetId;
-            document.getElementById('edit-widget-name').value = display.name;
-            document.getElementById('edit-widget-description').value = display.description;
-            document.getElementById('edit-widget-size').value = display.defaultSize;
-            
-            // Set available areas checkboxes
-            const activeAreas = getAreasForWidget(widgetId);
-            PLATFORM_AREAS.forEach(area => {
-                const checkbox = document.getElementById('edit-area-' + area.replace(/\s+/g, '-').toLowerCase());
-                if (checkbox) checkbox.checked = activeAreas.includes(area);
-            });
-            
-            showModal('editWidgetModal');
-        }
-
-        function saveWidgetChanges() {
-            const widgetId = document.getElementById('edit-widget-id').value;
-            const name = document.getElementById('edit-widget-name').value.trim();
-            const description = document.getElementById('edit-widget-description').value.trim();
-            const size = document.getElementById('edit-widget-size').value;
-            
-            if (!name || !description) {
-                alert('Please fill in all required fields');
-                return;
-            }
-            
-            // Get selected areas
-            const selectedAreas = [];
-            PLATFORM_AREAS.forEach(area => {
-                const checkbox = document.getElementById('edit-area-' + area.replace(/\s+/g, '-').toLowerCase());
-                if (checkbox && checkbox.checked) selectedAreas.push(area);
-            });
-            
-            if (selectedAreas.length === 0) {
-                alert('Please select at least one available area');
-                return;
-            }
-            
-            // Update widget areas in localStorage
-            const allAreas = getWidgetAreas();
-            allAreas[widgetId] = selectedAreas;
-            localStorage.setItem('activity-hub-widget-areas', JSON.stringify(allAreas));
-            
-            // Update widget customizations in localStorage (name, description, size)
-            const customizations = getWidgetCustomizations();
-            customizations[widgetId] = {
-                name: name,
-                description: description,
-                defaultSize: size
-            };
-            localStorage.setItem('activity-hub-widget-customizations', JSON.stringify(customizations));
-            
-            // Reload table to show changes
-            loadWidgetsTable();
-            hideModal('editWidgetModal');
-        }
+        // ──────────────────────────────────────────────────────────────
+        // WIDGET MANAGEMENT CODE HAS BEEN MOVED TO:
+        // - Interface/Admin/Widgets/widget-registry.js
+        // - Interface/Admin/Widgets/widget-storage.js
+        // - Interface/Admin/Widgets/widget-manager.js
+        //
+        // These are loaded at the bottom of this file
+        // ──────────────────────────────────────────────────────────────
 
         function loadAdminLinks() {
             const listContainer = document.getElementById('admin-managed-links-list');
@@ -3213,6 +3114,22 @@
         window.onclick = function(event) { if (event.target.classList.contains('modal')) event.target.style.display = 'none'; }
 
         function toggleFeedback() { document.getElementById('feedbackModal').classList.toggle('active'); }
+
+        // Dark Mode Toggle
+        function toggleAdminDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('activity-hub-dark-mode', isDark ? 'true' : 'false');
+            const btn = document.querySelector('.page-action-btn[title="Toggle Light/Dark Mode"]');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        if (localStorage.getItem('activity-hub-dark-mode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.addEventListener('DOMContentLoaded', function() {
+                const btn = document.querySelector('.page-action-btn[title="Toggle Light/Dark Mode"]');
+                if (btn) btn.textContent = '☀️';
+            });
+        }
 
         function nextFeedbackStep() {
             const selected = document.querySelector('input[name="feedback-category"]:checked');
@@ -4679,8 +4596,24 @@
                     loadFeedbackData();
                 }
             };
+            
+            // Initialize widget management
+            if (typeof initializeWidgetManagement !== 'undefined') {
+                initializeWidgetManagement();
+            }
         });
 
     </script>
+    
+    <!-- ┌─────────────────────────────────────────────────────────┐ -->
+    <!-- │           WIDGET SYSTEM INTEGRATION                      │ -->
+    <!-- │  Central widget management for Activity Hub             │ -->
+    <!-- │  Provides: Registry, Storage, Admin Functions           │ -->
+    <!-- │  Last Updated: April 16, 2026                           │ -->
+    <!-- └─────────────────────────────────────────────────────────┘ -->
+    
+    <script src="/Admin/Widgets/widget-registry.js"></script>
+    <script src="/Admin/Widgets/widget-storage.js"></script>
+    <script src="/Admin/Widgets/widget-manager.js"></script>
 </body>
 </html>

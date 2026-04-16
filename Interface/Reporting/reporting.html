@@ -147,22 +147,20 @@
             margin-right: 130px;
         }
 
+
         /* Sidebar */
         .quick-links-sidebar {
             position: fixed;
             right: 0;
             top: 88px;
             bottom: 0;
-            width: 130px;
+            width: 120px;
             background: var(--white);
             border-left: 2px solid var(--gray-300);
             overflow-y: auto;
-            z-index: 1001;
-            box-shadow: -2px 0 8px rgba(0,0,0,0.15);
-            padding: 0.5rem 0.5rem 1rem 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            z-index: 40;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.08);
+            padding: 1rem 0.5rem;
         }
 
         .sidebar-header {
@@ -170,31 +168,30 @@
             justify-content: space-between;
             align-items: center;
             padding: 0.5rem;
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--gray-900);
             margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--gray-700);
         }
 
         .sidebar-add-btn {
             background: var(--walmart-blue);
             color: var(--white);
             border: none;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.75rem;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
-            padding: 0;
         }
 
         .sidebar-add-btn:hover {
-            background: #004C91;
+            background: var(--walmart-blue-dark);
             transform: scale(1.1);
         }
 
@@ -441,9 +438,103 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
+            gap: 0.5rem;
             margin-bottom: var(--space-4);
             position: relative;
         }
+
+        .dashboard-action-btn {
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .dashboard-action-btn:hover {
+            border-color: var(--walmart-blue);
+            background: var(--walmart-blue-lightest);
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            --gray-100: #1A202C;
+            --gray-300: #2D3748;
+            --gray-600: #A0AEC0;
+            --gray-700: #CBD5E0;
+            --gray-900: #F7FAFC;
+            --white: #2D3748;
+            background-color: #1A202C;
+            color: #F7FAFC;
+        }
+        body.dark-mode .header {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+        }
+        body.dark-mode .header .nav-item { color: #fff; }
+        body.dark-mode .header .nav-item.active { background: rgba(255,255,255,0.2); }
+        body.dark-mode .header .user-section { color: #fff; }
+        body.dark-mode .header h1 { color: #fff; }
+        body.dark-mode .widget {
+            background: #2D3748;
+            border-color: #4A5568;
+        }
+        body.dark-mode .widget-header {
+            background: linear-gradient(135deg, #2D3748, #1A202C);
+        }
+        body.dark-mode .settings-gear,
+        body.dark-mode .dashboard-action-btn {
+            background: #2D3748;
+            border-color: #4A5568;
+            color: #F7FAFC;
+        }
+        body.dark-mode .metric-card {
+            background: #1A202C;
+        }
+
+        /* Feedback Modal */
+        .fy-feedback-modal {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 380px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow: hidden;
+        }
+        .fy-feedback-modal.active { display: block; animation: fySlideUp 0.3s ease; }
+        @keyframes fySlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .fy-feedback-header { background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%); color: #fff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .fy-feedback-header h3 { font-size: 1rem; margin: 0; }
+        .fy-feedback-close { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; }
+        .fy-feedback-body { padding: 1.5rem; }
+        .fy-fb-step { display: none; }
+        .fy-fb-step.active { display: block; }
+        .fy-fb-categories { display: flex; flex-direction: column; gap: 0.75rem; }
+        .fy-fb-cat { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: #F7FAFC; border: 2px solid transparent; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .fy-fb-cat:hover { background: #E2E8F0; }
+        .fy-fb-cat.selected { border-color: #3B82F6; background: #DBEAFE; }
+        .fy-fb-cat input { display: none; }
+        .fy-fb-cat span { font-size: 1.2rem; }
+        .fy-fb-rating { display: flex; justify-content: space-between; margin: 1.5rem 0; }
+        .fy-fb-rate { display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 0.5rem; border-radius: 8px; transition: all 0.2s; }
+        .fy-fb-rate:hover { background: #F7FAFC; }
+        .fy-fb-rate.selected { background: #DBEAFE; }
+        .fy-fb-rate input { display: none; }
+        .fy-fb-rate .r-emoji { font-size: 1.75rem; margin-bottom: 0.25rem; }
+        .fy-fb-rate .r-label { font-size: 0.7rem; color: #718096; }
+        .fy-fb-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+        .fy-fb-btn-next { flex: 1; background: #1E3A8A; color: #fff; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 500; cursor: pointer; }
+        .fy-fb-btn-next:hover { background: #3B82F6; }
+        .fy-fb-btn-back { background: #F7FAFC; color: #4A5568; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; }
 
         .settings-gear {
             background: var(--white);
@@ -687,7 +778,7 @@
         .add-widget-modal {
             display: none;
             position: fixed;
-            z-index: 1000;
+            z-index: 9999;
             left: 0;
             top: 0;
             width: 100%;
@@ -709,8 +800,34 @@
             width: 90%;
             max-width: 500px;
             animation: slideUp 0.3s ease;
-            max-height: 80vh;
+            max-height: 90vh;
             overflow-y: auto;
+            overflow-x: visible;
+            z-index: 9998;
+            position: relative;
+        }
+        
+        .add-widget-modal-content select {
+            position: relative;
+            z-index: 1002;
+            width: 100%;
+            max-height: none;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: var(--font-primary);
+            background-color: var(--white);
+        }
+        
+        .add-widget-modal-content select option {
+            padding: 0.75rem 0.5rem;
+            line-height: 1.5;
+        }
+        
+        .add-widget-modal-content .form-group {
+            margin-bottom: 1rem;
+            overflow: visible;
         }
 
         .add-widget-list-item {
@@ -1322,12 +1439,9 @@
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
-                <a href="/activity-hub/for-you" class="nav-item" data-view="dashboard">For You</a>
-                <a href="/activity-hub/projects" class="nav-item" data-embed="iframe" data-url="http://weus42608431466:8088/activity-hub/projects">Projects</a>
+                <a href="/activity-hub/for-you" class="nav-item">For You</a>
+                <a href="/activity-hub/projects" class="nav-item">Projects</a>
                 <a href="/activity-hub/reporting" class="nav-item active">Reporting</a>
-                <a href="/activity-hub/teams" class="nav-item">Teams</a>
-                <a href="/activity-hub/my-work" class="nav-item">My Work</a>
-                <a href="/activity-hub/settings" class="nav-item">Settings</a>
                 <a href="/activity-hub/admin" class="nav-item" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
             </nav>
             <div class="user-section">
@@ -1344,9 +1458,11 @@
     <div class="main-container">
         <!-- Settings Gear -->
         <div class="dashboard-header">
+            <button class="dashboard-action-btn" onclick="toggleFYFeedback()" title="Send Feedback">💬</button>
+            <button class="dashboard-action-btn" onclick="toggleDarkMode()" title="Toggle Light/Dark Mode">🌙</button>
             <button class="settings-gear" onclick="toggleGearDropdown()" title="Page Settings">⚙️</button>
             <div id="gearDropdown" class="gear-dropdown">
-                <div class="gear-dropdown-item" onclick="enterEditMode()">✏️ Edit Reporting Page</div>
+                <div class="gear-dropdown-item" onclick="reportingEnterEditMode()">✏️ Edit Reporting Page</div>
             </div>
         </div>
 
@@ -1354,21 +1470,55 @@
         <div id="editToolbar" class="edit-toolbar">
             <div class="edit-toolbar-title">✏️ Editing Reporting Page</div>
             <div class="edit-toolbar-actions">
-                <button class="edit-btn edit-btn-add" onclick="openAddWidgetModal()">+ Add Widget</button>
-                <button class="edit-btn edit-btn-reset" onclick="resetWidgetLayout()">↩ Reset to Default</button>
-                <button class="edit-btn edit-btn-done" onclick="exitEditMode()">✓ Done Editing</button>
+                <button class="edit-btn edit-btn-add" onclick="reportingOpenAddWidgetModal()">+ Add Widget</button>
+                <button class="edit-btn edit-btn-reset" onclick="reportingResetWidgetLayout()">↩ Reset to Default</button>
+                <button class="edit-btn edit-btn-done" onclick="reportingExitEditMode()">✓ Done Editing</button>
             </div>
         </div>
 
         <!-- Dashboard Grid -->
         <main class="dashboard" id="widgetGrid">
+            <!-- Projects Metrics Widget -->
+            <div class="widget report-widget widget-extra-large" data-widget-id="projects-metrics" data-widget-name="Projects Metrics" data-default-size="widget-extra-large" data-areas="reporting" draggable="false">
+                <div class="widget-edit-controls">
+                    <span class="widget-ctrl-label">Projects Metrics</span>
+                    <div class="widget-ctrl-group">
+                        <button class="widget-ctrl-btn" onclick="reportingResizeWidget('projects-metrics')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="reportingRemoveWidget('projects-metrics')" title="Remove">✕</button>
+                    </div>
+                </div>
+                <div class="widget-header">
+                    📊 Projects Overview
+                </div>
+                <div class="widget-content">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                        <div class="metric-card">
+                            <div class="metric-value" id="projects-total">4</div>
+                            <div class="metric-label">Active Projects</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="projects-owners">2</div>
+                            <div class="metric-label">Unique Owners</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="projects-updated">2</div>
+                            <div class="metric-label">Updated This Week</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="projects-percent">50.0%</div>
+                            <div class="metric-label">Percent Updated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Activity Dashboard Widget -->
             <div class="widget report-widget widget-extra-large" data-widget-id="activity-dashboard" data-widget-name="Activity Dashboard" data-default-size="widget-extra-large" data-areas="reporting" draggable="false">
                 <div class="widget-edit-controls">
                     <span class="widget-ctrl-label">Activity Dashboard</span>
                     <div class="widget-ctrl-group">
-                        <button class="widget-ctrl-btn" onclick="resizeWidget('activity-dashboard')" title="Resize">↔ Resize</button>
-                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('activity-dashboard')" title="Remove">✕</button>
+                        <button class="widget-ctrl-btn" onclick="reportingResizeWidget('activity-dashboard')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="reportingRemoveWidget('activity-dashboard')" title="Remove">✕</button>
                     </div>
                 </div>
                 <div class="widget-header">
@@ -1417,8 +1567,8 @@
                 <div class="widget-edit-controls">
                     <span class="widget-ctrl-label">Project Reports</span>
                     <div class="widget-ctrl-group">
-                        <button class="widget-ctrl-btn" onclick="resizeWidget('project-reports')" title="Resize">↔ Resize</button>
-                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('project-reports')" title="Remove">✕</button>
+                        <button class="widget-ctrl-btn" onclick="reportingResizeWidget('project-reports')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="reportingRemoveWidget('project-reports')" title="Remove">✕</button>
                     </div>
                 </div>
                 <div class="widget-header">
@@ -1497,8 +1647,8 @@
                 <div class="widget-edit-controls">
                     <span class="widget-ctrl-label">Key Metrics</span>
                     <div class="widget-ctrl-group">
-                        <button class="widget-ctrl-btn" onclick="resizeWidget('key-metrics')" title="Resize">↔ Resize</button>
-                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('key-metrics')" title="Remove">✕</button>
+                        <button class="widget-ctrl-btn" onclick="reportingResizeWidget('key-metrics')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="reportingRemoveWidget('key-metrics')" title="Remove">✕</button>
                     </div>
                 </div>
                 <div class="widget-header">
@@ -1541,8 +1691,8 @@
                 <div class="widget-edit-controls">
                     <span class="widget-ctrl-label">My Reports</span>
                     <div class="widget-ctrl-group">
-                        <button class="widget-ctrl-btn" onclick="resizeWidget('my-reports')" title="Resize">↔ Resize</button>
-                        <button class="widget-ctrl-btn remove-btn" onclick="removeWidget('my-reports')" title="Remove">✕</button>
+                        <button class="widget-ctrl-btn" onclick="reportingResizeWidget('my-reports')" title="Resize">↔ Resize</button>
+                        <button class="widget-ctrl-btn remove-btn" onclick="reportingRemoveWidget('my-reports')" title="Remove">✕</button>
                     </div>
                 </div>
                 <div class="widget-header">
@@ -1568,7 +1718,7 @@
             </div>
 
             <!-- Add Widget Placeholder -->
-            <div class="add-widget-placeholder" onclick="openAddWidgetModal()">
+            <div class="add-widget-placeholder" onclick="reportingOpenAddWidgetModal()">
                 <div class="add-widget-placeholder-text">+ Add Widget</div>
             </div>
         </main>
@@ -1579,7 +1729,7 @@
         <div class="add-widget-modal-content">
             <div class="modal-header">
                 <h2>➕ Add Widget</h2>
-                <button class="modal-close" onclick="closeAddWidgetModal()">✕</button>
+                <button class="modal-close" onclick="reportingCloseAddWidgetModal()">✕</button>
             </div>
             <p style="color: var(--gray-600); margin-bottom: 1rem;">Select a widget to add back to your dashboard:</p>
             <div id="addWidgetList"></div>
@@ -1604,10 +1754,12 @@
                     <div class="form-group">
                         <select id="updateWidgetSelect" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 0.9rem; font-family: var(--font-primary);">
                             <option value="">-- Select a Widget --</option>
-                            <option value="key-metrics">Key Reporting Metrics</option>
+                            <option value="key-metrics">Key Metrics</option>
                             <option value="activity-dashboard">Activity Dashboard</option>
                             <option value="project-reports">Project Reports</option>
                             <option value="my-reports">My Reports</option>
+                            <option value="projects-metrics">Projects Overview</option>
+                            <option value="team-activity">Team Activity Feed</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1789,7 +1941,91 @@
         </div>
     </div>
 
+    <!-- Feedback Modal -->
+    <div id="fyFeedbackModal" class="fy-feedback-modal">
+        <div class="fy-feedback-header"><h3>💬 Send Feedback</h3><button class="fy-feedback-close" onclick="toggleFYFeedback()">×</button></div>
+        <div class="fy-feedback-body">
+            <div id="fy-fb-step1" class="fy-fb-step active">
+                <p style="margin-bottom: 1rem; color: #718096;">What area would you like to give feedback on?</p>
+                <div class="fy-fb-categories">
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Dashboard UI"><span>🎨</span> Dashboard UI</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Widgets"><span>🧩</span> Widgets</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Reporting"><span>📊</span> Reporting</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Data"><span>📈</span> Data & Charts</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Other"><span>💡</span> Other</label>
+                </div>
+                <div class="fy-fb-actions"><button class="fy-fb-btn-next" onclick="fyFbNext()">Next →</button></div>
+            </div>
+            <div id="fy-fb-step2" class="fy-fb-step">
+                <p style="margin-bottom: 0.5rem; color: #718096;">How would you rate this aspect?</p>
+                <div class="fy-fb-rating">
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="1"><span class="r-emoji">😞</span><span class="r-label">Poor</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="2"><span class="r-emoji">😐</span><span class="r-label">Fair</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="3"><span class="r-emoji">😊</span><span class="r-label">Good</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="4"><span class="r-emoji">😄</span><span class="r-label">Great</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="5"><span class="r-emoji">🤩</span><span class="r-label">Excellent</span></label>
+                </div>
+                <div style="margin-bottom: 0.75rem;"><label style="font-size: 0.85rem; font-weight: 500; color: #4A5568; display: block; margin-bottom: 4px;">Comments (optional)</label><textarea id="fyFbComments" style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.9rem; font-family: inherit; resize: vertical;" placeholder="Tell us more..."></textarea></div>
+                <p style="font-size: 0.7rem; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 0.3rem 0.5rem; margin-bottom: 0.5rem;">🔒 Do not enter payment card information.</p>
+                <div class="fy-fb-actions"><button class="fy-fb-btn-back" onclick="fyFbBack()">← Back</button><button class="fy-fb-btn-next" onclick="fyFbSubmit()">Submit</button></div>
+            </div>
+            <div id="fy-fb-step3" class="fy-fb-step">
+                <div style="text-align: center; padding: 2rem 1rem;"><div style="font-size: 3rem; margin-bottom: 1rem;">✅</div><h3 style="margin-bottom: 0.5rem;">Thank You!</h3><p style="color: #718096;">Your feedback has been submitted.</p><button class="fy-fb-btn-next" style="margin-top: 1.5rem;" onclick="fyFbReset()">Close</button></div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // ──────────────────────────────────────────────
+        // Dark Mode Toggle
+        // ──────────────────────────────────────────────
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('activity-hub-dark-mode', isDark ? 'true' : 'false');
+            const btn = document.querySelector('.dashboard-action-btn[title="Toggle Light/Dark Mode"]');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        if (localStorage.getItem('activity-hub-dark-mode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.addEventListener('DOMContentLoaded', function() {
+                const btn = document.querySelector('.dashboard-action-btn[title="Toggle Light/Dark Mode"]');
+                if (btn) btn.textContent = '☀️';
+            });
+        }
+
+        // ──────────────────────────────────────────────
+        // Feedback Modal
+        // ──────────────────────────────────────────────
+        function toggleFYFeedback() { document.getElementById('fyFeedbackModal').classList.toggle('active'); }
+        function fyFbNext() {
+            if (!document.querySelector('input[name="fy-fb-category"]:checked')) { alert('Please select a category'); return; }
+            document.getElementById('fy-fb-step1').classList.remove('active');
+            document.getElementById('fy-fb-step2').classList.add('active');
+        }
+        function fyFbBack() { document.getElementById('fy-fb-step2').classList.remove('active'); document.getElementById('fy-fb-step1').classList.add('active'); }
+        function fyFbSubmit() {
+            const rating = document.querySelector('input[name="fy-fb-rating"]:checked');
+            if (!rating) { alert('Please select a rating'); return; }
+            let list = []; try { list = JSON.parse(localStorage.getItem('activity-hub-feedback') || '[]'); } catch {}
+            list.push({ source: 'Reporting', category: document.querySelector('input[name="fy-fb-category"]:checked').value, rating: parseInt(rating.value), comments: document.getElementById('fyFbComments').value.trim(), submittedAt: new Date().toISOString(), submittedBy: 'Current User' });
+            localStorage.setItem('activity-hub-feedback', JSON.stringify(list));
+            document.getElementById('fy-fb-step2').classList.remove('active');
+            document.getElementById('fy-fb-step3').classList.add('active');
+        }
+        function fyFbReset() {
+            document.querySelectorAll('.fy-fb-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('fy-fb-step1').classList.add('active');
+            document.querySelectorAll('input[name="fy-fb-category"], input[name="fy-fb-rating"]').forEach(i => i.checked = false);
+            document.getElementById('fyFbComments').value = '';
+            document.querySelectorAll('.fy-fb-cat, .fy-fb-rate').forEach(el => el.classList.remove('selected'));
+            toggleFYFeedback();
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.fy-fb-cat').forEach(c => { c.addEventListener('click', function() { document.querySelectorAll('.fy-fb-cat').forEach(x => x.classList.remove('selected')); this.classList.add('selected'); }); });
+            document.querySelectorAll('.fy-fb-rate').forEach(r => { r.addEventListener('click', function() { document.querySelectorAll('.fy-fb-rate').forEach(x => x.classList.remove('selected')); this.classList.add('selected'); }); });
+        });
+
         // ──────────────────────────────────────────────
         // Link Management - Initialize user links storage
         // ──────────────────────────────────────────────
@@ -2161,7 +2397,7 @@
             return null;
         }
 
-        function saveWidgetConfig() {
+        function reportingSaveWidgetConfig() {
             const grid = document.getElementById('widgetGrid');
             const widgets = grid.querySelectorAll('.widget[data-widget-id]');
             const order = [];
@@ -2224,7 +2460,7 @@
         // ──────────────────────────────────────────────
         // Edit Mode: Enter / Exit
         // ──────────────────────────────────────────────
-        function enterEditMode() {
+        function reportingEnterEditMode() {
             isEditMode = true;
             document.body.classList.add('edit-mode');
             document.getElementById('gearDropdown').classList.remove('show');
@@ -2235,7 +2471,7 @@
             });
         }
 
-        function exitEditMode() {
+        function reportingExitEditMode() {
             isEditMode = false;
             document.body.classList.remove('edit-mode');
             document.getElementById('editToolbar').classList.remove('show');
@@ -2245,13 +2481,13 @@
                 w.classList.remove('dragging', 'drag-over');
             });
 
-            saveWidgetConfig();
+            reportingSaveWidgetConfig();
         }
 
         // ──────────────────────────────────────────────
         // Edit Mode: Resize Widget
         // ──────────────────────────────────────────────
-        function resizeWidget(widgetId) {
+        function reportingResizeWidget(widgetId) {
             const w = document.querySelector('[data-widget-id="' + widgetId + '"]');
             if (!w) return;
 
@@ -2267,7 +2503,7 @@
         // ──────────────────────────────────────────────
         // Edit Mode: Remove Widget
         // ──────────────────────────────────────────────
-        function removeWidget(widgetId) {
+        function reportingRemoveWidget(widgetId) {
             const w = document.querySelector('[data-widget-id="' + widgetId + '"]');
             if (w) w.classList.add('widget-hidden');
         }
@@ -2275,30 +2511,47 @@
         // ──────────────────────────────────────────────
         // Edit Mode: Add Widget Modal
         // ──────────────────────────────────────────────
-        function openAddWidgetModal() {
-            const list = document.getElementById('addWidgetList');
-            const hiddenWidgets = document.querySelectorAll('.widget.widget-hidden[data-widget-id]');
+        function reportingOpenAddWidgetModal() {
+            try {
+                // CRITICAL: Show modal FIRST before populating content
+                // This prevents early returns from blocking modal display
+                const modal = document.getElementById('addWidgetModal');
+                if (!modal) {
+                    console.error('addWidgetModal element not found');
+                    return;
+                }
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+                
+                // THEN: Populate the content
+                const list = document.getElementById('addWidgetList');
+                if (!list) {
+                    console.error('addWidgetList element not found');
+                    return;
+                }
+                
+                const hiddenWidgets = document.querySelectorAll('.widget.widget-hidden[data-widget-id]');
 
-            if (hiddenWidgets.length === 0) {
-                list.innerHTML = '<p style="color: var(--gray-600); padding: 1rem; text-align: center;">All widgets are currently on your dashboard.</p>';
-            } else {
-                let html = '';
-                hiddenWidgets.forEach(w => {
-                    const id = w.dataset.widgetId;
-                    const name = w.dataset.widgetName;
-                    html += '<div class="add-widget-list-item">' +
-                        '<div><div class="widget-item-name">' + name + '</div></div>' +
-                        '<button class="btn-submit" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" onclick="restoreWidget(\'' + id + '\')">+ Add</button>' +
-                        '</div>';
-                });
-                list.innerHTML = html;
+                if (hiddenWidgets.length === 0) {
+                    list.innerHTML = '<p style="color: var(--gray-600); padding: 1rem; text-align: center;">All widgets are currently on your dashboard.</p>';
+                } else {
+                    let html = '';
+                    hiddenWidgets.forEach(w => {
+                        const id = w.dataset.widgetId;
+                        const name = w.dataset.widgetName;
+                        html += '<div class="add-widget-list-item">' +
+                            '<div><div class="widget-item-name">' + name + '</div></div>' +
+                            '<button class="btn-submit" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;" onclick="restoreWidget(\'' + id + '\')">+ Add</button>' +
+                            '</div>';
+                    });
+                    list.innerHTML = html;
+                }
+            } catch (e) {
+                console.error('Error in reportingOpenAddWidgetModal:', e);
             }
-
-            document.getElementById('addWidgetModal').classList.add('show');
-            document.body.style.overflow = 'hidden';
         }
 
-        function closeAddWidgetModal() {
+        function reportingCloseAddWidgetModal() {
             document.getElementById('addWidgetModal').classList.remove('show');
             document.body.style.overflow = 'auto';
         }
@@ -2306,7 +2559,7 @@
         function restoreWidget(widgetId) {
             const w = document.querySelector('[data-widget-id="' + widgetId + '"]');
             if (w) w.classList.remove('widget-hidden');
-            closeAddWidgetModal();
+            reportingCloseAddWidgetModal();
         }
 
         // ──────────────────────────────────────────────
@@ -2390,7 +2643,7 @@
         // ──────────────────────────────────────────────
         // Edit Mode: Reset to Default
         // ──────────────────────────────────────────────
-        function resetWidgetLayout() {
+        function reportingResetWidgetLayout() {
             if (!confirm('Reset the Reporting Page to the default layout? This will undo all customizations.')) return;
 
             localStorage.removeItem(WIDGET_CONFIG_KEY);
@@ -2446,12 +2699,83 @@
         // Initialize on Page Load
         // ──────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize widget system first if available
+            if (typeof initializePageWidgets !== 'undefined') {
+                try {
+                    initializeWidgetStorage();
+                    
+                    // Get configured widgets for this page
+                    const configuredWidgets = getActiveWidgetsForArea('Reporting');
+                    const hardcodedWidgetIds = ['projects-metrics', 'activity-dashboard', 'project-reports', 'key-metrics', 'my-reports'];
+                    
+                    // Find widgets that are configured but not hardcoded
+                    const additionalWidgets = configuredWidgets.filter(w => !hardcodedWidgetIds.includes(w.id));
+                    
+                    // If there are additional widgets, add them
+                    if (additionalWidgets.length > 0) {
+                        const grid = document.getElementById('widgetGrid');
+                        if (grid) {
+                            additionalWidgets.forEach(widget => {
+                                const display = getWidgetDisplay(widget);
+   const section = document.createElement('div');
+                                section.className = 'widget';
+                                section.id = `widget-${widget.id}`;
+                                section.setAttribute('data-widget-id', widget.id);
+                                section.style.gridColumn = 'span 2';
+                                section.innerHTML = `
+                                    <div style="padding: 1.5rem;">
+                                        <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">${display.name}</div>
+                                        <div style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">${display.description}</div>
+                                        <div style="color: #999; text-align: center; padding: 2rem;">
+                                            [${widget.id} content would load here]
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                grid.appendChild(section);
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Widget system initialization error:', e.message);
+                }
+            }
+            
             applyWidgetConfig();
             // Collapse categories by default for cleaner sidebar
             document.querySelectorAll('.sidebar-category').forEach((cat, idx) => {
                 if (idx > 0) cat.classList.add('collapsed');
             });
+            
+            // Load Projects Metrics
+            loadProjectsMetrics();
         });
+
+        // Load Projects Metrics from API
+        function loadProjectsMetrics() {
+            fetch('/api/projects/metrics?status=Active')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.metrics) {
+                        document.getElementById('projects-total').textContent = data.metrics.active_projects || 0;
+                        document.getElementById('projects-owners').textContent = data.metrics.unique_owners || 0;
+                        document.getElementById('projects-updated').textContent = data.metrics.projects_updated_this_week || 0;
+                        document.getElementById('projects-percent').textContent = (data.metrics.percent_updated || 0).toFixed(1) + '%';
+                    }
+                })
+                .catch(error => console.error('Error loading projects metrics:', error));
+        }
     </script>
+    
+    <!-- ┌─────────────────────────────────────────────────────────┐ -->
+    <!-- │           WIDGET SYSTEM INTEGRATION                      │ -->
+    <!-- │  Central widget management for Activity Hub             │ -->
+    <!-- │  Provides: Registry, Storage, Page Display Functions    │ -->
+    <!-- │  Last Updated: April 16, 2026                           │ -->
+    <!-- └─────────────────────────────────────────────────────────┘ -->
+    
+    <script src="/Admin/Widgets/widget-registry.js"></script>
+    <script src="/Admin/Widgets/widget-storage.js"></script>
+    <script src="/Admin/Widgets/widget-page-utils.js"></script>
 </body>
 </html>

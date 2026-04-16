@@ -281,6 +281,58 @@
             position: relative;
             z-index: 400;
         }
+
+        .header-action-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #fff;
+        }
+        .header-action-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        body.dark-mode {
+            background-color: #1A202C;
+            color: #F7FAFC;
+        }
+        body.dark-mode .header {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+        }
+        body.dark-mode .sidebar {
+            background: #2D3748;
+            border-color: #4A5568;
+        }
+        body.dark-mode #projects-iframe {
+            background: #1A202C;
+        }
+
+        /* Feedback Modal */
+        .fy-feedback-modal { display: none; position: fixed; bottom: 24px; right: 24px; width: 380px; background: #fff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 1000; overflow: hidden; }
+        .fy-feedback-modal.active { display: block; }
+        .fy-fb-hdr { background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%); color: #fff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .fy-fb-hdr h3 { font-size: 1rem; margin: 0; }
+        .fy-fb-cls { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; }
+        .fy-fb-body { padding: 1.5rem; }
+        .fy-fb-step { display: none; } .fy-fb-step.active { display: block; }
+        .fy-fb-cats { display: flex; flex-direction: column; gap: 0.75rem; }
+        .fy-fb-c { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: #F7FAFC; border: 2px solid transparent; border-radius: 8px; cursor: pointer; }
+        .fy-fb-c:hover { background: #E2E8F0; } .fy-fb-c.selected { border-color: #3B82F6; background: #DBEAFE; } .fy-fb-c input { display: none; } .fy-fb-c span { font-size: 1.2rem; }
+        .fy-fb-rtg { display: flex; justify-content: space-between; margin: 1.5rem 0; }
+        .fy-fb-r { display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 0.5rem; border-radius: 8px; }
+        .fy-fb-r:hover { background: #F7FAFC; } .fy-fb-r.selected { background: #DBEAFE; } .fy-fb-r input { display: none; }
+        .fy-fb-r .re { font-size: 1.75rem; } .fy-fb-r .rl { font-size: 0.7rem; color: #718096; }
+        .fy-fb-acts { display: flex; gap: 0.75rem; margin-top: 1rem; }
+        .fy-fb-nxt { flex: 1; background: #1E3A8A; color: #fff; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 500; cursor: pointer; }
+        .fy-fb-bck { background: #F7FAFC; color: #4A5568; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -295,12 +347,11 @@
                 <a href="/activity-hub/for-you" class="nav-item" onclick="navigateTo(event, '/activity-hub/for-you')">For You</a>
                 <a href="/activity-hub/projects" class="nav-item active" onclick="navigateTo(event, '/activity-hub/projects')">Projects</a>
                 <a href="/activity-hub/reporting" class="nav-item" onclick="navigateTo(event, '/activity-hub/reporting')">Reporting</a>
-                <a href="/activity-hub/teams" class="nav-item" onclick="navigateTo(event, '/activity-hub/teams')">Teams</a>
-                <a href="/activity-hub/my-work" class="nav-item" onclick="navigateTo(event, '/activity-hub/my-work')">My Work</a>
-                <a href="/activity-hub/settings" class="nav-item" onclick="navigateTo(event, '/activity-hub/settings')">Settings</a>
                 <a href="/activity-hub/admin" class="nav-item" onclick="navigateTo(event, '/activity-hub/admin')" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
             </nav>
             <div class="user-section">
+                <button class="header-action-btn" onclick="toggleProjFeedback()" title="Send Feedback">💬</button>
+                <button class="header-action-btn" onclick="toggleProjDarkMode()" title="Toggle Light/Dark Mode">🌙</button>
                 <div class="notification-bell">
                     🔔
                     <div class="notification-badge">3</div>
@@ -428,6 +479,85 @@
         
         // Ensure sidebar stays visible after iframe interaction
         window.addEventListener('load', ensureSidebarVisible);
+
+        // Dark Mode Toggle
+        function toggleProjDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('activity-hub-dark-mode', isDark ? 'true' : 'false');
+            const btn = document.querySelector('.header-action-btn[title="Toggle Light/Dark Mode"]');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        if (localStorage.getItem('activity-hub-dark-mode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.addEventListener('DOMContentLoaded', function() {
+                const btn = document.querySelector('.header-action-btn[title="Toggle Light/Dark Mode"]');
+                if (btn) btn.textContent = '☀️';
+            });
+        }
+
+        // Feedback
+        function toggleProjFeedback() { document.getElementById('projFbModal').classList.toggle('active'); }
+        function projFbNext() {
+            if (!document.querySelector('input[name="proj-fb-cat"]:checked')) { alert('Please select a category'); return; }
+            document.getElementById('proj-fb-s1').classList.remove('active');
+            document.getElementById('proj-fb-s2').classList.add('active');
+        }
+        function projFbBack() { document.getElementById('proj-fb-s2').classList.remove('active'); document.getElementById('proj-fb-s1').classList.add('active'); }
+        function projFbSubmit() {
+            const rating = document.querySelector('input[name="proj-fb-rating"]:checked');
+            if (!rating) { alert('Please select a rating'); return; }
+            let list = []; try { list = JSON.parse(localStorage.getItem('activity-hub-feedback') || '[]'); } catch {}
+            list.push({ source: 'Projects', category: document.querySelector('input[name="proj-fb-cat"]:checked').value, rating: parseInt(rating.value), comments: document.getElementById('projFbComments').value.trim(), submittedAt: new Date().toISOString(), submittedBy: 'Current User' });
+            localStorage.setItem('activity-hub-feedback', JSON.stringify(list));
+            document.getElementById('proj-fb-s2').classList.remove('active');
+            document.getElementById('proj-fb-s3').classList.add('active');
+        }
+        function projFbReset() {
+            document.querySelectorAll('.fy-fb-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('proj-fb-s1').classList.add('active');
+            document.querySelectorAll('input[name="proj-fb-cat"], input[name="proj-fb-rating"]').forEach(i => i.checked = false);
+            document.getElementById('projFbComments').value = '';
+            document.querySelectorAll('.fy-fb-c, .fy-fb-r').forEach(el => el.classList.remove('selected'));
+            toggleProjFeedback();
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.fy-fb-c').forEach(c => { c.addEventListener('click', function() { document.querySelectorAll('.fy-fb-c').forEach(x => x.classList.remove('selected')); this.classList.add('selected'); }); });
+            document.querySelectorAll('.fy-fb-r').forEach(r => { r.addEventListener('click', function() { document.querySelectorAll('.fy-fb-r').forEach(x => x.classList.remove('selected')); this.classList.add('selected'); }); });
+        });
     </script>
+
+    <!-- Feedback Modal -->
+    <div id="projFbModal" class="fy-feedback-modal">
+        <div class="fy-fb-hdr"><h3>💬 Send Feedback</h3><button class="fy-fb-cls" onclick="toggleProjFeedback()">×</button></div>
+        <div class="fy-fb-body">
+            <div id="proj-fb-s1" class="fy-fb-step active">
+                <p style="margin-bottom: 1rem; color: #718096;">What area would you like to give feedback on?</p>
+                <div class="fy-fb-cats">
+                    <label class="fy-fb-c"><input type="radio" name="proj-fb-cat" value="Projects UI"><span>📋</span> Projects UI</label>
+                    <label class="fy-fb-c"><input type="radio" name="proj-fb-cat" value="Data"><span>📊</span> Data & Upload</label>
+                    <label class="fy-fb-c"><input type="radio" name="proj-fb-cat" value="Navigation"><span>🧭</span> Navigation</label>
+                    <label class="fy-fb-c"><input type="radio" name="proj-fb-cat" value="Other"><span>💡</span> Other</label>
+                </div>
+                <div class="fy-fb-acts"><button class="fy-fb-nxt" onclick="projFbNext()">Next →</button></div>
+            </div>
+            <div id="proj-fb-s2" class="fy-fb-step">
+                <p style="margin-bottom: 0.5rem; color: #718096;">How would you rate this aspect?</p>
+                <div class="fy-fb-rtg">
+                    <label class="fy-fb-r"><input type="radio" name="proj-fb-rating" value="1"><span class="re">😞</span><span class="rl">Poor</span></label>
+                    <label class="fy-fb-r"><input type="radio" name="proj-fb-rating" value="2"><span class="re">😐</span><span class="rl">Fair</span></label>
+                    <label class="fy-fb-r"><input type="radio" name="proj-fb-rating" value="3"><span class="re">😊</span><span class="rl">Good</span></label>
+                    <label class="fy-fb-r"><input type="radio" name="proj-fb-rating" value="4"><span class="re">😄</span><span class="rl">Great</span></label>
+                    <label class="fy-fb-r"><input type="radio" name="proj-fb-rating" value="5"><span class="re">🤩</span><span class="rl">Excellent</span></label>
+                </div>
+                <div style="margin-bottom: 0.75rem;"><label style="font-size: 0.85rem; font-weight: 500; color: #4A5568; display: block; margin-bottom: 4px;">Comments (optional)</label><textarea id="projFbComments" style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.9rem; font-family: inherit; resize: vertical;" placeholder="Tell us more..."></textarea></div>
+                <p style="font-size: 0.7rem; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 0.3rem 0.5rem; margin-bottom: 0.5rem;">🔒 Do not enter payment card information.</p>
+                <div class="fy-fb-acts"><button class="fy-fb-bck" onclick="projFbBack()">← Back</button><button class="fy-fb-nxt" onclick="projFbSubmit()">Submit</button></div>
+            </div>
+            <div id="proj-fb-s3" class="fy-fb-step">
+                <div style="text-align: center; padding: 2rem 1rem;"><div style="font-size: 3rem; margin-bottom: 1rem;">✅</div><h3 style="margin-bottom: 0.5rem;">Thank You!</h3><p style="color: #718096;">Your feedback has been submitted.</p><button class="fy-fb-nxt" style="margin-top: 1.5rem;" onclick="projFbReset()">Close</button></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

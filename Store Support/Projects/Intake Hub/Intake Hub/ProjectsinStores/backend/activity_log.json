@@ -3896,6 +3896,87 @@
       "user_email": "krush@homeoffice.wal-mart.com",
       "details": "Logged in via windows_ad",
       "category": "dashboard_main"
+    },
+    {
+      "id": "61e1818c",
+      "timestamp": "2026-04-16 12:12:22",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "be7a48bc",
+      "timestamp": "2026-04-16 14:54:06",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "8e02a39f",
+      "timestamp": "2026-04-16 14:54:08",
+      "action": "Accessed Email Reports",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Opened Email Reports dashboard",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "52a5e4a7",
+      "timestamp": "2026-04-16 14:54:08",
+      "action": "Loaded Reports List",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed 0 total reports (filtered by user), 0 active",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "458930e4",
+      "timestamp": "2026-04-16 14:54:12",
+      "action": "Accessed Login Tracking",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed login history and unique users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "132273e6",
+      "timestamp": "2026-04-16 14:54:18",
+      "action": "Accessed Activity Log",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Viewed activity log and active users",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "a47c5ef7",
+      "timestamp": "2026-04-16 14:54:20",
+      "action": "Accessed Fix Management",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Opened pending fixes dashboard",
+      "category": "dashboard_admin"
+    },
+    {
+      "id": "9966fb4a",
+      "timestamp": "2026-04-16 15:02:07",
+      "action": "Fix Approved",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Approved fix b8af1fbe",
+      "category": "admin"
+    },
+    {
+      "id": "c80f0c9e",
+      "timestamp": "2026-04-16 15:02:07",
+      "action": "Approved Fix",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Fixed issue FIX-b8af1fbe - Manual acknowledgment",
+      "category": "dashboard_admin"
     }
   ]
 }

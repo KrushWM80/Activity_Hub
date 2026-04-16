@@ -204,6 +204,137 @@ Every 30 minutes (background thread)
 | SQLite Cache | Fast local queries | Auto-indexed | Real-time |
 | Job Code Master | Enrichment (category, family, etc.) | Dashboard UI | On-demand |
 | Teaming Excel | Team assignments | Manual upload | When updated |
+| **ELM** | **WM Stores, Facilities & Banner Codes** | **Auto-sync** | **Daily** |
+
+---
+
+## ELM Datasource - WM Stores & Facilities (Updated - April 16, 2026)
+
+### Overview
+**ELM (Enterprise Location Management)** is the authoritative source for all Walmart store and facility information, including complete banner code definitions.
+
+### Key Tables
+
+| Table | Project | Dataset | Purpose |
+|-------|---------|---------|---------|
+| `division_view` | `wmt-loc-cat-prod` | `catalog_location_views` | Store details, banners, locations, status |
+| `businessunit_view` | `wmt-loc-cat-prod` | `catalog_location_views` | Business unit hierarchy and organization |
+
+### Division Structure
+
+**Division 1: WM US Stores**
+- Format: Standard Walmart Supercenters, Neighborhood Markets, etc.
+- Banner codes: WAL, NHM, SAM, and others
+- Used for: Store-level targeting and job codes
+
+**Division 10: Health & Wellness (H&W)**
+- Format: Pharmacy operations, health facilities
+- Banner codes: RX and H&W specific codes
+- Used for: Pharmacy and health-focused job codes
+
+### Query Template - Division 1 (WM US Stores)
+
+```sql
+SELECT
+  CAST(business_unit_nbr AS NUMERIC) AS STORE_NBR,
+  physical_city AS CITY_NAME,
+  LEFT(physical_zip_code,5) AS POSTAL_CODE,
+  region_code AS REGION_NBR,
+  martket_code AS MARKET_AREA_NBR,
+  division_nbr,
+  division_name,
+  format_code,
+  CASE division_name
+    WHEN 'WAL-MART STORES INC.' THEN 'Store'
+    WHEN 'PHARMACY' THEN 'H&W'
+    ELSE division_name
+  END AS Alignment,
+  CASE subdivision_code
+    WHEN 'A' THEN 'SOUTHEAST BU'
+    WHEN 'B' THEN 'SOUTHWEST BU'
+    WHEN 'C' THEN 'FORMAT DEVELOPMENT'
+    WHEN 'D' THEN 'STORE NO 8'
+    WHEN 'E' THEN 'NORTH BU'
+    WHEN 'F' THEN 'EAST BU'
+    WHEN 'G' THEN 'RETAIL SUBDIVISION G'
+    WHEN 'M' THEN 'WEST BU'
+    WHEN 'O' THEN 'NHM BU'
+    WHEN 'X' THEN 'US Retail SD X'
+    WHEN 'I' THEN 'PR BU'
+    WHEN 'Z' THEN 'RX Facilities'
+    ELSE subdivision_code
+  END AS SUBDIV_NAME,
+  banner_code AS BANNER_CODE,
+  banner_desc AS BANNER_DESC,
+  bu_status_code AS OPEN_STATUS_CODE,
+  bu_status_desc AS OPEN_STATUS_DESC,
+  physical_county AS COUNTY_NAME,
+  physical_country_code AS COUNTRY_CODE,
+  physical_state_code AS STATE_PROV_CODE,
+  LATITUDE AS LATITUDE_DGR,
+  longitude AS LONGITUDE_DGR
+FROM
+  `wmt-loc-cat-prod.catalog_location_views.division_view`
+WHERE
+  physical_country_code = 'US'
+  AND base_division_desc = "WAL-MART STORES INC."
+  AND division_nbr = 1
+  AND bu_status_desc != 'CLOSED'
+  AND Date(new_bu_start_date) <= date_add(current_date(), INTERVAL 90 DAY)
+```
+
+### Query Template - Division 10 (Health & Wellness)
+
+Same structure as Division 1, but with `division_nbr = 10`
+
+### Output Tables
+
+**Division 1 Data:**
+- BigQuery: `wmt-assetprotection-prod.Store_Support_Dev.Store Cur Div 1 Data`
+- Frequency: Daily (queries run each morning)
+
+**Division 10 Data:**
+- BigQuery: `wmt-assetprotection-prod.Store_Support_Dev.Store Cur Div 10 Data`
+- Frequency: Daily (queries run each morning)
+
+### Banner Codes Reference
+
+Extracted from ELM `division_view.banner_code` and `banner_desc` - **Division 1 & 10 only**:
+
+**Division 1 - WM US Stores (Primary Retail):**
+
+| Code | Description | Type |
+|------|-------------|------|
+| A1 | WM Supercenter | Store |
+| B2 | Walmart Express | Store |
+| B4 | Neighborhood Market | Store |
+| C7 | Wal-Mart | Store |
+| D7 | Sam's Club | Store |
+| H8 | walmart.com | eCommerce |
+| H9 | samsclub.com | eCommerce |
+| O3 | WM On Campus/RX Facilities | Special |
+| S3 | WALMART NEIGHBORHOOD MARKET | Store |
+| Z1 | STAND ALONE PICKUP | Special |
+
+**Division 10 - Health & Wellness:**
+
+| Code | Description | Type |
+|------|-------------|------|
+| N7 | Pharmacy | H&W |
+| O3 | WM On Campus/RX Facilities | Special |
+
+**Note**: O3 (WM On Campus/RX Facilities) appears in both divisions and represents specialty facilities
+
+### Usage in Dashboard
+
+**Banner Code Dropdown:**
+- Source: Query result from `Store Cur Div 1 Data` and `Store Cur Div 10 Data` tables
+- Display format: `{BANNER_CODE} - {BANNER_DESC}`
+- Examples:
+  - `WAL - Walmart Supercenter`
+  - `NHM - Neighborhood Market`
+  - `RX - Pharmacy`
+  - `O3 - Aligned`
 
 ---
 

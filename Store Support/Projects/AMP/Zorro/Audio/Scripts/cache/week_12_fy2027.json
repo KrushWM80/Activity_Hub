@@ -1,65 +1,65 @@
 {
   "week": 12,
   "fy": 2027,
-  "cached_at": "2026-04-15T06:00:24.528479",
-  "bq_last_updated": "2026-04-14T23:55:07.133000+00:00",
+  "cached_at": "2026-04-16T06:00:21.337671",
+  "bq_last_updated": "2026-04-16T00:55:29.397000+00:00",
   "event_count": 6,
   "review_no_comm_count": 6,
   "status_breakdown": [
+    {
+      "status": "Review for Publish review - Pending",
+      "count": 10
+    },
+    {
+      "status": "Awaiting Business Review - Pending",
+      "count": 7
+    },
     {
       "status": "Review for Publish review - No Comms",
       "count": 6
     },
     {
-      "status": "Awaiting Business Review - Pending",
-      "count": 5
-    },
-    {
-      "status": "Awaiting Comms Approval - Ready to Review",
-      "count": 4
+      "status": "ATC final review - Pending",
+      "count": 6
     },
     {
       "status": "Awaiting Comms Approval - Pending",
       "count": 4
     },
     {
-      "status": "Review for Publish review - Pending",
-      "count": 4
+      "status": "Expired - Pending",
+      "count": 3
     },
     {
       "status": "Review for Publish review - Future Send",
       "count": 3
     },
     {
-      "status": "ATC final review - Pending",
-      "count": 3
-    },
-    {
-      "status": "Awaiting Comms Approval - In Progress",
+      "status": "Awaiting Comms Approval - Ready to Review",
       "count": 2
     },
     {
       "status": "Denied - Pending",
-      "count": 1
+      "count": 2
     },
     {
-      "status": "Expired - Pending",
-      "count": 1
-    },
-    {
-      "status": "Awaiting ATC Approval - Pending",
-      "count": 1
-    },
-    {
-      "status": "Awaiting Comms Approval - On Hold",
+      "status": "Awaiting Comms Approval - In Progress",
       "count": 1
     },
     {
       "status": "Draft - Pending",
       "count": 1
+    },
+    {
+      "status": "Awaiting Legal Approval - Pending",
+      "count": 1
+    },
+    {
+      "status": "Awaiting ATC Approval - Pending",
+      "count": 1
     }
   ],
-  "total_excl_denied": 34,
+  "total_excl_denied": 42,
   "summarized_count": 6,
   "events_with_summaries": [
     {
