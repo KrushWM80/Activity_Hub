@@ -631,7 +631,9 @@ def fetch_and_cache_bq_data(week, fy):
         for row in client.query(status_query, job_config=status_config).result():
             status_breakdown.append({'status': row.Status, 'count': row.cnt})
             total_all += row.cnt
-            if 'Denied' not in (row.Status or '') and 'Expired' not in (row.Status or ''):
+            if ('Denied' not in (row.Status or '')
+                    and 'Expired' not in (row.Status or '')
+                    and (row.Status or '') != 'Draft - Pending'):
                 total_excl_denied += row.cnt
     except Exception as e:
         logger.warning(f"Could not fetch status breakdown: {e}")
@@ -650,10 +652,12 @@ def fetch_and_cache_bq_data(week, fy):
         'Review for Publish review - Pending',
         'Review for Publish review - Future Send',
         'Expired - Pending',
-        'Review for Publish review - No Comms',
+        'Expired - In Progress',
+        'Review for Publish review - No Comms',  # Always last
     ]
     _order_map = {s: i for i, s in enumerate(STATUS_ORDER)}
-    status_breakdown.sort(key=lambda x: _order_map.get(x.get('status', ''), 999))
+    # Unknown statuses sort to 998 (just before "No Comms" anchor at the end)
+    status_breakdown.sort(key=lambda x: _order_map.get(x.get('status', ''), 998))
 
     logger.info(f"Status breakdown: {len(status_breakdown)} statuses, total (excl. Denied/Expired): {total_excl_denied}")
 

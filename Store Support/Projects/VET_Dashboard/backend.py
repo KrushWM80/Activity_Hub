@@ -227,21 +227,27 @@ class VETDataManager:
         data = self.fetch_all_data()
         return [row for row in data if str(row.get('Health Status', '')).lower() == 'at risk']
     
-    def filter_data(self, phase: str = None, health_status: str = None, 
-                   ownership: str = None) -> List[Dict[str, Any]]:
+    def filter_data(self, phases: List[str] = None, health_statuses: List[str] = None,
+                   ownership: str = None, titles: List[str] = None) -> List[Dict[str, Any]]:
         """Filter data by phase and/or health status (always Dallas POC)"""
         data = self.fetch_all_data()
-        
+
         filtered = data
-        
-        if phase and phase.lower() != "all":
-            filtered = [row for row in filtered if str(row.get('Phase', '')).lower() == phase.lower()]
-        
-        if health_status and health_status.lower() != "all":
-            filtered = [row for row in filtered if str(row.get('Health Status', '')).lower() == health_status.lower()]
-        
-        # Ownership is always filtered to Dallas POC in the query, no need to filter again
-        
+
+        if phases:
+            phases_lower = [p.lower() for p in phases]
+            filtered = [row for row in filtered if str(row.get('Phase', '')).lower() in phases_lower]
+
+        if health_statuses:
+            statuses_lower = [s.lower() for s in health_statuses]
+            filtered = [row for row in filtered if str(row.get('Health Status', '')).lower() in statuses_lower]
+
+        if titles:
+            titles_lower = [t.lower() for t in titles]
+            filtered = [row for row in filtered if str(row.get('Initiative - Project Title', '')).lower() in titles_lower]
+
+        # Ownership is always filtered to Dallas VET in the query, no need to filter again
+
         return filtered
 
 
@@ -296,26 +302,31 @@ def health_check():
 def get_data():
     """Get TDA data with optional filtering"""
     try:
-        phase = request.args.get('phase', 'All')
-        health_status = request.args.get('health_status', 'All')
+        phases = request.args.getlist('phases')
+        health_statuses = request.args.getlist('health_statuses')
+        titles = request.args.getlist('titles')
         force_refresh = request.args.get('refresh', 'false').lower() == 'true'
-        
+
         if force_refresh:
             logger.info("Force refreshing data...")
             data_manager._data_cache = None
             data_manager._cache_timestamp = None
-        
-        filtered_data = data_manager.filter_data(phase, health_status)
-        
+
+        filtered_data = data_manager.filter_data(
+            phases=phases or None,
+            health_statuses=health_statuses or None,
+            titles=titles or None
+        )
+
         return jsonify({
             'success': True,
             'count': len(filtered_data),
-            'phase': phase,
-            'health_status': health_status,
+            'phases': phases,
+            'health_statuses': health_statuses,
             'data': filtered_data,
             'timestamp': datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"Error in /api/data: {e}")
         return jsonify({

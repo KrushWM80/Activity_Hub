@@ -320,6 +320,75 @@ def parse_weekly_messages_audio_raw(file_path: str, logger: logging.Logger) -> p
         raise
 
 # ============================================================================
+# CLOUD CSV RAW PARSING (VB Process - New Data Sources)
+# ============================================================================
+
+def parse_weekly_messages_cloud_raw(file_path: str, logger: logging.Logger) -> pd.DataFrame:
+    """Parse Weekly Messages Cloud CSV and extract all rows/columns as-is."""
+    logger.info(f"Parsing Weekly Messages Cloud CSV for raw data: {file_path}")
+    
+    if not Path(file_path).exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+    
+    try:
+        df = pd.read_csv(file_path, skiprows=13, header=None)
+        rows = []
+        extracted_date = datetime.now()
+        
+        for _, row_data in df.iterrows():
+            row_dict = {}
+            for col_idx in range(min(6, len(row_data))):
+                row_dict[f"F{col_idx + 1}"] = str(row_data[col_idx]) if pd.notna(row_data[col_idx]) else ""
+            row_dict['extracted_date'] = extracted_date
+            rows.append(row_dict)
+        
+        result_df = pd.DataFrame(rows)
+        logger.info(f"Weekly Messages Cloud raw: {len(result_df)} rows × {len(result_df.columns)} columns")
+        return result_df
+    except Exception as e:
+        logger.error(f"Error: {e}", exc_info=True)
+        raise
+
+def parse_playbook_cloud_raw(file_path: str, logger: logging.Logger) -> pd.DataFrame:
+    """Parse Playbook Cloud CSV and extract all data rows as-is (raw format)."""
+    logger.info(f"Parsing Playbook Cloud CSV for raw data: {file_path}")
+    
+    if not Path(file_path).exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+    
+    try:
+        # Read entire CSV without headers - multi-section format
+        df = pd.read_csv(file_path, header=None, on_bad_lines='skip')
+        rows = []
+        extracted_date = datetime.now()
+        
+        # Extract all data rows (skip header/metadata rows)
+        for idx, row_data in df.iterrows():
+            cell_val = str(row_data.iloc[0]).strip() if pd.notna(row_data.iloc[0]) else ""
+            
+            # Skip header and metadata rows
+            if (cell_val.startswith('#') or 
+                'Report suite' in cell_val or 
+                'Date:' in cell_val or
+                cell_val == ''):
+                continue
+            
+            # Extract data row as-is
+            row_dict = {}
+            for col_idx in range(min(4, len(row_data))):
+                value = row_data.iloc[col_idx]
+                row_dict[f"F{col_idx + 1}"] = str(value) if pd.notna(value) else ""
+            row_dict['extracted_date'] = extracted_date
+            rows.append(row_dict)
+        
+        result_df = pd.DataFrame(rows)
+        logger.info(f"Playbook Cloud raw: {len(result_df)} rows × {len(result_df.columns)} columns")
+        return result_df
+    except Exception as e:
+        logger.error(f"Error: {e}", exc_info=True)
+        raise
+
+# ============================================================================
 # BIGQUERY LOADING
 # ============================================================================
 
@@ -419,6 +488,26 @@ def main():
         except FileNotFoundError as e:
             logger.warning(f"Weekly Messages Audio CSV file not available: {e}")
         
+        # Cloud CSV Raw Data
+        weekly_cloud_raw = pd.DataFrame()
+        playbook_cloud_raw = pd.DataFrame()
+        
+        try:
+            weekly_cloud_raw = parse_weekly_messages_cloud_raw(
+                config['source_files']['weekly_messages_cloud_csv'],
+                logger
+            )
+        except Exception as e:
+            logger.warning(f"Weekly Messages Cloud CSV not available: {e}")
+        
+        try:
+            playbook_cloud_raw = parse_playbook_cloud_raw(
+                config['source_files']['playbook_hub_cloud_csv'],
+                logger
+            )
+        except Exception as e:
+            logger.warning(f"Playbook Cloud CSV not available: {e}")
+        
         logger.info("\n--- PHASE 2: LOADING TO BIGQUERY ---")
         
         project = config['gcp']['project_id']
@@ -427,16 +516,19 @@ def main():
         playbook_raw_table = f"{project}.{dataset_id}.bq_playbook_hub_raw"
         weekly_raw_table = f"{project}.{dataset_id}.bq_weekly_messages_raw"
         audio_raw_table = f"{project}.{dataset_id}.bq_weekly_messages_audio_raw"
+        weekly_cloud_raw_table = f"{project}.{dataset_id}.bq_weekly_messages_cloud_raw"
+        playbook_cloud_raw_table = f"{project}.{dataset_id}.bq_playbook_cloud_raw"
         
-        logger.info(f"Target raw tables:")
-        logger.info(f"  - {playbook_raw_table}")
-        logger.info(f"  - {weekly_raw_table}")
-        logger.info(f"  - {audio_raw_table}")
+        logger.info(f"Target tables:")
+        logger.info(f"  LEGACY: {playbook_raw_table}, {weekly_raw_table}, {audio_raw_table}")
+        logger.info(f"  CLOUD:  {weekly_cloud_raw_table}, {playbook_cloud_raw_table}")
         
         # Load each table if data is available
         playbook_count = 0
         weekly_count = 0
         audio_count = 0
+        weekly_cloud_count = 0
+        playbook_cloud_count = 0
         
         if not playbook_raw.empty:
             playbook_count = load_raw_to_bigquery(
@@ -459,11 +551,30 @@ def main():
         else:
             logger.info(f"Weekly Messages Audio Raw: No data to load")
         
+        # Load Cloud CSV data
+        if not weekly_cloud_raw.empty:
+            weekly_cloud_count = load_raw_to_bigquery(
+                client, weekly_cloud_raw, weekly_cloud_raw_table, logger
+            )
+        else:
+            logger.info(f"Weekly Messages Cloud Raw: No data to load")
+        
+        if not playbook_cloud_raw.empty:
+            playbook_cloud_count = load_raw_to_bigquery(
+                client, playbook_cloud_raw, playbook_cloud_raw_table, logger
+            )
+        else:
+            logger.info(f"Playbook Cloud Raw: No data to load")
+        
         # Summary
         logger.info("\n--- SUMMARY ---")
-        logger.info(f"Playbook Hub Raw: {playbook_count} rows")
-        logger.info(f"Weekly Messages Raw: {weekly_count} rows")
-        logger.info(f"Weekly Messages Audio Raw: {audio_count} rows")
+        logger.info(f"LEGACY DATA (Excel):")
+        logger.info(f"  Playbook Hub Raw: {playbook_count} rows")
+        logger.info(f"  Weekly Messages Raw: {weekly_count} rows")
+        logger.info(f"  Weekly Messages Audio Raw: {audio_count} rows")
+        logger.info(f"CLOUD DATA (CSV):")
+        logger.info(f"  Weekly Messages Cloud Raw: {weekly_cloud_count} rows")
+        logger.info(f"  Playbook Cloud Raw: {playbook_cloud_count} rows")
         logger.info("=" * 80)
         logger.info("Adobe Analytics Raw Data Loader - SUCCESS")
         logger.info("=" * 80)

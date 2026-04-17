@@ -1,266 +1,1199 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"><head>
-<title>Tableau</title>
-    <meta content="width=device-width" name="viewport">
-    
-    <style type="text/css">
-        /* CLIENT-SPECIFIC STYLES */
+﻿<!DOCTYPE html><html><head>
 
-        #outlook a {
-            padding: 0;
-        }
-        /* Force Outlook to provide a "view in browser" message */
-
-        .ReadMsgBody {
-            width: 100%;
-        }
-
-        .ExternalClass {
-            width: 100%;
-        }
-        /* Force Hotmail to display emails at full width */
-
-        .ExternalClass,
-        .ExternalClass p,
-        .ExternalClass span,
-        .ExternalClass font,
-        .ExternalClass td,
-        .ExternalClass div {
-            line-height: 100%;
-        }
-        /* Force Hotmail to display normal line spacing */
-
-        body,
-        table,
-        td,
-        a {
-            -webkit-text-size-adjust: 100%;
-            -ms-text-size-adjust: 100%;
-        }
-        /* Prevent WebKit and Windows mobile changing default text sizes */
-
-        table,
-        td {
-            mso-table-lspace: 0pt;
-            mso-table-rspace: 0pt;
-        }
-        /* Remove spacing between tables in Outlook 1957 and up */
-
-        img {
-            -ms-interpolation-mode: bicubic;
-        }
-        /* Allow smoother rendering of resized image in Internet Explorer */
-        /* RESET STYLES */
-
-        body {
-            margin: 0;
-            padding: 0;
-        }
-
-        img {
-            border: 0;
-            line-height: 100%;
-            outline: none;
-            text-decoration: none;
-        }
-
-        table {
-            border-collapse: collapse !important;
-        }
-
-        body {
-            height: 100% !important;
-            margin: 0;
-            padding: 0;
-            width: 100% !important;
-        }
-
-        @media screen and (max-width: 600px) {
-            table[class="wrapper"] {
-                width: 100% !important;
-            }
-            td[class="logo"] {
-                text-align: left;
-                padding: 20px 0 20px 0 !important;
-            }
-            td[class="mobile-hide"] {
-                display: none !important;
-            }
-            td[class="logo"] img {
-                margin: 0 auto!important;
-            }
-            img[class="img-max"] {
-                max-width: 100%;
-                height: auto;
-            }
-            table[class=body] .btn table {
-                width: 100% !important;
-            }
-            table[class="responsive-table"] {
-                width: 100%!important;
-            }
-            td[class="section-padding"] {
-                padding: 30px 15px 0px 15px !important;
-            }
-            td[class="section-padding2"] {
-                padding: 30px 15px 0 15px !important;
-            }
-        }
+    <title>Daily Auto Feed Details Template</title>
+    <style>
+       #main { max-width: 55em; }
+      table { border-collapse: collapse; }
+      th, tr { text-align: left; vertical-align: top; padding-right: 2em; }
+      tr:nth-child(even) { background-color: #f2f2f2; }
+      .stats td:nth-child(1) {width: 5em; }
+      .stats td:nth-child(2) {width: 5em; }
+      .stats td:nth-child(3) {width: 5em; }
+      .details td:nth-child(1) {max-width: 5em;}
+      .details td:nth-child(2) {min-width: 15em; padding-right: 1em;}
+      .details td:nth-child(3) {min-width: 15em; padding-right: 1em;}
+      .details td:nth-child(4) {max-width: 5em;}
+	  .details td:nth-child(5) {max-width: 5em;}
+      .details td:nth-child(6) {min-width: 15em; padding-right: 1em;}
+      .details td:nth-child(7) {min-width: 10em; padding-right: 1em;}
+      .details td:nth-child(8) {min-width: 8em;}
+      .details td:nth-child(9) {min-width: 5em;}
+      .details td:nth-child(10) {min-width: 15em; padding-right: 1em;}
+      .details td:nth-child(11) {min-width: 5em;}
+      .details td:nth-child(12) {min-width: 15em; padding-right: 1em;}
     </style>
 </head>
-<body style="margin: 0; padding: 0;">
-<!-- HEADER -->
-<table border="0" cellpadding="0" cellspacing="0" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;" width="100%">
+<body>
+<div id="main">
+    <h3>AutoFeed Summary for <span>2026-04-17</span></h3>
+    <p>
+    <table class="stats">
+        <tr>
+            <th style="border:1px solid black;"></th>
+            <th style="border:1px solid black;">New</th>
+            <th style="border:1px solid black;">Updated</th>
+            <th style="border:1px solid black;">Removed</th>
+        </tr>
     <tr>
-        <td align="center" bgcolor="#FFFFFF" class="section-padding" style="padding-top:10px;padding-bottom:10px;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-            <table border="0" cellpadding="0" cellspacing="0" class="responsive-table" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;" width="500">
-                <tr>
-                    <td style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-                        <table border="0" cellpadding="0" cellspacing="0" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;" width="100%">
-                            <tr>
-                                <td style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-                                    <table border="0" cellpadding="0" cellspacing="0" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;" width="100%">
-                                        <tbody>
-                                        <tr>
-                                            <td style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-                                                <table border="0" cellpadding="0" cellspacing="0" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;" width="100%">
-                                                    <tr>
-                                                        <td align="center" bgcolor="#FFFFFF" width="215">
-                                                            <a href="http://tableau-prep-prod.homeoffice.wal-mart.com/#"><img src="https://mkt.tableau.com/emails/template/i/tableau_cmyk.png" style="display: block;" width="215"></a>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </td>
+        <th style="border:1px solid black;">QB New API</th>
+        <td style="border:1px solid black;">238</td>
+        <td style="border:1px solid black;">72</td>
+        <td style="border:1px solid black;">8</td>
     </tr>
-</table><!--Hero Grid-->
-<table border="0" cellpadding="0" cellspacing="0" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;" width="100%">
     <tr>
-        <td align="center" bgcolor="#FFFFFF" class="section-padding" style="padding-top:10px;padding-bottom:10px;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-            <table border="0" cellpadding="0" cellspacing="0" class="responsive-table" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;" width="600">
-                <tr>
-                    <td style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-                        <table border="0" cellpadding="0" cellspacing="0" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;" width="100%">
-                            <tr>
-                                <td style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-                                    <!-- Text Grid -->
-                                    <table border="0" cellpadding="0" cellspacing="0" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;" width="100%">
-                                        <tr>
-                                            <td align="center" style="font-size:24px;font-family: Benton Sans, sans-serif;color:#666666;padding-top:30px;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-                                                        Flow Run Failed
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="center" style="padding-top:5px;padding-bottom:0;padding-right:0;padding-left:0;font-size:18px;line-height:25px;font-family: Benton Sans, sans-serif;color:#666666;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">Site: Default<br>
-                                                Flow: QB Auto Feeds
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="left" style="font-size:14px;font-family: Benton Sans, sans-serif;color:#666666;padding-top:30px;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-                                                    An error in the flow caused the flow run to fail.
-                                                            <br><br>The flow has failed to run 1 time&nbsp;for schedule Run Flow-Daily - 06:00 AM CST. After 20&nbsp;consecutive failures, the scheduled flow task will be suspended until you take an action to resolve the issue.
-                                            </td>
-                                        </tr>
-                                    </table><br>
-                                    <br>
-                                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="padding-top:20px;padding-bottom:0;padding-right:1;padding-left:;font-size:14px;line-height:25px;font-family: Benton Sans, sans-serif;color:#666666;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;empty-cells: hide;" width="70%">
-                                        <tr>
-                                            <td align="left" style="font-weight:bold" valign="top" width="40%">List of failed flow output steps:</td>
-                                            <td align="left" valign="top">Output 8, Output 9</td>
-                                        </tr>
-                                        <tr>
-                                            <td align="left" style="font-weight:bold" valign="top">Flow run ID:</td>
-                                            <td align="left" valign="top">9,192,431</td>
-                                        </tr>
-                                        <tr>
-                                            <td align="left" style="font-weight:bold" valign="top">Error message:</td>
-                                            <td align="left" valign="top">An error in the flow caused the flow run to fail.</td>
-                                        </tr>
-                                        <tr>
-                                            <td align="left" style="font-weight:bold" valign="top">Flow run duration (minutes):</td>
-                                            <td align="left" valign="top">6</td>
-                                        </tr>
-                                        <tr>
-                                            <td align="left" style="font-weight:bold" valign="top">Flow run start time:</td>
-                                            <td align="left" valign="top">April 16, 2026, 6:00 AM</td>
-                                        </tr>
-                                        <tr>
-                                            <td align="left" style="font-weight:bold" valign="top">Flow run end time:</td>
-                                            <td align="left" valign="top">April 16, 2026, 6:06 AM</td>
-                                        </tr>
-                                        <tr>
-                                            <td align="left" style="font-weight:bold" valign="top">Suggested action:</td>
-                                            <td align="left" valign="top">Fix all errors in the flow, then run the flow again.</td>
-                                        </tr>
-                                    </table><br>
-                                    <br>
-                                    <table border="0" cellpadding="0" cellspacing="0" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;" width="100%">
-                                        <tr>
-                                            <td align="center" style="padding-top:25px;padding-bottom:0;padding-right:0;padding-left:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-                                                <table border="0" cellpadding="0" cellspacing="0" class="responsive-table" style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse !important;">
-                                                    <tr>
-                                                        <td align="center" bgcolor="#F58F50" style="padding-top:12px;padding-bottom:12px;padding-right:18px;padding-left:18px;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;">
-                                                            <a href="http://tableau-prep-prod.homeoffice.wal-mart.com/#/flows/17522" style="font-size:16px;font-family: Benton Sans, sans-serif;font-weight:normal;color:#ffffff;text-decoration:none;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">View Flow</a>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </td>
+        <th style="border:1px solid black;">Published in AMP 2.0</th>
+        <td style="border:1px solid black;">238</td>
+        <td style="border:1px solid black;">72</td>
+        <td style="border:1px solid black;">8</td>
     </tr>
-</table><!-- Footer -->
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-    <tbody>
-    <tr>
-        <td align="center" bgcolor="#FFFFFF" class="section-padding2;" style="padding-top: 25px; padding-bottom: 25px;">
-            <table border="0" cellpadding="0" cellspacing="0" class="responsive-table" width="600">
-                <tbody>
-                <tr>
-                    <td>
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                            <tbody>
-                            <tr>
-                                <td align="center">
-                                    <dl style="font-size:10px;line-height:14px;font-family:Benton Sans, sans-serif;color:#666666; border-top-color: #ccc; border-top-style: solid; border-top-width: 1px;">
-                                        <dt><br></dt>
-                                        <dt>You are receiving this email at kendall.rush@walmart.com because you have elected to receive failure email notifications.</dt>
-                                        <dt>
-                                            Not interested anymore?&nbsp;<a href="http://tableau-prep-prod.homeoffice.wal-mart.com/#/user/homeoffice.wal-mart.com/krush/settings" style="text-decoration: none; color: #F58F50;">Unsubscribe.</a>
-                                        </dt>
-                                        <dt>Copyright © 2024 Tableau Software, LLC. All Rights Reserved.</dt>
-                                        <dt>1621 N 34th St. Seattle, WA 98103</dt>
-                                        <dt><br></dt>
-                                        <dt><br></dt>
-                                        <dt>
-                                            <a href="http://www.tableau.com/privacy" style="text-decoration: none; color: #F58F50;">Privacy.</a> You've got it.
-                                        </dt>
-                                    </dl>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </td>
-    </tr>
-    </tbody>
-</table>
+        </tr>
+    </table>
+    </p>
+    <h3>AutoFeed Details</h3>
+    <p>
+        <span>Autofeed ids processed today: <span>704, 658, 632, 666</span></span><br><br>
+        <!--span>Num of Stores processed: <span th:text = "${storesProcessed}"></span></span-->
+    <!--/p-->
+    <!--p-->
+        <span>Following are the details for the processed autofeeds:</span>
+    <table class="details">
+        <tr>
+            <th>AutoFeed Id</th>
+            <th>Message Title</th>
+            <th>Stores (<span>318</span>)</th>
+            <th>Anchor Walmart Week</th>
+            <th>Status</th>
+            <th>Anchor Message Link</th>
+            <th>Relative Week Message Count<br>
+                (Actual: <span>48</span><br>
+                Processed: <span>48</span>)
+            </th>
+            <th>Relative Week Store Count (<span>360</span>)</th>
+            <th>Relative Week Set</th>
+            <th>Relative Week Message Link</th>
+            <th>Previous Anchor Walmart Week</th>
+            <th>Previous Anchor Message Link</th>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>2987, 2964, 634, 1017, 1967, 5291, 1970, 511</span> (<span>8</span>)</td>
+            <td>2027-22</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/cb96a681-4801-4cd1-bbc5-ad8279e45599/22/2027">Link to Anchor Msg: <span>2027-22</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>8</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/a5f1f1b7-2220-4608-ba6e-47dbd94ee1d3/21/2027">Link to Msg for Wk: <span>2027-21</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>1983, 1554, 2003, 2161, 2639, 2486, 4556, 2965, 4527, 4389, 621, 2138, 5414, 2091, 4530, 2140, 2634, 3935, 5142, 6732, 3023, 5198, 3349, 4174, 3548, 2681, 5392, 2282, 4303, 2119, 5435, 721, 7194, 2703, 7246, 1844, 6937, 2299, 4156, 5719, 2332, 5884, 2682, 4594, 2224, 5890, 3638, 1874, 2289, 5854, 627, 2530, 2901</span> (<span>53</span>)</td>
+            <td>2027-20</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/743c2a93-7e38-4efe-a835-fd12ddb3e92a/20/2027">Link to Anchor Msg: <span>2027-20</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>53</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/4ea7effd-0fa0-4c87-9c38-621ac3e9462f/19/2027">Link to Msg for Wk: <span>2027-19</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>1873, 2267, 3301, 4161, 4457, 2225, 2283, 2373, 2747, 3183, 4140, 1135, 2341, 1964, 2640, 2727, 5945, 642, 2885, 2261, 2660, 5671, 6397, 7188, 1030, 1680, 3491, 5912</span> (<span>28</span>)</td>
+            <td>2027-21</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/f5a8da64-9e31-4246-bfba-808ff7da288a/21/2027">Link to Anchor Msg: <span>2027-21</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>28</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/9bee87da-26b6-4754-bb75-0cdcb3fa0dbf/20/2027">Link to Msg for Wk: <span>2027-20</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>5869, 5841</span> (<span>2</span>)</td>
+            <td>2027-30</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/299e30d2-bbf0-4307-a668-2c984e83643f/30/2027">Link to Anchor Msg: <span>2027-30</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>2</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/9a1a2af8-5639-4332-a300-a2457508da9f/29/2027">Link to Msg for Wk: <span>2027-29</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>4247, 3511, 3739, 4180, 3897, 7199, 4249, 4395, 5494, 4494</span> (<span>10</span>)</td>
+            <td>2027-29</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/ff6b3019-0c8f-414e-96e7-3bef83440759/29/2027">Link to Anchor Msg: <span>2027-29</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>10</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/dbdc8900-252c-4c19-928d-f23e51913187/28/2027">Link to Msg for Wk: <span>2027-28</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>5383, 525, 579, 563, 377, 2157, 728, 613, 697, 582, 6395, 928, 860, 2158, 857, 2174, 7181, 1079, 943, 960</span> (<span>20</span>)</td>
+            <td>2027-23</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/74d8fdd3-6acf-4cd8-8ca6-c8f43b85c17e/23/2027">Link to Anchor Msg: <span>2027-23</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>20</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/238a96a6-aa1f-46b3-8262-b27ab3605e65/22/2027">Link to Msg for Wk: <span>2027-22</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>2329, 2228, 2832, 1383, 1374, 1391, 1847, 3207, 3310, 2944, 3629, 3862, 3606, 4245, 4368, 4434</span> (<span>16</span>)</td>
+            <td>2027-24</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/0684ca57-1161-4f82-aa78-04d2f3146ffe/24/2027">Link to Anchor Msg: <span>2027-24</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>16</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/97d2d190-4772-421e-906b-09c0d76d1d61/23/2027">Link to Msg for Wk: <span>2027-23</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>2781, 2782, 2259, 2861, 2831, 2455, 2607, 3093, 2862, 3472, 3094, 3259</span> (<span>12</span>)</td>
+            <td>2027-28</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/7ff9252d-9fc4-4029-98b1-9233d506cf05/28/2027">Link to Anchor Msg: <span>2027-28</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>12</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/7929b713-b5eb-40aa-b45e-e96f78813c9e/27/2027">Link to Msg for Wk: <span>2027-27</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>5326, 5106, 5132, 6398, 6894</span> (<span>5</span>)</td>
+            <td>2027-25</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/c65aeacf-521c-4109-91bb-b969f5e1fdc8/25/2027">Link to Anchor Msg: <span>2027-25</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>5</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/568bc923-5fb5-4336-84ad-4a26039d42d3/24/2027">Link to Msg for Wk: <span>2027-24</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>1878, 1900, 1872, 1901, 1902, 1905, 2485, 2084, 1995, 2508, 2780, 2147</span> (<span>12</span>)</td>
+            <td>2027-27</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/be27126d-c731-4992-8939-c80dd15fdc09/27/2027">Link to Anchor Msg: <span>2027-27</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>12</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/5ca0d20a-593e-4c5e-a630-6b89fa10fed8/26/2027">Link to Msg for Wk: <span>2027-26</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>666</td>
+            <td>NEXT Install This Week </td>
+            <td><span>5671, 542, 1909, 1899, 2205, 2307, 1653</span> (<span>7</span>)</td>
+            <td>2027-11</td>
+            <td>Removed</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/4fa6330a-b586-493c-bcd2-baee2283238f/11/2027">Link to Anchor Msg: <span>2027-11</span></a></span></td>
+            <td>Actual: <span>4</span><br>
+                Processed: <span>4</span></td>
+            <td>28</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-8</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-6</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-4</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/5b1c24c7-bb62-4f88-9303-2959a2b8cd71/3/2027">Link to Msg for Wk: <span>2027-3</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/ff71425e-de2b-4146-9da3-be7620a43680/5/2027">Link to Msg for Wk: <span>2027-5</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/58157a8a-3a41-4fb5-a291-fa4a97ee054b/7/2027">Link to Msg for Wk: <span>2027-7</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/5b1bec6b-5fcb-4255-9d24-7a288d837ba3/10/2027">Link to Msg for Wk: <span>2027-10</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>632</td>
+            <td>Frontend Transformation (FET) Installation Starts This Week!</td>
+            <td><span>7339</span> (<span>1</span>)</td>
+            <td>2027-11</td>
+            <td>Removed</td>
+            <td></td>
+            <td>Actual: <span>4</span><br>
+                Processed: <span>4</span></td>
+            <td>4</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-8</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-6</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-3</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>512, 743, 1072, 3046, 1061, 2142, 2907, 1372, 1354, 1024, 1977, 1840, 1906, 1119, 1930, 4664, 1698, 2030, 2840, 2615, 3337, 5046, 2000, 5087, 1953, 2814, 5391, 2440, 2630, 2399, 4354, 1237, 1785, 2294, 3535, 2025, 3200, 1511, 2055, 2758, 2860, 4525, 5055, 5743, 3417, 5944, 5448, 2195, 5710, 2369, 586, 1527, 3022, 4519, 1796, 1829, 1590, 2090, 1950, 1975, 3352, 4499, 5034, 5384, 987, 3549, 1587, 2690, 5347, 1907, 2057, 3560</span> (<span>72</span>)</td>
+            <td>2027-19</td>
+            <td>New</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/77c41299-c91c-4b56-9e0b-997cc4847162/19/2027">Link to Anchor Msg: <span>2027-19</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>72</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/60fb3d02-67d0-4117-b7d9-9f4d88a04826/18/2027">Link to Msg for Wk: <span>2027-18</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>658</td>
+            <td>Capacity Expansion, Week -1, Your Store Will Receive a Capacity Expansion in One Week!</td>
+            <td><span>1160</span> (<span>1</span>)</td>
+            <td>2027-19</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/bd897fa9-a5ce-4afc-9efd-3568a18713c2/19/2027">Link to Anchor Msg: <span>2027-19</span></a></span></td>
+            <td>Actual: <span>3</span><br>
+                Processed: <span>3</span></td>
+            <td>3</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-14</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-3</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-2</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/bf2a7487-673a-40aa-bed3-1bfca41fd8f6/5/2027">Link to Msg for Wk: <span>2027-5</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/4ed813fa-45db-49e1-a86e-78fda3192e6e/16/2027">Link to Msg for Wk: <span>2027-16</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/96cfe2ea-7b4d-42dc-b932-353d72e3ad8d/17/2027">Link to Msg for Wk: <span>2027-17</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/dff69039-489e-4d08-9524-0f46b410a178/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>1926, 2911, 3332, 1673, 1705, 1731, 2785, 1619, 1744, 1813, 3842, 1610, 2859, 3280, 5282</span> (<span>15</span>)</td>
+            <td>2027-19</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/77c41299-c91c-4b56-9e0b-997cc4847162/19/2027">Link to Anchor Msg: <span>2027-19</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>15</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/60fb3d02-67d0-4117-b7d9-9f4d88a04826/18/2027">Link to Msg for Wk: <span>2027-18</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/b02b7f30-8163-4555-8dab-ade28ca25aa2/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>1909, 1993, 2107, 3607, 2210, 2586, 4597, 5027, 1966, 2043, 2088, 2355, 1949, 1973, 2164, 2405, 2159, 2326, 2992</span> (<span>19</span>)</td>
+            <td>2027-20</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/743c2a93-7e38-4efe-a835-fd12ddb3e92a/20/2027">Link to Anchor Msg: <span>2027-20</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>19</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/4ea7effd-0fa0-4c87-9c38-621ac3e9462f/19/2027">Link to Msg for Wk: <span>2027-19</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/b02b7f30-8163-4555-8dab-ade28ca25aa2/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>1781, 2120, 3221, 5240, 1835, 2097, 2262, 5732, 2351, 2504, 2547, 4570, 1810, 1959, 2104, 2637, 2531, 2583, 2905, 5293</span> (<span>20</span>)</td>
+            <td>2027-21</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/f5a8da64-9e31-4246-bfba-808ff7da288a/21/2027">Link to Anchor Msg: <span>2027-21</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>20</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/9bee87da-26b6-4754-bb75-0cdcb3fa0dbf/20/2027">Link to Msg for Wk: <span>2027-20</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/b02b7f30-8163-4555-8dab-ade28ca25aa2/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+        <tr>
+            <td>704</td>
+            <td>FireFly Bluetooth Technology Installation</td>
+            <td><span>2916, 3420, 4184, 5295, 2286, 2915, 2917, 5202, 2156, 2906, 8331</span> (<span>11</span>)</td>
+            <td>2027-22</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/cb96a681-4801-4cd1-bbc5-ad8279e45599/22/2027">Link to Anchor Msg: <span>2027-22</span></a></span></td>
+            <td>Actual: <span>1</span><br>
+                Processed: <span>1</span></td>
+            <td>11</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/a5f1f1b7-2220-4608-ba6e-47dbd94ee1d3/21/2027">Link to Msg for Wk: <span>2027-21</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/b02b7f30-8163-4555-8dab-ade28ca25aa2/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+        <tr>
+            <td>658</td>
+            <td>Capacity Expansion, Week -1, Your Store Will Receive a Capacity Expansion in One Week!</td>
+            <td><span>1669</span> (<span>1</span>)</td>
+            <td>2027-23</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/bc6e32d2-7649-4d9d-a4f5-f628074af3cd/23/2027">Link to Anchor Msg: <span>2027-23</span></a></span></td>
+            <td>Actual: <span>3</span><br>
+                Processed: <span>3</span></td>
+            <td>3</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-14</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-3</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-2</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/164b8992-5c2c-4429-9498-dee7142b18c5/9/2027">Link to Msg for Wk: <span>2027-9</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/51fb7920-cdd3-4dd2-9bb0-718a69320574/20/2027">Link to Msg for Wk: <span>2027-20</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/c700ad2e-7b22-4fa4-b0e3-aff6788f55cc/21/2027">Link to Msg for Wk: <span>2027-21</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/dff69039-489e-4d08-9524-0f46b410a178/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+        <tr>
+            <td>666</td>
+            <td>NEXT Install This Week </td>
+            <td><span>249</span> (<span>1</span>)</td>
+            <td>2027-23</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/5732de22-c477-45e5-a2fb-2036b0e88410/23/2027">Link to Anchor Msg: <span>2027-23</span></a></span></td>
+            <td>Actual: <span>4</span><br>
+                Processed: <span>4</span></td>
+            <td>4</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-8</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-6</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-4</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/ef08e9cb-ec56-435f-b168-d59c18e6afb2/15/2027">Link to Msg for Wk: <span>2027-15</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/c732f6ec-34e8-42cb-8ceb-95ad0f6dff20/17/2027">Link to Msg for Wk: <span>2027-17</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/69ff53ea-7439-4209-a895-5db924f84941/19/2027">Link to Msg for Wk: <span>2027-19</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/4dc2f209-a986-4a8d-b18f-e5ed4b24d2fd/22/2027">Link to Msg for Wk: <span>2027-22</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/4fa6330a-b586-493c-bcd2-baee2283238f/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+        <tr>
+            <td>666</td>
+            <td>NEXT Install This Week </td>
+            <td><span>2529</span> (<span>1</span>)</td>
+            <td>2027-32</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/2e94ef71-4f0e-4fd4-ac60-963c4d9cd82a/32/2027">Link to Anchor Msg: <span>2027-32</span></a></span></td>
+            <td>Actual: <span>4</span><br>
+                Processed: <span>4</span></td>
+            <td>4</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-8</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-6</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-4</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/1f9e799c-e5cc-4fab-8e85-7289d7c34b84/24/2027">Link to Msg for Wk: <span>2027-24</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/af9038d1-5bfe-48ef-9b21-556a757f0ffd/26/2027">Link to Msg for Wk: <span>2027-26</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/82cf7b52-cca1-4095-898b-098b08d0a20e/28/2027">Link to Msg for Wk: <span>2027-28</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/7423f325-ac9e-49e2-8b90-1a93c645781d/31/2027">Link to Msg for Wk: <span>2027-31</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/4fa6330a-b586-493c-bcd2-baee2283238f/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+        <tr>
+            <td>666</td>
+            <td>NEXT Install This Week </td>
+            <td><span>1875</span> (<span>1</span>)</td>
+            <td>2027-33</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/a4e913eb-7003-4f45-af9b-bbc33c094ee4/33/2027">Link to Anchor Msg: <span>2027-33</span></a></span></td>
+            <td>Actual: <span>4</span><br>
+                Processed: <span>4</span></td>
+            <td>4</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-8</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-6</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-4</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/8f4d1ee0-b8c6-48ac-bc2b-63ecc6b8c7b3/25/2027">Link to Msg for Wk: <span>2027-25</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/6442f083-ab5f-4aa4-b48a-7c76430aa333/27/2027">Link to Msg for Wk: <span>2027-27</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/87e5dc00-83a6-4162-813f-2c5835992bcd/29/2027">Link to Msg for Wk: <span>2027-29</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/ce2f01b6-d8a3-4e76-97c5-654cb55a9207/32/2027">Link to Msg for Wk: <span>2027-32</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/4fa6330a-b586-493c-bcd2-baee2283238f/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+        <tr>
+            <td>666</td>
+            <td>NEXT Install This Week </td>
+            <td><span>4288</span> (<span>1</span>)</td>
+            <td>2027-36</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/366a3756-6ee5-4ff8-a8b6-29bc014a6593/36/2027">Link to Anchor Msg: <span>2027-36</span></a></span></td>
+            <td>Actual: <span>4</span><br>
+                Processed: <span>4</span></td>
+            <td>4</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-8</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-6</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-4</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-1</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/83f5f234-5d89-4c0c-b6de-c6237b930e84/28/2027">Link to Msg for Wk: <span>2027-28</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/e095fd05-3327-4cdc-9721-a976d352a0bd/30/2027">Link to Msg for Wk: <span>2027-30</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/68082397-e858-44c0-8671-09d716382bec/32/2027">Link to Msg for Wk: <span>2027-32</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/4313777d-dd46-4c70-a074-89aeb0ddce8c/35/2027">Link to Msg for Wk: <span>2027-35</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/4fa6330a-b586-493c-bcd2-baee2283238f/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+        <tr>
+            <td>658</td>
+            <td>Capacity Expansion, Week -1, Your Store Will Receive a Capacity Expansion in One Week!</td>
+            <td><span>2591</span> (<span>1</span>)</td>
+            <td>2028-15</td>
+            <td>Updated</td>
+            <td><span><a href="https://amp2-cms.prod.walmart.com/message/82e8ca49-253b-4857-b62c-6cb84dc9da32/15/2028">Link to Anchor Msg: <span>2028-15</span></a></span></td>
+            <td>Actual: <span>3</span><br>
+                Processed: <span>3</span></td>
+            <td>3</td>
+            <td>
+                <span>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-14</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-3</span>
+                        </li>
+                    </ul>
+                    <ul style="list-style: none; padding:0px; margin-top:0px;">
+                        <li>
+                            <span>-2</span>
+                        </li>
+                    </ul>
+                </span>
+                
+            </td>
+            <td><span>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/6fc4994f-abcf-473c-aed5-0666aa20059a/1/2028">Link to Msg for Wk: <span>2028-1</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/4a485947-55f1-4341-889d-741726d46e63/12/2028">Link to Msg for Wk: <span>2028-12</span></a>
+                        </span>
+                    </li>
+                </ul>
+                <ul style="list-style: none; padding:0px; margin-top:0px;">
+                    <li>
+                        
+                        <span>
+                            <a href="https://amp2-cms.prod.walmart.com/message/e4776538-ed76-4652-8fb4-40f1da675d89/13/2028">Link to Msg for Wk: <span>2028-13</span></a>
+                        </span>
+                    </li>
+                </ul>
+            </span>
+            </td>
+            <td><span><span>2027-11</span></span></td>
+            <td><span>
+                <a href="https://amp2-cms.prod.walmart.com/message/dff69039-489e-4d08-9524-0f46b410a178/11/2027">Link to Msg for Prev Wk: <span>2027-11</span></a>
+            </span></td>
+        </tr>
+    </table>
+    </p>
+</div>
 </body>
 </html>
+

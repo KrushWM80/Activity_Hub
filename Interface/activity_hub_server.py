@@ -5,6 +5,10 @@ Activity Hub Server V2 - Minimal Flask with inline BigQuery
 import os
 import logging
 import requests
+import uuid
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import Flask, send_from_directory, send_file, jsonify, request
 from flask_cors import CORS
 from datetime import datetime, timedelta
@@ -498,15 +502,51 @@ def logic_requests():
 # PROJECTS REPORT GENERATION
 # ──────────────────────────────────────────────
 
-@app.route('/api/generate-ppt', methods=['GET'])
+def get_dashboard_screenshot(output_path):
+    """Capture screenshot of Projects dashboard using Playwright"""
+    try:
+        import asyncio
+        from playwright.async_api import async_playwright
+        
+        async def screenshot_dashboard():
+            async with async_playwright() as p:
+                browser = await p.chromium.launch(headless=True)
+                page = await browser.new_page()
+                page.set_viewport_size({"width": 1280, "height": 960})
+                
+                # Navigate to projects page
+                await page.goto('http://localhost:8088/activity-hub/projects', wait_until='networkidle')
+                await page.wait_for_timeout(2000)  # Wait for data load
+                
+                # Take screenshot
+                screenshot = await page.screenshot(path=output_path, full_page=False)
+                await browser.close()
+                return True
+        
+        # Run async function
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        result = loop.run_until_complete(screenshot_dashboard())
+        loop.close()
+        
+        return os.path.exists(output_path)
+    except Exception as e:
+        logger.warning(f"Screenshot capture failed: {str(e)} - will use fallback")
+        return False
+
+
 def generate_ppt():
-    """Generate PPT report of projects with professional Walmart branding"""
+    """Generate PPT report with dashboard screenshot (TDA Insights style)"""
     try:
         from pptx import Presentation
         from pptx.util import Inches, Pt
         from pptx.enum.text import PP_ALIGN
         from pptx.dml.color import RGBColor
         from io import BytesIO
+        import asyncio
+        from playwright.async_api import async_playwright
+        import tempfile
+        import os
         
         # Calculate Walmart Week (WM WK)
         today = datetime.now()
@@ -534,7 +574,7 @@ def generate_ppt():
         results = bq_client.query(sql).result()
         projects = list(results)
         
-        # Create presentation with Walmart colors
+        # Create presentation
         prs = Presentation()
         prs.slide_width = Inches(10)
         prs.slide_height = Inches(7.5)
@@ -542,13 +582,7 @@ def generate_ppt():
         
         COLORS = {
             'walmart_blue_dark': RGBColor(0x1E, 0x3A, 0x8A),
-            'walmart_blue': RGBColor(0x00, 0x71, 0xCE),
             'walmart_yellow': RGBColor(0xFF, 0xC2, 0x20),
-            'on_track': RGBColor(0x10, 0x7C, 0x10),
-            'at_risk': RGBColor(0xF7, 0x63, 0x0C),
-            'off_track': RGBColor(0xDC, 0x35, 0x45),
-            'light_gray': RGBColor(0xF5, 0xF5, 0xF5),
-            'dark_gray': RGBColor(0x33, 0x33, 0x33),
             'white': RGBColor(0xFF, 0xFF, 0xFF),
         }
         
@@ -560,150 +594,62 @@ def generate_ppt():
         fill.fore_color.rgb = COLORS['walmart_blue_dark']
         
         # Main title
-        title_box = slide.shapes.add_textbox(Inches(0.5), Inches(2.0), Inches(9), Inches(1.5))
-        tf = title_box.text_frame
-        tf.word_wrap = True
-        p = tf.paragraphs[0]
+        title_box = slide.shapes.add_textbox(Inches(0.5), Inches(2.5), Inches(9), Inches(1.2))
+        p = title_box.text_frame.paragraphs[0]
         p.alignment = PP_ALIGN.CENTER
         run = p.add_run()
-        run.text = "Impact Platform"
-        run.font.size = Pt(54)
+        run.text = "Activity Hub Projects Overview"
+        run.font.size = Pt(48)
         run.font.bold = True
         run.font.color.rgb = COLORS['white']
         
-        # Subtitle
-        subtitle_box = slide.shapes.add_textbox(Inches(0.5), Inches(3.5), Inches(9), Inches(1))
+        # Subtitle with WM WK
+        subtitle_box = slide.shapes.add_textbox(Inches(0.5), Inches(3.8), Inches(9), Inches(0.8))
         p = subtitle_box.text_frame.paragraphs[0]
         p.alignment = PP_ALIGN.CENTER
         run = p.add_run()
-        run.text = "Projects Dashboard Report"
+        run.text = f"WM WK {wm_week} • {datetime.now().strftime('%B %d, %Y')}"
         run.font.size = Pt(28)
         run.font.color.rgb = COLORS['walmart_yellow']
         
-        # Date
-        date_box = slide.shapes.add_textbox(Inches(0.5), Inches(5.0), Inches(9), Inches(0.8))
-        p = date_box.text_frame.paragraphs[0]
-        p.alignment = PP_ALIGN.CENTER
-        run = p.add_run()
-        run.text = f"Generated: {datetime.now().strftime('%B %d, %Y')}"
-        run.font.size = Pt(14)
-        run.font.color.rgb = COLORS['white']
-        
-        # ──────── SLIDE 2: EXECUTIVE SUMMARY ────────
-        slide = prs.slides.add_slide(blank_layout)
-        
-        # Summary header
-        header_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.3), Inches(9), Inches(0.6))
-        p = header_box.text_frame.paragraphs[0]
-        p.alignment = PP_ALIGN.LEFT
-        run = p.add_run()
-        run.text = "Executive Summary"
-        run.font.size = Pt(32)
-        run.font.bold = True
-        run.font.color.rgb = COLORS['walmart_blue_dark']
-        
-        # Calculate stats
-        health_counts = {'On Track': 0, 'At Risk': 0, 'Off Track': 0}
-        for proj in projects:
-            health = proj['health_status'] or 'Unknown'
-            if health in health_counts:
-                health_counts[health] += 1
-        
-        # Stats grid
-        stats = {
-            'Total Projects': len(projects),
-            'On Track': health_counts['On Track'],
-            'At Risk': health_counts['At Risk'],
-            'Off Track': health_counts['Off Track'],
-        }
-        
-        stat_names = list(stats.keys())
-        for idx, (name, value) in enumerate(stats.items()):
-            col = idx % 4
-            x = Inches(0.7 + col * 2.1)
-            y = Inches(1.5)
+        # ──────── SLIDE 2: DASHBOARD SCREENSHOT ────────
+        # Try to capture dashboard screenshot
+        screenshot_path = None
+        try:
+            import tempfile
+            temp_dir = tempfile.gettempdir()
+            screenshot_path = os.path.join(temp_dir, f'dashboard_{uuid.uuid4().hex}.png')
             
-            # Colored box
-            box = slide.shapes.add_shape(1, x, y, Inches(1.9), Inches(1.8))
-            box.fill.solid()
-            box.fill.fore_color.rgb = COLORS['light_gray']
-            box.line.color.rgb = COLORS['walmart_blue']
-            box.line.width = Pt(2)
-            
-            # Label
-            label_box = slide.shapes.add_textbox(x + Inches(0.1), y + Inches(0.15), Inches(1.7), Inches(0.4))
-            p = label_box.text_frame.paragraphs[0]
-            p.font.size = Pt(10)
-            p.font.bold = True
-            p.font.color.rgb = COLORS['walmart_blue_dark']
-            p.text = name
-            
-            # Value
-            val_box = slide.shapes.add_textbox(x + Inches(0.1), y + Inches(0.65), Inches(1.7), Inches(0.8))
-            p = val_box.text_frame.paragraphs[0]
-            p.font.size = Pt(26)
-            p.font.bold = True
-            run = p.add_run()
-            run.text = str(value)
-            
-            if name == 'On Track':
-                run.font.color.rgb = COLORS['on_track']
-            elif name == 'At Risk':
-                run.font.color.rgb = COLORS['at_risk']
-            elif name == 'Off Track':
-                run.font.color.rgb = COLORS['off_track']
+            if get_dashboard_screenshot(screenshot_path):
+                # Add screenshot slide
+                slide = prs.slides.add_slide(blank_layout)
+                
+                # Add title bar
+                title_shape = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(0.6))
+                title_shape.fill.solid()
+                title_shape.fill.fore_color.rgb = COLORS['walmart_blue_dark']
+                title_shape.line.fill.background()
+                
+                title_box = slide.shapes.add_textbox(Inches(0.3), Inches(0.1), Inches(9), Inches(0.5))
+                p = title_box.text_frame.paragraphs[0]
+                run = p.add_run()
+                run.text = "Projects Dashboard"
+                run.font.size = Pt(20)
+                run.font.bold = True
+                run.font.color.rgb = COLORS['white']
+                
+                # Add screenshot (scaled to fit)
+                slide.shapes.add_picture(screenshot_path, Inches(0.2), Inches(0.8), width=Inches(9.6), height=Inches(6.5))
+                
+                # Clean up temp file
+                try:
+                    os.remove(screenshot_path)
+                except:
+                    pass
             else:
-                run.font.color.rgb = COLORS['walmart_blue']
-        
-        # ──────── SLIDE 3+: PROJECT DETAILS ────────
-        for project in projects[:20]:  # Max 20 projects
-            slide = prs.slides.add_slide(blank_layout)
-            
-            # Project title header (colored bar)
-            header_shape = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(0.8))
-            header_shape.fill.solid()
-            header_shape.fill.fore_color.rgb = COLORS['walmart_blue_dark']
-            header_shape.line.fill.background()
-            
-            # Project title on header
-            title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.15), Inches(9), Inches(0.6))
-            p = title_box.text_frame.paragraphs[0]
-            run = p.add_run()
-            run.text = project['title']
-            run.font.size = Pt(28)
-            run.font.bold = True
-            run.font.color.rgb = COLORS['white']
-            
-            # Project details
-            y_pos = 1.1
-            details = [
-                ('Business Area', project['business_area']),
-                ('Owner', project['owner_name']),
-                ('Status', project['project_status']),
-                ('Health Status', project['health_status']),
-                ('Latest Update', project['latest_update']),
-                ('Updated This Week', 'Yes' if project.get('updated_this_week') else 'No'),
-            ]
-            
-            for label, value in details:
-                # Label
-                label_box = slide.shapes.add_textbox(Inches(0.5), Inches(y_pos), Inches(2), Inches(0.3))
-                p = label_box.text_frame.paragraphs[0]
-                p.text = f"{label}:"
-                p.font.size = Pt(12)
-                p.font.bold = True
-                p.font.color.rgb = COLORS['walmart_blue_dark']
-                
-                # Value
-                val_box = slide.shapes.add_textbox(Inches(2.7), Inches(y_pos), Inches(6.5), Inches(0.8))
-                tf = val_box.text_frame
-                tf.word_wrap = True
-                p = tf.paragraphs[0]
-                p.text = str(value)
-                p.font.size = Pt(14)
-                p.font.color.rgb = COLORS['dark_gray']
-                
-                y_pos += 0.6
+                logger.warning("Dashboard screenshot capture failed - using fallback")
+        except Exception as e:
+            logger.warning(f"Screenshot processing error: {str(e)}")
         
         # Save to BytesIO
         ppt_file = BytesIO()
@@ -722,6 +668,37 @@ def generate_ppt():
     except Exception as e:
         logger.error(f"PPT generation error: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+# ──────────────────────────────────────────────
+# EMAIL UTILITIES
+# ──────────────────────────────────────────────
+
+def send_email_via_relay(recipient_email, subject, html_body, sender_email="Activity_Hub@walmart.com"):
+    """
+    Send email via Walmart internal SMTP relay (relay.walmart.com:25)
+    No authentication required on internal network
+    """
+    try:
+        # Create message
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = sender_email
+        msg['To'] = recipient_email
+        
+        # Attach HTML body
+        html_part = MIMEText(html_body, 'html', 'utf-8')
+        msg.attach(html_part)
+        
+        # Connect to Walmart SMTP relay
+        server = smtplib.SMTP('relay.walmart.com', 25, timeout=10)
+        server.sendmail(sender_email, [recipient_email], msg.as_string())
+        server.quit()
+        
+        logger.info(f"Email sent successfully to {recipient_email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send email to {recipient_email}: {str(e)}")
+        return False
 
 @app.route('/api/sample-email', methods=['GET'])
 def get_sample_email():
@@ -882,6 +859,194 @@ def get_sample_email():
         return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
     except Exception as e:
         logger.error(f"Sample email generation error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/send-email', methods=['POST'])
+def send_projects_email():
+    """
+    Send projects overview email to recipient
+    POST body: { "recipient_email": "email@walmart.com", "include_ppt": false }
+    """
+    try:
+        data = request.get_json()
+        recipient_email = data.get('recipient_email', 'kendall.rush@walmart.com').strip()
+        
+        if not recipient_email:
+            return jsonify({'error': 'recipient_email required'}), 400
+        
+        if not bq_client:
+            return jsonify({'error': 'BigQuery client not initialized'}), 500
+        
+        # Calculate Walmart Week
+        today = datetime.now()
+        fiscal_year_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
+        days_since_fy = (today - fiscal_year_start).days
+        wm_week = (days_since_fy // 7) + 1
+        
+        # Get project stats and sample projects (same as /api/sample-email)
+        sql = """
+        SELECT COUNT(*) as total, 
+               COUNTIF(health_status = 'On Track') as on_track,
+               COUNTIF(health_status = 'At Risk') as at_risk,
+               COUNTIF(health_status = 'Off Track') as off_track
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        WHERE project_status = 'Active'
+        """
+        
+        stats_result = bq_client.query(sql).result()
+        stats = list(stats_result)[0]
+        
+        # Get sample projects
+        projects_sql = """
+        SELECT title, business_area, owner_name, health_status, latest_update
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        WHERE project_status = 'Active'
+        LIMIT 5
+        """
+        projects_result = bq_client.query(projects_sql).result()
+        projects = list(projects_result)
+        
+        # Generate HTML email (same as /api/sample-email)
+        html = f"""
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Activity Hub - Projects Overview</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }}
+        .container {{ max-width: 800px; margin: 0 auto; background-color: white; }}
+        .header {{ background: linear-gradient(135deg, #1e3a8a 0%, #0071ce 100%); color: white; padding: 32px 24px; text-align: center; }}
+        .header h1 {{ margin: 0 0 8px 0; font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }}
+        .header p {{ margin: 0; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; }}
+        .content {{ padding: 24px 32px; }}
+        .section-title {{ font-size: 16px; font-weight: 700; color: #1e3a8a; margin: 20px 0 14px 0; text-transform: uppercase; border-bottom: 2px solid #0071ce; padding-bottom: 6px; }}
+        .stats-grid {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }}
+        .stat-box {{ background-color: #f8f9fa; border-left: 4px solid #0071ce; padding: 16px 12px; text-align: center; }}
+        .stat-value {{ font-size: 28px; font-weight: 700; color: #1e3a8a; line-height: 1.3; }}
+        .stat-label {{ font-size: 11px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; margin-top: 6px; }}
+        .stat-box.on-track {{ border-left-color: #107c10; }}
+        .stat-box.on-track .stat-value {{ color: #107c10; }}
+        .stat-box.at-risk {{ border-left-color: #f7630c; }}
+        .stat-box.at-risk .stat-value {{ color: #f7630c; }}
+        .stat-box.off-track {{ border-left-color: #dc3545; }}
+        .stat-box.off-track .stat-value {{ color: #dc3545; }}
+        .projects-table {{ width: 100%; border-collapse: collapse; margin-top: 12px; }}
+        .projects-table th {{ background-color: #1e3a8a; color: white; padding: 12px 8px; text-align: left; font-size: 12px; font-weight: 700; text-transform: uppercase; }}
+        .projects-table td {{ padding: 12px 8px; border-bottom: 1px solid #e0e0e0; font-size: 13px; }}
+        .projects-table tr:nth-child(even) {{ background-color: #f9f9f9; }}
+        .health-badge {{ display: inline-block; padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: 700; text-transform: uppercase; }}
+        .health-on-track {{ background-color: #d4edda; color: #107c10; }}
+        .health-at-risk {{ background-color: #fff3cd; color: #f7630c; }}
+        .health-off-track {{ background-color: #f8d7da; color: #dc3545; }}
+        .footer {{ background-color: #f5f5f5; padding: 16px 32px; text-align: center; font-size: 11px; color: #999; border-top: 1px solid #e0e0e0; }}
+        .footer p {{ margin: 4px 0; }}
+        .button {{ display: inline-block; background-color: #0071ce; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: 600; margin-top: 12px; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>Activity Hub Projects Overview</h1>
+            <p>WM WK {wm_week} • {datetime.now().strftime('%B %d, %Y')}</p>
+        </div>
+        
+        <!-- CONTENT -->
+        <div class="content">
+            <h2 class="section-title">Executive Summary</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value">{stats.total}</div>
+                    <div class="stat-label">Total Projects</div>
+                </div>
+                <div class="stat-box on-track">
+                    <div class="stat-value">{stats.on_track}</div>
+                    <div class="stat-label">On Track</div>
+                </div>
+                <div class="stat-box at-risk">
+                    <div class="stat-value">{stats.at_risk}</div>
+                    <div class="stat-label">At Risk</div>
+                </div>
+                <div class="stat-box off-track">
+                    <div class="stat-value">{stats.off_track}</div>
+                    <div class="stat-label">Off Track</div>
+                </div>
+            </div>
+
+            <h2 class="section-title">Projects</h2>
+            
+            <table class="projects-table">
+                <thead>
+                    <tr>
+                        <th>Project Title</th>
+                        <th>Business Area</th>
+                        <th>Owner</th>
+                        <th>Health Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+"""
+        
+        # Add project rows
+        for project in projects:
+            health = project['health_status'] or 'Unknown'
+            health_class = 'health-on-track' if 'track' in health.lower() else \
+                          'health-at-risk' if 'risk' in health.lower() else \
+                          'health-off-track' if 'off' in health.lower() else 'health-on-track'
+            
+            html += f"""
+                    <tr>
+                        <td style="font-weight: 600;">{project['title']}</td>
+                        <td>{project['business_area']}</td>
+                        <td>{project['owner_name']}</td>
+                        <td><span class="health-badge {health_class}">{health}</span></td>
+                    </tr>
+"""
+        
+        html += """
+                </tbody>
+            </table>
+
+            <div style="text-align: center; margin-top: 24px;">
+                <a href="http://localhost:8088/activity-hub/projects" class="button">View Full Dashboard</a>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <p><strong>Activity Hub</strong> • Walmart Projects Platform</p>
+            <p>This is an automated email from the Projects Management System.</p>
+            <p>&copy; 2026 Walmart Inc. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+        
+        # Send email via Walmart relay
+        success = send_email_via_relay(
+            recipient_email=recipient_email,
+            subject=f"Activity Hub Projects Overview - WM WK {wm_week}",
+            html_body=html
+        )
+        
+        if success:
+            return jsonify({
+                'status': 'sent',
+                'recipient': recipient_email,
+                'wm_week': wm_week,
+                'projects_count': len(projects),
+                'timestamp': datetime.now().isoformat()
+            }), 200
+        else:
+            return jsonify({
+                'error': f'Failed to send email to {recipient_email}',
+                'recipient': recipient_email
+            }), 500
+    
+    except Exception as e:
+        logger.error(f"Send-email error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/business-areas', methods=['GET'])

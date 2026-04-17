@@ -77,11 +77,11 @@
       "paycycle_date": "2026-04-17",
       "scheduled_send_time": "06:00",
       "scheduled_send_datetime": "2026-04-17T06:00:00",
-      "actual_send_time": null,
-      "actual_send_datetime": null,
-      "status": "scheduled",
-      "notes": "",
-      "recipients_count": 0,
+      "actual_send_time": "08:43",
+      "actual_send_datetime": "2026-04-17T08:43:32.351347",
+      "status": "completed",
+      "notes": "Sent to 5 affected DC leadership (10 emails: GM+AGM) on 2026-04-17 @ 08:43 (Manager change detection - Production)",
+      "recipients_count": 10,
       "error_message": null,
       "task_name": "DC-EMAIL-PC-06-FY27 PC 06"
     },
@@ -348,12 +348,12 @@
   ],
   "summary": {
     "total_paycycles": 26,
-    "completed": 3,
-    "scheduled": 23,
+    "completed": 4,
+    "scheduled": 22,
     "pending": 0,
     "missed": 0,
     "failed": 0,
-    "last_updated": "2026-04-03T14:21:09.655964",
+    "last_updated": "2026-04-17T08:43:32.351356",
     "notes": "PC-04 completed - sent to team (3 recipients) on 2026-03-24 15:56"
   }
 }

@@ -75,7 +75,7 @@ def build_status_email_html(week, fy, cache_data):
     for s in status_breakdown:
         status = html_mod.escape(s.get('status', ''))
         count = s.get('count', 0)
-        is_excluded = 'Denied' in status or 'Expired' in status
+        is_excluded = 'Denied' in status or 'Expired' in status or status == 'Draft - Pending'
         if is_excluded:
             status_rows += (
                 f'<tr>'
@@ -180,7 +180,7 @@ def build_status_email_html(week, fy, cache_data):
                     <td width="33%" style="padding:0 4px 0 0;">
                         <div style="background:#EFF6FF;border-radius:8px;padding:14px;text-align:center;">
                             <div style="font-size:26px;font-weight:700;color:#1D4ED8;">{total_excl}</div>
-                            <div style="font-size:11px;color:#6B7280;margin-top:2px;">Total (excl. Denied/Expired)</div>
+                            <div style="font-size:11px;color:#6B7280;margin-top:2px;">Total (excl. Draft/Denied/Expired)</div>
                         </div>
                     </td>
                     <td width="33%" style="padding:0 2px;">
@@ -201,7 +201,7 @@ def build_status_email_html(week, fy, cache_data):
             <!-- Status Breakdown Table -->
             <h3 style="font-size:14px;color:#111827;margin-bottom:6px;">Status Breakdown</h3>
             <p style="font-size:12px;color:#6B7280;margin:0 0 8px;">
-                Excludes: AMP PR Merchandise, Denied, Expired
+                Excludes: AMP PR Merchandise, Draft, Denied, Expired
             </p>
             <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px;">
                 <thead>
@@ -213,7 +213,7 @@ def build_status_email_html(week, fy, cache_data):
                 <tbody>
                     {status_rows}
                     <tr style="background:#F0F9FF;">
-                        <td style="padding:8px 12px;font-weight:700;border-top:2px solid #1D4ED8;">Total (excl. Denied/Expired)</td>
+                        <td style="padding:8px 12px;font-weight:700;border-top:2px solid #1D4ED8;">Total (excl. Draft/Denied/Expired)</td>
                         <td style="padding:8px 12px;text-align:right;font-weight:700;border-top:2px solid #1D4ED8;">{total_excl}</td>
                     </tr>
                 </tbody>

@@ -1,67 +1,140 @@
 {
   "week": 12,
   "fy": 2027,
-  "cached_at": "2026-04-16T06:00:21.337671",
-  "bq_last_updated": "2026-04-16T00:55:29.397000+00:00",
-  "event_count": 6,
-  "review_no_comm_count": 6,
+  "cached_at": "2026-04-17T13:57:56.353548",
+  "bq_last_updated": "2026-04-17T17:10:39.206000+00:00",
+  "event_count": 38,
+  "review_no_comm_count": 38,
   "status_breakdown": [
     {
-      "status": "Review for Publish review - Pending",
-      "count": 10
-    },
-    {
-      "status": "Awaiting Business Review - Pending",
-      "count": 7
-    },
-    {
-      "status": "Review for Publish review - No Comms",
-      "count": 6
-    },
-    {
-      "status": "ATC final review - Pending",
-      "count": 6
-    },
-    {
-      "status": "Awaiting Comms Approval - Pending",
-      "count": 4
-    },
-    {
-      "status": "Expired - Pending",
-      "count": 3
-    },
-    {
-      "status": "Review for Publish review - Future Send",
-      "count": 3
-    },
-    {
-      "status": "Awaiting Comms Approval - Ready to Review",
-      "count": 2
+      "status": "Draft - Pending",
+      "count": 1
     },
     {
       "status": "Denied - Pending",
       "count": 2
     },
     {
-      "status": "Awaiting Comms Approval - In Progress",
+      "status": "Expired - Pending",
+      "count": 5
+    },
+    {
+      "status": "Expired - In Progress",
       "count": 1
     },
     {
-      "status": "Draft - Pending",
-      "count": 1
-    },
-    {
-      "status": "Awaiting Legal Approval - Pending",
-      "count": 1
-    },
-    {
-      "status": "Awaiting ATC Approval - Pending",
-      "count": 1
+      "status": "Review for Publish review - No Comms",
+      "count": 38
     }
   ],
-  "total_excl_denied": 42,
-  "summarized_count": 6,
+  "total_excl_denied": 38,
+  "summarized_count": 38,
   "events_with_summaries": [
+    {
+      "event_id": "0587fefc-3e3d-4bdf-a7b1-52d0f5481247",
+      "store_area": "Asset Protection",
+      "title": "Department 95 Pepsi Deliveries",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Walmart and Pepsi are partnering to provide better orders for your stores. With the new partnership, orders will closely follow a stores's POS replenishment rules."
+    },
+    {
+      "event_id": "47185c52-4224-498b-b5d0-e2c466ba57e1",
+      "store_area": "Asset Protection",
+      "title": "Dept. 46: La\u00a0Roche-Posay Execution Audit",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 46: Remove all anti-theft barriers. Complete the La\u00a0Roche-Posay/CeraVe Dermatologist-Recommended modular set to planogram immediately. Keep the destination fully accessible for customers. Ensure it is ready for the Premium team and upcoming compliance audits."
+    },
+    {
+      "event_id": "69444a95-ba94-48fc-901b-5a5e8d476e7a",
+      "store_area": "Asset Protection",
+      "title": "Quarterly Strategic Law Enforcement Outreach Meetings",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Quick reminder: complete four Law Enforcement Outreach Meetings each year and log each one in Secure Audit. Partner with nearby stores served by the same agency, and if you share an event, each facility still submits separately. Details are in Better Way under Law Enforcement and Outreach."
+    },
+    {
+      "event_id": "09b3c94f-a12c-42c1-8152-47b82a69efa0",
+      "store_area": "Auto Care",
+      "title": "Dept. 10: Automotive Wiper Blade Fixture Replacement \u2014 Fixture Survey",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 10: Complete the wiper blade fixture survey by comparing your fixture to the provided diagrams, ordering any missing/damaged tracks, components, or size-specific signage using the listed SAP part numbers to ensure customers can quickly find the right blade and prevent lost sales."
+    },
+    {
+      "event_id": "45b61e8f-95cd-41bd-aa24-fd494ae64878",
+      "store_area": "Backroom and Claims",
+      "title": "Dept 2: Kotex Brand Stock Disruption",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 2: Due to a planned Kotex brand transition in Department 2, stores will manage temporary out\u2011of\u2011stocks by facing out Equate and Always products until the new Period Care modular launches in Week 15."
+    },
+    {
+      "event_id": "4a32a3c3-46a5-431e-ac71-fd9df1e01a57",
+      "store_area": "Backroom and Claims",
+      "title": "Dept. 79: Modular Brand Launch Delay ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 79 will see a delay in the Monica + Andy brand launch originally planned for the Week 11 (April 11\u201317) delay due to shipping issues. Impacted stores should immediately fill the temporary four-foot section using designated substitute items to maintain presentation standards until an updated modular drops."
+    },
+    {
+      "event_id": "473c3a74-1da7-47a7-95d8-31ffd223d727",
+      "store_area": "Backroom and Claims",
+      "title": "Reminder - Handling Breakpack Boxes",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Backroom: Breakpack box reuse is key to controlling costs and keeping RDC operations running smoothly. Handling cartons with care and returning them on time and undamaged helps keep everything moving efficiently."
+    },
+    {
+      "event_id": "040cbe77-b358-4d63-8d94-572b65b61023",
+      "store_area": "Consumables",
+      "title": "Consumables: P&G America 250 Event - Assortment & Activation",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Total Consumables: America\u2019s 250th Birthday program highlights American-made brands in store, tapping into growing customer demand and increasing visibility of products already made in the U.S. \u201cOur Stories Made Here\u201d creative brings that message to life with brands like Tide, Bounty, and Gillette. Displays begin rolling out in week 13, making early planning key to strong execution."
+    },
+    {
+      "event_id": "70c35824-b283-4f3c-a690-5911211af274",
+      "store_area": "Digital",
+      "title": "InHome Delivery: Distracted Driving and Work Zones",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: InHome Delivery drivers should stay focused as April brings more work zones and heavier traffic. Avoid distractions, follow signs, watch for lane changes and workers, and practice safe parking with a 360 Circle of Safety. Safe driving protects you, your community and the members who rely on you every day."
+    },
+    {
+      "event_id": "a7e45056-3600-46ea-b03b-21958dd42e6e",
+      "store_area": "Digital",
+      "title": "Let\u2019s Make Mother\u2019s Day Shine!\u00a0",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: Mother\u2019s Day is approaching quickly, and strong execution will be key to meeting customer demand. Focus on keeping top-selling items like floral, cards, gift sets and sweets fully stocked, easy to find and well signed. Expect increased demand leading into the week, especially for floral, beauty and last-minute giftables, with a spike in evening online orders. Staying stocked, visible and ready will help capture every opportunity."
+    },
+    {
+      "event_id": "9256ebda-811d-4097-a28e-467642a02a30",
+      "store_area": "Entertainment",
+      "title": "Dept. 72: Week 12 Samsung TV Item Swap",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 72: We\u2019ll receive the new 2026 Samsung 55\" TVs in weeks 11 and 12 to support a week 12 modular item swap. The outgoing 2025 55\" model will be marked down for clearance. The new model will be set on the Medium TV modular, including updating the display."
+    },
+    {
+      "event_id": "c3ae3304-e37c-42be-814c-59d8214bf83b",
+      "store_area": "Fashion",
+      "title": "Dept. 23: Late Inventory Guidance",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Men's Sportswear inventory is late for the Category 2125 original week 8 mod set, but will arrive for the week 13 relay."
+    },
+    {
+      "event_id": "97731ee5-b02f-428e-9625-0d0301dd54c7",
+      "store_area": "Fashion",
+      "title": "Dept. 29: Sleepwear & Intimates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Department 29, stores are urged to make sure signage for Mills by Millie Bobby Brown is set. We are also reminding stores to make sure licensed socks are set and fully stocked."
+    },
+    {
+      "event_id": "2731ec44-15a9-4c1a-bb1f-1ad6ad933074",
+      "store_area": "Fashion",
+      "title": "Dept. 34: Check Signage in Women's Plus ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Department 34, some stores are missing Jessica Simpson and Gloria Vanderbilt signage in Plus and Missy. We provided a lookup tool for stores to verify their store's signage."
+    },
+    {
+      "event_id": "770b9a57-d6bb-4a4c-9a5a-fd673416a225",
+      "store_area": "Fashion",
+      "title": "Dept. 34: Signage for Ingrid and Isabel Maternity",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Department 34, stores are encouraged to make sure signage is set for the new maternity brand, Ingrid and Isabel For Every Belly."
+    },
     {
       "event_id": "2ce1ac2d-42b6-487b-9d2d-273962c1b47c",
       "store_area": "Food",
@@ -70,11 +143,46 @@
       "summary_text": "Department 91: Associates should make sure Frozen pizza boxes are standing up and facing forward. This will help increase sales.\n\nDepartment 91: Associates should make sure all Frozen features are set to help drive sales.\n\nDepartment 91: In week 14, Great Value Breakfast Bowls are being added back into the Frozen Breakfast modular.\n\nDepartment 91: Did you know, stores on average sell 240 units of Banquet Chicken Pot Pies per week.\u00a0At $1 each, this is a great inflation buster and meal solution for customers.\n\nDepartment 91: Associates should make sure these four Rollback items are flagged and available for customers: Marie Callender's Dinners, Uncrustables 4ct, 10ct and 15ct, Caulipower Bites and Pillsbury Cinnamon Rolls."
     },
     {
+      "event_id": "31f102ed-00eb-4ff0-a115-04eb30ff31a6",
+      "store_area": "Food",
+      "title": "Dept. 92: ARIH Brand Is Launching at Walmart",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "The ARIH brand is launching in Walmart stores on Friday, April 24. What is the ARIH Brand? A new global Korean fusion food and beverage brand launched this month\u00a0in collaboration with the K-pop group BTS. This launch will be supported by four merchandising programs in select stores and online."
+    },
+    {
       "event_id": "b890b870-39ee-49a9-9077-3f4d9a148e78",
       "store_area": "Food",
       "title": "Dept. 92: Canned Fruit Inventory Update",
       "status": "Review for Publish review - No Comms",
       "summary_text": "The Del Monte brand canned fruit has new ownership. Once inventory starts to flow on Friday, April 10, store level recovery will occur as soon as the\u00a0DCs can process orders and load trucks."
+    },
+    {
+      "event_id": "2c21b996-66c8-443c-97cd-58d3c8d814bb",
+      "store_area": "Food",
+      "title": "Dept. 92: Fight Hunger. Spark Change. Keep the Momentum Going",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In week three of the fight hunger spark change campaign, the focus is on keeping the momentum. Maintain features and make sure all signing is correct. Top stores will be recognized and rewarded."
+    },
+    {
+      "event_id": "21454f5f-f7aa-4485-b127-d7391cd71410",
+      "store_area": "Fresh",
+      "title": "Dept. 93: Week 12 Merch Message",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "As summer grilling ramps up, ensure features are set and modular homes are full. Slack out dinner sausage every Wednesday to drive weekend sales. With rising temps, monitor case temps closely: keep meat at 30\u00b0F. At 34\u00b0F, shelf life starts to drop; each degree above 34 costs one day of shelf life. Reference the Better Way Fresh Meat (Dept. 93) guide for Supercenters and Neighborhood Markets."
+    },
+    {
+      "event_id": "df36b028-422a-4de5-9249-3587a65dca40",
+      "store_area": "Fresh",
+      "title": "Dept. 94: Produce Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Confirm Week 10 fixtures are set. Stores traited for the squeezable and bowl tray rack should have received it with Produce GDC freight; if not, check the backroom, then email\u00a0kenneth.resta@walmart.com\u00a0with store number, address and recipient name. The Herbs stack rack ships prebuilt via DC and sets with the Week 10 herbs mod. Bulk corn supply is improving as eight DCs start April 18-22, but expect early quality issues; mark down unsellable product, set a temporary location, rotate and escalate NIL picks. Adverse weather in both Florida and Canada have delayed harvests of slicing and Roma tomatoes in both growing regions. Stores carying sweet baby broccoli should ensure product is standing upright, not laying flat."
+    },
+    {
+      "event_id": "6851e722-ada7-444f-bb5f-9fbe386d2be2",
+      "store_area": "Fresh",
+      "title": "Dept. 98 & 81: WK12 Bakery & Bread Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Fresh Bakery, Department 98, follow the approved Mother\u2019s Day cake and cupcake decorating guides and keep seasonal feature space fully stocked through Sunday, May 10. Promote savings by featuring and flagging Marketside mini muffins, the 28-count cookie box, and angel food Rollbacks. In Commercial Bread, prioritize selling through clearance ahead of the week 13 Buns and Rolls modular reset (Category 103). Keep tortilla Rollbacks full and accurately priced to support upcoming event demand (Cinco de Mayo, July Fourth, and the World Cup). Treat Brown \u2019n Serve rolls like warehouse items and maintain a full feature at all times."
     },
     {
       "event_id": "dcbdf300-a79c-454f-acb0-dbfe63a3799f",
@@ -98,11 +206,95 @@
       "summary_text": "Department 82: Starting week 12 (April 18-24), the Moms, Dads and Grads Gift Card Pallet will arrive in stores. To capture maximum sales, move the pallet to the salesfloor in a high traffic area of the Front End."
     },
     {
+      "event_id": "2a96bbf8-4da5-44a2-a686-e3096630ce97",
+      "store_area": "Hardlines",
+      "title": "Dept. 11: Tools Markdown - Hold Markdown Items",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 11: Keep markdown tools in current modular locations through week 17 resets."
+    },
+    {
+      "event_id": "ed7871e8-4bb4-4291-9285-cf02a2069a48",
+      "store_area": "Hardlines",
+      "title": "Dept. 9: FIFA World Cup Tumbler Sidekick Late Arrival",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 9: FIFA World Cup tumbler sidekicks will arrive about two weeks late in about 2,000 stores; adjust feature-space plans and merchandise as planned when they arrive."
+    },
+    {
+      "event_id": "f369e144-c881-418d-bcd2-ea37bb09a31a",
+      "store_area": "Home",
+      "title": "Dept. 15: Ninja Blast Item Swap",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Department 15, we have an item swap\u00a0, transitioning stores from the Ninja Blast 16 ounce to the Ninja Blast 18 ounce, effective week 11."
+    },
+    {
+      "event_id": "77590a5b-cbe8-4d1f-b206-b8ea4e39c05a",
+      "store_area": "Home",
+      "title": "Home: Mainstays Kids Brand Launch \u2013 Key Updates\u00a0",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Home is getting ready for the Mainstays Kids brand launch by getting Your Zone inventory on the salesfloor with clearance flagging."
+    },
+    {
+      "event_id": "5fa9759a-6825-42b9-ab29-ea426ce13887",
+      "store_area": "Seasonal",
+      "title": "Dept. 18/67: Mother\u2019s Day, Graduation, and Patriotic Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 18/67: Seasonal update: maintain Mother\u2019s Day modulars, set Graduation/Patriotic, refresh Celebrations Value Wall, and support balloons/cards plus Administrative Professionals Day gifts."
+    },
+    {
+      "event_id": "e86863e0-50b5-4c1d-bc08-f244a9836877",
+      "store_area": "Total Store",
+      "title": "AI Tip of the Week: Turn KPIs into Weekly Priorities",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Turn\u00a0Key Performance Indicators into Weekly Priorities.\n\nMy Assistant can act as an expert in almost any area by providing specific criteria and data. My Assistant can that information into\u00a0clear, focused actions for you and your team.\n\nPrompt Example. Copy and paste your performance data into My Assistant and enter a prompt like: \"Act as a Walmart Market Manager with knowledge of Key Performance Indicators, Attendance to Demand, turnover, in-stock and engagement. Provide Key Performance Indicator results and expectations. Identify the top 3\u20135 weekly priorities with root causes, risks and actions. Put your results into a table with these headings:\u00a0Top priorities (ranked), Root causes, Actions for the week, Ownership (Store Manager, Manager, Team Lead), Key Performance Indicators impact.\""
+    },
+    {
+      "event_id": "87b64e51-7a40-4ecd-b1a7-b61d822a8775",
+      "store_area": "Total Store",
+      "title": "Dept. 3: Calendar Feature \u2013 End of Season Instructions",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 3: Clear all remaining seasonal calendar inventory by removing it from the sales floor, sorting it for donation or destruction per store process, keeping none in the backroom or on display, and completing by week 12."
+    },
+    {
+      "event_id": "44097c35-f366-4b38-81e2-2e139897dcc9",
+      "store_area": "Total Store",
+      "title": "Dept. 3: Teacher Appreciation ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 3: Teacher Appreciation Week is a key opportunity to set the Action Alley pallet, engage local teachers, and drive incremental sales and loyalty heading into Back to School."
+    },
+    {
+      "event_id": "bd8bc2dc-b710-4e41-adf9-450edf817b9e",
+      "store_area": "Total Store",
+      "title": "Dept. 56: Why ASN Scans Matter",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 56: Scan ASN numbers directly from the invoice at plant delivery for accurate receiving and on-hands, to prevent invoice discrepancies, and report any scanning issues immediately."
+    },
+    {
+      "event_id": "807ef107-0304-4da9-8e54-8cc11b94e182",
+      "store_area": "Total Store",
+      "title": "Execute Product Removals in AegisOne",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Product removals must be executed quickly to protect customers and associates. Within 24 hours of a removal notice, remove the item from the salesfloor and all impacted areas, complete the AegisOne verification form, and process the product per disposition instructions. Make sure associates have the ACT app, check your landing page to make sure all product removals are completed, and do not restock returned recalled items."
+    },
+    {
+      "event_id": "38f1b2ca-0502-4095-ae94-12c8f51c7ae0",
+      "store_area": "Total Store",
+      "title": "Open Office Hours for the New Incident Intake",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Open Office Hours for the New Incident Intake\n\nWalmart Claims Services is hosting open office hours to help with the new Incident Intake system, which replaces the Accident app and IRS. Join Mondays and Thursdays from April 20 through 30, from 2 to 3 p.m. Central. Drop in anytime with questions or issues."
+    },
+    {
       "event_id": "a03a6547-0afd-4ea7-9ca3-4c7bef55c09c",
       "store_area": "Total Store",
       "title": "Using Cash Fund Transfer the Right Way",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Front End: This reminder is to clarify when a Cash Fund Transfer (CFT) is appropriate and when another store process must be used instead. Cash Fund Transfers are typically misused for the following store processes: Travel, Store Use, Chamber Dues and Donations."
+    },
+    {
+      "event_id": "e10053e5-4dcb-470d-8049-b39d23ce22c3",
+      "store_area": "Total Store",
+      "title": "VPI Selection Is Now Open and Everyone\u2019s Invited",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Q2 VPI item selection is currently open through Thursday, April 30, and all are welcome! Participation is voluntary and may only occur during the associate\u2019s working hours. Associates may submit one VPI item per quarter, monetary prizes are awarded to hourly winners at the store, market and regional levels. Find full contest details, program updates and the list of winners centralized in the VPI section of the\u00a0Features Better Way guide."
     }
   ],
   "events_without_summary": []

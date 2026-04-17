@@ -126,14 +126,23 @@
         },
         {
           "name": "facility",
+          "type": "string",
+          "required": false,
+          "description": "Store/facility number(s) - comma-delimited list of store numbers for multi-location projects",
+          "validation": {
+            "pattern": "^[0-9]+([,][0-9]+)*$"
+          },
+          "aliases": ["Facility", "FACILITY", "store_number", "store", "Store", "store_id", "facilities"]
+        },
+        {
+          "name": "store_count",
           "type": "integer",
           "required": false,
-          "description": "Store/facility number",
+          "description": "Number of stores/facilities affected by this project",
           "validation": {
-            "minimum": 1,
-            "maximum": 99999
+            "minimum": 1
           },
-          "aliases": ["Facility", "FACILITY", "store_number", "store", "Store", "store_id"]
+          "aliases": ["Store_Count", "store_count", "facility_count", "number_of_stores"]
         },
         {
           "name": "city",
@@ -256,6 +265,14 @@
           "required": false,
           "description": "Implementation week identifier",
           "aliases": ["Implementation_WM_Week", "impl_week", "implementation_wm_week"]
+        },
+        {
+          "name": "projected_start_date",
+          "type": "date",
+          "required": false,
+          "description": "Projected project start date",
+          "format": "YYYY-MM-DD",
+          "aliases": ["Projected_Start_Date", "projected_start_date", "start_date", "begin_date"]
         }
       ]
     },
@@ -271,6 +288,13 @@
           "aliases": ["Owner", "PROJECT_OWNER", "project_owner", "lead", "pm"]
         },
         {
+          "name": "owner_id",
+          "type": "string",
+          "required": false,
+          "description": "Project owner employee ID (for email routing, manager lookup)",
+          "aliases": ["Owner_ID", "owner_id", "owner_employee_id"]
+        },
+        {
           "name": "director",
           "type": "string",
           "required": false,
@@ -278,11 +302,25 @@
           "aliases": ["Director", "DIRECTOR", "director_name"]
         },
         {
+          "name": "director_id",
+          "type": "string",
+          "required": false,
+          "description": "Director employee ID (for email routing, hierarchy)",
+          "aliases": ["Director_ID", "director_id", "director_employee_id"]
+        },
+        {
           "name": "sr_director",
           "type": "string",
           "required": false,
           "description": "Senior Director overseeing the project",
           "aliases": ["SR_Director", "sr_director", "senior_director", "SrDirector"]
+        },
+        {
+          "name": "sr_director_id",
+          "type": "string",
+          "required": false,
+          "description": "Senior Director employee ID (for email routing, hierarchy)",
+          "aliases": ["SR_Director_ID", "sr_director_id", "sr_director_employee_id"]
         }
       ]
     },
@@ -353,6 +391,22 @@
           "description": "Impact description for customers",
           "example": "Improved checkout experience",
           "aliases": ["CUSTOMER_IMPACT", "customer_impact", "cx_impact"]
+        },
+        {
+          "name": "ho_impact",
+          "type": "string",
+          "required": false,
+          "description": "Home Office impact description (impact on corporate teams)",
+          "example": "Reporting changes required -2 hours training",
+          "aliases": ["HO_Impact", "ho_impact", "home_office_impact", "corporate_impact"]
+        },
+        {
+          "name": "impact",
+          "type": "string",
+          "required": false,
+          "description": "Consolidated impact summary (general project impact)",
+          "example": "Reduced checkout times, improved store operations",
+          "aliases": ["Impact", "impact", "overall_impact", "general_impact"]
         }
       ]
     },
@@ -430,14 +484,27 @@
             "maxLength": 10000
           },
           "aliases": ["OVERVIEW", "overview", "description", "details", "long_description"]
+        },
+        {
+          "name": "project_update",
+          "type": "string",
+          "required": false,
+          "description": "Latest project update - status, progress, or recent changes",
+          "validation": {
+            "maxLength": 5000
+          },
+          "aliases": ["Project_Update", "project_update", "latest_update", "status_update"]
         }
       ]
     }
   },
 
   "metadata": {
-    "totalFields": 40,
+    "totalFields": 48,
     "requiredFields": ["project_id", "title", "status", "project_source", "created_date", "last_updated"],
-    "categories": ["identifiers", "status", "location", "time", "ownership", "categorization", "impact", "amp_meeting", "description"]
+    "categories": ["identifiers", "status", "location", "time", "ownership", "categorization", "impact", "amp_meeting", "description"],
+    "lastUpdated": "2026-04-17",
+    "updatedBy": "krush@walmart.com",
+    "updateNotes": "Added 8 new fields for full Intake Hub integration: owner_id, director_id, sr_director_id (ownership chain), ho_impact, impact (impact assessment), store_count (location), project_update (description), projected_start_date (timeline)"
   }
 }

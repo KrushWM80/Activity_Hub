@@ -3,7 +3,7 @@
 # This will register all remaining email tasks through January 22, 2027
 
 $pythonExe = "c:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\.venv\Scripts\python.exe"
-$scriptPath = "c:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\DC to Store Change Management Emails\send_pc06_production_email.py"
+$scriptPath = "c:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\Projects\DC to Store Change Management Emails\send_paycycle_production_email_generic.py"
 
 # Define all PayCycle tasks
 $tasks = @(
@@ -44,7 +44,8 @@ foreach ($task in $tasks) {
     
     try {
         $trigger = New-ScheduledTaskTrigger -At $pcDate -Once
-        $action = New-ScheduledTaskAction -Execute $pythonExe -Argument "`"$scriptPath`""
+        # Pass PayCycle number as command-line argument to generic script
+        $action = New-ScheduledTaskAction -Execute $pythonExe -Argument "`"$scriptPath`" $pcNum"
         $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
         Register-ScheduledTask -TaskName $taskName -Trigger $trigger -Action $action -Settings $settings -RunLevel Highest -User SYSTEM -Force | Out-Null
         

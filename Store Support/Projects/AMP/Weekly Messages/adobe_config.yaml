@@ -3,9 +3,15 @@
 
 source_files:
   weekly_messages_folder: "C:\\Users\\krush\\Documents\\VSCode\\AMP\\Weekly Messages\\Docs\\"
+  
+  # LEGACY: Adobe Excel-based files (FY27)
   weekly_messages_excel_path: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Weekly Messages Area Reports - Tables FY27.xlsx"
   weekly_messages_audio_csv_path: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Activity Weekly Messages Audio.csv"
   playbook_hub_path: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Playbook Hub and Active Playbooks - Weekly Report.xlsx"
+  
+  # NEW: Cloud-based CSV files (VB process)
+  weekly_messages_cloud_csv: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Weekly Messages Area Reports - Tables FY27.csv"
+  playbook_hub_cloud_csv: "C:\\Users\\krush\\OneDrive - Walmart Inc\\AGE Team - Documents\\Activity - Walmart US\\Reporting\\Data\\Me@\\MM\\Input\\Activity - Playbook Hub and Active Playbooks.csv"
 
 gcp:
   project_id: "wmt-assetprotection-prod"
@@ -14,9 +20,18 @@ gcp:
 bigquery:
   dataset_id: "Store_Support_Dev"
   tables:
+    # LEGACY: Adobe Excel-based tables
     weekly_devices: "bq_weekly_messages_devices"
     weekly_metrics: "bq_weekly_messages_metrics"
     playbook: "bq_playbook_hub_metrics"
+    
+    # NEW: Cloud CSV-based tables (normalized)
+    weekly_cloud: "bq_weekly_messages_cloud"
+    playbook_cloud: "bq_playbook_cloud"
+    
+    # NEW: Cloud CSV-based tables (raw)
+    weekly_cloud_raw: "bq_weekly_messages_cloud_raw"
+    playbook_cloud_raw: "bq_playbook_cloud_raw"
 
 logging:
   log_dir: "logs"

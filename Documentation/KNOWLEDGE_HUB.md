@@ -17,6 +17,7 @@
 | **Configuration** | Role management, access, links | [Configuration Files](#-configuration-reference) |
 | **Design Assets** | Brand, colors, typography, widgets | [Design System](Platform/Design/DESIGN_SYSTEM.md) |
 | **Compliance** | Security, data classification, WCAG | [Compliance Docs](Platform/Documents/Compliance/) |
+| **UI Change Mgmt** | Nav rules, dark mode, OneDrive sync issues | [UI Change Management Rules](#️-ui-change-management-rules) |
 | **API Documentation** | Backend & AI integration | [Backend API](Platform/Sparky%20AI/BACKEND_API.md) |
 
 ---
@@ -152,7 +153,8 @@ Individual Tier (7-8) → Specialist, Team Member, Admin
 
 #### My Work, Notifications, Settings, Teams
 - **Purpose**: Personal workspace, alerts, user preferences, collaboration
-- **Status**: Interface templates in development
+- **Status**: Interface templates in development; **nav tabs removed from all pages** (April 16, 2026)
+- **Note**: Teams/My Work/Settings links were removed from the header nav across all 4 pages. See [UI Change Management Rules](#️-ui-change-management-rules).
 - **Depends On**: Core Platform Services
 
 ---
@@ -1298,6 +1300,74 @@ Invoke-RestMethod -Uri "http://localhost:8001/api/data-status"
 
 ---
 
-**Version**: 1.3  
+## 🛡️ UI Change Management Rules
+
+**Last Updated**: April 17, 2026  
+**Reason**: OneDrive sync conflicts caused file reversions, requiring multiple re-applications of the same changes.
+
+### Established UI State (Do NOT Revert)
+
+#### Navigation — All 4 Pages
+All pages use **exactly 4 nav links** with standard `<a href>` full-page navigation:
+```html
+<nav class="nav-items">
+    <a href="/activity-hub/for-you" class="nav-item active">For You</a>
+    <a href="/activity-hub/projects" class="nav-item">Projects</a>
+    <a href="/activity-hub/reporting" class="nav-item">Reporting</a>
+    <a href="/activity-hub/admin" class="nav-item" style="...">🔒 Admin</a>
+</nav>
+```
+- **Teams, My Work, and Settings tabs were deliberately removed** (April 16, 2026).
+- **No iframe infrastructure**: No `data-embed="iframe"`, no `data-url`, no `<iframe>` elements, no iframe JS handlers.
+- **No `onclick="navigateTo()"`** on nav links.
+- **No `data-view="dashboard"`** on For You nav link.
+
+#### Light/Dark Mode + Feedback — All 4 Pages
+| Page | Button Location | Button Class | Feedback Source |
+|------|----------------|--------------|-----------------|
+| For You | `.dashboard-header` div | `dashboard-action-btn` | `'For You'` |
+| Projects | `.dashboard-header` div | `dashboard-action-btn` | `'Projects'` |
+| Reporting | `.dashboard-header` div | `dashboard-action-btn` | `'Reporting'` |
+| Admin | `.page-title-actions` div | `page-action-btn` | `'Admin'` |
+
+- Dark mode state: `localStorage` key `activity-hub-dark-mode`
+- Feedback submissions: `localStorage` key `activity-hub-feedback`
+
+#### CSS Consistency
+- **Sidebar width**: 120px across For You, Projects, Reporting
+- **Sidebar top**: 88px (below sticky header)
+- **Sidebar z-index**: 40, box-shadow: `rgba(0,0,0,0.08)`
+- **Header h1**: No explicit font-size on For You (browser default ~32px); Projects uses `font-size: 2rem` to override Bootstrap
+- **For You page is the canonical visual reference** for sizing and spacing
+
+### Files & Locations
+| Page | File Path |
+|------|-----------|
+| For You | `Interface/For You - Landing Page/activity-hub-demo.html` |
+| Projects | `Interface/projects-page.html` |
+| Reporting | `Interface/Reporting/reporting.html` |
+| Admin | `Interface/Admin/admin-dashboard.html` |
+| Flask Server | `Interface/activity_hub_server.py` (port 8088) |
+
+### Change Management Rules
+
+1. **Always re-read a file before editing.** OneDrive sync can silently revert files.
+2. **After saving, re-read to verify changes persisted.**
+3. **Do NOT add back Teams, My Work, or Settings tabs.**
+4. **Do NOT add iframe infrastructure** to any page.
+5. **Do NOT remove 💬 Feedback or 🌙 Dark Mode buttons** from any page.
+6. **When editing nav sections**, verify the 4-link structure is preserved.
+7. **When editing dashboard-header or page-title areas**, verify action buttons remain.
+
+### Incident Log
+| Date | Issue | Root Cause | Resolution |
+|------|-------|------------|------------|
+| April 16, 2026 | First round of edits to `activity-hub-demo.html` disappeared | OneDrive sync overwrote with older version | Re-applied all edits |
+| April 17, 2026 | `activity-hub-demo.html` fully reverted (Teams/MyWork/Settings back, iframe back, dark mode/feedback gone) | Another session worked from cached/older version | Re-applied nav cleanup, iframe removal, dark mode, feedback |
+| April 17, 2026 | `admin-dashboard.html` lost dark mode + page-action-btn styles | Nav fix accidentally removed other session's additions | Restored dark mode CSS, JS, page-title-actions HTML |
+
+---
+
+**Version**: 1.4  
 **Status**: Active  
-**Last Reviewed**: March 24, 2026
+**Last Reviewed**: April 17, 2026

@@ -52,7 +52,6 @@ TO_RECIPIENTS = [
     'JohnC.Davis@walmart.com',
     'LeeAnne.Mills@walmart.com',
 ]
-
 CC_RECIPIENTS = [
     'Tammy.Claunch@walmart.com',
     'kendall.rush@walmart.com',
@@ -83,15 +82,16 @@ def _get_current_ip():
 
 
 def _switch_to_walmartwifi():
-    """Switch WiFi to Walmartwifi (off VPN, enables edge-tts)."""
+    """Switch WiFi to Walmartwifi (off VPN, enables edge-tts).
+    No elevation needed — netsh wlan connect works for saved profiles.
+    """
     logger.info("Switching WiFi: Eagle → Walmartwifi...")
     try:
         result = subprocess.run(
-            ['powershell', '-Command',
-             f"Start-Process cmd -ArgumentList '/c','netsh wlan connect name={WALMARTWIFI_NAME} "
-             f"> C:\\Temp\\wifi_auto_switch.txt 2>&1' -Verb RunAs -Wait"],
-            capture_output=True, text=True, timeout=30
+            ['netsh', 'wlan', 'connect', f'name={WALMARTWIFI_NAME}'],
+            capture_output=True, text=True, timeout=15
         )
+        logger.info(f"netsh connect result: {result.stdout.strip()}")
         # Wait for connection to establish
         for attempt in range(10):
             time.sleep(3)
@@ -108,14 +108,14 @@ def _switch_to_walmartwifi():
 
 
 def _switch_to_eagle():
-    """Switch WiFi back to Eagle by disconnecting (auto-reconnects via group policy)."""
+    """Switch WiFi back to Eagle by disconnecting (auto-reconnects via group policy).
+    No elevation needed.
+    """
     logger.info("Switching WiFi: Walmartwifi → Eagle (disconnect + auto-reconnect)...")
     try:
         result = subprocess.run(
-            ['powershell', '-Command',
-             "Start-Process cmd -ArgumentList '/c','netsh wlan disconnect "
-             "> C:\\Temp\\wifi_auto_disconnect.txt 2>&1' -Verb RunAs -Wait"],
-            capture_output=True, text=True, timeout=30
+            ['netsh', 'wlan', 'disconnect'],
+            capture_output=True, text=True, timeout=15
         )
         # Wait for Eagle to auto-reconnect
         for attempt in range(15):

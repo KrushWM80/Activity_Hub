@@ -146,6 +146,7 @@ def parse_weekly_messages_excel(file_path: str, logger: logging.Logger) -> Tuple
         excel = win32.Dispatch('Excel.Application')
         excel.Visible = False
         workbook = excel.Workbooks.Open(file_path)
+        time.sleep(1)  # Give workbook time to fully initialize
         worksheet = workbook.Sheets(1)  # First sheet
         
         usedRange = worksheet.UsedRange
@@ -575,6 +576,156 @@ def parse_playbook_hub_file(file_path: str, logger: logging.Logger) -> pd.DataFr
     return playbook_df
 
 # ============================================================================
+# CLOUD CSV PARSING (VB Process - New Data Sources)
+# ============================================================================
+
+def parse_weekly_messages_cloud_csv(file_path: str, logger: logging.Logger) -> pd.DataFrame:
+    """
+    Parse Weekly Messages Cloud CSV file (from VB process).
+    Extracts device-level page views and aggregates metrics.
+    
+    Structure:
+    - Lines 1-11: Comments/headers
+    - Line 12-13: Column names (device types)
+    - Line 14+: Data rows (complete URLs and metrics)
+    """
+    logger.info(f"Parsing Weekly Messages Cloud CSV: {file_path}")
+    
+    if not Path(file_path).exists():
+        raise FileNotFoundError(f"Weekly Messages Cloud CSV not found: {file_path}")
+    
+    try:
+        # Read CSV, skip header comments
+        df = pd.read_csv(file_path, skiprows=13)
+        
+        # Clean column names
+        df.columns = df.columns.str.strip()
+        
+        # Extract data
+        rows = []
+        report_date = datetime.now().date()
+        extracted_date = datetime.now()
+        
+        for idx, row in df.iterrows():
+            page_name = str(row.iloc[0]).strip()
+            
+            # Skip empty rows or comment rows
+            if not page_name or page_name.startswith('#') or page_name == 'NaN':
+                continue
+            
+            # Extract device metrics
+            try:
+                tablets = int(float(row.iloc[1] or 0))
+                desktop = int(float(row.iloc[2] or 0))
+                store_devices = int(float(row.iloc[3] or 0))
+                mobile = int(float(row.iloc[4] or 0))
+                xcover = int(float(row.iloc[5] or 0))
+                total = tablets + desktop + store_devices + mobile + xcover
+                
+                # Extract category from page name
+                category = 'Weekly Messages - Cloud'
+                if 'fashion' in page_name.lower():
+                    category = 'Fashion'
+                elif 'home' in page_name.lower():
+                    category = 'Home'
+                
+                rows.append({
+                    'report_date': report_date,
+                    'category': category,
+                    'page_name': page_name,
+                    'tablets_page_views': tablets,
+                    'desktop_page_views': desktop,
+                    'store_devices_page_views': store_devices,
+                    'mobile_phones_page_views': mobile,
+                    'xcover_devices_page_views': xcover,
+                    'total_page_views': total,
+                    'extracted_date': extracted_date
+                })
+            except (ValueError, TypeError):
+                continue
+        
+        result_df = pd.DataFrame(rows)
+        logger.info(f"Weekly Messages Cloud CSV parsed: {len(result_df)} rows")
+        return result_df
+        
+    except Exception as e:
+        logger.error(f"Error parsing Weekly Messages Cloud CSV: {e}", exc_info=True)
+        raise
+
+def parse_playbook_cloud_csv(file_path: str, logger: logging.Logger) -> pd.DataFrame:
+    """
+    Parse Playbook Hub Cloud CSV file (from VB process).
+    Handles multiple category sections with their own tables.
+    """
+    logger.info(f"Parsing Playbook Cloud CSV: {file_path}")
+    
+    if not Path(file_path).exists():
+        raise FileNotFoundError(f"Playbook Cloud CSV not found: {file_path}")
+    
+    try:
+        # Read entire CSV first
+        df = pd.read_csv(file_path, header=None)
+        
+        rows = []
+        report_date = datetime.now().date()
+        extracted_date = datetime.now()
+        
+        current_category = None
+        i = 0
+        
+        while i < len(df):
+            cell_val = str(df.iloc[i, 0]).strip() if pd.notna(df.iloc[i, 0]) else ""
+            
+            # Check for category headers
+            if '# Playbook Hub' in cell_val or '# Freeform table' in cell_val:
+                i += 1
+                continue
+            elif '# Valentines' in cell_val:
+                current_category = 'Valentines'
+                i += 1
+                continue
+            elif '# Baby' in cell_val:
+                current_category = 'Baby Days'
+                i += 1
+                continue
+            elif '# Easter' in cell_val:
+                current_category = 'Easter'
+                i += 1
+                continue
+            elif cell_val.startswith('#') or 'Report suite' in cell_val or 'Date:' in cell_val:
+                i += 1
+                continue
+            
+            # Check for data rows (has numeric values)
+            if current_category and len(cell_val) > 0 and not cell_val.startswith('#'):
+                try:
+                    col2 = int(float(pd.to_numeric(df.iloc[i, 1] or 0)))
+                    col3 = int(float(pd.to_numeric(df.iloc[i, 2] or 0)))
+                    col4 = int(float(pd.to_numeric(df.iloc[i, 3] or 0)))
+                    
+                    rows.append({
+                        'report_date': report_date,
+                        'playbook_category': current_category or 'Unknown',
+                        'page_name': cell_val,
+                        'total_page_views': col2,
+                        'store_salary_associates_views': col3,
+                        'store_hourly_associates_views': col4,
+                        'extracted_date': extracted_date
+                    })
+                except (ValueError, TypeError):
+                    pass
+            
+            i += 1
+        
+        result_df = pd.DataFrame(rows)
+        logger.info(f"Playbook Cloud CSV parsed: {len(result_df)} rows")
+        return result_df
+        
+    except Exception as e:
+        logger.error(f"Error parsing Playbook Cloud CSV: {e}", exc_info=True)
+        raise
+
+# ============================================================================
 # BIGQUERY LOADING (MERGE/UPSERT)
 # ============================================================================
 
@@ -705,6 +856,26 @@ def main():
         except FileNotFoundError as e:
             logger.warning(f"Playbook Hub file not available: {e}")
         
+        # Cloud CSV: Parse Weekly Messages Cloud
+        weekly_messages_cloud = pd.DataFrame()
+        try:
+            weekly_messages_cloud_csv = config['source_files']['weekly_messages_cloud_csv']
+            weekly_messages_cloud = parse_weekly_messages_cloud_csv(weekly_messages_cloud_csv, logger)
+        except FileNotFoundError as e:
+            logger.warning(f"Weekly Messages Cloud CSV not available: {e}")
+        except Exception as e:
+            logger.warning(f"Error parsing Weekly Messages Cloud CSV: {e}")
+        
+        # Cloud CSV: Parse Playbook Cloud
+        playbook_cloud = pd.DataFrame()
+        try:
+            playbook_cloud_csv = config['source_files']['playbook_hub_cloud_csv']
+            playbook_cloud = parse_playbook_cloud_csv(playbook_cloud_csv, logger)
+        except FileNotFoundError as e:
+            logger.warning(f"Playbook Cloud CSV not available: {e}")
+        except Exception as e:
+            logger.warning(f"Error parsing Playbook Cloud CSV: {e}")
+        
         # Load to BigQuery
         logger.info("\n--- PHASE 2: LOADING TO BIGQUERY ---")
         project = config['gcp']['project_id']
@@ -719,10 +890,20 @@ def main():
         logger.info(f"  - {weekly_metrics_table}")
         logger.info(f"  - {playbook_table}")
         
+        # Cloud CSV target tables
+        weekly_cloud_table = f"{project}.{dataset_id}.{config['bigquery']['tables']['weekly_cloud']}"
+        playbook_cloud_table = f"{project}.{dataset_id}.{config['bigquery']['tables']['playbook_cloud']}"
+        
+        logger.info(f"Cloud data target tables:")
+        logger.info(f"  - {weekly_cloud_table}")
+        logger.info(f"  - {playbook_cloud_table}")
+        
         # Load each table if data is available
         devices_count = 0
         metrics_count = 0
         playbook_count = 0
+        weekly_cloud_count = 0
+        playbook_cloud_count = 0
         
         if not weekly_devices.empty:
             devices_count = load_to_bigquery(
@@ -730,7 +911,7 @@ def main():
                 ['report_date', 'category', 'page_name'], logger
             )
         else:
-            logger.info(f"Weekly Messages Devices: No data to load (CSV not available yet)")
+            logger.info(f"Weekly Messages Devices: No data to load (Excel not available yet)")
         
         if not weekly_metrics.empty:
             metrics_count = load_to_bigquery(
@@ -738,7 +919,7 @@ def main():
                 ['report_date', 'category', 'page_name'], logger
             )
         else:
-            logger.info(f"Weekly Messages Metrics: No data to load (CSV not available yet)")
+            logger.info(f"Weekly Messages Metrics: No data to load (Excel not available yet)")
         
         if not playbook_hub.empty:
             playbook_count = load_to_bigquery(
@@ -748,11 +929,32 @@ def main():
         else:
             logger.info(f"Playbook Hub: No data to load")
         
+        # Load Cloud CSV data
+        if not weekly_messages_cloud.empty:
+            weekly_cloud_count = load_to_bigquery(
+                client, weekly_messages_cloud, weekly_cloud_table,
+                ['report_date', 'category', 'page_name'], logger
+            )
+        else:
+            logger.info(f"Weekly Messages Cloud: No data to load")
+        
+        if not playbook_cloud.empty:
+            playbook_cloud_count = load_to_bigquery(
+                client, playbook_cloud, playbook_cloud_table,
+                ['report_date', 'playbook_category', 'page_name'], logger
+            )
+        else:
+            logger.info(f"Playbook Cloud: No data to load")
+        
         # Summary
         logger.info("\n--- SUMMARY ---")
-        logger.info(f"Weekly Messages Devices: {devices_count} rows")
-        logger.info(f"Weekly Messages Metrics: {metrics_count} rows")
-        logger.info(f"Playbook Hub: {playbook_count} rows")
+        logger.info(f"LEGACY DATA (Excel):")
+        logger.info(f"  Weekly Messages Devices: {devices_count} rows")
+        logger.info(f"  Weekly Messages Metrics: {metrics_count} rows")
+        logger.info(f"  Playbook Hub: {playbook_count} rows")
+        logger.info(f"CLOUD DATA (CSV):")
+        logger.info(f"  Weekly Messages Cloud: {weekly_cloud_count} rows")
+        logger.info(f"  Playbook Cloud: {playbook_cloud_count} rows")
         logger.info("=" * 80)
         logger.info("Adobe Analytics to BigQuery Loader - SUCCESS")
         logger.info("=" * 80)

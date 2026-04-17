@@ -1,53 +1,75 @@
-# ELM Manager Change Detection System
+# DC Manager Change Detection System
 
-**Automated manager change tracking and notification system for Walmart retail locations.**
-
----
-
-## 🎯 Quick Start
-
-1. **Extract** this ZIP file to a permanent location
-2. **Run** `python SETUP_WIZARD.py`
-3. **Follow** the prompts to configure
-4. **Test** with `python create_snapshot.py`
-5. **Deploy** with `setup_hourly_task_auto.bat` (as admin)
-
-**Full instructions:** See `DEPLOYMENT_GUIDE.md`
+**Production system for automated manager change tracking and DC leadership notification (PayCycle FY27)**
 
 ---
 
-## 📚 Documentation
+## 🚀 Production Status
 
-- **DEPLOYMENT_GUIDE.md** - Complete setup and deployment instructions
-- **7_DAY_VPN_RETRY_SUMMARY.md** - VPN retry logic explained
-- **VPN_RETRY_LOGIC.md** - Technical details on VPN detection
+**LAUNCHED:** April 17, 2026 (PC-06 ✅)  
+**Distribution:** 21 PayCycles scheduled (PC-06 through PC-26)  
+**Email Method:** Walmart SMTP Gateway (proven, reliable)  
+**Next Execution:** PC-07 on May 1, 2026 @ 06:00 AM
 
 ---
 
-## ✅ Prerequisites
+## 📚 Core Documentation
 
-- Windows 10/11
-- Python 3.8+
-- Microsoft Outlook (desktop)
-- Walmart VPN access
-- Shared mailbox with "Send As" permissions
+- **EMAIL_SYSTEM_STANDARDS.md** - Standard email delivery method (SMTP gateway)
+- **dc_email_config.py** - Configuration and settings
+- **paycycle_tracking.json** - Execution history and timestamps
+- **send_pc06_production_email.py** - Production email sender
+
+---
+
+## ✅ System Requirements
+
+- Windows Server 2016+ (Task Scheduler)
+- Python 3.8+ with venv
+- pywin32 (for task scheduling)
+- smtplib (built-in, SMTP email delivery)
+- Internal network access to `smtp-gw1.homeoffice.wal-mart.com:25`
+
+**NOTE:** No Outlook desktop required (uses SMTP gateway instead)
 
 ---
 
 ## 🛠️ What It Does
 
-1. **Automatically downloads** manager data from SDL (hourly)
-2. **Detects changes** by comparing daily snapshots
-3. **Groups changes** by DC territory
-4. **Sends emails** from your shared mailbox
-5. **Retries for 7 days** if VPN unavailable
+1. **Detects** manager changes from backend change management data
+2. **Identifies** affected distribution centers using smart DC routing
+3. **Targets** only DC leaders (GMs/AGMs) of affected DCs
+4. **Sends emails** via Walmart internal SMTP gateway (reliable, proven method)
+5. **Tracks** all executions with timestamps and recipient counts
+6. **Monitors** via BCC recipients for internal team oversight
 
 ---
 
-## 📧 Email Features
+## 📧 Email Recipients
 
-- **DC-Segmented:** Emails grouped by distribution center
-- **Test Mode:** All emails go to you (safe for testing)
+**Primary (TO):**
+- DC General Managers (GM)
+- DC Assistant General Managers (AGM)
+- Only for DCs affected by manager changes (smart targeting)
+
+**BCC (Internal Monitoring):**
+- Kristine Torres (kristine.torres@walmart.com)
+- Matthew Farnworth (matthew.farnworth@walmart.com)
+- Kendall Rush (kendall.rush@walmart.com)
+
+---
+
+## 🔧 Email Settings
+
+- **Subject:** Manager Change Report - PayCycle XX (Date)
+- **From:** supplychainops@email.wal-mart.com
+- **Content:** HTML formatted with greeting line
+- **Greeting:** "Please make time to meet them and introduce yourself and the team at the DC."
+- **Method:** SMTP Gateway (`smtp-gw1.homeoffice.wal-mart.com:25`)
+
+---
+
+## 📅 PayCycle Schedule (FY27)
 - **Shared Mailbox:** Sends from team mailbox (not personal)
 - **HTML Format:** Professional, branded emails
 - **Smart Alerts:** Incomplete DC alignment warnings

@@ -339,65 +339,52 @@ class EmailHelper:
     
     def send_email_via_outlook(self, to: List[str], subject: str, body_html: str, from_email: str = None, bcc: List[str] = None) -> bool:
         """
-        Send email via Outlook COM automation with optional BCC.
+        Send email via Walmart internal SMTP gateway (reliable, no Outlook dependency).
         
         Args:
             to: List of recipient email addresses
             subject: Email subject
             body_html: HTML body content
-            from_email: Optional - override FROM address
+            from_email: Optional - override FROM address (default: kendall.rush@walmart.com)
             bcc: Optional - List of BCC recipient email addresses
         
         Returns:
             True if sent successfully
         """
         try:
-            import win32com.client as win32
+            import smtplib
+            from email.mime.multipart import MIMEMultipart
+            from email.mime.text import MIMEText
             
-            outlook = win32.Dispatch("Outlook.Application")
-            mail = outlook.CreateItem(0)  # 0 = mail item
+            # Walmart internal SMTP gateway
+            SMTP_SERVER = "smtp-gw1.homeoffice.wal-mart.com"
+            SMTP_PORT = 25
+            SENDER = from_email or "kendall.rush@walmart.com"
             
-            mail.Subject = subject
-            mail.HTMLBody = body_html
-            mail.To = '; '.join(to)
-            
+            # Build message
+            msg = MIMEMultipart('alternative')
+            msg['From'] = SENDER
+            msg['To'] = '; '.join(to)
             if bcc:
-                mail.BCC = '; '.join(bcc)
+                msg['Bcc'] = '; '.join(bcc)
+            msg['Subject'] = subject
+            msg.attach(MIMEText(body_html, 'html', 'utf-8'))
             
-            # Try to use shared mailbox if available
-            try:
-                if from_email:
-                    # Create from specified email
-                    sender_account = None
-                    for account in outlook.Session.Accounts:
-                        if account.SmtpAddress.lower() == from_email.lower():
-                            sender_account = account
-                            break
-                    
-                    if sender_account:
-                        mail._oleobj_.Invoke(*(64209, 0, 8, 0, sender_account))
-                    else:
-                        # Account not found, use default
-                        print(f"[WARNING] Shared mailbox folder not found, using default account")
-            except:
-                print(f"[WARNING] Could not set shared mailbox, using default account")
-            
-            print(f"\n[EMAIL] Sending via Outlook COM automation:")
+            # Send via SMTP
+            print(f"\n[EMAIL] Sending via Walmart SMTP gateway:")
             print(f"  To: {', '.join(to)}")
             if bcc:
                 print(f"  BCC: {', '.join(bcc)}")
             print(f"  Subject: {subject}")
-            if from_email:
-                print(f"  From: {from_email}")
+            print(f"  From: {SENDER}")
             
-            mail.Send()
+            recipients = to + (bcc if bcc else [])
+            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=30) as server:
+                server.sendmail(SENDER, recipients, msg.as_string())
             
             print(f"  [OK] Email sent successfully!\n")
             return True
             
-        except ImportError:
-            print(f"[ERROR] pywin32 not installed. Cannot send via Outlook COM.\n")
-            return False
         except Exception as e:
             print(f"  [ERROR] Failed to send email: {e}\n")
             import traceback
