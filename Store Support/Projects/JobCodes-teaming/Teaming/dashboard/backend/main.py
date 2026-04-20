@@ -343,6 +343,64 @@ def to_json_safe(val):
         return None
     return val
 
+    
+def compute_status(row, job_code):
+    """Compute status and status_detail for a job code record based on source data availability"""
+    from_polaris = row.get('_from_polaris', False)
+    from_workforce = row.get('_from_workforce', False)
+    from_teaming = row.get('_from_teaming', False)
+    
+    # Determine status category
+    if from_polaris and (from_workforce or from_polaris) and from_teaming:
+        # Assigned: In Polaris, has enrichment data (Workforce or Polaris), and has teaming
+        status = "Assigned"
+        category = "Complete"
+        reason = "Job code is fully assigned with complete data"
+        action = None
+    elif from_polaris and not from_teaming:
+        # Review: In Polaris but not in Teaming
+        status = "Review"
+        category = "Missing"
+        reason = "Job code exists in Polaris but no team assignment found"
+        action = "Assign team from Teaming"
+    elif from_polaris and from_teaming and not from_workforce:
+        # Review: In Polaris + Teaming but missing Workforce enrichment
+        status = "Review"
+        category = "Incomplete"
+        reason = "Job code missing enrichment data (Workforce Table)"
+        action = "Add to Workforce Table"
+    elif from_teaming and not from_polaris:
+        # Review: In Teaming but not in Polaris (orphan)
+        status = "Review"
+        category = "Orphan"
+        reason = "Team assignment exists but job code not in Polaris"
+        action = "Add to Polaris or remove from Teaming"
+    elif from_workforce and not from_polaris:
+        # Review: In Workforce but not in Polaris (orphan)
+        status = "Review"
+        category = "Orphan"
+        reason = "Workforce enrichment data exists but job code not in Polaris"
+        action = "Add to Polaris or remove from Workforce"
+    else:
+        # Review: No clear source or missing data
+        status = "Review"
+        category = "Mismatch"
+        reason = f"Unexpected data configuration (P:{from_polaris}, W:{from_workforce}, T:{from_teaming})"
+        action = "Investigate data sources"
+    
+    status_detail = {
+        "category": category,
+        "reason": reason,
+        "action": action,
+        "sources": {
+            "polaris": from_polaris,
+            "workforce": from_workforce,
+            "teaming": from_teaming
+        }
+    }
+    
+    return status, status_detail
+
 def load_job_code_data():
     """Load and merge job code data from Polaris and Teaming sources"""
     # Check files exist
@@ -727,6 +785,34 @@ async def logout(request: Request, response: Response):
     response.delete_cookie("session_id")
     return {"success": True}
 
+def compute_source_badges(from_polaris, from_workforce, from_teaming, **kwargs):
+    """
+    Compute source badges indicating which data sources contain this job code.
+    
+    Returns list of badge strings like ['P', 'PW', 'W', 'PT', 'T'] based on source combination.
+    
+    Mapping:
+    - P = Polaris only
+    - PW = Polaris + Workforce
+    - W = Workforce only
+    - PT = Polaris + Teaming
+    - T = Teaming only
+    """
+    sources = []
+    
+    if from_polaris:
+        sources.append('P')
+    if from_workforce:
+        sources.append('W')
+    if from_teaming:
+        sources.append('T')
+    
+    if not sources:
+        return []  # No sources
+    
+    # Return badges as sorted list
+    return sorted(list(set(sources)))
+
 def send_email_notification(subject: str, body: str, to_email: str = NOTIFY_EMAIL):
     """
     Send email notification using Walmart's internal SMTP gateway.
@@ -939,11 +1025,44 @@ async def get_job_codes(request: Request):
             try:
                 job_code_str = jc.get("job_code", "")
                 teaming_info = teaming_map.get(job_code_str, {})
+                
+                # Determine source tracking flags
+                # A job code is from Polaris if it exists in the cache (filtered from Polaris CSV)
+                from_polaris = bool(True)  # All items in job_codes come from cache which loads Polaris
+                
+                # A job code has workforce enrichment if it has any of these fields
+                from_workforce = bool(
+                    jc.get("workday_code") or
+                    jc.get("category") or
+                    jc.get("job_family") or
+                    jc.get("pg_level")
+                )
+                
+                # A job code has team assignment if it's in teaming_map or has team data
+                from_teaming = bool(teaming_info and (
+                    teaming_info.get("teams") or
+                    teaming_info.get("team_ids") or
+                    teaming_info.get("workgroups")
+                ))
+                
+                # Compute badges
+                source_badges = compute_source_badges(from_polaris, from_workforce, from_teaming)
+                
+                # Compute status using the compute_status function
+                status_data = {
+                    '_from_polaris': from_polaris,
+                    '_from_workforce': from_workforce,
+                    '_from_teaming': from_teaming
+                }
+                computed_status, status_detail = compute_status(status_data, job_code_str)
+                
                 result.append({
                     "job_code": job_code_str,
                     "job_title": jc.get("job_nm", ""),
                     "job_name": jc.get("job_nm", ""),
-                    "status": "Assigned" if jc.get("updated_at") else "Missing",
+                    "status": computed_status,
+                    "status_detail": status_detail,
+                    "source_badges": source_badges,
                     "teams": teaming_info.get("teams", []),
                     "team_ids": teaming_info.get("team_ids", []),
                     "workgroups": teaming_info.get("workgroups", []),

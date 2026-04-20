@@ -109,7 +109,7 @@ def api_project_by_id(project_id):
     try:
         if request.method == 'DELETE':
             # Delete project
-            sql = "DELETE FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects` WHERE impact_id = %s"
+            sql = "DELETE FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects` WHERE project_id = %s"
             job = bq_client.query(sql, job_config=bigquery.QueryJobConfig(
                 query_parameters=[bigquery.ScalarQueryParameter(None, "STRING", project_id)]
             ))
@@ -122,33 +122,31 @@ def api_project_by_id(project_id):
             sql = """
             UPDATE `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
             SET title = @title, 
-                business_area = @business_area, 
-                owner_name = @owner_name, 
+                store_area = @store_area, 
+                owner = @owner, 
                 owner_id = @owner_id,
-                health_status = @health_status, 
-                project_status = @project_status, 
-                latest_update = @latest_update, 
-                latest_update_timestamp = CURRENT_TIMESTAMP(),
-                current_wm_week_update = TRUE,
-                modified_timestamp = CURRENT_TIMESTAMP()
-            WHERE impact_id = @impact_id
+                health = @health, 
+                status = @status, 
+                project_update = @project_update, 
+                last_updated = CURRENT_TIMESTAMP()
+            WHERE project_id = @project_id
             """
             query_params = [
                 bigquery.ScalarQueryParameter("title", "STRING", data.get('title')),
-                bigquery.ScalarQueryParameter("business_area", "STRING", data.get('business_area')),
-                bigquery.ScalarQueryParameter("owner_name", "STRING", data.get('owner_name')),
+                bigquery.ScalarQueryParameter("store_area", "STRING", data.get('store_area')),
+                bigquery.ScalarQueryParameter("owner", "STRING", data.get('owner')),
                 bigquery.ScalarQueryParameter("owner_id", "STRING", data.get('owner_id')),
-                bigquery.ScalarQueryParameter("health_status", "STRING", data.get('health_status')),
-                bigquery.ScalarQueryParameter("project_status", "STRING", data.get('project_status', 'Active')),
-                bigquery.ScalarQueryParameter("latest_update", "STRING", data.get('latest_update', '')),
-                bigquery.ScalarQueryParameter("impact_id", "STRING", project_id)
+                bigquery.ScalarQueryParameter("health", "STRING", data.get('health')),
+                bigquery.ScalarQueryParameter("status", "STRING", data.get('status', 'Active')),
+                bigquery.ScalarQueryParameter("project_update", "STRING", data.get('project_update', '')),
+                bigquery.ScalarQueryParameter("project_id", "STRING", project_id)
             ]
             
             job = bq_client.query(sql, job_config=bigquery.QueryJobConfig(
                 query_parameters=query_params
             ))
             job.result()
-            return jsonify({'success': True, 'impact_id': project_id}), 200
+            return jsonify({'success': True, 'project_id': project_id}), 200
     except Exception as e:
         logger.error(f"Project update error: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -165,115 +163,151 @@ def api_projects():
     if request.method in ['POST', 'PUT']:
         try:
             data = request.get_json()
-            project_id = data.get('impact_id', f'proj-{datetime.now().timestamp()}')
+            project_id = data.get('project_id', f'proj-{int(datetime.now().timestamp())}')
             
             if request.method == 'POST':
                 # Insert new project
-                sql = """
+                sql = f"""
                 INSERT INTO `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-                (impact_id, title, business_area, owner_name, owner_id, health_status, project_status, 
-                 created_timestamp, modified_timestamp, latest_update, latest_update_timestamp, current_wm_week_update)
+                (project_id, title, owner, owner_id, health, status, project_source, 
+                 created_date, last_updated, project_update, store_area)
                 VALUES 
-                (%s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), %s, CURRENT_TIMESTAMP(), false)
+                ('{project_id}', '{data.get('title', '')}', '{data.get('owner', '')}', 
+                 '{data.get('owner_id', '')}', '{data.get('health', 'Unknown')}', 
+                 '{data.get('status', 'Active')}', 'Manual Upload',
+                 CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '{data.get('project_update', '')}',
+                 '{data.get('store_area', '')}')
                 """
-                params = [
-                    project_id,
-                    data.get('title'),
-                    data.get('business_area'),
-                    data.get('owner_name'),
-                    data.get('owner_id'),
-                    data.get('health_status'),
-                    data.get('project_status', 'Active'),
-                    data.get('latest_update', '')
-                ]
             else:
                 # Update existing project
-                sql = """
+                sql = f"""
                 UPDATE `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-                SET title = %s, business_area = %s, owner_name = %s, owner_id = %s,
-                    health_status = %s, project_status = %s, latest_update = %s, modified_timestamp = CURRENT_TIMESTAMP()
-                WHERE impact_id = %s
+                SET title = '{data.get('title')}', 
+                    owner = '{data.get('owner')}', 
+                    owner_id = '{data.get('owner_id')}',
+                    health = '{data.get('health')}', 
+                    status = '{data.get('status')}', 
+                    project_update = '{data.get('project_update')}',
+                    last_updated = CURRENT_TIMESTAMP(),
+                    store_area = '{data.get('store_area')}'
+                WHERE project_id = '{project_id}'
                 """
-                params = [
-                    data.get('title'),
-                    data.get('business_area'),
-                    data.get('owner_name'),
-                    data.get('owner_id'),
-                    data.get('health_status'),
-                    data.get('project_status'),
-                    data.get('latest_update'),
-                    project_id
-                ]
             
-            job = bq_client.query(sql, job_config=bigquery.QueryJobConfig(
-                query_parameters=[bigquery.ScalarQueryParameter(None, "STRING", p) if isinstance(p, str) else bigquery.ScalarQueryParameter(None, "TIMESTAMP", p) for p in params]
-            ))
+            job = bq_client.query(sql)
             job.result()
-            return jsonify({'success': True, 'impact_id': project_id}), 200
+            return jsonify({'success': True, 'project_id': project_id}), 200
         except Exception as e:
             logger.error(f"Project create/update error: {str(e)}")
             return jsonify({'error': str(e)}), 500
     
     # Handle GET
     try:
-        status = request.args.get('status', 'Active')
-        business_area = request.args.get('business_area')
+        business_org = request.args.get('business_organization')
         health_status = request.args.get('health_status')
-        owner_name = request.args.get('owner_name')
+        title_search = request.args.get('title_search', '')  # Search in project title
+        owner_names = request.args.get('owner_names', '')   # Comma-separated list of owners
+        limit = int(request.args.get('limit', 1000))  # Default: 1000 rows per request
+        offset = int(request.args.get('offset', 0))   # Pagination offset
+        updated_status = request.args.get('updated_status', '')  # 'updated' or 'not_updated'
         
-        # Build SQL
-        sql = r"""
-        SELECT 
-            impact_id,
-            title,
-            business_area,
-            owner_name,
-            owner_id,
-            health_status,
-            project_status,
-            created_timestamp,
-            modified_timestamp,
-            latest_update,
-            latest_update_timestamp,
-            current_wm_week_update
-        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        WHERE 1=1
+        # Calculate current Walmart week
+        today = datetime.now()
+        fiscal_year_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
+        days_since_fy = (today - fiscal_year_start).days
+        current_wm_week = (days_since_fy // 7) + 1
+        
+        # Build base WHERE clause for both count and paginated queries
+        where_clause = """WHERE 1=1
+        AND business_organization NOT IN ('Automotive', 'Unknown', 'N/A')
+        AND TRIM(business_organization) != ''
         """
         
-        if status != 'All' and status:
-            sql += f" AND project_status = '{status}'"
-        if business_area:
-            sql += f" AND business_area = '{business_area}'"
+        if business_org:
+            where_clause += f" AND business_organization = '{business_org}'\n"
         if health_status:
-            sql += f" AND health_status = '{health_status}'"
-        if owner_name:
-            sql += f" AND owner_name = '{owner_name}'"
+            where_clause += f" AND health = '{health_status}'\n"
+        if title_search:
+            where_clause += f" AND LOWER(title) LIKE LOWER('%{title_search}%')\n"
+        if owner_names:
+            # Parse comma-separated owner names
+            owners = [f"'{o.strip()}'" for o in owner_names.split(',')]
+            where_clause += f" AND owner IN ({','.join(owners)})\n"
         
-        sql += " ORDER BY modified_timestamp DESC"
+        # First, get total count matching filters
+        count_sql = f"""
+        SELECT COUNT(*) as total
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        {where_clause}
+        """
+        
+        count_result = list(bq_client.query(count_sql).result())
+        total_count = count_result[0].total if count_result else 0
+        
+        # Then get paginated results
+        sql = f"""
+        SELECT 
+            project_id,
+            title,
+            business_organization,
+            owner,
+            owner_id,
+            health,
+            status,
+            project_source,
+            created_date,
+            last_updated,
+            project_update
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        {where_clause}
+        ORDER BY last_updated DESC
+        LIMIT {limit} OFFSET {offset}
+        """
         
         # Query
         results = bq_client.query(sql).result()
         projects = []
         
         for row in results:
+            # Determine if project was updated this WM week
+            update_date = row.last_updated
+            if update_date:
+                fy_start = datetime(update_date.year if update_date.month >= 2 else update_date.year - 1, 2, 1)
+                days_since = (update_date.replace(tzinfo=None) - fy_start).days
+                update_wm_week = (days_since // 7) + 1
+                is_updated_this_week = (update_wm_week == current_wm_week)
+            else:
+                is_updated_this_week = False
+            
+            # Apply updated_status filter client-side (could be server-side with CASE)
+            if updated_status == 'updated' and not is_updated_this_week:
+                continue
+            if updated_status == 'not_updated' and is_updated_this_week:
+                continue
+            
             projects.append({
-                'impact_id': row.impact_id,
+                'project_id': row.project_id,
                 'title': row.title,
-                'business_area': row.business_area,
-                'owner_name': row.owner_name,
+                'business_organization': row.business_organization,
+                'owner': row.owner,
                 'owner_id': row.owner_id,
-                'health_status': row.health_status,
-                'status': row.project_status,
-                'created_date': row.created_timestamp.isoformat() if row.created_timestamp else None,
-                'updated_date': row.modified_timestamp.isoformat() if row.modified_timestamp else None,
-                'latest_update': row.latest_update,
-                'latest_update_date': row.latest_update_timestamp.isoformat() if row.latest_update_timestamp else None,
-                'current_wm_week_update': str(row.current_wm_week_update).lower() == 'true'
+                'health': row.health,
+                'status': row.status,
+                'project_source': row.project_source,
+                'created_date': row.created_date.isoformat() if row.created_date else None,
+                'updated_date': row.last_updated.isoformat() if row.last_updated else None,
+                'project_update': row.project_update,
+                'is_updated_this_week': is_updated_this_week
             })
+        
+        # Recalculate total if updated_status filter was applied
+        if updated_status:
+            total_count = len(projects)
         
         return jsonify({
             'projects': projects,
-            'total_count': len(projects),
+            'total_count': total_count,
+            'limit': limit,
+            'offset': offset,
             'timestamp': datetime.now().isoformat()
         })
     
@@ -285,24 +319,21 @@ def api_projects():
 @app.route('/api/projects/metrics', methods=['GET'])
 def api_metrics():
     """Get metrics"""
-    from flask import request
     
     if not bq_client:
         return jsonify({'error': 'BigQuery client not initialized'}), 500
     
     try:
-        status = request.args.get('status', 'Active')
-        
-        sql = rf"""
+        # Get metrics for all projects
+        sql = r"""
         SELECT 
-            COUNT(DISTINCT impact_id) as total_projects,
-            COUNT(DISTINCT owner_id) as unique_owners,
+            COUNT(DISTINCT project_id) as total_projects,
+            COUNT(DISTINCT owner) as unique_owners,
             COUNT(DISTINCT CASE 
-                WHEN DATE_DIFF(CURRENT_DATE(), DATE(modified_timestamp), DAY) <= 7 
-                THEN impact_id 
+                WHEN DATE_DIFF(CURRENT_DATE(), DATE(last_updated), DAY) <= 7 
+                THEN project_id 
             END) as projects_this_week
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        WHERE project_status = '{status}'
         """
         
         results = bq_client.query(sql).result()
@@ -334,20 +365,22 @@ def api_metrics():
 
 @app.route('/api/projects/business-areas', methods=['GET'])
 def api_business_areas():
-    """Get business areas"""
+    """Get business organizations - only valid areas with projects"""
     if not bq_client:
         return jsonify({'error': 'BigQuery client not initialized'}), 500
     
     try:
         sql = r"""
-        SELECT DISTINCT business_area
+        SELECT DISTINCT business_organization
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        WHERE business_area IS NOT NULL
-        ORDER BY business_area
+        WHERE business_organization IS NOT NULL 
+        AND TRIM(business_organization) != ''
+        AND business_organization NOT IN ('Automotive', 'Unknown', 'N/A')
+        ORDER BY business_organization
         """
         
         results = bq_client.query(sql).result()
-        areas = [row.business_area for row in results if row.business_area]
+        areas = [row.business_organization for row in results if row.business_organization and row.business_organization.strip()]
         
         return jsonify({
             'business_areas': areas,
@@ -369,6 +402,62 @@ def projects_sync_status():
         'is_available': False,
         'message': 'Projects Data-Bridge service not available'
     }), 200
+
+
+@app.route('/api/projects/titles', methods=['GET'])
+def api_project_titles():
+    """Get all unique project titles for filtering"""
+    if not bq_client:
+        return jsonify({'error': 'BigQuery client not initialized'}), 500
+    
+    try:
+        sql = r"""
+        SELECT DISTINCT title
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        WHERE title IS NOT NULL
+        ORDER BY title
+        """
+        
+        results = bq_client.query(sql).result()
+        titles = [row.title for row in results if row.title]
+        
+        return jsonify({
+            'titles': titles,
+            'total': len(titles),
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    except Exception as e:
+        logger.error(f"Project titles error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/projects/owners', methods=['GET'])
+def api_project_owners():
+    """Get all unique owners for multi-select filtering"""
+    if not bq_client:
+        return jsonify({'error': 'BigQuery client not initialized'}), 500
+    
+    try:
+        sql = r"""
+        SELECT DISTINCT owner
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        WHERE owner IS NOT NULL
+        ORDER BY owner
+        """
+        
+        results = bq_client.query(sql).result()
+        owners = [row.owner for row in results if row.owner]
+        
+        return jsonify({
+            'owners': owners,
+            'total': len(owners),
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    except Exception as e:
+        logger.error(f"Project owners error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 
 # ──────────────────────────────────────────────
@@ -555,21 +644,24 @@ def generate_ppt():
         wm_week = (days_since_fy // 7) + 1
         
         # Get filter parameters
-        status = request.args.get('status', 'Active')
+        status = request.args.get('status', '')
         
         # Query projects
         sql = """
-        SELECT impact_id, title, business_area, owner_name, health_status, latest_update, project_status, 
+        SELECT project_id, title, store_area, owner, health, project_update, status, 
                CASE 
-                 WHEN LOWER(current_wm_week_update) = 'true' THEN TRUE
+                 WHEN LOWER(wm_week) = CAST((CASE 
+                   WHEN EXTRACT(MONTH FROM CURRENT_DATE()) >= 2 THEN EXTRACT(YEAR FROM CURRENT_DATE())
+                   ELSE EXTRACT(YEAR FROM CURRENT_DATE()) - 1
+                 END) as STRING) THEN TRUE
                  ELSE FALSE
                END as updated_this_week
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
         WHERE 1=1
         """
         if status != 'All' and status:
-            sql += f" AND project_status = '{status}'"
-        sql += " ORDER BY modified_timestamp DESC"
+            sql += f" AND status = '{status}'"
+        sql += " ORDER BY last_updated DESC"
         
         results = bq_client.query(sql).result()
         projects = list(results)
@@ -717,11 +809,11 @@ def get_sample_email():
         # Get sample projects for email
         sql = """
         SELECT COUNT(*) as total, 
-               COUNTIF(health_status = 'On Track') as on_track,
-               COUNTIF(health_status = 'At Risk') as at_risk,
-               COUNTIF(health_status = 'Off Track') as off_track
+               COUNTIF(health = 'On Track') as on_track,
+               COUNTIF(health = 'At Risk') as at_risk,
+               COUNTIF(health = 'Off Track') as off_track
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        WHERE project_status = 'Active'
+        WHERE status = 'Active'
         """
         
         stats_result = bq_client.query(sql).result()
@@ -729,9 +821,9 @@ def get_sample_email():
         
         # Get sample projects
         projects_sql = """
-        SELECT title, business_area, owner_name, health_status, latest_update
+        SELECT title, store_area as business_area, owner as owner_name, health as health_status, project_update as latest_update
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        WHERE project_status = 'Active'
+        WHERE status = 'Active'
         LIMIT 5
         """
         projects_result = bq_client.query(projects_sql).result()
@@ -886,11 +978,11 @@ def send_projects_email():
         # Get project stats and sample projects (same as /api/sample-email)
         sql = """
         SELECT COUNT(*) as total, 
-               COUNTIF(health_status = 'On Track') as on_track,
-               COUNTIF(health_status = 'At Risk') as at_risk,
-               COUNTIF(health_status = 'Off Track') as off_track
+               COUNTIF(health = 'On Track') as on_track,
+               COUNTIF(health = 'At Risk') as at_risk,
+               COUNTIF(health = 'Off Track') as off_track
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        WHERE project_status = 'Active'
+        WHERE status = 'Active'
         """
         
         stats_result = bq_client.query(sql).result()
@@ -898,9 +990,9 @@ def send_projects_email():
         
         # Get sample projects
         projects_sql = """
-        SELECT title, business_area, owner_name, health_status, latest_update
+        SELECT title, store_area as business_area, owner as owner_name, health as health_status, project_update as latest_update
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        WHERE project_status = 'Active'
+        WHERE status = 'Active'
         LIMIT 5
         """
         projects_result = bq_client.query(projects_sql).result()
@@ -1129,8 +1221,8 @@ def sync_data_bridge():
         if rows_to_insert:
             insert_sql = """
             INSERT INTO `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-            (impact_id, title, business_area, owner_name, owner_id, health_status, project_status, 
-             created_timestamp, modified_timestamp, latest_update, latest_update_timestamp, current_wm_week_update)
+            (project_id, title, store_area, owner, owner_id, health, status, 
+             created_date, last_updated, project_update, wm_week)
             VALUES 
             """
             using_params = []
@@ -1141,25 +1233,24 @@ def sync_data_bridge():
                     insert_sql += ", "
                 
                 params = [
-                    bigquery.ScalarQueryParameter(f"p{i}_impact_id", "STRING", row.impact_id or str(__import__('uuid').uuid4())),
+                    bigquery.ScalarQueryParameter(f"p{i}_project_id", "STRING", row.impact_id or str(__import__('uuid').uuid4())),
                     bigquery.ScalarQueryParameter(f"p{i}_title", "STRING", row.title),
-                    bigquery.ScalarQueryParameter(f"p{i}_business_area", "STRING", row.business_area),
-                    bigquery.ScalarQueryParameter(f"p{i}_owner_name", "STRING", row.owner_name),
+                    bigquery.ScalarQueryParameter(f"p{i}_store_area", "STRING", row.business_area),
+                    bigquery.ScalarQueryParameter(f"p{i}_owner", "STRING", row.owner_name),
                     bigquery.ScalarQueryParameter(f"p{i}_owner_id", "STRING", row.owner_id),
-                    bigquery.ScalarQueryParameter(f"p{i}_health_status", "STRING", row.health_status),
-                    bigquery.ScalarQueryParameter(f"p{i}_project_status", "STRING", row.project_status),
-                    bigquery.ScalarQueryParameter(f"p{i}_created_timestamp", "TIMESTAMP", row.created_timestamp),
-                    bigquery.ScalarQueryParameter(f"p{i}_modified_timestamp", "TIMESTAMP", row.modified_timestamp),
-                    bigquery.ScalarQueryParameter(f"p{i}_latest_update", "STRING", row.latest_update),
-                    bigquery.ScalarQueryParameter(f"p{i}_latest_update_timestamp", "TIMESTAMP", row.latest_update_timestamp),
-                    bigquery.ScalarQueryParameter(f"p{i}_current_wm_week_update", "STRING", row.current_wm_week_update),
+                    bigquery.ScalarQueryParameter(f"p{i}_health", "STRING", row.health_status),
+                    bigquery.ScalarQueryParameter(f"p{i}_status", "STRING", row.project_status),
+                    bigquery.ScalarQueryParameter(f"p{i}_created_date", "TIMESTAMP", row.created_timestamp),
+                    bigquery.ScalarQueryParameter(f"p{i}_last_updated", "TIMESTAMP", row.modified_timestamp),
+                    bigquery.ScalarQueryParameter(f"p{i}_project_update", "STRING", row.latest_update),
+                    bigquery.ScalarQueryParameter(f"p{i}_wm_week", "INT64", CURRENT_TIMESTAMP()),
                 ]
                 
                 using_params.extend(params)
-                insert_sql += f"""(@p{i}_impact_id, @p{i}_title, @p{i}_business_area, @p{i}_owner_name, 
-                              @p{i}_owner_id, @p{i}_health_status, @p{i}_project_status, 
-                              @p{i}_created_timestamp, @p{i}_modified_timestamp, @p{i}_latest_update, 
-                              @p{i}_latest_update_timestamp, @p{i}_current_wm_week_update)"""
+                insert_sql += f"""(@p{i}_project_id, @p{i}_title, @p{i}_store_area, @p{i}_owner, 
+                              @p{i}_owner_id, @p{i}_health, @p{i}_status, 
+                              @p{i}_created_date, @p{i}_last_updated, @p{i}_project_update, 
+                              @p{i}_wm_week)"""
             
             job_config = bigquery.QueryJobConfig(query_parameters=using_params)
             job = bq_client.query(insert_sql, job_config=job_config)
@@ -1180,6 +1271,95 @@ def sync_data_bridge():
             
     except Exception as e:
         logger.error(f"Data Bridge sync error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
+# Email endpoint for sending projects list
+@app.route('/api/email/send-projects-list', methods=['POST'])
+def send_projects_list_email():
+    """Send filtered projects list via email"""
+    try:
+        data = request.get_json()
+        recipient_email = data.get('recipientEmail')
+        projects = data.get('projects', [])
+        sent_by = data.get('sentBy', 'System')
+        
+        if not recipient_email:
+            return jsonify({'error': 'Recipient email is required'}), 400
+        
+        if not projects:
+            return jsonify({'error': 'No projects to send'}), 400
+        
+        # Build HTML email
+        project_rows = ''.join([f"""
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">{p.get('title', 'N/A')}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{p.get('owner', 'N/A')}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{p.get('business_area', 'N/A')}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{p.get('status', 'N/A')}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{p.get('health', 'N/A')}</td>
+            </tr>
+        """ for p in projects])
+        
+        html_content = f"""
+        <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; color: #333; }}
+                    h2 {{ color: #0066cc; }}
+                    table {{ border-collapse: collapse; width: 100%; margin: 20px 0; }}
+                    th {{ background-color: #0066cc; color: white; padding: 10px; text-align: left; }}
+                    td {{ border: 1px solid #ddd; padding: 8px; }}
+                    tr:nth-child(even) {{ background-color: #f5f5f5; }}
+                    .footer {{ margin-top: 20px; color: #666; font-size: 12px; }}
+                </style>
+            </head>
+            <body>
+                <h2>📊 Activity Hub Projects Report</h2>
+                <p>Hello,</p>
+                <p>Below is the current list of projects from the Activity Hub:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Project Title</th>
+                            <th>Owner</th>
+                            <th>Business Area</th>
+                            <th>Status</th>
+                            <th>Health</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {project_rows}
+                    </tbody>
+                </table>
+                
+                <p><strong>Total Projects:</strong> {len(projects)}</p>
+                
+                <div class="footer">
+                    <p>This email was sent by {sent_by} via Activity Hub Projects</p>
+                    <p>Generated: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
+                </div>
+            </body>
+        </html>
+        """
+        
+        # For now, just log it and return success
+        logger.info(f"Email request: Send {len(projects)} projects to {recipient_email} from {sent_by}")
+        
+        # TODO: Integrate with actual email service (SendGrid, AWS SES, etc.)
+        # For testing, you can uncomment the SMTP section below or use your email service
+        
+        return jsonify({
+            'success': True,
+            'message': f'Email prepared to send {len(projects)} projects',
+            'recipient': recipient_email,
+            'projectCount': len(projects),
+            'timestamp': datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Email send error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 

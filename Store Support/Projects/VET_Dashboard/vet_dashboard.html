@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/Spark_Blank.png">
-    <title>V.E.T. Executive Report - Walmart</title>
+    <title>Dallas Team Report - Walmart</title>
     <script src="/static/html2canvas.min.js"></script>
     <style>
         * {
@@ -640,7 +640,7 @@
             <div class="header-left">
                 <div class="header-logo"><img src="/static/spark-logo.png" alt="Walmart Spark" style="height: 40px; width: auto;"></div>
                 <div class="header-title">
-                    <h1>V.E.T. Executive Report</h1>
+                    <h1>Dallas Team Report</h1>
                     <p>TDA Initiatives - Dallas VET Focus</p>
                 </div>
             </div>
@@ -703,10 +703,6 @@
                 <div class="stat-value" id="stat-projects">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Stores Impacted</div>
-                <div class="stat-value" id="stat-stores">0</div>
-            </div>
-            <div class="stat-card">
                 <div class="stat-label">On Track</div>
                 <div class="stat-value" id="stat-on-track" style="color: var(--on-track);">0</div>
             </div>
@@ -733,7 +729,7 @@
         <!-- Data Table -->
         <div class="table-section">
             <div class="table-header">
-                <h2 id="table-title">V.E.T. Executive Report - All Phases</h2>
+                <h2 id="table-title">Dallas Team Report - All Phases</h2>
                 <div class="table-actions">
                     <span id="record-count" style="color: var(--text-secondary); font-size: var(--font-size-sm);">Loading...</span>
                 </div>
@@ -741,7 +737,7 @@
             <div class="table-wrapper" id="table-wrapper">
                 <div class="loading">
                     <div class="loader"></div>
-                    <span>Loading V.E.T. Executive Report...</span>
+                    <span>Loading Dallas Team Report...</span>
                 </div>
             </div>
             <div class="pagination-controls" id="pagination-controls" style="display: none;">
@@ -755,7 +751,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>V.E.T. Executive Report | Data Source: wmt-assetprotection-prod.Store_Support_Dev.Output- TDA Report (Dallas VET)</p>
+            <p>Dallas Team Report | Data Source: wmt-assetprotection-prod.Store_Support_Dev.Output- TDA Report (Dallas VET)</p>
             <p id="last-updated">Last updated: Never</p>
         </div>
     </div>
@@ -1243,11 +1239,6 @@
         function updateSummary(data) {
             document.getElementById('stat-projects').textContent = data.length;
             
-            const totalStores = data.reduce((sum, row) => {
-                return sum + (parseInt(row['# of Stores']) || 0);
-            }, 0);
-            document.getElementById('stat-stores').textContent = totalStores.toLocaleString();
-            
             let onTrack = 0;
             let atRisk = 0;
             let offTrack = 0;
@@ -1628,7 +1619,7 @@
                     body: JSON.stringify({
                         screenshots: screenshots,
                         selectedPhases: selectedPhases,
-                        title: 'V.E.T. Executive Report'
+                        title: 'Dallas Team Report'
                     })
                 });
                 
@@ -1639,7 +1630,7 @@
                 
                 // Download the PPT file as blob
                 const contentDisposition = response.headers.get('content-disposition');
-                let filename = 'VET_Executive_Report.pptx';
+                let filename = 'Dallas_Team_Report.pptx';
                 if (contentDisposition) {
                     const match = contentDisposition.match(/filename="([^"]+)"/);
                     if (match) filename = match[1];

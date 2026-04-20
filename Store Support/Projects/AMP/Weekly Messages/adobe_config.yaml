@@ -24,6 +24,7 @@ bigquery:
     weekly_devices: "bq_weekly_messages_devices"
     weekly_metrics: "bq_weekly_messages_metrics"
     playbook: "bq_playbook_hub_metrics"
+    audio: "bq_weekly_messages_audio"
     
     # NEW: Cloud CSV-based tables (normalized)
     weekly_cloud: "bq_weekly_messages_cloud"

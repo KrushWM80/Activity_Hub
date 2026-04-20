@@ -204,7 +204,6 @@ class TDAPowerPointGenerator:
             stat_y = 1.2
             stats = [
                 (f"Total Initiatives", total_projects, WALMART_BLUE),
-                (f"Total Stores Impacted", total_stores, WALMART_BLUE),
                 (f"On Track", on_track, SUCCESS),
                 (f"At Risk", at_risk, WARNING),
                 (f"Off Track", off_track, ERROR),
@@ -312,7 +311,7 @@ class TDAPowerPointGenerator:
             Inches(0.5), Inches(7), Inches(9), Inches(0.4)
         )
         footer_para = footer_box.text_frame.paragraphs[0]
-        footer_para.text = f"V.E.T. Executive Report | Data Source: wmt-assetprotection-prod.Store_Support_Dev | Generated: {datetime.now().strftime('%B %d, %Y')}"
+        footer_para.text = f"Dallas Team Report | Data Source: wmt-assetprotection-prod.Store_Support_Dev | Generated: {datetime.now().strftime('%B %d, %Y')}"
         footer_para.font.size = Pt(8)
         footer_para.font.color.rgb = TEXT_SECONDARY
         footer_para.alignment = PP_ALIGN.CENTER
@@ -337,7 +336,7 @@ class TDAPowerPointGenerator:
         # Add title slide
         self.add_title_slide(
             self.presentation,
-            "V.E.T. Executive Report",
+            "Dallas Team Report",
             f"Walmart Enterprise Transformation - {wm_week}"
         )
         
@@ -361,7 +360,7 @@ class TDAPowerPointGenerator:
         
         # Save presentation
         if not output_path:
-            output_path = f"VET_Executive_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pptx"
+            output_path = f"Dallas_Team_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pptx"
         
         self.presentation.save(output_path)
         logger.info(f"PowerPoint report generated: {output_path}")
@@ -397,7 +396,6 @@ class TDAPowerPointGenerator:
         
         stats_text = f"""
 Total Initiatives: {total_projects}
-Total Stores Impacted: {total_stores:,}
 On Track: {on_track}
 At Risk: {at_risk}
 Off Track: {off_track}
@@ -406,7 +404,6 @@ Key Insights:
 • {(on_track/total_projects*100):.1f}% of initiatives are on track
 • {(at_risk/total_projects*100):.1f}% of initiatives are at risk
 • {(off_track/total_projects*100):.1f}% of initiatives are off track
-• Average stores per initiative: {total_stores//total_projects if total_projects > 0 else 0}
         """
         
         stats_box = slide.shapes.add_textbox(

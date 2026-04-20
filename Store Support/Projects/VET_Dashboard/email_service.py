@@ -1,6 +1,6 @@
 """
-V.E.T. Executive Report Email Service
-Sends V.E.T. Dashboard reports via Walmart internal SMTP (no Outlook dependency)
+Dallas Team Report Email Service
+Sends Dallas Team Report via Walmart internal SMTP (no Outlook dependency)
 """
 
 import logging
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class VETEmailService:
-    """Service to send V.E.T. Executive Report emails"""
+    """Service to send Dallas Team Report emails"""
     
     def __init__(self):
         """Initialize email service"""
@@ -32,7 +32,7 @@ class VETEmailService:
     
     def generate_html_body(self, report_data: Dict[str, Any], ppt_filename: str) -> str:
         """
-        Generate HTML email body for V.E.T. Executive Report - Dashboard format
+        Generate HTML email body for Dallas Team Report - Dashboard format
         
         Args:
             report_data: Dictionary with report statistics and details
@@ -66,7 +66,7 @@ class VETEmailService:
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>V.E.T. Executive Report</title>
+    <title>Dallas Team Report</title>
 </head>
 <body style="font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: white;">
 
@@ -75,7 +75,7 @@ class VETEmailService:
     <!-- HEADER -->
     <tr>
         <td style="background-color: #1e3a8a; color: #ffffff; padding: 32px 24px; text-align: center; font-weight: bold;">
-            <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">V.E.T. Executive Report</h1>
+            <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">Dallas Team Report</h1>
             <p style="margin: 0; font-size: 14px; font-weight: 500; color: #ffffff; letter-spacing: 0.5px;">Walmart Enterprise Transformation Dashboard</p>
         </td>
     </tr>
@@ -90,15 +90,13 @@ class VETEmailService:
             <!-- Stats - Table Layout for Outlook Compatibility -->
             <table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                    <td style="width: 20%; background-color: #f8f9fa; border-left: 4px solid #0071ce; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #1e3a8a; line-height: 1.3;">{total_projects}</td>
-                    <td style="width: 20%; background-color: #f8f9fa; border-left: 4px solid #0071ce; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #1e3a8a; line-height: 1.3;">{total_stores:,}</td>
-                    <td style="width: 20%; background-color: #f8f9fa; border-left: 4px solid #107c10; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #107c10; line-height: 1.3;">{on_track}</td>
-                    <td style="width: 20%; background-color: #f8f9fa; border-left: 4px solid #f7630c; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #f7630c; line-height: 1.3;">{at_risk}</td>
-                    <td style="width: 20%; background-color: #f8f9fa; border-left: 4px solid #dc3545; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #dc3545; line-height: 1.3;">{off_track}</td>
+                    <td style="width: 25%; background-color: #f8f9fa; border-left: 4px solid #0071ce; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #1e3a8a; line-height: 1.3;">{total_projects}</td>
+                    <td style="width: 25%; background-color: #f8f9fa; border-left: 4px solid #107c10; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #107c10; line-height: 1.3;">{on_track}</td>
+                    <td style="width: 25%; background-color: #f8f9fa; border-left: 4px solid #f7630c; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #f7630c; line-height: 1.3;">{at_risk}</td>
+                    <td style="width: 25%; background-color: #f8f9fa; border-left: 4px solid #dc3545; padding: 12px 8px; text-align: center; font-size: 22px; font-weight: 700; color: #dc3545; line-height: 1.3;">{off_track}</td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; padding: 6px 4px;">Total Projects</td>
-                    <td style="text-align: center; font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; padding: 6px 4px;">Stores Impacted</td>
                     <td style="text-align: center; font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; padding: 6px 4px;">On Track</td>
                     <td style="text-align: center; font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; padding: 6px 4px;">At Risk</td>
                     <td style="text-align: center; font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; padding: 6px 4px;">Off Track</td>
@@ -114,7 +112,6 @@ class VETEmailService:
                             <li style="margin: 6px 0; color: #333; font-size: 12px; line-height: 1.4;"><span style="color: #0071ce; font-weight: 700;">•</span> <strong>{pct_on_track:.1f}%</strong> of initiatives are on track</li>
                             <li style="margin: 6px 0; color: #333; font-size: 12px; line-height: 1.4;"><span style="color: #0071ce; font-weight: 700;">•</span> <strong>{pct_at_risk:.1f}%</strong> of initiatives are at risk</li>
                             <li style="margin: 6px 0; color: #333; font-size: 12px; line-height: 1.4;"><span style="color: #0071ce; font-weight: 700;">•</span> <strong>{pct_off_track:.1f}%</strong> of initiatives are off track</li>
-                            <li style="margin: 6px 0; color: #333; font-size: 12px; line-height: 1.4;"><span style="color: #0071ce; font-weight: 700;">•</span> Average stores per initiative: <strong>{avg_stores:.0f}</strong></li>
                         </ul>
                     </td>
                 </tr>
@@ -155,7 +152,7 @@ class VETEmailService:
         test_mode: bool = False
     ) -> bool:
         """
-        Send V.E.T. Executive Report email with attachments
+        Send Dallas Team Report email with attachments
         
         Args:
             to_recipients: List of email addresses to send to
@@ -190,12 +187,12 @@ class VETEmailService:
                 return False
             
             # Generate email body
-            html_body = self.generate_html_body(report_data, "VET_Executive_Report.pptx")
+            html_body = self.generate_html_body(report_data, "Dallas_Team_Report.pptx")
             
             # Use default subject if not provided (include WM Week)
             if not subject:
                 wm_week = report_data.get('wm_week', 'Current')
-                subject = f"V.E.T. Executive Report - {wm_week}"
+                subject = f"Dallas Team Report - {wm_week}"
             
             # Format attachment info for logging
             attachment_info = ", ".join([Path(p).name for p in valid_attachments])
@@ -246,7 +243,7 @@ def send_vet_report_email(
     test_mode: bool = False
 ) -> bool:
     """
-    Convenience function to send V.E.T. Executive Report
+    Convenience function to send Dallas Team Report
     
     Args:
         to_recipients: List of email addresses (default: kendall.rush@walmart.com)

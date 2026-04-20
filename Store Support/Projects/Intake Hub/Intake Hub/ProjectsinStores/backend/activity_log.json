@@ -3977,6 +3977,24 @@
       "user_email": "krush@homeoffice.wal-mart.com",
       "details": "Fixed issue FIX-b8af1fbe - Manual acknowledgment",
       "category": "dashboard_admin"
+    },
+    {
+      "id": "c882ead0",
+      "timestamp": "2026-04-20 08:22:16",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "90e12424",
+      "timestamp": "2026-04-20 08:22:21",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
     }
   ]
 }

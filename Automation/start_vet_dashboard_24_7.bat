@@ -1,10 +1,10 @@
 @echo off
 REM ==========================================
-REM V.E.T. Dashboard Backend - 24/7 Auto-Restart
+REM Dallas Team Report Backend - 24/7 Auto-Restart
 REM ==========================================
-REM Purpose: Keep V.E.T. (Vendor/Executive/Tracking) Dashboard running continuously
-REM Access:  http://localhost:5001/vet_dashboard.html
-REM Network: http://WEUS42608431466:5001/vet_dashboard.html
+REM Purpose: Keep Dallas Team Report Dashboard running continuously
+REM Access:  http://localhost:5001/Dallas_Team_Report
+REM Network: http://WEUS42608431466:5001/Dallas_Team_Report
 REM Log:     Store Support/Projects/VET_Dashboard/vet_dashboard_server.log
 REM
 REM Features:
@@ -24,7 +24,7 @@ set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\krush\AppData\Roaming\gcloud\applica
 
 echo.
 echo ================================================================
-echo  V.E.T. Dashboard - 24/7 Auto-Restart Service
+echo  Dallas Team Report - 24/7 Auto-Restart Service
 echo  Port: %Port%
 echo  Log:  %LogFile%
 echo ================================================================
@@ -39,13 +39,13 @@ for /f "tokens=5" %%a in ('netstat -ano 2^>nul ^| findstr ":%Port% " ^| findstr 
 )
 timeout /t 2 /nobreak > nul
 
-echo [%date% %time%] Starting V.E.T. Dashboard on port %Port%... >> "%LogFile%"
-echo [%date% %time%] Starting V.E.T. Dashboard...
+echo [%date% %time%] Starting Dallas Team Report on port %Port%... >> "%LogFile%"
+echo [%date% %time%] Starting Dallas Team Report...
 
 cd /d "%VETPath%"
 "%PythonExe%" start_server.py >> "%LogFile%" 2>&1
 
-echo [%date% %time%] V.E.T. Dashboard stopped. Restarting in 5 seconds... >> "%LogFile%"
+echo [%date% %time%] Dallas Team Report stopped. Restarting in 5 seconds... >> "%LogFile%"
 echo [%date% %time%] Restarting in 5 seconds...
 timeout /t 5 /nobreak > nul
 goto restart_loop

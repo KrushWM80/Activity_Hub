@@ -601,17 +601,29 @@ def parse_weekly_messages_cloud_csv(file_path: str, logger: logging.Logger) -> p
         # Clean column names
         df.columns = df.columns.str.strip()
         
-        # Extract data
+        # Extract data - FIRST TABLE ONLY
         rows = []
         report_date = datetime.now().date()
         extracted_date = datetime.now()
+        data_started = False
+        table_ended = False
         
         for idx, row in df.iterrows():
             page_name = str(row.iloc[0]).strip()
             
-            # Skip empty rows or comment rows
-            if not page_name or page_name.startswith('#') or page_name == 'NaN':
+            # Skip empty rows
+            if not page_name or page_name == 'NaN':
                 continue
+            
+            # Detect table boundaries (comment rows), stop reading if we already have data
+            if page_name.startswith('#') or 'Complete URL' in page_name or 'Page Views' in page_name:
+                if data_started:
+                    # We've hit the end of the first table, stop reading
+                    table_ended = True
+                    break
+                else:
+                    # Still in header section
+                    continue
             
             # Extract device metrics
             try:
@@ -641,6 +653,7 @@ def parse_weekly_messages_cloud_csv(file_path: str, logger: logging.Logger) -> p
                     'total_page_views': total,
                     'extracted_date': extracted_date
                 })
+                data_started = True
             except (ValueError, TypeError):
                 continue
         
@@ -725,6 +738,117 @@ def parse_playbook_cloud_csv(file_path: str, logger: logging.Logger) -> pd.DataF
         logger.error(f"Error parsing Playbook Cloud CSV: {e}", exc_info=True)
         raise
 
+def parse_weekly_messages_audio_normalized(file_path: str, logger: logging.Logger) -> pd.DataFrame:
+    """
+    Parse Weekly Messages Audio CSV and convert to normalized columns.
+    Converts raw F1-F5 format to: page_name, page_views, unique_users, visits, avg_time_on_site
+    """
+    logger.info(f"Parsing Weekly Messages Audio CSV to normalized format: {file_path}")
+    
+    if not Path(file_path).exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+    
+    try:
+        import win32com.client as win32
+        import subprocess
+        import time
+        
+        logger.info("Using Windows COM to read Audio CSV file...")
+        
+        # Kill any existing Excel processes
+        try:
+            subprocess.run(['taskkill', '/F', '/IM', 'EXCEL.EXE'], 
+                          stderr=subprocess.DEVNULL, timeout=5)
+            time.sleep(2)
+        except:
+            pass
+        
+        excel = win32.Dispatch('Excel.Application')
+        excel.Visible = False
+        workbook = excel.Workbooks.Open(file_path)
+        time.sleep(1)
+        worksheet = workbook.Sheets(1)
+        
+        used_range = worksheet.UsedRange
+        all_data = used_range.Value
+        
+        rows_count = len(all_data) if all_data else 0
+        logger.info(f"Audio CSV dimensions: {rows_count} rows")
+        
+        rows = []
+        report_date = datetime.now().date()
+        extracted_date = datetime.now()
+        
+        # Skip header rows (those starting with #) and find where data starts
+        data_start_idx = None
+        for idx, row_data in enumerate(all_data):
+            if row_data and len(row_data) > 0:
+                first_cell = str(row_data[0]).strip()
+                # Look for first data row (doesn't start with # and isn't empty)
+                if not first_cell.startswith('#') and first_cell and 'Page Name' not in first_cell:
+                    data_start_idx = idx
+                    break
+        
+        if data_start_idx is None:
+            logger.warning("No data rows found in Audio CSV")
+            workbook.Close(SaveChanges=False)
+            excel.Quit()
+            return pd.DataFrame()
+        
+        # Extract data rows starting from data_start_idx
+        for row_data in all_data[data_start_idx:]:
+            if not row_data or len(row_data) < 5:
+                continue
+            
+            # Extract columns from data row
+            page_name = str(row_data[0]).strip() if row_data[0] else ""
+            
+            # Skip empty/header rows and only keep Audio pages (weekly_messages_audiowk*)
+            if not page_name or page_name.startswith('#') or 'Page Name' in page_name:
+                continue
+            
+            # Only extract rows for weekly_messages_audiowk (Audio-specific pages)
+            if 'weekly_messages_audiowk' not in page_name.lower():
+                continue
+            
+            try:
+                page_views = int(float(row_data[1] or 0))
+                unique_users = float(row_data[2] or 0)
+                visits = int(float(row_data[3] or 0))
+                avg_time_on_site = float(row_data[4] or 0)
+                
+                rows.append({
+                    'report_date': report_date,
+                    'page_name': str(page_name),
+                    'page_views': int(page_views),
+                    'unique_users': float(unique_users),
+                    'visits': int(visits),
+                    'avg_time_on_site': float(avg_time_on_site),
+                    'extracted_date': extracted_date
+                })
+            except (ValueError, TypeError, IndexError):
+                continue
+        
+        workbook.Close(SaveChanges=False)
+        excel.Quit()
+        
+        result_df = pd.DataFrame(rows)
+        
+        # Ensure correct data types
+        result_df['report_date'] = pd.to_datetime(result_df['report_date']).dt.date
+        result_df['page_name'] = result_df['page_name'].astype(str)
+        result_df['page_views'] = result_df['page_views'].astype('int64')
+        result_df['unique_users'] = result_df['unique_users'].astype('float64')
+        result_df['visits'] = result_df['visits'].astype('int64')
+        result_df['avg_time_on_site'] = result_df['avg_time_on_site'].astype('float64')
+        
+        logger.info(f"Weekly Messages Audio normalized: {len(result_df)} rows × {len(result_df.columns)} columns")
+        return result_df
+        
+    except Exception as e:
+        logger.error(f"Error parsing Audio CSV: {e}", exc_info=True)
+        raise
+
 # ============================================================================
 # BIGQUERY LOADING (MERGE/UPSERT)
 # ============================================================================
@@ -763,7 +887,7 @@ def load_to_bigquery(
                 schema.append(bigquery.SchemaField(col, "DATE"))
             elif col in {'page_views', 'visits', 'total_page_views', 'store_salary_associates_views', 'store_hourly_associates_views', 'tablets_page_views', 'desktop_page_views', 'store_devices_page_views', 'mobile_phones_page_views', 'xcover_devices_page_views'}:
                 schema.append(bigquery.SchemaField(col, "INT64"))
-            elif col in {'unique_users', 'average_time_on_site'}:
+            elif col in {'unique_users', 'average_time_on_site', 'avg_time_on_site'}:
                 schema.append(bigquery.SchemaField(col, "FLOAT64"))
             else:
                 schema.append(bigquery.SchemaField(col, "STRING"))
@@ -876,6 +1000,16 @@ def main():
         except Exception as e:
             logger.warning(f"Error parsing Playbook Cloud CSV: {e}")
         
+        # Audio CSV: Parse Weekly Messages Audio (normalized)
+        weekly_messages_audio = pd.DataFrame()
+        try:
+            weekly_messages_audio_csv = config['source_files']['weekly_messages_audio_csv_path']
+            weekly_messages_audio = parse_weekly_messages_audio_normalized(weekly_messages_audio_csv, logger)
+        except FileNotFoundError as e:
+            logger.warning(f"Weekly Messages Audio CSV not available: {e}")
+        except Exception as e:
+            logger.warning(f"Error parsing Weekly Messages Audio CSV: {e}")
+        
         # Load to BigQuery
         logger.info("\n--- PHASE 2: LOADING TO BIGQUERY ---")
         project = config['gcp']['project_id']
@@ -890,6 +1024,10 @@ def main():
         logger.info(f"  - {weekly_metrics_table}")
         logger.info(f"  - {playbook_table}")
         
+        # Audio table
+        audio_table = f"{project}.{dataset_id}.{config['bigquery']['tables']['audio']}"
+        logger.info(f"  - {audio_table}")
+        
         # Cloud CSV target tables
         weekly_cloud_table = f"{project}.{dataset_id}.{config['bigquery']['tables']['weekly_cloud']}"
         playbook_cloud_table = f"{project}.{dataset_id}.{config['bigquery']['tables']['playbook_cloud']}"
@@ -902,6 +1040,7 @@ def main():
         devices_count = 0
         metrics_count = 0
         playbook_count = 0
+        audio_count = 0
         weekly_cloud_count = 0
         playbook_cloud_count = 0
         
@@ -929,6 +1068,14 @@ def main():
         else:
             logger.info(f"Playbook Hub: No data to load")
         
+        if not weekly_messages_audio.empty:
+            audio_count = load_to_bigquery(
+                client, weekly_messages_audio, audio_table,
+                ['report_date', 'page_name'], logger
+            )
+        else:
+            logger.info(f"Weekly Messages Audio: No data to load")
+        
         # Load Cloud CSV data
         if not weekly_messages_cloud.empty:
             weekly_cloud_count = load_to_bigquery(
@@ -952,6 +1099,7 @@ def main():
         logger.info(f"  Weekly Messages Devices: {devices_count} rows")
         logger.info(f"  Weekly Messages Metrics: {metrics_count} rows")
         logger.info(f"  Playbook Hub: {playbook_count} rows")
+        logger.info(f"  Weekly Messages Audio: {audio_count} rows")
         logger.info(f"CLOUD DATA (CSV):")
         logger.info(f"  Weekly Messages Cloud: {weekly_cloud_count} rows")
         logger.info(f"  Playbook Cloud: {playbook_cloud_count} rows")

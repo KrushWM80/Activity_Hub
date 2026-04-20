@@ -78,5 +78,13 @@
     "email": "mark.kuehn@walmart.com",
     "approved": true,
     "registered": "2026-03-04T11:26:57.926078"
+  },
+  "krushak.mishra": {
+    "password_hash": "",
+    "role": "user",
+    "name": "Krushak Mishra",
+    "email": "krushak.mishra@walmart.com",
+    "approved": false,
+    "registered": "2026-04-20T13:42:41.438767"
   }
 }

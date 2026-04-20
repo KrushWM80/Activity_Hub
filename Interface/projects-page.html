@@ -947,39 +947,44 @@
             <!-- Filters -->
             <div class="filters-container">
                 <div class="row g-3">
+                    <!-- Project Title - Wide Filter -->
                     <div class="col-md-3">
+                        <label class="form-label"><strong>Project Title</strong></label>
+                        <input type="text" class="form-control" id="filter-title-search" placeholder="Search or click to select..." oninput="updateTitleOptions()" onfocus="openTitleFilterDropdown()" onblur="setTimeout(() => closeTitleFilterDropdown(), 200)">
+                        <div id="title-options" class="dropdown-list" style="display:none; max-height:250px; overflow-y:auto; margin-top:5px; border:1px solid #ddd; border-radius:4px; background:white; z-index:10; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+                    <!-- Owner - Wide Filter -->
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>Owner</strong></label>
+                        <input type="text" class="form-control" id="filter-owner-search" placeholder="Search or click to select..." oninput="updateOwnerOptions()" onfocus="openOwnerFilterDropdown()" onblur="setTimeout(() => closeOwnerFilterDropdown(), 200)">
+                        <div id="owner-options" class="dropdown-list" style="display:none; max-height:250px; overflow-y:auto; margin-top:5px; border:1px solid #ddd; border-radius:4px; background:white; z-index:10; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+                    <!-- Business Area -->
+                    <div class="col-md-2">
                         <label class="form-label"><strong>Business Area</strong></label>
                         <select class="form-select" id="filter-business-area" onchange="loadProjects(); loadMetrics();">
                             <option value="">All Areas</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label"><strong>Health Status</strong></label>
+                    <!-- Health Status -->
+                    <div class="col-md-1">
+                        <label class="form-label"><strong>Health</strong></label>
                         <select class="form-select" id="filter-health" onchange="loadProjects(); loadMetrics();">
-                            <option value="">All Health Statuses</option>
+                            <option value="">All</option>
                             <option value="On Track">On Track</option>
                             <option value="At Risk">At Risk</option>
                             <option value="Off Track">Off Track</option>
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label"><strong>Status</strong></label>
-                        <select class="form-select" id="filter-status" onchange="loadProjects(); loadMetrics();">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                            <option value="">All</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label"><strong>Owner</strong></label>
-                        <select class="form-select" id="filter-owner" onchange="loadProjects(); loadMetrics();">
-                            <option value="">All Owners</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2" style="display: flex; gap: 8px; align-items: flex-end;">
-                        <label class="form-label" style="width: 100%; margin-bottom: 0;">&nbsp;</label>
+                    <!-- Action Buttons & Filter Buttons -->
+                    <div class="col-md-3" style="display: flex; align-items: flex-end; justify-content: flex-end; gap: 8px;">
                         <button class="btn btn-outline-secondary" title="Refresh" onclick="location.reload()" style="padding: 10px 12px; border-radius: 6px;">
                             <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn btn-outline-info" title="Send Email" onclick="showSendEmailModal()" style="padding: 10px 12px; border-radius: 6px;">
+                            <i class="fas fa-envelope"></i>
                         </button>
                         <button class="btn btn-warning" title="Generate PPT Report" onclick="generatePPT()" style="padding: 10px 12px; border-radius: 6px;">
                             <i class="fas fa-file-powerpoint"></i>
@@ -987,29 +992,35 @@
                         <button class="btn btn-primary" title="Add Project" onclick="showAddProjectModal()" style="padding: 10px 12px; border-radius: 6px;">
                             <i class="fas fa-plus"></i>
                         </button>
+                        <button class="btn btn-outline-secondary" id="btn-updated" title="Show Updated This Week" onclick="toggleUpdatedFilter('updated')" style="padding: 10px 12px; border-radius: 6px;">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" id="btn-not-updated" title="Show Not Updated This Week" onclick="toggleUpdatedFilter('not_updated')" style="padding: 10px 12px; border-radius: 6px;">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Action Buttons (Moved to filters) -->
+            <!-- Hidden state storage -->
+            <input type="hidden" id="updated-status-filter" value="">
+            <input type="hidden" id="selected-owners" value="">
 
             <!-- Projects Table -->
             <div class="table-container">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">Project Title</th>
-                            <th style="width: 15%;">Business Area</th>
-                            <th style="width: 12%;">Owner</th>
-                            <th style="width: 10%;">Health</th>
-                            <th style="width: 15%;">Latest Update</th>
-                            <th style="width: 12%;">Week Status</th>
-                            <th style="width: 11%;">Actions</th>
+                            <th style="width: 24%; cursor: pointer;" onclick="sortTable('title')" title="Click to sort">Project Title <i class="fas fa-sort" style="opacity: 0.5; margin-left: 5px;"></i></th>
+                            <th style="width: 16%; cursor: pointer;" onclick="sortTable('business_organization')" title="Click to sort">Business Area <i class="fas fa-sort" style="opacity: 0.5; margin-left: 5px;"></i></th>
+                            <th style="width: 12%; cursor: pointer;" onclick="sortTable('owner')" title="Click to sort">Owner <i class="fas fa-sort" style="opacity: 0.5; margin-left: 5px;"></i></th>
+                            <th style="width: 10%; cursor: pointer;" onclick="sortTable('health')" title="Click to sort">Health <i class="fas fa-sort" style="opacity: 0.5; margin-left: 5px;"></i></th>
+                            <th style="width: 38%;">Update</th>
                         </tr>
                     </thead>
                     <tbody id="projects-table">
                         <tr>
-                            <td colspan="7" class="loading">
+                            <td colspan="5" class="loading">
                                 <i class="fas fa-spinner"></i> Loading projects...
                             </td>
                         </tr>
@@ -1054,28 +1065,34 @@
                         <div class="row">
                             <div class="col-md-6 form-group">
                                 <label>Owner Name *</label>
-                                <input type="text" class="form-control" id="form-owner-name" required onchange="handleOwnerNameChange(this)">
+                                <input type="text" class="form-control" id="form-owner-name" required readonly>
+                                <small class="text-muted">Auto-populated with current user</small>
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Owner ID *</label>
-                                <input type="text" class="form-control" id="form-owner-id" required onchange="handleOwnerIdChange(this)">
+                                <input type="text" class="form-control" id="form-owner-id" required readonly>
+                                <small class="text-muted">Auto-populated with current user ID</small>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 form-group">
-                                <label>Business Area *</label>
-                                <select class="form-select" id="form-business-area" required>
+                                <label>Business Area * (Multi-select)</label>
+                                <select class="form-select" id="form-business-area" multiple required size="5">
                                     <option value="">Loading options...</option>
                                 </select>
+                                <button type="button" class="btn btn-sm btn-link mt-2" onclick="showRequestBusinessAreaModal()" style="padding: 0; text-decoration: none;">
+                                    <i class="fas fa-plus"></i> Request New Business Area
+                                </button>
+                                <small class="text-muted d-block">Hold Ctrl/Cmd to select multiple areas</small>
                             </div>
                             <div class="col-md-6 form-group">
-                                <label>Health Status *</label>
-                                <select class="form-select" id="form-health-status" required>
-                                    <option value="">Select...</option>
+                                <label>Health Status * (Multi-select)</label>
+                                <select class="form-select" id="form-health-status" multiple required size="5">
                                     <option value="On Track">On Track</option>
                                     <option value="At Risk">At Risk</option>
                                     <option value="Off Track">Off Track</option>
                                 </select>
+                                <small class="text-muted">Hold Ctrl/Cmd to select multiple statuses</small>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1104,15 +1121,23 @@
                 </div>
                 <div class="modal-body">
                     <form id="editProjectForm">
-                        <div class="form-group">
+                        <input type="hidden" id="edit-project-id">
+                        <input type="hidden" id="edit-project-source" value="">
+                        
+                        <!-- Read-only fields section for Intake Hub projects -->
+                        <div id="intake-hub-notice" style="display: none; padding: 1rem; background: #e3f2fd; border: 1px solid #2196f3; border-radius: 6px; color: #1976d2; margin-bottom: 1rem;">
+                            <i class="fas fa-info-circle"></i> <strong>Note:</strong> This project is synced from Intake Hub. Only the project note can be edited here. Other fields must be updated in Intake Hub.
+                        </div>
+                        
+                        <div class="form-group" id="edit-title-group">
                             <label>Project Title *</label>
                             <input type="text" class="form-control" id="edit-title" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" id="edit-description-group">
                             <label>Description</label>
                             <textarea class="form-control" id="edit-description" rows="3"></textarea>
                         </div>
-                        <div class="row">
+                        <div class="row" id="edit-owner-row">
                             <div class="col-md-6 form-group">
                                 <label>Owner Name *</label>
                                 <input type="text" class="form-control" id="edit-owner-name" required onchange="handleOwnerNameChange(this)">
@@ -1122,7 +1147,7 @@
                                 <input type="text" class="form-control" id="edit-owner-id" required onchange="handleOwnerIdChange(this)">
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" id="edit-business-health-row">
                             <div class="col-md-6 form-group">
                                 <label>Business Area *</label>
                                 <input type="text" class="form-control" id="edit-business-area" required>
@@ -1201,6 +1226,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-info" onclick="goToIntakeHub()">
+                        <i class="fas fa-external-link-alt"></i> Go to Intake Hub
+                    </button>
                     <button type="button" class="btn btn-primary" id="detail-edit-btn" onclick="editProject(document.getElementById('detail-project-id').value)">
                         <i class="fas fa-edit"></i> Edit
                     </button>
@@ -1302,9 +1330,11 @@
         // ══════════════════════════════════════════════════════════════════
         
         const API_BASE = "/api";
-        const CURRENT_USER_ID = 'krush';  // Current logged-in user
+        const CURRENT_USER_ID = 'krush';
+        const CURRENT_USER_NAME = 'Kendall Rush';  // Match owner field in database
         let currentEditProjectId = null;
         let allProjects = [];  // Store all projects for detail modal
+        let currentSort = { column: null, ascending: true };  // Track sorting state
         
         // Initialize user links - load from localStorage
         let userLinks = [];
@@ -1611,8 +1641,7 @@
         // Load metrics from API
         async function loadMetrics() {
             try {
-                const status = document.getElementById('filter-status').value || 'Active';
-                const response = await fetch(`${API_BASE}/projects/metrics?status=${status}`);
+                const response = await fetch(`${API_BASE}/projects/metrics`);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -1631,18 +1660,20 @@
         // Load projects from API
         async function loadProjects() {
             try {
-                const businessArea = document.getElementById('filter-business-area').value;
+                const businessOrg = document.getElementById('filter-business-area').value;
                 const health = document.getElementById('filter-health').value;
-                const status = document.getElementById('filter-status').value;
-                const owner = document.getElementById('filter-owner').value;
+                const selectedTitles = Array.from(document.querySelectorAll('#title-options input[type="checkbox"]:checked')).map(cb => cb.value).join(',');
+                const selectedOwners = Array.from(document.querySelectorAll('#owner-options input[type="checkbox"]:checked')).map(cb => cb.value).join(',');
+                const updatedStatus = document.getElementById('updated-status-filter').value;
 
                 let url = `${API_BASE}/projects`;
                 const params = new URLSearchParams();
                 
-                if (businessArea) params.append('business_area', businessArea);
+                if (businessOrg) params.append('business_organization', businessOrg);
                 if (health) params.append('health_status', health);
-                if (status) params.append('status', status);
-                if (owner) params.append('owner_name', owner);
+                if (selectedTitles) params.append('title_search', selectedTitles.split(',')[0]);
+                if (selectedOwners) params.append('owner_names', selectedOwners);
+                if (updatedStatus) params.append('updated_status', updatedStatus);
                 
                 if (params.toString()) url += '?' + params.toString();
 
@@ -1650,20 +1681,25 @@
                 const data = await response.json();
                 const projects = data.projects || data;
                 
+                // Filter by selected titles if any
+                let filtered = projects;
+                if (selectedTitles) {
+                    const titles = selectedTitles.split(',').map(t => t.trim());
+                    filtered = projects.filter(p => titles.includes(p.title));
+                }
+                
                 // Store for detail modal access
-                allProjects = projects;
-
-                // Load metrics
-                const metricsResponse = await fetch(`${API_BASE}/projects/metrics`);
-                const metricsData = await metricsResponse.json();
-                const metrics = metricsData.metrics || metricsData;
-                updateMetrics(metrics);
+                allProjects = filtered;
 
                 // Populate business area filter
-                populateBusinessAreaFilter(projects);
+                populateBusinessAreaFilter(filtered);
+                populateTitleFilter(filtered);
 
                 // Display projects
-                displayProjects(projects);
+                displayProjects(filtered);
+                
+                // Load and update metrics
+                loadMetrics();
             } catch (error) {
                 console.error('Error loading projects:', error);
                 showError('Failed to load projects');
@@ -1700,58 +1736,60 @@
             let rows = [];
             for (let i = 0; i < projects.length; i++) {
                 const project = projects[i];
-                const isOwner = project.owner_id === CURRENT_USER_ID;
-                const actionBtn = isOwner ? 
-                    `<button class="btn btn-sm btn-primary" onclick="editProject('${project.impact_id}')"><i class="fas fa-edit"></i> Edit</button>` :
-                    `<span style="color: #999; font-size: 12px;">Owner only</span>`;
+                
+                // Handle null/undefined title
+                if (!project.title) {
+                    continue;  // Skip projects with null titles
+                }
+                
+                // More flexible owner check: trim whitespace and handle case-insensitive comparison
+                const projectOwner = (project.owner || '').trim();
+                const currentUser = (CURRENT_USER_NAME || '').trim();
+                const isOwner = projectOwner.toLowerCase() === currentUser.toLowerCase() || 
+                                projectOwner === currentUser ||
+                                project.owner_id === CURRENT_USER_ID;
+                
+                const editPencil = isOwner ? 
+                    `<i class="fas fa-pencil" style="cursor: pointer; color: #3B82F6; margin-left: 8px; opacity: 0; transition: opacity 0.2s;" onclick="event.stopPropagation(); editProject('${project.project_id}')" title="Edit"></i>` :
+                    '';
+                
+                const updateText = project.project_update ? project.project_update.substring(0, 120) : 'No update';
                 
                 rows.push(`
-                    <tr style="cursor: pointer;" data-project-id="${project.impact_id}" data-project-title="${project.title.replace(/"/g, '&quot;')}">
-                        <td><strong>${project.title}</strong></td>
-                        <td>${project.business_area}</td>
-                        <td>${project.owner_name}</td>
-                        <td>${getHealthBadge(project.health_status)}</td>
-                        <td><small>${project.latest_update ? project.latest_update.substring(0,50) : 'N/A'}</small></td>
-                        <td>
-                            ${project.current_wm_week_update ? 
-                                '<span style="background: #d4edda; color: #38A169; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold;"><i class="fas fa-check"></i> Updated</span>' :
-                                '<span style="background: #f8d7da; color: #E53E3E; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold;"><i class="fas fa-exclamation-circle"></i> Not Updated</span>'
-                            }
-                        </td>
-                        <td onclick="event.stopPropagation();">${actionBtn}</td>
+                    <tr style="cursor: pointer; position: relative;" data-project-id="${project.project_id}" data-project-title="${project.title.replace(/"/g, '&quot;')}" onclick="showProjectDetail('${project.project_id}', '${project.title.replace(/'/g, "\\'")}')">
+                        <td><strong>${project.title}${editPencil}</strong></td>
+                        <td>${project.business_organization || 'N/A'}</td>
+                        <td>${project.owner || 'N/A'}</td>
+                        <td>${getHealthBadge(project.health)}</td>
+                        <td><small>${updateText}</small></td>
                     </tr>
                 `);
             }
             
             table.innerHTML = rows.join('');
-            
-            // Add click handlers to rows
-            document.querySelectorAll('[data-project-id]').forEach(row => {
-                row.addEventListener('click', function() {
-                    const id = this.getAttribute('data-project-id');
-                    const title = this.getAttribute('data-project-title');
-                    showProjectDetail(id, title);
-                });
-            });
         }
 
         // Show project detail modal
         function showProjectDetail(projectId, projectTitle) {
-            const project = allProjects.find(p => p.impact_id === projectId);
+            const project = allProjects.find(p => p.project_id === projectId);
             if (!project) return;
 
             // Populate modal
             document.getElementById('detail-project-id').value = projectId;
             document.getElementById('detail-project-title').textContent = projectTitle;
-            document.getElementById('detail-business-area').textContent = project.business_area;
-            document.getElementById('detail-health-status').innerHTML = getHealthBadge(project.health_status);
-            document.getElementById('detail-owner').textContent = `${project.owner_name} (${project.owner_id})`;
-            document.getElementById('detail-status').textContent = project.project_status || 'N/A';
-            document.getElementById('detail-latest-update').textContent = project.latest_update || 'N/A';
+            document.getElementById('detail-business-area').textContent = project.business_organization || 'N/A';
+            document.getElementById('detail-health-status').innerHTML = getHealthBadge(project.health);
+            document.getElementById('detail-owner').textContent = `${project.owner || 'N/A'}`;
+            document.getElementById('detail-status').textContent = project.status || 'N/A';
+            document.getElementById('detail-latest-update').textContent = project.project_update || 'No update';
 
             // Show/hide Edit button based on ownership
             const editBtn = document.getElementById('detail-edit-btn');
-            const isOwner = project.owner_id === CURRENT_USER_ID;
+            const projectOwner = (project.owner || '').trim();
+            const currentUser = (CURRENT_USER_NAME || '').trim();
+            const isOwner = projectOwner.toLowerCase() === currentUser.toLowerCase() || 
+                            projectOwner === currentUser ||
+                            project.owner_id === CURRENT_USER_ID;
             editBtn.style.display = isOwner ? 'inline-block' : 'none';
 
             // Show Data Bridge notice if applicable
@@ -1781,25 +1819,179 @@
 
         // Populate owner filter
         function populateOwnerFilter(projects) {
-            const filterSelect = document.getElementById('filter-owner');
             if (!projects || projects.length === 0) return;
 
-            const owners = [...new Set(projects.map(p => p.owner_name))].sort();
-            const existingValue = filterSelect.value;
-
-            // Keep existing options (first is "All Owners")
-            const currentOptions = Array.from(filterSelect.options).map(o => o.textContent);
+            const owners = [...new Set(projects.map(p => p.owner).filter(p => p))].sort();
+            const ownerOptionsDiv = document.getElementById('owner-options');
             
-            owners.forEach(owner => {
-                if (!currentOptions.includes(owner)) {
-                    const option = document.createElement('option');
-                    option.value = owner;
-                    option.textContent = owner;
-                    filterSelect.appendChild(option);
-                }
-            });
+            if (!ownerOptionsDiv) return;
 
-            filterSelect.value = existingValue;
+            // Clear existing options
+            ownerOptionsDiv.innerHTML = '';
+            
+            // Create checkboxes for each owner
+            owners.forEach(owner => {
+                const label = document.createElement('label');
+                label.style.cssText = 'display: block; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee;';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = owner;
+                checkbox.style.marginRight = '8px';
+                checkbox.onchange = function() {
+                    loadProjects();
+                    loadMetrics();
+                };
+                
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(owner));
+                ownerOptionsDiv.appendChild(label);
+            });
+        }
+
+        // Update owner filter options based on search
+        function updateOwnerOptions() {
+            const searchInput = document.getElementById('filter-owner-search');
+            const ownerOptionsDiv = document.getElementById('owner-options');
+            
+            if (!searchInput || !ownerOptionsDiv) return;
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            const options = ownerOptionsDiv.querySelectorAll('label');
+            
+            let visibleCount = 0;
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase();
+                const shouldShow = text.includes(searchTerm);
+                option.style.display = shouldShow ? 'block' : 'none';
+                if (shouldShow) visibleCount++;
+            });
+            
+            // Show/hide the dropdown menu - show it if there's a search term or if dropdown has visible options
+            ownerOptionsDiv.style.display = visibleCount > 0 ? 'block' : 'none';
+        }
+
+        // Open owner filter dropdown
+        function openOwnerFilterDropdown() {
+            const ownerOptionsDiv = document.getElementById('owner-options');
+            if (ownerOptionsDiv) {
+                ownerOptionsDiv.style.display = ownerOptionsDiv.querySelectorAll('label').length > 0 ? 'block' : 'none';
+            }
+        }
+
+        // Close owner filter dropdown
+        function closeOwnerFilterDropdown() {
+            const ownerOptionsDiv = document.getElementById('owner-options');
+            if (ownerOptionsDiv) {
+                // Keep it open if there's a search term
+                const searchInput = document.getElementById('filter-owner-search');
+                if (!searchInput || searchInput.value === '') {
+                    ownerOptionsDiv.style.display = 'none';
+                }
+            }
+        }
+
+        // Update title filter options based on search
+        function updateTitleOptions() {
+            const searchInput = document.getElementById('filter-title-search');
+            const titleOptionsDiv = document.getElementById('title-options');
+            
+            if (!searchInput || !titleOptionsDiv) return;
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            const options = titleOptionsDiv.querySelectorAll('label');
+            
+            let visibleCount = 0;
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase();
+                const shouldShow = text.includes(searchTerm);
+                option.style.display = shouldShow ? 'block' : 'none';
+                if (shouldShow) visibleCount++;
+            });
+            
+            // Show/hide the dropdown menu - show it if there's a search term or if dropdown has visible options
+            titleOptionsDiv.style.display = visibleCount > 0 ? 'block' : 'none';
+        }
+
+        // Open title filter dropdown
+        function openTitleFilterDropdown() {
+            const titleOptionsDiv = document.getElementById('title-options');
+            if (titleOptionsDiv) {
+                titleOptionsDiv.style.display = titleOptionsDiv.querySelectorAll('label').length > 0 ? 'block' : 'none';
+            }
+        }
+
+        // Close title filter dropdown
+        function closeTitleFilterDropdown() {
+            const titleOptionsDiv = document.getElementById('title-options');
+            if (titleOptionsDiv) {
+                // Keep it open if there's a search term
+                const searchInput = document.getElementById('filter-title-search');
+                if (!searchInput || searchInput.value === '') {
+                    titleOptionsDiv.style.display = 'none';
+                }
+            }
+        }
+
+        // Populate title filter for multi-select
+        function populateTitleFilter(projects) {
+            if (!projects || projects.length === 0) return;
+
+            const titles = [...new Set(projects.map(p => p.title).filter(p => p))].sort();
+            const titleOptionsDiv = document.getElementById('title-options');
+            
+            if (!titleOptionsDiv) return;
+
+            // Clear existing options first
+            titleOptionsDiv.innerHTML = '';
+            
+            // Create checkboxes for each title
+            titles.forEach(title => {
+                const label = document.createElement('label');
+                label.style.cssText = 'display: block; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee;';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = title;
+                checkbox.style.marginRight = '8px';
+                checkbox.onchange = function() {
+                    loadProjects();
+                    loadMetrics();
+                };
+                
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(title.substring(0, 50)));
+                titleOptionsDiv.appendChild(label);
+            });
+        }
+
+        // Toggle updated/not updated filter
+        let currentUpdatedFilter = '';
+        function toggleUpdatedFilter(filterValue) {
+            const btnUpdated = document.getElementById('btn-updated');
+            const btnNotUpdated = document.getElementById('btn-not-updated');
+            
+            if (currentUpdatedFilter === filterValue) {
+                // Deselect if clicking same button
+                currentUpdatedFilter = '';
+                btnUpdated.style.background = '';
+                btnNotUpdated.style.background = '';
+            } else {
+                // Select new filter
+                currentUpdatedFilter = filterValue;
+                if (filterValue === 'updated') {
+                    btnUpdated.style.background = '#d4edda';
+                    btnNotUpdated.style.background = '';
+                } else {
+                    btnNotUpdated.style.background = '#f8d7da';
+                    btnUpdated.style.background = '';
+                }
+            }
+            
+            // Store in hidden element for loadProjects to access
+            document.getElementById('updated-status-filter').value = currentUpdatedFilter;
+            loadProjects();
+            loadMetrics();
         }
 
         // Populate business area filter
@@ -1807,7 +1999,11 @@
             const filterSelect = document.getElementById('filter-business-area');
             if (!projects || projects.length === 0) return;
 
-            const areas = [...new Set(projects.map(p => p.business_area))].sort();
+            const invalidAreas = ['Automotive', 'Unknown', 'N/A', ''];
+            const areas = [...new Set(projects
+                .map(p => p.business_organization)
+                .filter(a => a && a.trim() && !invalidAreas.includes(a))
+            )].sort();
             const existingValue = filterSelect.value;
 
             // Keep existing options (first is "All Areas")
@@ -1823,6 +2019,35 @@
             });
 
             filterSelect.value = existingValue;
+        }
+
+        // Sort table by column
+        function sortTable(column) {
+            // Toggle sort direction if clicking the same column
+            if (currentSort.column === column) {
+                currentSort.ascending = !currentSort.ascending;
+            } else {
+                currentSort.column = column;
+                currentSort.ascending = true;
+            }
+
+            // Sort the allProjects array
+            allProjects.sort((a, b) => {
+                let aVal = a[column] || '';
+                let bVal = b[column] || '';
+
+                // Convert to lowercase for string comparison
+                if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+                if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+
+                let comparison = 0;
+                if (aVal < bVal) comparison = -1;
+                if (aVal > bVal) comparison = 1;
+
+                return currentSort.ascending ? comparison : -comparison;
+            });
+
+            displayProjects(allProjects);
         }
 
         // Load Business Area options from Data Bridge for Add Project form
@@ -1865,11 +2090,17 @@
         function showAddProjectModal() {
             document.getElementById('form-title').value = '';
             document.getElementById('form-description').value = '';
-            document.getElementById('form-owner-name').value = 'Kendall Rush';
-            document.getElementById('form-owner-id').value = 'krush';
+            // Auto-populate with current user info
+            document.getElementById('form-owner-name').value = CURRENT_USER_NAME || 'Kendall Rush';
+            document.getElementById('form-owner-id').value = CURRENT_USER_ID || 'krush';
             document.getElementById('form-business-area').value = '';
             document.getElementById('form-health-status').value = '';
             document.getElementById('form-latest-update').value = '';
+            
+            // Clear previous selections
+            document.getElementById('form-business-area').querySelectorAll('option:checked').forEach(opt => opt.selected = false);
+            document.getElementById('form-health-status').querySelectorAll('option:checked').forEach(opt => opt.selected = false);
+            
             new bootstrap.Modal(document.getElementById('addProjectModal')).show();
         }
 
@@ -1901,39 +2132,59 @@
             const description = document.getElementById('form-description').value;
             const ownerName = document.getElementById('form-owner-name').value;
             const ownerId = document.getElementById('form-owner-id').value;
-            const businessArea = document.getElementById('form-business-area').value;
-            const healthStatus = document.getElementById('form-health-status').value;
+            
+            // Get multi-selected Business Areas
+            const businessAreaSelect = document.getElementById('form-business-area');
+            const selectedBusinessAreas = Array.from(businessAreaSelect.selectedOptions).map(opt => opt.value).filter(v => v);
+            
+            // Get multi-selected Health Statuses
+            const healthStatusSelect = document.getElementById('form-health-status');
+            const selectedHealthStatuses = Array.from(healthStatusSelect.selectedOptions).map(opt => opt.value).filter(v => v);
+            
             const latestUpdate = document.getElementById('form-latest-update').value;
 
-            if (!title || !ownerName || !ownerId || !businessArea || !healthStatus) {
-                alert('Please fill in all required fields');
+            if (!title || !ownerName || !ownerId || selectedBusinessAreas.length === 0 || selectedHealthStatuses.length === 0) {
+                alert('Please fill in all required fields (select at least one Business Area and one Health Status)');
                 return;
             }
 
             try {
-                const response = await fetch(`${API_BASE}/projects`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title,
-                        description,
-                        owner_name: ownerName,
-                        owner_id: ownerId,
-                        business_area: businessArea,
-                        health_status: healthStatus,
-                        latest_update: latestUpdate
-                    })
-                });
-
-                if (response.ok) {
-                    bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
-                    loadProjects();
-                } else {
-                    throw new Error('Failed to create project');
+                // Create a project entry for each combination of Business Area and Health Status
+                const projectsToCreate = [];
+                for (const ba of selectedBusinessAreas) {
+                    for (const hs of selectedHealthStatuses) {
+                        projectsToCreate.push({
+                            title,
+                            description,
+                            owner_name: ownerName,
+                            owner_id: ownerId,
+                            business_area: ba,
+                            health_status: hs,
+                            latest_update: latestUpdate,
+                            project_source: 'Manual Entry'
+                        });
+                    }
                 }
+                
+                // Submit all project combinations
+                for (const projectData of projectsToCreate) {
+                    const response = await fetch(`${API_BASE}/projects`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(projectData)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to create project with ${projectData.business_area} / ${projectData.health_status}`);
+                    }
+                }
+
+                bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
+                loadProjects();
+                alert(`Successfully created ${projectsToCreate.length} project variant(s)`);
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error creating project');
+                alert('Error creating project: ' + error.message);
             }
         }
 
@@ -1945,12 +2196,55 @@
             if (statusLower.includes('red') || statusLower.includes('off')) return 'Off Track';
             return status || '';
         }
+
+        // Show request business area modal
+        function showRequestBusinessAreaModal() {
+            document.getElementById('new-business-area').value = '';
+            document.getElementById('business-area-description').value = '';
+            new bootstrap.Modal(document.getElementById('requestBusinessAreaModal')).show();
+        }
+
+        // Submit business area request
+        async function submitBusinessAreaRequest() {
+            const businessAreaName = document.getElementById('new-business-area').value.trim();
+            const description = document.getElementById('business-area-description').value.trim();
+
+            if (!businessAreaName) {
+                alert('Please enter a business area name');
+                return;
+            }
+
+            try {
+                // Log the request (in production, this would save to database)
+                console.log('Business Area Request:', {
+                    name: businessAreaName,
+                    description: description,
+                    requestedBy: CURRENT_USER_NAME,
+                    requestedAt: new Date().toISOString(),
+                    status: 'Pending Approval'
+                });
+
+                // Close the modal
+                bootstrap.Modal.getInstance(document.getElementById('requestBusinessAreaModal')).hide();
+
+                // Show confirmation
+                alert(`Business area "${businessAreaName}" has been requested for approval.\nYour project will use "WM Business" temporarily until it's approved.`);
+
+                // Set to "WM Business" in the form
+                const baSelect = document.getElementById('form-business-area');
+                baSelect.value = 'WM Business';
+                baSelect._requestedBusinessArea = businessAreaName;  // Store the requested name
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error submitting request: ' + error.message);
+            }
+        }
         
         // Edit project
         async function editProject(projectId) {
             try {
                 // Find project in already-loaded allProjects array
-                const project = allProjects.find(p => p.impact_id === projectId);
+                const project = allProjects.find(p => p.project_id === projectId);
                 
                 if (!project) {
                     alert('Project not found');
@@ -1964,14 +2258,56 @@
                 }
                 
                 currentEditProjectId = projectId;
+                
+                // Determine if project is from Intake Hub
+                const isIntakeHubProject = project.project_source && project.project_source.toLowerCase().includes('intake');
+                document.getElementById('edit-project-source').value = project.project_source || '';
+                
+                // Populate form fields
+                document.getElementById('edit-project-id').value = projectId;
                 document.getElementById('edit-title').value = project.title;
-                document.getElementById('edit-description').value = project.description || '';
-                document.getElementById('edit-owner-name').value = project.owner_name;
-                document.getElementById('edit-owner-id').value = project.owner_id;
-                document.getElementById('edit-business-area').value = project.business_area;
-                // Normalize health status value to match form options
-                document.getElementById('edit-health-status').value = normalizeHealthStatus(project.health_status);
-                document.getElementById('edit-latest-update').value = project.latest_update || '';
+                document.getElementById('edit-description').value = project.project_update || '';
+                document.getElementById('edit-owner-name').value = project.owner;
+                document.getElementById('edit-owner-id').value = project.owner_id || '';
+                document.getElementById('edit-business-area').value = project.business_organization || project.business_area || '';
+                document.getElementById('edit-health-status').value = normalizeHealthStatus(project.health);
+                document.getElementById('edit-latest-update').value = project.project_update || '';
+                
+                // Show/hide Intake Hub notice
+                const intakeHubNotice = document.getElementById('intake-hub-notice');
+                if (isIntakeHubProject) {
+                    intakeHubNotice.style.display = 'block';
+                    // Disable fields for Intake Hub projects (read-only, can only edit note)
+                    document.getElementById('edit-title-group').style.opacity = '0.6';
+                    document.getElementById('edit-description-group').style.opacity = '0.6';
+                    document.getElementById('edit-owner-row').style.opacity = '0.6';
+                    document.getElementById('edit-business-health-row').style.opacity = '0.6';
+                    
+                    document.getElementById('edit-title').disabled = true;
+                    document.getElementById('edit-description').disabled = true;
+                    document.getElementById('edit-owner-name').disabled = true;
+                    document.getElementById('edit-owner-id').disabled = true;
+                    document.getElementById('edit-business-area').disabled = true;
+                    document.getElementById('edit-health-status').disabled = true;
+                    
+                    document.getElementById('edit-latest-update').disabled = false;
+                } else {
+                    intakeHubNotice.style.display = 'none';
+                    // Enable all fields for manual projects
+                    document.getElementById('edit-title-group').style.opacity = '1';
+                    document.getElementById('edit-description-group').style.opacity = '1';
+                    document.getElementById('edit-owner-row').style.opacity = '1';
+                    document.getElementById('edit-business-health-row').style.opacity = '1';
+                    
+                    document.getElementById('edit-title').disabled = false;
+                    document.getElementById('edit-description').disabled = false;
+                    document.getElementById('edit-owner-name').disabled = false;
+                    document.getElementById('edit-owner-id').disabled = false;
+                    document.getElementById('edit-business-area').disabled = false;
+                    document.getElementById('edit-health-status').disabled = false;
+                    
+                    document.getElementById('edit-latest-update').disabled = false;
+                }
                 
                 // Display previous updates (if stored)
                 displayPreviousUpdates(projectId);
@@ -1989,43 +2325,63 @@
 
         // Submit edit project form
         async function submitEditProjectForm() {
-            const title = document.getElementById('edit-title').value;
-            const description = document.getElementById('edit-description').value;
-            const ownerName = document.getElementById('edit-owner-name').value;
-            const ownerId = document.getElementById('edit-owner-id').value;
-            const businessArea = document.getElementById('edit-business-area').value;
-            const healthStatus = document.getElementById('edit-health-status').value;
+            const projectSource = document.getElementById('edit-project-source').value;
+            const isIntakeHubProject = projectSource && projectSource.toLowerCase().includes('intake');
+            
             const latestUpdate = document.getElementById('edit-latest-update').value;
 
-            if (!title || !ownerName || !ownerId || !businessArea || !healthStatus) {
-                alert('Please fill in all required fields');
+            if (!latestUpdate) {
+                alert('Please enter a project update');
                 return;
+            }
+
+            let updateData = {
+                latest_update: latestUpdate
+            };
+
+            // For Intake Hub projects, only update the note
+            // For manual projects, update all fields
+            if (!isIntakeHubProject) {
+                const title = document.getElementById('edit-title').value;
+                const description = document.getElementById('edit-description').value;
+                const ownerName = document.getElementById('edit-owner-name').value;
+                const ownerId = document.getElementById('edit-owner-id').value;
+                const businessArea = document.getElementById('edit-business-area').value;
+                const healthStatus = document.getElementById('edit-health-status').value;
+
+                if (!title || !ownerName || !ownerId || !businessArea || !healthStatus) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                updateData = {
+                    title,
+                    description,
+                    owner_name: ownerName,
+                    owner_id: ownerId,
+                    business_area: businessArea,
+                    health_status: healthStatus,
+                    latest_update: latestUpdate
+                };
             }
 
             try {
                 const response = await fetch(`${API_BASE}/projects/${currentEditProjectId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title,
-                        description,
-                        owner_name: ownerName,
-                        owner_id: ownerId,
-                        business_area: businessArea,
-                        health_status: healthStatus,
-                        latest_update: latestUpdate
-                    })
+                    body: JSON.stringify(updateData)
                 });
 
                 if (response.ok) {
                     bootstrap.Modal.getInstance(document.getElementById('editProjectModal')).hide();
                     loadProjects();
+                    alert(isIntakeHubProject ? 'Project note saved successfully' : 'Project updated successfully');
                 } else {
                     throw new Error('Failed to update project');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error updating project');
+                alert('Error updating project: ' + error.message);
             }
         }
         
@@ -2059,7 +2415,7 @@
         // Generate PPT report
         async function generatePPT() {
             try {
-                const status = document.getElementById('filter-status').value || 'Active';
+                const status = document.getElementById('filter-status').value || '';
                 const response = await fetch(`${API_BASE}/generate-ppt?status=${status}`);
                 
                 if (response.ok) {
@@ -2182,6 +2538,117 @@
                 });
             });
         });
+
+        // Navigate to Intake Hub
+        function goToIntakeHub() {
+            const projectId = document.getElementById('detail-project-id').value;
+            if (!projectId) {
+                alert('Project ID not found');
+                return;
+            }
+            const intakeHubUrl = `https://hoops.wal-mart.com/intake-hub/projects/${projectId}`;
+            window.open(intakeHubUrl, '_blank');
+        }
+
+        // Show send email modal
+        function showSendEmailModal() {
+            const modal = new bootstrap.Modal(document.getElementById('sendEmailModal'));
+            modal.show();
+        }
+
+        // Send projects list via email
+        // Send projects list via email
+        async function sendProjectsEmail() {
+            const recipientEmail = document.getElementById('email-recipient')?.value?.trim();
+            
+            if (!recipientEmail) {
+                alert('Please enter a recipient email address');
+                return;
+            }
+
+            // Basic email validation
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientEmail)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+            if (allProjects.length === 0) {
+                alert('No projects to send');
+                return;
+            }
+
+            try {
+                // Format projects for email
+                const projectData = allProjects.map(p => ({
+                    project_id: p.project_id,
+                    title: p.title || 'N/A',
+                    owner: p.owner || 'N/A',
+                    business_area: p.business_organization || 'N/A',
+                    status: p.status || 'N/A',
+                    health: p.health || 'N/A',
+                    last_update: p.project_update || 'No update provided'
+                }));
+
+                // Get the send button and show loading state
+                const sendBtn = document.querySelector('#sendEmailModal button[onclick*="sendProjectsEmail"]') || 
+                               Array.from(document.querySelectorAll('#sendEmailModal button')).find(b => b.textContent.includes('Send Email'));
+                const originalText = sendBtn?.innerHTML || 'Send Email';
+                if (sendBtn) {
+                    sendBtn.disabled = true;
+                    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                }
+
+                const response = await fetch(`${API_BASE}/email/send-projects-list`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        projects: projectData,
+                        recipientEmail: recipientEmail,
+                        projectCount: projectData.length,
+                        sentBy: CURRENT_USER_NAME,
+                        sentAt: new Date().toISOString()
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                // Reset button
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = originalText;
+                }
+
+                // Show success and close modal
+                alert(`✓ Email sent successfully to ${recipientEmail}\n\n${projectData.length} projects included`);
+                
+                // Clear email field
+                document.getElementById('email-recipient').value = '';
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('sendEmailModal'));
+                if (modal) modal.hide();
+
+                console.log('Email sent:', result);
+            } catch (error) {
+                console.error('Error sending email:', error);
+                
+                // Reset button
+                const sendBtn = document.querySelector('#sendEmailModal button[onclick*="sendProjectsEmail"]') || 
+                               Array.from(document.querySelectorAll('#sendEmailModal button')).find(b => b.textContent.includes('Send') || b.textContent.includes('Sending'));
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Email';
+                }
+                
+                alert(`Error sending email: ${error.message}`);
+            }
+        }
     </script>
 
     <!-- Feedback Modal -->
@@ -2227,6 +2694,63 @@
                     <h3 style="margin-bottom: var(--space-2);">Thank you!</h3>
                     <p style="color: #718096; margin-bottom: var(--space-6);">Your feedback helps us improve.</p>
                     <button class="fy-fb-btn-next" onclick="fyFbReset()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Email Modal -->
+    <div class="modal fade" id="sendEmailModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-envelope"></i> Send Projects via Email</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="email-recipient" class="form-label">Recipient Email</label>
+                        <input type="email" class="form-control" id="email-recipient" placeholder="Enter email address">
+                    </div>
+                    <div class="alert alert-warning small">
+                        <i class="fas fa-exclamation-triangle"></i> Email functionality is not yet connected to SMTP. Contact IT to enable email sending functionality.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="sendProjectsEmail()">
+                        <i class="fas fa-paper-plane"></i> Send Email
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Business Area Modal -->
+    <div class="modal fade" id="requestBusinessAreaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-lightbulb"></i> Request New Business Area</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>If your business area is not in the list, you can request a new one to be added.</p>
+                    <div class="mb-3">
+                        <label for="new-business-area" class="form-label">Business Area Name *</label>
+                        <input type="text" class="form-control" id="new-business-area" placeholder="Enter the business area name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="business-area-description" class="form-label">Description (optional)</label>
+                        <textarea class="form-control" id="business-area-description" rows="2" placeholder="Describe this business area..."></textarea>
+                    </div>
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle"></i> Your project will use "WM Business" temporarily until your requested business area is approved.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitBusinessAreaRequest()">Submit Request</button>
                 </div>
             </div>
         </div>

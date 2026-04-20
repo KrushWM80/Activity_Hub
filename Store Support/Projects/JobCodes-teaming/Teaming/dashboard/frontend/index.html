@@ -38,6 +38,48 @@
             color: white;
         }
         
+        /* Source badges for data lineage */
+        .source-badges {
+            display: inline-flex;
+            gap: 3px;
+            margin-left: 8px;
+            margin-top: 4px;
+        }
+        
+        .source-badge {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid #90caf9;
+            cursor: help;
+            transition: all 0.2s ease;
+        }
+        
+        .source-badge:hover {
+            background-color: #1976d2;
+            color: white;
+            border-color: #1976d2;
+        }
+        
+        /* 2-Status badges */
+        .status-badge-review {
+            background-color: #ff9800;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .status-badge-review:hover {
+            background-color: #f57c00;
+        }
+        
+        .status-detail-tooltip {
+            cursor: help;
+            text-decoration: underline dotted;
+        }
+        
         .card {
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border: none;
@@ -101,6 +143,103 @@
         
         .search-box input {
             padding-left: 40px;
+        }
+        
+        /* MultiSelect Status Filter */
+        .status-filter-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        .status-filter-btn {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: white;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        
+        .status-filter-btn:hover {
+            border-color: var(--walmart-blue);
+            background-color: #f8f9fa;
+        }
+        
+        .status-filter-btn.active {
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 3px rgba(0, 83, 226, 0.1);
+        }
+        
+        .status-filter-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: none;
+            min-width: 250px;
+        }
+        
+        .status-filter-dropdown.show {
+            display: block;
+        }
+        
+        .filter-option {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .filter-option:last-child {
+            border-bottom: none;
+        }
+        
+        .filter-option:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .filter-option input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .filter-option label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .status-badge-small {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        
+        .status-badge-small.assigned {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge-small.review {
+            background-color: #fff3cd;
+            color: #856404;
         }
         
         .filter-tabs .nav-link {
@@ -606,7 +745,7 @@
                     <div class="col-md-2">
                         <div class="card stats-card">
                             <div class="number text-danger" id="missingCount">0</div>
-                            <div class="label">Missing Teaming</div>
+                            <div class="label">Review</div>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -618,13 +757,13 @@
                     <div class="col-md-2">
                         <div class="card stats-card">
                             <div class="number text-info" id="totalMissingImpacted">0</div>
-                            <div class="label">Total Missing Impacted</div>
+                            <div class="label">Users in Review</div>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="card stats-card">
                             <div class="number text-danger" id="missingImpact">0%</div>
-                            <div class="label">Missing Impact</div>
+                            <div class="label">Review Impact %</div>
                         </div>
                     </div>
                 </div>
@@ -632,27 +771,77 @@
                 <!-- Filters -->
                 <div class="card mb-4">
                     <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-md-4">
+                        <div class="row align-items-center g-2">
+                            <div class="col-lg-3">
                                 <div class="search-box">
                                     <i class="bi bi-search"></i>
                                     <input type="text" class="form-control" id="searchInput" placeholder="Search job codes...">
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <ul class="nav filter-tabs">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" href="#" data-filter="all">All</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#" data-filter="assigned">Assigned</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#" data-filter="missing">Missing</a>
-                                    </li>
-                                </ul>
+                            <div class="col-lg-2">
+                                <div class="status-filter-container">
+                                    <button class="status-filter-btn" id="statusFilterBtn" onclick="toggleStatusFilter()" style="width: 100%;">
+                                        <span id="filterLabel">All Statuses</span>
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                    <div class="status-filter-dropdown" id="statusFilterDropdown">
+                                        <div class="filter-option">
+                                            <input type="checkbox" id="filterAll" onchange="handleFilterAllChange()">
+                                            <label for="filterAll">All Statuses</label>
+                                        </div>
+                                        <div class="filter-option">
+                                            <input type="checkbox" id="filterAssigned" onchange="handleSpecificFilterChange('Assigned')" data-status="Assigned">
+                                            <label for="filterAssigned">
+                                                <span>Assigned</span>
+                                                <span class="status-badge-small assigned ms-2">✅</span>
+                                            </label>
+                                        </div>
+                                        <div class="filter-option">
+                                            <input type="checkbox" id="filterReview" onchange="handleSpecificFilterChange('Review')" data-status="Review">
+                                            <label for="filterReview">
+                                                <span>Review</span>
+                                                <span class="status-badge-small review ms-2">📋</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4 text-end">
+                            <div class="col-lg-2">
+                                <div class="status-filter-container">
+                                    <button class="status-filter-btn" id="sourceFilterBtn" onclick="toggleSourceFilter()" style="background-color: #f0f0f0; width: 100%;">
+                                        <span id="sourceFilterLabel">All Sources</span>
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                    <div class="status-filter-dropdown" id="sourceFilterDropdown">
+                                        <div class="filter-option">
+                                            <input type="checkbox" id="filterAllSources" onchange="handleSourceFilterAllChange()">
+                                            <label for="filterAllSources">All Sources</label>
+                                        </div>
+                                        <div class="filter-option">
+                                            <input type="checkbox" id="filterPolaris" onchange="handleSourceFilterChange('Polaris')" data-source="P">
+                                            <label for="filterPolaris">
+                                                <span>Polaris</span>
+                                                <span class="status-badge-small assigned ms-2">P</span>
+                                            </label>
+                                        </div>
+                                        <div class="filter-option">
+                                            <input type="checkbox" id="filterWorkforce" onchange="handleSourceFilterChange('Workforce')" data-source="W">
+                                            <label for="filterWorkforce">
+                                                <span>Workforce</span>
+                                                <span class="status-badge-small assigned ms-2">W</span>
+                                            </label>
+                                        </div>
+                                        <div class="filter-option">
+                                            <input type="checkbox" id="filterTeaming" onchange="handleSourceFilterChange('Teaming')" data-source="T">
+                                            <label for="filterTeaming">
+                                                <span>Teaming</span>
+                                                <span class="status-badge-small review ms-2">T</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto ms-auto">
                                 <button class="btn btn-outline-secondary btn-sm" onclick="refreshJobCodes()">
                                     <i class="bi bi-arrow-clockwise"></i> Refresh
                                 </button>
@@ -725,6 +914,11 @@
                             </div>
                             <!-- Teaming Requests Tab -->
                             <div class="tab-pane fade" id="teamingRequestsTab">
+                                <div class="mb-3">
+                                    <button class="btn btn-danger btn-sm" onclick="clearAllTeamingRequests()">
+                                        <i class="bi bi-trash"></i> Clear All Requests
+                                    </button>
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover mb-0">
                                         <thead class="table-light">
@@ -1313,7 +1507,8 @@
         let allRequests = [];                    // All requests (for managing)
         let adminRequests = [];                  // Requests for admin view
         let pendingRequests = [];
-        let currentFilter = 'all';
+        let currentFilter = ['all'];  // Array to support multiple status filters
+        let currentSourceFilter = ['all'];  // Array to support multiple source filters
         let currentSort = { column: null, direction: 'asc' };
 
         // API Helper
@@ -1410,6 +1605,54 @@
             }
             
             new bootstrap.Modal(document.getElementById('requestDetailModal')).show();
+        }
+
+        // Show Status Detail Modal
+        function showStatusDetail(jobCode) {
+            const jobData = jobCodes.find(j => j.job_code === jobCode);
+            if (!jobData || !jobData.status_detail) {
+                alert(`No status details available for ${jobCode}`);
+                return;
+            }
+            
+            const statusDetail = jobData.status_detail;
+            const categoryMap = {
+                'Complete': '✅ Complete - Fully assigned with all data',
+                'Missing': '⚠️ Missing - Not assigned to any team',
+                'Incomplete': '📋 Incomplete - Missing enrichment data',
+                'Orphan': '🔴 Orphan - Assignment exists but not in Polaris',
+                'Mismatch': '❌ Mismatch - Data configuration issue'
+            };
+            
+            const category = statusDetail.category || 'Unknown';
+            const categoryText = categoryMap[category] || category;
+            const reason = statusDetail.reason || 'No details available';
+            const action = statusDetail.action || 'Review data sources';
+            const sources = statusDetail.sources || {};
+            
+            const sourcesList = [
+                `Polaris: ${sources.polaris ? '✅ Yes' : '❌ No'}`,
+                `Master Table: ${sources.master ? '✅ Yes' : '❌ No'}`,
+                `Teaming: ${sources.teaming ? '✅ Yes' : '❌ No'}`
+            ].join('\n');
+            
+            const message = `
+STATUS DETAILS FOR ${jobCode}
+════════════════════════════
+
+Category: ${categoryText}
+
+Reason: 
+${reason}
+
+Recommended Action: 
+${action}
+
+Data Sources:
+${sourcesList}
+            `;
+            
+            alert(message);
         }
 
         // Page Navigation
@@ -1633,6 +1876,16 @@
                 allRequests = requestsData.requests || [];
                 pendingRequests = allRequests.filter(r => r.status === 'pending');
                 
+                // DEBUG: Log API response
+                console.log('=== TEAMING DATA LOADED ===');
+                console.log('Total job codes:', jobCodes.length);
+                if (jobCodes.length > 0) {
+                    console.log('Sample job code (first):', jobCodes[0]);
+                    console.log('Source badges present?', 'source_badges' in jobCodes[0]);
+                    console.log('Status value:', jobCodes[0].status);
+                }
+                console.log('=== END DEBUG ===');
+                
                 // Reset sort to default
                 currentSort = { column: null, direction: 'asc' };
                 
@@ -1641,11 +1894,42 @@
                     th.classList.remove('asc', 'desc');
                 });
                 
+                // Initialize filter checkboxes to "All Statuses" on load
+                document.getElementById('filterAll').checked = true;
+                document.getElementById('filterAssigned').checked = false;
+                document.getElementById('filterReview').checked = false;
+                currentFilter = ['all'];
+                updateFilterLabel();
+                
+                // Initialize source filter checkboxes to "All Sources" on load
+                const filterAllSourcesEl = document.getElementById('filterAllSources');
+                const filterPolarisEl = document.getElementById('filterPolaris');
+                const filterWorkforceEl = document.getElementById('filterWorkforce');
+                const filterTeamingEl = document.getElementById('filterTeaming');
+                
+                if (filterAllSourcesEl && filterPolarisEl && filterWorkforceEl && filterTeamingEl) {
+                    filterAllSourcesEl.checked = true;
+                    filterPolarisEl.checked = false;
+                    filterWorkforceEl.checked = false;
+                    filterTeamingEl.checked = false;
+                    currentSourceFilter = ['all'];
+                    updateSourceFilterLabel();
+                    console.log('SOURCE FILTER - Initialized successfully');
+                } else {
+                    console.warn('SOURCE FILTER - Some elements are missing!', {
+                        filterAllSources: !!filterAllSourcesEl,
+                        filterPolaris: !!filterPolarisEl,
+                        filterWorkforce: !!filterWorkforceEl,
+                        filterTeaming: !!filterTeamingEl
+                    });
+                }
+                
                 updateStats();
                 renderJobCodes();
                 populateTeamSelect();
             } catch (error) {
                 showToast('Failed to load data: ' + error.message, 'error');
+                console.error('Error loading job codes:', error);
             }
             hideLoading();
         }
@@ -1658,21 +1942,21 @@
         function updateStats() {
             const total = jobCodes.length;
             const assigned = jobCodes.filter(j => j.status === 'Assigned').length;
-            const missing = jobCodes.filter(j => j.status === 'Missing').length;
+            const review = jobCodes.filter(j => j.status === 'Review').length;
             const pendingCount = pendingRequests.length;
             
-            // Calculate users impacted by missing job codes
-            const missingImpacted = jobCodes.filter(j => j.status === 'Missing')
+            // Calculate users impacted by reviewing job codes (non-Assigned)
+            const reviewImpacted = jobCodes.filter(j => j.status === 'Review')
                 .reduce((sum, j) => sum + (j.user_count || 0), 0);
-            // Missing Impact % = missing job codes / total job codes
-            const missingImpactPct = total ? Math.round(missing / total * 100) : 0;
+            // Review Impact % = review job codes / total job codes
+            const reviewImpactPct = total ? Math.round(review / total * 100) : 0;
             
             document.getElementById('totalJobCodes').textContent = total;
             document.getElementById('assignedCount').textContent = assigned;
-            document.getElementById('missingCount').textContent = missing;
+            document.getElementById('missingCount').textContent = review;  // Using 'missingCount' ID for 'Review' count
             document.getElementById('pendingRequestsCount').textContent = pendingCount;
-            document.getElementById('totalMissingImpacted').textContent = missingImpacted.toLocaleString();
-            document.getElementById('missingImpact').textContent = missingImpactPct + '%';
+            document.getElementById('totalMissingImpacted').textContent = reviewImpacted.toLocaleString();
+            document.getElementById('missingImpact').textContent = reviewImpactPct + '%';
         }
 
         // Helper to get pending request for a job code
@@ -1705,14 +1989,48 @@
             const search = document.getElementById('searchInput').value.toLowerCase();
             const tbody = document.getElementById('jobCodesTableBody');
             
+            // Debug: Log first few items to see API response structure
+            if (jobCodes.length > 0) {
+                console.log('DEBUG - First job code:', jobCodes[0]);
+                console.log('DEBUG - Has source_badges?', !!jobCodes[0].source_badges);
+                console.log('DEBUG - source_badges value:', jobCodes[0].source_badges);
+                console.log('DEBUG - Status value:', jobCodes[0].status);
+            }
+            
+            console.log('FILTER DEBUG - currentFilter value:', currentFilter);
+            console.log('FILTER DEBUG - currentFilter is array?', Array.isArray(currentFilter));
+            console.log('FILTER DEBUG - currentFilter length:', currentFilter.length);
+            console.log('FILTER DEBUG - currentSourceFilter value:', currentSourceFilter);
+            console.log('FILTER DEBUG - currentSourceFilter is array?', Array.isArray(currentSourceFilter));
+            console.log('FILTER DEBUG - currentSourceFilter length:', currentSourceFilter.length);
+            
             let filtered = jobCodes.filter(j => {
                 const matchesSearch = !search || 
                     j.job_code.toLowerCase().includes(search) ||
                     (j.job_title || '').toLowerCase().includes(search);
-                const matchesFilter = currentFilter === 'all' || 
-                    j.status.toLowerCase() === currentFilter;
-                return matchesSearch && matchesFilter;
+                
+                // Handle multiple status filter selection
+                const matchesFilter = Array.isArray(currentFilter) && currentFilter.length > 0
+                    ? currentFilter.includes('all') || currentFilter.includes(j.status)
+                    : j.status === currentFilter;  // fallback for string filter
+                
+                // Handle source badge filter selection
+                let matchesSourceFilter = true;
+                if (Array.isArray(currentSourceFilter) && currentSourceFilter.length > 0 && !currentSourceFilter.includes('all')) {
+                    // Check if job code has any of the selected sources
+                    const jobBadges = j.source_badges || [];
+                    matchesSourceFilter = currentSourceFilter.some(source => jobBadges.includes(source));
+                    
+                    // Debug first few items
+                    if (jobCodes.indexOf(j) < 3) {
+                        console.log(`FILTER DEBUG - Job ${j.job_code} - badges: ${JSON.stringify(jobBadges)}, filter: ${JSON.stringify(currentSourceFilter)}, matches: ${matchesSourceFilter}`);
+                    }
+                }
+                
+                return matchesSearch && matchesFilter && matchesSourceFilter;
             });
+            
+            console.log(`FILTER DEBUG - Total: ${jobCodes.length}, Filtered: ${filtered.length}, Status filter includes 'all': ${Array.isArray(currentFilter) ? currentFilter.includes('all') : 'N/A'}, Source filter: ${Array.isArray(currentSourceFilter) ? currentSourceFilter.join(',') : currentSourceFilter}`);
             
             // Apply sorting
             if (currentSort.column) {
@@ -1756,15 +2074,32 @@
                 const pendingBadge = pendingReq 
                     ? `<span class="badge bg-warning text-dark" style="cursor:pointer" onclick="showRequestDetail(${pendingReq.id})"><i class="bi bi-hourglass-split"></i> Pending</span>`
                     : '-';
+                
+                // Build source badges display
+                const sourceBadges = j.source_badges && j.source_badges.length > 0 
+                    ? j.source_badges.map(badge => {
+                        const badgeLabels = {
+                            'P': 'Polaris',
+                            'W': 'Workforce',
+                            'T': 'Teaming'
+                        };
+                        return `<span class="source-badge" title="${badgeLabels[badge] || badge}">${badge}</span>`;
+                    }).join('')
+                    : '';
+                
+                // Build status display with new 2-status system
+                const statusTitle = j.status_detail && j.status_detail.reason ? j.status_detail.reason : 'Requires review';
+                const statusDisplay = j.status === 'Assigned'
+                    ? `<span class="badge status-badge-assigned" style="cursor:pointer" onclick="showStatusDetail('${j.job_code}')" title="Click for details: Job code is fully assigned to teams">✅ Assigned</span>`
+                    : `<span class="badge status-badge-review status-detail-tooltip" style="cursor:pointer" onclick="showStatusDetail('${j.job_code}')" title="Click for details: ${statusTitle}">📋 Review</span>`;
+                
                 return `
                 <tr>
-                    <td><strong>${j.job_code}</strong></td>
+                    <td><strong>${j.job_code}</strong>${sourceBadges ? `<div class="source-badges">${sourceBadges}</div>` : ''}</td>
                     <td>${j.job_title || j.job_name || '-'}</td>
                     <td>${(j.user_count || 0).toLocaleString()}</td>
                     <td>
-                        <span class="badge status-badge-${j.status.toLowerCase()}">
-                            ${j.status}
-                        </span>
+                        ${statusDisplay}
                     </td>
                     <td>
                         ${j.teams && j.teams.length ? j.teams.map(t => `<span class="team-badge">${t}</span>`).join('') : '-'}
@@ -1775,7 +2110,7 @@
                     <td>${pendingBadge}</td>
                     <td>
                         <button class="btn btn-sm btn-walmart" onclick="openAssignModal('${j.job_code}', '${(j.job_title || j.job_name || '').replace(/'/g, "\\'")}', '${(j.teams || []).join(', ') || '-'}', '${(j.workgroups || []).join(', ') || '-'}')">
-                            <i class="bi bi-plus-circle"></i> ${j.status === 'Missing' ? 'Assign' : 'Update'}
+                            <i class="bi bi-plus-circle"></i> ${j.status === 'Missing' || j.status === 'Review' ? 'Assign' : 'Update'}
                         </button>
                     </td>
                 </tr>
@@ -1798,23 +2133,244 @@
         // Search and Filter
         document.getElementById('searchInput').addEventListener('input', renderJobCodes);
         
-        document.querySelectorAll('.filter-tabs .nav-link').forEach(el => {
-            el.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.querySelectorAll('.filter-tabs .nav-link').forEach(l => l.classList.remove('active'));
-                el.classList.add('active');
-                currentFilter = el.dataset.filter;
-                renderJobCodes();
-            });
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const filterBtn = document.getElementById('statusFilterBtn');
+            const filterDropdown = document.getElementById('statusFilterDropdown');
+            if (!filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
+                filterDropdown.classList.remove('show');
+                filterBtn.classList.remove('active');
+            }
+            
+            const sourceBtn = document.getElementById('sourceFilterBtn');
+            const sourceDropdown = document.getElementById('sourceFilterDropdown');
+            if (sourceBtn && sourceDropdown && !sourceBtn.contains(e.target) && !sourceDropdown.contains(e.target)) {
+                sourceDropdown.classList.remove('show');
+                sourceBtn.classList.remove('active');
+            }
         });
+        
+        function toggleStatusFilter() {
+            const dropdown = document.getElementById('statusFilterDropdown');
+            const btn = document.getElementById('statusFilterBtn');
+            dropdown.classList.toggle('show');
+            btn.classList.toggle('active');
+        }
+        
+        function handleFilterAllChange() {
+            const filterAll = document.getElementById('filterAll');
+            const filterAssigned = document.getElementById('filterAssigned');
+            const filterReview = document.getElementById('filterReview');
+            
+            console.log('FILTER ALL CHANGE - filterAll.checked:', filterAll.checked);
+            
+            // If "All" is now checked, uncheck the others
+            if (filterAll.checked) {
+                filterAssigned.checked = false;
+                filterReview.checked = false;
+                currentFilter = ['all'];
+            }
+            
+            console.log('FILTER ALL CHANGE - NEW currentFilter:', currentFilter);
+            updateFilterLabel();
+            renderJobCodes();
+        }
+        
+        function handleSpecificFilterChange(filterType) {
+            const filterAll = document.getElementById('filterAll');
+            const filterAssigned = document.getElementById('filterAssigned');
+            const filterReview = document.getElementById('filterReview');
+            
+            console.log(`SPECIFIC FILTER CHANGE (${filterType}) - filterAssigned.checked:`, filterAssigned.checked);
+            console.log(`SPECIFIC FILTER CHANGE (${filterType}) - filterReview.checked:`, filterReview.checked);
+            
+            // If "All" is currently checked, uncheck it since we're selecting specific filters
+            if (filterAll.checked) {
+                filterAll.checked = false;
+            }
+            
+            // Check if any specific filters are now selected
+            const anyChecked = filterAssigned.checked || filterReview.checked;
+            
+            if (!anyChecked) {
+                // No specific filters selected - default back to "All"
+                filterAll.checked = true;
+                currentFilter = ['all'];
+            } else {
+                // Build the filter array from selected specific filters
+                currentFilter = [];
+                if (filterAssigned.checked) currentFilter.push('Assigned');
+                if (filterReview.checked) currentFilter.push('Review', 'Missing');  // Include 'Missing' for backward compatibility
+            }
+            
+            console.log(`SPECIFIC FILTER CHANGE (${filterType}) - NEW currentFilter:`, currentFilter);
+            updateFilterLabel();
+            renderJobCodes();
+        }
+        
+        function updateFilterLabel() {
+            let labelText = 'All Statuses';
+            const filterAll = document.getElementById('filterAll');
+            const filterAssigned = document.getElementById('filterAssigned');
+            const filterReview = document.getElementById('filterReview');
+            
+            if (!filterAll.checked) {
+                const selected = [];
+                if (filterAssigned.checked) selected.push('Assigned');
+                if (filterReview.checked) selected.push('Review');
+                
+                if (selected.length === 1) {
+                    labelText = selected[0];
+                } else if (selected.length === 2) {
+                    labelText = 'Multiple (2)';
+                }
+            }
+            
+            document.getElementById('filterLabel').textContent = labelText;
+        }
+        
+        function toggleSourceFilter() {
+            const dropdown = document.getElementById('sourceFilterDropdown');
+            const btn = document.getElementById('sourceFilterBtn');
+            dropdown.classList.toggle('show');
+            btn.classList.toggle('active');
+        }
+        
+        function handleSourceFilterAllChange() {
+            const filterAllSources = document.getElementById('filterAllSources');
+            const filterPolaris = document.getElementById('filterPolaris');
+            const filterWorkforce = document.getElementById('filterWorkforce');
+            const filterTeaming = document.getElementById('filterTeaming');
+            
+            console.log('SOURCE FILTER ALL CHANGE - filterAllSources.checked:', filterAllSources.checked);
+            
+            // If "All Sources" is now checked, uncheck the others
+            if (filterAllSources.checked) {
+                filterPolaris.checked = false;
+                filterWorkforce.checked = false;
+                filterTeaming.checked = false;
+                currentSourceFilter = ['all'];
+            }
+            
+            console.log('SOURCE FILTER ALL CHANGE - NEW currentSourceFilter:', currentSourceFilter);
+            console.log('SOURCE FILTER ALL CHANGE - All checked state:', {
+                allSources: filterAllSources.checked,
+                polaris: filterPolaris.checked,
+                workforce: filterWorkforce.checked,
+                teaming: filterTeaming.checked
+            });
+            updateSourceFilterLabel();
+            renderJobCodes();
+        }
+        
+        function handleSourceFilterChange(sourceType) {
+            const filterAllSources = document.getElementById('filterAllSources');
+            const filterPolaris = document.getElementById('filterPolaris');
+            const filterWorkforce = document.getElementById('filterWorkforce');
+            const filterTeaming = document.getElementById('filterTeaming');
+            
+            console.log(`SOURCE FILTER CHANGE (${sourceType}) - BEFORE - states:`, {
+                allSources: filterAllSources.checked,
+                polaris: filterPolaris.checked,
+                workforce: filterWorkforce.checked,
+                teaming: filterTeaming.checked
+            });
+            
+            // If "All Sources" is currently checked, uncheck it
+            if (filterAllSources.checked) {
+                console.log(`SOURCE FILTER CHANGE (${sourceType}) - Unchecking "All Sources"`);
+                filterAllSources.checked = false;
+            }
+            
+            // Check if any specific sources are now selected
+            const anyChecked = filterPolaris.checked || filterWorkforce.checked || filterTeaming.checked;
+            
+            console.log(`SOURCE FILTER CHANGE (${sourceType}) - anyChecked:`, anyChecked);
+            
+            if (!anyChecked) {
+                // No specific sources selected - default back to "All"
+                console.log(`SOURCE FILTER CHANGE (${sourceType}) - No sources checked, reverting to ALL`);
+                filterAllSources.checked = true;
+                currentSourceFilter = ['all'];
+            } else {
+                // Build the source filter array from selected values
+                currentSourceFilter = [];
+                if (filterPolaris.checked) currentSourceFilter.push('P');
+                if (filterWorkforce.checked) currentSourceFilter.push('W');
+                if (filterTeaming.checked) currentSourceFilter.push('T');
+            }
+            
+            console.log(`SOURCE FILTER CHANGE (${sourceType}) - NEW currentSourceFilter:`, currentSourceFilter);
+            console.log(`SOURCE FILTER CHANGE (${sourceType}) - AFTER - states:`, {
+                allSources: filterAllSources.checked,
+                polaris: filterPolaris.checked,
+                workforce: filterWorkforce.checked,
+                teaming: filterTeaming.checked
+            });
+            updateSourceFilterLabel();
+            renderJobCodes();
+        }
+        
+        function updateSourceFilterLabel() {
+            let labelText = 'All Sources';
+            const filterAllSources = document.getElementById('filterAllSources');
+            const filterPolaris = document.getElementById('filterPolaris');
+            const filterWorkforce = document.getElementById('filterWorkforce');
+            const filterTeaming = document.getElementById('filterTeaming');
+            
+            if (!filterAllSources.checked) {
+                const selected = [];
+                if (filterPolaris.checked) selected.push('P');
+                if (filterWorkforce.checked) selected.push('W');
+                if (filterTeaming.checked) selected.push('T');
+                
+                if (selected.length === 1) {
+                    labelText = selected[0];
+                } else if (selected.length === 2) {
+                    labelText = 'Multiple (2)';
+                } else if (selected.length === 3) {
+                    labelText = 'Multiple (3)';
+                }
+            }
+            
+            document.getElementById('sourceFilterLabel').textContent = labelText;
+        }
 
         function refreshJobCodes() {
             // Reset search input
             document.getElementById('searchInput').value = '';
-            // Reset filter to 'all'
-            currentFilter = 'all';
-            document.querySelectorAll('.filter-tabs .nav-link').forEach(l => l.classList.remove('active'));
-            document.querySelector('.filter-tabs .nav-link[data-filter="all"]').classList.add('active');
+            // Reset status filter to 'all'
+            document.getElementById('filterAll').checked = true;
+            document.getElementById('filterAssigned').checked = false;
+            document.getElementById('filterReview').checked = false;
+            currentFilter = ['all'];
+            updateFilterLabel();
+            // Reset source filter to 'all'
+            const filterAllSourcesEl = document.getElementById('filterAllSources');
+            const filterPolarisEl = document.getElementById('filterPolaris');
+            const filterWorkforceEl = document.getElementById('filterWorkforce');
+            const filterTeamingEl = document.getElementById('filterTeaming');
+            
+            if (filterAllSourcesEl && filterPolarisEl && filterWorkforceEl && filterTeamingEl) {
+                filterAllSourcesEl.checked = true;
+                filterPolarisEl.checked = false;
+                filterWorkforceEl.checked = false;
+                filterTeamingEl.checked = false;
+                currentSourceFilter = ['all'];
+                updateSourceFilterLabel();
+            }
+            
+            // Close dropdowns
+            const statusDropdown = document.getElementById('statusFilterDropdown');
+            const statusBtn = document.getElementById('statusFilterBtn');
+            const sourceDropdown = document.getElementById('sourceFilterDropdown');
+            const sourceBtn = document.getElementById('sourceFilterBtn');
+            
+            if (statusDropdown) statusDropdown.classList.remove('show');
+            if (statusBtn) statusBtn.classList.remove('active');
+            if (sourceDropdown) sourceDropdown.classList.remove('show');
+            if (sourceBtn) sourceBtn.classList.remove('active');
+            
             // Reload data (which will reset sort)
             loadDashboardData();
             showToast('Teaming data refreshed');
@@ -2829,37 +3385,30 @@
                 document.getElementById('adminCommentsSection').style.display = 'block';
                 document.getElementById('adminComments').value = '';
                 
-                // Populate audit log + comments in merged section with streamlined format
+                // Populate audit log + comments with separate entries for actions and comments
                 let commentsHtml = '';
                 if (req.audit_log && Array.isArray(req.audit_log) && req.audit_log.length > 0) {
-                    commentsHtml = req.audit_log.map(entry => {
+                    let entries = [];
+                    
+                    req.audit_log.forEach(entry => {
                         const timestamp = new Date(entry.timestamp);
                         const dateStr = timestamp.toLocaleDateString();
                         const timeStr = timestamp.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
                         
-                        // Filter out undefined changes
-                        let changesHtml = '';
-                        if (entry.changes && Array.isArray(entry.changes)) {
-                            const validChanges = entry.changes.filter(c => c.field !== 'undefined' && c.from !== 'undefined' && c.to !== 'undefined');
-                            if (validChanges.length > 0) {
-                                changesHtml = '<div class="ms-3" style="font-size: 0.8rem; color: #666;">' + 
-                                    validChanges.map(c => `${c.field}: ${c.from} → ${c.to}`).join('<br>') + 
-                                    '</div>';
-                            }
+                        // Add the audit action as its own entry
+                        entries.push(`<div class="mb-2 pb-2 border-bottom" style="font-size: 0.9rem;">
+                            <strong style="color: #0071ce;">${entry.user}</strong> - ${dateStr} ${timeStr} - ${entry.action}
+                        </div>`);
+                        
+                        // Add comment as separate entry if it exists
+                        if (entry.comments) {
+                            entries.push(`<div class="mb-2 pb-2 border-bottom" style="font-size: 0.9rem;">
+                                <strong style="color: #0071ce;">${entry.user}</strong> - ${dateStr} ${timeStr} - <strong>Comment:</strong> ${entry.comments}
+                            </div>`);
                         }
-                        
-                        // Streamlined format: Username - Date Time - Action
-                        let mainLine = `<strong style="color: #0071ce;">${entry.user}</strong> - ${dateStr} ${timeStr} - ${entry.action}`;
-                        
-                        // If there's a comment, add it on a new line
-                        let commentLine = entry.comments ? `<div style="margin-top: 4px; font-style: italic; color: #555;">${entry.comments}</div>` : '';
-                        
-                        return `<div class="mb-2 pb-2 border-bottom" style="font-size: 0.9rem;">
-                                ${mainLine}
-                                ${commentLine}
-                                ${changesHtml}
-                                </div>`;
-                    }).join('');
+                    });
+                    
+                    commentsHtml = entries.join('');
                 } else {
                     commentsHtml = '<em class="text-muted">No comments yet</em>';
                 }
@@ -2884,6 +3433,38 @@
             } catch (error) {
                 showToast(error.message, 'error');
             }
+        }
+
+        async function clearAllTeamingRequests() {
+            const requestCount = (allRequests || []).length;
+            
+            if (requestCount === 0) {
+                showToast('No teaming requests to clear', 'info');
+                return;
+            }
+            
+            if (!confirm(`Delete ALL ${requestCount} teaming requests? This cannot be undone.`)) {
+                return;
+            }
+            
+            showLoading();
+            let deleted = 0;
+            let failed = 0;
+            
+            for (const request of allRequests) {
+                try {
+                    await api(`/requests/${request.id}`, { method: 'DELETE' });
+                    deleted++;
+                } catch (error) {
+                    failed++;
+                    console.error(`Failed to delete request ${request.id}:`, error);
+                }
+            }
+            
+            hideLoading();
+            showToast(`Deleted ${deleted} requests${failed > 0 ? `, ${failed} failed` : ''}`, failed > 0 ? 'warning' : 'success');
+            loadRequests();
+            loadDashboardData();
         }
 
         async function exportApprovedRequests() {

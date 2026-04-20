@@ -1,9 +1,9 @@
 @echo off
 REM ==========================================
-REM V.E.T. Dashboard - Daily Email Report
+REM Dallas Team Report - Daily Email Report
 REM ==========================================
 REM Runs: Daily at 6:00 AM Central Time
-REM Sends: V.E.T. Executive Report email with PPT + PDF attachments via Outlook
+REM Sends: Dallas Team Report email with PPT + PDF attachments via Outlook
 REM Recipients: Kendall Rush, Matthew Farnworth, Tina Budnaitis
 REM ==========================================
 
@@ -17,7 +17,7 @@ set LogFile=%VETPath%\daily_email.log
 REM Use absolute path for GCP credentials
 set GOOGLE_APPLICATION_CREDENTIALS=C:\Users\krush\AppData\Roaming\gcloud\application_default_credentials.json
 
-echo [%date% %time%] ====== VET Daily Email Run Starting ====== >> "%LogFile%"
+echo [%date% %time%] ====== Dallas Team Report Daily Email Run Starting ====== >> "%LogFile%"
 
 REM --- Ensure VET backend (port 5001) is running before generating report ---
 echo [%date% %time%] Checking VET backend on port 5001... >> "%LogFile%"

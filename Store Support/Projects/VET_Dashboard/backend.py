@@ -1,6 +1,6 @@
 """
-V.E.T. Dashboard Backend - Executive Report
-Fetches TDA data with Dallas POC focus and Implementation Week from Intake Hub
+Dallas Team Report Backend
+Fetches TDA data with Dallas VET focus and Implementation Week from Intake Hub
 """
 
 import json
@@ -50,7 +50,7 @@ INTAKE_HUB_TABLE = "IH_Intake_Data"
 FULL_TABLE_ID = f"`{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`"
 FULL_INTAKE_HUB_ID = f"`{PROJECT_ID}.{DATASET_ID}.{INTAKE_HUB_TABLE}`"
 
-# V.E.T. Dashboard specific config
+# Dallas Team Report specific config
 # BQ data now uses "Dallas VET" as TDA_Ownership value (renamed from "Dallas POC")
 BQ_OWNERSHIP_FILTER = "Dallas VET"
 DISPLAY_OWNERSHIP_NAME = "Dallas VET"
@@ -90,7 +90,7 @@ if not client:
 
 
 class VETDataManager:
-    """Manages V.E.T. Dashboard data from BigQuery with Intake Hub integration"""
+    """Manages Dallas Team Report data from BigQuery with Intake Hub integration"""
     
     def __init__(self, bigquery_client):
         self.client = bigquery_client
@@ -255,7 +255,7 @@ class VETDataManager:
 data_manager = VETDataManager(client)
 
 
-# Root route - serve the V.E.T. Dashboard HTML
+# Root route - serve the Dallas Team Report HTML
 @app.route('/Spark_Blank.png')
 def spark_blank():
     logo = os.path.join(os.path.dirname(__file__), 'Spark_Blank.png')
@@ -271,9 +271,9 @@ def favicon():
     return '', 204
 
 @app.route('/', methods=['GET'])
-@app.route('/VET_Executive_Report', methods=['GET'])
+@app.route('/Dallas_Team_Report', methods=['GET'])
 def show_dashboard():
-    """Serve the V.E.T. Dashboard HTML file"""
+    """Serve the Dallas Team Report HTML file"""
     try:
         dashboard_path = os.path.join(os.path.dirname(__file__), 'vet_dashboard.html')
         with open(dashboard_path, 'r', encoding='utf-8') as f:
@@ -535,11 +535,11 @@ def export_csv():
 # ── VET PPT Generation Endpoint ──
 @app.route('/api/vet/generate-ppt', methods=['POST'])
 def generate_vet_ppt():
-    """Generate V.E.T. Executive Report PowerPoint (VET-specific generator)"""
+    """Generate Dallas Team Report PowerPoint"""
     try:
         from vet_ppt_generator import generate_vet_pptx
         
-        logger.info("Generating VET Executive Report PPT...")
+        logger.info("Generating Dallas Team Report PPT...")
         pptx_path = generate_vet_pptx()
         
         if not pptx_path:
@@ -576,6 +576,6 @@ if __name__ == '__main__':
     port = int(os.getenv('PORT', 5001))
     debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     
-    logger.info(f"Starting V.E.T. Dashboard backend on port {port} (Dallas VET focus)")
+    logger.info(f"Starting Dallas Team Report backend on port {port} (Dallas VET focus)")
     logger.info(f"BQ Ownership Filter: {BQ_OWNERSHIP_FILTER} (displayed as {DISPLAY_OWNERSHIP_NAME})")
     app.run(host='0.0.0.0', port=port, debug=debug)

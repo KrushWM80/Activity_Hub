@@ -565,6 +565,76 @@ function initializeProjectsAPI(storage, validator, sync, metricsService = null) 
     }
   });
 
+  /**
+   * POST /api/email/send-projects
+   * Send projects list via email
+   * Body: { projects: [...], recipientEmail: 'email@example.com' }
+   */
+  router.post('/email/send-projects', (req, res) => {
+    try {
+      const { projects, recipientEmail } = req.body;
+
+      if (!recipientEmail) {
+        return res.status(400).json({
+          success: false,
+          error: 'Recipient email is required'
+        });
+      }
+
+      if (!projects || !Array.isArray(projects)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Projects array is required'
+        });
+      }
+
+      // Format projects into a table for email
+      const projectsHtml = `
+        <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+          <thead>
+            <tr style="background-color: #f5f5f5;">
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Project Title</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Status</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Business Area</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Last Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${projects.map(p => `
+              <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">${p.title || ''}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${p.status || ''}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${p.businessArea || ''}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${p.lastUpdated || ''}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+      // Here you would integrate with your email service (e.g., NodeMailer, SendGrid, etc.)
+      // For now, we'll log it and return success
+      console.log(`[Email Service] Sending projects list to: ${recipientEmail}`);
+      console.log(`[Email Service] Projects count: ${projects.length}`);
+
+      // Simulate email sending
+      res.json({
+        success: true,
+        message: 'Email queued for sending',
+        data: {
+          recipient: recipientEmail,
+          projectCount: projects.length,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  });
+
   return router;
 }
 

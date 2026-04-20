@@ -119,7 +119,7 @@ class ReportManager:
             
             # Generate report
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            output_file = OUTPUT_DIR / f"VET_Executive_Report_{timestamp}.pptx"
+            output_file = OUTPUT_DIR / f"Dallas_Team_Report_{timestamp}.pptx"
             
             logger.info(f"Generating PowerPoint report: {output_file}")
             self.generator.generate_report(str(output_file))
@@ -299,7 +299,7 @@ def generate_ppt_from_screenshots():
         data = request.get_json() or {}
         screenshots = data.get('screenshots', [])
         selected_phases = data.get('selectedPhases', [])
-        title = data.get('title', 'V.E.T. Executive Report')
+        title = data.get('title', 'Dallas Team Report')
         
         if not screenshots:
             return jsonify({
@@ -362,7 +362,7 @@ def generate_ppt_from_screenshots():
         
         # Save file to disk with WK format
         wk_format = get_walmart_week()
-        filename = f'VET_Executive_Report_{wk_format}.pptx'
+        filename = f'Dallas_Team_Report_{wk_format}.pptx'
         file_path = OUTPUT_DIR / filename
         
         # Save to file
@@ -392,7 +392,7 @@ def ppt_status():
     """Get status of PPT generation service"""
     return jsonify({
         'success': True,
-        'service': 'V.E.T. Executive Report Generator',
+        'service': 'Dallas Team Report Generator',
         'status': 'operational',
         'output_directory': str(OUTPUT_DIR),
         'reports_directory_exists': OUTPUT_DIR.exists(),

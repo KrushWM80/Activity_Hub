@@ -179,25 +179,37 @@ def fetch_dashboard_data(api_url: str = DASHBOARD_URL) -> tuple:
         return None, None
 
 
-def build_needs_attention_html(projects: list) -> str:
-    """Build HTML for Needs Attention section (at-risk initiatives)"""
+def build_needs_attention_html(projects: list) -> list:
+    """Build HTML pages for Needs Attention section (at-risk initiatives).
+    Returns a list of HTML strings — one per page (max 10 cards each).
+    Returns empty list if no At Risk items.
+    """
     
-    at_risk_items = [p for p in projects if str(p.get('Health Status', '')).lower() in ('at risk', 'off track')]
+    at_risk_items = [p for p in projects if str(p.get('Health Status', '')).lower() == 'at risk']
     
     if not at_risk_items:
-        return None
+        return []
     
-    cards_html = ''
-    for item in at_risk_items:
-        title = escape(item.get('Initiative - Project Title', 'Unknown'))
-        stores = item.get('# of Stores', 0)
-        notes = escape(item.get('Executive Notes', 'No notes provided'))
-        phase = escape(item.get('Phase', 'Unknown'))
-        wm_week = escape(str(item.get('WM Week', 'N/A')))
-        status_label = escape(str(item.get('Health Status', 'At Risk')))
-        deployment = escape(str(item.get('Deployment', 'No Note Provided')))
+    CARDS_PER_PAGE = 10
+    pages = []
+    total_pages = -(-len(at_risk_items) // CARDS_PER_PAGE)  # ceil division
+    
+    for page_idx in range(total_pages):
+        start = page_idx * CARDS_PER_PAGE
+        end = start + CARDS_PER_PAGE
+        page_items = at_risk_items[start:end]
         
-        cards_html += f'''<div style="background:white;border:1px solid #dc3545;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(220,53,69,0.1);">
+        cards_html = ''
+        for item in page_items:
+            title = escape(item.get('Initiative - Project Title', 'Unknown'))
+            stores = item.get('# of Stores', 0)
+            notes = escape(item.get('Executive Notes', 'No notes provided'))
+            phase = escape(item.get('Phase', 'Unknown'))
+            wm_week = escape(str(item.get('WM Week', 'N/A')))
+            status_label = escape(str(item.get('Health Status', 'At Risk')))
+            deployment = escape(str(item.get('Deployment', 'No Note Provided')))
+            
+            cards_html += f'''<div style="background:white;border:1px solid #dc3545;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(220,53,69,0.1);">
 <div style="margin-bottom:8px;">
   <div style="display:inline-block;background:#dc3545;color:white;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:600;margin-bottom:4px;">{status_label}</div>
   <div style="font-size:12px;color:#666;margin-top:4px;">Phase: {phase}</div>
@@ -208,25 +220,37 @@ def build_needs_attention_html(projects: list) -> str:
 <div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>WM Week:</strong> {wm_week}</div>
 <div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Status:</strong> {deployment}</div>
 </div>'''
-    
-    html = f'''<!DOCTYPE html><html><head><meta charset="utf-8">
+        
+        page_label = f' (Page {page_idx + 1}/{total_pages})' if total_pages > 1 else ''
+        
+        html = f'''<!DOCTYPE html><html><head><meta charset="utf-8">
 <style>*{{margin:0;padding:0;box-sizing:border-box;}} body{{background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;}}</style>
 </head><body>
 <div style="background:#fff3cd;border-left:6px solid #dc3545;border-radius:8px;padding:20px;box-shadow:0 2px 4px rgba(220,53,69,0.15);">
-  <div style="color:#dc3545;font-size:18px;font-weight:700;margin-bottom:16px;">🚨 Needs Attention</div>
+  <div style="color:#dc3545;font-size:18px;font-weight:700;margin-bottom:16px;">Needs Attention{page_label}</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;">
     {cards_html}
   </div>
 </div>
 </body></html>'''
+        
+        pages.append(html)
     
-    return html
+    return pages
 
 
 def build_executive_summary_html(stats: dict, projects: list) -> str:
     """Build HTML for the Executive Summary slide — matches dashboard layout exactly.
     Includes: header bar + stats cards + needs attention section.
     """
+    # Load Spark logo as base64 for embedding
+    import base64 as _b64
+    spark_logo_b64 = ''
+    spark_path = os.path.join(os.path.dirname(__file__), 'Spark_Blank.png')
+    if os.path.exists(spark_path):
+        with open(spark_path, 'rb') as _f:
+            spark_logo_b64 = _b64.b64encode(_f.read()).decode('ascii')
+
     total = stats.get('total_projects', 0)
     stores = stats.get('total_stores', 0)
     on_track = stats.get('on_track', 0)
@@ -234,11 +258,12 @@ def build_executive_summary_html(stats: dict, projects: list) -> str:
     off_track = stats.get('off_track', 0)
     continuous = stats.get('continuous', 0) if 'continuous' in stats else 0
     
-    # At-risk items for Needs Attention
-    at_risk_items = [p for p in projects if str(p.get('Health Status', '')).lower() in ('at risk', 'off track')]
+    # At-risk items for Needs Attention (first 10 only — overflow goes to separate slides)
+    at_risk_items = [p for p in projects if str(p.get('Health Status', '')).lower() == 'at risk']
+    display_items = at_risk_items[:10]
     
     cards_html = ''
-    for item in at_risk_items:
+    for item in display_items:
         title = escape(item.get('Initiative - Project Title', 'Unknown'))
         stores_val = item.get('# of Stores', 0)
         notes = escape(item.get('Executive Notes', 'No notes provided'))
@@ -279,10 +304,10 @@ body{{background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','
 <!-- Header Bar -->
 <div style="background:linear-gradient(135deg,#1E3A8A 0%,#2563EB 100%);padding:20px 30px;display:flex;align-items:center;gap:16px;">
   <div style="width:40px;height:40px;background:#FFC220;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-    <span style="font-size:20px;">✦</span>
+    <img src="data:image/png;base64,{spark_logo_b64}" style="width:24px;height:24px;" alt="Spark">
   </div>
   <div>
-    <div style="color:white;font-size:22px;font-weight:700;">V.E.T. Executive Report</div>
+    <div style="color:white;font-size:22px;font-weight:700;">Dallas Team Report</div>
     <div style="color:rgba(255,255,255,0.8);font-size:13px;">TDA Initiatives - Dallas VET Focus</div>
   </div>
 </div>
@@ -292,10 +317,6 @@ body{{background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','
   <div style="flex:1;text-align:center;padding:16px;border-right:1px solid #e5e5e5;">
     <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;">Total Initiatives</div>
     <div style="font-size:28px;font-weight:700;color:#212121;">{total}</div>
-  </div>
-  <div style="flex:1;text-align:center;padding:16px;border-right:1px solid #e5e5e5;">
-    <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;">Total Stores Impacted</div>
-    <div style="font-size:28px;font-weight:700;color:#212121;">{stores:,}</div>
   </div>
   <div style="flex:1;text-align:center;padding:16px;border-right:1px solid #e5e5e5;">
     <div style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.5px;">On Track</div>
@@ -320,7 +341,6 @@ body{{background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','
 
 </body></html>'''
     
-    return html
     return html
 
 
@@ -639,7 +659,7 @@ def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False
         ]
     
     print("=" * 90)
-    print("V.E.T. EXECUTIVE REPORT - FINAL VERSION")
+    print("DALLAS TEAM REPORT - FINAL VERSION")
     print("=" * 90)
     print()
     
@@ -653,7 +673,6 @@ def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False
         
         print("     [OK] Data fetched successfully")
         print(f"       * Total Projects: {stats['total_projects']}")
-        print(f"       * Stores Impacted: {stats['total_stores']:,}")
         print(f"       * On Track: {stats['on_track']}")
         print(f"       * At Risk: {stats['at_risk']}")
         print(f"       * Off Track: {stats['off_track']}")
@@ -664,6 +683,16 @@ def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False
         print("[2/6] Building Executive Summary slide...")
         executive_summary_html = build_executive_summary_html(stats, projects)
         print("     [OK] Executive Summary built (header + stats + needs attention)")
+        
+        # Build overflow Needs Attention pages (items beyond the first 10 shown in exec summary)
+        at_risk_all = [p for p in projects if str(p.get('Health Status', '')).lower() == 'at risk']
+        needs_attention_overflow = []
+        if len(at_risk_all) > 10:
+            overflow_pages = build_needs_attention_html(at_risk_all[10:])
+            for i, page_html in enumerate(overflow_pages):
+                label = f"Needs Attention (cont. {i + 2})"
+                needs_attention_overflow.append((label, page_html))
+            print(f"     [OK] {len(needs_attention_overflow)} overflow Needs Attention page(s)")
         print()
         
         # Step 3: Build Phase sections — combine small phases onto one slide
@@ -750,6 +779,11 @@ def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False
                 sections.append((names, html))
         
         print(f"     [OK] Built {len(sections)} slide sections (combined small phases)")
+        
+        # Insert overflow Needs Attention pages before phase slides
+        if needs_attention_overflow:
+            sections = needs_attention_overflow + sections
+        
         for name, _ in sections:
             print(f"       * {name}")
         print()
@@ -757,8 +791,8 @@ def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False
         # Step 4: Generate PPT
         print("[4/6] Generating PowerPoint...")
         wk = stats['wm_week']
-        pptx_filename = f"VET_Executive_Report_{wk}.pptx"
-        pdf_filename = f"VET_Executive_Report_{wk}.pdf"
+        pptx_filename = f"Dallas_Team_Report_{wk}.pptx"
+        pdf_filename = f"Dallas_Team_Report_{wk}.pdf"
         
         pptx_path = OUTPUT_DIR / pptx_filename
         pdf_path = OUTPUT_DIR / pdf_filename
@@ -794,7 +828,7 @@ def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False
         print(f"     Email Configuration:")
         print(f"       * Mode: {mode_text}")
         print(f"       * Recipients: {', '.join(recipient_emails)}")
-        print(f"       * Subject: V.E.T. Executive Report - {wk}")
+        print(f"       * Subject: Dallas Team Report - {wk}")
         
         attachments = [str(pptx_path)]
         if pdf_data:
@@ -822,8 +856,8 @@ def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False
             print("=" * 90)
             print()
             print(f"   Recipients: {', '.join(recipient_emails)}")
-            print(f"   Subject: V.E.T. Executive Report - {wk}")
-            print(f"   Data: {stats['total_projects']} projects, {stats['total_stores']:,} stores")
+            print(f"   Subject: Dallas Team Report - {wk}")
+            print(f"   Data: {stats['total_projects']} projects")
             print()
             return True
         else:
