@@ -1,0 +1,1142 @@
+[
+  {
+    "job_code": "1-0-040407",
+    "job_nm": "Overnight Coach Non Complex 1-0-040407",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "THOMAS",
+      "last_name": "CHAMBERS",
+      "store_number": 3493
+    }
+  },
+  {
+    "job_code": "1-0-040413",
+    "job_nm": "Asset Protection Operations Coach 1-0-040413",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Robin",
+      "last_name": "Johnson",
+      "store_number": 1042
+    }
+  },
+  {
+    "job_code": "1-0-40225",
+    "job_nm": "Store Manager, Micro Store 40225",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Blaise",
+      "last_name": "Mutchler",
+      "store_number": 7368
+    }
+  },
+  {
+    "job_code": "1-0-40267",
+    "job_nm": "Store Manager - Supercenter 40267",
+    "worker_count": 8025,
+    "sample_worker": {
+      "first_name": "ZAMIRA",
+      "last_name": "ABIERNO CALIL",
+      "store_number": 3417
+    }
+  },
+  {
+    "job_code": "1-0-40296",
+    "job_nm": "Store Manager - Division 1/NHM 40296",
+    "worker_count": 2195,
+    "sample_worker": {
+      "first_name": "Thomas",
+      "last_name": "Aaron",
+      "store_number": 2008
+    }
+  },
+  {
+    "job_code": "1-0-40301",
+    "job_nm": "Store Manager 40301",
+    "worker_count": 150,
+    "sample_worker": {
+      "first_name": "Dawn",
+      "last_name": "Almonte",
+      "store_number": 283
+    }
+  },
+  {
+    "job_code": "1-0-40321",
+    "job_nm": "Senior Fuel Station Manager 40321",
+    "worker_count": 20,
+    "sample_worker": {
+      "first_name": "Nina",
+      "last_name": "Ardis",
+      "store_number": 2926
+    }
+  },
+  {
+    "job_code": "1-0-40338",
+    "job_nm": "Emerging Store Manager, NHM 40338",
+    "worker_count": 26,
+    "sample_worker": {
+      "first_name": "Robert",
+      "last_name": "Bates",
+      "store_number": 5148
+    }
+  },
+  {
+    "job_code": "1-0-40339",
+    "job_nm": "Emerging Store Manager, SC 40339",
+    "worker_count": 18,
+    "sample_worker": {
+      "first_name": "Tim",
+      "last_name": "Barnhart",
+      "store_number": 3286
+    }
+  },
+  {
+    "job_code": "1-0-40342",
+    "job_nm": "Frontend Coach 40342",
+    "worker_count": 7217,
+    "sample_worker": {
+      "first_name": "LA",
+      "last_name": "ABDULLAH",
+      "store_number": 2786
+    }
+  },
+  {
+    "job_code": "1-0-40344",
+    "job_nm": "Operations Manager 40344",
+    "worker_count": 1743,
+    "sample_worker": {
+      "first_name": NaN,
+      "last_name": NaN,
+      "store_number": 6967
+    }
+  },
+  {
+    "job_code": "1-0-40345",
+    "job_nm": "Operations Manager 40345",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Lazaro",
+      "last_name": "Hernandez",
+      "store_number": 3046
+    }
+  },
+  {
+    "job_code": "1-0-40346",
+    "job_nm": "Store Lead 40346",
+    "worker_count": 3675,
+    "sample_worker": {
+      "first_name": "ZAMIRA",
+      "last_name": "ABIERNO CALIL",
+      "store_number": 5034
+    }
+  },
+  {
+    "job_code": "1-0-40347",
+    "job_nm": "Store Lead 40347",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Donovan",
+      "last_name": "Johnson",
+      "store_number": 5706
+    }
+  },
+  {
+    "job_code": "1-0-40348",
+    "job_nm": "Outbound Coach 40348",
+    "worker_count": 37,
+    "sample_worker": {
+      "first_name": "Ronald",
+      "last_name": "Austin",
+      "store_number": 3207
+    }
+  },
+  {
+    "job_code": "1-0-40349",
+    "job_nm": "Fashion Coach 40349",
+    "worker_count": 3424,
+    "sample_worker": {
+      "first_name": "FARAHNAZ",
+      "last_name": "ABASYAR",
+      "store_number": 2247
+    }
+  },
+  {
+    "job_code": "1-0-40386",
+    "job_nm": "MFC Store Lead 40386",
+    "worker_count": 43,
+    "sample_worker": {
+      "first_name": "Maricela",
+      "last_name": "Arvizu",
+      "store_number": 3267
+    }
+  },
+  {
+    "job_code": "1-0-40403",
+    "job_nm": "Inbound Coach 40403",
+    "worker_count": 48,
+    "sample_worker": {
+      "first_name": "Nicholas",
+      "last_name": "Adessa",
+      "store_number": 3207
+    }
+  },
+  {
+    "job_code": "1-0-40404",
+    "job_nm": "GM Coach 40404",
+    "worker_count": 9140,
+    "sample_worker": {
+      "first_name": "YAMAN",
+      "last_name": "AADI",
+      "store_number": 2807
+    }
+  },
+  {
+    "job_code": "1-0-40405",
+    "job_nm": "Food and Consumables Coach 40405",
+    "worker_count": 9308,
+    "sample_worker": {
+      "first_name": "JENNIFER",
+      "last_name": "A DOLVILLE",
+      "store_number": 5131
+    }
+  },
+  {
+    "job_code": "1-0-40406",
+    "job_nm": "Stocking 1 Coach 40406",
+    "worker_count": 3048,
+    "sample_worker": {
+      "first_name": "ERAY",
+      "last_name": "ABA",
+      "store_number": 1999
+    }
+  },
+  {
+    "job_code": "1-0-40407",
+    "job_nm": "Overnight Stocking Coach 40407",
+    "worker_count": 11221,
+    "sample_worker": {
+      "first_name": NaN,
+      "last_name": NaN,
+      "store_number": 2534
+    }
+  },
+  {
+    "job_code": "1-0-40409",
+    "job_nm": "GM Coach 40409",
+    "worker_count": 2,
+    "sample_worker": {
+      "first_name": "Chad",
+      "last_name": "Caldwell",
+      "store_number": 2003
+    }
+  },
+  {
+    "job_code": "1-0-40410",
+    "job_nm": "Food and Consumables Coach 40410",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Jennifer",
+      "last_name": "Phillips",
+      "store_number": 644
+    }
+  },
+  {
+    "job_code": "1-0-40413",
+    "job_nm": "AP Operations Coach 40413",
+    "worker_count": 5511,
+    "sample_worker": {
+      "first_name": "RAMIZ",
+      "last_name": "ABDULWAHED",
+      "store_number": 4538
+    }
+  },
+  {
+    "job_code": "1-0-40419",
+    "job_nm": "Stocking 2 Coach 40419",
+    "worker_count": 6539,
+    "sample_worker": {
+      "first_name": "YAMAN",
+      "last_name": "AADI",
+      "store_number": 2807
+    }
+  },
+  {
+    "job_code": "1-0-40420",
+    "job_nm": "Stocking 2 Coach 40420",
+    "worker_count": 2,
+    "sample_worker": {
+      "first_name": "Irina",
+      "last_name": "Alvarado",
+      "store_number": 6397
+    }
+  },
+  {
+    "job_code": "1-0-40421",
+    "job_nm": "Digital Coach 40421",
+    "worker_count": 7449,
+    "sample_worker": {
+      "first_name": "ERAY",
+      "last_name": "ABA",
+      "store_number": 1999
+    }
+  },
+  {
+    "job_code": "1-0-40422",
+    "job_nm": "Digital Coach 40422",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Yzaidelis",
+      "last_name": "Montes De Oca Resto",
+      "store_number": 3280
+    }
+  },
+  {
+    "job_code": "1-0-40423",
+    "job_nm": "Coach Trainee 40423",
+    "worker_count": 59,
+    "sample_worker": {
+      "first_name": "RUBI",
+      "last_name": "ACOSTA",
+      "store_number": 1565
+    }
+  },
+  {
+    "job_code": "1-0-40546",
+    "job_nm": "AP Operations Coach Trainee 40546",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "John",
+      "last_name": "Whiteman",
+      "store_number": 968
+    }
+  },
+  {
+    "job_code": "1-0-40547",
+    "job_nm": "Emerging Coach 40547",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Michelle",
+      "last_name": "Domineck",
+      "store_number": 3205
+    }
+  },
+  {
+    "job_code": "1-0-814893",
+    "job_nm": "Store Project Coach 1-0-814893",
+    "worker_count": 228,
+    "sample_worker": {
+      "first_name": "Dwayne",
+      "last_name": "Allen",
+      "store_number": 2832
+    }
+  },
+  {
+    "job_code": "1-0-814894",
+    "job_nm": "Realty Project Lead 1-0-814894",
+    "worker_count": 36,
+    "sample_worker": {
+      "first_name": "MONTY",
+      "last_name": "BOLTON",
+      "store_number": 1572
+    }
+  },
+  {
+    "job_code": "1-0-902941",
+    "job_nm": "Security Supervisor 1-0-902941",
+    "worker_count": 2,
+    "sample_worker": {
+      "first_name": "Carlos",
+      "last_name": "Martinez",
+      "store_number": 9271
+    }
+  },
+  {
+    "job_code": "1-0-903060",
+    "job_nm": "Project Team Associate 1-0-903060",
+    "worker_count": 17,
+    "sample_worker": {
+      "first_name": "Francisco",
+      "last_name": "Avila",
+      "store_number": 8809
+    }
+  },
+  {
+    "job_code": "1-10-101",
+    "job_nm": "Automotive DM 1-10-101",
+    "worker_count": 7,
+    "sample_worker": {
+      "first_name": "Rodolfo",
+      "last_name": "Berrios Otarola",
+      "store_number": 2449
+    }
+  },
+  {
+    "job_code": "1-11-201",
+    "job_nm": "Hardware SA 1-11-201",
+    "worker_count": 148,
+    "sample_worker": {
+      "first_name": "ISMAEL",
+      "last_name": "ACOSTA-BARBOSA",
+      "store_number": 5803
+    }
+  },
+  {
+    "job_code": "1-14-101",
+    "job_nm": "Housewares DM 1-14-101",
+    "worker_count": 71,
+    "sample_worker": {
+      "first_name": "Zuleyka",
+      "last_name": "Acevedo Guzman",
+      "store_number": 5803
+    }
+  },
+  {
+    "job_code": "1-14-201",
+    "job_nm": "Housewares SA 1-14-201",
+    "worker_count": 310,
+    "sample_worker": {
+      "first_name": "JEANCARLOS",
+      "last_name": "ABREU ROMAN",
+      "store_number": 1854
+    }
+  },
+  {
+    "job_code": "1-16-201",
+    "job_nm": "Lawn & Garden SA 1-16-201",
+    "worker_count": 259,
+    "sample_worker": {
+      "first_name": "MARICELIZ",
+      "last_name": "ALCAZAR CRUZ",
+      "store_number": 2302
+    }
+  },
+  {
+    "job_code": "1-19-201",
+    "job_nm": "Fab-Celeb-Station SA 1-19-201",
+    "worker_count": 117,
+    "sample_worker": {
+      "first_name": "SAIRELYS",
+      "last_name": "ALICEA ORTIZ",
+      "store_number": 3716
+    }
+  },
+  {
+    "job_code": "1-190-301",
+    "job_nm": "Food SA 1-190-301",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "FELIX",
+      "last_name": "GONZALEZ",
+      "store_number": 476
+    }
+  },
+  {
+    "job_code": "1-192-201",
+    "job_nm": "Dry Grocery SA 1-192-201",
+    "worker_count": 87,
+    "sample_worker": {
+      "first_name": "CARLOS",
+      "last_name": "ALICEA",
+      "store_number": 2072
+    }
+  },
+  {
+    "job_code": "1-2-201",
+    "job_nm": "Consumables SA 1-2-201",
+    "worker_count": 190,
+    "sample_worker": {
+      "first_name": "CARMEN",
+      "last_name": "ACEVEDO MEDINA",
+      "store_number": 3716
+    }
+  },
+  {
+    "job_code": "1-23-101",
+    "job_nm": "Fashion-Home DM 1-23-101",
+    "worker_count": 217,
+    "sample_worker": {
+      "first_name": "Sandra",
+      "last_name": "Acevedo",
+      "store_number": 2067
+    }
+  },
+  {
+    "job_code": "1-23-201",
+    "job_nm": "Apparel-Home SA 1-23-201",
+    "worker_count": 573,
+    "sample_worker": {
+      "first_name": "CHRISTIAN",
+      "last_name": "ACEVEDO VELAZQUEZ",
+      "store_number": 2085
+    }
+  },
+  {
+    "job_code": "1-27-238",
+    "job_nm": "Fashion Fitting Room Assoc 1-27-238",
+    "worker_count": 25,
+    "sample_worker": {
+      "first_name": "JANINE",
+      "last_name": "ADRIAN",
+      "store_number": 5111
+    }
+  },
+  {
+    "job_code": "1-5-201",
+    "job_nm": "Electronics SA 1-5-201",
+    "worker_count": 302,
+    "sample_worker": {
+      "first_name": "ALEYSHA",
+      "last_name": "AGOSTO",
+      "store_number": 2240
+    }
+  },
+  {
+    "job_code": "1-630-7310",
+    "job_nm": "ASA Trainer 1-630-7310",
+    "worker_count": 17,
+    "sample_worker": {
+      "first_name": "JUSTIN",
+      "last_name": "BENNETT",
+      "store_number": 1148
+    }
+  },
+  {
+    "job_code": "1-7-201",
+    "job_nm": "Toys SA 1-7-201",
+    "worker_count": 182,
+    "sample_worker": {
+      "first_name": "JOSEPH",
+      "last_name": "ACEVEDO",
+      "store_number": 2072
+    }
+  },
+  {
+    "job_code": "1-7-330",
+    "job_nm": "Assembler 1-7-330",
+    "worker_count": 38,
+    "sample_worker": {
+      "first_name": "Nieves",
+      "last_name": "Acevedo",
+      "store_number": 2026
+    }
+  },
+  {
+    "job_code": "1-9-201",
+    "job_nm": "Sport Goods SA 1-9-201",
+    "worker_count": 60,
+    "sample_worker": {
+      "first_name": "MICHAEL",
+      "last_name": "CASADO",
+      "store_number": 5802
+    }
+  },
+  {
+    "job_code": "1-910-606",
+    "job_nm": "Personnel Coord 1-910-606",
+    "worker_count": 56,
+    "sample_worker": {
+      "first_name": "Arlene",
+      "last_name": "Agosto Cirino",
+      "store_number": 2423
+    }
+  },
+  {
+    "job_code": "1-910-607",
+    "job_nm": "Training Coord 1-910-607",
+    "worker_count": 21,
+    "sample_worker": {
+      "first_name": "Edwin",
+      "last_name": "Alvarez Borges",
+      "store_number": 5803
+    }
+  },
+  {
+    "job_code": "1-910-651",
+    "job_nm": "PR Lead UPC 1-910-651",
+    "worker_count": 16,
+    "sample_worker": {
+      "first_name": "Johanna",
+      "last_name": "Arroyo Gonzalez",
+      "store_number": 5793
+    }
+  },
+  {
+    "job_code": "1-910-652",
+    "job_nm": "PR Lead Invoice 1-910-652",
+    "worker_count": 18,
+    "sample_worker": {
+      "first_name": "Aida",
+      "last_name": "Alicea Diaz",
+      "store_number": 2501
+    }
+  },
+  {
+    "job_code": "1-910-653",
+    "job_nm": "PR Lead Claims 1-910-653",
+    "worker_count": 22,
+    "sample_worker": {
+      "first_name": "Michael",
+      "last_name": "Camargo",
+      "store_number": 2240
+    }
+  },
+  {
+    "job_code": "1-912-617",
+    "job_nm": "Account Assoc 1-912-617",
+    "worker_count": 73,
+    "sample_worker": {
+      "first_name": "Maria",
+      "last_name": "Acevedo Acevedo",
+      "store_number": 1854
+    }
+  },
+  {
+    "job_code": "1-930-450",
+    "job_nm": "CAP Team 2 Assoc 1-930-450",
+    "worker_count": 1871,
+    "sample_worker": {
+      "first_name": "KENNETH",
+      "last_name": "ABREU",
+      "store_number": 5803
+    }
+  },
+  {
+    "job_code": "1-930-481",
+    "job_nm": "CAP Team 1 Assoc 1-930-481",
+    "worker_count": 830,
+    "sample_worker": {
+      "first_name": "ALEXIS",
+      "last_name": "ACEVEDO",
+      "store_number": 2085
+    }
+  },
+  {
+    "job_code": "1-931-3410",
+    "job_nm": "Mod/Price Chge Team ON 1-931-3410",
+    "worker_count": 176,
+    "sample_worker": {
+      "first_name": "CHRISTIAN",
+      "last_name": "ALICEA",
+      "store_number": 3716
+    }
+  },
+  {
+    "job_code": "1-931-469",
+    "job_nm": "Dry Groc GM Stocker ON 1-931-469",
+    "worker_count": 3105,
+    "sample_worker": {
+      "first_name": NaN,
+      "last_name": NaN,
+      "store_number": 2449
+    }
+  },
+  {
+    "job_code": "1-966-101",
+    "job_nm": "Walmart Services DM 1-966-101",
+    "worker_count": 30,
+    "sample_worker": {
+      "first_name": "Yeillen",
+      "last_name": "Alvarez Santos",
+      "store_number": 5802
+    }
+  },
+  {
+    "job_code": "1-966-516",
+    "job_nm": "Money Ctr Cashier 1-966-516",
+    "worker_count": 238,
+    "sample_worker": {
+      "first_name": "DADIANA",
+      "last_name": "ALVAREZ",
+      "store_number": 5803
+    }
+  },
+  {
+    "job_code": "1-966-540",
+    "job_nm": "Serv Desk Assoc 1-966-540",
+    "worker_count": 238,
+    "sample_worker": {
+      "first_name": "SARAI",
+      "last_name": "ALEJANDRO PEREZ",
+      "store_number": 5803
+    }
+  },
+  {
+    "job_code": "1-980-520",
+    "job_nm": "People Greeter 1-980-520",
+    "worker_count": 55,
+    "sample_worker": {
+      "first_name": "YIAMARI",
+      "last_name": "ALAMO",
+      "store_number": 5802
+    }
+  },
+  {
+    "job_code": "1-990-517",
+    "job_nm": "Checkout Host Day 1-990-517",
+    "worker_count": 1145,
+    "sample_worker": {
+      "first_name": "JUSTIN",
+      "last_name": "ACEVEDO",
+      "store_number": 2085
+    }
+  },
+  {
+    "job_code": "1-990-531",
+    "job_nm": "Parking Garage Supv 1-990-531",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Tracy",
+      "last_name": "Bowen",
+      "store_number": 2811
+    }
+  },
+  {
+    "job_code": "1-990-540",
+    "job_nm": "Cust Serv Desk Assoc 1-990-540",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Marie",
+      "last_name": "Jenkins",
+      "store_number": 3192
+    }
+  },
+  {
+    "job_code": "1-993-1150",
+    "job_nm": "Support Mgr Day 1-993-1150",
+    "worker_count": 8,
+    "sample_worker": {
+      "first_name": "Genevieve",
+      "last_name": "Christianson",
+      "store_number": 943
+    }
+  },
+  {
+    "job_code": "10-0-40083",
+    "job_nm": "Staff Pharmacist 10-0-40083",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Zuleika",
+      "last_name": "Corales Tirado",
+      "store_number": 5803
+    }
+  },
+  {
+    "job_code": "10-0-44701",
+    "job_nm": "Pharmacy Manager 10-0-44701",
+    "worker_count": 6,
+    "sample_worker": {
+      "first_name": "Lynette",
+      "last_name": "Echevarria",
+      "store_number": 3716
+    }
+  },
+  {
+    "job_code": "10-38-1849",
+    "job_nm": "CF QA Associate 10-38-1849",
+    "worker_count": 16,
+    "sample_worker": {
+      "first_name": "Kristen",
+      "last_name": "Aleman",
+      "store_number": 2670
+    }
+  },
+  {
+    "job_code": "10-38-201",
+    "job_nm": "Resolutions Specialist 10-38-201",
+    "worker_count": 8,
+    "sample_worker": {
+      "first_name": "Rebecca",
+      "last_name": "Adams",
+      "store_number": 2625
+    }
+  },
+  {
+    "job_code": "10-38-4201",
+    "job_nm": "CF Office Clerk 10-38-4201",
+    "worker_count": 4,
+    "sample_worker": {
+      "first_name": "MICHEAL",
+      "last_name": "DAVIS",
+      "store_number": 2625
+    }
+  },
+  {
+    "job_code": "10-38-4202",
+    "job_nm": "CF RecShip Sup 10-38-4202",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Regina",
+      "last_name": "Rivera",
+      "store_number": 2625
+    }
+  },
+  {
+    "job_code": "10-38-4205",
+    "job_nm": "CF Rx Tech Supvr 10-38-4205",
+    "worker_count": 34,
+    "sample_worker": {
+      "first_name": "Gustavo",
+      "last_name": "Alzuru",
+      "store_number": 5315
+    }
+  },
+  {
+    "job_code": "10-38-4208",
+    "job_nm": "CF AP Assoc 10-38-4208",
+    "worker_count": 21,
+    "sample_worker": {
+      "first_name": "Jason",
+      "last_name": "Gonzalez",
+      "store_number": 5997
+    }
+  },
+  {
+    "job_code": "10-38-4209",
+    "job_nm": "CF Maintenance 10-38-4209",
+    "worker_count": 111,
+    "sample_worker": {
+      "first_name": "GLORIA",
+      "last_name": "ALVAREZ",
+      "store_number": 5315
+    }
+  },
+  {
+    "job_code": "10-38-4212",
+    "job_nm": "NSO Call Center Assoc 10-38-4212",
+    "worker_count": 58,
+    "sample_worker": {
+      "first_name": "REGINA",
+      "last_name": "ALLEN",
+      "store_number": 2625
+    }
+  },
+  {
+    "job_code": "10-40-101",
+    "job_nm": "OTC Pharm DM 10-40-101",
+    "worker_count": 11,
+    "sample_worker": {
+      "first_name": "Migdalia",
+      "last_name": "Bonilla Ortiz",
+      "store_number": 5793
+    }
+  },
+  {
+    "job_code": "10-40-201",
+    "job_nm": "SpclstBilling-HWNonStOps 10-40-201",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Adrian",
+      "last_name": "Ruiz-Avila",
+      "store_number": 2625
+    }
+  },
+  {
+    "job_code": "10-40-301",
+    "job_nm": "Pharm Stocker 10-40-301",
+    "worker_count": 23,
+    "sample_worker": {
+      "first_name": "Damaris",
+      "last_name": "Colon",
+      "store_number": 2026
+    }
+  },
+  {
+    "job_code": "10-40-4200",
+    "job_nm": "CF Maintenance SUP 10-40-4200",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Mark",
+      "last_name": "Stewart",
+      "store_number": 860
+    }
+  },
+  {
+    "job_code": "10-40-4211",
+    "job_nm": "CF HR Coordinator 10-40-4211",
+    "worker_count": 17,
+    "sample_worker": {
+      "first_name": "PRISCILLA",
+      "last_name": "ADDO",
+      "store_number": 7638
+    }
+  },
+  {
+    "job_code": "11-32-101",
+    "job_nm": "Jewelry DM 11-32-101",
+    "worker_count": 24,
+    "sample_worker": {
+      "first_name": "Diana",
+      "last_name": "Aponte Lopez",
+      "store_number": 2346
+    }
+  },
+  {
+    "job_code": "11-32-201",
+    "job_nm": "Jewelry SA 11-32-201",
+    "worker_count": 107,
+    "sample_worker": {
+      "first_name": "IVANA",
+      "last_name": "ADORNO",
+      "store_number": 1822
+    }
+  },
+  {
+    "job_code": "24-80-102",
+    "job_nm": "Specialty Shop BBQ 24-80-102",
+    "worker_count": 149,
+    "sample_worker": {
+      "first_name": "Ana",
+      "last_name": "Abraham",
+      "store_number": 2302
+    }
+  },
+  {
+    "job_code": "24-80-201",
+    "job_nm": "Deli SA 24-80-201",
+    "worker_count": 394,
+    "sample_worker": {
+      "first_name": NaN,
+      "last_name": NaN,
+      "store_number": 3693
+    }
+  },
+  {
+    "job_code": "24-93-101",
+    "job_nm": "Meat DM 24-93-101",
+    "worker_count": 34,
+    "sample_worker": {
+      "first_name": "Carlos",
+      "last_name": "Arenas Vazquez",
+      "store_number": 5802
+    }
+  },
+  {
+    "job_code": "24-93-201",
+    "job_nm": "Meat SA 24-93-201",
+    "worker_count": 262,
+    "sample_worker": {
+      "first_name": "KENNETH",
+      "last_name": "ACEVEDO",
+      "store_number": 2240
+    }
+  },
+  {
+    "job_code": "24-93-915",
+    "job_nm": "Meat Processor 24-93-915",
+    "worker_count": 219,
+    "sample_worker": {
+      "first_name": "MANUEL",
+      "last_name": "AGOSTO",
+      "store_number": 2423
+    }
+  },
+  {
+    "job_code": "25-94-101",
+    "job_nm": "Produce DM 25-94-101",
+    "worker_count": 18,
+    "sample_worker": {
+      "first_name": "Miguel",
+      "last_name": "Caraballo",
+      "store_number": 3693
+    }
+  },
+  {
+    "job_code": "25-94-201",
+    "job_nm": "Produce SA 25-94-201",
+    "worker_count": 285,
+    "sample_worker": {
+      "first_name": "BRADLEY",
+      "last_name": "ADAMES TORRES",
+      "store_number": 1854
+    }
+  },
+  {
+    "job_code": "26-90-1010",
+    "job_nm": "Dairy Froz Meat DM 26-90-1010",
+    "worker_count": 4,
+    "sample_worker": {
+      "first_name": "Ivelisse",
+      "last_name": "Aviles",
+      "store_number": 1854
+    }
+  },
+  {
+    "job_code": "26-90-4690",
+    "job_nm": "Dairy Froz Meat SA Day 26-90-4690",
+    "worker_count": 247,
+    "sample_worker": {
+      "first_name": "SEBASTHIAN",
+      "last_name": "ALICEA RODRIGUEZ",
+      "store_number": 5793
+    }
+  },
+  {
+    "job_code": "27-98-101",
+    "job_nm": "Bakery DM 27-98-101",
+    "worker_count": 18,
+    "sample_worker": {
+      "first_name": "Ivan",
+      "last_name": "Antigua Garcia",
+      "store_number": 5803
+    }
+  },
+  {
+    "job_code": "27-98-981",
+    "job_nm": "Bakery SA 27-98-981",
+    "worker_count": 206,
+    "sample_worker": {
+      "first_name": "JAILENE",
+      "last_name": "AGOSTO MALPICA",
+      "store_number": 2423
+    }
+  },
+  {
+    "job_code": "30-0-902938",
+    "job_nm": "SpecialistVSecurityH&WField 30-0-902938",
+    "worker_count": 7,
+    "sample_worker": {
+      "first_name": "Zachary",
+      "last_name": "Bell",
+      "store_number": 9271
+    }
+  },
+  {
+    "job_code": "31-85-301",
+    "job_nm": "Photo SA 31-85-301",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Tarnesha",
+      "last_name": "Oden",
+      "store_number": 942
+    }
+  },
+  {
+    "job_code": "44-0-813042",
+    "job_nm": "Warehouse Manager 44-0-813042",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Mike",
+      "last_name": "Bray",
+      "store_number": 10657
+    }
+  },
+  {
+    "job_code": "44-0-902993",
+    "job_nm": "Warehouse Associate 44-0-902993",
+    "worker_count": 399,
+    "sample_worker": {
+      "first_name": "SCOTT",
+      "last_name": "ALBANO",
+      "store_number": 10643
+    }
+  },
+  {
+    "job_code": "44-0-903087",
+    "job_nm": "Lead Support 44-0-903087",
+    "worker_count": 39,
+    "sample_worker": {
+      "first_name": "Amalia",
+      "last_name": "Adame",
+      "store_number": 10654
+    }
+  },
+  {
+    "job_code": "5-0-814330",
+    "job_nm": "Salaried Technician 5-0-814330",
+    "worker_count": 22,
+    "sample_worker": {
+      "first_name": "Andrew",
+      "last_name": "Aguillon Langley",
+      "store_number": 9050
+    }
+  },
+  {
+    "job_code": "5-0-814749",
+    "job_nm": "Operations Analyst 5-0-814749",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Gene",
+      "last_name": "Reed",
+      "store_number": 9050
+    }
+  },
+  {
+    "job_code": "5-0-901351",
+    "job_nm": "COORDINATOR, CORPORATE SECURITY - GISAT 5-0-901351",
+    "worker_count": 4,
+    "sample_worker": {
+      "first_name": "Melinda",
+      "last_name": "Ciabattari",
+      "store_number": 30095
+    }
+  },
+  {
+    "job_code": "5-0-902343",
+    "job_nm": "Technician 5-0-902343",
+    "worker_count": 6,
+    "sample_worker": {
+      "first_name": "Nancy",
+      "last_name": "Aguilar",
+      "store_number": 9050
+    }
+  },
+  {
+    "job_code": "5-0-902742",
+    "job_nm": "SPECIALIST V SECURITY 5-0-902742",
+    "worker_count": 11,
+    "sample_worker": {
+      "first_name": "Antonio",
+      "last_name": "Aaron",
+      "store_number": 10467
+    }
+  },
+  {
+    "job_code": "6-0-40206",
+    "job_nm": "AutoCareCenter Mgr Complex-WM 6-0-40206",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Jared",
+      "last_name": "Wright",
+      "store_number": 1248
+    }
+  },
+  {
+    "job_code": "6-0-40556",
+    "job_nm": "ACC Coach 40556",
+    "worker_count": 4126,
+    "sample_worker": {
+      "first_name": "AMMAR",
+      "last_name": "ABU-HAMDA",
+      "store_number": 3278
+    }
+  },
+  {
+    "job_code": "71-0-40418",
+    "job_nm": "Academy Lead 40418",
+    "worker_count": 228,
+    "sample_worker": {
+      "first_name": "Aaron",
+      "last_name": "Adams",
+      "store_number": 5394
+    }
+  },
+  {
+    "job_code": "71-0-40432",
+    "job_nm": "Academy Coach 40432",
+    "worker_count": 1179,
+    "sample_worker": {
+      "first_name": "Chase",
+      "last_name": "Abel",
+      "store_number": 3894
+    }
+  },
+  {
+    "job_code": "71-76-101",
+    "job_nm": "Acad DM 71-76-101",
+    "worker_count": 1,
+    "sample_worker": {
+      "first_name": "Anna",
+      "last_name": "Schneider",
+      "store_number": 5368
+    }
+  }
+]

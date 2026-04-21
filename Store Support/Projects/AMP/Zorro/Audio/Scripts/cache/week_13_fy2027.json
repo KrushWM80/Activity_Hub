@@ -1,0 +1,91 @@
+{
+  "week": 13,
+  "fy": 2027,
+  "cached_at": "2026-04-21T06:00:25.384072",
+  "bq_last_updated": "2026-04-20T23:48:05.972000+00:00",
+  "event_count": 4,
+  "review_no_comm_count": 4,
+  "status_breakdown": [
+    {
+      "status": "Draft - Pending",
+      "count": 1
+    },
+    {
+      "status": "Awaiting ATC Approval - Pending",
+      "count": 1
+    },
+    {
+      "status": "Awaiting Comms Approval - Pending",
+      "count": 4
+    },
+    {
+      "status": "Awaiting Comms Approval - In Progress",
+      "count": 1
+    },
+    {
+      "status": "Awaiting Comms Approval - Ready to Review",
+      "count": 1
+    },
+    {
+      "status": "Awaiting Business Review - Pending",
+      "count": 4
+    },
+    {
+      "status": "Awaiting Legal Approval - Pending",
+      "count": 2
+    },
+    {
+      "status": "ATC final review - Pending",
+      "count": 2
+    },
+    {
+      "status": "Review for Publish review - Pending",
+      "count": 3
+    },
+    {
+      "status": "Review for Publish review - Future Send",
+      "count": 1
+    },
+    {
+      "status": "Review for Publish review - No Comms",
+      "count": 4
+    },
+    {
+      "status": "Awaiting Comms Approval - On Hold",
+      "count": 1
+    }
+  ],
+  "total_excl_denied": 24,
+  "summarized_count": 4,
+  "events_with_summaries": [
+    {
+      "event_id": "bf5173bf-224c-4aa5-8c2b-338fdf2a5011",
+      "store_area": "Food",
+      "title": "Dept. 92: Quick Modular Update for Sauces and Condiments",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "A week 14 quick modular is being implemented for Sauces and Condiments. This will address minor opportunities, late developing new items, brand flow and overall assortment cleanup."
+    },
+    {
+      "event_id": "2dc42c85-a030-4115-92c8-a98e0385e909",
+      "store_area": "Food",
+      "title": "Dept. 92: The Great American Grill Out \u2013 Celebrating America's Birthday",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 92: To celebrate America's 250th birthday, stores will have a new and improved Grilling Train. Items will include buns, Coca-Cola and Frito Lay chips along with a selection of core condiments. Many of the items are on Rollback and will be a featured through May and June."
+    },
+    {
+      "event_id": "dfc80b33-f0db-4811-b11e-3b2408556739",
+      "store_area": "Food",
+      "title": "Dept. 95: The Grilling Train Will Include a 1/2 Pallet of\u00a0Frito Lay\u00a0Chips\u00a0",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "As part of the America 250th celebration, the grilling train will include a half-pallet of party size potato chips from Frito Lay. It is the responsibility of the Frito Lay representative to keep this half-pallet maintained for the duration of this program."
+    },
+    {
+      "event_id": "75b08e71-19d0-495b-b348-6612e7e2dacf",
+      "store_area": "Frontend",
+      "title": "Frontend: Winners of the Friendliest Front End \u2013 Spring Edition",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "This AMP message announces the winners of the Friendliest Front End Spring Edition."
+    }
+  ],
+  "events_without_summary": []
+}

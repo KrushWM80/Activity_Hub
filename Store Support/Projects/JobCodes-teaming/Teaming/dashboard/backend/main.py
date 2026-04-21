@@ -1208,6 +1208,131 @@ async def lookup_job_code_employees(request: Request):
         print(f"[ERROR] Job code lookup error: {e}")
         raise HTTPException(status_code=500, detail=f"Query error: {str(e)}")
 
+@app.get("/api/missing-job-codes-report")
+async def missing_job_codes_report(request: Request):
+    """
+    Generate CSV report of Missing job codes with sample impacted users.
+    Returns: Job Code, Role/Title, Impacted Count, Sample Employee, Employee Name
+    """
+    user = require_auth(request)
+    
+    try:
+        print("[MISSING REPORT] Starting missing job codes report generation")
+        
+        # Get all job codes with their status
+        job_codes = cache.get_job_codes()
+        print(f"[MISSING REPORT] Loaded {len(job_codes) if job_codes else 0} total job codes")
+        
+        if not job_codes:
+            raise HTTPException(status_code=404, detail="No job codes available")
+        
+        # Load teaming data to get status
+        merged_df, _ = load_job_code_data()
+        print(f"[MISSING REPORT] Loaded teaming data: {len(merged_df) if merged_df is not None else 0} rows")
+        
+        # Build status map
+        status_map = {}
+        if merged_df is not None and len(merged_df) > 0:
+            for _, row in merged_df.iterrows():
+                job_code_str = str(row['job_code']).strip() if pd.notna(row['job_code']) else ""
+                status = 'Assigned' if pd.notna(row.get('composite_job_code')) else 'Missing'
+                status_map[job_code_str] = status
+        
+        # Filter for Missing status job codes
+        missing_codes = []
+        for jc in job_codes:
+            job_code_str = jc.get("job_code", "")
+            status = status_map.get(job_code_str, "Unknown")
+            if status == "Missing":
+                missing_codes.append({
+                    "job_code": job_code_str,
+                    "job_title": jc.get("job_nm", ""),
+                    "user_count": jc.get("user_count", 0),
+                })
+        
+        print(f"[MISSING REPORT] Found {len(missing_codes)} missing job codes")
+        
+        # Build CSV data
+        csv_rows = []
+        csv_rows.append({
+            "Job Code": "Job Code",
+            "Role": "Role/Title",
+            "Impacted Count": "Impacted User Count",
+            "Sample Employee ID": "Sample Employee",
+            "Sample Employee Name": "Employee Name"
+        })
+        
+        # Try to get sample employees if BigQuery is available
+        for idx, missing_code in enumerate(missing_codes):
+            job_code = missing_code["job_code"]
+            job_title = missing_code["job_title"]
+            user_count = missing_code["user_count"]
+            
+            sample_employee = "-"
+            sample_employee_name = "-"
+            
+            # Try to lookup one employee if BigQuery is available
+            if HAS_BIGQUERY:
+                try:
+                    from google.oauth2 import service_account
+                    credentials_path = r"C:\ProgramData\gcloud\application_default_credentials.json"
+                    try:
+                        credentials = service_account.Credentials.from_service_account_file(credentials_path)
+                        client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+                    except:
+                        from google.auth import load_credentials_from_file
+                        credentials, project = load_credentials_from_file(credentials_path)
+                        client = bigquery.Client(credentials=credentials, project=project)
+                    
+                    # Query for one employee
+                    query = f"""
+                    SELECT DISTINCT
+                        CAST(worker_id AS STRING) as worker_id,
+                        first_name,
+                        last_name
+                    FROM `polaris-analytics-prod.us_walmart.vw_polaris_current_schedule`
+                    WHERE job_code = '{job_code}'
+                    LIMIT 1
+                    """
+                    
+                    results = client.query(query, project="polaris-analytics-prod").result()
+                    rows = list(results)
+                    
+                    if rows:
+                        row = rows[0]
+                        sample_employee = str(row.worker_id)
+                        sample_employee_name = f"{row.first_name} {row.last_name}".strip()
+                        print(f"[MISSING REPORT] Found sample employee for {job_code}: {sample_employee} - {sample_employee_name}")
+                except Exception as e:
+                    print(f"[MISSING REPORT] Could not lookup employee for {job_code}: {e}")
+            
+            csv_rows.append({
+                "Job Code": job_code,
+                "Role": job_title,
+                "Impacted Count": str(user_count),
+                "Sample Employee ID": sample_employee,
+                "Sample Employee Name": sample_employee_name
+            })
+        
+        print(f"[MISSING REPORT] Generated {len(csv_rows)} rows (including header)")
+        
+        # Return as JSON - frontend can convert to CSV
+        return {
+            "report_type": "Missing Job Codes",
+            "generated_at": datetime.now().isoformat(),
+            "total_missing": len(missing_codes),
+            "data": csv_rows
+        }
+        
+    except HTTPException as e:
+        print(f"[MISSING REPORT] HTTPException: {e.status_code} - {e.detail}")
+        raise
+    except Exception as e:
+        print(f"[MISSING REPORT] ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error generating report: {str(e)}")
+
 @app.post("/api/comprehensive-teaming-request")
 async def comprehensive_teaming_request(request: Request):
     """Submit a comprehensive teaming request matching MyWalmart template format"""
@@ -1605,33 +1730,81 @@ async def delete_request(request_id: int, request: Request):
     raise HTTPException(status_code=404, detail="Request not found")
 
 @app.get("/api/export-requests")
-async def export_requests(request: Request, status: Optional[str] = "approved"):
-    """Export approved requests for TMS update"""
+async def export_requests(request: Request, status: Optional[str] = None):
+    """Export requests - all by default, or filtered by status"""
     user = require_admin(request)
     requests_list = load_requests()
     
+    print(f"[EXPORT] Total requests loaded: {len(requests_list)}")
+    print(f"[EXPORT] Status filter: {status}")
+    
+    # Load optimized worker data for sample worker info
+    worker_data = {}
+    try:
+        optimized_worker_file = os.path.join(TEAMING_DIR, "Worker_Names_Stores_Missing_JobCodes_Optimized.json")
+        if os.path.exists(optimized_worker_file):
+            with open(optimized_worker_file, 'r', encoding='utf-8') as f:
+                workers = json.load(f)
+                for w in workers:
+                    job_code = w.get('job_code')
+                    sample = w.get('sample_worker', {})
+                    worker_data[job_code] = {
+                        'name': f"{sample.get('first_name', '')} {sample.get('last_name', '')}".strip(),
+                        'store': sample.get('store_number', '')
+                    }
+        print(f"[EXPORT] Loaded worker data for {len(worker_data)} job codes")
+    except Exception as e:
+        print(f"[EXPORT] Warning: Could not load worker data: {e}")
+    
+    # If status is not provided, return all. If provided (including "approved"), filter by that status
+    # For backward compatibility, if status is explicitly "approved", show only approved
     if status:
         requests_list = [r for r in requests_list if r["status"] == status]
+    
+    print(f"[EXPORT] After status filter: {len(requests_list)}")
     
     # Format for TMS API or manual update
     export_data = []
     for req in requests_list:
-        # Parse job code into components
-        parts = req["job_code"].split("-")
-        if len(parts) == 3:
-            export_data.append({
-                "jobCode": parts[2],
-                "deptNumber": parts[1],
-                "divNumber": parts[0],
-                "teamName": req["team_name"],
-                "teamId": req["team_id"],
-                "workgroupName": req["workgroup_name"],
-                "workgroupId": req["workgroup_id"],
-                "full_job_code": req["job_code"],
-                "requested_by": req["requested_by_name"],
-                "requested_at": req["requested_at"]
-            })
+        # Parse job code into components - handle various formats
+        parts = req["job_code"].split("-") if req["job_code"] else []
+        
+        print(f"[EXPORT] Processing job code: {req['job_code']}, parts: {parts}")
+        
+        job_parts = {
+            "jobCode": parts[2] if len(parts) >= 3 else "",
+            "deptNumber": parts[1] if len(parts) >= 3 else "",
+            "divNumber": parts[0] if len(parts) >= 3 else ""
+        }
+        
+        # Calculate impact count (banner codes + merch depts)
+        banner_count = len(req.get("banner_codes", [])) if isinstance(req.get("banner_codes"), list) else 0
+        merch_count = len(req.get("merch_dept_numbers", [])) if isinstance(req.get("merch_dept_numbers"), list) else 0
+        impact_count = max(banner_count + merch_count, 1)  # At least 1 for the main job code
+        
+        # Get sample worker info
+        sample_worker_info = worker_data.get(req["job_code"], {})
+        sample_worker_name = sample_worker_info.get('name', '')
+        sample_worker_store = sample_worker_info.get('store', '')
+        
+        export_data.append({
+            "jobCode": job_parts["jobCode"],
+            "deptNumber": job_parts["deptNumber"],
+            "divNumber": job_parts["divNumber"],
+            "teamName": req["team_name"],
+            "teamId": int(req.get("team_id", 0)) if req.get("team_id") else "",
+            "workgroupName": req["workgroup_name"],
+            "workgroupId": int(req.get("workgroup_id", 0)) if req.get("workgroup_id") else "",
+            "full_job_code": req["job_code"],
+            "status": req.get("status", "pending"),
+            "impact_count": impact_count,
+            "requested_by": req["requested_by_name"],
+            "requested_at": req["requested_at"],
+            "sample_worker": sample_worker_name,
+            "sample_worker_store": sample_worker_store
+        })
     
+    print(f"[EXPORT] Final export_data count: {len(export_data)}")
     return {"export_data": export_data, "count": len(export_data)}
 
 # Admin endpoints
@@ -2468,6 +2641,45 @@ def verify_data_files():
         print(f"  âš ï¸ WARNING: Teaming data file not found!")
     if not os.path.exists(POLARIS_DATA_FILE):
         print(f"  âš ï¸ WARNING: Polaris data file not found!")
+
+
+
+
+
+@app.get("/Worker_Names_Stores_Missing_JobCodes_Optimized.json")
+async def get_worker_data_optimized():
+    """Serve optimized worker data (count + sample) for faster tooltip loading"""
+    import json as json_lib
+    worker_data_dir = TEAMING_DIR
+    json_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes_Optimized.json")
+    if os.path.exists(json_file):
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                return json_lib.load(f)
+        except Exception as e:
+            print(f"Error reading optimized worker JSON: {e}")
+    return []
+
+@app.get("/Worker_Names_Stores_Missing_JobCodes.json")
+async def get_worker_data():
+    """Serve worker data for employee tooltips"""
+    import json as json_lib
+    worker_data_dir = TEAMING_DIR
+    json_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes.json")
+    if os.path.exists(json_file):
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                return json_lib.load(f)
+        except Exception as e:
+            print(f"Error reading worker JSON: {e}")
+    csv_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes.csv")
+    if os.path.exists(csv_file):
+        try:
+            df = pd.read_csv(csv_file)
+            return df.to_dict('records')
+        except Exception as e:
+            print(f"Error reading worker CSV: {e}")
+    return []
 
 if __name__ == "__main__":
     print(f"""

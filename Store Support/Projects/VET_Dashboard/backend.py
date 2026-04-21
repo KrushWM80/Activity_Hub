@@ -7,7 +7,7 @@ import json
 import os
 from datetime import datetime
 from typing import List, Dict, Any
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request, send_file, redirect
 from flask_cors import CORS
 from google.cloud import bigquery
 import logging
@@ -47,8 +47,10 @@ PROJECT_ID = "wmt-assetprotection-prod"
 DATASET_ID = "Store_Support_Dev"
 TABLE_ID = "Output- TDA Report"  # Table name with space
 INTAKE_HUB_TABLE = "IH_Intake_Data"
+ACCEL_COUNCIL_TABLE = "Output - Intake Accel Council Data"
 FULL_TABLE_ID = f"`{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`"
 FULL_INTAKE_HUB_ID = f"`{PROJECT_ID}.{DATASET_ID}.{INTAKE_HUB_TABLE}`"
+FULL_ACCEL_ID = f"`{PROJECT_ID}.{DATASET_ID}.{ACCEL_COUNCIL_TABLE}`"
 
 # Dallas Team Report specific config
 # BQ data now uses "Dallas VET" as TDA_Ownership value (renamed from "Dallas POC")
@@ -122,6 +124,15 @@ class VETDataManager:
         
         try:
             query = f"""
+            WITH ih_agg AS (
+                SELECT
+                    Intake_Card,
+                    MIN(WM_Week) AS WM_Week,
+                    COUNT(DISTINCT CASE WHEN Banner_Desc IN ('WM Supercenter', 'Wal-Mart') AND CAST(Facility AS INT64) > 0 THEN CAST(Facility AS INT64) END) AS SC_Stores,
+                    COUNT(DISTINCT CASE WHEN Banner_Desc = 'Neighborhood Market' AND CAST(Facility AS INT64) > 0 THEN CAST(Facility AS INT64) END) AS NHM_Stores
+                FROM {FULL_INTAKE_HUB_ID}
+                GROUP BY Intake_Card
+            )
             SELECT 
                 tda.Topic AS `Initiative - Project Title`,
                 tda.Health_Update AS `Health Status`,
@@ -135,12 +146,15 @@ class VETDataManager:
                 tda.Intake_Card_Nbr AS `Project ID`,
                 tda.Intake_n_Testing AS `Intake & Testing`,
                 tda.Deployment,
-                COALESCE(CAST(MIN(intake.WM_Week) AS STRING), 'TBD') AS `WM Week`
+                COALESCE(CAST(ih.WM_Week AS STRING), 'TBD') AS `WM Week`,
+                FORMAT_DATE('%d/%m/%y', MIN(tda.Impl_Date)) AS `Start Date`,
+                COALESCE(ih.SC_Stores, 0) AS `SC`,
+                COALESCE(ih.NHM_Stores, 0) AS `NHM`
             FROM 
                 {FULL_TABLE_ID} tda
             LEFT JOIN 
-                {FULL_INTAKE_HUB_ID} intake
-                ON CAST(tda.Intake_Card_Nbr AS STRING) = CAST(intake.Intake_Card AS STRING)
+                ih_agg ih
+                ON CAST(tda.Intake_Card_Nbr AS STRING) = CAST(ih.Intake_Card AS STRING)
             WHERE 
                 tda.TDA_Ownership = '{BQ_OWNERSHIP_FILTER}'
             GROUP BY
@@ -151,7 +165,10 @@ class VETDataManager:
                 tda.TDA_Ownership,
                 tda.Intake_Card_Nbr,
                 tda.Intake_n_Testing,
-                tda.Deployment
+                tda.Deployment,
+                ih.WM_Week,
+                ih.SC_Stores,
+                ih.NHM_Stores
             ORDER BY 
                 tda.Phase ASC,
                 tda.Topic ASC
@@ -178,6 +195,53 @@ class VETDataManager:
             logger.error(f"Error fetching data from BigQuery: {e}")
             return []
     
+    def fetch_contacts(self) -> List[Dict[str, Any]]:
+        """Fetch Dallas Team Contact data from Intake Accel Council table"""
+        if not self.client:
+            self.client = _init_bigquery_client()
+        if not self.client:
+            return []
+        try:
+            query = f"""
+            SELECT 
+                Dallas_Team_Contact,
+                Topic AS project_title,
+                Store_Area,
+                Phase
+            FROM {FULL_ACCEL_ID}
+            WHERE TDA_Ownership = '{BQ_OWNERSHIP_FILTER}'
+              AND Dallas_Team_Contact IS NOT NULL
+              AND Dallas_Team_Contact != ''
+            ORDER BY Dallas_Team_Contact, Topic
+            """
+            rows = list(self.client.query(query).result())
+            # Group by contact
+            contacts = {}
+            for r in rows:
+                name = r.Dallas_Team_Contact
+                if name not in contacts:
+                    contacts[name] = {'name': name, 'projects': [], 'store_areas': set()}
+                proj = r.project_title
+                if proj not in [p['title'] for p in contacts[name]['projects']]:
+                    contacts[name]['projects'].append({'title': proj, 'phase': r.Phase, 'store_area': r.Store_Area or ''})
+                if r.Store_Area:
+                    contacts[name]['store_areas'].add(r.Store_Area)
+            
+            result = []
+            for name in sorted(contacts.keys()):
+                c = contacts[name]
+                result.append({
+                    'name': c['name'],
+                    'active_projects': len(c['projects']),
+                    'projects': c['projects'],
+                    'store_areas': sorted(list(c['store_areas']))
+                })
+            logger.info(f"Fetched {len(result)} Dallas Team contacts")
+            return result
+        except Exception as e:
+            logger.error(f"Error fetching contacts: {e}")
+            return []
+
     def get_unique_phases(self) -> List[str]:
         """Get list of unique phases - returned in TDA progression order"""
         data = self.fetch_all_data()
@@ -269,6 +333,10 @@ def favicon():
     if os.path.exists(logo):
         return send_file(logo, mimetype='image/png', max_age=86400)
     return '', 204
+
+@app.route('/VET_Executive_Report', methods=['GET'])
+def redirect_old_url():
+    return redirect('/Dallas_Team_Report', code=301)
 
 @app.route('/', methods=['GET'])
 @app.route('/Dallas_Team_Report', methods=['GET'])
@@ -423,6 +491,25 @@ def get_needs_attention():
         })
     except Exception as e:
         logger.error(f"Error in /api/needs-attention: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/contacts', methods=['GET'])
+def get_contacts():
+    """Get Dallas Team Contact assignments with project counts and store areas"""
+    try:
+        contacts = data_manager.fetch_contacts()
+        return jsonify({
+            'success': True,
+            'count': len(contacts),
+            'data': contacts,
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"Error in /api/contacts: {e}")
         return jsonify({
             'success': False,
             'error': str(e)

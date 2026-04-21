@@ -7,12 +7,14 @@ import logging
 import requests
 import uuid
 import smtplib
+import threading
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import Flask, send_from_directory, send_file, jsonify, request
 from flask_cors import CORS
 from datetime import datetime, timedelta
 from google.cloud import bigquery
+# from apscheduler.schedulers.background import BackgroundScheduler  # Network blocked - commented out
 
 # Basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -30,13 +32,8 @@ if not os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'):
 app = Flask(__name__)
 CORS(app)
 
-# BigQuery client - initialize once at startup
-try:
-    bq_client = bigquery.Client(project='wmt-assetprotection-prod')
-    logger.info("BigQuery client initialized successfully")
-except Exception as e:
-    logger.error(f"Failed to initialize BigQuery client: {e}")
-    bq_client = None
+# BigQuery client - initialize lazily on first use (don't block startup)
+bq_client = None
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -122,7 +119,7 @@ def api_project_by_id(project_id):
             sql = """
             UPDATE `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
             SET title = @title, 
-                store_area = @store_area, 
+                business_organization = @business_organization, 
                 owner = @owner, 
                 owner_id = @owner_id,
                 health = @health, 
@@ -133,7 +130,7 @@ def api_project_by_id(project_id):
             """
             query_params = [
                 bigquery.ScalarQueryParameter("title", "STRING", data.get('title')),
-                bigquery.ScalarQueryParameter("store_area", "STRING", data.get('store_area')),
+                bigquery.ScalarQueryParameter("business_organization", "STRING", data.get('business_organization', data.get('store_area', ''))),
                 bigquery.ScalarQueryParameter("owner", "STRING", data.get('owner')),
                 bigquery.ScalarQueryParameter("owner_id", "STRING", data.get('owner_id')),
                 bigquery.ScalarQueryParameter("health", "STRING", data.get('health')),
@@ -162,40 +159,84 @@ def api_projects():
     # Handle POST (create) and PUT (update)
     if request.method in ['POST', 'PUT']:
         try:
+            import json
             data = request.get_json()
             project_id = data.get('project_id', f'proj-{int(datetime.now().timestamp())}')
+            user_email = data.get('user_email', 'Activity Hub')
+            new_note = data.get('project_update', '')
             
             if request.method == 'POST':
-                # Insert new project
-                sql = f"""
+                # Insert new manual project
+                sql = """
                 INSERT INTO `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
                 (project_id, title, owner, owner_id, health, status, project_source, 
-                 created_date, last_updated, project_update, store_area)
+                 created_date, last_updated, project_update, project_update_date, 
+                 project_update_by, previous_updates, business_organization)
                 VALUES 
-                ('{project_id}', '{data.get('title', '')}', '{data.get('owner', '')}', 
-                 '{data.get('owner_id', '')}', '{data.get('health', 'Unknown')}', 
-                 '{data.get('status', 'Active')}', 'Manual Upload',
-                 CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '{data.get('project_update', '')}',
-                 '{data.get('store_area', '')}')
+                (@project_id, @title, @owner, @owner_id, @health, @status, 'Manual Upload',
+                 CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), @project_update,
+                 CURRENT_TIMESTAMP(), @user_email, JSON '[]',
+                 @business_organization)
                 """
+                
+                job_config = bigquery.QueryJobConfig(query_parameters=[
+                    bigquery.ScalarQueryParameter("project_id", "STRING", project_id),
+                    bigquery.ScalarQueryParameter("title", "STRING", data.get('title', '')),
+                    bigquery.ScalarQueryParameter("owner", "STRING", data.get('owner', '')),
+                    bigquery.ScalarQueryParameter("owner_id", "STRING", data.get('owner_id', '')),
+                    bigquery.ScalarQueryParameter("health", "STRING", data.get('health', 'Unknown')),
+                    bigquery.ScalarQueryParameter("status", "STRING", data.get('status', 'Active')),
+                    bigquery.ScalarQueryParameter("project_update", "STRING", new_note),
+                    bigquery.ScalarQueryParameter("user_email", "STRING", user_email),
+                    bigquery.ScalarQueryParameter("business_organization", "STRING", 
+                                                 data.get('business_organization', data.get('store_area', ''))),
+                ])
             else:
-                # Update existing project
-                sql = f"""
+                # Update project: track note history if note changed
+                sql = """
                 UPDATE `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-                SET title = '{data.get('title')}', 
-                    owner = '{data.get('owner')}', 
-                    owner_id = '{data.get('owner_id')}',
-                    health = '{data.get('health')}', 
-                    status = '{data.get('status')}', 
-                    project_update = '{data.get('project_update')}',
+                SET title = @title, 
+                    owner = @owner, 
+                    owner_id = @owner_id,
+                    health = @health, 
+                    status = @status, 
+                    project_update = @project_update,
+                    project_update_date = CURRENT_TIMESTAMP(),
+                    project_update_by = @user_email,
                     last_updated = CURRENT_TIMESTAMP(),
-                    store_area = '{data.get('store_area')}'
-                WHERE project_id = '{project_id}'
+                    business_organization = @business_organization,
+                    previous_updates = CASE 
+                        WHEN @project_update != project_update AND project_update IS NOT NULL
+                        THEN JSON_SET(
+                            COALESCE(previous_updates, JSON '[]'),
+                            CONCAT('$[', JSON_LENGTH(COALESCE(previous_updates, JSON '[]')), ']'),
+                            JSON_OBJECT(
+                                'note', project_update,
+                                'timestamp', CURRENT_TIMESTAMP(),
+                                'updated_by', project_update_by
+                            )
+                        )
+                        ELSE previous_updates
+                    END
+                WHERE project_id = @project_id
                 """
+                
+                job_config = bigquery.QueryJobConfig(query_parameters=[
+                    bigquery.ScalarQueryParameter("project_id", "STRING", project_id),
+                    bigquery.ScalarQueryParameter("title", "STRING", data.get('title')),
+                    bigquery.ScalarQueryParameter("owner", "STRING", data.get('owner')),
+                    bigquery.ScalarQueryParameter("owner_id", "STRING", data.get('owner_id')),
+                    bigquery.ScalarQueryParameter("health", "STRING", data.get('health')),
+                    bigquery.ScalarQueryParameter("status", "STRING", data.get('status')),
+                    bigquery.ScalarQueryParameter("project_update", "STRING", new_note),
+                    bigquery.ScalarQueryParameter("user_email", "STRING", user_email),
+                    bigquery.ScalarQueryParameter("business_organization", "STRING", 
+                                                 data.get('business_organization', data.get('store_area', ''))),
+                ])
             
-            job = bq_client.query(sql)
+            job = bq_client.query(sql, job_config=job_config)
             job.result()
-            return jsonify({'success': True, 'project_id': project_id}), 200
+            return jsonify({'success': True, 'project_id': project_id, 'note_tracked': True}), 200
         except Exception as e:
             logger.error(f"Project create/update error: {str(e)}")
             return jsonify({'error': str(e)}), 500
@@ -218,7 +259,6 @@ def api_projects():
         
         # Build base WHERE clause for both count and paginated queries
         where_clause = """WHERE 1=1
-        AND business_organization NOT IN ('Automotive', 'Unknown', 'N/A')
         AND TRIM(business_organization) != ''
         """
         
@@ -316,6 +356,69 @@ def api_projects():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/projects/<project_id>/history', methods=['GET'])
+def api_project_history(project_id):
+    """Get project note history (current + previous updates)"""
+    try:
+        sql = """
+        SELECT 
+            project_id,
+            project_update as current_note,
+            project_update_date as current_note_date,
+            project_update_by as current_note_by,
+            previous_updates
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        WHERE project_id = @project_id
+        """
+        
+        job_config = bigquery.QueryJobConfig(query_parameters=[
+            bigquery.ScalarQueryParameter("project_id", "STRING", project_id),
+        ])
+        
+        results = list(bq_client.query(sql, job_config=job_config).result())
+        
+        if not results:
+            return jsonify({'error': 'Project not found'}), 404
+        
+        row = results[0]
+        
+        # Build response with current + history
+        history = []
+        
+        # Add current note if exists
+        if row.current_note:
+            history.append({
+                'note': row.current_note,
+                'timestamp': row.current_note_date.isoformat() if row.current_note_date else None,
+                'updated_by': row.current_note_by or 'Activity Hub',
+                'is_current': True
+            })
+        
+        # Add previous notes from JSON array
+        if row.previous_updates:
+            import json
+            try:
+                previous = json.loads(row.previous_updates)
+                for prev in reversed(previous):  # Reverse to show newest first (after current)
+                    prev['is_current'] = False
+                    history.append(prev)
+            except:
+                pass
+        
+        return jsonify({
+            'project_id': project_id,
+            'current_note': row.current_note,
+            'current_note_date': row.current_note_date.isoformat() if row.current_note_date else None,
+            'current_note_by': row.current_note_by or 'Activity Hub',
+            'history': history,
+            'total_versions': len(history)
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Project history error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/projects/metrics', methods=['GET'])
 def api_metrics():
     """Get metrics"""
@@ -375,7 +478,6 @@ def api_business_areas():
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
         WHERE business_organization IS NOT NULL 
         AND TRIM(business_organization) != ''
-        AND business_organization NOT IN ('Automotive', 'Unknown', 'N/A')
         ORDER BY business_organization
         """
         
@@ -517,6 +619,56 @@ def admin_active_users():
         'users': active_users,
         'timestamp': datetime.now().isoformat()
     })
+
+
+@app.route('/api/admin/trigger-ah-projects-sync', methods=['POST'])
+def trigger_ah_projects_sync():
+    """Manually trigger AH_Projects sync from admin dashboard (async)"""
+    try:
+        data = request.get_json()
+        triggered_by = data.get('triggered_by', 'manual')
+        
+        logger.info(f"Manual AH_Projects sync triggered by: {triggered_by}")
+        
+        def run_sync_background():
+            """Run sync in background thread"""
+            try:
+                from google.cloud import bigquery
+                import subprocess
+                import sys
+                
+                # Run sync script
+                sync_script = os.path.join(BASE_DIR, '..', 'sync_now.py')
+                result = subprocess.run(
+                    [sys.executable, sync_script],
+                    capture_output=True,
+                    text=True,
+                    timeout=300  # 5 minutes
+                )
+                
+                if result.returncode == 0:
+                    logger.info(f"AH_Projects sync completed successfully")
+                else:
+                    logger.error(f"Sync script failed: {result.stderr}")
+                    
+            except Exception as e:
+                logger.error(f"Background sync error: {e}")
+        
+        # Start sync in background thread without blocking
+        sync_thread = threading.Thread(target=run_sync_background, daemon=True)
+        sync_thread.start()
+        
+        # Return immediately with acknowledgment
+        return jsonify({
+            'success': True,
+            'message': 'Sync started in background',
+            'status': 'running',
+            'timestamp': datetime.now().isoformat()
+        }), 202  # 202 Accepted
+            
+    except Exception as e:
+        logger.error(f"Manual sync trigger error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 # ──────────────────────────────────────────────
@@ -1173,101 +1325,167 @@ def get_business_areas():
 
 @app.route('/api/projects/sync-data-bridge', methods=['POST'])
 def sync_data_bridge():
-    """Sync projects data from Data Bridge (Intake Accel Council) table"""
+    """
+    Merge/sync projects from Intake Accel Council Data into AH_Projects.
+    Logic: For each source project, if it exists in AH_Projects (matched by Project ID),
+    compare timestamps and keep the newer version. Otherwise, insert as new.
+    """
     try:
         if not bq_client:
             return jsonify({'error': 'BigQuery client not initialized'}), 500
         
-        # First, get the list of existing project titles
-        existing_titles_sql = """
-        SELECT DISTINCT title FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        """
-        
-        existing_titles = set()
-        try:
-            results = bq_client.query(existing_titles_sql).result()
-            for row in results:
-                existing_titles.add(row.title)
-        except:
-            pass  # If table doesn't exist yet, that's ok
-        
-        # Get all projects from Data Bridge
+        # Query all ACTIVE projects from Intake Hub source (deduplicated by project ID)
+        # Active = ARCHIVED != True (includes all non-archived projects)
         source_sql = """
         SELECT 
-            COALESCE(impact_id, GENERATE_UUID()) as impact_id,
-            project_title as title,
-            business_area,
-            owner_name,
-            owner_id,
-            health_status,
-            project_status,
-            created_at as created_timestamp,
-            updated_at as modified_timestamp,
-            latest_update,
-            CURRENT_TIMESTAMP() as latest_update_timestamp,
-            CASE 
-              WHEN LOWER(updated_this_week) = 'true' THEN 'true'
-              ELSE 'false'
-            END as current_wm_week_update
-        FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - Intake Accel Council Data`
+            CAST(Intake_Card_Nbr AS STRING) as project_id,
+            Project_Title as title,
+            Business_Owner_Area as business_organization,
+            Owner as owner,
+            PROJECT_OWNERID as owner_id,
+            PROJECT_HEALTH_DESC as health,
+            Status as status,
+            'Intake Hub' as project_source,
+            CAST(CREATED_TS AS TIMESTAMP) as created_date,
+            CAST(Last_Updated AS TIMESTAMP) as last_updated,
+            Project_Update as project_update
+        FROM (
+            SELECT 
+                *,
+                ROW_NUMBER() OVER (PARTITION BY Intake_Card_Nbr ORDER BY Last_Updated DESC) as rn
+            FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - Intake Accel Council Data`
+            WHERE ARCHIVED != True
+        )
+        WHERE rn = 1
+        ORDER BY Intake_Card_Nbr
         """
         
-        rows_to_insert = []
-        source_results = bq_client.query(source_sql).result()
-        for row in source_results:
-            if row.title not in existing_titles:
-                rows_to_insert.append(row)
+        source_projects = list(bq_client.query(source_sql).result())
         
+        if not source_projects:
+            return jsonify({
+                'success': True,
+                'message': 'No active projects found in Intake Hub source',
+                'rows_affected': 0
+            }), 200
+        
+        # Get all projects currently in AH_Projects indexed by project_id
+        existing_sql = """
+        SELECT 
+            project_id,
+            last_updated
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        """
+        
+        existing_projects = {}
+        try:
+            for row in bq_client.query(existing_sql).result():
+                existing_projects[row.project_id] = row.last_updated
+        except:
+            pass  # Table may not exist yet
+        
+        # Separate into insert and update lists
+        rows_to_insert = []
+        rows_to_update = []
+        
+        for src_row in source_projects:
+            project_id = src_row.project_id
+            src_timestamp = src_row.last_updated
+            
+            if project_id in existing_projects:
+                # Project exists - compare timestamps
+                existing_timestamp = existing_projects[project_id]
+                if src_timestamp and (not existing_timestamp or src_timestamp > existing_timestamp):
+                    # Source is newer, mark for update
+                    rows_to_update.append(src_row)
+            else:
+                # New project, mark for insert
+                rows_to_insert.append(src_row)
+        
+        rows_affected = 0
+        
+        # INSERT new projects
         if rows_to_insert:
             insert_sql = """
             INSERT INTO `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-            (project_id, title, store_area, owner, owner_id, health, status, 
-             created_date, last_updated, project_update, wm_week)
+            (project_id, title, business_organization, owner, owner_id, health, status, project_source,
+             created_date, last_updated, project_update)
             VALUES 
             """
             using_params = []
-            param_names = []
             
             for i, row in enumerate(rows_to_insert):
                 if i > 0:
                     insert_sql += ", "
                 
                 params = [
-                    bigquery.ScalarQueryParameter(f"p{i}_project_id", "STRING", row.impact_id or str(__import__('uuid').uuid4())),
-                    bigquery.ScalarQueryParameter(f"p{i}_title", "STRING", row.title),
-                    bigquery.ScalarQueryParameter(f"p{i}_store_area", "STRING", row.business_area),
-                    bigquery.ScalarQueryParameter(f"p{i}_owner", "STRING", row.owner_name),
-                    bigquery.ScalarQueryParameter(f"p{i}_owner_id", "STRING", row.owner_id),
-                    bigquery.ScalarQueryParameter(f"p{i}_health", "STRING", row.health_status),
-                    bigquery.ScalarQueryParameter(f"p{i}_status", "STRING", row.project_status),
-                    bigquery.ScalarQueryParameter(f"p{i}_created_date", "TIMESTAMP", row.created_timestamp),
-                    bigquery.ScalarQueryParameter(f"p{i}_last_updated", "TIMESTAMP", row.modified_timestamp),
-                    bigquery.ScalarQueryParameter(f"p{i}_project_update", "STRING", row.latest_update),
-                    bigquery.ScalarQueryParameter(f"p{i}_wm_week", "INT64", CURRENT_TIMESTAMP()),
+                    bigquery.ScalarQueryParameter(f"ins{i}_project_id", "STRING", row.project_id),
+                    bigquery.ScalarQueryParameter(f"ins{i}_title", "STRING", row.title),
+                    bigquery.ScalarQueryParameter(f"ins{i}_business_organization", "STRING", row.business_organization),
+                    bigquery.ScalarQueryParameter(f"ins{i}_owner", "STRING", row.owner),
+                    bigquery.ScalarQueryParameter(f"ins{i}_owner_id", "STRING", row.owner_id),
+                    bigquery.ScalarQueryParameter(f"ins{i}_health", "STRING", row.health),
+                    bigquery.ScalarQueryParameter(f"ins{i}_status", "STRING", row.status),
+                    bigquery.ScalarQueryParameter(f"ins{i}_project_source", "STRING", row.project_source),
+                    bigquery.ScalarQueryParameter(f"ins{i}_created_date", "TIMESTAMP", row.created_date),
+                    bigquery.ScalarQueryParameter(f"ins{i}_last_updated", "TIMESTAMP", row.last_updated),
+                    bigquery.ScalarQueryParameter(f"ins{i}_project_update", "STRING", row.project_update),
                 ]
                 
                 using_params.extend(params)
-                insert_sql += f"""(@p{i}_project_id, @p{i}_title, @p{i}_store_area, @p{i}_owner, 
-                              @p{i}_owner_id, @p{i}_health, @p{i}_status, 
-                              @p{i}_created_date, @p{i}_last_updated, @p{i}_project_update, 
-                              @p{i}_wm_week)"""
+                insert_sql += f"""(@ins{i}_project_id, @ins{i}_title, @ins{i}_business_organization, @ins{i}_owner, 
+                              @ins{i}_owner_id, @ins{i}_health, @ins{i}_status, @ins{i}_project_source,
+                              @ins{i}_created_date, @ins{i}_last_updated, @ins{i}_project_update)"""
             
             job_config = bigquery.QueryJobConfig(query_parameters=using_params)
             job = bq_client.query(insert_sql, job_config=job_config)
             job.result()
+            rows_affected += len(rows_to_insert)
+        
+        # UPDATE existing projects with newer source data
+        if rows_to_update:
+            for src_row in rows_to_update:
+                update_sql = """
+                UPDATE `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+                SET 
+                    title = @title,
+                    business_organization = @business_organization,
+                    owner = @owner,
+                    owner_id = @owner_id,
+                    health = @health,
+                    status = @status,
+                    last_updated = @last_updated,
+                    project_update = @project_update
+                WHERE project_id = @project_id
+                """
+                
+                query_params = [
+                    bigquery.ScalarQueryParameter("title", "STRING", src_row.title),
+                    bigquery.ScalarQueryParameter("business_organization", "STRING", src_row.business_organization),
+                    bigquery.ScalarQueryParameter("owner", "STRING", src_row.owner),
+                    bigquery.ScalarQueryParameter("owner_id", "STRING", src_row.owner_id),
+                    bigquery.ScalarQueryParameter("health", "STRING", src_row.health),
+                    bigquery.ScalarQueryParameter("status", "STRING", src_row.status),
+                    bigquery.ScalarQueryParameter("last_updated", "TIMESTAMP", src_row.last_updated),
+                    bigquery.ScalarQueryParameter("project_update", "STRING", src_row.project_update),
+                    bigquery.ScalarQueryParameter("project_id", "STRING", src_row.project_id),
+                ]
+                
+                job_config = bigquery.QueryJobConfig(query_parameters=query_params)
+                job = bq_client.query(update_sql, job_config=job_config)
+                job.result()
             
-            logger.info(f"Data Bridge sync completed: {len(rows_to_insert)} new projects synced")
-            return jsonify({
-                'success': True,
-                'message': f'Synced {len(rows_to_insert)} new projects from Data Bridge',
-                'rows_affected': len(rows_to_insert)
-            }), 200
-        else:
-            return jsonify({
-                'success': True,
-                'message': 'No new projects to sync from Data Bridge',
-                'rows_affected': 0
-            }), 200
+            rows_affected += len(rows_to_update)
+        
+        logger.info(f"Data Bridge sync completed: {len(rows_to_insert)} new, {len(rows_to_update)} updated")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Sync completed from Intake Hub. Inserted: {len(rows_to_insert)}, Updated: {len(rows_to_update)}',
+            'inserted': len(rows_to_insert),
+            'updated': len(rows_to_update),
+            'rows_affected': rows_affected
+        }), 200
             
     except Exception as e:
         logger.error(f"Data Bridge sync error: {str(e)}")
@@ -1374,4 +1592,11 @@ if __name__ == '__main__':
     print(f'Activity Hub V2 starting on port {port}...')
     print(f'  Local:   http://localhost:{port}/activity-hub/')
     print(f'  Network: http://weus42608431466:{port}/activity-hub/')
+    
+    # NOTE: APScheduler scheduler disabled - network blocked pip install
+    # Background scheduler would run:
+    #  - AH_Projects sync every 30 minutes (smart merge, preserves note history)
+    #  - Weekly audio digest every Saturday at 9:00 AM
+    # Manual sync available via POST /api/admin/trigger-ah-projects-sync
+    
     app.run(host='0.0.0.0', port=port, debug=False)

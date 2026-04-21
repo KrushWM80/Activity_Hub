@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-V.E.T. Executive Report - Final Version (Complete Dashboard Integration)
-Captures V.E.T. Dashboard content exactly as displayed including:
+Dallas Team Report - Final Version (Complete Dashboard Integration)
+Captures Dallas Team Report content exactly as displayed including:
 - Needs Attention section with at-risk initiatives
 - Complete data tables with all columns (Initiative, Health, Phase, WM Week, # Stores, Executive Notes)
 - Dashboard-rendered screenshots for PPT and PDF
@@ -92,6 +92,15 @@ def _fetch_from_bigquery_direct() -> list:
             os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = creds_path
         bq_client = bq.Client(project='wmt-assetprotection-prod')
         query = """
+        WITH ih_agg AS (
+            SELECT
+                Intake_Card,
+                MIN(WM_Week) AS WM_Week,
+                COUNT(DISTINCT CASE WHEN Banner_Desc IN ('WM Supercenter', 'Wal-Mart') AND CAST(Facility AS INT64) > 0 THEN CAST(Facility AS INT64) END) AS SC_Stores,
+                COUNT(DISTINCT CASE WHEN Banner_Desc = 'Neighborhood Market' AND CAST(Facility AS INT64) > 0 THEN CAST(Facility AS INT64) END) AS NHM_Stores
+            FROM `wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data`
+            GROUP BY Intake_Card
+        )
         SELECT
             tda.Topic AS `Initiative - Project Title`,
             tda.Health_Update AS `Health Status`,
@@ -102,13 +111,17 @@ def _fetch_from_bigquery_direct() -> list:
             tda.Intake_Card_Nbr AS `Project ID`,
             tda.Intake_n_Testing AS `Intake & Testing`,
             tda.Deployment,
-            COALESCE(CAST(MIN(intake.WM_Week) AS STRING), 'TBD') AS `WM Week`
+            COALESCE(CAST(ih.WM_Week AS STRING), 'TBD') AS `WM Week`,
+            FORMAT_DATE('%d/%m/%y', MIN(tda.Impl_Date)) AS `Start Date`,
+            COALESCE(ih.SC_Stores, 0) AS `SC`,
+            COALESCE(ih.NHM_Stores, 0) AS `NHM`
         FROM `wmt-assetprotection-prod.Store_Support_Dev.Output- TDA Report` tda
-        LEFT JOIN `wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data` intake
-            ON CAST(tda.Intake_Card_Nbr AS STRING) = CAST(intake.Intake_Card AS STRING)
+        LEFT JOIN ih_agg ih
+            ON CAST(tda.Intake_Card_Nbr AS STRING) = CAST(ih.Intake_Card AS STRING)
         WHERE tda.TDA_Ownership IN ('Dallas POC', 'Dallas VET')
         GROUP BY tda.Topic, tda.Health_Update, tda.Phase, tda.Dallas_POC,
-                 tda.TDA_Ownership, tda.Intake_Card_Nbr, tda.Intake_n_Testing, tda.Deployment
+                 tda.TDA_Ownership, tda.Intake_Card_Nbr, tda.Intake_n_Testing, tda.Deployment,
+                 ih.WM_Week, ih.SC_Stores, ih.NHM_Stores
         ORDER BY tda.Phase ASC, tda.Topic ASC
         """
         rows = list(bq_client.query(query).result())
@@ -133,6 +146,49 @@ def _build_stats(projects: list) -> dict:
         'off_track': len([p for p in projects if 'Off Track' in str(p.get('Health Status', ''))]),
         'wm_week': current_wm_week,
     }
+
+
+def fetch_contacts(api_url: str = DASHBOARD_URL) -> list:
+    """Fetch Dallas Team Contact data from API"""
+    try:
+        url = f"{api_url}/api/contacts"
+        with urllib.request.urlopen(url, timeout=10) as response:
+            data = json.loads(response.read().decode())
+        if data.get('success'):
+            return data.get('data', [])
+    except Exception as e:
+        print(f"     [!] Could not fetch contacts: {e}")
+    return []
+
+
+def build_contacts_html(contacts: list) -> str:
+    """Build HTML slide for Initiatives by Dallas Team Contact"""
+    if not contacts:
+        return ''
+    cards_html = ''
+    for c in contacts:
+        name = escape(c['name'])
+        count = c['active_projects']
+        areas = escape(', '.join(c.get('store_areas', [])) or 'N/A')
+        cards_html += f'''<div style="background:#f8f9fa;border-radius:8px;padding:16px;border-left:4px solid #0071CE;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <span style="font-weight:700;font-size:15px;color:#212121;">{name}</span>
+    <span style="background:#0071CE;color:white;padding:3px 10px;border-radius:12px;font-size:13px;font-weight:600;">{count} Project{"s" if count != 1 else ""}</span>
+  </div>
+  <div style="font-size:12px;color:#666;line-height:1.4;"><strong>Store Areas:</strong> {areas}</div>
+</div>'''
+
+    html = f'''<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>*{{margin:0;padding:0;box-sizing:border-box;}} body{{background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;}}</style>
+</head><body>
+<div style="background:white;border-radius:8px;padding:20px;border-top:4px solid #1E3A5F;">
+  <div style="color:#1E3A5F;font-size:18px;font-weight:700;margin-bottom:16px;">Initiatives by Dallas Team Contact</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
+    {cards_html}
+  </div>
+</div>
+</body></html>'''
+    return html
 
 
 def fetch_dashboard_data(api_url: str = DASHBOARD_URL) -> tuple:
@@ -347,7 +403,7 @@ body{{background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','
 def build_phase_html(phase: str, rows: list) -> str:
     """Build HTML for a phase section — matches dashboard Generate PPT styling exactly"""
     
-    columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'WM Week', '# of Stores', 'Executive Notes']
+    columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Start Date', 'WM Week', '# of Stores', 'SC', 'NHM', 'Executive Notes']
     
     # Phase banner — matches dashboard blue (#3B82F6)
     banner = f'''<div style="background:#3B82F6;color:white;padding:10px 20px;font-size:16px;font-weight:600;text-align:center;border-radius:4px 4px 0 0;">Phase: {escape(phase)}</div>'''
@@ -391,6 +447,12 @@ def build_phase_html(phase: str, rows: list) -> str:
                     pass
                 table += f'<td style="{cell_style}font-weight:600;color:#0071CE;">{escape(value)}</td>'
             
+            elif col in ('SC', 'NHM'):
+                table += f'<td style="{cell_style}font-weight:600;color:#0071CE;">{escape(value)}</td>'
+            
+            elif col == 'Start Date':
+                table += f'<td style="{cell_style}white-space:nowrap;">{escape(value)}</td>'
+            
             elif col == 'Initiative - Project Title':
                 project_id = row.get('Project ID', '')
                 if project_id:
@@ -417,7 +479,7 @@ def build_combined_phases_html(phase_sections: list) -> str:
     """Build HTML combining multiple small phases onto one page.
     phase_sections: list of (phase_name, rows_list) tuples
     """
-    columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'WM Week', '# of Stores', 'Executive Notes']
+    columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Start Date', 'WM Week', '# of Stores', 'SC', 'NHM', 'Executive Notes']
     
     body = ''
     for phase, rows in phase_sections:
@@ -454,6 +516,10 @@ def build_combined_phases_html(phase_sections: list) -> str:
                     except:
                         pass
                     table += f'<td style="{cell_style}font-weight:600;color:#0071CE;">{escape(value)}</td>'
+                elif col in ('SC', 'NHM'):
+                    table += f'<td style="{cell_style}font-weight:600;color:#0071CE;">{escape(value)}</td>'
+                elif col == 'Start Date':
+                    table += f'<td style="{cell_style}white-space:nowrap;">{escape(value)}</td>'
                 elif col == 'Initiative - Project Title':
                     project_id = row.get('Project ID', '')
                     if project_id:
@@ -539,7 +605,7 @@ def generate_report_pptx(executive_summary_html: str, sections: list) -> tuple:
         p = txBox.text_frame.paragraphs[0]
         p.alignment = PP_ALIGN.CENTER
         run = p.add_run()
-        run.text = "V.E.T. Executive Report"
+        run.text = "Dallas Team Report"
         run.font.size = Pt(44)
         run.font.bold = True
         run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
@@ -684,6 +750,14 @@ def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False
         executive_summary_html = build_executive_summary_html(stats, projects)
         print("     [OK] Executive Summary built (header + stats + needs attention)")
         
+        # Build Initiatives by Dallas Team Contact section
+        contacts = fetch_contacts()
+        contacts_sections = []
+        if contacts:
+            contacts_html = build_contacts_html(contacts)
+            contacts_sections.append(('Initiatives by Dallas Team Contact', contacts_html))
+            print(f"     [OK] Contacts section: {len(contacts)} team member(s)")
+        
         # Build overflow Needs Attention pages (items beyond the first 10 shown in exec summary)
         at_risk_all = [p for p in projects if str(p.get('Health Status', '')).lower() == 'at risk']
         needs_attention_overflow = []
@@ -695,10 +769,23 @@ def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False
             print(f"     [OK] {len(needs_attention_overflow)} overflow Needs Attention page(s)")
         print()
         
+        # Build Ops Models section (projects with "Ops Model" or "Operating Model" in title)
+        def is_ops_model(p):
+            t = str(p.get('Initiative - Project Title', '')).lower()
+            return 'ops model' in t or 'operating model' in t
+        ops_model_projects = [p for p in projects if is_ops_model(p)]
+        ops_model_sections = []
+        if ops_model_projects:
+            ops_html = build_phase_html('Operating Model Initiatives', ops_model_projects)
+            ops_model_sections.append(('Operating Model Initiatives', ops_html))
+            print(f"     [OK] Operating Model Initiatives section: {len(ops_model_projects)} project(s)")
+        
         # Step 3: Build Phase sections — combine small phases onto one slide
+        # Exclude Ops Model projects from regular phase sections
         print("[3/6] Capturing dashboard phase tables...")
+        non_ops_projects = [p for p in projects if not is_ops_model(p)]
         phases_dict = {}
-        for proj in projects:
+        for proj in non_ops_projects:
             phase = proj.get('Phase', 'Unknown')
             if phase not in phases_dict:
                 phases_dict[phase] = []
@@ -780,9 +867,16 @@ def send_vet_report_email(recipient_emails: list = None, test_mode: bool = False
         
         print(f"     [OK] Built {len(sections)} slide sections (combined small phases)")
         
-        # Insert overflow Needs Attention pages before phase slides
+        # Insert Contacts, overflow Needs Attention, then Ops Models, before phase slides
+        prefix_sections = []
+        if contacts_sections:
+            prefix_sections += contacts_sections
         if needs_attention_overflow:
-            sections = needs_attention_overflow + sections
+            prefix_sections += needs_attention_overflow
+        if ops_model_sections:
+            prefix_sections += ops_model_sections
+        if prefix_sections:
+            sections = prefix_sections + sections
         
         for name, _ in sections:
             print(f"       * {name}")

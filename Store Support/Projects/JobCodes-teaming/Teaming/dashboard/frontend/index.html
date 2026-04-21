@@ -280,6 +280,27 @@
             margin: 2px;
             display: inline-block;
         }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 4px;
+        }
+
+        .btn-group .btn {
+            flex: 0 0 auto;
+            margin: 0;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-group .btn i {
+            font-size: 0.75rem;
+        }
         
         .request-status-pending {
             color: #ffc107;
@@ -859,12 +880,10 @@
                                     <tr>
                                         <th class="sortable" data-sort="job_code" onclick="sortTable('job_code')">Job Code <i class="bi bi-sort-down"></i></th>
                                         <th class="sortable" data-sort="job_title" onclick="sortTable('job_title')">Job Title <i class="bi bi-sort-down"></i></th>
-                                        <th class="sortable" data-sort="user_count" onclick="sortTable('user_count')">Impacted <i class="bi bi-sort-down"></i></th>
-                                        <th class="sortable" data-sort="status" onclick="sortTable('status')">Status <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="user_count" onclick="sortTable('user_count')" style="min-width: 420px; white-space: nowrap;">Impacted <i class="bi bi-sort-down"></i></th>
                                         <th>Assigned Teams</th>
                                         <th>Workgroups</th>
-                                        <th>Pending Request</th>
-                                        <th>Action</th>
+                                        <th style="min-width: 240px;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="jobCodesTableBody">
@@ -1020,9 +1039,14 @@
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h5 class="mb-0"><i class="bi bi-list-check"></i> All Teaming Requests</h5>
-                                        <button class="btn btn-sm btn-success" onclick="exportApprovedRequests()">
-                                            <i class="bi bi-download"></i> Export Approved
-                                        </button>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-success" onclick="exportAllActions()">
+                                                <i class="bi bi-download"></i> Export All Actions
+                                            </button>
+                                            <button class="btn btn-sm btn-success" onclick="exportApprovedRequests()">
+                                                <i class="bi bi-download"></i> Export Approved
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="card-body p-0">
                                         <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
@@ -1030,10 +1054,12 @@
                                                 <thead class="table-light sticky-top">
                                                     <tr>
                                                         <th>Job Code</th>
+                                                        <th>Role</th>
+                                                        <th style="min-width: 350px; white-space: nowrap;">Impacted <i class="bi bi-sort-down" style="margin-left: 4px;"></i></th>
                                                         <th>Team</th>
                                                         <th>By</th>
-                                                        <th>Status</th>
-                                                        <th>Actions</th>
+                                                        <th>Date Submitted</th>
+                                                        <th style="min-width: 200px;">Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="pendingRequestsTableBody">
@@ -1510,6 +1536,7 @@
         let currentFilter = ['all'];  // Array to support multiple status filters
         let currentSourceFilter = ['all'];  // Array to support multiple source filters
         let currentSort = { column: null, direction: 'asc' };
+        let workersByJobCode = {};              // Maps job_code to array of {name, store} objects
 
         // API Helper
         async function api(endpoint, options = {}) {
@@ -1939,6 +1966,103 @@ ${sourcesList}
             showToast('Teaming data refreshed');
         }
 
+        // Load worker data for employee tooltips
+        async function loadWorkerData() {
+            try {
+                // Try to load from generated CSV file
+                // Try to load optimized data first (count + sample worker)
+                let response = await fetch('/Worker_Names_Stores_Missing_JobCodes_Optimized.json');
+                if (!response.ok) {
+                    // Fall back to full data if optimized not available
+                    response = await fetch('/Worker_Names_Stores_Missing_JobCodes.json');
+                }
+                if (response.ok) {
+                    const data = await response.json();
+                    // Map workers by job code for quick lookup
+                    if (Array.isArray(data)) {
+                        workersByJobCode = {};
+                        data.forEach(worker => {
+                            const code = worker.job_code;
+                            if (!workersByJobCode[code]) {
+                                // Store the optimized structure with count and sample
+                                workersByJobCode[code] = {
+                                    count: worker.worker_count || 0,
+                                    sampleWorker: worker.sample_worker || {}
+                                };
+                            }
+                        });
+                        console.log('Optimized worker data loaded:', Object.keys(workersByJobCode).length, 'job codes');
+                    } else if (typeof data === 'object') {
+                        // Handle old format compatibility
+                        workersByJobCode = data;
+                    }
+                } else {
+                    console.log('Worker data file not available yet');
+                }
+            } catch (error) {
+                console.log('Worker data loading skipped:', error.message);
+            }
+        }
+
+        // Get sample worker display text for job code
+        function getWorkerDisplayText(jobCode) {
+            const workerData = workersByJobCode[jobCode];
+            if (!workerData) return 'Loading worker data...';
+            
+            const count = workerData.count || 0;
+            const worker = workerData.sampleWorker || {};
+            const name = worker.first_name && worker.last_name 
+                ? `${worker.first_name} ${worker.last_name}`
+                : 'Unknown';
+            const store = worker.store_number ? `Store #${worker.store_number}` : 'Unknown Store';
+            
+            return `${count} worker${count !== 1 ? 's' : ''} - ${name} - ${store}`;
+        }
+
+        // Safely escape HTML for tooltip content
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        // Initialize Bootstrap tooltips for a container
+        function initializeTooltips(container) {
+            const tooltipElements = (container || document).querySelectorAll('[data-bs-toggle="tooltip"]');
+            tooltipElements.forEach(el => {
+                // Dispose old tooltip if exists
+                const existingTooltip = bootstrap.Tooltip.getInstance(el);
+                if (existingTooltip) {
+                    existingTooltip.dispose();
+                }
+                // Create new tooltip with proper initialization
+                const title = el.getAttribute('data-bs-title') || el.title;
+                new bootstrap.Tooltip(el, {
+                    title: title,
+                    html: false,
+                    trigger: 'hover',
+                    delay: { show: 100, hide: 200 }
+                });
+            });
+        }
+
+        // Determine smart action text based on request status
+        function getSmartActionText(request, jobData) {
+            // If pending/submitted but not approved
+            if (request.status === 'pending') {
+                return 'Pending';
+            }
+            // Check if request has all necessary information
+            const hasTeam = request.team_name && request.team_name !== '-';
+            const hasWorkgroup = request.workgroup_name && request.workgroup_name !== '-';
+            // If approved and complete
+            if (request.status === 'approved' && hasTeam && hasWorkgroup) {
+                return 'Update';
+            }
+            // If incomplete or needs assignment
+            return 'Assign';
+        }
+
         function updateStats() {
             const total = jobCodes.length;
             const assigned = jobCodes.filter(j => j.status === 'Assigned').length;
@@ -2069,11 +2193,19 @@ ${sourcesList}
                 });
             }
             
+            // Initialize tooltips after rendering with small delay
+            setTimeout(() => {
+                initializeTooltips(document.getElementById('jobCodesTableBody'));
+            }, 100);
+        }
+        
+        // Helper to render teaming tab after tooltips
+        function renderJobCodesWithTooltips() {
+            renderJobCodes();
             tbody.innerHTML = filtered.map(j => {
-                const pendingReq = getPendingRequestForJobCode(j.job_code);
-                const pendingBadge = pendingReq 
-                    ? `<span class="badge bg-warning text-dark" style="cursor:pointer" onclick="showRequestDetail(${pendingReq.id})"><i class="bi bi-hourglass-split"></i> Pending</span>`
-                    : '-';
+                // Get worker tooltip text for Impacted column
+                const workerText = getWorkerDisplayText(j.job_code);
+                const safeTooltip = escapeHtml(workerText);
                 
                 // Build source badges display
                 const sourceBadges = j.source_badges && j.source_badges.length > 0 
@@ -2093,28 +2225,38 @@ ${sourcesList}
                     ? `<span class="badge status-badge-assigned" style="cursor:pointer" onclick="showStatusDetail('${j.job_code}')" title="Click for details: Job code is fully assigned to teams">✅ Assigned</span>`
                     : `<span class="badge status-badge-review status-detail-tooltip" style="cursor:pointer" onclick="showStatusDetail('${j.job_code}')" title="Click for details: ${statusTitle}">📋 Review</span>`;
                 
+                // Smart action logic
+                const actionText = getSmartActionText(j, j);
+                const actionColor = actionText === 'Pending' ? 'warning' : actionText === 'Update' ? 'success' : 'info';
+                
                 return `
                 <tr>
                     <td><strong>${j.job_code}</strong>${sourceBadges ? `<div class="source-badges">${sourceBadges}</div>` : ''}</td>
                     <td>${j.job_title || j.job_name || '-'}</td>
-                    <td>${(j.user_count || 0).toLocaleString()}</td>
-                    <td>
-                        ${statusDisplay}
-                    </td>
+                    <td><span class="badge bg-info cursor-pointer" data-bs-toggle="tooltip" data-bs-title="${safeTooltip}" style="font-size: 0.9rem; padding: 0.4rem 0.6rem;">${(j.user_count || 0).toLocaleString()}</span></td>
                     <td>
                         ${j.teams && j.teams.length ? j.teams.map(t => `<span class="team-badge">${t}</span>`).join('') : '-'}
                     </td>
                     <td>
                         ${j.workgroups && j.workgroups.length ? j.workgroups.map(w => `<span class="team-badge">${w}</span>`).join('') : '-'}
                     </td>
-                    <td>${pendingBadge}</td>
                     <td>
-                        <button class="btn btn-sm btn-walmart" onclick="openAssignModal('${j.job_code}', '${(j.job_title || j.job_name || '').replace(/'/g, "\\'")}', '${(j.teams || []).join(', ') || '-'}', '${(j.workgroups || []).join(', ') || '-'}')">
-                            <i class="bi bi-plus-circle"></i> ${j.status === 'Missing' || j.status === 'Review' ? 'Assign' : 'Update'}
-                        </button>
+                        <div class="btn-group btn-group-sm" role="group" style="flex-wrap: nowrap; gap: 4px;">
+                            <button class="btn btn-${actionColor} assign-btn" data-job-code="${j.job_code}" data-job-title="${escapeHtml((j.job_title || j.job_name || ''))}" data-teams="${(j.teams || []).join(', ') || '-'}" data-workgroups="${(j.workgroups || []).join(', ') || '-'}">  
+                                ${actionText}
+                            </button>
+                            <button class="btn btn-outline-secondary assign-btn" data-job-code="${j.job_code}" data-job-title="${escapeHtml((j.job_title || j.job_name || ''))}" data-teams="${(j.teams || []).join(', ') || '-'}" data-workgroups="${(j.workgroups || []).join(', ') || '-'}" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `}).join('');
+            
+            // Initialize tooltips after rendering with small delay
+            setTimeout(() => {
+                initializeTooltips(document.getElementById('jobCodesTableBody'));
+            }, 100);
         }
 
         function populateTeamSelect() {
@@ -2132,6 +2274,18 @@ ${sourcesList}
 
         // Search and Filter
         document.getElementById('searchInput').addEventListener('input', renderJobCodes);
+        
+        // Handle assign button clicks
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.assign-btn')) {
+                const btn = e.target.closest('.assign-btn');
+                const jobCode = btn.getAttribute('data-job-code');
+                const jobTitle = btn.getAttribute('data-job-title');
+                const teams = btn.getAttribute('data-teams');
+                const workgroups = btn.getAttribute('data-workgroups');
+                openAssignModal(jobCode, jobTitle, teams, workgroups);
+            }
+        });
         
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
@@ -2884,37 +3038,54 @@ ${sourcesList}
                 const allRequestsData = await api('/requests');
                 adminRequests = allRequestsData.requests || [];  // Store for editRequest function
                 pendingBody.innerHTML = (adminRequests || []).map(r => {
-                    const statusBadge = r.status === 'approved' ? 'success' : r.status === 'rejected' ? 'danger' : 'warning';
-                    const statusIcon = r.status === 'approved' ? 'check-circle' : r.status === 'rejected' ? 'x-circle' : 'hourglass-split';
+                    const dateSubmitted = new Date(r.requested_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                    const role = r.job_title || r.tl_job_title || r.role || '-';
+                    
+                    // Look up user_count from jobCodes data for consistency with teaming tab
+                    const jobData = jobCodes.find(j => j.job_code === r.job_code);
+                    const impactedCount = (jobData && jobData.user_count) ? (jobData.user_count || 0).toLocaleString() : '-';
+                    
+                    // Get worker tooltip text
+                    const workerText = getWorkerDisplayText(r.job_code);
+                    const safeTooltip = escapeHtml(workerText);
+                    
+                    // Get smart action text
+                    const actionText = getSmartActionText(r, jobData);
+                    const actionColor = actionText === 'Pending' ? 'warning' : actionText === 'Update' ? 'success' : 'info';
+                    
                     return `
                     <tr>
                         <td><strong>${r.job_code}</strong></td>
+                        <td><small>${role}</small></td>
+                        <td><span class="badge bg-info cursor-pointer" data-bs-toggle="tooltip" data-bs-title="${safeTooltip}">${impactedCount}</span></td>
                         <td>${r.team_name}</td>
                         <td>${r.requested_by_name}</td>
+                        <td><small>${dateSubmitted}</small></td>
                         <td>
-                            <span class="badge bg-${statusBadge}">
-                                <i class="bi bi-${statusIcon}"></i> ${r.status.charAt(0).toUpperCase() + r.status.slice(1)}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" onclick="showRequestDetail(${r.id})" title="View">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            ${r.status !== 'approved' ? `
-                            <button class="btn btn-sm btn-success me-1" onclick="processRequest(${r.id}, 'approved')" title="Approve">
-                                <i class="bi bi-check"></i>
-                            </button>` : ''}
-                            ${r.status !== 'rejected' ? `
-                            <button class="btn btn-sm btn-danger me-1" onclick="processRequest(${r.id}, 'rejected')" title="Reject">
-                                <i class="bi bi-x"></i>
-                            </button>` : ''}
-                            ${r.status !== 'pending' ? `
-                            <button class="btn btn-sm btn-warning" onclick="processRequest(${r.id}, 'pending')" title="Revert to Pending">
-                                <i class="bi bi-arrow-counterclockwise"></i>
-                            </button>` : ''}
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-${actionColor}" onclick="showRequestDetail(${r.id})" title="View Details">
+                                    ${actionText}
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="showRequestDetail(${r.id})" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                ${r.status !== 'approved' ? `
+                                <button class="btn btn-sm btn-success" onclick="processRequest(${r.id}, 'approved')" title="Approve">
+                                    <i class="bi bi-check"></i>
+                                </button>` : ''}
+                                ${r.status !== 'rejected' ? `
+                                <button class="btn btn-sm btn-danger" onclick="processRequest(${r.id}, 'rejected')" title="Reject">
+                                    <i class="bi bi-x"></i>
+                                </button>` : ''}
+                            </div>
                         </td>
                     </tr>
-                `}).join('') || '<tr><td colspan="5" class="text-center">No requests</td></tr>';
+                `}).join('') || '<tr><td colspan="7" class="text-center">No requests</td></tr>';
+                
+                // Initialize tooltips for the admin requests table with a small delay to ensure DOM is ready
+                setTimeout(() => {
+                    initializeTooltips(document.getElementById('pendingRequestsTableBody'));
+                }, 100);
                 
                 // Load job code requests
                 loadAdminJobCodeRequests();
@@ -3467,6 +3638,44 @@ ${sourcesList}
             loadDashboardData();
         }
 
+        async function exportAllActions() {
+            try {
+                console.log("[EXPORT] Starting exportAllActions");
+                const data = await api('/export-requests');
+                
+                console.log("[EXPORT] Response from server:", data);
+                console.log("[EXPORT] Export data length:", data.export_data.length);
+                console.log("[EXPORT] AdminRequests length:", adminRequests.length);
+                
+                // Create CSV
+                if (data.export_data.length === 0) {
+                    console.log("[EXPORT] No export data - showing error");
+                    showToast('No requests to export', 'error');
+                    return;
+                }
+                
+                const headers = Object.keys(data.export_data[0]);
+                const csv = [
+                    headers.join(','),
+                    ...data.export_data.map(row => headers.map(h => `"${row[h] || ''}"`).join(','))
+                ].join('\n');
+                
+                // Download
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `teaming_all_actions_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                showToast(`Exported ${data.count} requests`);
+            } catch (error) {
+                console.log("[EXPORT] Error:", error);
+                showToast(error.message, 'error');
+            }
+        }
+
         async function exportApprovedRequests() {
             try {
                 const data = await api('/export-requests?status=approved');
@@ -3953,6 +4162,7 @@ ${sourcesList}
 
         // Initialize
         checkAuth();
+        loadWorkerData();  // Load worker data for tooltips
     </script>
 
     <!-- Feedback Modal -->

@@ -248,13 +248,38 @@
             border-radius: 0 0 4px 4px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             z-index: 100;
-            max-height: 220px;
+            max-height: 320px;
             overflow-y: auto;
             padding: 4px 0;
         }
 
         .dropdown-multi-panel.open {
             display: block;
+        }
+
+        .dropdown-search {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1;
+        }
+
+        .dropdown-search input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: var(--font-size-sm);
+            font-family: var(--font-family);
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .dropdown-search input:focus {
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 2px rgba(0, 113, 206, 0.1);
         }
 
         .dropdown-multi-panel label {
@@ -720,10 +745,22 @@
             </div>
         </div>
 
+        <!-- Initiatives by Dallas Team Contact -->
+        <div id="contacts-section" style="display: none; margin: 30px 0;">
+            <div style="background: #1E3A5F; color: white; padding: 12px 20px; font-size: 16px; font-weight: 600; border-radius: 4px 4px 0 0;">👤 Initiatives by Dallas Team Contact</div>
+            <div id="contacts-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; padding: 16px; background: white; border: 1px solid var(--border-color); border-top: none; border-radius: 0 0 4px 4px;"></div>
+        </div>
+
         <!-- Needs Attention Section (At Risk Items) -->
         <div class="needs-attention-section" id="needs-attention-section" style="display: none; margin: 30px 0;">
             <div class="needs-attention-header">🚨 Needs Attention</div>
             <div class="needs-attention-items" id="needs-attention-items"></div>
+        </div>
+
+        <!-- Ops Models Section -->
+        <div class="ops-models-section" id="ops-models-section" style="display: none; margin: 30px 0;">
+            <div style="background: #7C3AED; color: white; padding: 12px 20px; font-size: 16px; font-weight: 600; border-radius: 4px 4px 0 0;">⚙️ Operating Model Initiatives</div>
+            <div id="ops-models-table" class="table-wrapper"></div>
         </div>
 
         <!-- Data Table -->
@@ -785,6 +822,10 @@
         let healthStatuses = [];
         let projectTitles = [];
         let currentPage = 1;
+        
+        // Sort state: { column: string|null, direction: 'asc'|'desc'|null }
+        let sortState = { column: null, direction: null };
+        let currentTableData = []; // Data currently displayed in the main table (for sorting)
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async () => {
@@ -851,6 +892,9 @@
                 
                 // Load data with default filters (all selected)
                 await loadData();
+                
+                // Load contacts section
+                await loadContacts();
                 
                 updateConnectionStatus(true);
             } catch (error) {
@@ -995,8 +1039,15 @@
                     const { atRisk, regular } = separateAtRiskItems(result.data);
                     renderNeedsAttention(atRisk);
                     
-                    // Render regular (non-At Risk) initiatives
-                    renderTable(regular, currentSelectedPhases);
+                    // Separate Ops Model projects (title contains "Ops Model" or "Operating Model")
+                    const isOpsModel = (title) => { const t = (title || '').toLowerCase(); return t.includes('ops model') || t.includes('operating model'); };
+                    const opsModels = regular.filter(r => isOpsModel(r['Initiative - Project Title']));
+                    const initiatives = regular.filter(r => !isOpsModel(r['Initiative - Project Title']));
+                    renderOpsModels(opsModels);
+                    
+                    // Render regular initiatives (excluding Ops Models)
+                    currentTableData = initiatives;
+                    renderTable(initiatives, currentSelectedPhases);
                     updateSummary(result.data);
                     updateRecordCount(result.count);
                     updateLastUpdated();
@@ -1096,6 +1147,136 @@
             });
         }
 
+        // Load and render Dallas Team Contacts section
+        async function loadContacts() {
+            try {
+                const res = await fetch(`${API_BASE}/contacts`);
+                const data = await res.json();
+                if (data.success && data.data && data.data.length > 0) {
+                    renderContacts(data.data);
+                }
+            } catch (e) {
+                console.error('Error loading contacts:', e);
+            }
+        }
+
+        function renderContacts(contacts) {
+            const section = document.getElementById('contacts-section');
+            const container = document.getElementById('contacts-cards');
+            if (!contacts || contacts.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = 'block';
+            container.innerHTML = '';
+            contacts.forEach(c => {
+                const areas = c.store_areas.join(', ') || 'N/A';
+                const card = document.createElement('div');
+                card.style.cssText = 'background: var(--bg-light); border-radius: 8px; padding: 16px; border-left: 4px solid var(--walmart-blue);';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-weight: 700; font-size: 15px; color: var(--text-primary);">👤 ${escapeHtml(c.name)}</span>
+                        <span style="background: var(--walmart-blue); color: white; padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 600;">${c.active_projects} Project${c.active_projects !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                        <strong>Store Areas:</strong> ${escapeHtml(areas)}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Render Ops Models section
+        function renderOpsModels(opsData) {
+            const section = document.getElementById('ops-models-section');
+            const tableContainer = document.getElementById('ops-models-table');
+            
+            if (!opsData || opsData.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            const columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Start Date', 'WM Week', '# of Stores', 'SC', 'NHM', 'Executive Notes'];
+            
+            let html = '<table><thead><tr>';
+            columns.forEach(col => { html += `<th>${col}</th>`; });
+            html += '</tr></thead><tbody>';
+            
+            opsData.forEach(row => {
+                html += '<tr>';
+                columns.forEach(col => {
+                    let value = row[col] ?? '';
+                    if (col === 'Health Status') {
+                        const status = String(value).toLowerCase();
+                        let cls = 'badge';
+                        if (status.includes('on track')) cls = 'badge badge-on-track';
+                        else if (status.includes('at risk')) cls = 'badge badge-at-risk';
+                        else if (status.includes('off track')) cls = 'badge badge-off-track';
+                        else if (status.includes('continuous')) cls = 'badge badge-continuous';
+                        html += `<td><span class="${cls}">${value}</span></td>`;
+                    } else if (col === 'Phase') {
+                        html += `<td><span class="phase-tag">${value}</span></td>`;
+                    } else if (col === '# of Stores' || col === 'SC' || col === 'NHM') {
+                        html += `<td style="font-weight: 600; color: var(--walmart-blue);">${value}</td>`;
+                    } else if (col === 'Initiative - Project Title') {
+                        const projectId = row['Project ID'];
+                        if (projectId) {
+                            html += `<td><a href="https://hoops.wal-mart.com/intake-hub/projects/${projectId}" target="_blank" style="color: var(--walmart-blue); text-decoration: none; font-weight: 500;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${value}</a></td>`;
+                        } else {
+                            html += `<td>${value}</td>`;
+                        }
+                    } else {
+                        html += `<td>${value}</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            tableContainer.innerHTML = html;
+        }
+
+        // Column sort handler: cycles Asc → Desc → Default
+        function handleColumnSort(column) {
+            if (sortState.column === column) {
+                if (sortState.direction === 'asc') {
+                    sortState.direction = 'desc';
+                } else if (sortState.direction === 'desc') {
+                    sortState = { column: null, direction: null }; // Back to default
+                }
+            } else {
+                sortState = { column: column, direction: 'asc' };
+            }
+            
+            let sortedData;
+            if (!sortState.column) {
+                // Default sort — use original data order
+                sortedData = [...currentTableData];
+            } else {
+                sortedData = [...currentTableData].sort((a, b) => {
+                    let valA = a[sortState.column] ?? '';
+                    let valB = b[sortState.column] ?? '';
+                    
+                    // Numeric columns
+                    if (['# of Stores', 'SC', 'NHM', 'WM Week'].includes(sortState.column)) {
+                        valA = parseFloat(valA) || 0;
+                        valB = parseFloat(valB) || 0;
+                    } else {
+                        valA = String(valA).toLowerCase();
+                        valB = String(valB).toLowerCase();
+                    }
+                    
+                    if (valA < valB) return sortState.direction === 'asc' ? -1 : 1;
+                    if (valA > valB) return sortState.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+            
+            currentPage = 1;
+            renderTable(sortedData, currentSelectedPhases);
+        }
+
         function renderTable(data, selectedPhases) {
             const wrapper = document.getElementById('table-wrapper');
             const paginationControls = document.getElementById('pagination-controls');
@@ -1140,8 +1321,11 @@
                 'Initiative - Project Title',
                 'Health Status',
                 'Phase',
+                'Start Date',
                 'WM Week',
                 '# of Stores',
+                'SC',
+                'NHM',
                 'Executive Notes'
             ];
             
@@ -1149,7 +1333,11 @@
             let html = `<div style="background: #3B82F6; color: white; padding: 10px 20px; font-size: 16px; font-weight: 600; text-align: center; border-radius: 4px 4px 0 0;">Phase: ${pageData.phase}</div>`;
             html += '<table><thead><tr>';
             columns.forEach(col => {
-                html += `<th>${col}</th>`;
+                let indicator = '';
+                if (sortState.column === col) {
+                    indicator = sortState.direction === 'asc' ? ' ▲' : ' ▼';
+                }
+                html += `<th style="cursor:pointer;user-select:none;" onclick="handleColumnSort('${col.replace(/'/g, "\\'")}')">${col}${indicator}</th>`;
             });
             html += '</tr></thead><tbody>';
             
@@ -1175,8 +1363,10 @@
                         html += `<td><span class="${cellClass}">${value}</span></td>`;
                     } else if (col === 'Phase') {
                         html += `<td><span class="phase-tag">${value}</span></td>`;
-                    } else if (col === '# of Stores') {
+                    } else if (col === '# of Stores' || col === 'SC' || col === 'NHM') {
                         html += `<td style="font-weight: 600; color: var(--walmart-blue);">${value}</td>`;
+                    } else if (col === 'Start Date') {
+                        html += `<td style="white-space: nowrap;">${value}</td>`;
                     } else if (col === 'Initiative - Project Title') {
                         const projectId = row['Project ID'];
                         if (projectId) {

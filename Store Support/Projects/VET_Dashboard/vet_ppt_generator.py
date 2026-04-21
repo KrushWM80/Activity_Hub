@@ -104,7 +104,7 @@ def generate_vet_pptx():
         p = tf.paragraphs[0]
         p.alignment = PP_ALIGN.CENTER
         run = p.add_run()
-        run.text = "V.E.T. Executive Report"
+        run.text = "Dallas Team Report"
         run.font.size = Pt(44)
         run.font.bold = True
         run.font.color.rgb = RGBColor(255, 255, 255)
