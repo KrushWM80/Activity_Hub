@@ -1,38 +1,34 @@
 {
   "week": 13,
   "fy": 2027,
-  "cached_at": "2026-04-21T06:00:25.384072",
-  "bq_last_updated": "2026-04-20T23:48:05.972000+00:00",
-  "event_count": 4,
-  "review_no_comm_count": 4,
+  "cached_at": "2026-04-23T06:00:26.873138",
+  "bq_last_updated": "2026-04-22T23:57:37.675000+00:00",
+  "event_count": 27,
+  "review_no_comm_count": 27,
   "status_breakdown": [
     {
       "status": "Draft - Pending",
       "count": 1
     },
     {
-      "status": "Awaiting ATC Approval - Pending",
-      "count": 1
+      "status": "Denied - Pending",
+      "count": 3
     },
     {
       "status": "Awaiting Comms Approval - Pending",
-      "count": 4
+      "count": 1
     },
     {
       "status": "Awaiting Comms Approval - In Progress",
       "count": 1
     },
     {
-      "status": "Awaiting Comms Approval - Ready to Review",
-      "count": 1
-    },
-    {
       "status": "Awaiting Business Review - Pending",
-      "count": 4
+      "count": 2
     },
     {
       "status": "Awaiting Legal Approval - Pending",
-      "count": 2
+      "count": 1
     },
     {
       "status": "ATC final review - Pending",
@@ -40,30 +36,76 @@
     },
     {
       "status": "Review for Publish review - Pending",
-      "count": 3
+      "count": 10
     },
     {
       "status": "Review for Publish review - Future Send",
       "count": 1
     },
     {
-      "status": "Review for Publish review - No Comms",
-      "count": 4
+      "status": "Expired - Pending",
+      "count": 1
     },
     {
-      "status": "Awaiting Comms Approval - On Hold",
+      "status": "Review for Publish review - No Comms",
+      "count": 27
+    },
+    {
+      "status": "Expired - No Comms",
       "count": 1
     }
   ],
-  "total_excl_denied": 24,
-  "summarized_count": 4,
+  "total_excl_denied": 45,
+  "summarized_count": 27,
   "events_with_summaries": [
+    {
+      "event_id": "14ee4636-c4c5-4db9-9c11-901ad6a2f8c3",
+      "store_area": "Asset Protection",
+      "title": "Identifying the correct Styrofoam type for recycling",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Backroom: Sending the wrong Styrofoam to Used Asset Centers increases costs and risks contaminating recyclable materials. Use a simple bend test at the store \u2013 rigid pieces should be returned, while flexible pieces should be disposed of on site."
+    },
+    {
+      "event_id": "e1680cb5-39a4-4228-ba54-22c319e09c7f",
+      "store_area": "Auto Care",
+      "title": "Dept 12: Compliance Requirement for Paint Service Desk",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 12: Install the Paint Service Desk disclosure sign upon arrival in a visible, customer-facing spot and keep it unobstructed."
+    },
+    {
+      "event_id": "6f9cae07-86f2-4ee2-a210-5ddfccf21311",
+      "store_area": "Auto Care",
+      "title": "Walmart Protection Plan - New Quick Reference Barcode Sheet",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Front end: Allstate has updated the Walmart Protection Plan Quick Reference Barcode Sheets for store registers. The new version no longer displays prices so they can be used for an unlimited amount of time."
+    },
+    {
+      "event_id": "a0a6b273-260c-44a8-a385-00535f5562a7",
+      "store_area": "Consumables",
+      "title": "Dept. 40: Continue to Feature Equate Allergy ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In department 40, continue to set Equate Allergy features which are shipping to stores at the start of each month. Quantities are calibrated to support an 80 percent sell through target.\u00a0 Most markets are past peak allergy season and moving into the back half, while the Northeast is just beginning to ramp up."
+    },
+    {
+      "event_id": "69544247-03e0-4453-acbb-24f2a524eb7d",
+      "store_area": "Entertainment",
+      "title": "Dept. 72: Cut the Cord Cover Letter Correction",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 72: Disregard the cover letter instruction to remove or destroy\u00a0Roku signage, and keep Roku displays and backing in place as shown on the floorplan."
+    },
+    {
+      "event_id": "a11dabe5-c86a-4e30-8441-4cf4a2b24c82",
+      "store_area": "Food",
+      "title": "Dept. 91: Frozen Modular Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 91: Associates should make sure Frozen pizza boxes are standing up and facing forward. This will help increase sales.\n\nDepartment 91: Associates should make sure all Frozen features are set to help drive sales.\n\nDepartment 91: In week 10 (April 4-10), four ice cream novelty innovations were launched including iconic brands,\u00a0Walmart exclusives and fun options to drive customer excitement and future trips. These items include SNICKERS and M&M's Minis Ice Cream Bar, Nutella\u00ae Ice Cream Cones and Pints, FATBOY Strawberry Cheesecake Ice Cream Sandwich Pops and Drumstick\u00ae Red, White & Blueberry Sundae Cones.\n\nDepartment 91: In week 14, Great Value Breakfast Bowls are being added back into the Frozen Breakfast modular.\n\nDepartment 91: Did you know, stores on average sell 240 units of Banquet Chicken Pot Pies per week.\u00a0At $1 each, this is a great inflation buster and meal solution for customers.\n\nDepartment 91: Associates should make sure these four Rollback items are flagged and available for customers: Marie Callender's Dinners, Uncrustables 4ct, 10ct and 15ct, Caulipower Bites, Pillsbury Cinnamon Rolls and Totinos Pizza Rolls."
+    },
     {
       "event_id": "bf5173bf-224c-4aa5-8c2b-338fdf2a5011",
       "store_area": "Food",
       "title": "Dept. 92: Quick Modular Update for Sauces and Condiments",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "A week 14 quick modular is being implemented for Sauces and Condiments. This will address minor opportunities, late developing new items, brand flow and overall assortment cleanup."
+      "summary_text": "Department 92: A week 14 quick modular is being implemented for Sauces and Condiments. This will address minor opportunities, late developing new items, brand flow and overall assortment cleanup."
     },
     {
       "event_id": "2dc42c85-a030-4115-92c8-a98e0385e909",
@@ -77,7 +119,28 @@
       "store_area": "Food",
       "title": "Dept. 95: The Grilling Train Will Include a 1/2 Pallet of\u00a0Frito Lay\u00a0Chips\u00a0",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "As part of the America 250th celebration, the grilling train will include a half-pallet of party size potato chips from Frito Lay. It is the responsibility of the Frito Lay representative to keep this half-pallet maintained for the duration of this program."
+      "summary_text": "Dept. 95: As part of the America 250th celebration, the grilling train will include a half-pallet of party size potato chips from Frito Lay. It is the responsibility of the Frito Lay representative to keep this half-pallet maintained for the duration of this program."
+    },
+    {
+      "event_id": "243a3f19-35e4-4418-b85a-22dc21fc3c81",
+      "store_area": "Fresh",
+      "title": "D80: Bulk Meat & Cheese Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 80: Replenishment settings have been adjusted to make sure stores have one chub per facing of each item, plus one for behind the counter to slice and sell.\u00a0associates need to make sure their on hands are correct in order for this replenishment goal to be met.\n\nDepartment 80: To reduce markdowns, stores should only weigh and label enough product for 2-3 days of\u00a0sales. Once associates label it, the product only has 5-7 days to sell before CVP.\n\nDepartment 80: This message points out four known in-stock issues. The items include Jennie O Sundried Turkey, Jennie O Herb Roasted Turkey, Prima Della Honey Roasted Turkey and Prima Della Truffle Gouda."
+    },
+    {
+      "event_id": "5b35da9b-fd61-4fe1-b5cb-eff29d98c03c",
+      "store_area": "Fresh",
+      "title": "Dept. 80: Chicken Salad Croissant Will Arrive Ready to Sell",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 80: The in-store made Chicken Salad Croissant is transitioning to a supplier-produced version. It will now arrive ready to sell with no in\u2011store production or manual ordering required."
+    },
+    {
+      "event_id": "0b5f57ed-71ab-42ae-8715-47ed42b066e6",
+      "store_area": "Frontend",
+      "title": "Front End: OnePay Credit Card Limited Time Welcome Bonus Offer ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "We're excited to share a limited-time Walmart+ membership promotion that makes it easier - and more rewarding - than ever for customers to join Walmart+ when they sign up or a OnePay Credit Card."
     },
     {
       "event_id": "75b08e71-19d0-495b-b348-6612e7e2dacf",
@@ -85,6 +148,104 @@
       "title": "Frontend: Winners of the Friendliest Front End \u2013 Spring Edition",
       "status": "Review for Publish review - No Comms",
       "summary_text": "This AMP message announces the winners of the Friendliest Front End Spring Edition."
+    },
+    {
+      "event_id": "d3154a55-02e9-481f-a463-8de5c9455c07",
+      "store_area": "Hardlines",
+      "title": "Dept 19: Diamond Art Club Feature Set",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 19: Place the Diamond Art Club feature in a prominent, high-traffic location to maximize visibility and drive customer engagement and sales for the licensed assortment."
+    },
+    {
+      "event_id": "598714a7-b5ba-49fd-b6f7-42711d4d1f75",
+      "store_area": "Hardlines",
+      "title": "Dept. 11: Tool World Relaunch \u2013 Modular Signing Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 11: During the Tool World relaunch, place the provided modular sign in any Hart sell-through empty sections by printing it, cutting along the dotted line, and taping one per affected modular."
+    },
+    {
+      "event_id": "7e42120f-8cb4-4936-bbdf-a76d9a57ab05",
+      "store_area": "Hardlines",
+      "title": "Dept. 19: New Caron Yarn Launch",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 19: Week 10 launch of\u00a0Caron Simply Me yarn, new No. 5 weight at $7.47. Set five endcap PDQs with clear, accurate signage."
+    },
+    {
+      "event_id": "6bb81a2c-a964-4b9d-8316-e57d0bb79261",
+      "store_area": "Hardlines",
+      "title": "Dept. 9: Cat. 312 Week 14 Modular Relay",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 9: Category 312, week 14 modular relay adds new Caldwell Clay Copter items, with a few delayed shipments requiring temporary shelf fills."
+    },
+    {
+      "event_id": "6d125ce7-fd25-4915-b57e-b9f4c64c8d4c",
+      "store_area": "Hardlines",
+      "title": "Dept. 9: Cat. 389 Gel Bead Modular",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 9: In week 28, Gel Bead resets to 4 feet in all stores as Nerf and Gel Blaster are deleted and replaced by Havoc, with stores spreading Splat-R-Ball and XShot until the transition is complete."
+    },
+    {
+      "event_id": "a84b5140-a42a-4134-967b-1af0c6d134f9",
+      "store_area": "Hardlines",
+      "title": "Dept. 9: Cat. 450 Week 12 Item Swap Delays",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 9: Category 450, week 12 item swap replaces Champion with\u00a0Etymotic earmuffs, but two new UPCs are delayed until June 5, so fill with adjacent muffs such as Walkers."
+    },
+    {
+      "event_id": "73fa27a4-eae9-4876-a1d5-3556500f4439",
+      "store_area": "Home",
+      "title": "Dept 74: Boost Sales With the New Sterilite 4-Tier Tote Rack",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 74 is highlighting the Sterilite 4-Tier Tote Rack, designed to help your customers with home organization while boosting store sales."
+    },
+    {
+      "event_id": "b5d85467-c3f6-4eda-a5b2-e074904a54c4",
+      "store_area": "Home",
+      "title": "Dept. 22: Air Mattress Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Department 22, the Bestway queen size maroon indoor air mattress is selling through, so we are sending a supplemental queen airbed to most stores."
+    },
+    {
+      "event_id": "ab6480d4-1a34-4ee7-898c-0c34a723f6bd",
+      "store_area": "Home",
+      "title": "Dept. 74 Update: Mainstays Laundry Flex Totes Have Arrived!",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 74 is refreshing the Garment, Closet, and Laundry category with a mod set for week 13, including the Mainstays Flex Tote, a social media sensation."
+    },
+    {
+      "event_id": "b18099b6-8d21-4af8-a159-f9f77847e1a7",
+      "store_area": "Home",
+      "title": "Dept. 74: Closet Storage Modular Reset",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Department 74, we're excited about the Closet Storage modular reset, but stores can expect delays for the new and improved Magic Bag items."
+    },
+    {
+      "event_id": "9ded0ef9-6136-4e62-8632-6325802dc722",
+      "store_area": "Home",
+      "title": "Home: Countdown to Launch With Mainstays Kids",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Home, stores continue to prepare for the week 14 launch of Mainstays Kids."
+    },
+    {
+      "event_id": "861ff115-0ad2-41ac-a92e-bf5038f889a5",
+      "store_area": "People",
+      "title": "Update: Attendance Authorization Reason",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Beginning Saturday, May 2, when managers authorize an exception in the Global Time and Attendance system using Protected Paid Time off, an updated authorization reason will display protected by associate balance, ppto and or sick.\n\nThis update will not change ppto eligibility, accruals or how associates can protect their attendance exceptions. Review the attendance authorize reason guide for more information."
+    },
+    {
+      "event_id": "4984fe8c-5b07-4f5c-ab9c-45a7c4acc828",
+      "store_area": "Total Store",
+      "title": "AI Tip of the Week: Improve the Associate Experience",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Keep calm and ask my assistant. AI Tip of the Week.\n\nMy assistant can help spot behavior gaps and take action to improve consistency, accountability and retention. My assistant can act as an expert Walmart operations leader or people partner, by entering tasks and current facility conditions. My assistant can provide a table with specific headings and data to help make performance improvements and an improved associate experience during their first 90 days."
+    },
+    {
+      "event_id": "fd70f102-e960-4c6e-85dc-dbeadd5b7760",
+      "store_area": "Total Store",
+      "title": "Weekly Message: Ethics \u2013 Integrity in Action",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Ethics, Integrity in Action.\n\nIf you know an associate who spoke up, prevented a compliance issue or did the right thing when it was challenging, you could nominate them for an Integrity in Action Award. Review the Integrity in Action Award page on One Walmart for additional details."
     }
   ],
   "events_without_summary": []

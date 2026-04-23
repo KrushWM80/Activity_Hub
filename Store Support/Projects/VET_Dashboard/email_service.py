@@ -5,6 +5,8 @@ Sends Dallas Team Report via Walmart internal SMTP (no Outlook dependency)
 
 import logging
 import smtplib
+import base64
+import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
@@ -50,11 +52,20 @@ class VETEmailService:
         wm_week = report_data.get('wm_week', '')
         dashboard_html = report_data.get('dashboard_html', None)
         
-        # Build dashboard HTML section
-        if dashboard_html:
-            dashboard_html_section = dashboard_html.replace('<!DOCTYPE html>', '').replace('<html>', '').replace('</html>', '').replace('<head>.*?</head>', '', 1).replace('<body>', '').replace('</body>', '')
-        else:
-            dashboard_html_section = ''
+        # Don't embed exec summary HTML — build Outlook-compatible version instead
+        dashboard_html_section = ''
+        
+        # Load Spark logo as base64 for email header
+        spark_b64 = ''
+        for logo_path in [
+            os.path.join(os.path.dirname(__file__), 'Spark_Blank.png'),
+            os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Interface', 'Spark_Blank.png'),
+        ]:
+            if os.path.exists(logo_path):
+                with open(logo_path, 'rb') as _f:
+                    spark_b64 = base64.b64encode(_f.read()).decode('ascii')
+                break
+        spark_img_html = f'<img src="data:image/png;base64,{spark_b64}" width="36" height="36" alt="Spark" style="vertical-align:middle;margin-right:12px;">' if spark_b64 else ''
         
         # Calculate percentages
         pct_on_track = (on_track / total_projects * 100) if total_projects > 0 else 0
@@ -75,8 +86,21 @@ class VETEmailService:
     <!-- HEADER -->
     <tr>
         <td style="background-color: #1e3a8a; color: #ffffff; padding: 32px 24px; text-align: center; font-weight: bold;">
-            <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">Dallas Team Report</h1>
+            <h1 style="margin: 0 0 8px 0; font-size: 32px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">{spark_img_html}Dallas Team Report</h1>
             <p style="margin: 0; font-size: 14px; font-weight: 500; color: #ffffff; letter-spacing: 0.5px;">Walmart Enterprise Transformation Dashboard</p>
+        </td>
+    </tr>
+    
+    <!-- GO TO DASHBOARD BUTTON -->
+    <tr>
+        <td style="background-color: #f0f4ff; padding: 12px 24px; text-align: center;">
+            <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                <tr>
+                    <td style="background-color: #0071ce; border-radius: 6px; padding: 10px 24px; text-align: center;">
+                        <a href="http://localhost:5001/Dallas_Team_Report" style="color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; display: inline-block;">Go to Dashboard</a>
+                    </td>
+                </tr>
+            </table>
         </td>
     </tr>
     

@@ -144,6 +144,7 @@ def _build_stats(projects: list) -> dict:
         'on_track': len([p for p in projects if 'On Track' in str(p.get('Health Status', ''))]),
         'at_risk': len([p for p in projects if 'At Risk' in str(p.get('Health Status', ''))]),
         'off_track': len([p for p in projects if 'Off Track' in str(p.get('Health Status', ''))]),
+        'continuous': len([p for p in projects if 'Continuous' in str(p.get('Health Status', ''))]),
         'wm_week': current_wm_week,
     }
 
@@ -207,14 +208,22 @@ def fetch_dashboard_data(api_url: str = DASHBOARD_URL) -> tuple:
 
         if projects:
             current_wm_week = get_current_walmart_week()
-            stats = {
-                'total_projects': summary.get('total_projects', 0),
-                'total_stores': summary.get('total_stores', 0),
-                'on_track': summary.get('by_health_status', {}).get('On Track', 0),
-                'at_risk': summary.get('by_health_status', {}).get('At Risk', 0),
-                'off_track': summary.get('by_health_status', {}).get('Off Track', 0),
-                'wm_week': current_wm_week,
-            }
+            # Prefer summary stats from API, but if they're 0 (stale cache), compute from projects
+            api_total = summary.get('total_projects', 0)
+            if api_total > 0:
+                stats = {
+                    'total_projects': api_total,
+                    'total_stores': summary.get('total_stores', 0),
+                    'on_track': summary.get('by_health_status', {}).get('On Track', 0),
+                    'at_risk': summary.get('by_health_status', {}).get('At Risk', 0),
+                    'off_track': summary.get('by_health_status', {}).get('Off Track', 0),
+                    'continuous': summary.get('by_health_status', {}).get('Continuous', 0),
+                    'wm_week': current_wm_week,
+                }
+            else:
+                # API summary returned 0 — compute directly from projects
+                stats = _build_stats(projects)
+                stats['wm_week'] = current_wm_week
             print(f"     [OK] API returned {len(projects)} projects")
             return stats, projects
     except Exception as e:

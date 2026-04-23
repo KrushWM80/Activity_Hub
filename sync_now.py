@@ -33,7 +33,7 @@ def sync_projects():
         ap.status = sl.source_status,
         ap.business_organization = sl.source_business_org,
         ap.project_update = sl.source_update_text,
-        ap.project_update_date = CURRENT_TIMESTAMP(),
+        ap.project_update_date = sl.source_update_date,
         ap.project_update_by = 'Intake Hub',
         ap.last_updated = CURRENT_TIMESTAMP()
     FROM (
@@ -45,7 +45,8 @@ def sync_projects():
             COALESCE(PROJECT_OWNERID, CREATED_BY_ID, '') as source_owner_id,
             COALESCE(PROJECT_HEALTH_DESC, 'Unknown') as source_health,
             COALESCE(Status, '') as source_status,
-            COALESCE(CAST(Project_Update AS STRING), CAST(Project_Updates AS STRING), '') as source_update_text
+            COALESCE(CAST(Project_Update AS STRING), CAST(Project_Updates AS STRING), '') as source_update_text,
+            Project_Update_Date as source_update_date
         FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - Intake Accel Council Data`
         WHERE Intake_Card_Nbr IS NOT NULL
           AND COALESCE(Is_Duplicate_Row, 'No') = 'No'
@@ -72,18 +73,18 @@ def sync_projects():
      project_update, project_update_date, project_update_by)
     
     SELECT 
-        CAST(Intake_Card_Nbr AS STRING),
-        Project_Title,
-        COALESCE(Owner, Initiative_Lead, 'Unknown'),
-        COALESCE(PROJECT_OWNERID, CREATED_BY_ID, ''),
-        COALESCE(PROJECT_HEALTH_DESC, 'Unknown'),
-        COALESCE(Status, ''),
-        Business_Owner_Area,
+        CAST(sl.Intake_Card_Nbr AS STRING),
+        sl.Project_Title,
+        COALESCE(sl.Owner, sl.Initiative_Lead, 'Unknown'),
+        COALESCE(sl.PROJECT_OWNERID, sl.CREATED_BY_ID, ''),
+        COALESCE(sl.PROJECT_HEALTH_DESC, 'Unknown'),
+        COALESCE(sl.Status, ''),
+        sl.Business_Owner_Area,
         'Intake Hub',
         CURRENT_TIMESTAMP(),
         CURRENT_TIMESTAMP(),
-        COALESCE(CAST(Project_Update AS STRING), CAST(Project_Updates AS STRING), ''),
-        CURRENT_TIMESTAMP(),
+        COALESCE(CAST(sl.Project_Update AS STRING), CAST(sl.Project_Updates AS STRING), ''),
+        sl.Project_Update_Date,
         'Intake Hub'
     FROM (
         SELECT 
@@ -98,13 +99,14 @@ def sync_projects():
             Status,
             Project_Update,
             Project_Updates,
+            Project_Update_Date,
             ROW_NUMBER() OVER (PARTITION BY Intake_Card_Nbr ORDER BY COALESCE(Project_Update_Date, CURRENT_TIMESTAMP()) DESC) as rn
         FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - Intake Accel Council Data`
         WHERE Intake_Card_Nbr IS NOT NULL
           AND COALESCE(Is_Duplicate_Row, 'No') = 'No'
     ) sl
-    WHERE rn = 1
-      AND CAST(Intake_Card_Nbr AS STRING) NOT IN (
+    WHERE sl.rn = 1
+      AND CAST(sl.Intake_Card_Nbr AS STRING) NOT IN (
         SELECT project_id FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
     )
     """

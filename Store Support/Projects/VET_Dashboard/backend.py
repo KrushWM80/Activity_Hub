@@ -520,10 +520,8 @@ def get_contacts():
 def get_summary():
     """Get summary statistics"""
     try:
-        phase = request.args.get('phase', 'All')
-        health_status = request.args.get('health_status', 'All')
-        
-        filtered_data = data_manager.filter_data(phase, health_status)
+        # Use unfiltered data for summary stats (always show totals across all phases/statuses)
+        filtered_data = data_manager.fetch_all_data()
         
         summary = {
             'total_projects': len(filtered_data),

@@ -935,6 +935,8 @@ async def get_me(request: Request):
         raise HTTPException(status_code=401, detail="Not authenticated")
     return {"username": user["username"], "role": user["role"], "name": user["name"]}
 
+
+
 @app.get("/api/job-codes")
 async def get_job_codes(request: Request):
     """Get all job codes with enrichment data from cache and master table"""

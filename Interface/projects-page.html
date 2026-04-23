@@ -964,17 +964,17 @@
             <div class="filters-container">
                 <div class="row g-3">
                     <!-- Project Title - Wide Filter -->
-                    <div class="col-md-3">
+                    <div class="col-md-3" style="position: relative;">
                         <label class="form-label"><strong>Project Title</strong></label>
                         <input type="text" class="form-control" id="filter-title-search" placeholder="Search or click to select..." oninput="updateTitleOptions()" onfocus="openTitleFilterDropdown()" onblur="setTimeout(() => closeTitleFilterDropdown(), 200)">
-                        <div id="title-options" class="dropdown-list" style="display:none; max-height:250px; overflow-y:auto; margin-top:5px; border:1px solid #ddd; border-radius:4px; background:white; z-index:10; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div id="title-options" class="dropdown-list" style="display:none; max-height:250px; overflow-y:auto; position: absolute; top: 100%; left: 0; right: 0; border:1px solid #ddd; border-radius:4px; background:white; z-index:1050; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                         </div>
                     </div>
                     <!-- Owner - Wide Filter -->
-                    <div class="col-md-3">
+                    <div class="col-md-3" style="position: relative;">
                         <label class="form-label"><strong>Owner</strong></label>
                         <input type="text" class="form-control" id="filter-owner-search" placeholder="Search or click to select..." oninput="updateOwnerOptions()" onfocus="openOwnerFilterDropdown()" onblur="setTimeout(() => closeOwnerFilterDropdown(), 200)">
-                        <div id="owner-options" class="dropdown-list" style="display:none; max-height:250px; overflow-y:auto; margin-top:5px; border:1px solid #ddd; border-radius:4px; background:white; z-index:10; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div id="owner-options" class="dropdown-list" style="display:none; max-height:250px; overflow-y:auto; position: absolute; top: 100%; left: 0; right: 0; border:1px solid #ddd; border-radius:4px; background:white; z-index:1050; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                         </div>
                     </div>
                     <!-- Business Area -->
@@ -1008,11 +1008,13 @@
                         <button class="btn btn-primary" title="Add Project" onclick="showAddProjectModal()" style="padding: 10px 12px; border-radius: 6px;">
                             <i class="fas fa-plus"></i>
                         </button>
-                        <button class="btn btn-outline-secondary" id="btn-updated" title="Show Updated This Week" onclick="toggleUpdatedFilter('updated')" style="padding: 10px 12px; border-radius: 6px;">
+                        <button class="btn btn-outline-secondary" id="btn-updated" title="Show Updated This Week" onclick="toggleUpdatedFilter('updated')" style="padding: 10px 12px; border-radius: 6px; position: relative;">
                             <i class="fas fa-check"></i>
+                            <span id="badge-updated" class="badge badge-success" style="position: absolute; top: -8px; right: -8px; background-color: #28a745; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">0</span>
                         </button>
-                        <button class="btn btn-outline-secondary" id="btn-not-updated" title="Show Not Updated This Week" onclick="toggleUpdatedFilter('not_updated')" style="padding: 10px 12px; border-radius: 6px;">
+                        <button class="btn btn-outline-secondary" id="btn-not-updated" title="Show Not Updated This Week" onclick="toggleUpdatedFilter('not_updated')" style="padding: 10px 12px; border-radius: 6px; position: relative;">
                             <i class="fas fa-times"></i>
+                            <span id="badge-not-updated" class="badge badge-danger" style="position: absolute; top: -8px; right: -8px; background-color: #dc3545; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">0</span>
                         </button>
                     </div>
                 </div>
@@ -1682,6 +1684,9 @@
                 const selectedOwners = Array.from(document.querySelectorAll('#owner-options input[type="checkbox"]:checked')).map(cb => cb.value).join(',');
                 const updatedStatus = document.getElementById('updated-status-filter').value;
 
+                // UPDATE: Show selected filters in the input field VALUE
+                updateFilterDisplayText();
+
                 let url = `${API_BASE}/projects`;
                 const params = new URLSearchParams();
                 
@@ -1707,11 +1712,14 @@
                 // Store for detail modal access
                 allProjects = filtered;
 
-                // Populate business area filter
+                // Populate filter dropdowns 
                 populateBusinessAreaFilter(filtered);
+                populateOwnerFilter(filtered);
                 populateTitleFilter(filtered);
 
                 // Display projects
+                // Sort by title by default
+                filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
                 displayProjects(filtered);
                 
                 // Load and update metrics
@@ -1783,6 +1791,7 @@
             }
             
             table.innerHTML = rows.join('');
+            updateBadgeCounts();
         }
 
         // Show project detail modal
@@ -1834,6 +1843,39 @@
         }
 
         // Populate owner filter
+        // Update filter input field display text
+        function updateFilterDisplayText() {
+            const selectedOwners = Array.from(document.querySelectorAll('#owner-options input[type="checkbox"]:checked')).map(cb => cb.value);
+            const selectedTitles = Array.from(document.querySelectorAll('#title-options input[type="checkbox"]:checked')).map(cb => cb.value);
+            
+            const ownerInputField = document.getElementById('filter-owner-search');
+            const titleInputField = document.getElementById('filter-title-search');
+            
+            // Update owner filter input
+            if (selectedOwners.length === 0) {
+                ownerInputField.value = '';
+                ownerInputField.placeholder = 'Search or click to select...';
+            } else if (selectedOwners.length === 1) {
+                ownerInputField.value = selectedOwners[0];
+                ownerInputField.placeholder = '';
+            } else {
+                ownerInputField.value = `${selectedOwners.length} Owners Selected`;
+                ownerInputField.placeholder = '';
+            }
+            
+            // Update title filter input
+            if (selectedTitles.length === 0) {
+                titleInputField.value = '';
+                titleInputField.placeholder = 'Search or click to select...';
+            } else if (selectedTitles.length === 1) {
+                titleInputField.value = selectedTitles[0].substring(0, 40);
+                titleInputField.placeholder = '';
+            } else {
+                titleInputField.value = `${selectedTitles.length} Projects Selected`;
+                titleInputField.placeholder = '';
+            }
+        }
+
         function populateOwnerFilter(projects) {
             if (!projects || projects.length === 0) return;
 
@@ -1841,6 +1883,12 @@
             const ownerOptionsDiv = document.getElementById('owner-options');
             
             if (!ownerOptionsDiv) return;
+
+            // PRESERVE: Save currently checked owners before clearing
+            const previouslyChecked = new Set(
+                Array.from(document.querySelectorAll('#owner-options input[type="checkbox"]:checked'))
+                    .map(cb => cb.value)
+            );
 
             // Clear existing options
             ownerOptionsDiv.innerHTML = '';
@@ -1854,7 +1902,14 @@
                 checkbox.type = 'checkbox';
                 checkbox.value = owner;
                 checkbox.style.marginRight = '8px';
+                
+                // RESTORE: Re-check if this owner was previously checked
+                if (previouslyChecked.has(owner)) {
+                    checkbox.checked = true;
+                }
+                
                 checkbox.onchange = function() {
+                    updateFilterDisplayText();
                     loadProjects();
                     loadMetrics();
                 };
@@ -1863,6 +1918,9 @@
                 label.appendChild(document.createTextNode(owner));
                 ownerOptionsDiv.appendChild(label);
             });
+            
+            // Update display after population
+            updateFilterDisplayText();
         }
 
         // Update owner filter options based on search
@@ -1899,9 +1957,18 @@
         function closeOwnerFilterDropdown() {
             const ownerOptionsDiv = document.getElementById('owner-options');
             if (ownerOptionsDiv) {
-                // Keep it open if there's a search term
+                // Keep it open if user is actively searching (not just showing selected value)
                 const searchInput = document.getElementById('filter-owner-search');
-                if (!searchInput || searchInput.value === '') {
+                if (!searchInput) return;
+                
+                // Close if the field only contains selected value(s), not search text
+                // Check if field contains "X Owners Selected" or a known owner name (no search in progress)
+                const value = searchInput.value;
+                const isSearchTerm = !value.includes('Selected') && 
+                                   value.length > 0 && 
+                                   !value.match(/^[A-Z]/); // Rough check for search vs selected
+                                   
+                if (!isSearchTerm) {
                     ownerOptionsDiv.style.display = 'none';
                 }
             }
@@ -1943,7 +2010,15 @@
             if (titleOptionsDiv) {
                 // Keep it open if there's a search term
                 const searchInput = document.getElementById('filter-title-search');
-                if (!searchInput || searchInput.value === '') {
+                if (!searchInput) return;
+                
+                const value = searchInput.value;
+                // Close if field only contains selected value(s), not search text
+                const isSearchTerm = !value.includes('Selected') && 
+                                    value.length > 0 && 
+                                    value.length < 20; // Heuristic: search terms usually shorter
+                
+                if (!isSearchTerm) {
                     titleOptionsDiv.style.display = 'none';
                 }
             }
@@ -1958,6 +2033,12 @@
             
             if (!titleOptionsDiv) return;
 
+            // PRESERVE: Save currently checked titles before clearing
+            const previouslyChecked = new Set(
+                Array.from(document.querySelectorAll('#title-options input[type="checkbox"]:checked'))
+                    .map(cb => cb.value)
+            );
+
             // Clear existing options first
             titleOptionsDiv.innerHTML = '';
             
@@ -1970,7 +2051,14 @@
                 checkbox.type = 'checkbox';
                 checkbox.value = title;
                 checkbox.style.marginRight = '8px';
+                
+                // RESTORE: Re-check if this title was previously checked
+                if (previouslyChecked.has(title)) {
+                    checkbox.checked = true;
+                }
+                
                 checkbox.onchange = function() {
+                    updateFilterDisplayText();
                     loadProjects();
                     loadMetrics();
                 };
@@ -1979,6 +2067,9 @@
                 label.appendChild(document.createTextNode(title.substring(0, 50)));
                 titleOptionsDiv.appendChild(label);
             });
+            
+            // Update display after population
+            updateFilterDisplayText();
         }
 
         // Toggle updated/not updated filter
@@ -2008,6 +2099,22 @@
             document.getElementById('updated-status-filter').value = currentUpdatedFilter;
             loadProjects();
             loadMetrics();
+        }
+
+        // Update badge counts on buttons
+        function updateBadgeCounts() {
+            if (!allProjects || allProjects.length === 0) {
+                document.getElementById('badge-updated').textContent = '0';
+                document.getElementById('badge-not-updated').textContent = '0';
+                return;
+            }
+
+            // Count updated vs not updated from allProjects
+            const updated = allProjects.filter(p => p.is_updated_this_week).length;
+            const notUpdated = allProjects.filter(p => !p.is_updated_this_week).length;
+
+            document.getElementById('badge-updated').textContent = updated;
+            document.getElementById('badge-not-updated').textContent = notUpdated;
         }
 
         // Populate business area filter

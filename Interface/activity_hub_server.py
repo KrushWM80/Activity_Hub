@@ -32,13 +32,42 @@ if not os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'):
 app = Flask(__name__)
 CORS(app)
 
-# BigQuery client - initialize lazily on first use (don't block startup)
-bq_client = None
+# BigQuery client - will be initialized on first use
+_bq_client_cache = None
+
+def get_bq_client():
+    """Get or initialize the BigQuery client"""
+    global _bq_client_cache
+    if _bq_client_cache is None:
+        try:
+            logger.info("[get_bq_client] Attempting to initialize BigQuery client...")
+            _bq_client_cache = bigquery.Client(project='wmt-assetprotection-prod')
+            logger.info(f"[get_bq_client] ✓ Client initialized successfully")
+        except Exception as e:
+            logger.error(f"[get_bq_client] ✗ Failed: {e}", exc_info=True)
+            return None
+    logger.info(f"[get_bq_client] Returning cached client")
+    return _bq_client_cache
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Scheduler Service URL for proxying
 SCHEDULER_SERVICE_URL = 'http://localhost:5011'
+
+# ──────────────────────────────────────────────
+# DEBUG ENDPOINT
+# ──────────────────────────────────────────────
+
+@app.route('/api/debug/bq-status', methods=['GET'])
+def debug_bq_status():
+    """Check if BigQuery client is initialized"""
+    global bq_client
+    client_status = "initialized" if bq_client else "NOT initialized"
+    return jsonify({
+        'bq_client_status': client_status,
+        'bq_client_type': str(type(bq_client)),
+        'bq_client_value': str(bq_client)
+    })
 
 # ──────────────────────────────────────────────
 # CORE ROUTES
@@ -100,6 +129,7 @@ def api_project_by_id(project_id):
     """Update or delete a specific project by ID"""
     from flask import request
     
+    bq_client = get_bq_client()
     if not bq_client:
         return jsonify({'error': 'BigQuery client not initialized'}), 500
     
@@ -152,9 +182,14 @@ def api_project_by_id(project_id):
 def api_projects():
     """Get/create/update projects from BigQuery"""
     from flask import request
+    logger.info("[api_projects] ENDPOINT CALLED")
     
+    bq_client = get_bq_client()
     if not bq_client:
+        logger.error(f"[api_projects] bq_client is None!")
         return jsonify({'error': 'BigQuery client not initialized'}), 500
+    
+    logger.info(f"[api_projects] bq_client check passed, proceeding with request")
     
     # Handle POST (create) and PUT (update)
     if request.method in ['POST', 'PUT']:
@@ -296,10 +331,11 @@ def api_projects():
             project_source,
             created_date,
             last_updated,
-            project_update
+            project_update,
+            project_update_date
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
         {where_clause}
-        ORDER BY last_updated DESC
+        ORDER BY COALESCE(project_update_date, last_updated) DESC
         LIMIT {limit} OFFSET {offset}
         """
         
@@ -308,8 +344,12 @@ def api_projects():
         projects = []
         
         for row in results:
-            # Determine if project was updated this WM week
-            update_date = row.last_updated
+            # Determine if project was updated this WM week using project_update_date
+            try:
+                update_date = getattr(row, 'project_update_date', None)
+            except:
+                update_date = None
+            
             if update_date:
                 fy_start = datetime(update_date.year if update_date.month >= 2 else update_date.year - 1, 2, 1)
                 days_since = (update_date.replace(tzinfo=None) - fy_start).days
@@ -318,7 +358,7 @@ def api_projects():
             else:
                 is_updated_this_week = False
             
-            # Apply updated_status filter client-side (could be server-side with CASE)
+            # Apply updated_status filter
             if updated_status == 'updated' and not is_updated_this_week:
                 continue
             if updated_status == 'not_updated' and is_updated_this_week:
@@ -336,6 +376,7 @@ def api_projects():
                 'created_date': row.created_date.isoformat() if row.created_date else None,
                 'updated_date': row.last_updated.isoformat() if row.last_updated else None,
                 'project_update': row.project_update,
+                'project_update_date': update_date.isoformat() if update_date else None,
                 'is_updated_this_week': is_updated_this_week
             })
         
@@ -422,39 +463,60 @@ def api_project_history(project_id):
 @app.route('/api/projects/metrics', methods=['GET'])
 def api_metrics():
     """Get metrics"""
-    
+    bq_client = get_bq_client()
     if not bq_client:
         return jsonify({'error': 'BigQuery client not initialized'}), 500
     
     try:
-        # Get metrics for all projects
-        sql = r"""
+        # Calculate current WM week (Python)
+        today = datetime.now()
+        fy_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
+        days_since = (today - fy_start).days
+        current_wm_week = (days_since // 7) + 1
+        
+        # Get all projects with their update dates
+        sql = """
         SELECT 
-            COUNT(DISTINCT project_id) as total_projects,
-            COUNT(DISTINCT owner) as unique_owners,
-            COUNT(DISTINCT CASE 
-                WHEN DATE_DIFF(CURRENT_DATE(), DATE(last_updated), DAY) <= 7 
-                THEN project_id 
-            END) as projects_this_week
+            project_id,
+            project_update_date,
+            owner
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+        ORDER BY project_id
         """
         
-        results = bq_client.query(sql).result()
+        results = list(bq_client.query(sql).result())
+        
+        # Count projects updated this week in Python
+        total = len(results)
+        unique_owners = set()
+        projects_this_week = 0
         
         for row in results:
-            total = int(row.total_projects) if row.total_projects else 0
-            this_week = int(row.projects_this_week) if row.projects_this_week else 0
-            percent = (this_week * 100 / total) if total > 0 else 0
+            if row.project_update_date:
+                # Calculate WM week for this project
+                update_date = row.project_update_date
+                fy_start_proj = datetime(update_date.year if update_date.month >= 2 else update_date.year - 1, 2, 1)
+                days_since_proj = (update_date.replace(tzinfo=None) - fy_start_proj).days
+                update_wm_week = (days_since_proj // 7) + 1
+                
+                if update_wm_week == current_wm_week:
+                    projects_this_week += 1
             
-            return jsonify({
-                'metrics': {
-                    'active_projects': total,
-                    'unique_owners': int(row.unique_owners) if row.unique_owners else 0,
-                    'projects_updated_this_week': this_week,
-                    'percent_updated': round(percent, 2)
-                },
-                'timestamp': datetime.now().isoformat()
-            })
+            # Count unique owners
+            if row.owner:
+                unique_owners.add(row.owner)
+        
+        percent = (projects_this_week * 100 / total) if total > 0 else 0
+        
+        return jsonify({
+            'metrics': {
+                'active_projects': total,
+                'unique_owners': len(unique_owners),
+                'projects_updated_this_week': projects_this_week,
+                'percent_updated': round(percent, 2)
+            },
+            'timestamp': datetime.now().isoformat()
+        })
         
         return jsonify({
             'metrics': {'active_projects': 0, 'unique_owners': 0, 'projects_updated_this_week': 0, 'percent_updated': 0},
@@ -469,6 +531,7 @@ def api_metrics():
 @app.route('/api/projects/business-areas', methods=['GET'])
 def api_business_areas():
     """Get business organizations - only valid areas with projects"""
+    bq_client = get_bq_client()
     if not bq_client:
         return jsonify({'error': 'BigQuery client not initialized'}), 500
     
@@ -509,6 +572,7 @@ def projects_sync_status():
 @app.route('/api/projects/titles', methods=['GET'])
 def api_project_titles():
     """Get all unique project titles for filtering"""
+    bq_client = get_bq_client()
     if not bq_client:
         return jsonify({'error': 'BigQuery client not initialized'}), 500
     
@@ -537,6 +601,7 @@ def api_project_titles():
 @app.route('/api/projects/owners', methods=['GET'])
 def api_project_owners():
     """Get all unique owners for multi-select filtering"""
+    bq_client = get_bq_client()
     if not bq_client:
         return jsonify({'error': 'BigQuery client not initialized'}), 500
     
