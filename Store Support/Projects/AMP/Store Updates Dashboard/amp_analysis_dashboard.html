@@ -1022,19 +1022,7 @@
  </style>
 </head>
 <body>
- <!-- Backend Connection Status -->
- <div id="google-auth-ui" style="margin: 16px 0; padding: 12px 16px; background: #F0F8FF; border-radius: 4px; display: flex; align-items: center; gap: 12px;">
- <div id="backend-status" style="display: flex; align-items: center; gap: 8px;">
- <span id="status-indicator" style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #D69E2E; animation: pulse 2s infinite;"></span>
- <span id="auth-status" style="color: #718096; font-size: 13px;">Connecting to backend...</span>
- </div>
- </div>
- <style>
- @keyframes pulse {
- 0%, 100% { opacity: 1; }
- 50% { opacity: 0.5; }
- }
- </style>
+
  <!-- Header -->
  <div class="header">
  <div class="header-top">
@@ -1321,35 +1309,43 @@
  <div class="data-header">
  <h3>Activity List</h3>
  <div class="data-stats">
- <div class="stat-item">
+ <div class="stat-item" title="Count of activities matching current week/filter selections">
  <span class="stat-label">Total Activity</span>
  <span class="stat-value" id="recordCount">0</span>
  </div>
- <div class="stat-item">
+ <div class="stat-item" title="Count of unique AutoFeed activities (distinct AMP_IDs) in selected filters">
+ <span class="stat-label">Unique Autofeeds</span>
+ <span class="stat-value" id="uniqueAutofeeds">0</span>
+ </div>
+ <div class="stat-item" title="Activities reaching 2000 or more stores">
+ <span class="stat-label">Majority Activities</span>
+ <span class="stat-value highlight-high" id="majorityActivities">0</span>
+ </div>
+ <div class="stat-item" title="Maximum stores accessed by any single activity">
  <span class="stat-label">Store High</span>
  <span class="stat-value highlight-high" id="storeHigh">0</span>
  </div>
- <div class="stat-item">
+ <div class="stat-item" title="Minimum stores accessed by any single activity">
  <span class="stat-label">Store Low</span>
  <span class="stat-value highlight-low" id="storeLow">0</span>
  </div>
- <div class="stat-item">
+ <div class="stat-item" title="Average stores per activity across all selected activities">
  <span class="stat-label">Store Avg.</span>
  <span class="stat-value" id="storeAvg">0</span>
  </div>
- <div class="stat-item">
+ <div class="stat-item" title="Sum of all clicks across all activities in current filters">
  <span class="stat-label">Total Clicks</span>
  <span class="stat-value" id="totalClicks">0</span>
  </div>
- <div class="stat-item">
+ <div class="stat-item" title="Total Clicks ÷ Total Activities">
  <span class="stat-label">Avg. Clicks</span>
  <span class="stat-value" id="avgClicks">0</span>
  </div>
- <div class="stat-item">
+ <div class="stat-item" title="(Total Clicks ÷ Total Unique Users) × 100 for all activities">
  <span class="stat-label">Engagement %</span>
  <span class="stat-value" id="engagementPct">0%</span>
  </div>
- <div class="stat-item">
+ <div class="stat-item" title="Average of per-activity engagement rates">
  <span class="stat-label">Avg. Engagement</span>
  <span class="stat-value" id="avgEngagement">0%</span>
  </div>
@@ -3107,16 +3103,7 @@
  return;
  }
  
- // Update backend status indicator immediately
- const statusIndicator = document.getElementById('status-indicator');
- const authStatus = document.getElementById('auth-status');
- if (statusIndicator && authStatus) {
- statusIndicator.style.background = '#38A169';
- statusIndicator.style.animation = 'none';
- authStatus.innerHTML = '✅ <strong>Connected</strong> - ' + data.count + ' records loaded';
- authStatus.style.color = '#38A169';
- authStatus.style.fontWeight = 'bold';
- }
+
  
  // Populate table with API data
  const tableBody = document.getElementById('tableBody');
@@ -3346,16 +3333,30 @@
  let totalUniqueUsers = 0;
  let totalStores = 0;
  let engagementRates = []; // Array of per-activity engagement rates
+ let uniqueAutofeedIds = new Set(); // Track unique AMP_IDs for autofeeds
+ let majorityActivityCount = 0; // Count activities with 2000+ stores
  
  // Calculate totals from API data
  apiData.forEach(row => {
  const clicks = parseInt(row.Total_Clicks) || 0;
  const users = parseInt(row.Unique_Users) || 0;
  const stores = parseInt(row.Stores_With_Access) || 0;
+ const ampId = row.AMP_ID || '';
+ const messageType = row.Message_Type || '';
  
  totalClicks += clicks;
  totalUniqueUsers += users;
  totalStores += stores;
+ 
+ // Track unique autofeed activity IDs
+ if (messageType === 'Autofeeds' && ampId) {
+ uniqueAutofeedIds.add(ampId);
+ }
+ 
+ // Count activities with 2000+ stores
+ if (stores >= 2000) {
+ majorityActivityCount++;
+ }
  
  // Per-activity engagement = (Clicks / Users) * 100
  if (users > 0) {
@@ -3372,6 +3373,12 @@
  const storeLow = STORE_LOW_ACTIVITIES;
  const storeAvg = STORE_AVG_ACTIVITIES;
  
+ // Unique Autofeeds = count of distinct AMP_IDs with Message_Type = 'Autofeeds'
+ const uniqueAutofeeds = uniqueAutofeedIds.size;
+ 
+ // Majority Activities = activities with 2000+ stores
+ const majorityActivities = majorityActivityCount;
+ 
  // Avg Clicks = Total Clicks / Total Activities
  const avgClicks = recordCount > 0 ? Math.round(totalClicks / recordCount) : 0;
  
@@ -3386,6 +3393,8 @@
  : 0;
  
  document.getElementById('recordCount').textContent = recordCount.toLocaleString();
+ document.getElementById('uniqueAutofeeds').textContent = uniqueAutofeeds.toLocaleString();
+ document.getElementById('majorityActivities').textContent = majorityActivities.toLocaleString();
  document.getElementById('storeHigh').textContent = storeHigh.toLocaleString();
  document.getElementById('storeLow').textContent = storeLow.toLocaleString();
  document.getElementById('storeAvg').textContent = storeAvg;
@@ -3434,7 +3443,7 @@
  padding-left: 10px;
  pointer-events: none;
  font-size: 14px;
- color: #333;
+ color: #718096;
  border-radius: 4px 0 0 4px;
  overflow: hidden;
  white-space: nowrap;
@@ -3567,7 +3576,7 @@
  // Calculate current Walmart fiscal week
  // Walmart FY starts first Saturday of February
  function getCurrentWMWeek() {
- const today = new Date(2026, 3, 7); // Apr 7, 2026 = Week 10, FY2027
+ const today = new Date(2026, 3, 24); // Apr 24, 2026 = Week 12, FY2027
  const year = today.getFullYear();
  
  // Walmart fiscal week mapping for FY2027 (starts Feb 2026)

@@ -92,37 +92,29 @@ def _fetch_from_bigquery_direct() -> list:
             os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = creds_path
         bq_client = bq.Client(project='wmt-assetprotection-prod')
         query = """
-        WITH ih_agg AS (
-            SELECT
-                Intake_Card,
-                MIN(WM_Week) AS WM_Week,
-                COUNT(DISTINCT CASE WHEN Banner_Desc IN ('WM Supercenter', 'Wal-Mart') AND CAST(Facility AS INT64) > 0 THEN CAST(Facility AS INT64) END) AS SC_Stores,
-                COUNT(DISTINCT CASE WHEN Banner_Desc = 'Neighborhood Market' AND CAST(Facility AS INT64) > 0 THEN CAST(Facility AS INT64) END) AS NHM_Stores
-            FROM `wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data`
-            GROUP BY Intake_Card
-        )
         SELECT
             tda.Topic AS `Initiative - Project Title`,
             tda.Health_Update AS `Health Status`,
             tda.Phase,
-            SUM(CASE WHEN tda.Phase = tda.Facility_Phase THEN tda.Facility ELSE 0 END) AS `# of Stores`,
+            tda.Facility_Phase AS `Facility Phase`,
+            FORMAT_DATE('%d/%m/%y', MIN(tda.Impl_Date)) AS `Start Date`,
+            COALESCE(MIN(CAST(ih.WM_Week AS STRING)), 'TBD') AS `WM Week`,
+            COUNT(DISTINCT CASE WHEN ih.Banner_Desc IN ('WM Supercenter', 'Wal-Mart') AND CAST(tda.Facility AS INT64) > 0 THEN CAST(tda.Facility AS INT64) END) AS `SC`,
+            COUNT(DISTINCT CASE WHEN ih.Banner_Desc = 'Neighborhood Market' AND CAST(tda.Facility AS INT64) > 0 THEN CAST(tda.Facility AS INT64) END) AS `NHM`,
             tda.Dallas_POC AS `Executive Notes`,
             tda.TDA_Ownership,
             tda.Intake_Card_Nbr AS `Project ID`,
             tda.Intake_n_Testing AS `Intake & Testing`,
-            tda.Deployment,
-            COALESCE(CAST(ih.WM_Week AS STRING), 'TBD') AS `WM Week`,
-            FORMAT_DATE('%d/%m/%y', MIN(tda.Impl_Date)) AS `Start Date`,
-            COALESCE(ih.SC_Stores, 0) AS `SC`,
-            COALESCE(ih.NHM_Stores, 0) AS `NHM`
+            tda.Deployment
         FROM `wmt-assetprotection-prod.Store_Support_Dev.Output- TDA Report` tda
-        LEFT JOIN ih_agg ih
+        LEFT JOIN `wmt-assetprotection-prod.Store_Support_Dev.IH_Intake_Data` ih
             ON CAST(tda.Intake_Card_Nbr AS STRING) = CAST(ih.Intake_Card AS STRING)
+            AND CAST(tda.Facility AS STRING) = CAST(ih.Facility AS STRING)
         WHERE tda.TDA_Ownership IN ('Dallas POC', 'Dallas VET')
-        GROUP BY tda.Topic, tda.Health_Update, tda.Phase, tda.Dallas_POC,
-                 tda.TDA_Ownership, tda.Intake_Card_Nbr, tda.Intake_n_Testing, tda.Deployment,
-                 ih.WM_Week, ih.SC_Stores, ih.NHM_Stores
-        ORDER BY tda.Phase ASC, tda.Topic ASC
+        GROUP BY tda.Topic, tda.Health_Update, tda.Phase, tda.Facility_Phase,
+                 tda.Dallas_POC, tda.TDA_Ownership, tda.Intake_Card_Nbr,
+                 tda.Intake_n_Testing, tda.Deployment
+        ORDER BY tda.Phase ASC, tda.Topic ASC, tda.Facility_Phase ASC
         """
         rows = list(bq_client.query(query).result())
         data = [dict(r) for r in rows]
@@ -136,15 +128,27 @@ def _fetch_from_bigquery_direct() -> list:
 
 
 def _build_stats(projects: list) -> dict:
-    """Build summary stats dict from a project list"""
+    """Build summary stats dict from a project list (deduplicating by Project ID)"""
     current_wm_week = get_current_walmart_week()
+    seen = set()
+    total = on_track = at_risk = off_track = continuous = 0
+    for p in projects:
+        key = p.get('Project ID', p.get('Initiative - Project Title', ''))
+        if key not in seen:
+            seen.add(key)
+            total += 1
+            status = str(p.get('Health Status', ''))
+            if 'On Track' in status: on_track += 1
+            elif 'At Risk' in status: at_risk += 1
+            elif 'Off Track' in status: off_track += 1
+            elif 'Continuous' in status: continuous += 1
     return {
-        'total_projects': len(projects),
-        'total_stores': sum(int(p.get('# of Stores', 0) or 0) for p in projects),
-        'on_track': len([p for p in projects if 'On Track' in str(p.get('Health Status', ''))]),
-        'at_risk': len([p for p in projects if 'At Risk' in str(p.get('Health Status', ''))]),
-        'off_track': len([p for p in projects if 'Off Track' in str(p.get('Health Status', ''))]),
-        'continuous': len([p for p in projects if 'Continuous' in str(p.get('Health Status', ''))]),
+        'total_projects': total,
+        'total_stores': sum(int(p.get('SC', 0) or 0) + int(p.get('NHM', 0) or 0) for p in projects),
+        'on_track': on_track,
+        'at_risk': at_risk,
+        'off_track': off_track,
+        'continuous': continuous,
         'wm_week': current_wm_week,
     }
 
@@ -193,8 +197,14 @@ def build_contacts_html(contacts: list) -> str:
 
 
 def fetch_dashboard_data(api_url: str = DASHBOARD_URL) -> tuple:
-    """Fetch dashboard data: API first, then direct BigQuery, then sample data"""
-    # --- Attempt 1: Live API ---
+    """Fetch dashboard data: Direct BigQuery first (preferred), then API, then sample data"""
+    # --- Attempt 1: Direct BigQuery (preferred — API server may be running stale code) ---
+    print("     [*] Querying BigQuery directly...")
+    projects = _fetch_from_bigquery_direct()
+    if projects:
+        return _build_stats(projects), projects
+
+    # --- Attempt 2: Live API (fallback if BQ fails) ---
     try:
         summary_url = f"{api_url}/api/summary"
         with urllib.request.urlopen(summary_url, timeout=5) as response:
@@ -208,7 +218,6 @@ def fetch_dashboard_data(api_url: str = DASHBOARD_URL) -> tuple:
 
         if projects:
             current_wm_week = get_current_walmart_week()
-            # Prefer summary stats from API, but if they're 0 (stale cache), compute from projects
             api_total = summary.get('total_projects', 0)
             if api_total > 0:
                 stats = {
@@ -221,16 +230,12 @@ def fetch_dashboard_data(api_url: str = DASHBOARD_URL) -> tuple:
                     'wm_week': current_wm_week,
                 }
             else:
-                # API summary returned 0 — compute directly from projects
                 stats = _build_stats(projects)
                 stats['wm_week'] = current_wm_week
             print(f"     [OK] API returned {len(projects)} projects")
             return stats, projects
     except Exception as e:
         print(f"     [!] API fetch failed: {e}")
-
-    # --- Attempt 2: Direct BigQuery ---
-    print("     [*] Falling back to direct BigQuery query...")
     projects = _fetch_from_bigquery_direct()
     if projects:
         return _build_stats(projects), projects
@@ -248,12 +253,28 @@ def build_needs_attention_html(projects: list) -> list:
     """Build HTML pages for Needs Attention section (at-risk initiatives).
     Returns a list of HTML strings — one per page (max 10 cards each).
     Returns empty list if no At Risk items.
+    Deduplicates by Project ID and shows Start Date from matching Facility Phase.
     """
     
-    at_risk_items = [p for p in projects if str(p.get('Health Status', '')).lower() == 'at risk']
+    at_risk_rows = [p for p in projects if str(p.get('Health Status', '')).lower() == 'at risk']
     
-    if not at_risk_items:
+    if not at_risk_rows:
         return []
+    
+    # Deduplicate: one card per project. Find the row where Facility Phase == Phase for Start Date.
+    seen = {}
+    for row in at_risk_rows:
+        key = row.get('Project ID', row.get('Initiative - Project Title', ''))
+        phase = str(row.get('Phase', ''))
+        fac_phase = str(row.get('Facility Phase', ''))
+        if key not in seen:
+            seen[key] = dict(row)
+            seen[key]['_matched_start_date'] = ''
+        # If Facility Phase matches Phase, capture that Start Date
+        if fac_phase == phase and row.get('Start Date'):
+            seen[key]['_matched_start_date'] = row.get('Start Date', '')
+    
+    at_risk_items = list(seen.values())
     
     CARDS_PER_PAGE = 10
     pages = []
@@ -267,12 +288,14 @@ def build_needs_attention_html(projects: list) -> list:
         cards_html = ''
         for item in page_items:
             title = escape(item.get('Initiative - Project Title', 'Unknown'))
-            stores = item.get('# of Stores', 0)
             notes = escape(item.get('Executive Notes', 'No notes provided'))
             phase = escape(item.get('Phase', 'Unknown'))
+            start_date = escape(item.get('_matched_start_date', '') or item.get('Start Date', 'TBD'))
             wm_week = escape(str(item.get('WM Week', 'N/A')))
             status_label = escape(str(item.get('Health Status', 'At Risk')))
             deployment = escape(str(item.get('Deployment', 'No Note Provided')))
+            sc = item.get('SC', 0)
+            nhm = item.get('NHM', 0)
             
             cards_html += f'''<div style="background:white;border:1px solid #dc3545;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(220,53,69,0.1);">
 <div style="margin-bottom:8px;">
@@ -280,7 +303,8 @@ def build_needs_attention_html(projects: list) -> list:
   <div style="font-size:12px;color:#666;margin-top:4px;">Phase: {phase}</div>
 </div>
 <div style="font-weight:700;color:#212121;margin-bottom:8px;font-size:14px;">{title}</div>
-<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Stores:</strong> {stores}</div>
+<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Start Date:</strong> {start_date}</div>
+<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Format:</strong> SC: {sc} | NHM: {nhm}</div>
 <div style="font-size:12px;color:#333;margin:8px 0;line-height:1.4;padding-left:8px;border-left:2px solid #dc3545;"><strong>Notes:</strong> {notes}</div>
 <div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>WM Week:</strong> {wm_week}</div>
 <div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Status:</strong> {deployment}</div>
@@ -324,18 +348,31 @@ def build_executive_summary_html(stats: dict, projects: list) -> str:
     continuous = stats.get('continuous', 0) if 'continuous' in stats else 0
     
     # At-risk items for Needs Attention (first 10 only — overflow goes to separate slides)
-    at_risk_items = [p for p in projects if str(p.get('Health Status', '')).lower() == 'at risk']
-    display_items = at_risk_items[:10]
+    # Deduplicate by project and find matching Facility Phase Start Date
+    at_risk_rows = [p for p in projects if str(p.get('Health Status', '')).lower() == 'at risk']
+    seen_projects = {}
+    for row in at_risk_rows:
+        key = row.get('Project ID', row.get('Initiative - Project Title', ''))
+        phase_val = str(row.get('Phase', ''))
+        fac_phase = str(row.get('Facility Phase', ''))
+        if key not in seen_projects:
+            seen_projects[key] = dict(row)
+            seen_projects[key]['_matched_start_date'] = ''
+        if fac_phase == phase_val and row.get('Start Date'):
+            seen_projects[key]['_matched_start_date'] = row.get('Start Date', '')
+    display_items = list(seen_projects.values())[:10]
     
     cards_html = ''
     for item in display_items:
         title = escape(item.get('Initiative - Project Title', 'Unknown'))
-        stores_val = item.get('# of Stores', 0)
         notes = escape(item.get('Executive Notes', 'No notes provided'))
         phase = escape(item.get('Phase', 'Unknown'))
+        start_date = escape(item.get('_matched_start_date', '') or item.get('Start Date', 'TBD'))
         wm_week = escape(str(item.get('WM Week', 'N/A')))
         status_label = escape(str(item.get('Health Status', 'At Risk')))
         deployment = escape(str(item.get('Deployment', 'No Note Provided')))
+        sc = item.get('SC', 0)
+        nhm = item.get('NHM', 0)
         
         cards_html += f'''<div style="background:white;border:1px solid #dc3545;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(220,53,69,0.1);">
 <div style="margin-bottom:8px;">
@@ -343,7 +380,8 @@ def build_executive_summary_html(stats: dict, projects: list) -> str:
   <div style="font-size:12px;color:#666;margin-top:4px;">Phase: {phase}</div>
 </div>
 <div style="font-weight:700;color:#212121;margin-bottom:8px;font-size:14px;">{title}</div>
-<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Stores:</strong> {stores_val}</div>
+<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Start Date:</strong> {start_date}</div>
+<div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Format:</strong> SC: {sc} | NHM: {nhm}</div>
 <div style="font-size:12px;color:#333;margin:8px 0;line-height:1.4;padding-left:8px;border-left:2px solid #dc3545;"><strong>Notes:</strong> {notes}</div>
 <div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>WM Week:</strong> {wm_week}</div>
 <div style="font-size:12px;color:#666;margin:4px 0;padding-left:8px;border-left:2px solid #dc3545;"><strong>Status:</strong> {deployment}</div>
@@ -368,8 +406,8 @@ body{{background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','
 
 <!-- Header Bar -->
 <div style="background:linear-gradient(135deg,#1E3A8A 0%,#2563EB 100%);padding:20px 30px;display:flex;align-items:center;gap:16px;">
-  <div style="width:40px;height:40px;background:#FFC220;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-    <img src="data:image/png;base64,{spark_logo_b64}" style="width:24px;height:24px;" alt="Spark">
+  <div style="width:40px;height:40px;background:#ffffff;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+    <img src="data:image/png;base64,{spark_logo_b64}" style="width:28px;height:28px;" alt="Spark">
   </div>
   <div>
     <div style="color:white;font-size:22px;font-weight:700;">Dallas Team Report</div>
@@ -412,7 +450,7 @@ body{{background:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','
 def build_phase_html(phase: str, rows: list) -> str:
     """Build HTML for a phase section — matches dashboard Generate PPT styling exactly"""
     
-    columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Start Date', 'WM Week', '# of Stores', 'SC', 'NHM', 'Executive Notes']
+    columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Facility Phase', 'Start Date', 'WM Week', 'SC', 'NHM', 'Executive Notes']
     
     # Phase banner — matches dashboard blue (#3B82F6)
     banner = f'''<div style="background:#3B82F6;color:white;padding:10px 20px;font-size:16px;font-weight:600;text-align:center;border-radius:4px 4px 0 0;">Phase: {escape(phase)}</div>'''
@@ -445,16 +483,8 @@ def build_phase_html(phase: str, rows: list) -> str:
                 
                 table += f'<td style="{cell_style}"><span style="display:inline-block;padding:4px 10px;background-color:{bg_color};color:{color};border-radius:12px;font-weight:600;font-size:12px;white-space:nowrap;">{escape(value)}</span></td>'
             
-            elif col == 'Phase':
+            elif col == 'Phase' or col == 'Facility Phase':
                 table += f'<td style="{cell_style}"><span style="display:inline-block;padding:4px 10px;background-color:#DBEAFE;color:#1E3A8A;border-radius:4px;font-weight:500;font-size:12px;">{escape(value)}</span></td>'
-            
-            elif col == '# of Stores':
-                try:
-                    stores = int(row.get(col, 0) or 0)
-                    value = f"{stores:,}"
-                except:
-                    pass
-                table += f'<td style="{cell_style}font-weight:600;color:#0071CE;">{escape(value)}</td>'
             
             elif col in ('SC', 'NHM'):
                 table += f'<td style="{cell_style}font-weight:600;color:#0071CE;">{escape(value)}</td>'
@@ -488,7 +518,7 @@ def build_combined_phases_html(phase_sections: list) -> str:
     """Build HTML combining multiple small phases onto one page.
     phase_sections: list of (phase_name, rows_list) tuples
     """
-    columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Start Date', 'WM Week', '# of Stores', 'SC', 'NHM', 'Executive Notes']
+    columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Facility Phase', 'Start Date', 'WM Week', 'SC', 'NHM', 'Executive Notes']
     
     body = ''
     for phase, rows in phase_sections:
@@ -516,15 +546,8 @@ def build_combined_phases_html(phase_sections: list) -> str:
                     elif 'off track' in status:
                         bg_color, color = 'rgba(220,53,69,0.2)', '#DC3545'
                     table += f'<td style="{cell_style}"><span style="display:inline-block;padding:4px 10px;background-color:{bg_color};color:{color};border-radius:12px;font-weight:600;font-size:12px;white-space:nowrap;">{escape(value)}</span></td>'
-                elif col == 'Phase':
+                elif col == 'Phase' or col == 'Facility Phase':
                     table += f'<td style="{cell_style}"><span style="display:inline-block;padding:4px 10px;background-color:#DBEAFE;color:#1E3A8A;border-radius:4px;font-weight:500;font-size:12px;">{escape(value)}</span></td>'
-                elif col == '# of Stores':
-                    try:
-                        stores = int(row.get(col, 0) or 0)
-                        value = f"{stores:,}"
-                    except:
-                        pass
-                    table += f'<td style="{cell_style}font-weight:600;color:#0071CE;">{escape(value)}</td>'
                 elif col in ('SC', 'NHM'):
                     table += f'<td style="{cell_style}font-weight:600;color:#0071CE;">{escape(value)}</td>'
                 elif col == 'Start Date':
@@ -609,6 +632,11 @@ def generate_report_pptx(executive_summary_html: str, sections: list) -> tuple:
         fill = background.fill
         fill.solid()
         fill.fore_color.rgb = RGBColor(0x1E, 0x3A, 0x8A)
+        
+        # Spark logo on title slide
+        spark_png = SCRIPT_DIR / 'Spark_Blank.png'
+        if spark_png.exists():
+            slide.shapes.add_picture(str(spark_png), Inches(3.8), Inches(0.8), Inches(2.0), Inches(2.0))
         
         txBox = slide.shapes.add_textbox(Inches(0.5), Inches(2.5), Inches(8.6), Inches(1.8))
         p = txBox.text_frame.paragraphs[0]

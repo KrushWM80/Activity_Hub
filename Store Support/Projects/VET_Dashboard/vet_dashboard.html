@@ -1118,9 +1118,22 @@
             section.style.display = 'block';
             itemsContainer.innerHTML = '';
             
-            // Group by Phase for organization
+            // Group by Phase for organization, deduplicating by Project ID
             const phaseMap = {};
+            const seenProjects = {};
             atRiskData.forEach(item => {
+                const key = item['Project ID'] || item['Initiative - Project Title'] || '';
+                const phase = item.Phase || 'Unknown';
+                const facPhase = item['Facility Phase'] || '';
+                if (!seenProjects[key]) {
+                    seenProjects[key] = {...item, _matchedStartDate: ''};
+                }
+                // If Facility Phase matches Phase, capture that Start Date
+                if (facPhase === phase && item['Start Date']) {
+                    seenProjects[key]._matchedStartDate = item['Start Date'];
+                }
+            });
+            Object.values(seenProjects).forEach(item => {
                 const phase = item.Phase || 'Unknown';
                 if (!phaseMap[phase]) phaseMap[phase] = [];
                 phaseMap[phase].push(item);
@@ -1129,6 +1142,9 @@
             // Render items grouped by phase
             Object.entries(phaseMap).forEach(([phase, items]) => {
                 items.forEach(item => {
+                    const startDate = escapeHtml(item._matchedStartDate || item['Start Date'] || 'TBD');
+                    const sc = item['SC'] || 0;
+                    const nhm = item['NHM'] || 0;
                     const html = `
                         <div class="needs-attention-item">
                             <div style="margin-bottom: 8px;">
@@ -1136,7 +1152,8 @@
                                 <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Phase: ${phase}</div>
                             </div>
                             <div class="needs-attention-item-title">${escapeHtml(item['Initiative - Project Title'] || 'N/A')}</div>
-                            <div class="needs-attention-item-detail"><strong>Stores:</strong> ${item['# of Stores'] || 0}</div>
+                            <div class="needs-attention-item-detail"><strong>Start Date:</strong> ${startDate}</div>
+                            <div class="needs-attention-item-detail"><strong>Format:</strong> SC: ${sc} | NHM: ${nhm}</div>
                             <div class="needs-attention-item-detail"><strong>Notes:</strong> ${escapeHtml(item['Executive Notes'] || 'No notes')}</div>
                             <div class="needs-attention-item-detail"><strong>WM Week:</strong> ${item['WM Week'] || 'TBD'}</div>
                             <div class="needs-attention-item-detail"><strong>Status:</strong> ${escapeHtml(item['Deployment'] || 'N/A')}</div>
@@ -1197,7 +1214,7 @@
             }
             
             section.style.display = 'block';
-            const columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Start Date', 'WM Week', '# of Stores', 'SC', 'NHM', 'Executive Notes'];
+            const columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Facility Phase', 'Start Date', 'WM Week', 'SC', 'NHM', 'Executive Notes'];
             
             let html = '<table><thead><tr>';
             columns.forEach(col => { html += `<th>${col}</th>`; });
@@ -1215,9 +1232,9 @@
                         else if (status.includes('off track')) cls = 'badge badge-off-track';
                         else if (status.includes('continuous')) cls = 'badge badge-continuous';
                         html += `<td><span class="${cls}">${value}</span></td>`;
-                    } else if (col === 'Phase') {
+                    } else if (col === 'Phase' || col === 'Facility Phase') {
                         html += `<td><span class="phase-tag">${value}</span></td>`;
-                    } else if (col === '# of Stores' || col === 'SC' || col === 'NHM') {
+                    } else if (col === 'SC' || col === 'NHM') {
                         html += `<td style="font-weight: 600; color: var(--walmart-blue);">${value}</td>`;
                     } else if (col === 'Initiative - Project Title') {
                         const projectId = row['Project ID'];
@@ -1259,7 +1276,7 @@
                     let valB = b[sortState.column] ?? '';
                     
                     // Numeric columns
-                    if (['# of Stores', 'SC', 'NHM', 'WM Week'].includes(sortState.column)) {
+                    if (['SC', 'NHM', 'WM Week'].includes(sortState.column)) {
                         valA = parseFloat(valA) || 0;
                         valB = parseFloat(valB) || 0;
                     } else {
@@ -1321,9 +1338,9 @@
                 'Initiative - Project Title',
                 'Health Status',
                 'Phase',
+                'Facility Phase',
                 'Start Date',
                 'WM Week',
-                '# of Stores',
                 'SC',
                 'NHM',
                 'Executive Notes'
@@ -1361,9 +1378,9 @@
                             cellClass = 'badge';
                         }
                         html += `<td><span class="${cellClass}">${value}</span></td>`;
-                    } else if (col === 'Phase') {
+                    } else if (col === 'Phase' || col === 'Facility Phase') {
                         html += `<td><span class="phase-tag">${value}</span></td>`;
-                    } else if (col === '# of Stores' || col === 'SC' || col === 'NHM') {
+                    } else if (col === 'SC' || col === 'NHM') {
                         html += `<td style="font-weight: 600; color: var(--walmart-blue);">${value}</td>`;
                     } else if (col === 'Start Date') {
                         html += `<td style="white-space: nowrap;">${value}</td>`;
@@ -1425,16 +1442,16 @@
             document.getElementById('table-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Update summary statistics
+        // Update summary statistics (deduplicate by Project ID since rows repeat per Facility Phase)
         function updateSummary(data) {
-            document.getElementById('stat-projects').textContent = data.length;
-            
-            let onTrack = 0;
-            let atRisk = 0;
-            let offTrack = 0;
-            let continuous = 0;
+            const seen = new Set();
+            let total = 0, onTrack = 0, atRisk = 0, offTrack = 0, continuous = 0;
             
             data.forEach(row => {
+                const key = row['Project ID'] || row['Initiative - Project Title'] || '';
+                if (seen.has(key)) return;
+                seen.add(key);
+                total++;
                 const status = String(row['Health Status']).toLowerCase();
                 if (status.includes('on track')) onTrack++;
                 else if (status.includes('at risk')) atRisk++;
@@ -1442,6 +1459,7 @@
                 else if (status.includes('continuous')) continuous++;
             });
             
+            document.getElementById('stat-projects').textContent = total;
             document.getElementById('stat-on-track').textContent = onTrack;
             document.getElementById('stat-at-risk').textContent = atRisk;
             document.getElementById('stat-off-track').textContent = offTrack;
@@ -1627,7 +1645,7 @@
                 
                 // Helper: build HTML for one section's page (banner + table)
                 function buildSectionPageHtml(phase, pageRows) {
-                    const columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'WM Week', '# of Stores', 'Executive Notes'];
+                    const columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Facility Phase', 'WM Week', 'SC', 'NHM', 'Executive Notes'];
                     let html = `<div style="margin-bottom: 10px;">`;
                     html += `<div style="background: #3B82F6; color: white; padding: 10px 20px; font-size: 16px; font-weight: 600; text-align: center; border-radius: 4px 4px 0 0;">Phase: ${phase}</div>`;
                     html += `<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
@@ -1659,9 +1677,9 @@
                                     badgeColor = '#DC3545';
                                 }
                                 html += `<td style="${cellStyle}"><span style="display: inline-block; padding: 4px 10px; background-color: ${badgeBg}; color: ${badgeColor}; border-radius: 12px; font-weight: 600; font-size: 12px; white-space: nowrap;">${value}</span></td>`;
-                            } else if (col === 'Phase') {
+                            } else if (col === 'Phase' || col === 'Facility Phase') {
                                 html += `<td style="${cellStyle}"><span style="display: inline-block; padding: 4px 10px; background-color: #DBEAFE; color: #1E3A8A; border-radius: 4px; font-weight: 500; font-size: 12px;">${value}</span></td>`;
-                            } else if (col === '# of Stores') {
+                            } else if (col === 'SC' || col === 'NHM') {
                                 html += `<td style="${cellStyle} font-weight: 600; color: #0071CE;">${value}</td>`;
                             } else if (col === 'Initiative - Project Title') {
                                 const projectId = row['Project ID'];
@@ -1895,7 +1913,7 @@
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Initiative - Project Title</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Health Status</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Phase</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;"># of Stores</th>
+                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Facility Phase</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Dallas VET</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Intake & Testing</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Deployment</th>
@@ -1918,13 +1936,13 @@
                 let testRow = document.createElement('tr');
                 testRow.style.cssText = 'border: 1px solid #ddd;';
                 
-                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas VET', 'Intake & Testing', 'Deployment'];
+                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', 'Facility Phase', 'Dallas VET', 'Intake & Testing', 'Deployment'];
                 columns.forEach(col => {
                     const td = document.createElement('td');
                     td.style.cssText = 'padding: 8px; border: 1px solid #ddd; word-wrap: break-word; white-space: normal;';
                     
                     let value = row[col] ?? '';
-                    if (col === 'Health Status' || col === 'Phase' || col === '# of Stores') {
+                    if (col === 'Health Status' || col === 'Phase' || col === 'Facility Phase') {
                         td.style.fontWeight = '600';
                     }
                     if (col === 'Initiative - Project Title' && row['Project ID']) {

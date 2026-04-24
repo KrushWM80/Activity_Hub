@@ -2654,13 +2654,21 @@ async def get_worker_data_optimized():
     import json as json_lib
     worker_data_dir = TEAMING_DIR
     json_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes_Optimized.json")
+    print(f"[DEBUG] Attempting to load: {json_file}")
+    print(f"[DEBUG] File exists: {os.path.exists(json_file)}")
+    print(f"[DEBUG] TEAMING_DIR: {TEAMING_DIR}")
     if os.path.exists(json_file):
         try:
             with open(json_file, 'r', encoding='utf-8') as f:
-                return json_lib.load(f)
+                data = json_lib.load(f)
+                print(f"[SUCCESS] Loaded {len(data) if isinstance(data, list) else 1} records")
+                return data
         except Exception as e:
-            print(f"Error reading optimized worker JSON: {e}")
-    return []
+            print(f"[ERROR] Error reading optimized worker JSON: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+    else:
+        print(f"[ERROR] File not found: {json_file}")
+        raise HTTPException(status_code=404, detail="File not found")
 
 @app.get("/Worker_Names_Stores_Missing_JobCodes.json")
 async def get_worker_data():
@@ -2668,20 +2676,30 @@ async def get_worker_data():
     import json as json_lib
     worker_data_dir = TEAMING_DIR
     json_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes.json")
+    print(f"[DEBUG] Attempting to load full worker data: {json_file}")
+    print(f"[DEBUG] File exists: {os.path.exists(json_file)}")
     if os.path.exists(json_file):
         try:
             with open(json_file, 'r', encoding='utf-8') as f:
-                return json_lib.load(f)
+                data = json_lib.load(f)
+                print(f"[SUCCESS] Loaded full worker data with {len(data) if isinstance(data, list) else 1} records")
+                return data
         except Exception as e:
-            print(f"Error reading worker JSON: {e}")
+            print(f"[ERROR] Error reading worker JSON: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
     csv_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes.csv")
+    print(f"[DEBUG] Trying CSV fallback: {csv_file}")
     if os.path.exists(csv_file):
         try:
             df = pd.read_csv(csv_file)
-            return df.to_dict('records')
+            data = df.to_dict('records')
+            print(f"[SUCCESS] Loaded CSV with {len(data)} records")
+            return data
         except Exception as e:
-            print(f"Error reading worker CSV: {e}")
-    return []
+            print(f"[ERROR] Error reading worker CSV: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+    print(f"[ERROR] Neither JSON nor CSV file found")
+    raise HTTPException(status_code=404, detail="Worker data files not found")
 
 if __name__ == "__main__":
     print(f"""

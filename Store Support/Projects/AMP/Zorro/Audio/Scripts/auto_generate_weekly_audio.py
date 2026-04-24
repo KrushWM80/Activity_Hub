@@ -67,15 +67,25 @@ WALMARTWIFI_NAME = 'Walmartwifi'
 # ── WiFi Switching ──────────────────────────────────────────────────────────
 
 def _get_current_ip():
-    """Get the current WiFi IPv4 address."""
+    """Get the current WiFi IPv4 address using ipconfig (fast, no CIM dependency)."""
     try:
         result = subprocess.run(
-            ['powershell', '-Command',
-             "Get-NetIPConfiguration | Where-Object { $_.InterfaceAlias -eq 'Wi-Fi' } "
-             "| Select-Object -ExpandProperty IPv4Address | Select-Object -ExpandProperty IPAddress"],
+            ['ipconfig'],
             capture_output=True, text=True, timeout=10
         )
-        return result.stdout.strip()
+        import re
+        in_wifi = False
+        for line in result.stdout.splitlines():
+            if 'Wi-Fi' in line and 'adapter' in line.lower():
+                in_wifi = True
+            elif in_wifi and 'adapter' in line.lower() and ':' in line:
+                # Hit the next adapter section — stop
+                break
+            elif in_wifi and 'IPv4 Address' in line:
+                match = re.search(r':\s*([\d.]+)', line)
+                if match:
+                    return match.group(1)
+        return ''
     except Exception as e:
         logger.warning(f"Could not get IP: {e}")
         return ''

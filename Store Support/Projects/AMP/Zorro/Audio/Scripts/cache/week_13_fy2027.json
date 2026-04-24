@@ -1,10 +1,10 @@
 {
   "week": 13,
   "fy": 2027,
-  "cached_at": "2026-04-23T06:00:26.873138",
-  "bq_last_updated": "2026-04-22T23:57:37.675000+00:00",
-  "event_count": 27,
-  "review_no_comm_count": 27,
+  "cached_at": "2026-04-24T15:08:31.854311",
+  "bq_last_updated": "2026-04-24T19:53:22.457000+00:00",
+  "event_count": 45,
+  "review_no_comm_count": 45,
   "status_breakdown": [
     {
       "status": "Draft - Pending",
@@ -12,43 +12,15 @@
     },
     {
       "status": "Denied - Pending",
-      "count": 3
-    },
-    {
-      "status": "Awaiting Comms Approval - Pending",
-      "count": 1
-    },
-    {
-      "status": "Awaiting Comms Approval - In Progress",
-      "count": 1
-    },
-    {
-      "status": "Awaiting Business Review - Pending",
-      "count": 2
-    },
-    {
-      "status": "Awaiting Legal Approval - Pending",
-      "count": 1
-    },
-    {
-      "status": "ATC final review - Pending",
-      "count": 2
-    },
-    {
-      "status": "Review for Publish review - Pending",
-      "count": 10
-    },
-    {
-      "status": "Review for Publish review - Future Send",
-      "count": 1
+      "count": 5
     },
     {
       "status": "Expired - Pending",
-      "count": 1
+      "count": 3
     },
     {
       "status": "Review for Publish review - No Comms",
-      "count": 27
+      "count": 45
     },
     {
       "status": "Expired - No Comms",
@@ -56,7 +28,7 @@
     }
   ],
   "total_excl_denied": 45,
-  "summarized_count": 27,
+  "summarized_count": 44,
   "events_with_summaries": [
     {
       "event_id": "14ee4636-c4c5-4db9-9c11-901ad6a2f8c3",
@@ -87,11 +59,46 @@
       "summary_text": "In department 40, continue to set Equate Allergy features which are shipping to stores at the start of each month. Quantities are calibrated to support an 80 percent sell through target.\u00a0 Most markets are past peak allergy season and moving into the back half, while the Northeast is just beginning to ramp up."
     },
     {
+      "event_id": "1a6a179f-4067-4460-94b0-26d1b65e9458",
+      "store_area": "Consumables",
+      "title": "Item Info Is Now in Pinpoint",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Consumables and Hardlines: Item Info is now built directly into Pinpoint, so you can view item details and purchase history without leaving the app. This helps you resolve exceptions faster without switching devices or tools."
+    },
+    {
+      "event_id": "46892a0a-8abe-4b56-bd21-cb5f6a2a2d9f",
+      "store_area": "Digital",
+      "title": "Don\u2019t Let Sales Slip This Mother\u2019s Day!",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: Mother\u2019s Day demand is building, so now is the time to stay focused on the biggest sales drivers. Keep floral fresh and full, make sure greeting cards are organized and easy to shop, maintain strong in-stocks on giftables like candles and spa sets, and use chocolate and sweets as add-on opportunities near floral and cards. Above all, keep the salesfloor full, clean and shoppable to capture both planned and impulse purchases."
+    },
+    {
+      "event_id": "a3162df1-96eb-4c6a-a899-e7d1f97f3f52",
+      "store_area": "Digital",
+      "title": "FY27\u00a0InHome\u00a0Driver Safety Calendar",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: The FY27 InHome Driver Safety Calendar gives stores and drivers a year-long plan to stay focused on safe delivery practices. Each month features a safety theme based on real-world risks and Lytx insights, with clear actions and in-app messages to reinforce key behaviors. Stores should print the calendar from the Safety Enterprise Hub and post it in the InHome backroom for daily visibility."
+    },
+    {
+      "event_id": "f3801f48-09ed-41c3-a0e9-86886b748b47",
+      "store_area": "Digital",
+      "title": "InHome In-Cab Camera Insight for Distracted Driving",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: Lytx in-cab camera alerts help remind InHome drivers to stay focused and avoid distracted driving. Keep your eyes on the road, your hands on the wheel and your phone out of reach. If you hear an alert, refocus right away. Safe driving protects you, your load and everyone on the road."
+    },
+    {
       "event_id": "69544247-03e0-4453-acbb-24f2a524eb7d",
       "store_area": "Entertainment",
       "title": "Dept. 72: Cut the Cord Cover Letter Correction",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Dept. 72: Disregard the cover letter instruction to remove or destroy\u00a0Roku signage, and keep Roku displays and backing in place as shown on the floorplan."
+    },
+    {
+      "event_id": "31bb150a-e578-4cc3-81a6-00273bf02f1c",
+      "store_area": "Fashion",
+      "title": "Dept. 29: Sleepwear Mod Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "We're asking stores to verify that sleepwear mods are set correctly in Department 29."
     },
     {
       "event_id": "a11dabe5-c86a-4e30-8441-4cf4a2b24c82",
@@ -122,6 +129,13 @@
       "summary_text": "Dept. 95: As part of the America 250th celebration, the grilling train will include a half-pallet of party size potato chips from Frito Lay. It is the responsibility of the Frito Lay representative to keep this half-pallet maintained for the duration of this program."
     },
     {
+      "event_id": "f3b0fd44-8e9c-4b43-a042-a65df51e93a6",
+      "store_area": "Food",
+      "title": "Summer Grilling Train",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "The 12-week Great American Grill-Out campaign celebrates \u00a0America\u2019s 250th birthday with a \u201cGrilling Train.\u201d It runs week 14 (May 2\u20138) through week 26 (July 25\u201331). Positioned in action alley for maximum visibility, it features eight high-volume items across Departments 92, 95 and 98 with sustained Rollback pricing."
+    },
+    {
       "event_id": "243a3f19-35e4-4418-b85a-22dc21fc3c81",
       "store_area": "Fresh",
       "title": "D80: Bulk Meat & Cheese Updates",
@@ -129,11 +143,46 @@
       "summary_text": "Department 80: Replenishment settings have been adjusted to make sure stores have one chub per facing of each item, plus one for behind the counter to slice and sell.\u00a0associates need to make sure their on hands are correct in order for this replenishment goal to be met.\n\nDepartment 80: To reduce markdowns, stores should only weigh and label enough product for 2-3 days of\u00a0sales. Once associates label it, the product only has 5-7 days to sell before CVP.\n\nDepartment 80: This message points out four known in-stock issues. The items include Jennie O Sundried Turkey, Jennie O Herb Roasted Turkey, Prima Della Honey Roasted Turkey and Prima Della Truffle Gouda."
     },
     {
+      "event_id": "5ba64c61-d288-4f79-a7a6-01a4e4c0b5fc",
+      "store_area": "Fresh",
+      "title": "D93 Week 13 Merch Message",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Ensure the sales floor is set for Cinco de Mayo (Tuesday, May 5) and Mother\u2019s Day (Sunday, May 10). Expect a ground beef lift for Cinco de Mayo; for Mother\u2019s Day, watch for increased demand in steaks, ribs, lobster, snow crab and other grilling items. Keep features set and modular homes full. Slack out dinner sausage on Wednesdays to build up in preparation for weekend sales. With warmer weather coming, monitor case temps: target 30 degrees; shelf life drops at 34, and each degree above 34 costs a day. See the Meat Better Way Guide for your store formats for more details."
+    },
+    {
       "event_id": "5b35da9b-fd61-4fe1-b5cb-eff29d98c03c",
       "store_area": "Fresh",
       "title": "Dept. 80: Chicken Salad Croissant Will Arrive Ready to Sell",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Department 80: The in-store made Chicken Salad Croissant is transitioning to a supplier-produced version. It will now arrive ready to sell with no in\u2011store production or manual ordering required."
+      "summary_text": "In the Deli (department 80), the in-store made chicken salad croissant is transitioning to a supplier-produced version that will now arrive ready to sell with no in\u2011store production or manual ordering required."
+    },
+    {
+      "event_id": "3a59cdfa-dbc0-4d86-8f86-f1c46cc15f53",
+      "store_area": "Fresh",
+      "title": "Dept. 94: Mother's Day Floral",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Mother\u2019s Day is near\u2014execute the department 94 fresh floral plan now to win the season. Use the Mother\u2019s Day Floral Scan Sheet daily to scan items and adjust inventory. Set and price action alley displays, then aisle-locate by scanning into a nearby label. Keep displays organized, full and fresh\u2014refill and consolidate shippers often, and update locations as product moves. With about 80% of sales in the final three days, it\u2019s essential to assign dedicated coverage May 7\u201310."
+    },
+    {
+      "event_id": "b9a00184-a672-4074-a4a6-3c48c1f71bfb",
+      "store_area": "Fresh",
+      "title": "Dept. 94: Produce Instock Risk",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Produce supply remains tight due to weather in Florida/Mexico and seasonal transitions. Supply constrains will be seen with carrots, chilis, cucumbers, green beans/okra, grapes, green bells, nectarines, mangos, tomatoes and watermelons.\u00a0Incremental supply is being sourced and we expect recovery for most items to be between weeks 13 and 15. We ask stores to flex adjacent items to fill outs during supply gaps."
+    },
+    {
+      "event_id": "6eb9e206-ff6c-4d5d-acae-9d59c9859937",
+      "store_area": "Fresh",
+      "title": "Dept. 94: Produce Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Mother\u2019s Day flowers are coming\u2014receive all product, set features with correct retail prices, and pick gently to keep bouquets gift\u2011ready; cherry season is here, so feature big, rotate inventory for freshness, and execute retail actions (no TPAs) through June 24; and summer starts with watermelons\u2014check your bin details and set a winning display now. Also, count juice on the Premium Juice mod with cost inventory (excluding Olipop and Poppi), verify asparagus on-hands as adverse weather constrains supply for asparagus and bulk slicing/Roma tomatoes and repurpose the Salsa Bar Bin as a temporary tomato solution, and merchandise baby broccoli upright (do not lay flat)."
+    },
+    {
+      "event_id": "49d884cc-f8e0-44dc-856d-6ccd7f2fe07f",
+      "store_area": "Fresh",
+      "title": "Dept. 98 & 81: WK13 Bakery & Bread Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Commercial Bread (department 81), continue selling through markdowns and begin the week 13 Buns mod (category 103) reset. Watch for new UPCs on Artesano and remove outdated Sam\u2019s Choice tags as product transitions. Execute Bimbo Rollbacks beginning April 27 and keep tortilla Rollbacks featured, full and priced correctly. In Fresh Bakery (department 98), continue the Mother\u2019s Day production through the holiday and focus on volume driving features. Be sure to fill, price and maintain Rollback features on tables and the Bakery SPI where space allows: Mini Muffins, 28-count Cookie Box, Angel Food varieties. As everyday traffic rebuilds and Mother\u2019s Day begins, be sure to fill the following: carrot cakes, cheesecakes, white decorated cakes, and angel food items. Finally, watch for temporary out of stocks\u00a0on early deletes/swaps and flex adjacent items as needed."
     },
     {
       "event_id": "0b5f57ed-71ab-42ae-8715-47ed42b066e6",
@@ -150,6 +199,13 @@
       "summary_text": "This AMP message announces the winners of the Friendliest Front End Spring Edition."
     },
     {
+      "event_id": "6fa5080b-ede8-4437-8b80-49b0d35a46c2",
+      "store_area": "Frontend",
+      "title": "OnePay Builder Card is here \u2014 a new way to help associates build credit",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Front End: On Wednesday, April 22,\u00a0OnePay is launching the Builder Card, a secured credit card available to\u00a0Walmart associates and customers who bank through OnePay.\u00a0The Builder Card helps build credit by reporting positive secured credit card activity to major credit bureaus."
+    },
+    {
       "event_id": "d3154a55-02e9-481f-a463-8de5c9455c07",
       "store_area": "Hardlines",
       "title": "Dept 19: Diamond Art Club Feature Set",
@@ -162,6 +218,13 @@
       "title": "Dept. 11: Tool World Relaunch \u2013 Modular Signing Update",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Dept. 11: During the Tool World relaunch, place the provided modular sign in any Hart sell-through empty sections by printing it, cutting along the dotted line, and taping one per affected modular."
+    },
+    {
+      "event_id": "6b651ffb-6d9f-4c94-91b2-8ccbdb20599d",
+      "store_area": "Hardlines",
+      "title": "Dept. 11: Use PDQ Trays for Command Project Kits",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 11:\u00a0Keep and use the provided PDQ trays with Command Project Kits on the base deck to maintain organization and improve efficiency."
     },
     {
       "event_id": "7e42120f-8cb4-4936-bbdf-a76d9a57ab05",
@@ -192,11 +255,25 @@
       "summary_text": "Dept. 9: Category 450, week 12 item swap replaces Champion with\u00a0Etymotic earmuffs, but two new UPCs are delayed until June 5, so fill with adjacent muffs such as Walkers."
     },
     {
+      "event_id": "b4a99cf6-6366-4b54-b5bb-246e8865d632",
+      "store_area": "Home",
+      "title": "Dept 14: Ello S2 Iced Coffee Endcap",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Department 14, we're asking stores to make sure they have set their Ello Iced Coffee endcap."
+    },
+    {
       "event_id": "73fa27a4-eae9-4876-a1d5-3556500f4439",
       "store_area": "Home",
       "title": "Dept 74: Boost Sales With the New Sterilite 4-Tier Tote Rack",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Department 74 is highlighting the Sterilite 4-Tier Tote Rack, designed to help your customers with home organization while boosting store sales."
+    },
+    {
+      "event_id": "f91a78fa-9d40-4165-94d8-76e6e25348de",
+      "store_area": "Home",
+      "title": "Dept. 14: Pricing Loaded Early for Table Settings Mod Relay",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Stores will receive pricing early for the week 14 Table Settings mod relay in Department 14 to give them more flexibility."
     },
     {
       "event_id": "b5d85467-c3f6-4eda-a5b2-e074904a54c4",
@@ -241,6 +318,20 @@
       "summary_text": "Keep calm and ask my assistant. AI Tip of the Week.\n\nMy assistant can help spot behavior gaps and take action to improve consistency, accountability and retention. My assistant can act as an expert Walmart operations leader or people partner, by entering tasks and current facility conditions. My assistant can provide a table with specific headings and data to help make performance improvements and an improved associate experience during their first 90 days."
     },
     {
+      "event_id": "bd0dde7c-7503-4cb7-9509-c26df9b39c9b",
+      "store_area": "Total Store",
+      "title": "Cart Safety",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Total Store: Carts are essential to daily work, but using them unsafely can put associates and customers at risk. Simple habits like maintaining clear visibility, controlling loads and staying aware in high-traffic areas help prevent injuries and disruptions. Prioritizing safe cart use supports a safer, more efficient store for everyone."
+    },
+    {
+      "event_id": "3deb6901-817d-4541-9bca-246c62d66a0c",
+      "store_area": "Total Store",
+      "title": "VPI Selection Is Now Open and Everyone\u2019s Invited",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Q2 VPI item selection is currently open through Thursday, April 30, and all are welcome!\u00a0Participation is voluntary and may only occur during the associate\u2019s working hours.\u00a0Associates may submit one VPI item per quarter, monetary prizes are awarded to hourly winners at the store, market and regional levels. Find full contest details, program updates and the list of winners centralized in the VPI section of the\u00a0Features Better Way guide."
+    },
+    {
       "event_id": "fd70f102-e960-4c6e-85dc-dbeadd5b7760",
       "store_area": "Total Store",
       "title": "Weekly Message: Ethics \u2013 Integrity in Action",
@@ -248,5 +339,12 @@
       "summary_text": "Ethics, Integrity in Action.\n\nIf you know an associate who spoke up, prevented a compliance issue or did the right thing when it was challenging, you could nominate them for an Integrity in Action Award. Review the Integrity in Action Award page on One Walmart for additional details."
     }
   ],
-  "events_without_summary": []
+  "events_without_summary": [
+    {
+      "event_id": "997e393f-6aba-4730-9154-1bb4c751358f",
+      "title": "Dept. 18/67: Mother\u2019s Day, Graduation and Patriotic Updates",
+      "area": "Seasonal",
+      "status": "Review for Publish review - No Comms"
+    }
+  ]
 }

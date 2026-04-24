@@ -1360,24 +1360,24 @@ def send_projects_email():
 
 @app.route('/api/business-areas', methods=['GET'])
 def get_business_areas():
-    """Get unique Business Area options from existing projects"""
+    """Get unique Business Organization options from existing projects"""
     try:
         if not bq_client:
             return jsonify({'error': 'BigQuery client not initialized'}), 500
         
-        # Query unique business areas from the AH_Projects table (we know this exists)
+        # Query unique business organizations from the AH_Projects table
         sql = """
-        SELECT DISTINCT business_area
+        SELECT DISTINCT business_organization
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        WHERE business_area IS NOT NULL AND business_area != ''
-        ORDER BY business_area
+        WHERE business_organization IS NOT NULL AND TRIM(business_organization) != ''
+        ORDER BY business_organization
         """
         
         job = bq_client.query(sql)
         results = job.result()
         
-        areas = [row.business_area for row in results]
-        logger.info(f"Retrieved {len(areas)} unique business areas from projects")
+        areas = [row.business_organization for row in results]
+        logger.info(f"Retrieved {len(areas)} unique business organizations from projects")
         
         return jsonify({
             'success': True,
@@ -1396,6 +1396,7 @@ def sync_data_bridge():
     compare timestamps and keep the newer version. Otherwise, insert as new.
     """
     try:
+        bq_client = get_bq_client()
         if not bq_client:
             return jsonify({'error': 'BigQuery client not initialized'}), 500
         

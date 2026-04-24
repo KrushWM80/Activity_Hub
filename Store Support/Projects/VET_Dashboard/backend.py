@@ -124,54 +124,42 @@ class VETDataManager:
         
         try:
             query = f"""
-            WITH ih_agg AS (
-                SELECT
-                    Intake_Card,
-                    MIN(WM_Week) AS WM_Week,
-                    COUNT(DISTINCT CASE WHEN Banner_Desc IN ('WM Supercenter', 'Wal-Mart') AND CAST(Facility AS INT64) > 0 THEN CAST(Facility AS INT64) END) AS SC_Stores,
-                    COUNT(DISTINCT CASE WHEN Banner_Desc = 'Neighborhood Market' AND CAST(Facility AS INT64) > 0 THEN CAST(Facility AS INT64) END) AS NHM_Stores
-                FROM {FULL_INTAKE_HUB_ID}
-                GROUP BY Intake_Card
-            )
             SELECT 
                 tda.Topic AS `Initiative - Project Title`,
                 tda.Health_Update AS `Health Status`,
                 tda.Phase,
-                SUM(CASE 
-                    WHEN tda.Phase = tda.Facility_Phase THEN tda.Facility 
-                    ELSE 0 
-                END) AS `# of Stores`,
+                tda.Facility_Phase AS `Facility Phase`,
+                FORMAT_DATE('%d/%m/%y', MIN(tda.Impl_Date)) AS `Start Date`,
+                COALESCE(MIN(CAST(ih.WM_Week AS STRING)), 'TBD') AS `WM Week`,
+                COUNT(DISTINCT CASE WHEN ih.Banner_Desc IN ('WM Supercenter', 'Wal-Mart') AND CAST(tda.Facility AS INT64) > 0 THEN CAST(tda.Facility AS INT64) END) AS `SC`,
+                COUNT(DISTINCT CASE WHEN ih.Banner_Desc = 'Neighborhood Market' AND CAST(tda.Facility AS INT64) > 0 THEN CAST(tda.Facility AS INT64) END) AS `NHM`,
                 tda.Dallas_POC AS `Executive Notes`,
                 tda.TDA_Ownership,
                 tda.Intake_Card_Nbr AS `Project ID`,
                 tda.Intake_n_Testing AS `Intake & Testing`,
-                tda.Deployment,
-                COALESCE(CAST(ih.WM_Week AS STRING), 'TBD') AS `WM Week`,
-                FORMAT_DATE('%d/%m/%y', MIN(tda.Impl_Date)) AS `Start Date`,
-                COALESCE(ih.SC_Stores, 0) AS `SC`,
-                COALESCE(ih.NHM_Stores, 0) AS `NHM`
+                tda.Deployment
             FROM 
                 {FULL_TABLE_ID} tda
             LEFT JOIN 
-                ih_agg ih
+                {FULL_INTAKE_HUB_ID} ih
                 ON CAST(tda.Intake_Card_Nbr AS STRING) = CAST(ih.Intake_Card AS STRING)
+                AND CAST(tda.Facility AS STRING) = CAST(ih.Facility AS STRING)
             WHERE 
                 tda.TDA_Ownership = '{BQ_OWNERSHIP_FILTER}'
             GROUP BY
                 tda.Topic,
                 tda.Health_Update,
                 tda.Phase,
+                tda.Facility_Phase,
                 tda.Dallas_POC,
                 tda.TDA_Ownership,
                 tda.Intake_Card_Nbr,
                 tda.Intake_n_Testing,
-                tda.Deployment,
-                ih.WM_Week,
-                ih.SC_Stores,
-                ih.NHM_Stores
+                tda.Deployment
             ORDER BY 
                 tda.Phase ASC,
-                tda.Topic ASC
+                tda.Topic ASC,
+                tda.Facility_Phase ASC
             """
             
             logger.info("Executing BigQuery query with Intake Hub join...")
@@ -523,21 +511,30 @@ def get_summary():
         # Use unfiltered data for summary stats (always show totals across all phases/statuses)
         filtered_data = data_manager.fetch_all_data()
         
+        # Deduplicate by Project ID since rows now repeat per Facility Phase
+        seen = set()
+        unique_projects = []
+        for row in filtered_data:
+            key = row.get('Project ID', row.get('Initiative - Project Title', ''))
+            if key not in seen:
+                seen.add(key)
+                unique_projects.append(row)
+        
         summary = {
-            'total_projects': len(filtered_data),
-            'total_stores': sum([int(row.get('# of Stores', 0) or 0) for row in filtered_data]),
+            'total_projects': len(unique_projects),
+            'total_stores': sum([int(row.get('SC', 0) or 0) + int(row.get('NHM', 0) or 0) for row in filtered_data]),
             'by_health_status': {},
             'by_phase': {}
         }
         
-        # Count by health status
-        for row in filtered_data:
+        # Count by health status (unique projects only)
+        for row in unique_projects:
             status = row.get('Health Status', 'Unknown')
             if status:
                 summary['by_health_status'][status] = summary['by_health_status'].get(status, 0) + 1
         
-        # Count by phase
-        for row in filtered_data:
+        # Count by phase (unique projects only)
+        for row in unique_projects:
             phase_val = row.get('Phase', 'Unknown')
             if phase_val:
                 summary['by_phase'][phase_val] = summary['by_phase'].get(phase_val, 0) + 1

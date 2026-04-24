@@ -148,11 +148,13 @@ def get_amp_data():
 
         # Build count query to get total records
         count_query = build_amp_count_query(filters, days)
+        logger.info(f"📊 COUNT QUERY:\n{count_query}")
         count_result = client.query(count_query).result()
         total_count = next(count_result)[0]
         
         # Build data query with LIMIT and OFFSET
         query = build_amp_query(filters, days, limit, offset)
+        logger.info(f"📋 DATA QUERY:\n{query}")
         
         logger.info(f"📋 Executing BigQuery query with filters: {filters}")
         logger.info(f"   Limit: {limit}, Offset: {offset}, Total Results: {total_count}")
@@ -334,11 +336,12 @@ def build_amp_query(filters, days, limit, offset=0):
     weeks_list = ', '.join(map(str, selected_weeks))
     
     query = f"""
-        SELECT DISTINCT
+        SELECT
             AMP_ID,
             Week,
             Activity_Title,
             Activity_Type,
+            Message_Type,
             Business_Area,
             COALESCE(Store_Cnt, 0) as Stores_With_Access,
             COALESCE(Count, 0) as Unique_Users,
@@ -404,7 +407,7 @@ def build_amp_count_query(filters, days):
     weeks_list = ', '.join(map(str, selected_weeks))
     
     query = f"""
-        SELECT COUNT(DISTINCT AMP_ID) as total
+        SELECT COUNT(*) as total
         FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
         WHERE 1=1
             AND FY = CAST({fy} AS INT64)
