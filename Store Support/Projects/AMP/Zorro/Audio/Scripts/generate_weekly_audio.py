@@ -319,7 +319,11 @@ def fetch_week_events(client, week, fy):
 
 
 def fetch_message_bodies(client, event_ids):
-    """Batch query Cosmos raw table for msg_txt HTML bodies."""
+    """Batch query Cosmos raw table for msg_txt HTML bodies.
+    
+    Handles duplicate event_ids by preferring versions with 'Summarized:' text.
+    (Messages can be revised/reissued; we want the current version with summaries.)
+    """
     if not event_ids:
         return {}
     ids_str = ", ".join([f"'{eid}'" for eid in event_ids])
@@ -330,16 +334,48 @@ def fetch_message_bodies(client, event_ids):
     """
     rows = list(client.query(query).result())
     msg_map = {}
+    duplicates_found = {}
+    
     for r in rows:
         msg = r.msg_txt
         if msg:
             if isinstance(msg, dict):
                 arr = msg.get('array', [])
                 if arr:
-                    msg_map[r.event_id] = arr[0]
+                    msg_text = arr[0]
             else:
-                msg_map[r.event_id] = str(msg)
+                msg_text = str(msg)
+            
+            # If duplicate event_id, prefer version with 'Summarized:' text
+            if r.event_id in msg_map:
+                if r.event_id not in duplicates_found:
+                    duplicates_found[r.event_id] = 0
+                duplicates_found[r.event_id] += 1
+                
+                # Check if new version has 'Summarized:' and current doesn't
+                current = msg_map[r.event_id]
+                has_summarized_new = 'Summarized' in msg_text or 'summarized' in msg_text.lower()
+                has_summarized_cur = 'Summarized' in current or 'summarized' in current.lower()
+                
+                logger.info(f"DUPLICATE FOUND: Event {r.event_id}")
+                logger.info(f"  Current version: len={len(current)}, has_summarized={has_summarized_cur}")
+                logger.info(f"  New version:     len={len(msg_text)}, has_summarized={has_summarized_new}")
+                
+                if has_summarized_new and not has_summarized_cur:
+                    logger.info(f"  ACTION: Upgrading to version WITH 'Summarized:' text")
+                    msg_map[r.event_id] = msg_text
+                elif not has_summarized_new and not has_summarized_cur:
+                    # Both lack summary - keep newer (later in result set)
+                    logger.info(f"  ACTION: Both lack summary, keeping newer version")
+                    msg_map[r.event_id] = msg_text
+                else:
+                    logger.info(f"  ACTION: Keeping current version")
+            else:
+                msg_map[r.event_id] = msg_text
+    
     logger.info(f"Retrieved message bodies for {len(msg_map)}/{len(event_ids)} events")
+    if duplicates_found:
+        logger.info(f"Duplicate event_ids handled: {duplicates_found}")
     return msg_map
 
 

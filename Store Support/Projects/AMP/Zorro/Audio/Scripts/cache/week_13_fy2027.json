@@ -1,8 +1,8 @@
 {
   "week": 13,
   "fy": 2027,
-  "cached_at": "2026-04-24T15:08:31.854311",
-  "bq_last_updated": "2026-04-24T19:53:22.457000+00:00",
+  "cached_at": "2026-04-24T16:30:50.731485",
+  "bq_last_updated": "2026-04-24T20:44:54.213000+00:00",
   "event_count": 45,
   "review_no_comm_count": 45,
   "status_breakdown": [
@@ -28,7 +28,7 @@
     }
   ],
   "total_excl_denied": 45,
-  "summarized_count": 44,
+  "summarized_count": 45,
   "events_with_summaries": [
     {
       "event_id": "14ee4636-c4c5-4db9-9c11-901ad6a2f8c3",
@@ -311,6 +311,13 @@
       "summary_text": "Beginning Saturday, May 2, when managers authorize an exception in the Global Time and Attendance system using Protected Paid Time off, an updated authorization reason will display protected by associate balance, ppto and or sick.\n\nThis update will not change ppto eligibility, accruals or how associates can protect their attendance exceptions. Review the attendance authorize reason guide for more information."
     },
     {
+      "event_id": "997e393f-6aba-4730-9154-1bb4c751358f",
+      "store_area": "Seasonal",
+      "title": "Dept. 18/67: Mother\u2019s Day, Graduation and Patriotic Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 18/67: Seasonal Update: Maintain Mother's Day modular's, set Graduation/Patriotic, refresh Celebration Value Wall and support balloons/cards."
+    },
+    {
       "event_id": "4984fe8c-5b07-4f5c-ab9c-45a7c4acc828",
       "store_area": "Total Store",
       "title": "AI Tip of the Week: Improve the Associate Experience",
@@ -339,12 +346,5 @@
       "summary_text": "Ethics, Integrity in Action.\n\nIf you know an associate who spoke up, prevented a compliance issue or did the right thing when it was challenging, you could nominate them for an Integrity in Action Award. Review the Integrity in Action Award page on One Walmart for additional details."
     }
   ],
-  "events_without_summary": [
-    {
-      "event_id": "997e393f-6aba-4730-9154-1bb4c751358f",
-      "title": "Dept. 18/67: Mother\u2019s Day, Graduation and Patriotic Updates",
-      "area": "Seasonal",
-      "status": "Review for Publish review - No Comms"
-    }
-  ]
+  "events_without_summary": []
 }
