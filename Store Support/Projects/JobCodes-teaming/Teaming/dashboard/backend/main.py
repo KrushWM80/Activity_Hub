@@ -75,6 +75,9 @@ USER_COUNTS_FILE = os.path.join(TEAMING_DIR, "polaris_user_counts.csv")
 # Job Code Master Excel file
 JOB_CODE_MASTER_EXCEL = os.path.join(JOB_CODES_DIR, "Job_Code_Master_Table.xlsx")
 
+# Frontend path
+FRONTEND_PATH = os.path.join(BASE_DIR, "frontend")
+
 # Ensure data directory exists
 os.makedirs(DATA_DIR, exist_ok=True)
 
@@ -145,8 +148,7 @@ async def startup_event():
     
     # Load and sync Job Code Master (Excel or JSON fallback) to cache
     master_records = []
-    
-    # First try: Load from Excel (requires openpyxl)
+    # DISABLED: Master data loading was blocking server startup
     try:
         print(f"Loading Job Code Master from Excel: {JOB_CODE_MASTER_EXCEL}")
         if os.path.exists(JOB_CODE_MASTER_EXCEL):
@@ -173,7 +175,7 @@ async def startup_event():
             print(f"âš ï¸ Could not load JSON fallback: {e}")
     
     # Sync all loaded master records to cache
-    if master_records:
+    if False:  # DISABLED FOR FASTER STARTUP
         synced_count = 0
         for idx, row in enumerate(master_records):
             # Handle both SMART Job Code and job_code field names
@@ -203,6 +205,7 @@ async def startup_event():
     # Start background sync thread (will attempt BigQuery every 30 min)
     cache.start_sync_thread(sync_polaris_from_bigquery if HAS_BIGQUERY else None)
     print("Cache initialized and sync thread started")
+    print("\n[INFO] Server ready to accept requests on http://0.0.0.0:8081")
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -223,7 +226,7 @@ def load_users():
     default_users = {
         "admin": {
             "password_hash": hashlib.sha256("admin123".encode()).hexdigest(),
-            "role": "admin",
+            "role": "Admin - All",
             "name": "Administrator",
             "approved": True
         }
@@ -271,11 +274,37 @@ def require_auth(request: Request):
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
 
-def require_admin(request: Request):
-    """Require admin user"""
+def user_has_admin_access(user, tab: Optional[str] = None) -> bool:
+    """Check if user has admin access (Admin - All or Admin - [Tab])"""
+    role = user.get("role", "")
+    if role == "Admin - All":
+        return True
+    if tab and role == f"Admin - {tab}":
+        return True
+    return False
+
+def user_has_reviewer_access(user, tab: Optional[str] = None) -> bool:
+    """Check if user has reviewer access (Reviewer - All or Reviewer - [Tab])"""
+    role = user.get("role", "")
+    if role == "Reviewer - All":
+        return True
+    if tab and role == f"Reviewer - {tab}":
+        return True
+    # Admins also have reviewer access
+    return user_has_admin_access(user, tab)
+
+def require_admin(request: Request, tab: Optional[str] = None):
+    """Require admin user (Admin - All or Admin - [Tab])"""
     user = require_auth(request)
-    if user.get("role") != "admin":
+    if not user_has_admin_access(user, tab):
         raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+def require_reviewer(request: Request, tab: Optional[str] = None):
+    """Require reviewer or admin user"""
+    user = require_auth(request)
+    if not user_has_reviewer_access(user, tab):
+        raise HTTPException(status_code=403, detail="Reviewer access required")
     return user
 
 # ============================================================
@@ -657,7 +686,7 @@ def add_rejection_to_history(job_code, request_type, reason, requested_by, rejec
 @app.get("/")
 async def root():
     """Redirect to frontend"""
-    return RedirectResponse(url="/static/index.html")
+    return RedirectResponse(url="/Aligned")
 
 @app.post("/api/check-email")
 async def check_email(request: Request):
@@ -1740,7 +1769,7 @@ async def export_requests(request: Request, status: Optional[str] = None):
     print(f"[EXPORT] Total requests loaded: {len(requests_list)}")
     print(f"[EXPORT] Status filter: {status}")
     
-    # Load optimized worker data for sample worker info
+    # Load optimized worker data for worker count and sample worker info
     worker_data = {}
     try:
         optimized_worker_file = os.path.join(TEAMING_DIR, "Worker_Names_Stores_Missing_JobCodes_Optimized.json")
@@ -1752,7 +1781,8 @@ async def export_requests(request: Request, status: Optional[str] = None):
                     sample = w.get('sample_worker', {})
                     worker_data[job_code] = {
                         'name': f"{sample.get('first_name', '')} {sample.get('last_name', '')}".strip(),
-                        'store': sample.get('store_number', '')
+                        'store': sample.get('store_number', ''),
+                        'worker_count': w.get('worker_count', 0)
                     }
         print(f"[EXPORT] Loaded worker data for {len(worker_data)} job codes")
     except Exception as e:
@@ -1779,31 +1809,32 @@ async def export_requests(request: Request, status: Optional[str] = None):
             "divNumber": parts[0] if len(parts) >= 3 else ""
         }
         
-        # Calculate impact count (banner codes + merch depts)
-        banner_count = len(req.get("banner_codes", [])) if isinstance(req.get("banner_codes"), list) else 0
-        merch_count = len(req.get("merch_dept_numbers", [])) if isinstance(req.get("merch_dept_numbers"), list) else 0
-        impact_count = max(banner_count + merch_count, 1)  # At least 1 for the main job code
-        
-        # Get sample worker info
+        # Get worker info including actual worker count
         sample_worker_info = worker_data.get(req["job_code"], {})
         sample_worker_name = sample_worker_info.get('name', '')
         sample_worker_store = sample_worker_info.get('store', '')
+        impact_count = sample_worker_info.get('worker_count', 0)  # Use actual worker count instead of banner count
         
+        # Build export row with priority order: role, teamName, status, then rest
         export_data.append({
-            "jobCode": job_parts["jobCode"],
-            "deptNumber": job_parts["deptNumber"],
-            "divNumber": job_parts["divNumber"],
-            "teamName": req["team_name"],
-            "teamId": int(req.get("team_id", 0)) if req.get("team_id") else "",
-            "workgroupName": req["workgroup_name"],
-            "workgroupId": int(req.get("workgroup_id", 0)) if req.get("workgroup_id") else "",
-            "full_job_code": req["job_code"],
-            "status": req.get("status", "pending"),
+            "role_name": req.get("role", req.get("job_title", "")),  # Role Name - prioritized
+            "job_title": req.get("job_title", ""),
+            "team_name_requested": req["team_name"],  # Team Name Requested - prioritized
+            "status": req.get("status", "pending"),  # Status - prioritized
+            "workgroup_name": req["workgroup_name"],
+            "workgroup_id": int(req.get("workgroup_id", 0)) if req.get("workgroup_id") else "",
+            "job_code": req["job_code"],
+            "div_number": job_parts["divNumber"],
+            "dept_number": job_parts["deptNumber"],
+            "job_code_number": job_parts["jobCode"],
+            "team_id": int(req.get("team_id", 0)) if req.get("team_id") else "",
             "impact_count": impact_count,
             "requested_by": req["requested_by_name"],
             "requested_at": req["requested_at"],
             "sample_worker": sample_worker_name,
-            "sample_worker_store": sample_worker_store
+            "sample_worker_store": sample_worker_store,
+            "banner_codes": ", ".join(req.get("banner_codes", [])) if isinstance(req.get("banner_codes"), list) else "",
+            "merch_dept_numbers": ", ".join(str(m) for m in req.get("merch_dept_numbers", [])) if isinstance(req.get("merch_dept_numbers"), list) else ""
         })
     
     print(f"[EXPORT] Final export_data count: {len(export_data)}")
@@ -1821,7 +1852,7 @@ async def get_users(request: Request):
 
 @app.put("/api/admin/users/{username}")
 async def update_user(username: str, request: Request):
-    """Update user (admin only)"""
+    """Update user (admin only) - supports new granular role system"""
     admin = require_admin(request)
     data = await request.json()
     
@@ -1829,12 +1860,19 @@ async def update_user(username: str, request: Request):
     if username not in users:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # Validate role format if being updated
+    if "role" in data:
+        valid_roles = [
+            "Admin - All", "Admin - Job Code", "Admin - Teaming",
+            "Reviewer - All", "Reviewer - Job Code", "Reviewer - Teaming",
+            "Submitter - All", "Submitter - Job Code", "Submitter - Teaming"
+        ]
+        if data["role"] not in valid_roles:
+            raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {', '.join(valid_roles)}")
+        users[username]["role"] = data["role"]
+    
     if "approved" in data:
         users[username]["approved"] = data["approved"]
-    if "role" in data:
-        users[username]["role"] = data["role"]
-    if "default_tab" in data:
-        users[username]["default_tab"] = data["default_tab"]
     
     save_users(users)
     return {"success": True}
@@ -2457,19 +2495,36 @@ async def get_banner_codes():
         }
 
 # ============================================================
-# /aligned ROUTE - Main Entry Point for Aligned App
+# /Aligned ROUTE - Main Entry Point for Aligned App
 # ============================================================
 
-@app.get("/aligned")
+@app.get("/Aligned")
 async def serve_aligned():
-    """Serve Aligned app from /aligned path"""
-    return RedirectResponse(url="/static/index.html")
+    """Serve Aligned app from /Aligned path"""
+    index_path = os.path.join(FRONTEND_PATH, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
+    raise HTTPException(status_code=404, detail="Dashboard not found")
+
+@app.get("/Aligned/{full_path:path}")
+async def serve_aligned_spa(full_path: str):
+    """SPA routing for Aligned app - serve index.html for all routes"""
+    # Check if requesting a static file with an extension
+    if '.' in full_path:
+        file_path = os.path.join(FRONTEND_PATH, full_path)
+        file_path = os.path.normpath(file_path)
+        if file_path.startswith(os.path.normpath(FRONTEND_PATH)) and os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+    
+    # For all other paths (SPA routes), serve index.html
+    index_path = os.path.join(FRONTEND_PATH, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
+    raise HTTPException(status_code=404, detail="Dashboard not found")
 
 # ============================================================
 # STATIC FILES
 # ============================================================
-
-FRONTEND_PATH = os.path.join(os.path.dirname(__file__), "..", "frontend")
 
 print(f"\n[STATIC FILES] Frontend path: {FRONTEND_PATH}")
 print(f"[STATIC FILES] Path exists: {os.path.exists(FRONTEND_PATH)}")
@@ -2513,6 +2568,30 @@ async def serve_static(full_path: str):
         return FileResponse(index_path, media_type="text/html")
     
     raise HTTPException(status_code=404, detail="File not found")
+
+@app.get("/Aligned")
+async def aligned_app():
+    """Serve Aligned dashboard app"""
+    index_path = os.path.join(FRONTEND_PATH, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
+    raise HTTPException(status_code=404, detail="Dashboard not found")
+
+@app.get("/Aligned/{full_path:path}")
+async def aligned_spa_routing(full_path: str):
+    """SPA routing for Aligned dashboard"""
+    # Check if requesting a static file
+    file_path = os.path.join(FRONTEND_PATH, full_path)
+    file_path = os.path.normpath(file_path)
+    if file_path.startswith(os.path.normpath(FRONTEND_PATH)) and os.path.exists(file_path) and os.path.isfile(file_path):
+        return FileResponse(file_path)
+    
+    # For all other paths, serve index.html (SPA routing)
+    index_path = os.path.join(FRONTEND_PATH, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
+    
+    raise HTTPException(status_code=404, detail="Dashboard not found")
 
 # ============================================================
 # FEEDBACK ENDPOINTS
@@ -2651,55 +2730,120 @@ def verify_data_files():
 @app.get("/Worker_Names_Stores_Missing_JobCodes_Optimized.json")
 async def get_worker_data_optimized():
     """Serve optimized worker data (count + sample) for faster tooltip loading"""
-    import json as json_lib
-    worker_data_dir = TEAMING_DIR
-    json_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes_Optimized.json")
-    print(f"[DEBUG] Attempting to load: {json_file}")
-    print(f"[DEBUG] File exists: {os.path.exists(json_file)}")
-    print(f"[DEBUG] TEAMING_DIR: {TEAMING_DIR}")
-    if os.path.exists(json_file):
-        try:
-            with open(json_file, 'r', encoding='utf-8') as f:
-                data = json_lib.load(f)
-                print(f"[SUCCESS] Loaded {len(data) if isinstance(data, list) else 1} records")
-                return data
-        except Exception as e:
-            print(f"[ERROR] Error reading optimized worker JSON: {e}")
-            raise HTTPException(status_code=500, detail=str(e))
-    else:
-        print(f"[ERROR] File not found: {json_file}")
-        raise HTTPException(status_code=404, detail="File not found")
+    try:
+        print("[DEBUG] ===== ENDPOINT CALLED =====")
+        import json as json_lib
+        import math
+        worker_data_dir = TEAMING_DIR
+        json_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes_Optimized.json")
+        print(f"[DEBUG] Attempting to load: {json_file}")
+        print(f"[DEBUG] File exists: {os.path.exists(json_file)}")
+        print(f"[DEBUG] TEAMING_DIR: {TEAMING_DIR}")
+        
+        if os.path.exists(json_file):
+            try:
+                print("[DEBUG] Opening file...")
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    print("[DEBUG] Reading JSON...")
+                    data = json_lib.load(f)
+                    print(f"[DEBUG] Loaded data type: {type(data)}")
+                    print(f"[DEBUG] Loaded {len(data) if isinstance(data, list) else 1} records")
+                    
+                    # Clean NaN values
+                    if isinstance(data, list):
+                        for record in data:
+                            if isinstance(record, dict):
+                                for key, value in record.items():
+                                    if isinstance(value, float) and math.isnan(value):
+                                        record[key] = None
+                                    elif isinstance(value, dict):
+                                        for sub_key, sub_value in value.items():
+                                            if isinstance(sub_value, float) and math.isnan(sub_value):
+                                                value[sub_key] = None
+                    
+                    print(f"[DEBUG] About to return data...")
+                    return data
+            except Exception as e:
+                print(f"[ERROR] Error reading optimized worker JSON: {type(e).__name__}: {e}")
+                import traceback
+                traceback.print_exc()
+                raise HTTPException(status_code=500, detail=f"Error reading file: {type(e).__name__}: {str(e)}")
+        else:
+            print(f"[ERROR] File not found: {json_file}")
+            raise HTTPException(status_code=404, detail="File not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[FATAL] Unexpected error in endpoint: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {type(e).__name__}: {str(e)}")
 
 @app.get("/Worker_Names_Stores_Missing_JobCodes.json")
 async def get_worker_data():
     """Serve worker data for employee tooltips"""
-    import json as json_lib
-    worker_data_dir = TEAMING_DIR
-    json_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes.json")
-    print(f"[DEBUG] Attempting to load full worker data: {json_file}")
-    print(f"[DEBUG] File exists: {os.path.exists(json_file)}")
-    if os.path.exists(json_file):
-        try:
-            with open(json_file, 'r', encoding='utf-8') as f:
-                data = json_lib.load(f)
-                print(f"[SUCCESS] Loaded full worker data with {len(data) if isinstance(data, list) else 1} records")
+    try:
+        print("[DEBUG] ===== FULL WORKER ENDPOINT CALLED =====")
+        import json as json_lib
+        import math
+        worker_data_dir = TEAMING_DIR
+        json_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes.json")
+        print(f"[DEBUG] Attempting to load full worker data: {json_file}")
+        print(f"[DEBUG] File exists: {os.path.exists(json_file)}")
+        
+        if os.path.exists(json_file):
+            try:
+                print("[DEBUG] Opening JSON file...")
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    print("[DEBUG] Reading JSON...")
+                    data = json_lib.load(f)
+                    
+                    # Clean NaN values
+                    if isinstance(data, list):
+                        for record in data:
+                            if isinstance(record, dict):
+                                for key, value in record.items():
+                                    if isinstance(value, float) and math.isnan(value):
+                                        record[key] = None
+                                    elif isinstance(value, dict):
+                                        for sub_key, sub_value in value.items():
+                                            if isinstance(sub_value, float) and math.isnan(sub_value):
+                                                value[sub_key] = None
+                    
+                    print(f"[SUCCESS] Loaded full worker data with {len(data) if isinstance(data, list) else 1} records")
+                    print(f"[DEBUG] About to return data...")
+                    return data
+            except Exception as e:
+                print(f"[ERROR] Error reading worker JSON: {type(e).__name__}: {e}")
+                import traceback
+                traceback.print_exc()
+                raise HTTPException(status_code=500, detail=f"Error reading JSON: {type(e).__name__}: {str(e)}")
+        
+        csv_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes.csv")
+        print(f"[DEBUG] Trying CSV fallback: {csv_file}")
+        if os.path.exists(csv_file):
+            try:
+                print("[DEBUG] Reading CSV...")
+                df = pd.read_csv(csv_file)
+                data = df.to_dict('records')
+                print(f"[SUCCESS] Loaded CSV with {len(data)} records")
                 return data
-        except Exception as e:
-            print(f"[ERROR] Error reading worker JSON: {e}")
-            raise HTTPException(status_code=500, detail=str(e))
-    csv_file = os.path.join(worker_data_dir, "Worker_Names_Stores_Missing_JobCodes.csv")
-    print(f"[DEBUG] Trying CSV fallback: {csv_file}")
-    if os.path.exists(csv_file):
-        try:
-            df = pd.read_csv(csv_file)
-            data = df.to_dict('records')
-            print(f"[SUCCESS] Loaded CSV with {len(data)} records")
-            return data
-        except Exception as e:
-            print(f"[ERROR] Error reading worker CSV: {e}")
-            raise HTTPException(status_code=500, detail=str(e))
-    print(f"[ERROR] Neither JSON nor CSV file found")
-    raise HTTPException(status_code=404, detail="Worker data files not found")
+            except Exception as e:
+                print(f"[ERROR] Error reading worker CSV: {type(e).__name__}: {e}")
+                import traceback
+                traceback.print_exc()
+                raise HTTPException(status_code=500, detail=f"Error reading CSV: {type(e).__name__}: {str(e)}")
+        
+        print(f"[ERROR] Neither JSON nor CSV file found")
+        raise HTTPException(status_code=404, detail="Worker data files not found")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[FATAL] Unexpected error in full worker endpoint: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {type(e).__name__}: {str(e)}")
 
 if __name__ == "__main__":
     print(f"""

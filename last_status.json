@@ -6,20 +6,20 @@
     "VETDashboardRunning":  true,
     "TDARunning":  true,
     "RebootPending":  true,
-    "DCTasksCount":  22,
+    "DCTasksCount":  0,
     "Port8888Listening":  true,
     "ProjectsInStoresRunning":  true,
     "Port8090Listening":  true,
     "JobCodesRunning":  true,
-    "TDAWeeklyEmailTask":  true,
+    "TDAWeeklyEmailTask":  false,
     "ZorroRunning":  true,
     "Port5001Listening":  true,
     "RebootReasons":  "Pending file operations",
     "TimeStamp":  {
-                      "value":  "\/Date(1777028413630)\/",
+                      "value":  "\/Date(1777287970314)\/",
                       "DisplayHint":  2,
-                      "DateTime":  "Friday, April 24, 2026 6:00:13 AM"
+                      "DateTime":  "Monday, April 27, 2026 6:06:10 AM"
                   },
-    "JobCodesBackendTask":  true,
+    "JobCodesBackendTask":  false,
     "Port8080Listening":  true
 }

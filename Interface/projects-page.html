@@ -1094,23 +1094,24 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 form-group">
-                                <label>Business Area * (Multi-select)</label>
-                                <select class="form-select" id="form-business-area" multiple required size="5">
-                                    <option value="">Loading options...</option>
+                                <label><strong>Business Area</strong> *</label>
+                                <select class="form-select" id="form-business-area" required>
+                                    <option value="">-- Select Business Area --</option>
                                 </select>
-                                <button type="button" class="btn btn-sm btn-link mt-2" onclick="showRequestBusinessAreaModal()" style="padding: 0; text-decoration: none;">
+                                <button type="button" class="btn btn-sm btn-link mt-2" data-bs-toggle="modal" data-bs-target="#requestBusinessAreaModal" style="padding: 0; text-decoration: none;">
                                     <i class="fas fa-plus"></i> Request New Business Area
                                 </button>
-                                <small class="text-muted d-block">Hold Ctrl/Cmd to select multiple areas</small>
+                                <div id="form-business-area-error" style="color: #d32f2f; font-size: 0.9em; margin-top: 4px; display: none;">Please select a business area</div>
                             </div>
                             <div class="col-md-6 form-group">
-                                <label>Health Status * (Multi-select)</label>
-                                <select class="form-select" id="form-health-status" multiple required size="5">
+                                <label><strong>Health Status</strong> *</label>
+                                <select class="form-select" id="form-health-status" required>
+                                    <option value="">-- Select Health Status --</option>
                                     <option value="On Track">On Track</option>
                                     <option value="At Risk">At Risk</option>
                                     <option value="Off Track">Off Track</option>
                                 </select>
-                                <small class="text-muted">Hold Ctrl/Cmd to select multiple statuses</small>
+                                <div id="form-health-status-error" style="color: #d32f2f; font-size: 0.9em; margin-top: 4px; display: none;">Please select a health status</div>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1120,8 +1121,12 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="submitProjectForm()">Create Project</button>
+                    <div id="project-form-spinner" style="display: none; margin-right: auto;">
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Creating project...</span>
+                    </div>
+                    <button type="button" class="btn btn-secondary" id="project-cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="project-submit-btn" onclick="submitProjectForm()">Create Project</button>
                 </div>
             </div>
         </div>
@@ -1244,7 +1249,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-info" onclick="goToIntakeHub()">
+                    <button type="button" class="btn btn-info" id="detail-intake-hub-btn" onclick="goToIntakeHub()">
                         <i class="fas fa-external-link-alt"></i> Go to Intake Hub
                     </button>
                     <button type="button" class="btn btn-primary" id="detail-edit-btn" onclick="editProject(document.getElementById('detail-project-id').value)">
@@ -1651,7 +1656,28 @@
             setActiveNav();
             initializeLinks();  // Load links from localStorage
             loadMetrics();      // Load metrics
-            loadProjects();
+            
+            // Check for URL parameter to open project modal
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('id');
+            
+            loadProjects().then(() => {
+                // After projects load, check if we need to open a modal
+                if (projectId && allProjects && allProjects.length > 0) {
+                    const project = allProjects.find(p => p.project_id === projectId);
+                    if (project) {
+                        // Give the DOM a moment to render the table
+                        setTimeout(() => {
+                            showProjectDetail(projectId, project.title);
+                        }, 100);
+                    } else {
+                        console.warn(`Project ${projectId} not found in loaded projects`);
+                    }
+                }
+            }).catch(err => {
+                console.error('Error loading projects:', err);
+            });
+            
             populateBusinessAreaFilter();
             populateBusinessAreaDropdown();  // Load options for Add Project form
         });
@@ -1816,6 +1842,11 @@
                             projectOwner === currentUser ||
                             project.owner_id === CURRENT_USER_ID;
             editBtn.style.display = isOwner ? 'inline-block' : 'none';
+
+            // Show/hide "Go to Intake Hub" button - only show if project is from Intake Hub
+            const intakeHubBtn = document.getElementById('detail-intake-hub-btn');
+            const isIntakeProject = project.project_source && project.project_source.includes('Intake');
+            intakeHubBtn.style.display = isIntakeProject ? 'inline-block' : 'none';
 
             // Show Data Bridge notice if applicable
             const dataBridgeNotice = document.getElementById('data-bridge-notice');
@@ -2178,34 +2209,45 @@
             if (!select) return;
 
             try {
-                const response = await fetch(`${API_BASE}/business-areas`);
+                const response = await fetch(`${API_BASE}/projects/business-areas`);
                 if (!response.ok) {
-                    console.warn('Could not fetch business areas, falling back to manual entry');
-                    select.innerHTML = '<option value="">Select or enter area...</option>';
+                    console.warn('Could not fetch business areas, using defaults');
+                    loadBusinessAreaOptions(['E2E Strategy', 'Health & Wellness', 'Marketing', 'Merchandising', 'Operations Strategy & Support', 'People', 'Realty', 'Safety', 'Store Fulfillment', 'Supply Chain', 'Transformation Strategy']);
                     return;
                 }
 
                 const data = await response.json();
                 if (!data.business_areas || data.business_areas.length === 0) {
-                    select.innerHTML = '<option value="">No areas available</option>';
+                    console.warn('No business areas returned, using defaults');
+                    loadBusinessAreaOptions(['E2E Strategy', 'Health & Wellness', 'Marketing', 'Merchandising', 'Operations Strategy & Support', 'People', 'Realty', 'Safety', 'Store Fulfillment', 'Supply Chain', 'Transformation Strategy']);
                     return;
                 }
 
-                // Clear and rebuild options
-                select.innerHTML = '<option value="">Select a Business Area...</option>';
-                
-                data.business_areas.forEach(area => {
-                    const option = document.createElement('option');
-                    option.value = area;
-                    option.textContent = area;
-                    select.appendChild(option);
-                });
-
-                console.info(`Loaded ${data.business_areas.length} business areas from API`);
+                loadBusinessAreaOptions(data.business_areas);
+                console.info(`Loaded ${data.business_areas.length} business areas`);
             } catch (error) {
                 console.error('Error loading business areas:', error);
-                select.innerHTML = '<option value="">Error loading areas</option>';
+                loadBusinessAreaOptions(['E2E Strategy', 'Health & Wellness', 'Marketing', 'Merchandising', 'Operations Strategy & Support', 'People', 'Realty', 'Safety', 'Store Fulfillment', 'Supply Chain', 'Transformation Strategy']);
             }
+        }
+
+        // Load business area options into the select dropdown
+        function loadBusinessAreaOptions(areas) {
+            const select = document.getElementById('form-business-area');
+            if (!select) return;
+
+            // Keep the first option (placeholder)
+            const existingValue = select.value;
+            select.innerHTML = '<option value="">-- Select Business Area --</option>';
+            
+            areas.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                option.textContent = area;
+                select.appendChild(option);
+            });
+            
+            select.value = existingValue;
         }
 
         // Show add project modal
@@ -2215,13 +2257,18 @@
             // Auto-populate with current user info
             document.getElementById('form-owner-name').value = CURRENT_USER_NAME || 'Kendall Rush';
             document.getElementById('form-owner-id').value = CURRENT_USER_ID || 'krush';
-            document.getElementById('form-business-area').value = '';
-            document.getElementById('form-health-status').value = '';
             document.getElementById('form-latest-update').value = '';
             
-            // Clear previous selections
-            document.getElementById('form-business-area').querySelectorAll('option:checked').forEach(opt => opt.selected = false);
-            document.getElementById('form-health-status').querySelectorAll('option:checked').forEach(opt => opt.selected = false);
+            // Reset dropdowns
+            document.getElementById('form-business-area').value = '';
+            document.getElementById('form-health-status').value = '';
+            
+            // Clear error messages
+            document.getElementById('form-business-area-error').style.display = 'none';
+            document.getElementById('form-health-status-error').style.display = 'none';
+            
+            // Load business areas
+            populateBusinessAreaDropdown();
             
             new bootstrap.Modal(document.getElementById('addProjectModal')).show();
         }
@@ -2250,63 +2297,118 @@
 
         // Submit add project form
         async function submitProjectForm() {
-            const title = document.getElementById('form-title').value;
-            const description = document.getElementById('form-description').value;
-            const ownerName = document.getElementById('form-owner-name').value;
-            const ownerId = document.getElementById('form-owner-id').value;
+            console.log('=== submitProjectForm called ===');
             
-            // Get multi-selected Business Areas
-            const businessAreaSelect = document.getElementById('form-business-area');
-            const selectedBusinessAreas = Array.from(businessAreaSelect.selectedOptions).map(opt => opt.value).filter(v => v);
+            const title = document.getElementById('form-title').value.trim();
+            const description = document.getElementById('form-description').value.trim();
+            const ownerName = document.getElementById('form-owner-name').value.trim();
+            const ownerId = document.getElementById('form-owner-id').value.trim();
             
-            // Get multi-selected Health Statuses
-            const healthStatusSelect = document.getElementById('form-health-status');
-            const selectedHealthStatuses = Array.from(healthStatusSelect.selectedOptions).map(opt => opt.value).filter(v => v);
+            // Get selected Business Area (single select)
+            const businessArea = document.getElementById('form-business-area').value.trim();
             
-            const latestUpdate = document.getElementById('form-latest-update').value;
+            // Get selected Health Status (single select)
+            const healthStatus = document.getElementById('form-health-status').value.trim();
+            
+            const latestUpdate = document.getElementById('form-latest-update').value.trim();
 
-            if (!title || !ownerName || !ownerId || selectedBusinessAreas.length === 0 || selectedHealthStatuses.length === 0) {
-                alert('Please fill in all required fields (select at least one Business Area and one Health Status)');
+            console.log('Form values:', {
+                title,
+                description,
+                ownerName,
+                ownerId,
+                businessArea,
+                healthStatus,
+                latestUpdate
+            });
+
+            // Clear error messages
+            document.getElementById('form-business-area-error').style.display = 'none';
+            document.getElementById('form-health-status-error').style.display = 'none';
+
+            // Validation
+            let hasErrors = false;
+            if (!title) {
+                console.warn('Validation: Missing title');
+                alert('Please enter a project title');
+                return;
+            }
+            if (!ownerName || !ownerId) {
+                console.warn('Validation: Missing owner info', {ownerName, ownerId});
+                alert('Owner information is required');
+                return;
+            }
+            if (!businessArea) {
+                console.warn('Validation: Missing business area');
+                document.getElementById('form-business-area-error').style.display = 'block';
+                hasErrors = true;
+            }
+            if (!healthStatus) {
+                console.warn('Validation: Missing health status');
+                document.getElementById('form-health-status-error').style.display = 'block';
+                hasErrors = true;
+            }
+
+            if (hasErrors) {
+                console.warn('Form has validation errors, aborting');
                 return;
             }
 
-            try {
-                // Create a project entry for each combination of Business Area and Health Status
-                const projectsToCreate = [];
-                for (const ba of selectedBusinessAreas) {
-                    for (const hs of selectedHealthStatuses) {
-                        projectsToCreate.push({
-                            title,
-                            description,
-                            owner_name: ownerName,
-                            owner_id: ownerId,
-                            business_area: ba,
-                            health_status: hs,
-                            latest_update: latestUpdate,
-                            project_source: 'Manual Entry'
-                        });
-                    }
-                }
-                
-                // Submit all project combinations
-                for (const projectData of projectsToCreate) {
-                    const response = await fetch(`${API_BASE}/projects`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(projectData)
-                    });
+            console.log('Validation passed, creating project...');
 
-                    if (!response.ok) {
-                        throw new Error(`Failed to create project with ${projectData.business_area} / ${projectData.health_status}`);
-                    }
+            // Show loading spinner and disable buttons
+            const spinner = document.getElementById('project-form-spinner');
+            const submitBtn = document.getElementById('project-submit-btn');
+            const cancelBtn = document.getElementById('project-cancel-btn');
+            
+            spinner.style.display = 'block';
+            submitBtn.disabled = true;
+            cancelBtn.disabled = true;
+
+            try {
+                // Create a single project with the selected Business Area and Health Status
+                const projectData = {
+                    title,
+                    description,
+                    owner: ownerName,           // Changed from owner_name to owner
+                    owner_id: ownerId,
+                    business_organization: businessArea,
+                    health: healthStatus,
+                    project_update: latestUpdate,
+                    project_source: 'Manual Entry'
+                };
+                
+                console.log('Project data:', projectData);
+                
+                // Submit the project
+                const response = await fetch(`${API_BASE}/projects`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(projectData)
+                });
+
+                console.log('API response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API error response:', errorText);
+                    throw new Error(`Failed to create project: ${response.status}`);
                 }
+
+                const result = await response.json();
+                console.log('API success response:', result);
 
                 bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
                 loadProjects();
-                alert(`Successfully created ${projectsToCreate.length} project variant(s)`);
+                alert(`Successfully created project: ${title}`);
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error creating project:', error);
                 alert('Error creating project: ' + error.message);
+            } finally {
+                // Hide loading spinner and re-enable buttons
+                spinner.style.display = 'none';
+                submitBtn.disabled = false;
+                cancelBtn.disabled = false;
             }
         }
 
@@ -2346,16 +2448,24 @@
                     status: 'Pending Approval'
                 });
 
-                // Close the modal
+                // Close the request modal
                 bootstrap.Modal.getInstance(document.getElementById('requestBusinessAreaModal')).hide();
 
-                // Show confirmation
-                alert(`Business area "${businessAreaName}" has been requested for approval.\nYour project will use "WM Business" temporarily until it's approved.`);
+                // Add the new business area to the select dropdown
+                const select = document.getElementById('form-business-area');
+                const newOption = document.createElement('option');
+                newOption.value = businessAreaName;
+                newOption.textContent = `${businessAreaName} (pending approval)`;
+                newOption.style.backgroundColor = '#fff3cd';
+                newOption.style.color = '#856404';
+                select.appendChild(newOption);
+                
+                // Set it as selected
+                select.value = businessAreaName;
 
-                // Set to "WM Business" in the form
-                const baSelect = document.getElementById('form-business-area');
-                baSelect.value = 'WM Business';
-                baSelect._requestedBusinessArea = businessAreaName;  // Store the requested name
+                // Show confirmation
+                alert(`Business area "${businessAreaName}" has been added to the dropdown and automatically selected!\n\nNote: This area is pending approval. Once approved by admin, it will be available for all projects.`);
+
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error submitting request: ' + error.message);

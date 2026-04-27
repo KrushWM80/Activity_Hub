@@ -3576,7 +3576,7 @@
  // Calculate current Walmart fiscal week
  // Walmart FY starts first Saturday of February
  function getCurrentWMWeek() {
- const today = new Date(2026, 3, 24); // Apr 24, 2026 = Week 12, FY2027
+ const today = new Date(); // Use TODAY's date - automatically updates daily
  const year = today.getFullYear();
  
  // Walmart fiscal week mapping for FY2027 (starts Feb 2026)

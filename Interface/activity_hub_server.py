@@ -146,28 +146,47 @@ def api_project_by_id(project_id):
         elif request.method == 'PUT':
             # Update project
             data = request.get_json()
-            sql = """
-            UPDATE `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-            SET title = @title, 
-                business_organization = @business_organization, 
-                owner = @owner, 
-                owner_id = @owner_id,
-                health = @health, 
-                status = @status, 
-                project_update = @project_update, 
-                last_updated = CURRENT_TIMESTAMP()
-            WHERE project_id = @project_id
-            """
-            query_params = [
-                bigquery.ScalarQueryParameter("title", "STRING", data.get('title')),
-                bigquery.ScalarQueryParameter("business_organization", "STRING", data.get('business_organization', data.get('store_area', ''))),
-                bigquery.ScalarQueryParameter("owner", "STRING", data.get('owner')),
-                bigquery.ScalarQueryParameter("owner_id", "STRING", data.get('owner_id')),
-                bigquery.ScalarQueryParameter("health", "STRING", data.get('health')),
-                bigquery.ScalarQueryParameter("status", "STRING", data.get('status', 'Active')),
-                bigquery.ScalarQueryParameter("project_update", "STRING", data.get('project_update', '')),
-                bigquery.ScalarQueryParameter("project_id", "STRING", project_id)
-            ]
+            
+            # Check if this is a partial update (Intake Hub project - only latest_update field)
+            # or a full update (manual project - all fields)
+            has_full_fields = any(field in data for field in ['title', 'owner', 'owner_id', 'health', 'business_area', 'business_organization'])
+            
+            if has_full_fields:
+                # Full update for manual projects
+                sql = """
+                UPDATE `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+                SET title = @title, 
+                    business_organization = @business_organization, 
+                    owner = @owner, 
+                    owner_id = @owner_id,
+                    health = @health, 
+                    status = @status, 
+                    project_update = @project_update, 
+                    last_updated = CURRENT_TIMESTAMP()
+                WHERE project_id = @project_id
+                """
+                query_params = [
+                    bigquery.ScalarQueryParameter("title", "STRING", data.get('title')),
+                    bigquery.ScalarQueryParameter("business_organization", "STRING", data.get('business_organization', data.get('store_area', ''))),
+                    bigquery.ScalarQueryParameter("owner", "STRING", data.get('owner')),
+                    bigquery.ScalarQueryParameter("owner_id", "STRING", data.get('owner_id')),
+                    bigquery.ScalarQueryParameter("health", "STRING", data.get('health')),
+                    bigquery.ScalarQueryParameter("status", "STRING", data.get('status', 'Active')),
+                    bigquery.ScalarQueryParameter("project_update", "STRING", data.get('project_update', '')),
+                    bigquery.ScalarQueryParameter("project_id", "STRING", project_id)
+                ]
+            else:
+                # Partial update for Intake Hub projects (only update the note)
+                sql = """
+                UPDATE `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
+                SET project_update = @project_update, 
+                    last_updated = CURRENT_TIMESTAMP()
+                WHERE project_id = @project_id
+                """
+                query_params = [
+                    bigquery.ScalarQueryParameter("project_update", "STRING", data.get('latest_update', data.get('project_update', ''))),
+                    bigquery.ScalarQueryParameter("project_id", "STRING", project_id)
+                ]
             
             job = bq_client.query(sql, job_config=bigquery.QueryJobConfig(
                 query_parameters=query_params
@@ -288,54 +307,73 @@ def api_projects():
         
         # Calculate current Walmart week
         today = datetime.now()
-        fiscal_year_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
-        days_since_fy = (today - fiscal_year_start).days
-        current_wm_week = (days_since_fy // 7) + 1
-        
-        # Build base WHERE clause for both count and paginated queries
-        where_clause = """WHERE 1=1
-        AND TRIM(business_organization) != ''
+        # Get current WM week from Cal_Dim_Data (authoritative source)
+        cal_sql = """
+        SELECT DISTINCT WM_WEEK_NBR, FISCAL_YEAR_NBR
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data`
+        WHERE CALENDAR_DATE = CURRENT_DATE()
         """
+        cal_result = list(bq_client.query(cal_sql).result())
+        if cal_result:
+            current_wm_week = cal_result[0].WM_WEEK_NBR
+            current_fiscal_year = cal_result[0].FISCAL_YEAR_NBR
+        else:
+            # Fallback if no match today
+            today = datetime.now()
+            fiscal_year_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
+            days_since_fy = (today - fiscal_year_start).days
+            current_wm_week = (days_since_fy // 7) + 1
+            current_fiscal_year = today.year if today.month >= 2 else today.year - 1
         
+        # Build WHERE clause filters for consistent use in both count and paginated queries
+        where_filters = ""
         if business_org:
-            where_clause += f" AND business_organization = '{business_org}'\n"
+            where_filters += f" AND p.business_organization = '{business_org}'"
         if health_status:
-            where_clause += f" AND health = '{health_status}'\n"
-        if title_search:
-            where_clause += f" AND LOWER(title) LIKE LOWER('%{title_search}%')\n"
+            where_filters += f" AND p.health = '{health_status}'"
         if owner_names:
-            # Parse comma-separated owner names
             owners = [f"'{o.strip()}'" for o in owner_names.split(',')]
-            where_clause += f" AND owner IN ({','.join(owners)})\n"
+            where_filters += f" AND p.owner IN ({','.join(owners)})"
         
         # First, get total count matching filters
         count_sql = f"""
         SELECT COUNT(*) as total
-        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        {where_clause}
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects` p
+        WHERE TRIM(p.business_organization) != ''
+        AND LOWER(p.title) LIKE LOWER('%{title_search}%')
+        {where_filters}
         """
         
         count_result = list(bq_client.query(count_sql).result())
         total_count = count_result[0].total if count_result else 0
         
-        # Then get paginated results
+        # Then get paginated results with Cal_Dim_Data join for WM week info
         sql = f"""
         SELECT 
-            project_id,
-            title,
-            business_organization,
-            owner,
-            owner_id,
-            health,
-            status,
-            project_source,
-            created_date,
-            last_updated,
-            project_update,
-            project_update_date
-        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        {where_clause}
-        ORDER BY COALESCE(project_update_date, last_updated) DESC
+            p.project_id,
+            p.title,
+            p.business_organization,
+            p.owner,
+            p.owner_id,
+            p.health,
+            p.status,
+            p.project_source,
+            p.created_date,
+            p.last_updated,
+            p.project_update,
+            p.project_update_date,
+            CASE 
+                WHEN c.WM_WEEK_NBR = {current_wm_week} AND c.FISCAL_YEAR_NBR = {current_fiscal_year}
+                THEN TRUE
+                ELSE FALSE
+            END as is_updated_this_week
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects` p
+        LEFT JOIN `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data` c
+            ON CAST(p.project_update_date AS DATE) = c.CALENDAR_DATE
+        WHERE TRIM(p.business_organization) != ''
+        AND LOWER(p.title) LIKE LOWER('%{title_search}%')
+        {where_filters}
+        ORDER BY COALESCE(p.project_update_date, p.last_updated) DESC
         LIMIT {limit} OFFSET {offset}
         """
         
@@ -344,19 +382,9 @@ def api_projects():
         projects = []
         
         for row in results:
-            # Determine if project was updated this WM week using project_update_date
-            try:
-                update_date = getattr(row, 'project_update_date', None)
-            except:
-                update_date = None
-            
-            if update_date:
-                fy_start = datetime(update_date.year if update_date.month >= 2 else update_date.year - 1, 2, 1)
-                days_since = (update_date.replace(tzinfo=None) - fy_start).days
-                update_wm_week = (days_since // 7) + 1
-                is_updated_this_week = (update_wm_week == current_wm_week)
-            else:
-                is_updated_this_week = False
+            # Get is_updated_this_week from query result (checks WK 13: 4/25-5/1)
+            is_updated_this_week = getattr(row, 'is_updated_this_week', False)
+            update_date = getattr(row, 'project_update_date', None)
             
             # Apply updated_status filter
             if updated_status == 'updated' and not is_updated_this_week:
@@ -468,58 +496,57 @@ def api_metrics():
         return jsonify({'error': 'BigQuery client not initialized'}), 500
     
     try:
-        # Calculate current WM week (Python)
-        today = datetime.now()
-        fy_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
-        days_since = (today - fy_start).days
-        current_wm_week = (days_since // 7) + 1
+        # Get current WM week and fiscal year from Cal_Dim_Data (authoritative source)
+        cal_sql = """
+        SELECT DISTINCT WM_WEEK_NBR, FISCAL_YEAR_NBR
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data`
+        WHERE CALENDAR_DATE = CURRENT_DATE()
+        """
+        cal_result = list(bq_client.query(cal_sql).result())
+        if cal_result:
+            current_wm_week = cal_result[0].WM_WEEK_NBR
+            current_fiscal_year = cal_result[0].FISCAL_YEAR_NBR
+        else:
+            # Fallback if no match today
+            today = datetime.now()
+            fy_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
+            days_since = (today - fy_start).days
+            current_wm_week = (days_since // 7) + 1
+            current_fiscal_year = today.year if today.month >= 2 else today.year - 1
         
-        # Get all projects with their update dates
-        sql = """
+        # Get all projects and count those updated in current WM week using Cal_Dim_Data
+        sql = f"""
         SELECT 
-            project_id,
-            project_update_date,
-            owner
-        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        ORDER BY project_id
+            COUNT(*) as total,
+            SUM(CASE WHEN c.WM_WEEK_NBR = {current_wm_week} AND c.FISCAL_YEAR_NBR = {current_fiscal_year} THEN 1 ELSE 0 END) as projects_this_week,
+            COUNT(DISTINCT p.owner) as unique_owners
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects` p
+        LEFT JOIN `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data` c
+            ON CAST(p.project_update_date AS DATE) = c.CALENDAR_DATE
+        WHERE p.project_id IS NOT NULL
         """
         
         results = list(bq_client.query(sql).result())
+        row = results[0] if results else None
         
-        # Count projects updated this week in Python
-        total = len(results)
-        unique_owners = set()
-        projects_this_week = 0
-        
-        for row in results:
-            if row.project_update_date:
-                # Calculate WM week for this project
-                update_date = row.project_update_date
-                fy_start_proj = datetime(update_date.year if update_date.month >= 2 else update_date.year - 1, 2, 1)
-                days_since_proj = (update_date.replace(tzinfo=None) - fy_start_proj).days
-                update_wm_week = (days_since_proj // 7) + 1
-                
-                if update_wm_week == current_wm_week:
-                    projects_this_week += 1
-            
-            # Count unique owners
-            if row.owner:
-                unique_owners.add(row.owner)
+        if row:
+            total = row.total or 0
+            projects_this_week = row.projects_this_week or 0
+            unique_owners = row.unique_owners or 0
+        else:
+            total = 0
+            projects_this_week = 0
+            unique_owners = 0
         
         percent = (projects_this_week * 100 / total) if total > 0 else 0
         
         return jsonify({
             'metrics': {
                 'active_projects': total,
-                'unique_owners': len(unique_owners),
+                'unique_owners': unique_owners,
                 'projects_updated_this_week': projects_this_week,
                 'percent_updated': round(percent, 2)
             },
-            'timestamp': datetime.now().isoformat()
-        })
-        
-        return jsonify({
-            'metrics': {'active_projects': 0, 'unique_owners': 0, 'projects_updated_this_week': 0, 'percent_updated': 0},
             'timestamp': datetime.now().isoformat()
         })
     
@@ -530,22 +557,22 @@ def api_metrics():
 
 @app.route('/api/projects/business-areas', methods=['GET'])
 def api_business_areas():
-    """Get business organizations - only valid areas with projects"""
+    """Get unique Business Owner Area options from source Intake Hub"""
     bq_client = get_bq_client()
     if not bq_client:
         return jsonify({'error': 'BigQuery client not initialized'}), 500
     
     try:
         sql = r"""
-        SELECT DISTINCT business_organization
-        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        WHERE business_organization IS NOT NULL 
-        AND TRIM(business_organization) != ''
-        ORDER BY business_organization
+        SELECT DISTINCT Business_Owner_Area
+        FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - Intake Accel Council Data`
+        WHERE Business_Owner_Area IS NOT NULL 
+        AND TRIM(Business_Owner_Area) != ''
+        ORDER BY Business_Owner_Area
         """
         
         results = bq_client.query(sql).result()
-        areas = [row.business_organization for row in results if row.business_organization and row.business_organization.strip()]
+        areas = [row.Business_Owner_Area for row in results if row.Business_Owner_Area and row.Business_Owner_Area.strip()]
         
         return jsonify({
             'business_areas': areas,
@@ -1358,35 +1385,7 @@ def send_projects_email():
         logger.error(f"Send-email error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/business-areas', methods=['GET'])
-def get_business_areas():
-    """Get unique Business Organization options from existing projects"""
-    try:
-        if not bq_client:
-            return jsonify({'error': 'BigQuery client not initialized'}), 500
-        
-        # Query unique business organizations from the AH_Projects table
-        sql = """
-        SELECT DISTINCT business_organization
-        FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects`
-        WHERE business_organization IS NOT NULL AND TRIM(business_organization) != ''
-        ORDER BY business_organization
-        """
-        
-        job = bq_client.query(sql)
-        results = job.result()
-        
-        areas = [row.business_organization for row in results]
-        logger.info(f"Retrieved {len(areas)} unique business organizations from projects")
-        
-        return jsonify({
-            'success': True,
-            'business_areas': areas,
-            'count': len(areas)
-        }), 200
-    except Exception as e:
-        logger.error(f"Business areas retrieval error: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/api/projects/sync-data-bridge', methods=['POST'])
 def sync_data_bridge():

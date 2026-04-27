@@ -1,23 +1,22 @@
 {
   "admin": {
     "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
-    "role": "admin",
+    "role": "Admin - All",
     "name": "Administrator",
     "email": "admin@walmart.com",
     "approved": true
   },
   "krush": {
     "password_hash": "1ff275f4655a4137b257002b5abedbd8e4fbb1697e167ff170c44a54c5bb7a26",
-    "role": "admin",
+    "role": "Admin - All",
     "name": "Kendall Rush",
     "email": "kendall.rush@walmart.com",
     "approved": true,
-    "registered": "2026-01-21T11:41:26.658749",
-    "default_tab": "admin"
+    "registered": "2026-01-21T11:41:26.658749"
   },
   "micah.roth": {
     "password_hash": "",
-    "role": "admin",
+    "role": "Reviewer - Teaming",
     "name": "Micah Roth",
     "email": "micah.roth@walmart.com",
     "approved": true,
@@ -25,7 +24,7 @@
   },
   "steven.reid": {
     "password_hash": "",
-    "role": "admin",
+    "role": "Admin - Job Code",
     "name": "Steven Reid",
     "email": "steven.reid@walmart.com",
     "approved": true,
@@ -33,7 +32,7 @@
   },
   "robert.isaacs": {
     "password_hash": "",
-    "role": "user",
+    "role": "Admin - All",
     "name": "Robert Isaacs",
     "email": "robert.isaacs@walmart.com",
     "approved": true,
@@ -41,7 +40,7 @@
   },
   "rachel.doctorello": {
     "password_hash": "",
-    "role": "user",
+    "role": "Reviewer - Teaming",
     "name": "Rachel Doctorello",
     "email": "rachel.doctorello@walmart.com",
     "approved": true,
@@ -49,7 +48,7 @@
   },
   "andrea.hanson": {
     "password_hash": "",
-    "role": "user",
+    "role": "Submitter - All",
     "name": "Andrea Hanson",
     "email": "andrea.hanson@walmart.com",
     "approved": true,
@@ -57,7 +56,7 @@
   },
   "alaya.hardy": {
     "password_hash": "",
-    "role": "user",
+    "role": "Reviewer - Job Code",
     "name": "Alaya Hardy",
     "email": "alaya.hardy@walmart.com",
     "approved": true,
@@ -65,7 +64,7 @@
   },
   "kristii.buttrey": {
     "password_hash": "",
-    "role": "user",
+    "role": "Submitter - All",
     "name": "Kristii Buttrey",
     "email": "kristii.buttrey@walmart.com",
     "approved": true,
@@ -73,7 +72,7 @@
   },
   "mark.kuehn": {
     "password_hash": "",
-    "role": "user",
+    "role": "Submitter - All",
     "name": "Mark Kuehn",
     "email": "mark.kuehn@walmart.com",
     "approved": true,
@@ -81,10 +80,10 @@
   },
   "krushak.mishra": {
     "password_hash": "",
-    "role": "user",
+    "role": "Submitter - All",
     "name": "Krushak Mishra",
     "email": "krushak.mishra@walmart.com",
-    "approved": false,
+    "approved": true,
     "registered": "2026-04-20T13:42:41.438767"
   }
 }

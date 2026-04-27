@@ -4058,6 +4058,42 @@
       "user_email": "krush@homeoffice.wal-mart.com",
       "details": "Logged in via windows_ad",
       "category": "dashboard_main"
+    },
+    {
+      "id": "18375568",
+      "timestamp": "2026-04-27 14:19:40",
+      "action": "User Login",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via Windows AD",
+      "category": "user_login"
+    },
+    {
+      "id": "3fadd803",
+      "timestamp": "2026-04-27 14:19:42",
+      "action": "Accessed Main Dashboard",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Logged in via windows_ad",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "ddaf6d1d",
+      "timestamp": "2026-04-27 14:20:01",
+      "action": "Applied Filters",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "",
+      "category": "dashboard_main"
+    },
+    {
+      "id": "523ec4bd",
+      "timestamp": "2026-04-27 14:21:17",
+      "action": "Applied Filters",
+      "user": "krush@homeoffice.wal-mart.com",
+      "user_email": "krush@homeoffice.wal-mart.com",
+      "details": "Title: dsd - delivery notifications - frito lay",
+      "category": "dashboard_main"
     }
   ]
 }

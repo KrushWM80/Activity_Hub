@@ -315,7 +315,7 @@ def get_filter_options():
 
 
 def build_amp_query(filters, days, limit, offset=0):
-    """Build BigQuery SQL query with filters - support multiple weeks"""
+    """Build BigQuery SQL query with filters - GROUP BY event_id to eliminate duplicates"""
     
     # Extract fiscal year and weeks
     fy = filters.get('fy', '2027')
@@ -337,21 +337,21 @@ def build_amp_query(filters, days, limit, offset=0):
     
     query = f"""
         SELECT
-            AMP_ID,
-            Week,
-            Activity_Title,
-            Activity_Type,
-            Message_Type,
-            Business_Area,
-            COALESCE(Store_Cnt, 0) as Stores_With_Access,
-            COALESCE(Count, 0) as Unique_Users,
-            COALESCE(Count, 0) as Total_Clicks,
-            COALESCE(Count, 0) as Engagement_Rate,
-            COALESCE(Count, 0) as Completion_Rate,
-            COALESCE(Status, Message_Status, 'DRAFT') as Status,
-            COALESCE(Web_Preview, Link, '') as Preview_Link,
-            Start_Date,
-            End_Date
+            event_id,
+            MAX(Week) as Week,
+            MAX(Activity_Title) as Activity_Title,
+            MAX(Activity_Type) as Activity_Type,
+            MAX(Message_Type) as Message_Type,
+            MAX(Business_Area) as Business_Area,
+            MAX(COALESCE(Store_Cnt, 0)) as Stores_With_Access,
+            MAX(COALESCE(Count, 0)) as Unique_Users,
+            MAX(COALESCE(Count, 0)) as Total_Clicks,
+            MAX(COALESCE(Count, 0)) as Engagement_Rate,
+            MAX(COALESCE(Count, 0)) as Completion_Rate,
+            MAX(COALESCE(Status, Message_Status, 'DRAFT')) as Status,
+            MAX(COALESCE(Web_Preview, Link, '')) as Preview_Link,
+            MAX(Start_Date) as Start_Date,
+            MAX(End_Date) as End_Date
         FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
         WHERE 1=1
             AND FY = CAST({fy} AS INT64)
@@ -379,6 +379,7 @@ def build_amp_query(filters, days, limit, offset=0):
         query += f" AND (LOWER(Activity_Title) LIKE '%{keyword.lower()}%' OR LOWER(Activity_Type) LIKE '%{keyword.lower()}%' OR LOWER(Business_Area) LIKE '%{keyword.lower()}%')"
 
     query += f"""
+        GROUP BY event_id
         ORDER BY Activity_Title
         LIMIT {limit} OFFSET {offset}
     """
@@ -387,7 +388,7 @@ def build_amp_query(filters, days, limit, offset=0):
 
 
 def build_amp_count_query(filters, days):
-    """Build BigQuery count query - support multiple weeks"""
+    """Build BigQuery count query - COUNT(DISTINCT event_id) to eliminate duplicates"""
     
     fy = filters.get('fy', '2027')
     selected_week = int(filters.get('week', 2))
@@ -407,7 +408,7 @@ def build_amp_count_query(filters, days):
     weeks_list = ', '.join(map(str, selected_weeks))
     
     query = f"""
-        SELECT COUNT(*) as total
+        SELECT COUNT(DISTINCT event_id) as total
         FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
         WHERE 1=1
             AND FY = CAST({fy} AS INT64)

@@ -301,6 +301,44 @@
         .btn-group .btn i {
             font-size: 0.75rem;
         }
+
+        /* Table column width adjustments */
+        #jobCodesTableBody td:nth-child(1),
+        #jobCodesTableBody th:nth-child(1) {
+            width: 15%;
+            min-width: 100px;
+        }
+
+        #jobCodesTableBody td:nth-child(2),
+        #jobCodesTableBody th:nth-child(2) {
+            width: 40%;
+            min-width: 200px;
+        }
+
+        #jobCodesTableBody td:nth-child(3),
+        #jobCodesTableBody th:nth-child(3) {
+            width: 5%;
+            min-width: 40px;
+            white-space: nowrap;
+        }
+
+        #jobCodesTableBody td:nth-child(4),
+        #jobCodesTableBody th:nth-child(4) {
+            width: 15%;
+            min-width: 100px;
+        }
+
+        #jobCodesTableBody td:nth-child(5),
+        #jobCodesTableBody th:nth-child(5) {
+            width: 15%;
+            min-width: 100px;
+        }
+
+        #jobCodesTableBody td:nth-child(6),
+        #jobCodesTableBody th:nth-child(6) {
+            width: 10%;
+            min-width: 90px;
+        }
         
         .request-status-pending {
             color: #ffc107;
@@ -880,10 +918,10 @@
                                     <tr>
                                         <th class="sortable" data-sort="job_code" onclick="sortTable('job_code')">Job Code <i class="bi bi-sort-down"></i></th>
                                         <th class="sortable" data-sort="job_title" onclick="sortTable('job_title')">Job Title <i class="bi bi-sort-down"></i></th>
-                                        <th class="sortable" data-sort="user_count" onclick="sortTable('user_count')" style="min-width: 420px; white-space: nowrap;">Impacted <i class="bi bi-sort-down"></i></th>
-                                        <th>Assigned Teams</th>
-                                        <th>Workgroups</th>
-                                        <th style="min-width: 240px;">Action</th>
+                                        <th class="sortable" data-sort="user_count" onclick="sortTable('user_count')" style="white-space: nowrap;">Impacted <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="teams" onclick="sortTable('teams')">Assigned Teams <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="workgroups" onclick="sortTable('workgroups')">Workgroups <i class="bi bi-sort-down"></i></th>
+                                        <th class="sortable" data-sort="action" onclick="sortTable('action')" style="min-width: 120px;">Action <i class="bi bi-sort-down"></i></th>
                                     </tr>
                                 </thead>
                                 <tbody id="jobCodesTableBody">
@@ -996,7 +1034,6 @@
                                                 <th>Username</th>
                                                 <th>Name</th>
                                                 <th>Role</th>
-                                                <th>Default Tab</th>
                                                 <th>Status</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -1717,9 +1754,13 @@ ${sourcesList}
         function navigateToTab(tab) {
             showPage('dashboardPage');
             
-            // Show admin tab if admin
+            // Show admin tab if user has admin or reviewer role
+            const hasAdminAccess = currentUser.role && (
+                currentUser.role.startsWith('Admin - ') || 
+                currentUser.role.startsWith('Reviewer - ')
+            );
             document.querySelectorAll('.admin-only').forEach(el => {
-                el.classList.toggle('hidden', currentUser.role !== 'admin');
+                el.classList.toggle('hidden', !hasAdminAccess);
             });
             
             document.getElementById('currentUserName').textContent = currentUser.name;
@@ -2047,19 +2088,32 @@ ${sourcesList}
         }
 
         // Determine smart action text based on request status
-        function getSmartActionText(request, jobData) {
-            // If pending/submitted but not approved
-            if (request.status === 'pending') {
-                return 'Pending';
+        function getSmartActionText(obj) {
+            // Check if there's a pending request for this job code
+            const pendingRequest = pendingRequests.find(r => r.job_code === obj.job_code);
+            if (pendingRequest && pendingRequest.status === 'pending') {
+                return 'Pending Request';
             }
-            // Check if request has all necessary information
-            const hasTeam = request.team_name && request.team_name !== '-';
-            const hasWorkgroup = request.workgroup_name && request.workgroup_name !== '-';
-            // If approved and complete
-            if (request.status === 'approved' && hasTeam && hasWorkgroup) {
-                return 'Update';
+            
+            // Handle job code objects (from teaming tab)
+            if (obj.teams || obj.workgroups) {
+                const hasTeams = obj.teams && obj.teams.length > 0;
+                const hasWorkgroups = obj.workgroups && obj.workgroups.length > 0;
+                
+                if (hasTeams && hasWorkgroups) {
+                    return 'Update';
+                }
             }
-            // If incomplete or needs assignment
+            // Handle request objects (from admin tab)
+            else if (obj.team_name) {
+                const hasTeam = obj.team_name && obj.team_name !== '-';
+                
+                if (hasTeam && obj.status === 'approved') {
+                    return 'Update';
+                }
+            }
+            
+            // Default to Assign
             return 'Assign';
         }
 
@@ -2178,6 +2232,18 @@ ${sourcesList}
                             valA = a.status || '';
                             valB = b.status || '';
                             break;
+                        case 'teams':
+                            valA = (a.teams && a.teams.length > 0) ? a.teams.join(', ').toLowerCase() : '';
+                            valB = (b.teams && b.teams.length > 0) ? b.teams.join(', ').toLowerCase() : '';
+                            break;
+                        case 'workgroups':
+                            valA = (a.workgroups && a.workgroups.length > 0) ? a.workgroups.join(', ').toLowerCase() : '';
+                            valB = (b.workgroups && b.workgroups.length > 0) ? b.workgroups.join(', ').toLowerCase() : '';
+                            break;
+                        case 'action':
+                            valA = getSmartActionText(a);
+                            valB = getSmartActionText(b);
+                            break;
                         default:
                             return 0;
                     }
@@ -2193,15 +2259,7 @@ ${sourcesList}
                 });
             }
             
-            // Initialize tooltips after rendering with small delay
-            setTimeout(() => {
-                initializeTooltips(document.getElementById('jobCodesTableBody'));
-            }, 100);
-        }
-        
-        // Helper to render teaming tab after tooltips
-        function renderJobCodesWithTooltips() {
-            renderJobCodes();
+            // Populate the table with filtered and sorted data
             tbody.innerHTML = filtered.map(j => {
                 // Get worker tooltip text for Impacted column
                 const workerText = getWorkerDisplayText(j.job_code);
@@ -2226,8 +2284,8 @@ ${sourcesList}
                     : `<span class="badge status-badge-review status-detail-tooltip" style="cursor:pointer" onclick="showStatusDetail('${j.job_code}')" title="Click for details: ${statusTitle}">📋 Review</span>`;
                 
                 // Smart action logic
-                const actionText = getSmartActionText(j, j);
-                const actionColor = actionText === 'Pending' ? 'warning' : actionText === 'Update' ? 'success' : 'info';
+                const actionText = getSmartActionText(j);
+                const actionColor = actionText === 'Pending Request' ? 'warning' : actionText === 'Update' ? 'success' : 'info';
                 
                 return `
                 <tr>
@@ -3009,16 +3067,21 @@ ${sourcesList}
                         <td>
                             <select class="form-select form-select-sm" onchange="updateUserRole('${username}', this.value)" 
                                     ${username === currentUser.username ? 'disabled' : ''}>
-                                <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
-                                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-select form-select-sm" onchange="updateUserDefaultTab('${username}', this.value)">
-                                <option value="none" ${!user.default_tab || user.default_tab === 'none' ? 'selected' : ''}>Welcome Page</option>
-                                <option value="jobcodes" ${user.default_tab === 'jobcodes' ? 'selected' : ''}>Job Codes</option>
-                                <option value="teaming" ${user.default_tab === 'teaming' ? 'selected' : ''}>Teaming</option>
-                                <option value="admin" ${user.default_tab === 'admin' ? 'selected' : ''}>Admin</option>
+                                <optgroup label="Admin (Full Access)">
+                                    <option value="Admin - All" ${user.role === 'Admin - All' ? 'selected' : ''}>Admin - All Tabs</option>
+                                    <option value="Admin - Job Code" ${user.role === 'Admin - Job Code' ? 'selected' : ''}>Admin - Job Code</option>
+                                    <option value="Admin - Teaming" ${user.role === 'Admin - Teaming' ? 'selected' : ''}>Admin - Teaming</option>
+                                </optgroup>
+                                <optgroup label="Reviewer (Can Update & Approve)">
+                                    <option value="Reviewer - All" ${user.role === 'Reviewer - All' ? 'selected' : ''}>Reviewer - All Tabs</option>
+                                    <option value="Reviewer - Job Code" ${user.role === 'Reviewer - Job Code' ? 'selected' : ''}>Reviewer - Job Code</option>
+                                    <option value="Reviewer - Teaming" ${user.role === 'Reviewer - Teaming' ? 'selected' : ''}>Reviewer - Teaming</option>
+                                </optgroup>
+                                <optgroup label="Submitter (Can Request Only)">
+                                    <option value="Submitter - All" ${user.role === 'Submitter - All' ? 'selected' : ''}>Submitter - All</option>
+                                    <option value="Submitter - Job Code" ${user.role === 'Submitter - Job Code' ? 'selected' : ''}>Submitter - Job Code</option>
+                                    <option value="Submitter - Teaming" ${user.role === 'Submitter - Teaming' ? 'selected' : ''}>Submitter - Teaming</option>
+                                </optgroup>
                             </select>
                         </td>
                         <td>
@@ -3050,8 +3113,8 @@ ${sourcesList}
                     const safeTooltip = escapeHtml(workerText);
                     
                     // Get smart action text
-                    const actionText = getSmartActionText(r, jobData);
-                    const actionColor = actionText === 'Pending' ? 'warning' : actionText === 'Update' ? 'success' : 'info';
+                    const actionText = getSmartActionText(r);
+                    const actionColor = actionText === 'Pending Request' ? 'warning' : actionText === 'Update' ? 'success' : 'info';
                     
                     return `
                     <tr>
@@ -3297,27 +3360,20 @@ ${sourcesList}
                     body: JSON.stringify({ role })
                 });
                 showToast('User role updated');
+                
+                // If updating current user's role, update currentUser
+                if (username === currentUser.username) {
+                    currentUser.role = role;
+                }
+                
+                // Reload admin data to show changes
+                await loadAdminData();
             } catch (error) {
                 showToast(error.message, 'error');
             }
         }
         
-        async function updateUserDefaultTab(username, defaultTab) {
-            try {
-                await api(`/admin/users/${username}`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ default_tab: defaultTab })
-                });
-                showToast('Default tab updated');
-                
-                // Update current user if updating own settings
-                if (username === currentUser.username) {
-                    currentUser.default_tab = defaultTab;
-                }
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
-        }
+
 
         async function deleteUser(username) {
             if (!confirm(`Delete user ${username}?`)) return;
