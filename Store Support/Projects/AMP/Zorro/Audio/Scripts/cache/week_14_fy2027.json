@@ -1,0 +1,119 @@
+{
+  "week": 14,
+  "fy": 2027,
+  "cached_at": "2026-04-28T06:00:19.678966",
+  "bq_last_updated": "2026-04-28T00:05:02.973000+00:00",
+  "event_count": 8,
+  "review_no_comm_count": 8,
+  "status_breakdown": [
+    {
+      "status": "Awaiting ATC Approval - Pending",
+      "count": 1
+    },
+    {
+      "status": "Awaiting Comms Approval - Pending",
+      "count": 1
+    },
+    {
+      "status": "Awaiting Comms Approval - Ready to Review",
+      "count": 3
+    },
+    {
+      "status": "Awaiting Business Review - Pending",
+      "count": 5
+    },
+    {
+      "status": "Awaiting Legal Approval - Pending",
+      "count": 3
+    },
+    {
+      "status": "Review for Publish review - Pending",
+      "count": 4
+    },
+    {
+      "status": "Review for Publish review - Future Send",
+      "count": 1
+    },
+    {
+      "status": "Expired - Pending",
+      "count": 2
+    },
+    {
+      "status": "Review for Publish review - No Comms",
+      "count": 8
+    },
+    {
+      "status": "Expired - Future Send",
+      "count": 1
+    },
+    {
+      "status": "Review for Publish review - On Hold",
+      "count": 1
+    },
+    {
+      "status": "Awaiting Comms Approval - On Hold",
+      "count": 1
+    }
+  ],
+  "total_excl_denied": 28,
+  "summarized_count": 8,
+  "events_with_summaries": [
+    {
+      "event_id": "5f4c87f1-adb8-49d7-9d65-da1ec413582f",
+      "store_area": "Entertainment",
+      "title": "Let the OnePay credit card make Mother's Day Extra Special \\n",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Customers and associates can apply for a OnePay Credit Card and use it for Mother's Day purchases."
+    },
+    {
+      "event_id": "2a6ad638-2a73-486c-ad71-c65ee4615b81",
+      "store_area": "Fashion",
+      "title": "Dept. 23: Men\u2019s H226 Floorplan Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 23: In week 15, stores will be able to preview the new Men\u2019s H226\u00a0floorplan in the SET Tool to prepare for the upcoming layout changes. This update sets the foundation for stronger performance in Men\u2019s Fashion by improving shop flow, expanding elevated brands and aligning layouts to current fashion trends."
+    },
+    {
+      "event_id": "b3fd3511-a167-4dad-86de-93e5b3e7ee09",
+      "store_area": "Fashion",
+      "title": "Dept. 23: Team Sports Modular Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 23: Beginning in week 14, NFL,\u00a0NCAA, NBA\u00a0and NHL\u00a0product will be removed from Team Sports modulars to allow for sell-down.\u00a0While these categories are exiting the modular, not all items will receive markdowns immediately. Stores may continue to see select NCAA, NBA\u00a0and NHL styles at full price\u00a0during this period."
+    },
+    {
+      "event_id": "1577ea52-f26e-4bf3-a59f-0b4df37a8cc4",
+      "store_area": "Fashion",
+      "title": "Dept. 29: Recall\u00a0Period Company ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 29: Some boxes from the Period Company were mislabeled, so stores are asked to pull and hold impacted items until third-party Anderson re-tickets items starting May 3."
+    },
+    {
+      "event_id": "dae13f9c-c834-48f7-99f3-36cf4f0a48aa",
+      "store_area": "Food",
+      "title": "Dept. 92: ARIH Brand Is Launching at Walmart",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "The ARIH brand launched in Walmart stores on Friday, April 24. What is the ARIH Brand? A new global Korean fusion food and beverage brand launched this month\u00a0in collaboration with the K-pop group BTS. This launch is supported by four merchandising programs in select stores and online."
+    },
+    {
+      "event_id": "51ef80b3-fea2-4d96-9444-c62c85d6cd1e",
+      "store_area": "Food",
+      "title": "Dept. 95: Coke x Panini FIFA 20oz Sticker Program",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Walmart and Coke are partnering to promote stickers for FIFA World Cup Panini Collector Albums. Stickers will be available on 20oz Coke or Coke Zero Sugar.."
+    },
+    {
+      "event_id": "1fb2a010-bade-4cff-996b-2d1dcd38130b",
+      "store_area": "Food",
+      "title": "Dept. 95: Q2 $1 Bin - $1 Poppi Minis",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 95: Starting week 14 (May 2-8) and running through week 26 (July 25-31), $1\u00a0poppi minis will be available in the $1 bin program."
+    },
+    {
+      "event_id": "50f6bc26-3cbe-4e82-b000-c7f72cf0801a",
+      "store_area": "Food",
+      "title": "Dept. 95: Summer \u201cFlavor\u201d 12oz 12pk Rollback $5.97",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 95: Coke 12oz, 12-pack Summer Flavors are on Rollback for $5.97. Rollback dates are from Monday, May 4 \u2013 Sunday, Sept. 20. Stores should work with their local Coca-Cola representative if they want extra displays to support Store Fulfillment and in-store demand."
+    }
+  ],
+  "events_without_summary": []
+}

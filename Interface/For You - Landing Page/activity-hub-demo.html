@@ -1537,9 +1537,12 @@
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
-                <a href="/activity-hub/for-you" class="nav-item active">For You</a>
-                <a href="/activity-hub/projects" class="nav-item">Projects</a>
+                <a href="/activity-hub/for-you" class="nav-item active" data-view="dashboard">For You</a>
+                <a href="/activity-hub/projects" class="nav-item" data-embed="iframe" data-url="http://weus42608431466:8088/activity-hub/projects">Projects</a>
                 <a href="/activity-hub/reporting" class="nav-item">Reporting</a>
+                <a href="/activity-hub/teams" class="nav-item">Teams</a>
+                <a href="/activity-hub/my-work" class="nav-item">My Work</a>
+                <a href="/activity-hub/settings" class="nav-item">Settings</a>
                 <a href="/activity-hub/admin" class="nav-item" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
             </nav>
             <div class="user-section">
@@ -1551,6 +1554,11 @@
             </div>
         </div>
     </header>
+
+    <!-- Embedded Content Iframe -->
+    <div id="iframe-content" class="iframe-wrapper">
+        <iframe id="embedded-frame" src="" title="Embedded Content"></iframe>
+    </div>
 
     <!-- Main Content -->
     <div id="dashboard-content" class="main-container">
@@ -2455,9 +2463,40 @@
             // Navigation items
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', function(e) {
-                    // Update active state
-                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
+                    const href = this.getAttribute('href');
+                    const dataEmbed = this.getAttribute('data-embed');
+                    const dataView = this.getAttribute('data-view');
+                    const dataUrl = this.getAttribute('data-url');
+                    
+                    // Handle iframe embedding (Projects)
+                    if (dataEmbed === 'iframe' && dataUrl) {
+                        e.preventDefault();
+                        // Update URL in address bar
+                        window.history.pushState({page: 'projects'}, 'Projects', href);
+                        
+                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Hide dashboard, show iframe
+                        document.getElementById('dashboard-content').style.display = 'none';
+                        document.getElementById('iframe-content').classList.add('active');
+                        document.getElementById('embedded-frame').src = dataUrl;
+                    }
+                    // Handle returning to dashboard view (For You)
+                    else if (dataView === 'dashboard') {
+                        e.preventDefault();
+                        // Update URL in address bar
+                        window.history.pushState({page: 'dashboard'}, 'For You', href);
+                        
+                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Show dashboard, hide iframe
+                        document.getElementById('dashboard-content').style.display = 'block';
+                        document.getElementById('iframe-content').classList.remove('active');
+                        document.getElementById('embedded-frame').src = '';
+                    }
+                    // All other nav items navigate to their href (real routes)
                 });
             });
         }

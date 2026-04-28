@@ -102,6 +102,29 @@ app.add_middleware(
 security = HTTPBasic()
 
 # ============================================================
+# UTILITY FUNCTIONS
+# ============================================================
+
+def load_json_file(filepath, default=None):
+    """Load JSON file with error handling"""
+    try:
+        if os.path.exists(filepath):
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading {filepath}: {str(e)}")
+    return default if default is not None else {}
+
+def save_json_file(filepath, data):
+    """Save data to JSON file"""
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        print(f"Error saving {filepath}: {str(e)}")
+
+# ============================================================
 # CACHE INITIALIZATION
 # ============================================================
 
@@ -962,7 +985,12 @@ async def get_me(request: Request):
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    return {"username": user["username"], "role": user["role"], "name": user["name"]}
+    return {
+        "username": user["username"], 
+        "role": user["role"], 
+        "name": user["name"],
+        "email": user.get("email", "")
+    }
 
 
 
@@ -1863,9 +1891,9 @@ async def update_user(username: str, request: Request):
     # Validate role format if being updated
     if "role" in data:
         valid_roles = [
-            "Admin - All", "Admin - Job Code", "Admin - Teaming",
-            "Reviewer - All", "Reviewer - Job Code", "Reviewer - Teaming",
-            "Submitter - All", "Submitter - Job Code", "Submitter - Teaming"
+            "Admin - All", "Admin - Job Codes", "Admin - Teaming",
+            "Reviewer - All", "Reviewer - Job Codes", "Reviewer - Teaming",
+            "Submitter - All", "Submitter - Job Codes", "Submitter - Teaming"
         ]
         if data["role"] not in valid_roles:
             raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {', '.join(valid_roles)}")
@@ -2613,6 +2641,221 @@ def save_feedback(feedback_list):
     """Save feedback to file"""
     with open(FEEDBACK_FILE, 'w', encoding='utf-8') as f:
         json.dump(feedback_list, f, indent=2, ensure_ascii=False)
+
+@app.post("/api/submit-new-request")
+async def submit_new_request(request: Request):
+    """Submit a new request from the welcome page for job codes, teaming, or other"""
+    try:
+        user = require_auth(request)
+        data = await request.json()
+        
+        # Use authenticated user's information (not frontend submission)
+        submitter_name = user.get("name", "Unknown")
+        submitter_email = user.get("email", "")
+        submitter_username = user.get("username", "")
+        
+        # Extract request data
+        request_types = data.get("request_types", {})
+        selected_job_codes = data.get("selected_job_codes", [])
+        description = data.get("description", "")
+        
+        # Parse job codes to extract code and role information
+        # Format: "1-202-2104 - Food & Consumables Coach (Produce)"
+        requests_created = []
+        
+        # Handle the case where at least one request type is selected
+        has_job_codes = len(selected_job_codes) > 0
+        
+        # If job codes are selected, create requests for each code
+        if has_job_codes:
+            for job_code_entry in selected_job_codes:
+                # Extract just the job code (first part before " - ")
+                job_code = job_code_entry.split(" - ")[0] if " - " in job_code_entry else job_code_entry
+                
+                # Create request for Job Codes if selected
+                if request_types.get("job_code"):
+                    job_code_request = {
+                        "id": int(datetime.now().timestamp() * 1000),
+                        "job_code": job_code,
+                        "request_type": "job_code_update",
+                        "status": "pending",
+                        "requested_by": submitter_username,
+                        "requested_by_name": submitter_name,
+                        "requested_at": datetime.now().isoformat(),
+                        "reason": description,
+                        "notes": f"Submitted from New Request form by {submitter_name}",
+                        "request_source": "new_request_form"
+                    }
+                    
+                    # Add to job code requests
+                    all_job_code_reqs = load_json_file(JOB_CODE_REQUESTS_FILE, [])
+                    all_job_code_reqs.append(job_code_request)
+                    save_json_file(JOB_CODE_REQUESTS_FILE, all_job_code_reqs)
+                    requests_created.append(f"Job Code request for {job_code}")
+                
+                # Create request for Teaming if selected
+                if request_types.get("teaming"):
+                    teaming_request = {
+                        "id": int(datetime.now().timestamp() * 1000),
+                        "job_code": job_code,
+                        "team_name": "-",  # To be filled by admin
+                        "workgroup_name": "-",  # To be filled by admin
+                        "status": "pending",
+                        "requested_by": submitter_username,
+                        "requested_by_name": submitter_name,
+                        "requested_at": datetime.now().isoformat(),
+                        "notes": f"Submitted from New Request form: {description}",
+                        "request_source": "new_request_form"
+                    }
+                    
+                    # Add to teaming requests
+                    all_teaming_reqs = load_json_file(REQUEST_FILE, [])
+                    all_teaming_reqs.append(teaming_request)
+                    save_json_file(REQUEST_FILE, all_teaming_reqs)
+                    requests_created.append(f"Teaming request for {job_code}")
+                
+                # Create request for Other if selected - goes to BOTH tabs
+                if request_types.get("other"):
+                    other_description = request_types.get("other_description", "")
+                    other_request = {
+                        "id": int(datetime.now().timestamp() * 1000),
+                        "job_code": job_code,
+                        "request_type": "other",
+                        "other_description": other_description,
+                        "status": "pending",
+                        "requested_by": submitter_username,
+                        "requested_by_name": submitter_name,
+                        "requested_at": datetime.now().isoformat(),
+                        "reason": description,
+                        "notes": f"Other request: {other_description}",
+                        "request_source": "new_request_form"
+                    }
+                    
+                    # Store in BOTH job code and teaming requests (since admin won't know which)
+                    all_other_reqs = load_json_file(JOB_CODE_REQUESTS_FILE, [])
+                    all_other_reqs.append(other_request)
+                    save_json_file(JOB_CODE_REQUESTS_FILE, all_other_reqs)
+                    
+                    all_teaming_reqs = load_json_file(REQUEST_FILE, [])
+                    all_teaming_reqs.append(other_request)
+                    save_json_file(REQUEST_FILE, all_teaming_reqs)
+                    
+                    requests_created.append(f"Other request: {other_description}")
+        
+        # Handle Other when no job codes are provided
+        if request_types.get("other") and not has_job_codes:
+            other_description = request_types.get("other_description", "")
+            other_request = {
+                "id": int(datetime.now().timestamp() * 1000),
+                "job_code": "OTHER",
+                "request_type": "other",
+                "other_description": other_description,
+                "status": "pending",
+                "requested_by": submitter_username,
+                "requested_by_name": submitter_name,
+                "requested_at": datetime.now().isoformat(),
+                "reason": description,
+                "notes": f"Other request: {other_description}",
+                "request_source": "new_request_form"
+            }
+            
+            # Store in BOTH tabs so admin can review and decide
+            all_other_reqs = load_json_file(JOB_CODE_REQUESTS_FILE, [])
+            all_other_reqs.append(other_request)
+            save_json_file(JOB_CODE_REQUESTS_FILE, all_other_reqs)
+            
+            all_teaming_reqs = load_json_file(REQUEST_FILE, [])
+            all_teaming_reqs.append(other_request)
+            save_json_file(REQUEST_FILE, all_teaming_reqs)
+            
+            requests_created.append(f"Other request: {other_description}")
+        
+        # Send notification email to admins
+        send_new_request_notification(submitter_name, submitter_email, request_types, selected_job_codes, description, requests_created)
+        
+        return {
+            "success": True,
+            "message": f"Request submitted successfully! ({len(requests_created)} request(s) created)",
+            "requests_created": requests_created
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"âŒ Error submitting new request: {str(e)}")
+        return {"success": False, "error": str(e)}
+
+def send_new_request_notification(submitter_name, submitter_email, request_types, selected_job_codes, description, requests_created):
+    """Send email notification when a new request is submitted"""
+    try:
+        # Query users with Admin - Job Codes or Reviewer - Job Codes roles
+        recipients = ["ATCteamsupport@walmart.com"]  # Default recipient
+        
+        try:
+            users_data = load_json_file(USERS_FILE)
+            if users_data:
+                admin_users = []
+                for username, user_info in users_data.items():
+                    role = user_info.get("role", "")
+                    if role in ["Admin - Job Codes", "Admin - All", "Reviewer - Job Codes", "Reviewer - All"]:
+                        email = user_info.get("email", "")
+                        if email:
+                            admin_users.append(email)
+                
+                # Use found admins, but keep default if none found
+                if admin_users:
+                    recipients = list(set(admin_users))  # Remove duplicates
+                    print(f"Found {len(recipients)} admin users for notification")
+        except Exception as e:
+            print(f"Warning: Could not load admin users from database: {str(e)}. Using default recipients.")
+        
+        request_type_list = []
+        if request_types.get("job_code"):
+            request_type_list.append("Job Codes")
+        if request_types.get("teaming"):
+            request_type_list.append("Teaming")
+        if request_types.get("other"):
+            request_type_list.append(f"Other: {request_types.get('other_description', 'N/A')}")
+        
+        request_types_str = ", ".join(request_type_list)
+        job_codes_str = "\n".join(selected_job_codes) if selected_job_codes else "(None selected)"
+        
+        subject = f"New Request Submitted: {request_types_str}"
+        
+        body = f"""
+Job Codes Teaming Dashboard - New Request Submitted
+
+Submitter: {submitter_name}
+Email: {submitter_email}
+Request Types: {request_types_str}
+
+Selected Job Codes:
+{job_codes_str}
+
+Description:
+{description}
+
+---
+Requests Created:
+{chr(10).join(['- ' + r for r in requests_created])}
+
+---
+This is an automated notification from the Job Codes Teaming Dashboard.
+Please review and respond to the submitted request.
+        """
+        
+        msg = MIMEMultipart()
+        msg['From'] = FROM_EMAIL
+        msg['To'] = ", ".join(recipients)
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain', 'utf-8'))
+        
+        # Send via Walmart SMTP
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.sendmail(FROM_EMAIL, recipients, msg.as_string())
+        
+        print(f"✅ New request notification sent to {', '.join(recipients)}")
+    except Exception as e:
+        print(f"⚠️ Failed to send new request notification: {str(e)}")
 
 @app.post("/api/submit-feedback")
 async def submit_feedback(request: Request):

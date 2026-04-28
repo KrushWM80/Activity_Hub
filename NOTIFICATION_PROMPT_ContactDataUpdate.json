@@ -1,0 +1,345 @@
+/*
+Activity Hub - Owner Contact Data Update Notification
+Generated: April 28, 2026
+
+This prompt defines the notification message for Activity Hub owners
+whose contact information (Director/Sr Director) needs to be updated
+in the Intake Hub system.
+*/
+
+{
+  "notification_config": {
+    "title": "⚠️ Action Needed: Update Your Contact Information",
+    "severity": "info",
+    "audience": "project_owners",
+    "target_owners": [
+      "Taylor Young",
+      "Quinn Johnson III",
+      "Allison Dolan",
+      "AMBAR HATCHER",
+      "Jennifer Schmidlin",
+      "Nicholas Campbell",
+      "Ebong Eka",
+      "Hollie Miller",
+      "Ajay Joshi",
+      "Vanessa Summers",
+      "Andrea Hanson",
+      "Nicole Hamby",
+      "Sammy Livingston",
+      "Emily Varner",
+      "Mark Meek Jr."
+    ],
+    "expiry_days": 30,
+    "priority": "medium"
+  },
+
+  "html_notification": `
+    <div class="ah-notification" style="background: #FFF3CD; border-left: 4px solid #FFC107; padding: 16px; margin: 16px 0; border-radius: 4px;">
+      
+      <div style="display: flex; align-items: start; gap: 12px;">
+        <div style="font-size: 24px; flex-shrink: 0;">⚠️</div>
+        
+        <div style="flex: 1;">
+          <h3 style="margin: 0 0 8px 0; color: #333;">Action Needed: Update Your Contact Information</h3>
+          
+          <p style="margin: 8px 0; color: #555; font-size: 14px; line-height: 1.6;">
+            Your project(s) are missing critical organizational contact information. 
+            To ensure proper project visibility and reporting, please update your Director and Sr Director information in Intake Hub.
+          </p>
+          
+          <div style="background: #FFF; padding: 12px; margin: 12px 0; border-radius: 3px; border-left: 3px solid #FFC107;">
+            <p style="margin: 0; color: #666; font-size: 13px;">
+              <strong>What's Missing:</strong><br/>
+              • Director Name<br/>
+              • Senior Director Name<br/>
+              • (VP information when available)
+            </p>
+          </div>
+          
+          <div style="background: #FFF; padding: 12px; margin: 12px 0; border-radius: 3px;">
+            <p style="margin: 0 0 8px 0; color: #666; font-size: 13px;"><strong>How to Update:</strong></p>
+            <ol style="margin: 8px 0; padding-left: 20px; color: #666; font-size: 13px;">
+              <li>Go to <a href="https://hoops.wal-mart.com/intake-hub/contacts" target="_blank" style="color: #0066CC;">Intake Hub → Contacts</a></li>
+              <li>Find your profile and update:</li>
+              <li style="margin-left: 20px;">Your direct manager (Director)</li>
+              <li style="margin-left: 20px;">Your Sr Director (reporting hierarchy)</li>
+              <li>Save changes</li>
+            </ol>
+          </div>
+          
+          <div style="background: #E7F3FF; padding: 12px; margin: 12px 0; border-radius: 3px; border-left: 3px solid #0066CC;">
+            <p style="margin: 0; color: #0066CC; font-size: 13px;">
+              <strong>Impact:</strong> Without this information, your projects may not appear in leadership dashboards, 
+              team reports, or be properly tracked in Activity Hub reporting.
+            </p>
+          </div>
+          
+          <div style="margin-top: 16px; display: flex; gap: 8px;">
+            <a href="https://hoops.wal-mart.com/intake-hub/contacts" 
+               style="display: inline-block; background: #0066CC; color: white; padding: 8px 16px; border-radius: 3px; text-decoration: none; font-size: 13px; font-weight: bold;">
+              Update Contacts Now
+            </a>
+            <a href="#dismiss" 
+               style="display: inline-block; background: #f0f0f0; color: #333; padding: 8px 16px; border-radius: 3px; text-decoration: none; font-size: 13px;">
+              Dismiss
+            </a>
+          </div>
+          
+          <p style="margin: 12px 0 0 0; color: #999; font-size: 12px;">
+            Questions? Contact Activity Hub Support at activity-hub-support@walmart.com
+          </p>
+        </div>
+      </div>
+    </div>
+  `,
+
+  "email_notification": {
+    "subject": "⚠️ Action Needed: Update Your Contact Information in Activity Hub",
+    "body": `
+Hello,
+
+Your project(s) in Activity Hub are missing critical organizational contact information. 
+To ensure proper project visibility and team reporting, we need you to update your organizational hierarchy data.
+
+WHAT'S MISSING:
+• Your Direct Manager (Director Name)
+• Your Senior Director 
+• Your VP (when available)
+
+HOW TO UPDATE (Takes 2 minutes):
+1. Go to Intake Hub → Contacts
+2. Find your profile in the system
+3. Update the following fields:
+   - Director: [Your direct manager's name]
+   - Sr Director: [Your Sr Director's name]
+   - VP: [Your VP's name, if applicable]
+4. Click Save
+
+LINK: https://hoops.wal-mart.com/intake-hub/contacts
+
+WHY THIS MATTERS:
+Without this information, your projects may:
+✗ Not appear in leadership dashboards
+✗ Be missing from team reports
+✗ Not be properly tracked in Activity Hub reporting
+✗ Affect project visibility to executives
+
+AFFECTED PROJECTS: 
+You have 1+ project(s) needing this update. Once completed, these projects will automatically 
+appear in Activity Hub dashboards and leadership reports.
+
+Thank you for keeping Activity Hub current!
+
+Activity Hub Support Team
+activity-hub-support@walmart.com
+    `
+  },
+
+  "dashboard_banner": {
+    "icon": "warning",
+    "text": "⚠️ 17 project owners need to update their contact information. View Details →",
+    "action_url": "/activity-hub/notifications/contact-update",
+    "dismiss_option": true,
+    "expiry_days": 30
+  },
+
+  "metrics": {
+    "total_projects_affected": 17,
+    "projects_can_be_auto_populated": 22,
+    "owners_needing_action": [
+      {
+        "name": "Taylor Young",
+        "affected_projects": 2,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Quinn Johnson III",
+        "affected_projects": 2,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Allison Dolan",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "AMBAR HATCHER",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Jennifer Schmidlin",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Nicholas Campbell",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Ebong Eka",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Hollie Miller",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Ajay Joshi",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Vanessa Summers",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Andrea Hanson",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Nicole Hamby",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Sammy Livingston",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Emily Varner",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      },
+      {
+        "name": "Mark Meek Jr.",
+        "affected_projects": 1,
+        "intake_hub_link": "https://hoops.wal-mart.com/intake-hub/contacts"
+      }
+    ],
+    "owners_auto_populated": 22,
+    "auto_populated_projects": [
+      {
+        "name": "Lela Morgan-Holmes",
+        "projects": 4
+      },
+      {
+        "name": "Kenneth Deal",
+        "projects": 3
+      },
+      {
+        "name": "Jason Turner",
+        "projects": 3
+      },
+      {
+        "name": "Norman Williams",
+        "projects": 2
+      },
+      {
+        "name": "Holly Dayberry",
+        "projects": 1
+      },
+      {
+        "name": "Brent Holmes",
+        "projects": 1
+      },
+      {
+        "name": "Drew March",
+        "projects": 1
+      },
+      {
+        "name": "Audrea Henderson",
+        "projects": 1
+      },
+      {
+        "name": "Thomas Bonds",
+        "projects": 1
+      },
+      {
+        "name": "Shelby Weidner",
+        "projects": 1
+      },
+      {
+        "name": "Courtney Jackson",
+        "projects": 1
+      },
+      {
+        "name": "William Roberts",
+        "projects": 1
+      },
+      {
+        "name": "Dabney Brannon",
+        "projects": 1
+      },
+      {
+        "name": "Hanna Pawlowicz",
+        "projects": 1
+      }
+    ]
+  },
+
+  "notification_schedule": {
+    "initial_notification": "2026-04-28T08:00:00Z",
+    "reminder_1": "2026-05-05T08:00:00Z",
+    "reminder_2": "2026-05-12T08:00:00Z",
+    "final_notice": "2026-05-19T08:00:00Z",
+    "escalation": "2026-05-26T08:00:00Z"
+  }
+}
+    `
+  },
+
+  "plain_text_notification": `
+ACTIVITY HUB - ACTION REQUIRED
+========================================
+
+Your project(s) need updated contact information!
+
+WHAT'S NEEDED:
+17 project owners need to update their organizational hierarchy 
+information (Director, Sr Director, VP) in Intake Hub.
+
+WITHOUT THIS UPDATE:
+✗ Projects won't show in leadership dashboards
+✗ Reports will be incomplete
+✗ Project visibility will be affected
+✗ Team tracking will be inaccurate
+
+HOW TO FIX (2 minutes):
+1. Go to: https://hoops.wal-mart.com/intake-hub/contacts
+2. Update your Director information
+3. Update your Sr Director information
+4. Save and done!
+
+PROJECTS AFFECTED:
+If you're listed below, please update your profile:
+• Taylor Young (2 projects)
+• Quinn Johnson III (2 projects)
+• Allison Dolan (1 project)
+• AMBAR HATCHER (1 project)
+• Jennifer Schmidlin (1 project)
+• Nicholas Campbell (1 project)
+• Ebong Eka (1 project)
+• Hollie Miller (1 project)
+• Ajay Joshi (1 project)
+• Vanessa Summers (1 project)
+• Andrea Hanson (1 project)
+• Nicole Hamby (1 project)
+• Sammy Livingston (1 project)
+• Emily Varner (1 project)
+• Mark Meek Jr. (1 project)
+
+GOOD NEWS:
+22 other owners (Lela Morgan-Holmes, Kenneth Deal, Jason Turner, etc.)
+already have their information in the system and will be automatically 
+kept current by Activity Hub.
+
+Questions? Contact: activity-hub-support@walmart.com
+  `
+}

@@ -9,9 +9,11 @@ Activity Hub Projects Email System - All Three Email Types
 import os
 import sys
 import smtplib
+import base64
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 from pathlib import Path
 from google.cloud import bigquery
 import logging
@@ -46,7 +48,7 @@ LEADERSHIP_HIERARCHY = {
     }
 }
 
-# Logging
+# Logging - MUST BE BEFORE SPARK LOGO SETUP
 logging.basicConfig(
     level=logging.INFO,
     format='[%(asctime)s] %(levelname)s: %(message)s',
@@ -54,10 +56,53 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Spark Logo - Read dynamically at runtime (matching TDA Insights approach)
+# Try multiple paths to find the logo
+def _get_spark_logo_path():
+    """Find Spark logo in multiple possible locations"""
+    paths_to_try = [
+        Path(__file__).parent / "Spark_Blank.png",  # Same directory as this script
+        Path(__file__).parent.parent / "Interface" / "Spark_Blank.png",  # Up to Activity_Hub, then Interface
+        Path(__file__).parent.parent.parent / "Interface" / "Spark_Blank.png",  # Go up further
+        Path("C:/Users/krush/OneDrive - Walmart Inc/Documents/VSCode/Activity_Hub/Interface/Spark_Blank.png"),  # Absolute path
+    ]
+    
+    for path in paths_to_try:
+        if path.exists():
+            logger.info(f"✓ Found Spark logo at: {path}")
+            return path
+    
+    # If nothing found, log all paths checked
+    logger.warning(f"Spark logo not found. Checked paths:")
+    for path in paths_to_try:
+        logger.warning(f"  - {path}")
+    return None
+
+SPARK_LOGO_PATH = _get_spark_logo_path()
+
 # Set Google Cloud credentials
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.path.join(
     os.environ.get('APPDATA', ''), 'gcloud', 'application_default_credentials.json'
 )
+
+
+def get_spark_logo_base64() -> str:
+    """Get Spark logo as base64 string, reading dynamically from PNG file like TDA Insights"""
+    try:
+        if SPARK_LOGO_PATH and SPARK_LOGO_PATH.exists():
+            logo_b64 = base64.b64encode(SPARK_LOGO_PATH.read_bytes()).decode('ascii')
+            if logo_b64:
+                return logo_b64
+        logger.warning("Spark logo not found or empty, emails will show placeholder")
+        return ""
+    except Exception as e:
+        logger.error(f"Error reading Spark logo: {e}")
+        return ""
+
+def get_spark_logo_html(size: str = "44") -> str:
+    """Generate HTML img tag for Spark logo using CID reference for email client compatibility"""
+    # Use cid: reference - the actual image is attached in send_smtp_email()
+    return f'<img src="cid:spark_logo" width="{size}" height="{size}" alt="Spark" style="display:block;"/>'
 
 
 def get_project_url(project_id: str, project_source: str) -> tuple:
@@ -69,6 +114,35 @@ def get_project_url(project_id: str, project_source: str) -> tuple:
     else:
         # Projects dashboard - link to Activity Hub projects page
         return (f"http://weus42608431466:8088/activity-hub/projects?id={project_id}", True)
+
+
+def check_owner_missing_hierarchy(owner_name: str) -> dict:
+    """Check if owner has projects with missing director/sr_director data"""
+    client = bigquery.Client(project=BQ_PROJECT)
+    
+    query = f"""
+    SELECT 
+        COUNT(*) as total_projects,
+        COUNTIF(director_id IS NULL) as missing_director,
+        COUNTIF(sr_director_id IS NULL) as missing_sr_director,
+        COUNTIF(director_id IS NULL OR sr_director_id IS NULL) as missing_either
+    FROM `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE}`
+    WHERE owner = @owner_name
+    """
+    
+    job_config = bigquery.QueryJobConfig(query_parameters=[
+        bigquery.ScalarQueryParameter("owner_name", "STRING", owner_name),
+    ])
+    
+    results = list(client.query(query, job_config=job_config).result())
+    if results:
+        return {
+            'total_projects': results[0].total_projects,
+            'missing_director': results[0].missing_director,
+            'missing_sr_director': results[0].missing_sr_director,
+            'missing_either': results[0].missing_either
+        }
+    return {}
 
 
 def query_owner_projects(owner_name: str, include_only_not_updated: bool = False) -> list:
@@ -103,6 +177,8 @@ def query_owner_projects(owner_name: str, include_only_not_updated: bool = False
         ap.project_update_date,
         ap.business_organization,
         ap.project_source,
+        ap.director_id,
+        ap.sr_director_id,
         c.WM_WEEK_NBR,
         c.FISCAL_YEAR_NBR
     FROM `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE}` ap
@@ -149,6 +225,95 @@ def query_owner_projects(owner_name: str, include_only_not_updated: bool = False
             'update_date': update_date_str,
             'business_area': row.business_organization or 'N/A',
             'project_source': row.project_source or 'Manual',
+            'url': url,
+            'director_id': row.director_id,
+            'sr_director_id': row.sr_director_id
+        })
+    
+    return projects
+
+
+def query_director_projects(director_name: str, include_only_not_updated: bool = False) -> list:
+    """Query BigQuery for all projects where person is director or sr_director"""
+    
+    client = bigquery.Client(project=BQ_PROJECT)
+    
+    # Use Cal_Dim_Data to determine current WM week
+    week_query = """
+    SELECT DISTINCT WM_WEEK_NBR, FISCAL_YEAR_NBR
+    FROM `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data`
+    WHERE CALENDAR_DATE = CURRENT_DATE()
+    LIMIT 1
+    """
+    
+    week_result = list(client.query(week_query).result())
+    if week_result:
+        current_wm_week = week_result[0]['WM_WEEK_NBR']
+        current_fiscal_year = week_result[0]['FISCAL_YEAR_NBR']
+    else:
+        current_wm_week = 13
+        current_fiscal_year = 2027
+    
+    sql = f"""
+    SELECT 
+        ap.project_id,
+        ap.title,
+        ap.owner,
+        ap.health,
+        ap.status,
+        ap.project_update,
+        ap.project_update_date,
+        ap.business_organization,
+        ap.project_source,
+        ap.director_id,
+        ap.sr_director_id,
+        c.WM_WEEK_NBR,
+        c.FISCAL_YEAR_NBR
+    FROM `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE}` ap
+    LEFT JOIN `{BQ_PROJECT}.{BQ_DATASET}.Cal_Dim_Data` c
+      ON CAST(ap.project_update_date AS DATE) = c.CALENDAR_DATE
+    WHERE ap.sr_director_id = @director_name OR ap.director_id = @director_name
+    ORDER BY ap.title ASC
+    """
+    
+    job_config = bigquery.QueryJobConfig(query_parameters=[
+        bigquery.ScalarQueryParameter("director_name", "STRING", director_name),
+    ])
+    
+    results = list(client.query(sql, job_config=job_config).result())
+    
+    projects = []
+    for row in results:
+        # Check if updated this WM week
+        is_updated = False
+        if row.WM_WEEK_NBR == current_wm_week and row.FISCAL_YEAR_NBR == current_fiscal_year:
+            is_updated = True
+        
+        # Filter based on parameter
+        if include_only_not_updated and is_updated:
+            continue
+        
+        # Handle project_update note
+        project_note = row.project_update if row.project_update and row.project_update.strip() else 'No update provided'
+        
+        # Handle date display
+        update_date_str = row.project_update_date.strftime('%b %d, %Y') if row.project_update_date else 'Not updated'
+        
+        # Get project URL and whether to show link
+        url, show_link = get_project_url(row.project_id, row.project_source or 'Projects')
+        
+        projects.append({
+            'project_id': row.project_id,
+            'title': row.title or 'N/A',
+            'owner': row.owner or 'N/A',
+            'project_owner': row.owner or 'N/A',  # Add project_owner for leadership email compatibility
+            'health': row.health or 'Unknown',
+            'status': row.status or 'Unknown',
+            'project_update': project_note,
+            'updated': is_updated,
+            'update_date': update_date_str,
+            'business_area': row.business_organization or 'N/A',
+            'project_source': row.project_source or 'Manual',
             'url': url
         })
     
@@ -168,6 +333,43 @@ def generate_email_html(email_type: str, owner_name: str, projects: list, is_lea
     else:  # wednesday
         day_text = "Projects Needing Updates"
         action_text = "Below are your projects that have not been updated in this Walmart week. Please provide status updates."
+    
+    # Check for missing director/sr_director data (only for owner emails, not leadership)
+    missing_callout = ""
+    if not is_leadership:
+        hierarchy_check = check_owner_missing_hierarchy(owner_name)
+        has_missing_hierarchy = hierarchy_check.get('missing_either', 0) > 0
+        
+        if has_missing_hierarchy:
+            missing_callout = f"""
+        <!-- MISSING CONTACT DATA CALLOUT -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px; background-color: #fff4e6; border-left: 4px solid #f7630c; padding: 16px 20px; border-radius: 4px; box-sizing: border-box;">
+        <tr>
+        <td>
+            <div style="font-size: 13px; font-weight: 700; color: #f7630c; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">⚠️ ACTION NEEDED: Update Your Contact Information</div>
+            <div style="font-size: 13px; color: #333; line-height: 1.5;">
+                We detected that <strong>{hierarchy_check.get('missing_either', 0)} of your {hierarchy_check.get('total_projects', 0)} project(s)</strong> are missing <strong>Director</strong> and/or <strong>Sr. Director</strong> contact information.
+                <br><br>
+                This information is critical for:
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Routing escalations to the right leadership</li>
+                    <li>Ensuring visibility in leadership dashboards</li>
+                    <li>Proper project approvals and oversight</li>
+                </ul>
+                
+                <strong>Quick Fix:</strong>
+                <ol style="margin: 10px 0; padding-left: 20px;">
+                    <li>Go to <a href="http://weus42608431466:8088/activity-hub/projects" style="color: #f7630c; text-decoration: underline;">Activity Hub Projects</a></li>
+                    <li>Click on each project and update <strong>Director</strong> and <strong>Sr. Director</strong> fields</li>
+                    <li>Or update in <a href="https://hoops.wal-mart.com/intake-hub" style="color: #f7630c; text-decoration: underline;">Intake Hub</a> if projects originated there</li>
+                </ol>
+                
+                <strong>Need help?</strong> See the notification in your Activity Hub inbox or contact the Activity Hub support team.
+            </div>
+        </td>
+        </tr>
+        </table>
+        """
     
     if not projects:
         projects_table = """
@@ -201,9 +403,14 @@ def generate_email_html(email_type: str, owner_name: str, projects: list, is_lea
             
             project_title_html = f'<a href="{project_url}" style="color: #0071CE; text-decoration: none; font-weight: 500;" target="_blank">{p["title"]}</a>'
             
+            # Add missing indicator if director/sr_director is missing
+            missing_indicator = ""
+            if p.get('director_id') is None or p.get('sr_director_id') is None:
+                missing_indicator = " ⚠️"
+            
             project_rows.append(f"""
             <tr style="border-bottom: 1px solid #e0e0e0;">
-                <td style="padding: 12px; border-right: 1px solid #e0e0e0; font-weight: 500;">{project_title_html}</td>
+                <td style="padding: 12px; border-right: 1px solid #e0e0e0; font-weight: 500;">{project_title_html}{missing_indicator}</td>
                 <td style="padding: 12px; border-right: 1px solid #e0e0e0; font-weight: 600; color: {health_color};">{p['health']}</td>
                 <td style="padding: 12px; border-right: 1px solid #e0e0e0; color: #666; font-size: 13px;">{p['business_area']}</td>
                 <td style="padding: 12px; border-right: 1px solid #e0e0e0; color: #666; font-size: 13px;">{p['update_date']}</td>
@@ -212,9 +419,6 @@ def generate_email_html(email_type: str, owner_name: str, projects: list, is_lea
             """)
         
         projects_table = ''.join(project_rows)
-    
-    # Spark logo as base64
-    spark_logo_base64 = "iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAAACXBIWXMAAA7DAAAOwwHHb6thAAADYElEQVR4nO2dMU7kQBCFXXCBgMSBA5wgwwGYkZjhmBnGhBvESNwgJGbGS0BAVOQwMIGsADeQmBFgBGZGYkbg6VJ3bXudu2M7M/PVV/O/F3i1M+6e/k9P/1v+MTAZQgh4WRCWKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKvJfI8Symj5VVV0uFgvzfr/N9/t9ur6+vpqZmW1ubtzOzs7ZbrezDIfDi9/vZ6enp1fX13fN5eXlEZqZfb1ex+Px2Ox2O3t9fb27ubmxs7MzGwwGdn19ber1ul1dXVk4HJrnx2Nx+Pj4aJPJRHU6HbtYLMxmszGdTseMMXY2m6nJZKLKkiSJ6vV60eFwUCXJN2VZqMFgYJRlYXq9nsKBNpvN1GazMXXhw+FgfD6furu7U2qCmUxGXV5eqslkotRt6XQ6RP0fFGWhLi8v1dPTkyrJRFGUKk+S6PV6DgYDg1wt6vfhcKB8Pp9yOp3K6/UqxOdzPJQqyFUlmSjLQrlcLjObzSqn06lcLpc6HA5qvV4rr9er+v2+6vV6anNzWzkcDhV/PuQ5oQA9Ho/yeDyqXq8rj8ej/H6/Ug6HQ/lcLpXJZNT5+blKpVLK5XKp5XKpPB6PCgaDCofDocLhsBoNBkrJsuHhsNBkMlH/F/wwGqPxwHB8f3+v/H6/gm6Pb28Kdq1eowqFArb8wWDg+MrpjvAdj8f29fV1PYVWXIrFou1tbwV6PQ2YL+vc2Zm/PgXv3/B9BYZhMBqN1A/y3C4F7xJx8Jv3A+XTfX5+qtwulwoEAsZGo5H5/X6z3W7/Pd+J6XT63xY3N+pXCfk8T7cYBZx/7AqOlPL5rG3S+0Y3PGW/xPJWbHEbsxyOhJv0h1eGGZfCvGt+jOuqWrH2nH8ZMFBENz/M8xwT9WHj0s1qBGhm5pP0hzHg2dMPnbhHEFGU3VLOkZzOvCrXbq7uWe0qN0Fs7hEUjcr8b0/aTLN7Uo3dHnlS3dIW3SXYIEjdHYYEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZX7f/oMyJPfAcUVw9QAAAAASUVORK5CYII="
     
     html = f"""<!DOCTYPE html>
 <html>
@@ -229,7 +433,9 @@ def generate_email_html(email_type: str, owner_name: str, projects: list, is_lea
 <td bgcolor="#004C91" style="background-color:#004C91; padding: 24px 30px;">
     <table cellpadding="0" cellspacing="0" border="0">
     <tr>
-    <td style="padding-right: 20px; vertical-align: middle; font-size: 32px; font-weight: bold; color: #0071CE; width: 60px; text-align: center; background: white; border-radius: 4px; height: 48px; line-height: 48px;">W</td>
+    <td style="padding-right: 15px; vertical-align: middle;">
+        {get_spark_logo_html("48")}
+    </td>
     <td style="vertical-align: middle;">
         <div style="color: white; font-size: 26px; font-weight: 700;">Projects</div>
         <div style="color: #cccccc; font-size: 13px; margin-top: 2px;">by Activity Hub</div>
@@ -257,6 +463,9 @@ def generate_email_html(email_type: str, owner_name: str, projects: list, is_lea
         <p style="margin: 0 0 8px 0; font-size: 16px; font-weight: 500; color: #333;">Hi {owner_name},</p>
         <p style="margin: 0 0 24px 0; font-size: 14px; color: #666; line-height: 1.6;">{action_text}</p>
         
+        <!-- MISSING CONTACT CALLOUT (if needed) -->
+        {missing_callout}
+        
         <!-- Projects Count Badge -->
         <div style="background-color: #f0f7ff; border-left: 4px solid #0071CE; padding: 16px 20px; margin-bottom: 24px; border-radius: 4px;">
             <div style="font-size: 11px; font-weight: 700; color: #0071CE; text-transform: uppercase; letter-spacing: 0.5px;">Project Summary</div>
@@ -278,6 +487,10 @@ def generate_email_html(email_type: str, owner_name: str, projects: list, is_lea
                 {projects_table}
             </tbody>
         </table>
+        
+        <p style="margin: 0; font-size: 12px; color: #999; font-style: italic;">
+            ⚠️ = Projects missing Director and/or Sr. Director contact information
+        </p>
     </td>
     </tr>
     </table>
@@ -304,14 +517,27 @@ def generate_email_html(email_type: str, owner_name: str, projects: list, is_lea
 
 
 def send_smtp_email(recipient_email: str, subject: str, html_body: str) -> bool:
-    """Send email via Walmart internal SMTP"""
+    """Send email via Walmart internal SMTP with embedded Spark logo as CID attachment"""
     try:
-        msg = MIMEMultipart('alternative')
+        # Use 'related' so inline images (CID) are bundled with the HTML
+        msg = MIMEMultipart('related')
         msg['From'] = FROM_EMAIL
         msg['To'] = recipient_email
         msg['Subject'] = subject
         
-        msg.attach(MIMEText(html_body, 'html', 'utf-8'))
+        # Wrap HTML in an 'alternative' sub-part
+        msg_alt = MIMEMultipart('alternative')
+        msg_alt.attach(MIMEText(html_body, 'html', 'utf-8'))
+        msg.attach(msg_alt)
+        
+        # Attach Spark logo as inline CID image
+        if SPARK_LOGO_PATH and SPARK_LOGO_PATH.exists():
+            with open(SPARK_LOGO_PATH, 'rb') as f:
+                logo_data = f.read()
+            logo_img = MIMEImage(logo_data, _subtype='png')
+            logo_img.add_header('Content-ID', '<spark_logo>')
+            logo_img.add_header('Content-Disposition', 'inline', filename='Spark_Blank.png')
+            msg.attach(logo_img)
         
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=30) as server:
             server.sendmail(FROM_EMAIL, [recipient_email], msg.as_string())
@@ -481,7 +707,9 @@ def generate_leadership_email_html(manager_name: str, projects: list) -> str:
 <td bgcolor="#004C91" style="background-color:#004C91; padding: 24px 30px;">
     <table cellpadding="0" cellspacing="0" border="0">
     <tr>
-    <td style="padding-right: 20px; vertical-align: middle; font-size: 32px; font-weight: bold; color: #0071CE; width: 60px; text-align: center; background: white; border-radius: 4px; height: 48px; line-height: 48px;">W</td>
+    <td style="padding-right: 15px; vertical-align: middle;">
+        {get_spark_logo_html("48")}
+    </td>
     <td style="vertical-align: middle;">
         <div style="color: white; font-size: 26px; font-weight: 700;">Projects</div>
         <div style="color: #cccccc; font-size: 13px; margin-top: 2px;">by Activity Hub</div>
@@ -560,37 +788,16 @@ def send_leadership_email_test(manager_name: str):
     logger.info(f"\nSending leadership email for {manager_name}...")
     logger.info("-" * 80)
     
-    # Special handling for Kristine - get all 28 projects from Intake Hub directly
+    # Special case for Kristine: use director query instead of hierarchical approach
     if manager_name == 'Kristine Torres':
-        kristine_projects = query_kristine_all_projects()
-        if not kristine_projects:
-            logger.warning("No projects found for Kristine Torres")
-            return False
-        
-        logger.info(f"Found {len(kristine_projects)} projects for Kristine Torres")
-        
-        # Format projects for leadership email - group by director
-        projects_by_director = {}
-        for p in kristine_projects:
-            director = p['director']
-            if director not in projects_by_director:
-                projects_by_director[director] = []
-            # Add project_owner for grouping in email
-            p['project_owner'] = director
-            projects_by_director[director].append(p)
-        
-        # Flatten back to list for email generation
-        formatted_projects = []
-        for director in sorted(projects_by_director.keys()):
-            formatted_projects.extend(projects_by_director[director])
-        
-        html_body = generate_leadership_email_html(manager_name, formatted_projects)
+        projects = query_director_projects('Kristine Torres', include_only_not_updated=False)
+        logger.info(f"Found {len(projects)} total projects where Kristine Torres is director/sr_director")
     else:
-        # Regular hierarchical approach for other managers
+        # Get all direct reports projects using hierarchical approach
         projects = get_all_direct_reports_projects(manager_name)
         logger.info(f"Found {len(projects)} total team projects for {manager_name}")
-        
-        html_body = generate_leadership_email_html(manager_name, projects)
+    
+    html_body = generate_leadership_email_html(manager_name, projects)
     
     subject = f"Activity Hub Projects - Team Summary for {manager_name}"
     
@@ -604,49 +811,7 @@ def send_leadership_email_test(manager_name: str):
     return False
 
 
-def query_kristine_all_projects() -> list:
-    """Query all 28 projects where Kristine Torres is director or sr_director from Intake Hub"""
-    
-    client = bigquery.Client(project=BQ_PROJECT)
-    
-    # Query Intake Hub data for all projects with Kristine as director or sr_director
-    sql = """
-    SELECT 
-        Intake_Card_Nbr as project_id,
-        Project_Title as title,
-        Owner as owner,
-        Business_Owner_Area as business_area,
-        Project_Update as project_update,
-        Project_Update_Date as update_date,
-        Health_Update as health,
-        Status as status,
-        PROJECT_DIRECTOR as director,
-        PROJECT_DIRECTOR_ID as director_id,
-        'Intake' as project_source
-    FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - Intake Accel Council Data`
-    WHERE PROJECT_SR_DIRECTOR = 'Kristine Torres'
-       OR PROJECT_DIRECTOR = 'Kristine Torres'
-    ORDER BY PROJECT_DIRECTOR, Project_Title
-    """
-    
-    results = list(client.query(sql).result())
-    projects = []
-    for row in results:
-        projects.append({
-            'project_id': str(row.project_id),
-            'title': row.title or 'N/A',
-            'owner': row.owner or 'N/A',
-            'health': row.health or 'Unknown',
-            'status': row.status or 'Unknown',
-            'project_update': row.project_update if row.project_update and row.project_update.strip() else 'No update provided',
-            'update_date': row.update_date.strftime('%b %d, %Y') if row.update_date else 'Not updated',
-            'business_area': row.business_area or 'N/A',
-            'project_source': row.project_source,
-            'director': row.director or 'No Director Assigned',
-            'url': f"https://hoops.wal-mart.com/intake-hub/projects/{row.project_id}"
-        })
-    
-    return projects
+
 
 
 def generate_kristine_comprehensive_email(projects: list) -> str:
@@ -662,9 +827,6 @@ def generate_kristine_comprehensive_email(projects: list) -> str:
     
     # Build projects table with director sections
     projects_html = ""
-    
-    # Spark logo as base64
-    spark_logo_base64 = "iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAAACXBIWXMAAA7DAAAOwwHHb6thAAADYElEQVR4nO2dMU7kQBCFXXCBgMSBA5wgwwGYkZjhmBnGhBvESNwgJGbGS0BAVOQwMIGsADeQmBFgBGZGYkbg6VJ3bXudu2M7M/PVV/O/F3i1M+6e/k9P/1v+MTAZQgh4WRCWKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKlKqKvJfI8Symj5VVV0uFgvzfr/N9/t9ur6+vpqZmW1ubtzOzs7ZbrezDIfDi9/vZ6enp1fX13fN5eXlEZqZfb1ex+Px2Ox2O3t9fb27ubmxs7MzGwwGdn19ber1ul1dXVk4HJrnx2Nx+Pj4aJPJRHU6HbtYLMxmszGdTseMMXY2m6nJZKLKkiSJ6vV60eFwUCXJN2VZqMFgYJRlYXq9nsKBNpvN1GazMXXhw+FgfD6fuju7U2qCmUxGXV5eqslkotRt6XQ6RP0fFGWhLi8v1dPTkyrJRFGUKk+S6PV6DgYDg1wt6vfhcKB8Pp9yOp3K6/UqxOdzPJQqyFUlmSjLQrlcLjObzSqn06lcLpc6HA5qvV4rr9er+v2+6vV6anNzWzkcDhV/PuQ5oQA9Ho/yeDyqXq8rj8ej/H6/Ug6HQ/lcLpXJZNT5+blKpVLK5XKp5XKpPB6PCgaDCofDocLhsBoNBkrJsuHhsNBkMlH/F/wwGqPxwHB8f3+v/H6/gm6Pb28Kdq1eowqFArb8wWDg+MrpjvAdj8f29fV1PYVWXIrFou1tbwV6PQ2YL+vc2Zm/PgXv3/B9BYZhMBqN1A/y3C4F7xJx8Jv3A+XTfX5+qtwulwoEAsZGo5H5/X6z3W7/Pd+J6XT63xY3N+pXCfk8T7cYBZx/7AqOlPL5rG3S+0Y3PGW/xPJWbHEbsxyOhJv0h1eGGZfCvGt+jOuqWrH2nH8ZMFBENz/M8xwT9WHj0s1qBGhm5pP0hzHg2dMPnbhHEFGU3VLOkZzOvCrXbq7uWe0qN0Fs7hEUjcr8b0/aTLN7Uo3dHnlS3dIW3SXYIEjdHYYEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZXrfcIEjdbZ1ZX7f/oMyJPfAcUVw9QAAAAASUVORK5CYII="
     
     for director in sorted(projects_by_director.keys()):
         director_projects = projects_by_director[director]
@@ -714,7 +876,7 @@ def generate_kristine_comprehensive_email(projects: list) -> str:
     <table cellpadding="0" cellspacing="0" border="0">
     <tr>
     <td style="padding-right: 15px; vertical-align: middle;">
-        <img src="data:image/png;base64,{spark_logo_base64}" width="48" height="48" alt="Spark" style="display:block;"/>
+        {get_spark_logo_html("48")}
     </td>
     <td style="vertical-align: middle;">
         <div style="color: white; font-size: 26px; font-weight: 700;">Projects</div>
@@ -789,32 +951,7 @@ def generate_kristine_comprehensive_email(projects: list) -> str:
     return html
 
 
-def send_kristine_comprehensive_email_test():
-    """Send Kristine a comprehensive email with all 28 projects grouped by director"""
-    
-    logger.info("\n" + "=" * 80)
-    logger.info("KRISTINE TORRES - COMPREHENSIVE LEADERSHIP EMAIL (28 Projects)")
-    logger.info("=" * 80)
-    
-    projects = query_kristine_all_projects()
-    
-    if not projects:
-        logger.warning("No projects found for Kristine Torres")
-        return False
-    
-    logger.info(f"Found {len(projects)} projects for Kristine Torres")
-    
-    html_body = generate_kristine_comprehensive_email(projects)
-    subject = "Activity Hub Projects - Complete Leadership Portfolio for Kristine Torres"
-    
-    # For testing, send to Kendall
-    recipient = 'kendall.rush@walmart.com'
-    logger.info(f"Sending comprehensive Kristine email to: {recipient}")
-    
-    if send_smtp_email(recipient, subject, html_body):
-        logger.info(f"✓ Kristine comprehensive email sent successfully!")
-        return True
-    return False
+
 
 
 def main():
@@ -843,9 +980,6 @@ def main():
     
     # Send Kristine's leadership email to Kendall (to see what Kristine would get)
     send_leadership_email_test('Kristine Torres')
-    
-    # Send Kristine's comprehensive email (all 28 projects from Intake Hub)
-    send_kristine_comprehensive_email_test()
     
     logger.info("\n" + "=" * 80)
     logger.info("✓ ALL TEST EMAILS SENT")

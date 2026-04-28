@@ -1,0 +1,37 @@
+{
+  "job_codes": {
+    "71-76-624": [
+      {
+        "reason": "Test",
+        "requested_by": "Kendall Rush",
+        "rejected_by": "Kendall Rush",
+        "rejected_date": "2026-04-28T16:15:40.665698"
+      }
+    ],
+    "1-202-2104": [
+      {
+        "reason": "Test",
+        "requested_by": "Kendall Rush",
+        "rejected_by": "Kendall Rush",
+        "rejected_date": "2026-04-28T16:15:47.295144"
+      }
+    ],
+    "1-996-754": [
+      {
+        "reason": "Test",
+        "requested_by": "Kendall Rush",
+        "rejected_by": "Kendall Rush",
+        "rejected_date": "2026-04-28T16:15:52.476631"
+      }
+    ],
+    "1-600-7200": [
+      {
+        "reason": "Test",
+        "requested_by": "Kendall Rush",
+        "rejected_by": "Kendall Rush",
+        "rejected_date": "2026-04-28T16:15:56.045920"
+      }
+    ]
+  },
+  "teaming": {}
+}

@@ -38,5 +38,37 @@
     "timestamp": "2026-04-16T08:16:26.629908",
     "sent": false,
     "error": "Connection unexpectedly closed: timed out"
+  },
+  {
+    "to": "krush",
+    "subject": "Job Code Request Rejected - 71-76-624",
+    "body": "\n        <html>\n        <body style=\"font-family: Arial, sans-serif;\">\n        <h2 style=\"color: red;\">\u00e2\u0153\u2014 Job Code Request Rejected</h2>\n        <p>Your job code request has been rejected by Kendall Rush.</p>\n        <table border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse;\">\n            <tr><td><strong>Job Code:</strong></td><td>71-76-624</td></tr>\n            <tr><td><strong>Type:</strong></td><td>Update</td></tr>\n            <tr><td><strong>Rejected by:</strong></td><td>Kendall Rush</td></tr>\n            <tr><td><strong>Reason:</strong></td><td>Test</td></tr>\n            <tr><td><strong>Rejected date:</strong></td><td>2026-04-28 16:15:40</td></tr>\n        </table>\n        </body>\n        </html>\n        ",
+    "timestamp": "2026-04-28T16:15:40.886513",
+    "sent": false,
+    "error": "{'krush': (501, b'5.1.3 Invalid address')}"
+  },
+  {
+    "to": "krush",
+    "subject": "Job Code Request Rejected - 1-202-2104",
+    "body": "\n        <html>\n        <body style=\"font-family: Arial, sans-serif;\">\n        <h2 style=\"color: red;\">\u00e2\u0153\u2014 Job Code Request Rejected</h2>\n        <p>Your job code request has been rejected by Kendall Rush.</p>\n        <table border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse;\">\n            <tr><td><strong>Job Code:</strong></td><td>1-202-2104</td></tr>\n            <tr><td><strong>Type:</strong></td><td>Update</td></tr>\n            <tr><td><strong>Rejected by:</strong></td><td>Kendall Rush</td></tr>\n            <tr><td><strong>Reason:</strong></td><td>Test</td></tr>\n            <tr><td><strong>Rejected date:</strong></td><td>2026-04-28 16:15:47</td></tr>\n        </table>\n        </body>\n        </html>\n        ",
+    "timestamp": "2026-04-28T16:15:47.497777",
+    "sent": false,
+    "error": "{'krush': (501, b'5.1.3 Invalid address')}"
+  },
+  {
+    "to": "krush",
+    "subject": "Job Code Request Rejected - 1-996-754",
+    "body": "\n        <html>\n        <body style=\"font-family: Arial, sans-serif;\">\n        <h2 style=\"color: red;\">\u00e2\u0153\u2014 Job Code Request Rejected</h2>\n        <p>Your job code request has been rejected by Kendall Rush.</p>\n        <table border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse;\">\n            <tr><td><strong>Job Code:</strong></td><td>1-996-754</td></tr>\n            <tr><td><strong>Type:</strong></td><td>Update</td></tr>\n            <tr><td><strong>Rejected by:</strong></td><td>Kendall Rush</td></tr>\n            <tr><td><strong>Reason:</strong></td><td>Test</td></tr>\n            <tr><td><strong>Rejected date:</strong></td><td>2026-04-28 16:15:52</td></tr>\n        </table>\n        </body>\n        </html>\n        ",
+    "timestamp": "2026-04-28T16:15:52.677429",
+    "sent": false,
+    "error": "{'krush': (501, b'5.1.3 Invalid address')}"
+  },
+  {
+    "to": "krush",
+    "subject": "Job Code Request Rejected - 1-600-7200",
+    "body": "\n        <html>\n        <body style=\"font-family: Arial, sans-serif;\">\n        <h2 style=\"color: red;\">\u00e2\u0153\u2014 Job Code Request Rejected</h2>\n        <p>Your job code request has been rejected by Kendall Rush.</p>\n        <table border=\"1\" cellpadding=\"5\" style=\"border-collapse: collapse;\">\n            <tr><td><strong>Job Code:</strong></td><td>1-600-7200</td></tr>\n            <tr><td><strong>Type:</strong></td><td>Update</td></tr>\n            <tr><td><strong>Rejected by:</strong></td><td>Kendall Rush</td></tr>\n            <tr><td><strong>Reason:</strong></td><td>Test</td></tr>\n            <tr><td><strong>Rejected date:</strong></td><td>2026-04-28 16:15:56</td></tr>\n        </table>\n        </body>\n        </html>\n        ",
+    "timestamp": "2026-04-28T16:15:56.245782",
+    "sent": false,
+    "error": "{'krush': (501, b'5.1.3 Invalid address')}"
   }
 ]

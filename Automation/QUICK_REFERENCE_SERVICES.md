@@ -22,6 +22,7 @@
 ### Monitoring Schedule
 ```
 Daily at 6:00 AM EST        → Full health check + email report
+Daily at 7:00 AM EST        → Projects email scheduler (Mon/Wed/Thu)
 On System Startup           → Startup detection + health check + notification
 Every 6 Hours (Background)  → Automatic restart if services offline
 ```

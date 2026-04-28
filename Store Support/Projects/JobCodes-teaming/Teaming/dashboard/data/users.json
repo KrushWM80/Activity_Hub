@@ -24,7 +24,7 @@
   },
   "steven.reid": {
     "password_hash": "",
-    "role": "Admin - Job Code",
+    "role": "Admin - Job Codes",
     "name": "Steven Reid",
     "email": "steven.reid@walmart.com",
     "approved": true,
@@ -56,7 +56,7 @@
   },
   "alaya.hardy": {
     "password_hash": "",
-    "role": "Reviewer - Job Code",
+    "role": "Reviewer - Job Codes",
     "name": "Alaya Hardy",
     "email": "alaya.hardy@walmart.com",
     "approved": true,

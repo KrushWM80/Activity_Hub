@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Operations Callouts - Walmart Spark</title>
+    <link rel="icon" type="image/png" href="/walmart-spark-logo.png">
+    <style>
+        :root {
+            /* Walmart Colors */
+            --walmart-navy: #1E3A8A;
+            --walmart-blue-dark: #1D4ED8;
+            --walmart-blue: #3B82F6;
+            --walmart-blue-light: #60A5FA;
+            --walmart-yellow: #FFCC00;
+            --walmart-yellow-dark: #E6B800;
+            --walmart-teal: #00A0B0;
+            --walmart-green: #76B900;
+            
+            /* Grays */
+            --gray-900: #1A202C;
+            --gray-800: #2D3748;
+            --gray-700: #4A5568;
+            --gray-600: #718096;
+            --gray-500: #A0AEC0;
+            --gray-400: #CBD5E0;
+            --gray-300: #E2E8F0;
+            --gray-200: #EDF2F7;
+            --gray-100: #F7FAFC;
+            --white: #FFFFFF;
+            
+            /* Status Colors */
+            --success: #38A169;
+            --warning: #D69E2E;
+            --error: #E53E3E;
+            --info: #3182CE;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--walmart-blue-dark) 0%, var(--walmart-navy) 100%);
+            color: var(--gray-900);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, var(--walmart-navy) 0%, var(--walmart-blue-dark) 100%);
+            color: var(--white);
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .spark-icon {
+            width: 48px;
+            height: 48px;
+            display: block;
+            object-fit: contain;
+            filter: brightness(1.1) drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .current-week {
+            margin-left: auto;
+            text-align: right;
+            padding-right: 20px;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .current-week-label {
+            font-size: 12px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .current-week-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* ALERT BANNER */
+        .alert-banner {
+            background: var(--walmart-yellow);
+            color: var(--gray-900);
+            padding: 14px 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            font-weight: 500;
+            flex-wrap: wrap;
+        }
+
+        .alert-text {
+            font-size: 14px;
+        }
+
+        .countdown-badge {
+            background: rgba(0,0,0,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-dark) 100%);
+            color: var(--white);
+            padding: 14px 20px;
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-icon {
+            font-size: 18px;
+            margin-right: 8px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* FILTERS */
+        .filters-section {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-size: 14px;
+            background: var(--white);
+            cursor: pointer;
+            transition: border-color 0.2s;
+            min-width: 140px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
+        /* FORM ELEMENTS */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .form-input {
+            padding: 10px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--walmart-blue);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
+        /* BUTTONS */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--walmart-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--walmart-blue-dark);
+            box-shadow: 0 2px 8px rgba(29,78,216,0.3);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-success {
+            background: var(--walmart-green);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #d42b2b;
+        }
+
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        /* TABLE */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: var(--gray-100);
+            border-bottom: 2px solid var(--gray-300);
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: top;
+        }
+
+        tr:hover {
+            background: var(--gray-50);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-500);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* SIDEBAR WIDGETS */
+        .widget {
+            background: var(--white);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .widget-header {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, var(--walmart-blue-dark) 100%);
+            color: var(--white);
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .widget-body {
+            padding: 16px;
+        }
+
+        .stat-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--walmart-navy);
+        }
+
+        .recipient-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .recipient-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: var(--gray-50);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .recipient-email {
+            color: var(--gray-700);
+            word-break: break-all;
+        }
+
+        .recipient-remove {
+            background: none;
+            border: none;
+            color: var(--error);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 4px;
+        }
+
+        .recipient-remove:hover {
+            color: #d42b2b;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+
+            .current-week {
+                border-right: none;
+                border-top: 1px solid rgba(255,255,255,0.2);
+                padding-right: 0;
+                padding-top: 12px;
+            }
+
+            .filters-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-select {
+                min-width: auto;
+            }
+
+            .alert-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* LOADING & ERRORS */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray-600);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--gray-300);
+            border-top-color: var(--walmart-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(229,62,62,0.1);
+            color: var(--error);
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid var(--error);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .success-message {
+            background: rgba(56,161,105,0.1);
+            color: var(--success);
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid var(--success);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <img class="spark-icon" src="/walmart-spark-logo.png" alt="Spark Logo" />
+            <div>
+                <div class="header-title">Pricing Operations Callouts</div>
+                <div class="header-subtitle">Walmart Week Forecast Management</div>
+            </div>
+        </div>
+        <div class="current-week">
+            <div class="current-week-label">Current Week</div>
+            <div class="current-week-value" id="currentWeekDisplay">WK14</div>
+        </div>
+    </div>
+
+    <!-- ALERT BANNER -->
+    <div class="alert-banner">
+        <div class="alert-text">⏰ Email sends Friday at <strong>4:00 PM CT</strong></div>
+        <div class="countdown-badge" id="countdownBadge">--h --m remaining</div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- FILTERS -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="filters-section">
+                        <div class="filter-group">
+                            <label class="filter-label">Fiscal Year</label>
+                            <select class="filter-select" id="fyFilter">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Walmart Week</label>
+                            <select class="filter-select" id="weekFilter">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CALLOUT FORM -->
+            <div class="card">
+                <div class="card-header"><span class="card-icon">➕</span>Add New Callout</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Title (Optional)</label>
+                        <input type="text" class="form-input" id="calloutTitle" placeholder="Brief title or topic...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Callout Content *</label>
+                        <textarea class="form-input" id="calloutContent" rows="4" placeholder="Enter callout details..."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="addCallout()">Add Callout</button>
+                        <button class="btn btn-secondary" onclick="clearCalloutForm()">Clear</button>
+                    </div>
+                    <div id="calloutMessage"></div>
+                </div>
+            </div>
+
+            <!-- CALLOUTS TABLE -->
+            <div class="card">
+                <div class="card-header"><span class="card-icon">📋</span>Callouts for Selected Week</div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="calloutsTable">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Content</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calloutsTableBody">
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <div class="empty-icon">📭</div>
+                                        <div>No callouts yet. Add one above!</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <!-- EMAIL RECIPIENTS WIDGET -->
+            <div class="widget">
+                <div class="widget-header"><span class="card-icon">✉️</span>Email Recipients</div>
+                <div class="widget-body">
+                    <div class="stat-group">
+                        <div class="stat">
+                            <div class="stat-label">Total</div>
+                            <div class="stat-value" id="totalRecipients">0</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Active</div>
+                            <div class="stat-value" id="activeRecipients">0</div>
+                        </div>
+                    </div>
+
+                    <div class="recipient-list" id="recipientsList"></div>
+
+                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200);">
+                        <div class="form-group">
+                            <input type="email" class="form-input" id="newRecipientEmail" placeholder="name@walmart.com">
+                            <button class="btn btn-primary" onclick="addRecipient()" style="width: 100%; justify-content: center;">Add Recipient</button>
+                        </div>
+                        <div id="recipientMessage"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABOUT WIDGET -->
+            <div class="widget">
+                <div class="widget-header"><span class="card-icon">ℹ️</span>About</div>
+                <div class="widget-body" style="font-size: 13px; line-height: 1.6; color: var(--gray-700);">
+                    <p><strong>Purpose:</strong> Manage pricing forecast callouts for the coming Walmart week.</p>
+                    <p style="margin-top: 10px;"><strong>Friday Email:</strong> Automatically sent to all recipients at 4:00 PM CT with callouts + Tableau dashboard screenshot.</p>
+                    <p style="margin-top: 10px;"><strong>Signature:</strong> Emily Varner, Senior Manager - Pricing</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════════════════════════════
+        let selectedFY = null;
+        let selectedWeek = null;
+        let allWeeks = [];
+        let allFY = [];
+        let currentFY = null;
+
+        // ═══════════════════════════════════════════════════════════════════
+        // INITIALIZATION
+        // ═══════════════════════════════════════════════════════════════════
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initializeDashboard();
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        });
+
+        async function initializeDashboard() {
+            // Fetch FY and Weeks
+            await loadFiscalYears();
+            await loadWeeks();
+            
+            // Set defaults
+            if (currentFY) {
+                selectedFY = currentFY;
+                document.getElementById('fyFilter').value = currentFY;
+            }
+            
+            // Load CURRENT week (from Cal_Dim_Data)
+            const currentWeek = await getCurrentWeek();
+            if (currentWeek) {
+                selectedWeek = currentWeek;
+                document.getElementById('weekFilter').value = currentWeek;
+            }
+
+            loadCallouts();
+            loadEmailRecipients();
+
+            // Event listeners
+            document.getElementById('fyFilter').addEventListener('change', (e) => {
+                selectedFY = parseInt(e.target.value);
+                loadWeeks();
+                loadCallouts();
+            });
+
+            document.getElementById('weekFilter').addEventListener('change', (e) => {
+                selectedWeek = parseInt(e.target.value);
+                loadCallouts();
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // FISCAL YEAR & WEEKS
+        // ═══════════════════════════════════════════════════════════════════
+        async function loadFiscalYears() {
+            try {
+                const response = await fetch('/api/fy');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allFY = data.fiscal_years;
+                    currentFY = data.current_fy;
+                    
+                    const fySelect = document.getElementById('fyFilter');
+                    fySelect.innerHTML = allFY.map(fy => 
+                        `<option value="${fy}" ${fy === currentFY ? 'selected' : ''}>FY ${fy}</option>`
+                    ).join('');
+                }
+            } catch (error) {
+                console.error('Error loading fiscal years:', error);
+            }
+        }
+
+        async function loadWeeks() {
+            try {
+                const params = selectedFY ? `?fy=${selectedFY}` : '';
+                const response = await fetch(`/api/weeks${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allWeeks = data.weeks;
+                    
+                    const weekSelect = document.getElementById('weekFilter');
+                    weekSelect.innerHTML = allWeeks.map(w => 
+                        `<option value="${w.week}">WK ${String(w.week).padStart(2, '0')}</option>`
+                    ).join('');
+                }
+            } catch (error) {
+                console.error('Error loading weeks:', error);
+            }
+        }
+
+        async function getNextWeekForFY(fy) {
+            const weekObj = allWeeks.find(w => w.fy === fy);
+            return weekObj ? weekObj.week + 1 : 1;
+        }
+
+        async function getCurrentWeek() {
+            try {
+                const response = await fetch('/api/current-time');
+                const data = await response.json();
+                return data.current_wm_week || 1;
+            } catch (error) {
+                console.error('Error getting current week:', error);
+                return 1;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // CALLOUTS
+        // ═══════════════════════════════════════════════════════════════════
+        async function addCallout() {
+            const title = document.getElementById('calloutTitle').value.trim();
+            const content = document.getElementById('calloutContent').value.trim();
+
+            if (!content) {
+                showMessage('calloutMessage', 'Callout content is required', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/callouts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        wm_week: selectedWeek,
+                        title: title || 'Untitled',
+                        content: content,
+                        created_by: 'User'
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('calloutMessage', 'Callout added successfully', 'success');
+                    clearCalloutForm();
+                    loadCallouts();
+                } else {
+                    showMessage('calloutMessage', data.error || 'Failed to add callout', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding callout:', error);
+                showMessage('calloutMessage', 'Error adding callout', 'error');
+            }
+        }
+
+        function clearCalloutForm() {
+            document.getElementById('calloutTitle').value = '';
+            document.getElementById('calloutContent').value = '';
+            document.getElementById('calloutMessage').innerHTML = '';
+        }
+
+        async function loadCallouts() {
+            if (!selectedWeek) return;
+
+            try {
+                const response = await fetch(`/api/callouts/${selectedWeek}`);
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                const data = await response.json();
+
+                const tbody = document.getElementById('calloutsTableBody');
+                if (data && data.success && Array.isArray(data.callouts) && data.callouts.length > 0) {
+                    tbody.innerHTML = data.callouts.map(c => `
+                        <tr>
+                            <td><strong>${escapeHtml(c.title || 'Untitled')}</strong></td>
+                            <td>${escapeHtml(c.content || '').substring(0, 100)}...</td>
+                            <td>${formatDate(c.created_date)}</td>
+                            <td>
+                                <button class="btn btn-danger btn-small" onclick="deleteCallout('${c.id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <div class="empty-icon">📭</div>
+                                <div>No callouts yet. Add one above!</div>
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading callouts:', error);
+                const tbody = document.getElementById('calloutsTableBody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-state" style="color: #e53e3e;">
+                            <div>Error loading callouts. Please try again.</div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        async function deleteCallout(calloutId) {
+            if (!confirm('Delete this callout?')) return;
+
+            try {
+                const response = await fetch(`/api/callouts/${calloutId}`, { method: 'DELETE' });
+                const data = await response.json();
+                if (data.success) {
+                    loadCallouts();
+                }
+            } catch (error) {
+                console.error('Error deleting callout:', error);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // EMAIL RECIPIENTS
+        // ═══════════════════════════════════════════════════════════════════
+        async function addRecipient() {
+            const email = document.getElementById('newRecipientEmail').value.trim().toLowerCase();
+
+            if (!email || !email.includes('@')) {
+                showMessage('recipientMessage', 'Enter a valid email address', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/email-recipients', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('recipientMessage', 'Email recipient added', 'success');
+                    document.getElementById('newRecipientEmail').value = '';
+                    loadEmailRecipients();
+                } else {
+                    showMessage('recipientMessage', data.error || 'Failed to add recipient', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding recipient:', error);
+                showMessage('recipientMessage', 'Error adding recipient', 'error');
+            }
+        }
+
+        async function removeRecipient(recipientId) {
+            try {
+                const response = await fetch(`/api/email-recipients/${recipientId}`, { method: 'DELETE' });
+                const data = await response.json();
+                if (data.success) {
+                    loadEmailRecipients();
+                }
+            } catch (error) {
+                console.error('Error removing recipient:', error);
+            }
+        }
+
+        async function loadEmailRecipients() {
+            try {
+                const response = await fetch('/api/email-recipients');
+                const data = await response.json();
+
+                if (data.success) {
+                    const recipients = data.recipients || [];
+                    const active = recipients.filter(r => r.is_active).length;
+                    
+                    document.getElementById('totalRecipients').textContent = recipients.length;
+                    document.getElementById('activeRecipients').textContent = active;
+
+                    const list = document.getElementById('recipientsList');
+                    if (recipients.length > 0) {
+                        list.innerHTML = recipients.map(r => `
+                            <div class="recipient-item">
+                                <span class="recipient-email">${escapeHtml(r.email)}</span>
+                                <button class="recipient-remove" onclick="removeRecipient('${r.id}')">✕</button>
+                            </div>
+                        `).join('');
+                    } else {
+                        list.innerHTML = '<div style="text-align:center;color:var(--gray-500);padding:10px;">No recipients yet</div>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading recipients:', error);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // COUNTDOWN TIMER
+        // ═══════════════════════════════════════════════════════════════════
+        function updateCountdown() {
+            const now = new Date();
+            let friday = new Date(now);
+            
+            // Get this Friday (day 5 = Friday)
+            const daysUntilFriday = (5 - now.getDay() + 7) % 7 || 7;
+            friday.setDate(friday.getDate() + daysUntilFriday);
+            friday.setHours(16, 0, 0, 0); // 4 PM CT
+
+            const diff = friday - now;
+            if (diff > 0) {
+                const hours = Math.floor(diff / 3600000);
+                const minutes = Math.floor((diff % 3600000) / 60000);
+                document.getElementById('countdownBadge').textContent = `${hours}h ${minutes}m remaining`;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // UTILITIES
+        // ═══════════════════════════════════════════════════════════════════
+        function showMessage(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `<div class="${type}-message">${message}</div>`;
+            setTimeout(() => {
+                el.innerHTML = '';
+            }, 5000);
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function formatDate(timestamp) {
+            return new Date(timestamp).toLocaleString();
+        }
+    </script>
+</body>
+</html>

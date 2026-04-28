@@ -1,10 +1,10 @@
 {
   "week": 13,
   "fy": 2027,
-  "cached_at": "2026-04-24T17:00:13.246597",
-  "bq_last_updated": "2026-04-24T21:56:25.339000+00:00",
-  "event_count": 45,
-  "review_no_comm_count": 45,
+  "cached_at": "2026-04-28T13:21:57.306888",
+  "bq_last_updated": "2026-04-28T17:50:52.973000+00:00",
+  "event_count": 44,
+  "review_no_comm_count": 44,
   "status_breakdown": [
     {
       "status": "Draft - Pending",
@@ -15,20 +15,28 @@
       "count": 5
     },
     {
+      "status": "Awaiting Comms Approval - Pending",
+      "count": 1
+    },
+    {
+      "status": "Review for Publish review - Pending",
+      "count": 1
+    },
+    {
       "status": "Expired - Pending",
-      "count": 3
+      "count": 4
     },
     {
       "status": "Review for Publish review - No Comms",
-      "count": 45
+      "count": 44
     },
     {
       "status": "Expired - No Comms",
       "count": 1
     }
   ],
-  "total_excl_denied": 45,
-  "summarized_count": 45,
+  "total_excl_denied": 47,
+  "summarized_count": 44,
   "events_with_summaries": [
     {
       "event_id": "14ee4636-c4c5-4db9-9c11-901ad6a2f8c3",
@@ -161,7 +169,7 @@
       "store_area": "Fresh",
       "title": "Dept. 94: Mother's Day Floral",
       "status": "Review for Publish review - No Comms",
-      "summary_text": "Mother\u2019s Day is near\u2014execute the department 94 fresh floral plan now to win the season. Use the Mother\u2019s Day Floral Scan Sheet daily to scan items and adjust inventory. Set and price action alley displays, then aisle-locate by scanning into a nearby label. Keep displays organized, full and fresh\u2014refill and consolidate shippers often, and update locations as product moves. With about 80% of sales in the final three days, it\u2019s essential to assign dedicated coverage May 7\u201310."
+      "summary_text": "Mother\u2019s Day is near\u2014execute the department 94 fresh floral plan now to win the season. Use the Mother\u2019s Day Floral Scan Sheet daily to scan items and adjust inventory. Set and price action alley displays, then aisle-locate by scanning into a nearby label. Keep displays organized, full and fresh\u2014refill and consolidate shippers often, and update locations as product moves. With about 80% of sales in the final three days, it\u2019s essential to assign dedicated Store Champion to drive ownership and ensure floral checks are completed twice, daily."
     },
     {
       "event_id": "b9a00184-a672-4074-a4a6-3c48c1f71bfb",
@@ -324,13 +332,7 @@
       "status": "Review for Publish review - No Comms",
       "summary_text": "Keep calm and ask my assistant. AI Tip of the Week.\n\nMy assistant can help spot behavior gaps and take action to improve consistency, accountability and retention. My assistant can act as an expert Walmart operations leader or people partner, by entering tasks and current facility conditions. My assistant can provide a table with specific headings and data to help make performance improvements and an improved associate experience during their first 90 days."
     },
-    {
-      "event_id": "bd0dde7c-7503-4cb7-9509-c26df9b39c9b",
-      "store_area": "Total Store",
-      "title": "Cart Safety",
-      "status": "Review for Publish review - No Comms",
-      "summary_text": "Total Store: Carts are essential to daily work, but using them unsafely can put associates and customers at risk. Simple habits like maintaining clear visibility, controlling loads and staying aware in high-traffic areas help prevent injuries and disruptions. Prioritizing safe cart use supports a safer, more efficient store for everyone."
-    },
+
     {
       "event_id": "3deb6901-817d-4541-9bca-246c62d66a0c",
       "store_area": "Total Store",

@@ -403,13 +403,13 @@
         }
         
         .dropdown-multi-btn::after {
-            content: 'â–¼';
+            content: '▼';
             position: absolute;
             right: 12px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 10px;
-            color: #999;
+            font-size: 11px;
+            color: #666;
             pointer-events: none;
         }
         
@@ -575,7 +575,7 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#"><img src="/Spark_Blank.png" alt="Spark Logo" style="height: 32px; margin-right: 8px; display: inline-block;"> Aligned<small class="ms-2" style="font-size: 0.6rem; opacity: 0.9;">Store Impact through Job Codes</small></a>
+                <a class="navbar-brand" href="#" onclick="goToWelcome(); return false;" style="cursor: pointer;"><img src="/Spark_Blank.png" alt="Spark Logo" style="height: 32px; margin-right: 8px; display: inline-block;"> Aligned<small class="ms-2" style="font-size: 0.6rem; opacity: 0.9;">Store Impact through Job Codes</small></a>
                 <div class="d-flex align-items-center">
                     <span class="text-white-50 me-3" style="font-size: 0.75rem;">Owner: Kendall Rush</span>
                     <span class="text-white me-3">
@@ -594,6 +594,9 @@
                     <div class="text-center mb-5">
                         <h1 class="display-4 mb-3"><i class="bi bi-house-door"></i> Welcome</h1>
                         <p class="lead text-muted">Select which module you'd like to work with</p>
+                        <button class="btn btn-success btn-lg mt-3" onclick="openNewRequestModal()">
+                            <i class="bi bi-plus-circle"></i> Submit New Request
+                        </button>
                     </div>
                     
                     <div class="row g-4">
@@ -644,6 +647,30 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Admin Module -->
+                        <div class="col-md-6 admin-only hidden">
+                            <div class="card h-100 shadow-sm" onclick="navigateToTab('admin')" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div class="card-body text-center p-5">
+                                    <div class="mb-4">
+                                        <i class="bi bi-gear" style="font-size: 4rem; color: var(--walmart-blue);"></i>
+                                    </div>
+                                    <h3 class="card-title mb-3">Admin</h3>
+                                    <p class="card-text text-muted mb-4">
+                                        Manage users, view all requests, update job codes and team assignments, and maintain the dashboard configuration.
+                                    </p>
+                                    <ul class="list-unstyled text-start text-muted">
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Manage user roles and permissions</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Review all submitted requests</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Update and approve changes</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Monitor system activity</li>
+                                    </ul>
+                                    <button class="btn btn-walmart btn-lg mt-3">
+                                        <i class="bi bi-arrow-right-circle"></i> Go to Admin
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -655,7 +682,7 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#"><img src="/Spark_Blank.png" alt="Spark Logo" style="height: 32px; margin-right: 8px; display: inline-block;"> Aligned<small class="ms-2" style="font-size: 0.6rem; opacity: 0.9;">Store Impact through Job Codes</small></a>
+                <a class="navbar-brand" href="#" onclick="goToWelcome(); return false;" style="cursor: pointer;"><img src="/Spark_Blank.png" alt="Spark Logo" style="height: 32px; margin-right: 8px; display: inline-block;"> Aligned<small class="ms-2" style="font-size: 0.6rem; opacity: 0.9;">Store Impact through Job Codes</small></a>
                 <div class="d-flex align-items-center">
                     <span class="text-white-50 me-3" style="font-size: 0.75rem;">Owner: Kendall Rush</span>
                     <span class="text-white me-3">
@@ -971,11 +998,6 @@
                             </div>
                             <!-- Teaming Requests Tab -->
                             <div class="tab-pane fade" id="teamingRequestsTab">
-                                <div class="mb-3">
-                                    <button class="btn btn-danger btn-sm" onclick="clearAllTeamingRequests()">
-                                        <i class="bi bi-trash"></i> Clear All Requests
-                                    </button>
-                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover mb-0">
                                         <thead class="table-light">
@@ -1749,6 +1771,15 @@ ${sourcesList}
         function showWelcomePage() {
             showPage('welcomePage');
             document.getElementById('welcomeUserName').textContent = currentUser.name;
+            
+            // Show admin card if user has admin role
+            const hasAdminAccess = currentUser.role && (
+                currentUser.role.startsWith('Admin - ') || 
+                currentUser.role.startsWith('Reviewer - ')
+            );
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.classList.toggle('hidden', !hasAdminAccess);
+            });
         }
         
         function navigateToTab(tab) {
@@ -3069,17 +3100,17 @@ ${sourcesList}
                                     ${username === currentUser.username ? 'disabled' : ''}>
                                 <optgroup label="Admin (Full Access)">
                                     <option value="Admin - All" ${user.role === 'Admin - All' ? 'selected' : ''}>Admin - All Tabs</option>
-                                    <option value="Admin - Job Code" ${user.role === 'Admin - Job Code' ? 'selected' : ''}>Admin - Job Code</option>
+                                    <option value="Admin - Job Codes" ${user.role === 'Admin - Job Codes' ? 'selected' : ''}>Admin - Job Codes</option>
                                     <option value="Admin - Teaming" ${user.role === 'Admin - Teaming' ? 'selected' : ''}>Admin - Teaming</option>
                                 </optgroup>
                                 <optgroup label="Reviewer (Can Update & Approve)">
                                     <option value="Reviewer - All" ${user.role === 'Reviewer - All' ? 'selected' : ''}>Reviewer - All Tabs</option>
-                                    <option value="Reviewer - Job Code" ${user.role === 'Reviewer - Job Code' ? 'selected' : ''}>Reviewer - Job Code</option>
+                                    <option value="Reviewer - Job Codes" ${user.role === 'Reviewer - Job Codes' ? 'selected' : ''}>Reviewer - Job Codes</option>
                                     <option value="Reviewer - Teaming" ${user.role === 'Reviewer - Teaming' ? 'selected' : ''}>Reviewer - Teaming</option>
                                 </optgroup>
                                 <optgroup label="Submitter (Can Request Only)">
                                     <option value="Submitter - All" ${user.role === 'Submitter - All' ? 'selected' : ''}>Submitter - All</option>
-                                    <option value="Submitter - Job Code" ${user.role === 'Submitter - Job Code' ? 'selected' : ''}>Submitter - Job Code</option>
+                                    <option value="Submitter - Job Codes" ${user.role === 'Submitter - Job Codes' ? 'selected' : ''}>Submitter - Job Codes</option>
                                     <option value="Submitter - Teaming" ${user.role === 'Submitter - Teaming' ? 'selected' : ''}>Submitter - Teaming</option>
                                 </optgroup>
                             </select>
@@ -4216,10 +4247,378 @@ ${sourcesList}
         document.getElementById('searchJobCodeMaster').addEventListener('input', renderJobCodesMaster);
         document.getElementById('filterCategory').addEventListener('change', renderJobCodesMaster);
 
+        // Navigate to Welcome page
+        function goToWelcome() {
+            showWelcomePage();
+        }
+
+        // Open new request modal
+        async function openNewRequestModal() {
+            // Auto-populate submitter information from current logged-in user
+            if (currentUser) {
+                document.getElementById('submitterName').value = currentUser.name || '';
+            }
+            
+            // Reset form fields (but keep submitter info)
+            document.getElementById('newRequestForm').reset();
+            document.getElementById('submitterName').value = currentUser ? (currentUser.name || '') : '';
+            document.getElementById('otherTypeDiv').style.display = 'none';
+            document.getElementById('jobCodeSelectionDiv').style.display = 'none';
+            updateRequestSummary();
+            
+            // Load and populate job codes dropdown
+            await populateJobCodesForRequest();
+            
+            const modal = new bootstrap.Modal(document.getElementById('newRequestModal'));
+            modal.show();
+        }
+
+        // Update visibility of request type fields
+        function updateRequestTypeSelection() {
+            const jobCodeChecked = document.getElementById('reqTypeJobCode').checked;
+            const teamingChecked = document.getElementById('reqTypeTeaming').checked;
+            const otherChecked = document.getElementById('reqTypeOther').checked;
+            
+            // Show/hide other type description
+            document.getElementById('otherTypeDiv').style.display = otherChecked ? 'block' : 'none';
+            
+            // Show/hide job code selection (if Job Code or Other is selected)
+            document.getElementById('jobCodeSelectionDiv').style.display = (jobCodeChecked || otherChecked) ? 'block' : 'none';
+            
+            updateRequestSummary();
+        }
+
+        // Populate job codes dropdown for request
+        async function populateJobCodesForRequest() {
+            // Load job codes if not already loaded
+            if (!jobCodesMaster || jobCodesMaster.length === 0) {
+                try {
+                    const response = await fetch('/api/job-codes');
+                    const data = await response.json();
+                    jobCodesMaster = data.job_codes || [];
+                } catch (error) {
+                    console.error('Error loading job codes:', error);
+                    jobCodesMaster = [];
+                }
+            }
+            
+            const jobCodeOptions = jobCodesMaster.map(jc => {
+                const code = jc['job_code'] || jc['SMART Job Code'] || '-';
+                const title = jc['job_title'] || jc['Job Title'] || jc['job_name'] || '-';
+                const team = (jc['teams'] && jc['teams'].length > 0) ? jc['teams'][0] : jc['Team'] || '-';
+                return `${code} - ${title} (${team})`;
+            });
+            
+            populateDropdownWithSearch('job-codes-dropdown', jobCodeOptions);
+        }
+        
+        // Populate dropdown with search and improved selection functionality
+        function populateDropdownWithSearch(dropdownId, options) {
+            const panel = document.getElementById(dropdownId + '-panel');
+            const btn = document.getElementById(dropdownId + '-btn');
+            if (!panel || !btn) return;
+            
+            // Remove existing search input if present
+            const container = panel.parentElement;
+            let existingSearch = container.querySelector('.dropdown-search-input');
+            if (existingSearch) existingSearch.remove();
+            
+            // Create search input
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.className = 'dropdown-search-input form-control';
+            searchInput.placeholder = 'Search job codes...';
+            searchInput.style.cssText = 'margin: 8px; width: calc(100% - 16px); padding: 6px 10px;';
+            panel.parentElement.insertBefore(searchInput, panel);
+            
+            // Clear existing options
+            panel.innerHTML = '';
+            
+            // Add "All" checkbox
+            const allLabel = document.createElement('label');
+            allLabel.className = 'dropdown-option dropdown-option-all';
+            allLabel.style.cssText = 'display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; font-size: 0.95rem; color: #333; transition: background 0.15s; margin: 0;'
+            const allCheckbox = document.createElement('input');
+            allCheckbox.type = 'checkbox';
+            allCheckbox.value = 'All';
+            allCheckbox.style.cssText = 'width: 16px; height: 16px; cursor: pointer; flex-shrink: 0;';
+            allCheckbox.addEventListener('change', function() {
+                handleAllCheckbox(this, dropdownId, searchInput.value);
+            });
+            allLabel.appendChild(allCheckbox);
+            allLabel.appendChild(document.createTextNode('Select All'));
+            panel.appendChild(allLabel);
+            
+            // Add options
+            options.forEach((opt, idx) => {
+                const label = document.createElement('label');
+                label.className = 'dropdown-option';
+                label.style.cssText = 'display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; font-size: 0.95rem; color: #333; transition: background 0.15s; margin: 0;'
+                label.setAttribute('data-search-text', opt.toLowerCase());
+                label.addEventListener('mouseenter', function() {
+                    this.style.background = '#f8f9fa';
+                });
+                label.addEventListener('mouseleave', function() {
+                    this.style.background = 'transparent';
+                });
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = opt;
+                checkbox.style.cssText = 'width: 16px; height: 16px; cursor: pointer; flex-shrink: 0;';
+                checkbox.addEventListener('change', function() {
+                    updateRequestSummary();
+                    // Close dropdown after selection
+                    panel.style.display = 'none';
+                });
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(opt));
+                panel.appendChild(label);
+            });
+            
+            // Add search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const labels = panel.querySelectorAll('label.dropdown-option:not(.dropdown-option-all)');
+                labels.forEach(label => {
+                    const searchText = label.getAttribute('data-search-text');
+                    label.style.display = searchText.includes(searchTerm) ? 'flex' : 'none';
+                });
+            });
+            
+            // Toggle dropdown visibility
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!panel.parentElement.contains(e.target)) {
+                    panel.style.display = 'none';
+                }
+            });
+        }
+        
+        // Handle "Select All" checkbox with search awareness
+        function handleAllCheckbox(checkbox, dropdownId, searchTerm = '') {
+            const panel = document.getElementById(dropdownId + '-panel');
+            if (!panel) return;
+            
+            const isChecked = checkbox.checked;
+            const labels = panel.querySelectorAll('label.dropdown-option:not(.dropdown-option-all)');
+            
+            labels.forEach(label => {
+                // If searching, only check visible items
+                if (searchTerm) {
+                    if (label.style.display !== 'none') {
+                        label.querySelector('input').checked = isChecked;
+                    }
+                } else {
+                    // Otherwise check all items
+                    label.querySelector('input').checked = isChecked;
+                }
+            });
+            
+            updateRequestSummary();
+        }
+
+        // Update request summary display
+        function updateRequestSummary() {
+            const jobCodeChecked = document.getElementById('reqTypeJobCode').checked;
+            const teamingChecked = document.getElementById('reqTypeTeaming').checked;
+            const otherChecked = document.getElementById('reqTypeOther').checked;
+            const selectedJobCodes = getSelectedValues('job-codes-dropdown');
+            const description = document.getElementById('requestDescription').value;
+            
+            let summary = '<ul class="mb-0">';
+            
+            if (jobCodeChecked) {
+                summary += '<li>Request Type: <strong>Job Codes</strong></li>';
+            }
+            if (teamingChecked) {
+                summary += '<li>Request Type: <strong>Teaming</strong></li>';
+            }
+            if (otherChecked) {
+                const otherDesc = document.getElementById('otherTypeDescription').value || '(not specified)';
+                summary += `<li>Request Type: <strong>Other</strong> - ${otherDesc}</li>`;
+            }
+            
+            if (selectedJobCodes.length > 0) {
+                summary += `<li>Job Codes: <strong>${selectedJobCodes.length}</strong> selected</li>`;
+            }
+            
+            if (description) {
+                summary += `<li>Description: <strong>${description.substring(0, 50)}${description.length > 50 ? '...' : ''}</strong></li>`;
+            }
+            
+            summary += '</ul>';
+            
+            if (!jobCodeChecked && !teamingChecked && !otherChecked) {
+                summary = '<em class="text-muted">Select request types and provide details above</em>';
+            }
+            
+            document.getElementById('requestSummary').innerHTML = summary;
+        }
+
+        // Submit new request
+        async function submitNewRequest() {
+            // Validation
+            const jobCodeChecked = document.getElementById('reqTypeJobCode').checked;
+            const teamingChecked = document.getElementById('reqTypeTeaming').checked;
+            const otherChecked = document.getElementById('reqTypeOther').checked;
+            const description = document.getElementById('requestDescription').value.trim();
+            const selectedJobCodes = getSelectedValues('job-codes-dropdown');
+            
+            if (!jobCodeChecked && !teamingChecked && !otherChecked) {
+                showToast('Please select at least one request type', 'error');
+                return;
+            }
+            
+            if (otherChecked && !document.getElementById('otherTypeDescription').value.trim()) {
+                showToast('Please describe your request', 'error');
+                return;
+            }
+            
+            if ((jobCodeChecked || otherChecked) && selectedJobCodes.length === 0) {
+                showToast('Please select at least one job code', 'error');
+                return;
+            }
+            
+            if (!description) {
+                showToast('Please provide a description', 'error');
+                return;
+            }
+            
+            showLoading();
+            try {
+                // Prepare request data
+                const requestData = {
+                    submitter_name: currentUser.name,
+                    submitter_email: currentUser.email,
+                    request_types: {
+                        job_code: jobCodeChecked,
+                        teaming: teamingChecked,
+                        other: otherChecked,
+                        other_description: otherChecked ? document.getElementById('otherTypeDescription').value : null
+                    },
+                    selected_job_codes: selectedJobCodes,
+                    description: description
+                };
+                
+                // Submit to backend
+                const response = await api('/submit-new-request', {
+                    method: 'POST',
+                    body: JSON.stringify(requestData)
+                });
+                
+                showToast('Request submitted successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('newRequestModal')).hide();
+                
+                // Refresh relevant data
+                await loadRequests();
+                await loadAdminData();
+                
+            } catch (error) {
+                showToast('Failed to submit request: ' + error.message, 'error');
+            }
+            hideLoading();
+        }
+
         // Initialize
         checkAuth();
         loadWorkerData();  // Load worker data for tooltips
     </script>
+
+    <!-- New Request Modal -->
+    <div class="modal fade" id="newRequestModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Submit New Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newRequestForm">
+                        <!-- Submitter Information (Auto-filled) -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Submitter Name</label>
+                                <input type="text" class="form-control" id="submitterName" readonly style="background-color: #f8f9fa;">
+                            </div>
+                        </div>
+
+                        <!-- Request Type Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Request Type <span class="text-danger">*</span></label>
+                            <div class="row g-2">
+                                <div class="col-auto">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="reqTypeJobCode" value="Job Code" onchange="updateRequestTypeSelection()">
+                                        <label class="form-check-label" for="reqTypeJobCode">
+                                            Job Codes
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="reqTypeTeaming" value="Teaming" onchange="updateRequestTypeSelection()">
+                                        <label class="form-check-label" for="reqTypeTeaming">
+                                            Teaming
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="reqTypeOther" value="Other" onchange="updateRequestTypeSelection()">
+                                        <label class="form-check-label" for="reqTypeOther">
+                                            Other
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Other Type Description (conditional) -->
+                        <div class="mb-3" id="otherTypeDiv" style="display: none;">
+                            <label class="form-label">Please describe what you need <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="otherTypeDescription" placeholder="Please specify your request">
+                        </div>
+
+                        <hr>
+
+                        <!-- Job Code Selection (conditional) -->
+                        <div id="jobCodeSelectionDiv" style="display: none;" class="mb-3">
+                            <label class="form-label">Job Codes <span class="text-danger">*</span></label>
+                            <div class="dropdown-multi" id="job-codes-dropdown">
+                                <button type="button" class="dropdown-multi-btn" id="job-codes-dropdown-btn">Select Job Codes</button>
+                                <div class="dropdown-multi-panel" id="job-codes-dropdown-panel"></div>
+                            </div>
+                            <small class="form-text text-muted">Select one or more job codes with their associated role</small>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="requestDescription" rows="4" placeholder="Provide details about your request, including any context or reasoning..."></textarea>
+                        </div>
+
+                        <!-- Request Summary (read-only) -->
+                        <div class="alert alert-info">
+                            <strong>Request Summary:</strong>
+                            <div id="requestSummary">
+                                <em class="text-muted">Select options above to see summary</em>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-walmart" onclick="submitNewRequest()">Submit Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Feedback Modal -->
     <div id="feedbackModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">

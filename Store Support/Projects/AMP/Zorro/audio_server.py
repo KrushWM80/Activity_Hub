@@ -56,9 +56,15 @@ class AudioHandler(SimpleHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
 
-        # Strip the /Zorro/Audio_Message_Hub prefix for hostname-based URL support
-        if path.startswith("/Zorro/Audio_Message_Hub"):
-            path = path[len("/Zorro/Audio_Message_Hub"):] or "/"
+        # Strip the /Zorro/AudioMessageHub prefix for hostname-based URL support
+        if path.startswith("/Zorro/AudioMessageHub"):
+            path = path[len("/Zorro/AudioMessageHub"):] or "/"
+        # Legacy prefix redirect
+        elif path.startswith("/Zorro/Audio_Message_Hub"):
+            self.send_response(301)
+            self.send_header('Location', path.replace('/Zorro/Audio_Message_Hub', '/Zorro/AudioMessageHub', 1))
+            self.end_headers()
+            return
         
         # Serve favicon (reuse Spark logo PNG)
         if path == "/favicon.ico":
@@ -132,8 +138,10 @@ class AudioHandler(SimpleHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
 
-        # Strip the /Zorro/Audio_Message_Hub prefix for hostname-based URL support
-        if path.startswith("/Zorro/Audio_Message_Hub"):
+        # Strip the /Zorro/AudioMessageHub prefix for hostname-based URL support
+        if path.startswith("/Zorro/AudioMessageHub"):
+            path = path[len("/Zorro/AudioMessageHub"):]
+        elif path.startswith("/Zorro/Audio_Message_Hub"):
             path = path[len("/Zorro/Audio_Message_Hub"):]
         
         # Handle Jenny audio generation API
@@ -159,6 +167,11 @@ class AudioHandler(SimpleHTTPRequestHandler):
         # Handle sending email report
         if path == "/api/send-email-report":
             self.handle_send_email_report()
+            return
+        
+        # Handle test audio synthesis (preview only, no save)
+        if path == "/api/test-audio":
+            self.handle_test_audio()
             return
         
         # Default 404
@@ -775,6 +788,168 @@ class AudioHandler(SimpleHTTPRequestHandler):
             traceback.print_exc()
             self.send_json_response({'success': False, 'error': str(e)}, 500)
     
+    def handle_test_audio(self):
+        """Synthesize user text with local Jenny OneCore Neural voice for preview.
+        
+        Uses Windows.Media.SpeechSynthesis (WinRT) — fully offline, no internet required.
+        Returns base64-encoded MP3 audio for inline playback. Nothing is saved.
+        """
+        import tempfile
+        import base64
+        import subprocess
+        import shutil
+        
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length > 50_000:  # 50 KB limit on input
+                self.send_json_response({'success': False, 'error': 'Text too long (max ~10,000 characters)'}, 400)
+                return
+            body = self.rfile.read(content_length).decode('utf-8')
+            params = json.loads(body)
+            
+            text = params.get('text', '').strip()
+            if not text:
+                self.send_json_response({'success': False, 'error': 'No text provided'}, 400)
+                return
+            if len(text) > 10_000:
+                self.send_json_response({'success': False, 'error': 'Text too long (max 10,000 characters)'}, 400)
+                return
+            
+            # Apply standard body inflection (matches weekly script ways of working)
+            tier = params.get('tier', 'body')
+            tier_settings = {
+                'intro_outro':  {'rate': '-5%',  'pitch': '+2%'},
+                'group_header': {'rate': '-10%', 'pitch': '+1%'},
+                'area_header':  {'rate': '-5%',  'pitch': '+1%'},
+                'headline':     {'rate': '-4%',  'pitch': '+1%'},
+                'body':         {'rate': '+0%',  'pitch': '+0%'},
+            }
+            settings = tier_settings.get(tier, tier_settings['body'])
+            
+            # Sanitize text for SSML (escape XML special chars)
+            safe_text = (text
+                         .replace('&', '&amp;')
+                         .replace('<', '&lt;')
+                         .replace('>', '&gt;')
+                         .replace('"', '&quot;'))
+            
+            # Build SSML with prosody tier settings
+            ssml = (
+                '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">'
+                f'<prosody rate="{settings["rate"]}" pitch="{settings["pitch"]}">'
+                f'{safe_text}'
+                '</prosody></speak>'
+            )
+            
+            # Create temp directory for synthesis artifacts
+            temp_dir = tempfile.mkdtemp(prefix='test_audio_')
+            wav_path = os.path.join(temp_dir, 'test.wav')
+            mp3_path = os.path.join(temp_dir, 'test.mp3')
+            ssml_path = os.path.join(temp_dir, 'input.ssml')
+            ps1_path = os.path.join(temp_dir, 'synth.ps1')
+            
+            try:
+                # Write SSML to temp file (avoids PowerShell escaping issues)
+                with open(ssml_path, 'w', encoding='utf-8') as f:
+                    f.write(ssml)
+                
+                # Write PowerShell script to temp file (avoids all escaping issues)
+                ps_script = r"""$ErrorActionPreference = "Stop"
+Add-Type -AssemblyName System.Runtime.WindowsRuntime
+[Windows.Media.SpeechSynthesis.SpeechSynthesizer, Windows.Media.SpeechSynthesis, ContentType = WindowsRuntime] | Out-Null
+
+$voices = [Windows.Media.SpeechSynthesis.SpeechSynthesizer]::AllVoices
+$jenny = $null
+foreach ($v in $voices) {
+    if ($v.DisplayName -like '*Jenny*') { $jenny = $v; break }
+}
+if (-not $jenny) {
+    Write-Error 'Jenny Neural voice not found in Windows OneCore voices'
+    exit 1
+}
+
+$synth = New-Object Windows.Media.SpeechSynthesis.SpeechSynthesizer
+$synth.Voice = $jenny
+
+$ssmlContent = [System.IO.File]::ReadAllText($args[0], [System.Text.Encoding]::UTF8)
+$stream = $synth.SynthesizeSsmlToStreamAsync($ssmlContent).GetAwaiter().GetResult()
+
+$size = [uint32]$stream.Size
+$reader = [Windows.Storage.Streams.DataReader]::new($stream)
+$reader.LoadAsync($size).GetAwaiter().GetResult() | Out-Null
+$bytes = New-Object byte[] $size
+$reader.ReadBytes($bytes)
+[System.IO.File]::WriteAllBytes($args[1], $bytes)
+
+$reader.Dispose()
+$stream.Dispose()
+$synth.Dispose()
+Write-Host 'OK'
+"""
+                with open(ps1_path, 'w', encoding='utf-8') as f:
+                    f.write(ps_script)
+                
+                result = subprocess.run(
+                    ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass',
+                     '-File', ps1_path, ssml_path, wav_path],
+                    capture_output=True, text=True, timeout=60
+                )
+                
+                if result.returncode != 0 or not os.path.exists(wav_path) or os.path.getsize(wav_path) == 0:
+                    error_msg = result.stderr.strip() if result.stderr.strip() else 'Local synthesis failed'
+                    # Strip verbose PS error formatting
+                    for line in error_msg.split('\n'):
+                        line = line.strip()
+                        if line and not line.startswith('+') and not line.startswith('At '):
+                            error_msg = line
+                            break
+                    print(f"Test audio PS error: {result.stderr}")
+                    self.send_json_response({'success': False, 'error': error_msg}, 500)
+                    return
+                
+                # Convert WAV to MP3 via FFmpeg (smaller payload for base64 response)
+                ffmpeg_path = r'C:\ffmpeg\bin\ffmpeg.exe'
+                ffmpeg_cmd = [
+                    ffmpeg_path, '-i', wav_path,
+                    '-c:a', 'libmp3lame', '-b:a', '192k',
+                    '-y', mp3_path
+                ]
+                ff_result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, timeout=30)
+                
+                if ff_result.returncode != 0 or not os.path.exists(mp3_path):
+                    self.send_json_response({'success': False, 'error': 'FFmpeg WAV→MP3 conversion failed'}, 500)
+                    return
+                
+                # Read MP3 and return as base64
+                with open(mp3_path, 'rb') as f:
+                    audio_bytes = f.read()
+                
+                if len(audio_bytes) == 0:
+                    self.send_json_response({'success': False, 'error': 'Synthesis produced empty audio'}, 500)
+                    return
+                
+                audio_b64 = base64.b64encode(audio_bytes).decode('ascii')
+                
+                self.send_json_response({
+                    'success': True,
+                    'audio_base64': audio_b64,
+                    'mime': 'audio/mpeg',
+                    'size_kb': round(len(audio_bytes) / 1024, 1),
+                    'char_count': len(text),
+                    'tier': tier,
+                }, 200)
+            finally:
+                # Always clean up temp directory
+                shutil.rmtree(temp_dir, ignore_errors=True)
+        
+        except json.JSONDecodeError:
+            self.send_json_response({'success': False, 'error': 'Invalid JSON'}, 400)
+        except Exception as e:
+            print(f"Test audio error: {e}")
+            import traceback
+            traceback.print_exc()
+            self.send_json_response({'success': False, 'error': str(e)}, 500)
+    
     def serve_index(self):
         """Serve Audio Message Hub index page"""
         # Collect audio files from both /output/Audio/ and /Audio/mp4_output/
@@ -1106,11 +1281,34 @@ class AudioHandler(SimpleHTTPRequestHandler):
     </style>
 </head>
 <body>
+    <!-- User Identification Modal -->
+    <div id="user-id-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:#1F2937; border-radius:16px; padding:36px; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.6); border:1px solid #374151; text-align:center;">
+            <img src="/Spark_Blank.png" alt="Spark" style="width:48px; margin-bottom:12px;">
+            <h2 style="margin:0 0 8px; color:#F9FAFB; font-size:1.3em;">Welcome to Audio Message Hub</h2>
+            <p style="color:#9CA3AF; margin:0 0 20px; font-size:0.88em;">Please enter your name to continue.</p>
+            <input id="user-id-input" type="text" placeholder="e.g. Kendall Rush" style="width:100%; padding:12px; border-radius:8px; border:1px solid #4B5563; background:#111827; color:#F9FAFB; font-size:1em; box-sizing:border-box; text-align:center;" autofocus>
+            <button onclick="submitUserName()" style="width:100%; margin-top:14px; padding:12px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:1em; background:linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color:#111827;">Continue</button>
+        </div>
+    </div>
+
+    <!-- Access Denied Modal -->
+    <div id="access-denied-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1500; justify-content:center; align-items:center;">
+        <div style="background:#1F2937; border-radius:16px; padding:30px; max-width:440px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:1px solid #374151; text-align:center;">
+            <div style="font-size:2.5em; margin-bottom:10px;">🔒</div>
+            <h2 style="margin:0 0 8px; color:#F9FAFB; font-size:1.2em;">Access Restricted</h2>
+            <p style="color:#9CA3AF; margin:0 0 6px; font-size:0.9em;">This feature is restricted to authorized users.</p>
+            <p style="color:#60A5FA; margin:0 0 18px; font-size:0.9em;">Please reach out to <strong>Kendall Rush</strong> for access.</p>
+            <button onclick="document.getElementById('access-denied-modal').style.display='none'" style="width:100%; padding:10px; border-radius:8px; border:1px solid #4B5563; background:transparent; color:#9CA3AF; cursor:pointer; font-size:0.9em;">Close</button>
+        </div>
+    </div>
+
     <div class="header">
         <img src="/Spark_Blank.png" alt="Spark" class="header-logo"><br>
         <h1>Audio Message Hub</h1>
         <p>Creating Audio Activity for WM US Stores</p>
         <div class="branding">ZORRO ACTIVITY HUB</div>
+        <div id="user-greeting" style="margin-top:6px; font-size:0.85em; color:#FCD34D; display:none;"></div>
     </div>
     
     <div class="container">
@@ -1118,8 +1316,9 @@ class AudioHandler(SimpleHTTPRequestHandler):
             <h2>🎤 Generate New Audio</h2>
             <p>Create a new MP4 audio message with Jenny Neural voice.</p>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                <a href="/create-audio" class="generate-btn">🎤 Custom Audio</a>
-                <button class="generate-btn" id="btn-weekly" onclick="openWeeklyAudioModal()" style="background: linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%); border: none; cursor: pointer; font-weight: 600;">🎤 Weekly Message Audio</button>
+                <a href="/create-audio" class="generate-btn" onclick="return checkAccess(event)">🎤 Custom Audio</a>
+                <button class="generate-btn" id="btn-weekly" onclick="if(!checkAccess(event))return; openWeeklyAudioModal()" style="background: linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%); border: none; cursor: pointer; font-weight: 600;">🎤 Weekly Message Audio</button>
+                <button class="generate-btn" id="btn-test-audio" onclick="openTestAudioModal()" style="background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%); border: none; cursor: pointer; font-weight: 600;">🔊 Test Audio</button>
             </div>
             <div id="pipeline-status" style="margin-top: 12px; padding: 10px; border-radius: 8px; display: none; font-size: 0.9em;"></div>
         </div>
@@ -1166,6 +1365,32 @@ class AudioHandler(SimpleHTTPRequestHandler):
                 </div>
 
                 <button onclick="closeModal()" style="margin-top:18px; width:100%; padding:8px; border-radius:8px; border:1px solid #4B5563; background:transparent; color:#9CA3AF; cursor:pointer; font-size:0.9em;">Close</button>
+            </div>
+        </div>
+
+        <!-- Test Audio Modal -->
+        <div id="test-audio-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
+            <div style="background:#1F2937; border-radius:16px; padding:30px; max-width:580px; width:92%; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid #374151;">
+                <h2 style="margin:0 0 6px; color:#F9FAFB; font-size:1.3em;">🔊 Test Audio — Jenny Neural</h2>
+                <p style="color:#9CA3AF; margin:0 0 16px; font-size:0.85em;">Type or paste your message description to hear how Jenny will narrate it. Uses the same inflection rules as the Weekly Messages script. Nothing is saved or downloaded.</p>
+
+                <!-- Text Input -->
+                <textarea id="test-audio-text" placeholder="Enter your message text here...\\n\\nExample: Hello! Your Week 13 Weekly Messages are Here! Please visit the Landing Page to access full content." style="width:100%; height:140px; padding:12px; border-radius:8px; border:1px solid #4B5563; background:#111827; color:#F9FAFB; font-size:0.95em; font-family:inherit; resize:vertical; box-sizing:border-box;"></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                    <span id="test-audio-charcount" style="font-size:0.78em; color:#6B7280;">0 / 10,000 characters</span>
+                    <span style="font-size:0.78em; color:#6B7280;">🖥️ Local Jenny OneCore — No WiFi switch needed</span>
+                </div>
+
+                <!-- Synthesize Button -->
+                <button id="test-audio-btn" onclick="testAudioSynthesize()" style="width:100%; margin-top:14px; padding:12px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:1em; background:linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%); color:white;">🔊 Synthesize with Jenny</button>
+
+                <!-- Status / Audio Player -->
+                <div id="test-audio-status" style="margin-top:12px; display:none; padding:10px; border-radius:8px; font-size:0.85em; background:#111827; border:1px solid #374151;"></div>
+                <div id="test-audio-player-wrap" style="margin-top:10px; display:none;">
+                    <audio id="test-audio-player" controls style="width:100%; border-radius:8px;"></audio>
+                </div>
+
+                <button onclick="closeTestAudioModal()" style="margin-top:14px; width:100%; padding:8px; border-radius:8px; border:1px solid #4B5563; background:transparent; color:#9CA3AF; cursor:pointer; font-size:0.9em;">Close</button>
             </div>
         </div>
         
@@ -1303,10 +1528,65 @@ class AudioHandler(SimpleHTTPRequestHandler):
     
     <div class="footer">
         <p>🎙️ Narrated by: Jenny Neural Voice | Powered by Zorro Activity Hub</p>
-        <p style="font-size: 11px; margin-top: 10px; opacity: 0.7;">Server: http://localhost:8888</p>
+        <p style="font-size: 11px; margin-top: 10px; opacity: 0.7;">Server: http://10.97.114.181:8888/Zorro/AudioMessageHub</p>
     </div>
     
     <script>
+        // ── User Identification & Access Control ──────────────────────
+        var AUTHORIZED_USERS = ['kendall rush', 'matt farnworth', 'tammy claunch'];
+        var currentUser = localStorage.getItem('amh_user_name') || '';
+
+        function normalizeUserName(name) {
+            return name.replace(/[^a-z ]/gi, '').replace(/\\s+/g, ' ').trim().toLowerCase();
+        }
+
+        function isAuthorized() {
+            return AUTHORIZED_USERS.indexOf(normalizeUserName(currentUser)) >= 0;
+        }
+
+        function submitUserName() {
+            var val = document.getElementById('user-id-input').value.trim();
+            if (!val) { document.getElementById('user-id-input').style.borderColor='#EF4444'; return; }
+            currentUser = val;
+            localStorage.setItem('amh_user_name', val);
+            document.getElementById('user-id-modal').style.display = 'none';
+            showGreeting();
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('user-id-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') submitUserName();
+        });
+
+        function showGreeting() {
+            var el = document.getElementById('user-greeting');
+            var first = currentUser.split(' ')[0];
+            first = first.charAt(0).toUpperCase() + first.slice(1);
+            el.textContent = 'Welcome, ' + first;
+            el.style.display = 'block';
+        }
+
+        function checkAccess(e) {
+            if (isAuthorized()) return true;
+            if (e) e.preventDefault();
+            document.getElementById('access-denied-modal').style.display = 'flex';
+            return false;
+        }
+
+        // Show name prompt if no user stored
+        (function() {
+            if (!currentUser) {
+                document.getElementById('user-id-modal').style.display = 'flex';
+            } else {
+                showGreeting();
+            }
+        })();
+
+        // Close access-denied on backdrop click
+        document.getElementById('access-denied-modal').addEventListener('click', function(e) {
+            if (e.target === this) this.style.display = 'none';
+        });
+
         function copyStreamURL(btn) {
             const card = btn.closest('.file-card');
             const span = card.querySelector('.link-row span');
@@ -1547,6 +1827,82 @@ class AudioHandler(SimpleHTTPRequestHandler):
                 stepStatus(2, '<strong>❌ Network Error:</strong> ' + err.message, 'error');
             });
         }
+
+        // ── Test Audio Modal ───────────────────────────────────────────
+
+        function openTestAudioModal() {
+            document.getElementById('test-audio-modal').style.display = 'flex';
+            document.getElementById('test-audio-status').style.display = 'none';
+            document.getElementById('test-audio-player-wrap').style.display = 'none';
+            updateCharCount();
+        }
+
+        function closeTestAudioModal() {
+            document.getElementById('test-audio-modal').style.display = 'none';
+            // Stop any playing audio
+            var player = document.getElementById('test-audio-player');
+            player.pause();
+            player.removeAttribute('src');
+        }
+
+        // Close on backdrop click
+        document.getElementById('test-audio-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeTestAudioModal();
+        });
+
+        // Character counter
+        document.getElementById('test-audio-text').addEventListener('input', updateCharCount);
+        function updateCharCount() {
+            var len = (document.getElementById('test-audio-text').value || '').length;
+            document.getElementById('test-audio-charcount').textContent = len.toLocaleString() + ' / 10,000 characters';
+        }
+
+        function testAudioSynthesize() {
+            var text = document.getElementById('test-audio-text').value.trim();
+            if (!text) { alert('Please enter some text to synthesize.'); return; }
+            if (text.length > 10000) { alert('Text exceeds 10,000 character limit.'); return; }
+
+            var btn = document.getElementById('test-audio-btn');
+            var statusEl = document.getElementById('test-audio-status');
+            var playerWrap = document.getElementById('test-audio-player-wrap');
+            var player = document.getElementById('test-audio-player');
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Synthesizing with Jenny Neural...';
+            statusEl.style.display = 'block';
+            statusEl.style.borderColor = '#3B82F6';
+            statusEl.style.color = '#F3F4F6';
+            statusEl.innerHTML = '🎙️ Synthesizing ' + text.length.toLocaleString() + ' characters with local Jenny Neural...';
+            playerWrap.style.display = 'none';
+            player.pause();
+
+            fetch('/api/test-audio', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({text: text, tier: 'body'})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                btn.disabled = false;
+                btn.textContent = '🔊 Synthesize with Jenny';
+                if (data.success) {
+                    statusEl.style.borderColor = '#10B981';
+                    statusEl.innerHTML = '✅ <strong>Ready!</strong> ' + data.size_kb + ' KB &bull; ' + data.char_count.toLocaleString() + ' chars';
+                    player.src = 'data:' + data.mime + ';base64,' + data.audio_base64;
+                    playerWrap.style.display = 'block';
+                    player.play();
+                } else {
+                    statusEl.style.borderColor = '#EF4444';
+                    statusEl.innerHTML = '❌ <strong>Failed:</strong> ' + data.error;
+                }
+            })
+            .catch(function(err) {
+                btn.disabled = false;
+                btn.textContent = '🔊 Synthesize with Jenny';
+                statusEl.style.borderColor = '#EF4444';
+                statusEl.innerHTML = '❌ <strong>Network Error:</strong> ' + err.message;
+            });
+        }
     </script>
 </body>
 </html>
@@ -1643,12 +1999,12 @@ def start_server(port=8888):
        AMP AUDIO SERVER STARTED
 ========================================================
 
-Server Running on: http://localhost:{port}
+Server Running on: http://10.97.114.181:{port}/Zorro/AudioMessageHub
 
 Available URLs:
-  Web Player: http://localhost:{port}
-  Download:   http://localhost:{port}/audio/[filename]
-  Metadata:   http://localhost:{port}/metadata/[json]
+  Web Player: http://10.97.114.181:{port}/Zorro/AudioMessageHub
+  Download:   http://10.97.114.181:{port}/Zorro/AudioMessageHub/audio/[filename]
+  Metadata:   http://10.97.114.181:{port}/Zorro/AudioMessageHub/metadata/[json]
 
 Serving from:
   {AudioHandler.AUDIO_DIR}
