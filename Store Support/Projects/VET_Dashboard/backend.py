@@ -129,7 +129,7 @@ class VETDataManager:
                 tda.Health_Update AS `Health Status`,
                 tda.Phase,
                 tda.Facility_Phase AS `Facility Phase`,
-                FORMAT_DATE('%d/%m/%y', MIN(tda.Impl_Date)) AS `Start Date`,
+                FORMAT_DATE('%m/%d/%y', MIN(tda.Impl_Date)) AS `Start Date`,
                 COALESCE(MIN(CAST(ih.WM_Week AS STRING)), 'TBD') AS `WM Week`,
                 COUNT(DISTINCT CASE WHEN ih.Banner_Desc IN ('WM Supercenter', 'Wal-Mart') AND CAST(tda.Facility AS INT64) > 0 THEN CAST(tda.Facility AS INT64) END) AS `SC`,
                 COUNT(DISTINCT CASE WHEN ih.Banner_Desc = 'Neighborhood Market' AND CAST(tda.Facility AS INT64) > 0 THEN CAST(tda.Facility AS INT64) END) AS `NHM`,

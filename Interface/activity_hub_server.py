@@ -309,21 +309,19 @@ def api_projects():
         today = datetime.now()
         # Get current WM week from Cal_Dim_Data (authoritative source)
         cal_sql = """
-        SELECT DISTINCT WM_WEEK_NBR, FISCAL_YEAR_NBR
+        SELECT DISTINCT WM_WEEK_NBR
         FROM `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data`
         WHERE CALENDAR_DATE = CURRENT_DATE()
         """
         cal_result = list(bq_client.query(cal_sql).result())
         if cal_result:
             current_wm_week = cal_result[0].WM_WEEK_NBR
-            current_fiscal_year = cal_result[0].FISCAL_YEAR_NBR
         else:
             # Fallback if no match today
             today = datetime.now()
             fiscal_year_start = datetime(today.year if today.month >= 2 else today.year - 1, 2, 1)
             days_since_fy = (today - fiscal_year_start).days
             current_wm_week = (days_since_fy // 7) + 1
-            current_fiscal_year = today.year if today.month >= 2 else today.year - 1
         
         # Build WHERE clause filters for consistent use in both count and paginated queries
         where_filters = ""
@@ -347,7 +345,7 @@ def api_projects():
         count_result = list(bq_client.query(count_sql).result())
         total_count = count_result[0].total if count_result else 0
         
-        # Then get paginated results with Cal_Dim_Data join for WM week info
+        # Then get paginated results with WM week info from Cal_Dim_Data
         sql = f"""
         SELECT 
             p.project_id,
@@ -362,11 +360,7 @@ def api_projects():
             p.last_updated,
             p.project_update,
             p.project_update_date,
-            CASE 
-                WHEN c.WM_WEEK_NBR = {current_wm_week} AND c.FISCAL_YEAR_NBR = {current_fiscal_year}
-                THEN TRUE
-                ELSE FALSE
-            END as is_updated_this_week
+            COALESCE(c.WM_WEEK_NBR, NULL) as update_wm_week
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects` p
         LEFT JOIN `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data` c
             ON CAST(p.project_update_date AS DATE) = c.CALENDAR_DATE
@@ -382,9 +376,10 @@ def api_projects():
         projects = []
         
         for row in results:
-            # Get is_updated_this_week from query result (checks WK 13: 4/25-5/1)
-            is_updated_this_week = getattr(row, 'is_updated_this_week', False)
+            # Determine if project was updated this WM week using Cal_Dim_Data join result
             update_date = getattr(row, 'project_update_date', None)
+            update_wm_week = getattr(row, 'update_wm_week', None)
+            is_updated_this_week = (update_wm_week == current_wm_week) if update_wm_week else False
             
             # Apply updated_status filter
             if updated_status == 'updated' and not is_updated_this_week:
@@ -496,7 +491,7 @@ def api_metrics():
         return jsonify({'error': 'BigQuery client not initialized'}), 500
     
     try:
-        # Get current WM week and fiscal year from Cal_Dim_Data (authoritative source)
+        # Get current WM week from Cal_Dim_Data (authoritative source)
         cal_sql = """
         SELECT DISTINCT WM_WEEK_NBR, FISCAL_YEAR_NBR
         FROM `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data`
@@ -514,39 +509,48 @@ def api_metrics():
             current_wm_week = (days_since // 7) + 1
             current_fiscal_year = today.year if today.month >= 2 else today.year - 1
         
-        # Get all projects and count those updated in current WM week using Cal_Dim_Data
-        sql = f"""
+        # Get all projects with their update dates and join with Cal_Dim_Data for WM week
+        sql = """
         SELECT 
-            COUNT(*) as total,
-            SUM(CASE WHEN c.WM_WEEK_NBR = {current_wm_week} AND c.FISCAL_YEAR_NBR = {current_fiscal_year} THEN 1 ELSE 0 END) as projects_this_week,
-            COUNT(DISTINCT p.owner) as unique_owners
+            p.project_id,
+            p.project_update_date,
+            p.owner,
+            COALESCE(c.WM_WEEK_NBR, NULL) as update_wm_week
         FROM `wmt-assetprotection-prod.Store_Support_Dev.AH_Projects` p
         LEFT JOIN `wmt-assetprotection-prod.Store_Support_Dev.Cal_Dim_Data` c
             ON CAST(p.project_update_date AS DATE) = c.CALENDAR_DATE
-        WHERE p.project_id IS NOT NULL
+        ORDER BY p.project_id
         """
         
         results = list(bq_client.query(sql).result())
-        row = results[0] if results else None
         
-        if row:
-            total = row.total or 0
-            projects_this_week = row.projects_this_week or 0
-            unique_owners = row.unique_owners or 0
-        else:
-            total = 0
-            projects_this_week = 0
-            unique_owners = 0
+        # Count projects updated this week
+        total = len(results)
+        unique_owners = set()
+        projects_this_week = 0
+        
+        for row in results:
+            if row.project_update_date and row.update_wm_week == current_wm_week:
+                projects_this_week += 1
+            
+            # Count unique owners
+            if row.owner:
+                unique_owners.add(row.owner)
         
         percent = (projects_this_week * 100 / total) if total > 0 else 0
         
         return jsonify({
             'metrics': {
                 'active_projects': total,
-                'unique_owners': unique_owners,
+                'unique_owners': len(unique_owners),
                 'projects_updated_this_week': projects_this_week,
                 'percent_updated': round(percent, 2)
             },
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        return jsonify({
+            'metrics': {'active_projects': 0, 'unique_owners': 0, 'projects_updated_this_week': 0, 'percent_updated': 0},
             'timestamp': datetime.now().isoformat()
         })
     

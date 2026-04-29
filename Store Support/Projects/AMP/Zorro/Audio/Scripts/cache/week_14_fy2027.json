@@ -1,22 +1,22 @@
 {
   "week": 14,
   "fy": 2027,
-  "cached_at": "2026-04-28T06:00:19.678966",
-  "bq_last_updated": "2026-04-28T00:05:02.973000+00:00",
-  "event_count": 8,
-  "review_no_comm_count": 8,
+  "cached_at": "2026-04-29T06:00:20.813024",
+  "bq_last_updated": "2026-04-28T23:19:52.121000+00:00",
+  "event_count": 20,
+  "review_no_comm_count": 20,
   "status_breakdown": [
     {
-      "status": "Awaiting ATC Approval - Pending",
-      "count": 1
+      "status": "Draft - Pending",
+      "count": 2
     },
     {
       "status": "Awaiting Comms Approval - Pending",
-      "count": 1
+      "count": 9
     },
     {
-      "status": "Awaiting Comms Approval - Ready to Review",
-      "count": 3
+      "status": "Awaiting Comms Approval - In Progress",
+      "count": 1
     },
     {
       "status": "Awaiting Business Review - Pending",
@@ -24,15 +24,11 @@
     },
     {
       "status": "Awaiting Legal Approval - Pending",
-      "count": 3
+      "count": 1
     },
     {
       "status": "Review for Publish review - Pending",
-      "count": 4
-    },
-    {
-      "status": "Review for Publish review - Future Send",
-      "count": 1
+      "count": 9
     },
     {
       "status": "Expired - Pending",
@@ -40,24 +36,48 @@
     },
     {
       "status": "Review for Publish review - No Comms",
-      "count": 8
-    },
-    {
-      "status": "Expired - Future Send",
-      "count": 1
-    },
-    {
-      "status": "Review for Publish review - On Hold",
-      "count": 1
+      "count": 20
     },
     {
       "status": "Awaiting Comms Approval - On Hold",
       "count": 1
+    },
+    {
+      "status": "Expired - Future Send",
+      "count": 1
     }
   ],
-  "total_excl_denied": 28,
-  "summarized_count": 8,
+  "total_excl_denied": 46,
+  "summarized_count": 20,
   "events_with_summaries": [
+    {
+      "event_id": "e2b173da-dc9d-4c43-a51d-30a9046e829f",
+      "store_area": "Asset Protection",
+      "title": "Dept 95: Keurig Dr Pepper (KDP) GRS/Computer Assisted Ordering (CAO)",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 95 and Backroom: Starting May 3,\u00a0Keurig Dr Pepper orders will move to system-generated ordering through GRS, aligning with standard grocery processes. Early execution is critical, as the system takes two to three weeks to stabilize, so accurate on-hands, team alignment, and not refusing orders will directly impact in-stock. This applies to KDP company-owned stores only, with reps continuing to support and adjust as needed."
+    },
+    {
+      "event_id": "7612a232-e22c-4c2d-a416-5eb16fe5b874",
+      "store_area": "Backroom and Claims",
+      "title": "Backroom: Join the DSD Office Hours for Real-Time Support",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Backroom: DSD Office Hours provide fast, direct support for Direct Store Delivery issues by connecting stores with key partners every other Tuesday. The next session is May 12 from 2:00 to 3:00 p.m. Central on Teams, with ongoing sessions available for continued support."
+    },
+    {
+      "event_id": "97d1a03e-76e4-46e8-a980-2d08dc5ffc23",
+      "store_area": "Consumables",
+      "title": "Dept. 40: New Wellness Minis Endcap Has Arrived",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In department 40, the new Wellness Minis\u00a0endcap is\u00a0coming to stores in week 16, offering low cost trial size wellness items to drive impulse\u00a0add ons, bringing new customers into the category, and encouraging repeat purchases as shoppers trade up to full size.\u00a0Set the pre-filled display upon arrival. Insert price labels. Keep it stocked and zoned. Do not substitute items. Add aisle location for online pickup and delivery associates to locate."
+    },
+    {
+      "event_id": "ef713f58-ff4a-488b-b966-76c632c0bf61",
+      "store_area": "Consumables",
+      "title": "Dept. 40: Pusher Kits for Upcoming Mods",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In department 40, modular resets are beginning over the next couple of weeks which include foot care, vitamins, and digestive wellness. To make sure modulars are set to the most current planograms and deliver the best customer experience, please have teams order pushers as needed. Review the message for fixture order numbers."
+    },
     {
       "event_id": "5f4c87f1-adb8-49d7-9d65-da1ec413582f",
       "store_area": "Entertainment",
@@ -87,6 +107,20 @@
       "summary_text": "Department 29: Some boxes from the Period Company were mislabeled, so stores are asked to pull and hold impacted items until third-party Anderson re-tickets items starting May 3."
     },
     {
+      "event_id": "6570c8fc-c7c8-4751-95f8-bb8e6d538dee",
+      "store_area": "Fashion",
+      "title": "Dept. 32: Mother's Day Is a Time for Jewelry Sales",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 31: Stores should take the actions outlined in this message for a successful Mother's Day in Jewelry."
+    },
+    {
+      "event_id": "3206a552-5ab3-4a74-8700-0bda28b2dcb3",
+      "store_area": "Fashion",
+      "title": "Dept. 32: Planogram Delay",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "There has been a delay of the Jewelry Planogram booklets. Stores should start receiving them at the end of this week or next week. To keep a consistent and elevated presentation in stores, use the interim merchandise guidance in this message."
+    },
+    {
       "event_id": "dae13f9c-c834-48f7-99f3-36cf4f0a48aa",
       "store_area": "Food",
       "title": "Dept. 92: ARIH Brand Is Launching at Walmart",
@@ -94,11 +128,25 @@
       "summary_text": "The ARIH brand launched in Walmart stores on Friday, April 24. What is the ARIH Brand? A new global Korean fusion food and beverage brand launched this month\u00a0in collaboration with the K-pop group BTS. This launch is supported by four merchandising programs in select stores and online."
     },
     {
+      "event_id": "b206e114-b5c8-4d2c-8d47-cac0d99241bd",
+      "store_area": "Food",
+      "title": "Dept. 92: The Great American Grill Out \u2013 Celebrating America's Birthday",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 92: To celebrate America's 250th birthday, stores will have a new and improved Grilling Train. Items will include buns, Coca-Cola and\u00a0Frito Lay chips along with a selection of core condiments. Many of the items are on Rollback and will be a featured through May and June."
+    },
+    {
       "event_id": "51ef80b3-fea2-4d96-9444-c62c85d6cd1e",
       "store_area": "Food",
       "title": "Dept. 95: Coke x Panini FIFA 20oz Sticker Program",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Walmart and Coke are partnering to promote stickers for FIFA World Cup Panini Collector Albums. Stickers will be available on 20oz Coke or Coke Zero Sugar.."
+    },
+    {
+      "event_id": "957fe122-a1d6-4bd1-bd3e-45cd5f687f8a",
+      "store_area": "Food",
+      "title": "Dept. 95: Lay's LTO Flavors for FIFA Program ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Lay's Potato Chips is the official sponsor for FIFA and they are launching new flavors to drive sales and excitement with your customers. Stores should take action based on Saturday, May 2, feature plans."
     },
     {
       "event_id": "1fb2a010-bade-4cff-996b-2d1dcd38130b",
@@ -113,6 +161,34 @@
       "title": "Dept. 95: Summer \u201cFlavor\u201d 12oz 12pk Rollback $5.97",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Department 95: Coke 12oz, 12-pack Summer Flavors are on Rollback for $5.97. Rollback dates are from Monday, May 4 \u2013 Sunday, Sept. 20. Stores should work with their local Coca-Cola representative if they want extra displays to support Store Fulfillment and in-store demand."
+    },
+    {
+      "event_id": "1e8beb31-d345-407f-a5f5-0d88f3ed113e",
+      "store_area": "Food",
+      "title": "Dpt 92: FHSC Final Week \u2013 Finish Strong",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 92: This is the final week of fight hunger spark change. Associates should continue to follow the program guidelines to finish strong."
+    },
+    {
+      "event_id": "70be0944-4865-43a1-ad08-3af8a5a5f364",
+      "store_area": "Fresh",
+      "title": "Summer Grilling Basket Launch Plan",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In Fresh, the Summer Grilling Basket program launches May 4 and sets through July 5, offering a family-of-8 meal solution for under $5 per person. New this year: 10 of 13 items are consolidated in one shoppable location between the frozen and refrigerated bunker endcaps and includes supporting sidekick fixtures and a 4-way to deliver a strong in-store grilling statement and elevate the customer experience!\u00a0 Ensure the grilling 4-way, bunkers, endcaps and sidekicks are set to plan, items stocked, high standards are maintained and the Summer Grilling Basket signing kit is in place through July 5."
+    },
+    {
+      "event_id": "bbf004aa-5136-4ee2-a214-9c4fdff20433",
+      "store_area": "Total Store",
+      "title": "Associate to Driver Program: Applications Now Open",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Total Store: Associate to Driver applications are open May 2-8. Selected associates begin training August 10 and receive a Private Fleet driver offer upon graduation. Have associates review the toolkit before applying."
+    },
+    {
+      "event_id": "ecadfc2e-d68d-4997-811a-c2001108d308",
+      "store_area": "Total Store",
+      "title": "Week 14 - Total Fresh: Prep for May Fresh Cost Inventory",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "May's Fresh Cost Inventory will be conducted on Tuesday, May 26. To prepare, staff up, check the Inventory Tracking Report, follow guidance provided in the Fresh Better Way guide and reach out with questions."
     }
   ],
   "events_without_summary": []

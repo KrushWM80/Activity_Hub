@@ -10,10 +10,10 @@ Email sending configuration for DC-segmented notifications.
 # ============================================================================
 
 # Email address to send FROM
-SEND_FROM_EMAIL = "supplychainops@email.wal-mart.com"
+SEND_FROM_EMAIL = "atcteamsupport@walmart.com"
 
 # Display name for sender
-SEND_FROM_NAME = "ELM Manager Change Tracking System"
+SEND_FROM_NAME = "ATC Team Support - Manager Change Notifications"
 
 # ============================================================================
 # RECIPIENT CONFIGURATION

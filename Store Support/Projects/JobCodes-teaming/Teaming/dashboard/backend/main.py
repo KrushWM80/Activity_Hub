@@ -25,7 +25,7 @@ import threading
 # BigQuery for employee lookup
 try:
     from google.cloud import bigquery
-    HAS_BIGQUERY = True
+    HAS_BIGQUERY = False  # Disabled due to missing db-dtypes package - not needed for consolidation testing
 except ImportError:
     HAS_BIGQUERY = False
 
@@ -2338,7 +2338,7 @@ async def get_job_code_requests(request: Request):
         requests = [r for r in requests if r['status'] == status]
     
     # Non-admins only see their own requests
-    if user['role'] != 'admin':
+    if not user_has_admin_access(user, "Job Codes"):
         requests = [r for r in requests if r['requested_by'] == user['username']]
     
     return {"requests": requests}
@@ -2644,151 +2644,123 @@ def save_feedback(feedback_list):
 
 @app.post("/api/submit-new-request")
 async def submit_new_request(request: Request):
-    """Submit a new request from the welcome page for job codes, teaming, or other"""
+    """Submit a new request - Job Code or Teaming"""
     try:
         user = require_auth(request)
         data = await request.json()
         
-        # Use authenticated user's information (not frontend submission)
+        # Use authenticated user's information
         submitter_name = user.get("name", "Unknown")
         submitter_email = user.get("email", "")
         submitter_username = user.get("username", "")
         
         # Extract request data
-        request_types = data.get("request_types", {})
-        selected_job_codes = data.get("selected_job_codes", [])
-        description = data.get("description", "")
+        request_type = data.get("request_type", "")  # "Job Code - ..." or "Teaming - ..."
+        reason = data.get("reason", "")  # specific reason (new_job_code, update_teaming, etc.)
+        description = data.get("description", "")  # description
+        notes = data.get("notes", "")
         
-        # Parse job codes to extract code and role information
-        # Format: "1-202-2104 - Food & Consumables Coach (Produce)"
-        requests_created = []
+        if not request_type:
+            return {"success": False, "error": "Request type is required"}
         
-        # Handle the case where at least one request type is selected
-        has_job_codes = len(selected_job_codes) > 0
+        request_id = int(datetime.now().timestamp() * 1000)
         
-        # If job codes are selected, create requests for each code
-        if has_job_codes:
-            for job_code_entry in selected_job_codes:
-                # Extract just the job code (first part before " - ")
-                job_code = job_code_entry.split(" - ")[0] if " - " in job_code_entry else job_code_entry
-                
-                # Create request for Job Codes if selected
-                if request_types.get("job_code"):
-                    job_code_request = {
-                        "id": int(datetime.now().timestamp() * 1000),
-                        "job_code": job_code,
-                        "request_type": "job_code_update",
-                        "status": "pending",
-                        "requested_by": submitter_username,
-                        "requested_by_name": submitter_name,
-                        "requested_at": datetime.now().isoformat(),
-                        "reason": description,
-                        "notes": f"Submitted from New Request form by {submitter_name}",
-                        "request_source": "new_request_form"
-                    }
-                    
-                    # Add to job code requests
-                    all_job_code_reqs = load_json_file(JOB_CODE_REQUESTS_FILE, [])
-                    all_job_code_reqs.append(job_code_request)
-                    save_json_file(JOB_CODE_REQUESTS_FILE, all_job_code_reqs)
-                    requests_created.append(f"Job Code request for {job_code}")
-                
-                # Create request for Teaming if selected
-                if request_types.get("teaming"):
-                    teaming_request = {
-                        "id": int(datetime.now().timestamp() * 1000),
-                        "job_code": job_code,
-                        "team_name": "-",  # To be filled by admin
-                        "workgroup_name": "-",  # To be filled by admin
-                        "status": "pending",
-                        "requested_by": submitter_username,
-                        "requested_by_name": submitter_name,
-                        "requested_at": datetime.now().isoformat(),
-                        "notes": f"Submitted from New Request form: {description}",
-                        "request_source": "new_request_form"
-                    }
-                    
-                    # Add to teaming requests
-                    all_teaming_reqs = load_json_file(REQUEST_FILE, [])
-                    all_teaming_reqs.append(teaming_request)
-                    save_json_file(REQUEST_FILE, all_teaming_reqs)
-                    requests_created.append(f"Teaming request for {job_code}")
-                
-                # Create request for Other if selected - goes to BOTH tabs
-                if request_types.get("other"):
-                    other_description = request_types.get("other_description", "")
-                    other_request = {
-                        "id": int(datetime.now().timestamp() * 1000),
-                        "job_code": job_code,
-                        "request_type": "other",
-                        "other_description": other_description,
-                        "status": "pending",
-                        "requested_by": submitter_username,
-                        "requested_by_name": submitter_name,
-                        "requested_at": datetime.now().isoformat(),
-                        "reason": description,
-                        "notes": f"Other request: {other_description}",
-                        "request_source": "new_request_form"
-                    }
-                    
-                    # Store in BOTH job code and teaming requests (since admin won't know which)
-                    all_other_reqs = load_json_file(JOB_CODE_REQUESTS_FILE, [])
-                    all_other_reqs.append(other_request)
-                    save_json_file(JOB_CODE_REQUESTS_FILE, all_other_reqs)
-                    
-                    all_teaming_reqs = load_json_file(REQUEST_FILE, [])
-                    all_teaming_reqs.append(other_request)
-                    save_json_file(REQUEST_FILE, all_teaming_reqs)
-                    
-                    requests_created.append(f"Other request: {other_description}")
-        
-        # Handle Other when no job codes are provided
-        if request_types.get("other") and not has_job_codes:
-            other_description = request_types.get("other_description", "")
-            other_request = {
-                "id": int(datetime.now().timestamp() * 1000),
-                "job_code": "OTHER",
-                "request_type": "other",
-                "other_description": other_description,
+        if request_type.startswith("Job Code"):
+            # Job Code Request (simplified - details will be filled by admin/reviewer)
+            job_codes = data.get("job_codes", [])
+            
+            new_request = {
+                "id": request_id,
+                "request_type": request_type,  # e.g., "Job Code - new_job_code"
+                "reason": reason,
                 "status": "pending",
                 "requested_by": submitter_username,
                 "requested_by_name": submitter_name,
                 "requested_at": datetime.now().isoformat(),
-                "reason": description,
-                "notes": f"Other request: {other_description}",
+                "description": description,
+                "notes": notes,
+                "comments": [],
+                "history": [],
                 "request_source": "new_request_form"
             }
             
-            # Store in BOTH tabs so admin can review and decide
-            all_other_reqs = load_json_file(JOB_CODE_REQUESTS_FILE, [])
-            all_other_reqs.append(other_request)
-            save_json_file(JOB_CODE_REQUESTS_FILE, all_other_reqs)
+            # Add job_codes if provided (for update requests)
+            if job_codes:
+                new_request["job_codes"] = job_codes if isinstance(job_codes, list) else [job_codes]
             
-            all_teaming_reqs = load_json_file(REQUEST_FILE, [])
-            all_teaming_reqs.append(other_request)
-            save_json_file(REQUEST_FILE, all_teaming_reqs)
+            all_reqs = load_job_code_requests()
+            all_reqs.append(new_request)
+            save_job_code_requests(all_reqs)
             
-            requests_created.append(f"Other request: {other_description}")
+            return {
+                "success": True,
+                "message": "Job code request submitted successfully!",
+                "request_id": request_id
+            }
+            
+        elif request_type.startswith("Teaming"):
+            # Teaming Request
+            job_codes = data.get("job_codes", [])
+            teams = data.get("teams", [])
+            reason = data.get("reason", "")
+            
+            # For "update_teaming" and "missing_teaming" reasons, require job codes and teams
+            # For "other" reason, job codes and teams are not required
+            if reason in ("update_teaming", "missing_teaming"):
+                if not job_codes or not teams:
+                    error_msg = "Job Codes and Teams are required for Update Teaming" if reason == "update_teaming" else "Job Codes and Teams are required for Missing Teaming"
+                    return {"success": False, "error": error_msg}
+            
+            new_request = {
+                "id": request_id,
+                "request_type": request_type,  # e.g., "Teaming - update_teaming"
+                "reason": reason,
+                "status": "pending",
+                "requested_by": submitter_username,
+                "requested_by_name": submitter_name,
+                "requested_at": datetime.now().isoformat(),
+                "notes": notes,
+                "comments": [],
+                "history": [],
+                "request_source": "new_request_form"
+            }
+            
+            # Add description if provided
+            if description:
+                new_request["description"] = description
+            
+            # Add job_codes if provided
+            if job_codes:
+                new_request["job_codes"] = job_codes if isinstance(job_codes, list) else [job_codes]
+            
+            # Add teams if provided
+            if teams:
+                new_request["teams"] = teams if isinstance(teams, list) else [teams]
+            
+            # Save to same file as job code requests
+            all_reqs = load_job_code_requests()
+            all_reqs.append(new_request)
+            save_job_code_requests(all_reqs)
+            
+            return {
+                "success": True,
+                "message": "Teaming request submitted successfully!",
+                "request_id": request_id
+            }
         
-        # Send notification email to admins
-        send_new_request_notification(submitter_name, submitter_email, request_types, selected_job_codes, description, requests_created)
-        
-        return {
-            "success": True,
-            "message": f"Request submitted successfully! ({len(requests_created)} request(s) created)",
-            "requests_created": requests_created
-        }
-    except HTTPException:
-        raise
+        else:
+            return {"success": False, "error": "Invalid request type"}
+            return {"success": False, "error": "Invalid request type"}
+            
     except Exception as e:
-        print(f"âŒ Error submitting new request: {str(e)}")
+        logger.error(f"Error in submit_new_request: {str(e)}")
         return {"success": False, "error": str(e)}
 
-def send_new_request_notification(submitter_name, submitter_email, request_types, selected_job_codes, description, requests_created):
-    """Send email notification when a new request is submitted"""
+def send_new_request_notification(submitter_name, submitter_email, request_types, job_codes_list, description, created_request_ids):
+    """Send email notification with request links and consolidated info"""
     try:
-        # Query users with Admin - Job Codes or Reviewer - Job Codes roles
-        recipients = ["ATCteamsupport@walmart.com"]  # Default recipient
+        # Query admin users
+        recipients = ["ATCteamsupport@walmart.com"]
         
         try:
             users_data = load_json_file(USERS_FILE)
@@ -2801,24 +2773,43 @@ def send_new_request_notification(submitter_name, submitter_email, request_types
                         if email:
                             admin_users.append(email)
                 
-                # Use found admins, but keep default if none found
                 if admin_users:
-                    recipients = list(set(admin_users))  # Remove duplicates
+                    recipients = list(set(admin_users))
                     print(f"Found {len(recipients)} admin users for notification")
         except Exception as e:
-            print(f"Warning: Could not load admin users from database: {str(e)}. Using default recipients.")
+            print(f"Warning: Could not load admin users: {str(e)}")
         
+        # Build request types and links
         request_type_list = []
+        request_links = []
+        
         if request_types.get("job_code"):
             request_type_list.append("Job Codes")
+            req_id = created_request_ids.get("job_code")
+            if req_id:
+                request_links.append(f"Review Job Code Request: http://weus42608431466:8080/Aligned#admin/{req_id}")
+        
         if request_types.get("teaming"):
             request_type_list.append("Teaming")
+            req_id = created_request_ids.get("teaming")
+            if req_id:
+                request_links.append(f"Review Teaming Request: http://weus42608431466:8080/Aligned#admin/{req_id}")
+        
         if request_types.get("other"):
-            request_type_list.append(f"Other: {request_types.get('other_description', 'N/A')}")
+            request_type_list.append("Other")
+            req_id = created_request_ids.get("other")
+            if req_id:
+                request_links.append(f"Review Other Request: http://weus42608431466:8080/Aligned#admin/{req_id}")
         
         request_types_str = ", ".join(request_type_list)
-        job_codes_str = "\n".join(selected_job_codes) if selected_job_codes else "(None selected)"
         
+        # Show first 8 codes
+        if len(job_codes_list) > 8:
+            codes_display = "\n".join(job_codes_list[:8]) + f"\n... and {len(job_codes_list) - 8} more"
+        else:
+            codes_display = "\n".join(job_codes_list) if job_codes_list else "(None)"
+        
+        links_str = "\n".join(request_links)
         subject = f"New Request Submitted: {request_types_str}"
         
         body = f"""
@@ -2828,15 +2819,15 @@ Submitter: {submitter_name}
 Email: {submitter_email}
 Request Types: {request_types_str}
 
-Selected Job Codes:
-{job_codes_str}
+Job Codes ({len(job_codes_list)} total):
+{codes_display}
 
 Description:
 {description}
 
 ---
-Requests Created:
-{chr(10).join(['- ' + r for r in requests_created])}
+REVIEW REQUEST:
+{links_str}
 
 ---
 This is an automated notification from the Job Codes Teaming Dashboard.
@@ -2856,6 +2847,83 @@ Please review and respond to the submitted request.
         print(f"✅ New request notification sent to {', '.join(recipients)}")
     except Exception as e:
         print(f"⚠️ Failed to send new request notification: {str(e)}")
+
+@app.post("/api/job-codes-master/requests/{request_id}/update-status")
+async def update_request_status(request_id: int, request: Request):
+    """Update request status with history logging"""
+    user = require_admin(request)
+    data = await request.json()
+    
+    requests = load_json_file(JOB_CODE_REQUESTS_FILE, [])
+    req = next((r for r in requests if r['id'] == request_id), None)
+    
+    if not req:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    old_status = req.get('status')
+    new_status = data.get('status')
+    
+    if 'history' not in req:
+        req['history'] = []
+    
+    req['history'].append({
+        "timestamp": datetime.now().isoformat(),
+        "changed_by": user.get('username'),
+        "changed_by_name": user.get('name'),
+        "field": "status",
+        "old_value": old_status,
+        "new_value": new_status
+    })
+    
+    req['status'] = new_status
+    save_json_file(JOB_CODE_REQUESTS_FILE, requests)
+    
+    return {"success": True, "message": f"Status updated to {new_status}"}
+
+@app.post("/api/job-codes-master/requests/{request_id}/add-comment")
+async def add_request_comment(request_id: int, request: Request):
+    """Add a comment to a request (visible to submitter)"""
+    user = require_auth(request)
+    data = await request.json()
+    
+    requests = load_json_file(JOB_CODE_REQUESTS_FILE, [])
+    req = next((r for r in requests if r['id'] == request_id), None)
+    
+    if not req:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    if 'comments' not in req:
+        req['comments'] = []
+    
+    comment = {
+        "timestamp": datetime.now().isoformat(),
+        "author": user.get('username'),
+        "author_name": user.get('name'),
+        "text": data.get('text'),
+        "is_internal": data.get('is_internal', False)
+    }
+    
+    req['comments'].append(comment)
+    save_json_file(JOB_CODE_REQUESTS_FILE, requests)
+    
+    return {"success": True, "message": "Comment added", "comment": comment}
+
+@app.get("/api/job-codes-master/requests/{request_id}/history")
+async def get_request_history(request_id: int, request: Request):
+    """Get change history for a request"""
+    user = get_current_user(request)
+    
+    requests = load_json_file(JOB_CODE_REQUESTS_FILE, [])
+    req = next((r for r in requests if r['id'] == request_id), None)
+    
+    if not req:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    return {
+        "request_id": request_id,
+        "history": req.get('history', []),
+        "comments": req.get('comments', [])
+    }
 
 @app.post("/api/submit-feedback")
 async def submit_feedback(request: Request):

@@ -789,19 +789,33 @@ class AudioHandler(SimpleHTTPRequestHandler):
             self.send_json_response({'success': False, 'error': str(e)}, 500)
     
     def handle_test_audio(self):
-        """Synthesize user text with local Jenny OneCore Neural voice for preview.
+        """Synthesize user text with Jenny Neural voice via edge-tts for preview.
         
-        Uses Windows.Media.SpeechSynthesis (WinRT) — fully offline, no internet required.
+        Uses edge-tts (speech.platform.bing.com) — requires Walmartwifi.
+        Fast 2-second connectivity check prevents 30-second timeout on Eagle WiFi.
         Returns base64-encoded MP3 audio for inline playback. Nothing is saved.
+        Jenny Neural only — no fallback to other voices.
         """
         import tempfile
         import base64
         import subprocess
         import shutil
+        import socket
+        import asyncio
         
         try:
+            # Fast connectivity check — prevents 30-second edge-tts timeout on Eagle WiFi
+            try:
+                socket.create_connection(("speech.platform.bing.com", 443), timeout=2).close()
+            except (socket.timeout, socket.error, OSError):
+                self.send_json_response({
+                    'success': False,
+                    'error': 'Test Audio requires internet access to speech.platform.bing.com. Switch to Walmartwifi and try again.'
+                }, 503)
+                return
+            
             content_length = int(self.headers.get('Content-Length', 0))
-            if content_length > 50_000:  # 50 KB limit on input
+            if content_length > 50_000:
                 self.send_json_response({'success': False, 'error': 'Text too long (max ~10,000 characters)'}, 400)
                 return
             body = self.rfile.read(content_length).decode('utf-8')
@@ -815,118 +829,43 @@ class AudioHandler(SimpleHTTPRequestHandler):
                 self.send_json_response({'success': False, 'error': 'Text too long (max 10,000 characters)'}, 400)
                 return
             
-            # Apply standard body inflection (matches weekly script ways of working)
             tier = params.get('tier', 'body')
             tier_settings = {
-                'intro_outro':  {'rate': '-5%',  'pitch': '+2%'},
-                'group_header': {'rate': '-10%', 'pitch': '+1%'},
-                'area_header':  {'rate': '-5%',  'pitch': '+1%'},
-                'headline':     {'rate': '-4%',  'pitch': '+1%'},
-                'body':         {'rate': '+0%',  'pitch': '+0%'},
+                'intro_outro':  {'rate': '-5%',  'pitch': '+2Hz'},
+                'group_header': {'rate': '-10%', 'pitch': '+1Hz'},
+                'area_header':  {'rate': '-5%',  'pitch': '+1Hz'},
+                'headline':     {'rate': '-4%',  'pitch': '+1Hz'},
+                'body':         {'rate': '+0%',  'pitch': '+0Hz'},
             }
             settings = tier_settings.get(tier, tier_settings['body'])
             
-            # Sanitize text for SSML (escape XML special chars)
-            safe_text = (text
-                         .replace('&', '&amp;')
-                         .replace('<', '&lt;')
-                         .replace('>', '&gt;')
-                         .replace('"', '&quot;'))
-            
-            # Build SSML with prosody tier settings
-            ssml = (
-                '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">'
-                f'<prosody rate="{settings["rate"]}" pitch="{settings["pitch"]}">'
-                f'{safe_text}'
-                '</prosody></speak>'
-            )
-            
             # Create temp directory for synthesis artifacts
             temp_dir = tempfile.mkdtemp(prefix='test_audio_')
-            wav_path = os.path.join(temp_dir, 'test.wav')
             mp3_path = os.path.join(temp_dir, 'test.mp3')
-            ssml_path = os.path.join(temp_dir, 'input.ssml')
-            ps1_path = os.path.join(temp_dir, 'synth.ps1')
             
             try:
-                # Write SSML to temp file (avoids PowerShell escaping issues)
-                with open(ssml_path, 'w', encoding='utf-8') as f:
-                    f.write(ssml)
+                import edge_tts
                 
-                # Write PowerShell script to temp file (avoids all escaping issues)
-                ps_script = r"""$ErrorActionPreference = "Stop"
-Add-Type -AssemblyName System.Runtime.WindowsRuntime
-[Windows.Media.SpeechSynthesis.SpeechSynthesizer, Windows.Media.SpeechSynthesis, ContentType = WindowsRuntime] | Out-Null
-
-$voices = [Windows.Media.SpeechSynthesis.SpeechSynthesizer]::AllVoices
-$jenny = $null
-foreach ($v in $voices) {
-    if ($v.DisplayName -like '*Jenny*') { $jenny = $v; break }
-}
-if (-not $jenny) {
-    Write-Error 'Jenny Neural voice not found in Windows OneCore voices'
-    exit 1
-}
-
-$synth = New-Object Windows.Media.SpeechSynthesis.SpeechSynthesizer
-$synth.Voice = $jenny
-
-$ssmlContent = [System.IO.File]::ReadAllText($args[0], [System.Text.Encoding]::UTF8)
-$stream = $synth.SynthesizeSsmlToStreamAsync($ssmlContent).GetAwaiter().GetResult()
-
-$size = [uint32]$stream.Size
-$reader = [Windows.Storage.Streams.DataReader]::new($stream)
-$reader.LoadAsync($size).GetAwaiter().GetResult() | Out-Null
-$bytes = New-Object byte[] $size
-$reader.ReadBytes($bytes)
-[System.IO.File]::WriteAllBytes($args[1], $bytes)
-
-$reader.Dispose()
-$stream.Dispose()
-$synth.Dispose()
-Write-Host 'OK'
-"""
-                with open(ps1_path, 'w', encoding='utf-8') as f:
-                    f.write(ps_script)
+                # edge-tts uses rate as string like "-5%" and pitch as "+2Hz"
+                rate_str = settings['rate']
+                pitch_str = settings['pitch']
                 
-                result = subprocess.run(
-                    ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass',
-                     '-File', ps1_path, ssml_path, wav_path],
-                    capture_output=True, text=True, timeout=60
-                )
+                async def _synth():
+                    communicate = edge_tts.Communicate(
+                        text, 'en-US-JennyNeural',
+                        rate=rate_str, pitch=pitch_str
+                    )
+                    await communicate.save(mp3_path)
                 
-                if result.returncode != 0 or not os.path.exists(wav_path) or os.path.getsize(wav_path) == 0:
-                    error_msg = result.stderr.strip() if result.stderr.strip() else 'Local synthesis failed'
-                    # Strip verbose PS error formatting
-                    for line in error_msg.split('\n'):
-                        line = line.strip()
-                        if line and not line.startswith('+') and not line.startswith('At '):
-                            error_msg = line
-                            break
-                    print(f"Test audio PS error: {result.stderr}")
-                    self.send_json_response({'success': False, 'error': error_msg}, 500)
-                    return
+                asyncio.run(_synth())
                 
-                # Convert WAV to MP3 via FFmpeg (smaller payload for base64 response)
-                ffmpeg_path = r'C:\ffmpeg\bin\ffmpeg.exe'
-                ffmpeg_cmd = [
-                    ffmpeg_path, '-i', wav_path,
-                    '-c:a', 'libmp3lame', '-b:a', '192k',
-                    '-y', mp3_path
-                ]
-                ff_result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, timeout=30)
-                
-                if ff_result.returncode != 0 or not os.path.exists(mp3_path):
-                    self.send_json_response({'success': False, 'error': 'FFmpeg WAV→MP3 conversion failed'}, 500)
+                if not os.path.exists(mp3_path) or os.path.getsize(mp3_path) == 0:
+                    self.send_json_response({'success': False, 'error': 'Jenny Neural synthesis produced empty audio'}, 500)
                     return
                 
                 # Read MP3 and return as base64
                 with open(mp3_path, 'rb') as f:
                     audio_bytes = f.read()
-                
-                if len(audio_bytes) == 0:
-                    self.send_json_response({'success': False, 'error': 'Synthesis produced empty audio'}, 500)
-                    return
                 
                 audio_b64 = base64.b64encode(audio_bytes).decode('ascii')
                 
@@ -939,7 +878,6 @@ Write-Host 'OK'
                     'tier': tier,
                 }, 200)
             finally:
-                # Always clean up temp directory
                 shutil.rmtree(temp_dir, ignore_errors=True)
         
         except json.JSONDecodeError:
@@ -1378,7 +1316,7 @@ Write-Host 'OK'
                 <textarea id="test-audio-text" placeholder="Enter your message text here...\\n\\nExample: Hello! Your Week 13 Weekly Messages are Here! Please visit the Landing Page to access full content." style="width:100%; height:140px; padding:12px; border-radius:8px; border:1px solid #4B5563; background:#111827; color:#F9FAFB; font-size:0.95em; font-family:inherit; resize:vertical; box-sizing:border-box;"></textarea>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
                     <span id="test-audio-charcount" style="font-size:0.78em; color:#6B7280;">0 / 10,000 characters</span>
-                    <span style="font-size:0.78em; color:#6B7280;">🖥️ Local Jenny OneCore — No WiFi switch needed</span>
+                    <span style="font-size:0.78em; color:#6B7280;">🌐 Jenny Neural via edge-tts — Requires Walmartwifi</span>
                 </div>
 
                 <!-- Synthesize Button -->
@@ -1872,7 +1810,7 @@ Write-Host 'OK'
             statusEl.style.display = 'block';
             statusEl.style.borderColor = '#3B82F6';
             statusEl.style.color = '#F3F4F6';
-            statusEl.innerHTML = '🎙️ Synthesizing ' + text.length.toLocaleString() + ' characters with local Jenny Neural...';
+            statusEl.innerHTML = '🎙️ Synthesizing ' + text.length.toLocaleString() + ' characters with Jenny Neural...';
             playerWrap.style.display = 'none';
             player.pause();
 

@@ -925,7 +925,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    const recipients = data.recipients || [];
+                    const recipients = data.data || [];
                     const active = recipients.filter(r => r.is_active).length;
                     
                     document.getElementById('totalRecipients').textContent = recipients.length;

@@ -21,6 +21,7 @@ Schedule:
 import sys
 import os
 import json
+import base64
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -30,6 +31,37 @@ import dc_leadership_config as dc_config
 from email_helper import EmailHelper
 from compare_snapshots import ManagerChange, SnapshotComparator
 from dc_change_grouper import group_changes_by_dc, load_dc_lookup
+from dc_leadership_config import get_dc_emails  # <-- ADDED: Get DC email addresses
+
+
+# ── TEST MODE ────────────────────────────────────────────────────────────────
+# CRITICAL: TEST_MODE is ONLY for interactive testing with Kendall
+# 
+# TEST MODE (Manual use only):
+#   Set: $env:TEST_MODE='true' at command line before running script
+#   Email goes to: Kendall.Rush@walmart.com ONLY
+#   No DC leadership receives emails
+#   Uses: Synthetic test data
+#   When: Developer testing during work sessions
+#
+# PRODUCTION MODE (Task Scheduler only):
+#   Default: TEST_MODE not set (environment variable missing)
+#   Email goes to: atcteamsupport@walmart.com + DC leadership in BCC
+#   DC leadership DOES receive: Real data from SDL system
+#   When: Automatic execution May 1 @ 06:00 AM and future PayCycles
+#
+# RULE: NO test tasks in Task Scheduler. Ever.
+# RULE: Only production tasks (TEST_MODE=False or unset) are scheduled.
+
+TEST_MODE = os.getenv('TEST_MODE', 'False').lower() == 'true'
+
+if TEST_MODE:
+    print("\n[TEST MODE ENABLED] ⚠️  DEVELOPMENT ONLY")
+    print("[TEST MODE] Emails will be sent ONLY to Kendall.Rush@walmart.com")
+    print("[TEST MODE] No DC leadership emails will be sent")
+else:
+    print("\n[PRODUCTION MODE ENABLED] ⚠️  REAL DATA - REAL DC EMAILS")
+    print("[PRODUCTION MODE] Emails will be sent to DC leadership")
 
 
 # ── PayCycle Calendar ────────────────────────────────────────────────────────
@@ -166,6 +198,29 @@ def detect_paycycle_changes(pc_number: int) -> List[ManagerChange]:
     return changes
 
 
+def get_spark_logo_base64() -> str:
+    """
+    Load Spark Logo and convert to Base64 for email embedding.
+    
+    Returns Base64 encoded image data URI or empty string if not found.
+    """
+    logo_path = Path(r"C:\Users\krush\OneDrive - Walmart Inc\Documents\VSCode\Activity_Hub\Store Support\General Setup\Design\Spark Blank.png")
+    
+    try:
+        if not logo_path.exists():
+            print(f"[WARNING] Spark logo not found: {logo_path}")
+            return ""
+        
+        with open(logo_path, 'rb') as img_file:
+            img_data = base64.b64encode(img_file.read()).decode()
+        
+        # Return as data URI for embedding in HTML
+        return f"data:image/png;base64,{img_data}"
+    except Exception as e:
+        print(f"[WARNING] Failed to load Spark logo: {e}")
+        return ""
+
+
 def generate_paycycle_email_html(changes: List[ManagerChange], pc_number: int) -> str:
     """Generate HTML email for PayCycle with detected manager changes."""
     
@@ -179,6 +234,10 @@ def generate_paycycle_email_html(changes: List[ManagerChange], pc_number: int) -
         changes_by_role[role].append(change)
     
     change_count_by_role = {role: len(c) for role, c in changes_by_role.items()}
+    
+    # Load Spark Logo
+    logo_data_uri = get_spark_logo_base64()
+    logo_html = f'<img src="{logo_data_uri}" alt="Spark" width="40" height="40" border="0" style="width: 40px; height: 40px; display: block;">' if logo_data_uri else ""
     
     html = f"""
 <!DOCTYPE html>
@@ -201,20 +260,30 @@ def generate_paycycle_email_html(changes: List[ManagerChange], pc_number: int) -
             overflow: hidden;
         }}
         .header {{
-            background: linear-gradient(135deg, #0071ce 0%, #005a9c 100%);
-            color: white;
+            background-color: #0071ce;
+            color: #ffffff;
             padding: 30px;
-            text-align: center;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }}
+        .header-content {{
+            flex-grow: 1;
         }}
         .header h1 {{
             margin: 0;
-            font-size: 28px;
-            font-weight: 600;
+            padding: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff !important;
         }}
         .header p {{
-            margin: 8px 0 0 0;
+            margin: 5px 0 0 0;
+            padding: 0;
             font-size: 14px;
-            opacity: 0.9;
+            color: #ffffff !important;
+            font-weight: 500;
         }}
         .content {{
             padding: 30px;
@@ -227,26 +296,27 @@ def generate_paycycle_email_html(changes: List[ManagerChange], pc_number: int) -
             border-radius: 4px;
         }}
         .summary-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            width: 100%;
             margin-top: 12px;
+            border-collapse: collapse;
         }}
-        .summary-item {{
-            background-color: white;
+        .summary-grid td {{
             padding: 12px;
-            border-radius: 4px;
+            text-align: center;
+            background-color: white;
             border: 1px solid #ddd;
         }}
         .summary-item-number {{
             font-size: 24px;
             font-weight: bold;
             color: #0071ce;
+            display: block;
         }}
         .summary-item-label {{
             font-size: 12px;
             color: #666;
             margin-top: 4px;
+            display: block;
         }}
         .section {{
             margin-bottom: 30px;
@@ -322,24 +392,33 @@ def generate_paycycle_email_html(changes: List[ManagerChange], pc_number: int) -
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>✉️ Manager Change Notification</h1>
-            <p>PayCycle {pc_number} • {paycycle_date.strftime('%B %d, %Y')}</p>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0071ce;">
+            <tr>
+                <td width="60" valign="top" style="padding: 30px 20px 30px 30px;">
+                    {logo_html if logo_html else ''}
+                </td>
+                <td style="padding: 30px 30px 30px 0; vertical-align: middle;">
+                    <h1 style="margin: 0; padding: 0; font-size: 24px; font-weight: 700; color: #ffffff;">Manager Change Notification</h1>
+                    <p style="margin: 8px 0 0 0; padding: 0; font-size: 14px; color: #ffffff; font-weight: 500;">PayCycle {pc_number} • {paycycle_date.strftime('%B %d, %Y')}</p>
+                </td>
+            </tr>
+        </table>
         
         <div class="content">
             <div class="summary">
                 <strong>📋 Summary</strong>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <div class="summary-item-number">{len(changes)}</div>
-                        <div class="summary-item-label">Total Changes</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-item-number">{len(change_count_by_role)}</div>
-                        <div class="summary-item-label">Role Types</div>
-                    </div>
-                </div>
+                <table class="summary-grid">
+                    <tr>
+                        <td>
+                            <span class="summary-item-number">{len(changes)}</span>
+                            <span class="summary-item-label">Total Changes</span>
+                        </td>
+                        <td>
+                            <span class="summary-item-number">{len(change_count_by_role)}</span>
+                            <span class="summary-item-label">Role Types</span>
+                        </td>
+                    </tr>
+                </table>
             </div>
 """
     
@@ -361,7 +440,7 @@ def generate_paycycle_email_html(changes: List[ManagerChange], pc_number: int) -
             for change in role_changes:
                 html += f"""
                 <div class="change-item">
-                    <div class="change-location">{change.location_name} (ID: {change.location_id})</div>
+                    <div class="change-location">{change.location_name} (Facility #{change.location_id})</div>
                     <div class="change-detail"><strong>Role:</strong> {change.role}</div>
                     <div class="change-detail">
                         <strong>Transition:</strong> 
@@ -398,50 +477,86 @@ def generate_paycycle_email_html(changes: List[ManagerChange], pc_number: int) -
 
 def send_paycycle_email(pc_number: int, changes: List[ManagerChange], html_body: str) -> bool:
     """
-    Send PayCycle email to affected DC leadership.
+    Send PayCycle email to affected DC leadership (or test recipients in TEST_MODE).
+    
+    TEST_MODE:
+        When True: Sends ONLY to BCC recipients (you) - no DC emails sent
+        When False: Sends to affected DC leadership emails
     
     Returns:
         True if sent successfully, False otherwise
     """
     paycycle_date = get_paycycle_date(pc_number)
     
-    # Group changes by affected DC
-    affected_dcs = group_changes_by_dc(changes)
-    
-    print(f"[INFO] Identifying affected DCs...")
-    for dc_id, emails in affected_dcs.items():
-        print(f"  - DC {dc_id}: {len(emails)} recipients")
-    
-    if not affected_dcs:
-        print(f"[INFO] No affected DCs for this PayCycle")
-        return False
-    
-    # Build recipient list
-    recipients = []
-    for dc_id, emails in affected_dcs.items():
-        recipients.extend(emails)
-    
     # Email configuration
     subject = f"Manager Change Report - PayCycle {pc_number:02d} ({paycycle_date.strftime('%B %d, %Y')})"
-    
-    # BCC recipients for internal monitoring
     bcc_recipients = email_config.BCC_RECIPIENTS if hasattr(email_config, 'BCC_RECIPIENTS') else []
     
-    # Send email
-    print(f"\n[SENDING] Email to affected DC leadership")
-    print(f"  Affected DCs: {len(affected_dcs)}")
-    print(f"  Primary Recipients: {len(recipients)}")
-    print(f"  BCC Recipients: {len(bcc_recipients)}")
-    print(f"  Subject: {subject}\n")
-    
-    email_helper = EmailHelper(test_mode=False)  # Production mode
-    success = email_helper.send_email_via_outlook(
-        to=recipients,
-        subject=subject,
-        body_html=html_body,
-        from_email=email_config.SEND_FROM_EMAIL if hasattr(email_config, 'SEND_FROM_EMAIL') else "supplychainops@email.wal-mart.com",
-        bcc=bcc_recipients
-    )
+    if TEST_MODE:
+        # TEST MODE: Send ONLY to you (Kendall Rush) - NEVER to DC leadership
+        # CRITICAL SAFETY: DC emails disabled in test mode
+        print(f"\n[TEST MODE] Email to you only")
+        print(f"  To: Kendall.Rush@walmart.com")
+        print(f"  BCC: None")
+        print(f"  Subject: {subject}\n")
+        print(f"  ⚠️  DC EMAILS DISABLED IN TEST MODE - Safety mechanism active")
+        print(f"  ⚠️  No DC leadership will receive this email\n")
+        
+        email_helper = EmailHelper(test_mode=False)
+        success = email_helper.send_email_via_outlook(
+            to=['Kendall.Rush@walmart.com'],
+            subject=subject,
+            body_html=html_body,
+            from_email=email_config.SEND_FROM_EMAIL if hasattr(email_config, 'SEND_FROM_EMAIL') else "atcteamsupport@walmart.com",
+            bcc=[]
+        )
+    else:
+        # PRODUCTION MODE: Send TO atcteamsupport@walmart.com, BCC affected DC leadership + team
+        # CRITICAL: This requires REAL data and explicit production authorization
+        print(f"\n[PRODUCTION MODE] Sending to DC leadership with REAL data")
+        print(f"  ⚠️  THIS IS PRODUCTION - REAL DATA ONLY")
+        print(f"  ⚠️  DC leadership WILL receive this email\n")
+        
+        affected_dcs = group_changes_by_dc(changes)
+        
+        print(f"[INFO] Identifying affected DCs...")
+        for dc_id, dc_changes in affected_dcs.items():
+            print(f"  - DC {dc_id}: {len(dc_changes)} changes")
+        
+        if not affected_dcs:
+            print(f"[INFO] No affected DCs for this PayCycle")
+            return False
+        
+        # Convert DC IDs to email addresses (for BCC)
+        dc_bcc_recipients = []
+        for dc_id in affected_dcs.keys():
+            dc_emails = get_dc_emails(dc_id)  # Returns ['6020GM@...', '6020AGM@...']
+            dc_bcc_recipients.extend(dc_emails)
+        
+        # Combine DC BCC with team BCC (all 3 team members)
+        team_bcc = [
+            'Kristine.Torres@walmart.com',
+            'Matthew.Farnworth@walmart.com',
+            'Kendall.Rush@walmart.com'
+        ]
+        all_bcc = dc_bcc_recipients + team_bcc
+        
+        print(f"\n[PRODUCTION] Email to atcteamsupport@walmart.com")
+        print(f"  To: atcteamsupport@walmart.com")
+        print(f"  Affected DCs: {len(affected_dcs)}")
+        print(f"  BCC Recipients (DC + Team): {len(all_bcc)}")
+        print(f"    DC Leadership: {len(dc_bcc_recipients)} (REAL DC teams)")
+        print(f"    Team Monitoring: {len(team_bcc)}")
+        print(f"  Subject: {subject}\n")
+        
+        email_helper = EmailHelper(test_mode=False)
+        success = email_helper.send_email_via_outlook(
+            to=['atcteamsupport@walmart.com'],
+            subject=subject,
+            body_html=html_body,
+            from_email=email_config.SEND_FROM_EMAIL if hasattr(email_config, 'SEND_FROM_EMAIL') else "atcteamsupport@walmart.com",
+            bcc=all_bcc
+        )
     
     return success
 
@@ -479,7 +594,8 @@ def update_tracking(pc_number: int, success: bool, recipients_count: int = 0):
 def main():
     """Main entry point."""
     print("=" * 70)
-    print("GENERIC PAYCYCLE MANAGER CHANGE EMAIL - PRODUCTION")
+    mode_label = "TEST MODE (EMAIL TO YOU ONLY)" if TEST_MODE else "PRODUCTION MODE"
+    print(f"GENERIC PAYCYCLE MANAGER CHANGE EMAIL - {mode_label}")
     print("=" * 70)
     
     # Get PayCycle number
@@ -499,7 +615,10 @@ def main():
         update_tracking(pc_number, success, len(changes) * 2)  # Roughly 2 recipients per change (GM + AGM)
         
         if success:
-            print(f"\n[SUCCESS] PC-{pc_number} email sent to affected DC leadership!")
+            if TEST_MODE:
+                print(f"\n[SUCCESS] PC-{pc_number} test email sent to you!")
+            else:
+                print(f"\n[SUCCESS] PC-{pc_number} email sent to affected DC leadership!")
         else:
             print(f"\n[ERROR] PC-{pc_number} email send failed!")
             return 1

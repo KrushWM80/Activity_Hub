@@ -1,0 +1,46 @@
+⚠️  WARNING - TEST DATA ONLY ⚠️
+
+This directory contains SYNTHETIC/TEST snapshots created by create_synthetic_snapshots.py
+
+DO NOT USE for production decisions or real business analysis.
+
+---
+
+## Current Files (TEST ONLY)
+
+- manager_snapshot_2026-04-17.json → FAKE manager data
+- manager_snapshot_2026-05-01.json → FAKE manager data
+
+All manager names, store numbers, and changes are SYNTHETIC and created for testing email pipeline functionality.
+
+---
+
+## Production Data (Starts May 1 @ 05:00 AM)
+
+On May 1, 2026 at 05:00 AM, sdl_scraper.py will automatically:
+1. Connect to real Walmart SDL system
+2. Export REAL manager data
+3. Replace these test snapshots with production snapshots
+4. No action needed - automatic replacement
+
+---
+
+## Critical Rules
+
+❌ DO NOT:
+- Use these test snapshots for business decisions
+- Assume test manager names are real
+- Send test emails to DC leadership
+- Use test data for compliance reporting
+
+✅ DO:
+- Keep TEST_MODE=True during testing
+- Use REAL snapshots only for business analysis
+- Archive production snapshots (starting May 1)
+- Monitor May 1 execution to ensure real data loads
+
+---
+
+**See:** DATA_SOURCE_CLARIFICATION.md for complete details
+**See:** INCIDENT_REPORT_20260429.md for what went wrong with test emails
+

@@ -1,6 +1,6 @@
 # 📚 Activity Hub - Knowledge Hub & Dependencies Map
 
-**Last Updated**: April 13, 2026  
+**Last Updated**: April 29, 2026  
 **Project**: Walmart Enterprise Activity Hub  
 **Scope**: Complete organizational reference for architecture, dependencies, and institutional knowledge
 
@@ -14,6 +14,7 @@
 | **System Overview** | High-level project understanding | [Architecture Overview](#-architecture-overview) |
 | **Dependencies Map** | Component relationships & imports | [See Dependencies](DEPENDENCIES-MAP.md) |
 | **Module Guide** | Detailed module documentation | [Module Reference](#-module-reference-guide) |
+| **Job Codes Admin** | Consolidated requests, status updates, comments, audit trail | [Job Codes Teaming Dashboard](#4-job-codes-teaming-dashboard) |
 | **Configuration** | Role management, access, links | [Configuration Files](#-configuration-reference) |
 | **Design Assets** | Brand, colors, typography, widgets | [Design System](Platform/Design/DESIGN_SYSTEM.md) |
 | **Compliance** | Security, data classification, WCAG | [Compliance Docs](Platform/Documents/Compliance/) |
@@ -233,9 +234,164 @@ Individual Tier (7-8) → Specialist, Team Member, Admin
 
 ---
 
+### **4. Job Codes Teaming Dashboard**
+
+**Status**: ✅ PRODUCTION READY (Validated April 29, 2026)
+
+- **Purpose**: Manage job code updates and team assignments through consolidated requests
+- **URL**: http://localhost:8080/Aligned#admin (Admin Panel)
+- **Port**: 8080
+- **Architecture**: FastAPI (Python) backend + Vanilla JavaScript frontend (SPA)
+- **Key Features**:
+  - ✅ **Consolidated Requests**: Multiple job codes (1-300+) submitted as ONE request per request type
+  - ✅ **Admin Table**: All 6+ columns displaying request metadata with dynamic status badges
+  - ✅ **Detail Modal**: Full editing interface with status updates, comments, and history tracking
+  - ✅ **Status Management**: Dropdown to change status (Pending → In Review → Approved → Rejected)
+  - ✅ **Comments System**: Add timestamped comments with author metadata
+  - ✅ **Audit Trail**: Complete history tracking with old→new values and change timestamps
+
+#### **Key Files & Structure**
+```
+Store Support/Projects/JobCodes-teaming/Teaming/dashboard/
+├── backend/
+│   └── main.py                 # FastAPI server, REST endpoints, business logic
+│       ├── POST /api/submit-new-request         # Submit consolidated requests
+│       ├── GET  /api/job-codes-master/requests  # Get all requests (admin view)
+│       ├── POST /api/job-codes-master/requests/{id}/update-status
+│       ├── POST /api/job-codes-master/requests/{id}/add-comment
+│       └── GET  /api/job-codes-master/requests/{id}/history
+├── frontend/
+│   └── index.html              # Single Page App (SPA)
+│       ├── Admin Panel (tabs: User Management, Job Code Requests, Teaming Requests)
+│       ├── Admin Table (Job Codes, Description, Status, Requested By, Date, Actions)
+│       ├── Detail Modal (metadata, status dropdown, comments, history)
+│       └── Consolidated request display (all codes in single row)
+└── data/
+    └── job_code_requests.json  # Persistent JSON storage
+```
+
+#### **Consolidated Request Structure**
+```json
+{
+  "id": 1777410999999,
+  "job_codes": ["1-0-040407", "1-0-040413", "1-0-40225", ...],
+  "request_type": "job_code_update",
+  "status": "approved",
+  "requested_by": "krush",
+  "requested_by_name": "Kendall Rush",
+  "requested_at": "2026-04-29T14:30:00.000000",
+  "description": "Full description text",
+  "comments": [
+    {
+      "timestamp": "2026-04-29T12:58:52.382949",
+      "author": "admin",
+      "author_name": "Administrator",
+      "text": "Comment text",
+      "is_internal": false
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-04-29T12:57:34.725694",
+      "changed_by": "admin",
+      "changed_by_name": "Administrator",
+      "field": "status",
+      "old_value": "pending",
+      "new_value": "approved"
+    }
+  ]
+}
+```
+
+#### **Admin Features Validated**
+| Feature | Status | Details |
+|---------|--------|---------|
+| **One Request, Multiple Codes** | ✅ | 6 job codes in single row (not 6 separate rows) |
+| **Admin Table Columns** | ✅ | Job Codes, Description, Status, Requested By, Date, Actions |
+| **Dynamic Status Badges** | ✅ | Yellow=pending, Green=approved, Red=rejected |
+| **Detail Modal Display** | ✅ | Full metadata, request type, requester info, job codes as badges |
+| **Status Dropdown** | ✅ | Change status with single dropdown selection |
+| **Comment Add/Display** | ✅ | Add timestamped comments, stored with author metadata |
+| **History Tracking** | ✅ | Records all changes with old→new values and timestamps |
+| **Data Persistence** | ✅ | All changes saved to JSON file (no loss on server restart) |
+
+#### **Critical Bugs Fixed (April 29, 2026)**
+1. **Role-Check Bug** (main.py:2341)
+   - Fixed: Changed `if user['role'] != 'admin':` to `if not user_has_admin_access(user, "Job Codes"):`
+   - Impact: Admin role prefix "Admin - All Tabs" now recognized correctly
+
+2. **History Display Bug** (index.html)
+   - Fixed: Changed `entry.from/to` to `entry.old_value/new_value`
+   - Impact: History now displays "pending → approved" instead of "undefined"
+
+3. **Function Routing** (index.html)
+   - Created: Separate `showAdminJobCodeRequestDetail()` function for admin modal
+   - Impact: Admin table uses correct modal with full editing UI
+
+#### **Authentication & Access Control**
+- **Session-Based**: `session_id` cookie authentication
+- **Role-Based Access**: `user_has_admin_access(user, "Job Codes")` function
+- **Supported Roles**: 
+  - "Admin - All Tabs" (full access)
+  - "Admin - Job Codes" (job codes only)
+  - "Reviewer - Job Codes" (view-only access)
+- **User Metadata**: username, full name, role stored in session
+
+#### **API Endpoints - Fully Functional**
+```
+GET  /api/job-codes-master/requests
+     → Returns: { "requests": [ { consolidated request object }, ... ] }
+
+POST /api/job-codes-master/requests/{id}/update-status
+     → Body: { "status": "approved|rejected|in_review|pending" }
+     → Response: { "success": true, "history_entry": {...} }
+
+POST /api/job-codes-master/requests/{id}/add-comment
+     → Body: { "text": "comment text" }
+     → Response: { "success": true, "comment": {...} }
+
+GET  /api/job-codes-master/requests/{id}/history
+     → Returns: { "history": [...], "comments": [...] }
+```
+
+#### **Frontend Functions - Validated Working**
+- `loadAdminJobCodeRequests()` — Fetches all requests, populates admin table
+- `showAdminJobCodeRequestDetail(requestId)` — Opens detail modal with full editing UI
+- `saveJobCodeRequestChanges(requestId)` — Updates status, saves to backend
+- `saveJobCodeComment(requestId)` — Adds comment with metadata
+
+#### **Dependencies**
+- **Backend**: FastAPI, Python 3.14+, Uvicorn
+- **Frontend**: Bootstrap 5, Bootstrap Icons, Vanilla JavaScript
+- **Data**: JSON file-based persistence (no database required for MVP)
+- **Authentication**: Session-based via cookie
+- **Optional**: BigQuery disabled by default (HAS_BIGQUERY = False)
+
+#### **How to Run**
+```bash
+# Terminal in Project Root
+cd "Store Support/Projects/JobCodes-teaming/Teaming/dashboard/backend"
+python main.py
+# Server runs on http://localhost:8080
+# Frontend served at /Aligned path
+```
+
+#### **Testing Checklist** ✅
+- ✅ Consolidated request displays in single table row
+- ✅ All 6 job codes visible in Job Codes column
+- ✅ Status changed from pending to approved (backend recorded)
+- ✅ Admin table status badge updated dynamically
+- ✅ Comment added with timestamp and author metadata
+- ✅ History displays "pending → approved" with correct timestamp
+- ✅ All changes persisted to JSON file
+- ✅ Success toasts appear for all operations
+- ✅ Detail modal refreshes after edits
+
+---
+
 ## 🖥️ Live Services & Automation
 
-**Last Updated**: April 13, 2026  
+**Last Updated**: April 29, 2026  
 **Machine**: WEUS42608431466 | IP: 10.97.114.181 | User: `krush`
 
 ---

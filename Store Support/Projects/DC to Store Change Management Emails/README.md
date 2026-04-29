@@ -13,6 +13,23 @@
 
 ---
 
+## ⚠️ Data Source Information
+
+**CURRENT STATUS (April 29):**
+- Using **SYNTHETIC TEST DATA** from `create_synthetic_snapshots.py`
+- Fake stores, fake managers for testing email pipeline only
+- **NOT production data**
+
+**MAY 1, 2026:**
+- Real data from `sdl_scraper.py` (automated Playwright browser automation)
+- Connects to Walmart SDL (Store Directory Lookup) system
+- Exports real manager data and store information
+- **THEN production email with real data**
+
+**See:** `DATA_SOURCE_CLARIFICATION.md` for full details
+
+---
+
 ## 📚 Core Documentation
 
 - **EMAIL_SYSTEM_STANDARDS.md** - Standard email delivery method (SMTP gateway)

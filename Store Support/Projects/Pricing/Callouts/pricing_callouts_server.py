@@ -20,10 +20,22 @@ import sys
 import json
 import logging
 import argparse
+import smtplib
+import subprocess
+import base64
+import tempfile
 from datetime import datetime, timedelta, date
 from pathlib import Path
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from xml.sax.saxutils import escape
 from flask import Flask, render_template, request, jsonify
 from google.cloud import bigquery
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.edge.service import Service
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 SCRIPT_DIR = Path(__file__).parent
@@ -54,6 +66,13 @@ BQ_DATASET = 'Store_Support_Dev'
 BQ_TABLE_CALLOUTS = 'Pricing_Weekly_Callouts'
 BQ_TABLE_RECIPIENTS = 'Pricing_Callout_Email_Recipients'
 BQ_TABLE_CAL_DIM = 'Cal_Dim_Data'
+
+# Email configuration
+SMTP_SERVER = 'smtp-gw1.homeoffice.wal-mart.com'
+SMTP_PORT = 25
+FROM_EMAIL = 'kendall.rush@walmart.com'
+DASHBOARD_URL = 'https://tableau-entprod.walmart.com/views/PendingPriceChanges_16788014706880/FuturePriceChanges?%3Aembed=yes&%3Aiid=10&%3Atoolbar=yes#1'
+EDGE_PATH = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 
 # ─── Utility Functions ───────────────────────────────────────────────────────
 
@@ -141,6 +160,177 @@ def init_tables():
             logger.info(f"✓ Created table {table_ref_recipients}")
         else:
             raise
+
+# ─── Email Functions ────────────────────────────────────────────────────────
+
+def capture_dashboard_screenshot(wm_week):
+    """
+    Capture Tableau Future Price Changes dashboard screenshot using Selenium.
+    
+    Simple approach: Open browser with user profile, navigate, wait 10s, capture.
+    No complex waits or element detection — just force capture after fixed timeout.
+    """
+    driver = None
+    try:
+        logger.info(f'Capturing Tableau dashboard for WK{wm_week}...')
+        
+        # Setup Edge with your authenticated user profile
+        edge_options = webdriver.EdgeOptions()
+        user_profile = os.path.expanduser('~\\AppData\\Local\\Microsoft\\Edge\\User Data')
+        edge_options.add_argument(f'--user-data-dir={user_profile}')
+        edge_options.add_argument('--disable-dev-shm-usage')
+        edge_options.add_argument('--no-sandbox')
+        
+        # Create driver
+        edge_executable = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+        service = Service(edge_executable)
+        driver = webdriver.Edge(service=service, options=edge_options)
+        
+        logger.info(f'Opening Tableau dashboard...')
+        driver.set_page_load_timeout(15)  # 15s page load timeout
+        driver.get(DASHBOARD_URL)
+        
+        # Simple fixed wait - no element detection complexity
+        logger.info('Waiting 10 seconds for rendering...')
+        import time
+        time.sleep(10)
+        
+        # Capture screenshot
+        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
+            screenshot_path = f.name
+        
+        logger.info(f'Taking screenshot...')
+        driver.save_screenshot(screenshot_path)
+        
+        if Path(screenshot_path).exists():
+            file_size = Path(screenshot_path).stat().st_size
+            logger.info(f'Screenshot: {file_size:,} bytes')
+            
+            if file_size > 50000:
+                logger.info('Valid screenshot captured')
+                with open(screenshot_path, 'rb') as f:
+                    screenshot_base64 = base64.b64encode(f.read()).decode('ascii')
+                return screenshot_base64
+            else:
+                logger.warning(f'Screenshot too small ({file_size:,} bytes) - returning None')
+                return None
+        else:
+            logger.warning('Screenshot file not created')
+            return None
+    
+    except Exception as e:
+        logger.error(f'Screenshot error: {e}')
+        return None
+    
+    finally:
+        if driver:
+            try:
+                driver.quit()
+            except:
+                pass
+
+def build_callout_email_html(callouts, wm_week, screenshot_base64=None):
+    """Build HTML email with callouts for the week - matches official template."""
+    
+    # Build callouts section
+    if callouts:
+        callouts_html = '<table style="width:100%; border-collapse:collapse; margin: 15px 0;">'
+        callouts_html += '<thead style="background:#f0f0f0;"><tr>'
+        callouts_html += '<th style="padding:10px; text-align:left; border:1px solid #ddd; font-weight:600;">Title</th>'
+        callouts_html += '<th style="padding:10px; text-align:left; border:1px solid #ddd; font-weight:600;">Details</th>'
+        callouts_html += '</tr></thead><tbody>'
+        
+        for i, callout in enumerate(callouts):
+            bg = '#ffffff' if i % 2 == 0 else '#fafafa'
+            title = escape(callout.get('title') or '(No title)')
+            content = escape(callout.get('content') or '')
+            callouts_html += f'''<tr style="background:{bg};">
+                <td style="padding:10px; border:1px solid #ddd; font-weight:600;">{title}</td>
+                <td style="padding:10px; border:1px solid #ddd;">{content}</td>
+            </tr>'''
+        
+        callouts_html += '</tbody></table>'
+    else:
+        callouts_html = '<p style="color:#666; margin:15px 0;">There are no Callouts this week.</p>'
+    
+    # Build dashboard section with screenshot and link
+    dashboard_html = ''
+    if screenshot_base64:
+        dashboard_html = f'<p><img src="data:image/png;base64,{screenshot_base64}" alt="Dashboard Screenshot" style="max-width:100%; border:1px solid #ddd; border-radius:4px; margin: 15px 0;"></p>'
+    
+    dashboard_html += f'''<p><strong>View the dashboard:</strong></p>
+<p><a href="{DASHBOARD_URL}" style="color: #0071CE; text-decoration: none; font-weight: bold;">Future Price Changes →</a></p>'''
+    
+    html = f'''<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Weekly Pricing Forecast Callouts</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; color: #333; line-height: 1.5; }}
+        .container {{ max-width: 800px; margin: 0 auto; background: white; }}
+        .content {{ padding: 20px; }}
+        .section {{ margin: 20px 0; }}
+        .signature {{ margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 13px; }}
+        h2 {{ color: #0071CE; font-size: 16px; margin: 20px 0 10px 0; }}
+        p {{ margin: 10px 0; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <p>Hello, team!</p>
+            
+            <p>Please see below for next week's forecast.</p>
+            
+            <h2>Callouts:</h2>
+            <div class="section">
+                {callouts_html}
+            </div>
+            
+            <h2>Dashboard:</h2>
+            <div class="section">
+                {dashboard_html}
+            </div>
+            
+            <p>Please let me know if you have any questions.</p>
+            
+            <p>Thank you,</p>
+            
+            <div class="signature">
+                Emily Varner<br>
+                Senior Manager - Pricing<br>
+                Walmart US - Operations Support<br>
+                479-387-8916
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+'''
+    return html
+
+def send_test_email(recipient_email, subject, html_body):
+    """Send test email via Walmart SMTP server."""
+    try:
+        logger.info(f'Connecting to {SMTP_SERVER}:{SMTP_PORT}...')
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=30)
+        
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = FROM_EMAIL
+        msg['To'] = recipient_email
+        msg.attach(MIMEText(html_body, 'html'))
+        
+        server.send_message(msg)
+        server.quit()
+        
+        logger.info(f'[SUCCESS] Test email sent to {recipient_email}')
+        return True
+    
+    except Exception as e:
+        logger.error(f'Error sending email: {e}')
+        return False
 
 # ─── Routes: HTML Pages ──────────────────────────────────────────────────────
 
@@ -302,11 +492,22 @@ def get_email_recipients():
         """
         results = client.query(query).result()
         recipients = [dict(row) for row in results]
+        logger.info(f"[DEBUG] Raw recipients from BigQuery: {recipients}")
         
-        # Convert timestamps to ISO format
+        # Convert timestamps to ISO format (handle both string and datetime)
         for r in recipients:
-            r['added_date'] = r['added_date'].isoformat() if r['added_date'] else None
+            if r['added_date']:
+                if isinstance(r['added_date'], str):
+                    # Already a string, keep as is
+                    r['added_date'] = r['added_date']
+                else:
+                    # DateTime object, convert to ISO string
+                    r['added_date'] = r['added_date'].isoformat()
+            else:
+                r['added_date'] = None
         
+        logger.info(f"[DEBUG] Processed recipients: {recipients}")
+        logger.info(f"[DEBUG] Total recipients to return: {len(recipients)}")
         return jsonify({"success": True, "data": recipients})
     except Exception as e:
         logger.error(f"Error fetching email recipients: {e}")
@@ -336,7 +537,7 @@ def add_email_recipient():
             return jsonify({"success": False, "error": "Email already exists"}), 400
         
         recipient_id = f"recipient_{int(datetime.now().timestamp())}"
-        now = datetime.utcnow()
+        now = datetime.utcnow().isoformat()
         
         table = client.get_table(f"{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE_RECIPIENTS}")
         rows = [
@@ -374,6 +575,55 @@ def remove_email_recipient(recipient_id):
         return jsonify({"success": True})
     except Exception as e:
         logger.error(f"Error removing email recipient {recipient_id}: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/send-test-email', methods=['POST'])
+def send_test_email_endpoint():
+    """Send a test email with Friday callouts preview and dashboard screenshot."""
+    try:
+        data = request.get_json()
+        recipient_email = data.get('recipient_email', '').strip().lower()
+        wm_week = data.get('wm_week', calculate_next_walmart_week())
+        
+        if not recipient_email or '@' not in recipient_email:
+            return jsonify({"success": False, "error": "Invalid email address"}), 400
+        
+        # Fetch callouts for the week
+        client = get_bq_client()
+        query = f"""
+        SELECT id, wm_week, title, content, created_date, created_by, last_modified_date, status
+        FROM `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE_CALLOUTS}`
+        WHERE wm_week = @wm_week AND (status IS NULL OR status = 'active')
+        ORDER BY created_date DESC
+        """
+        job_config = bigquery.QueryJobConfig(
+            query_parameters=[bigquery.ScalarQueryParameter("wm_week", "INTEGER", wm_week)]
+        )
+        results = client.query(query, job_config=job_config).result()
+        callouts = [dict(row) for row in results]
+        
+        # Capture dashboard screenshot
+        logger.info(f'Capturing dashboard screenshot for WK{wm_week}...')
+        screenshot_base64 = capture_dashboard_screenshot(wm_week)
+        
+        # Build email HTML with screenshot
+        html_body = build_callout_email_html(callouts, wm_week, screenshot_base64)
+        subject = f"Weekly Pricing Forecast Callouts - WK{wm_week}"
+        
+        # Send email
+        if send_test_email(recipient_email, subject, html_body):
+            return jsonify({
+                "success": True,
+                "message": f"Test email sent to {recipient_email}",
+                "callout_count": len(callouts),
+                "week": wm_week,
+                "screenshot": "included" if screenshot_base64 else "failed"
+            })
+        else:
+            return jsonify({"success": False, "error": "Failed to send email"}), 500
+    
+    except Exception as e:
+        logger.error(f"Error sending test email: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 # ─── API Routes: Utilities ───────────────────────────────────────────────────

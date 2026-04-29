@@ -69,7 +69,7 @@ def get_bigquery_client():
 
 # ── Temporary data normalization (until BQ data reflects new names) ──
 _PHASE_MAP = {'POC/POT': 'Vet', 'Mkt Scale': 'Test Markets'}
-_OWNERSHIP_MAP = {'Dallas POC': 'Dallas VET'}
+_OWNERSHIP_MAP = {'Dallas POC': 'Dallas Team', 'Dallas VET': 'Dallas Team'}
 
 def _normalize_phase(phase):
     return _PHASE_MAP.get(phase, phase)
@@ -121,7 +121,7 @@ def get_bigquery_data():
                 'Health Status': row['Health Status'] or 'Unknown',
                 'Phase': _normalize_phase(row['Phase'] or 'Unknown'),
                 '# of Stores': row['# of Stores'] or 0,
-                'Dallas VET': row['Dallas POC'] or 'N/A',
+                'Dallas Team': row['Dallas POC'] or 'N/A',
                 'Intake & Testing': row['Intake & Testing'] or 'N/A',
                 'Deployment': row['Deployment'] or 'N/A',
                 'Project ID': row['Project ID'] or 0,
@@ -145,7 +145,7 @@ SAMPLE_DATA = [
         "# of Stores": 120,
         "TDA Ownership": "Intake & Test",
         "Intake & Testing": "System testing in progress. All core features validated. Ready for POC expansion.",
-        "Dallas VET": "John Smith - Store #4521, TX",
+        "Dallas Team": "John Smith - Store #4521, TX",
         "Deployment": "Scheduled for 3/15/2026. Training materials prepared. Rollout plan finalized."
     },
     {
@@ -155,7 +155,7 @@ SAMPLE_DATA = [
         "# of Stores": 95,
         "TDA Ownership": "Intake & Test",
         "Intake & Testing": "POC execution with pilot stores. Initial results show 15% efficiency gains.",
-        "Dallas VET": "Jane Doe - Store #2847, TX",
+        "Dallas Team": "Jane Doe - Store #2847, TX",
         "Deployment": "Delayed. Addressing performance issues discovered in POC phase. New target: 4/1/2026"
     },
     {
@@ -165,7 +165,7 @@ SAMPLE_DATA = [
         "# of Stores": 250,
         "TDA Ownership": "No Selection Provided",
         "Intake & Testing": "All validation complete. Rollout in waves starting Week 3.",
-        "Dallas VET": "Bob Wilson - Store #1234, TX",
+        "Dallas Team": "Bob Wilson - Store #1234, TX",
         "Deployment": "Live in 250 stores as of 2/28/2026. Phase 2 rollout beginning next week."
     },
     {
@@ -175,7 +175,7 @@ SAMPLE_DATA = [
         "# of Stores": 180,
         "TDA Ownership": "No Selection Provided",
         "Intake & Testing": "Initial requirements gathering delayed. No testing scheduled yet.",
-        "Dallas VET": "Alice Johnson - Pending Assignment",
+        "Dallas Team": "Alice Johnson - Pending Assignment",
         "Deployment": "Blocked. Awaiting stakeholder sign-off on requirements."
     },
     {
@@ -185,7 +185,7 @@ SAMPLE_DATA = [
         "# of Stores": 15,
         "TDA Ownership": "Intake & Test",
         "Intake & Testing": "Market testing complete. System scaling for regional rollout.",
-        "Dallas VET": "Tom Brown - Store #5678, TX",
+        "Dallas Team": "Tom Brown - Store #5678, TX",
         "Deployment": "Regional deployment Q2 2026. Infrastructure scaled for 500+ stores."
     },
 ]
@@ -201,9 +201,117 @@ if BQ_DATA:
 else:
     DATA_SOURCE = "Sample Data (local)"
 
+def get_sif_aim_data():
+    """Fetch SIF/AIM meeting data from Intake Accel Council Data table"""
+    if not BQ_AVAILABLE:
+        return {'upcoming': [], 'recent_actions': []}
+    try:
+        client = get_bigquery_client()
+        if not client:
+            return {'upcoming': [], 'recent_actions': []}
+        
+        today_str = time.strftime('%Y-%m-%d')
+        twenty_one_days_ago = time.strftime('%Y-%m-%d', time.localtime(time.time() - 21 * 86400))
+        
+        # Try with SIF_OR_AIM_Note column first; fall back without it
+        base_cols = """
+            Project_Title,
+            CAST(Intake_Card_Nbr AS INT64) as Project_ID,
+            Meeting_Type,
+            SIF_Date,
+            AIM_Date"""
+        where_clause = f"""
+        FROM `{BQ_PROJECT}.{BQ_DATASET}.Output - Intake Accel Council Data`
+        WHERE (SIF_Date IS NOT NULL OR AIM_Date IS NOT NULL)
+          AND Project_Title IS NOT NULL
+          AND COALESCE(CAST(Is_Duplicate_Row AS STRING), '') != 'Yes'
+        ORDER BY COALESCE(SIF_Date, AIM_Date) DESC"""
+        
+        has_note_col = True
+        query = f"SELECT {base_cols}, COALESCE(SIF_OR_AIM_Note, '') as SIF_OR_AIM_Note {where_clause}"
+        try:
+            query_job = client.query(query)
+            results = query_job.result()
+        except Exception:
+            has_note_col = False
+            query = f"SELECT {base_cols} {where_clause}"
+            query_job = client.query(query)
+            results = query_job.result()
+        
+        upcoming = []
+        recent_actions = []
+        
+        for row in results:
+            title = row['Project_Title'] or ''
+            project_id = row['Project_ID'] or 0
+            meeting_type = row['Meeting_Type'] or ''
+            sif_date = str(row['SIF_Date']) if row['SIF_Date'] else None
+            aim_date = str(row['AIM_Date']) if row['AIM_Date'] else None
+            note = (row['SIF_OR_AIM_Note'] or '') if has_note_col else ''
+            
+            # Determine which meeting date to use
+            # If meeting_type is AIM, use aim_date; if SIF, use sif_date; otherwise use whichever is available
+            if meeting_type.upper() == 'AIM' and aim_date:
+                meeting_date = aim_date
+                meeting_label = 'AIM'
+            elif meeting_type.upper() == 'SIF' and sif_date:
+                meeting_date = sif_date
+                meeting_label = 'SIF'
+            elif sif_date and aim_date:
+                # Both dates present — create entries for both
+                # For SIF
+                if sif_date >= today_str:
+                    upcoming.append({'title': title, 'project_id': project_id, 'meeting': 'SIF', 'date': sif_date, 'note': note})
+                elif sif_date >= twenty_one_days_ago:
+                    recent_actions.append({'title': title, 'project_id': project_id, 'meeting': 'SIF', 'date': sif_date, 'note': note})
+                # For AIM
+                if aim_date >= today_str:
+                    upcoming.append({'title': title, 'project_id': project_id, 'meeting': 'AIM', 'date': aim_date, 'note': note})
+                elif aim_date >= twenty_one_days_ago:
+                    recent_actions.append({'title': title, 'project_id': project_id, 'meeting': 'AIM', 'date': aim_date, 'note': note})
+                continue
+            elif sif_date:
+                meeting_date = sif_date
+                meeting_label = 'SIF'
+            elif aim_date:
+                meeting_date = aim_date
+                meeting_label = 'AIM'
+            else:
+                continue
+            
+            # Categorize: upcoming (today or future) vs recent actions (past 21 days)
+            if meeting_date >= today_str:
+                upcoming.append({'title': title, 'project_id': project_id, 'meeting': meeting_label, 'date': meeting_date, 'note': note})
+            elif meeting_date >= twenty_one_days_ago:
+                recent_actions.append({'title': title, 'project_id': project_id, 'meeting': meeting_label, 'date': meeting_date, 'note': note})
+        
+        # Sort upcoming by date ascending, recent by date descending
+        upcoming.sort(key=lambda x: x['date'])
+        recent_actions.sort(key=lambda x: x['date'], reverse=True)
+        
+        unique_upcoming = set()
+        for entry in upcoming:
+            key = entry.get('project_id') if entry.get('project_id') else entry.get('title', '')
+            unique_upcoming.add(key)
+        unique_upcoming_count = len(unique_upcoming)
+        
+        print(f"[OK] SIF/AIM data: {len(upcoming)} upcoming, {len(recent_actions)} recent actions")
+        return {
+            'upcoming': upcoming,
+            'recent_actions': recent_actions,
+            'unique_upcoming_count': unique_upcoming_count
+        }
+    except Exception as e:
+        print(f"[WARN] SIF/AIM query failed (column may not exist yet): {e}")
+        return {'upcoming': [], 'recent_actions': [], 'unique_upcoming_count': 0}
+
+# Load SIF/AIM meeting data (after function is defined)
+print("[*] Loading SIF/AIM meeting data...")
+SIF_AIM_DATA = get_sif_aim_data()
+
 def refresh_data():
     """Re-fetch data from BigQuery and update the global DATA cache"""
-    global DATA, BQ_DATA, DATA_SOURCE, DATA_LAST_REFRESH
+    global DATA, BQ_DATA, DATA_SOURCE, DATA_LAST_REFRESH, SIF_AIM_DATA
     print(f"[{time.strftime('%H:%M:%S')}] Refreshing data from BigQuery...")
     new_data = get_bigquery_data()
     if new_data:
@@ -212,10 +320,129 @@ def refresh_data():
         DATA_SOURCE = "BigQuery (wmt-assetprotection-prod)"
         DATA_LAST_REFRESH = time.strftime('%Y-%m-%d %H:%M:%S')
         print(f"[OK] Refreshed: {len(DATA)} records loaded")
+        SIF_AIM_DATA = get_sif_aim_data()
         return True, len(DATA)
     else:
         print("[WARN] Refresh failed, keeping existing data")
         return False, len(DATA)
+
+def get_project_detail(project_id_str):
+    """Fetch detailed project info for the Project Summary view"""
+    if not BQ_AVAILABLE:
+        return None
+    try:
+        from urllib.parse import unquote_plus
+        project_id_str = unquote_plus(project_id_str)
+        client = get_bigquery_client()
+        if not client:
+            return None
+        
+        # Query project detail from Intake Accel Council Data
+        query = f"""
+        SELECT
+            Project_Title,
+            CAST(Intake_Card_Nbr AS INT64) as Project_ID,
+            Owner,
+            Store_Area,
+            Phase,
+            Health_Update,
+            COALESCE(PRESENTATION_SUMMARY, OVERVIEW, '') as Summary,
+            COALESCE(Project_Update, '') as Latest_Update,
+            Count_of_Stores,
+            SIF_Date,
+            AIM_Date,
+            Meeting_Type,
+            PROJECT_START_DATE,
+            PROJECT_END_DATE,
+            TDA_Ownership,
+            Dallas_POC,
+            Intake_n_Testing,
+            Deployment
+        FROM `{BQ_PROJECT}.{BQ_DATASET}.Output - Intake Accel Council Data`
+        WHERE CAST(Intake_Card_Nbr AS STRING) = '{project_id_str}'
+          AND COALESCE(CAST(Is_Duplicate_Row AS STRING), '') != 'Yes'
+        LIMIT 1
+        """
+        
+        query_job = client.query(query)
+        results = list(query_job.result())
+        
+        if not results:
+            # Try matching by title from TDA data
+            for row in DATA:
+                if str(row.get('Project ID', '')) == project_id_str:
+                    return {
+                        'title': row.get('Initiative - Project Title', ''),
+                        'project_id': row.get('Project ID', 0),
+                        'owner': 'N/A',
+                        'team': row.get('TDA Ownership', ''),
+                        'phase': row.get('Phase', ''),
+                        'health_status': row.get('Health Status', ''),
+                        'summary': '',
+                        'latest_update': '',
+                        'store_count': row.get('# of Stores', 0),
+                        'dallas_team_notes': row.get('Dallas Team', ''),
+                        'intake_testing_notes': row.get('Intake & Testing', ''),
+                        'deployment_notes': row.get('Deployment', ''),
+                        'sif_date': None,
+                        'aim_date': None,
+                        'start_date': None,
+                        'end_date': None,
+                        'metrics': []
+                    }
+            return None
+        
+        row = results[0]
+        project_id = row['Project_ID'] or 0
+        
+        # Fetch metrics from Project_Metric_Lift
+        metrics = []
+        try:
+            metrics_query = f"""
+            SELECT Metric_Name, Metric_Type, Actual, Expected, Impact, Lift, Start_Date, End_Date
+            FROM `{BQ_PROJECT}.Store_Support.Project_Metric_Lift`
+            WHERE Project_ID = {project_id}
+            ORDER BY Metric_Name
+            """
+            metrics_job = client.query(metrics_query)
+            for mrow in metrics_job.result():
+                metrics.append({
+                    'metric_name': mrow['Metric_Name'] or '',
+                    'metric_type': mrow['Metric_Type'] or '',
+                    'actual': float(mrow['Actual']) if mrow['Actual'] is not None else None,
+                    'expected': float(mrow['Expected']) if mrow['Expected'] is not None else None,
+                    'impact': float(mrow['Impact']) if mrow['Impact'] is not None else None,
+                    'lift': mrow['Lift'] or '',
+                    'start_date': str(mrow['Start_Date']) if mrow['Start_Date'] else None,
+                    'end_date': str(mrow['End_Date']) if mrow['End_Date'] else None
+                })
+        except Exception as me:
+            print(f"[WARN] Metrics query failed: {me}")
+        
+        detail = {
+            'title': row['Project_Title'] or '',
+            'project_id': project_id,
+            'owner': row['Owner'] or 'N/A',
+            'team': _normalize_ownership(row['TDA_Ownership']),
+            'store_area': row['Store_Area'] or '',
+            'phase': _normalize_phase(row['Phase'] or ''),
+            'health_status': row['Health_Update'] or '',
+            'summary': row['Summary'] or '',
+            'latest_update': row['Latest_Update'] or '',
+            'store_count': row['Count_of_Stores'] or 0,
+            'dallas_team_notes': row['Dallas_POC'] or '',
+            'intake_testing_notes': row['Intake_n_Testing'] or '',
+            'deployment_notes': row['Deployment'] or '',
+            'sif_date': str(row['SIF_Date']) if row['SIF_Date'] else None,
+            'aim_date': str(row['AIM_Date']) if row['AIM_Date'] else None,
+            'start_date': str(row['PROJECT_START_DATE']) if row['PROJECT_START_DATE'] else None,
+            'end_date': str(row['PROJECT_END_DATE']) if row['PROJECT_END_DATE'] else None,
+            'metrics': metrics
+        }
+        return detail
+    except Exception as e:
+        print(f"[ERROR] Project detail query failed: {e}")
+        return None
 def generate_minimal_pptx(phase=None):
     """Generate a PPTX file with data organized by phase"""
     pptx_buffer = io.BytesIO()
@@ -847,7 +1074,7 @@ def handle_request(client_socket, addr):
         
         elif path == '/api/ownerships':
             excluded = {'Complete'}
-            OWNERSHIP_ORDER = ['Dallas VET', 'Intake & Test', 'Deployment', 'No Selection Provided']
+            OWNERSHIP_ORDER = ['Dallas Team', 'Intake & Test', 'Deployment', 'No Selection Provided']
             all_ownerships = set((r.get("TDA Ownership") or 'No Selection Provided') for r in DATA if r.get("Phase") not in excluded)
             known_set = set(OWNERSHIP_ORDER)
             unknown_ownerships = sorted(o for o in all_ownerships if o not in known_set)
@@ -861,9 +1088,33 @@ def handle_request(client_socket, addr):
         
         elif path == '/api/summary':
             data = filter_data()
+            # Team counts by TDA Ownership
+            dallas_team_count = sum(1 for r in data if r.get('TDA Ownership') == 'Dallas Team')
+            intake_test_count = sum(1 for r in data if r.get('TDA Ownership') == 'Intake & Test')
+            deployment_count = sum(1 for r in data if r.get('TDA Ownership') == 'Deployment')
+            # Operating Model: projects with "Ops Model" or "Operation Model" in title
+            import re
+            ops_model_pattern = re.compile(r'ops\s*model|operation\s*model', re.IGNORECASE)
+            ops_model_count = sum(1 for r in data if ops_model_pattern.search(r.get('Initiative - Project Title', '')))
+            # Upcoming count (from SIF/AIM data if available)
+            if SIF_AIM_DATA:
+                upcoming_count = SIF_AIM_DATA.get('unique_upcoming_count')
+                if upcoming_count is None:
+                    upcoming_count = len({
+                        entry.get('project_id') if entry.get('project_id') else entry.get('title', '')
+                        for entry in SIF_AIM_DATA.get('upcoming', [])
+                    })
+            else:
+                upcoming_count = 0
+
             summary = {
                 'total_projects': len(data),
                 'total_stores': sum(int(r.get('# of Stores', 0) or 0) for r in data),
+                'dallas_team_count': dallas_team_count,
+                'intake_test_count': intake_test_count,
+                'deployment_count': deployment_count,
+                'ops_model_count': ops_model_count,
+                'upcoming_count': upcoming_count,
                 'by_health_status': {},
                 'by_phase': {}
             }
@@ -875,6 +1126,24 @@ def handle_request(client_socket, addr):
             
             response_json = json.dumps({'success': True, 'summary': summary})
             response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
+            client_socket.sendall(response.encode())
+        
+        elif path == '/api/sif-aim':
+            # Return SIF/AIM meeting data (upcoming + recent 21-day actions)
+            response_json = json.dumps({'success': True, 'data': SIF_AIM_DATA})
+            response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
+            client_socket.sendall(response.encode())
+        
+        elif path.startswith('/api/project-detail/'):
+            # Return detailed project info for Project Summary view
+            project_id_str = path.split('/api/project-detail/')[-1]
+            detail = get_project_detail(project_id_str)
+            if detail:
+                response_json = json.dumps({'success': True, 'project': detail})
+                response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
+            else:
+                response_json = json.dumps({'success': False, 'error': 'Project not found'})
+                response = f"HTTP/1.1 404 Not Found\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {len(response_json)}\r\nConnection: close\r\n\r\n{response_json}"
             client_socket.sendall(response.encode())
         
         elif path == '/lib/html2canvas.min.js':

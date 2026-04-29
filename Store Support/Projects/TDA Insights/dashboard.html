@@ -335,18 +335,30 @@
         /* Summary Stats */
         .summary-section {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: var(--spacing-md);
+            grid-template-columns: repeat(10, 1fr);
+            gap: var(--spacing-sm, 8px);
             margin-bottom: var(--spacing-lg);
         }
 
         .stat-card {
             background: white;
-            padding: var(--spacing-md);
+            padding: var(--spacing-sm, 8px) var(--spacing-xs, 4px);
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
             border-left: 4px solid var(--walmart-yellow);
             text-align: center;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card.active {
+            border-left-color: var(--walmart-blue);
+            box-shadow: 0 0 0 2px var(--walmart-blue), 0 4px 12px rgba(0, 113, 206, 0.2);
         }
 
         .stat-label {
@@ -565,7 +577,7 @@
             }
 
             .summary-section {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(5, 1fr);
             }
 
             .table-wrapper {
@@ -661,27 +673,43 @@
 
         <!-- Summary Stats -->
         <div class="summary-section" id="summary-section">
-            <div class="stat-card">
-                <div class="stat-label">Total Initiatives</div>
+            <div class="stat-card" data-filter="total-active" onclick="filterByMetric('total-active')">
+                <div class="stat-label">Total Active</div>
                 <div class="stat-value" id="stat-projects">0</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Total Stores Impacted</div>
-                <div class="stat-value" id="stat-stores">0</div>
+            <div class="stat-card" data-filter="upcoming" onclick="filterByMetric('upcoming')">
+                <div class="stat-label">Upcoming</div>
+                <div class="stat-value" id="stat-upcoming">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" data-filter="dallas-team" onclick="filterByMetric('dallas-team')">
+                <div class="stat-label">Dallas Team</div>
+                <div class="stat-value" id="stat-dallas-team">0</div>
+            </div>
+            <div class="stat-card" data-filter="intake-test" onclick="filterByMetric('intake-test')">
+                <div class="stat-label">Intake & Test</div>
+                <div class="stat-value" id="stat-intake-test">0</div>
+            </div>
+            <div class="stat-card" data-filter="deployment" onclick="filterByMetric('deployment')">
+                <div class="stat-label">Deployment</div>
+                <div class="stat-value" id="stat-deployment">0</div>
+            </div>
+            <div class="stat-card" data-filter="ops-model" onclick="filterByMetric('ops-model')">
+                <div class="stat-label">Operating Model</div>
+                <div class="stat-value" id="stat-ops-model">0</div>
+            </div>
+            <div class="stat-card" data-filter="on-track" onclick="filterByMetric('on-track')">
                 <div class="stat-label">On Track</div>
                 <div class="stat-value" id="stat-on-track" style="color: var(--on-track);">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" data-filter="at-risk" onclick="filterByMetric('at-risk')">
                 <div class="stat-label">At Risk</div>
                 <div class="stat-value" id="stat-at-risk" style="color: var(--at-risk);">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" data-filter="off-track" onclick="filterByMetric('off-track')">
                 <div class="stat-label">Off Track</div>
                 <div class="stat-value" id="stat-off-track" style="color: var(--off-track);">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" data-filter="continuous" onclick="filterByMetric('continuous')">
                 <div class="stat-label">Continuous</div>
                 <div class="stat-value" id="stat-continuous" style="color: var(--continuous);">0</div>
             </div>
@@ -707,6 +735,73 @@
                     <span>Page <span id="current-page">1</span> of <span id="total-pages">1</span></span>
                 </div>
                 <button class="btn-secondary" id="next-page-btn">Next →</button>
+            </div>
+        </div>
+
+        <!-- SIF/AIM Upcoming & Recent Actions Section -->
+        <div id="sif-aim-section" class="table-section" style="margin-top: var(--spacing-lg);">
+            <div class="table-header">
+                <h2 style="display:flex;align-items:center;gap:8px;">📅 Upcoming SIF/AIM Meetings (Future Dates)</h2>
+            </div>
+            <div id="sif-aim-upcoming-wrapper" class="table-wrapper">
+                <div class="empty-state" style="padding:24px;"><span style="color:var(--text-secondary);">Loading...</span></div>
+            </div>
+        </div>
+
+        <div id="sif-aim-recent-section" class="table-section" style="margin-top: var(--spacing-lg);">
+            <div class="table-header" style="background:#FEE2E2;">
+                <h2 style="display:flex;align-items:center;gap:8px;color:#DC2626;">🔄 Post SIF/AIM Actions - Prior 21 Days (<span id="recent-count">0</span> Initiatives)</h2>
+            </div>
+            <div id="sif-aim-recent-wrapper" class="table-wrapper">
+                <div class="empty-state" style="padding:24px;"><span style="color:var(--text-secondary);">Loading...</span></div>
+            </div>
+        </div>
+
+        <!-- Project Summary Modal -->
+        <div id="project-summary-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:rgba(0,0,0,0.5);overflow-y:auto;padding:40px 20px;">
+            <div style="max-width:1200px;margin:0 auto;background:#EFF6FF;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;">
+                <!-- Close button -->
+                <button onclick="closeProjectSummary()" style="position:absolute;top:16px;right:16px;background:#1E3A8A;color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;">×</button>
+                <!-- Header bar -->
+                <div style="background:#1E3A8A;padding:20px 32px;border-radius:12px 12px 0 0;">
+                    <h2 id="ps-title" style="color:white;font-size:24px;margin:0;font-weight:700;"></h2>
+                    <div style="display:flex;gap:24px;margin-top:8px;color:#93C5FD;font-size:14px;">
+                        <span>Team: <strong id="ps-team" style="color:white;"></strong></span>
+                        <span>Owner: <strong id="ps-owner" style="color:white;"></strong></span>
+                    </div>
+                </div>
+                <!-- Description -->
+                <div style="padding:20px 32px 0;">
+                    <p id="ps-description" style="color:#1E3A5F;font-size:14px;line-height:1.6;margin:0;background:#DBEAFE;padding:12px 16px;border-radius:8px;border-left:4px solid #3B82F6;"></p>
+                </div>
+                <!-- Body -->
+                <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;padding:24px 32px;">
+                    <!-- Left Panel: Insights -->
+                    <div style="background:white;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                        <h3 style="color:#1E3A5F;font-family:Georgia,serif;font-style:italic;font-size:18px;margin:0 0 16px;border-bottom:2px solid #E5E7EB;padding-bottom:8px;">Insights-</h3>
+                        <div id="ps-insights-content" style="font-size:14px;color:#374151;line-height:1.7;"></div>
+                        
+                        <h3 style="color:#1E3A5F;font-family:Georgia,serif;font-style:italic;font-size:18px;margin:24px 0 12px;border-bottom:2px solid #E5E7EB;padding-bottom:8px;">Updates-</h3>
+                        <div id="ps-updates-content" style="font-size:14px;color:#374151;line-height:1.7;"></div>
+                    </div>
+                    <!-- Right Panel: Timeline + Metrics -->
+                    <div style="display:flex;flex-direction:column;gap:16px;">
+                        <!-- Timeline -->
+                        <div style="background:white;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                            <div id="ps-timeline" style="font-size:13px;color:#374151;"></div>
+                        </div>
+                        <!-- Metrics -->
+                        <div style="background:white;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                            <h4 style="color:#1E3A5F;font-family:Georgia,serif;font-style:italic;font-size:16px;margin:0 0 12px;letter-spacing:2px;">Metrics-</h4>
+                            <div id="ps-metrics-content" style="font-size:13px;"></div>
+                        </div>
+                        <!-- Store Count -->
+                        <div style="background:white;border-radius:8px;padding:16px 20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                            <div style="font-size:12px;color:#6B7280;font-weight:600;">Store Count</div>
+                            <div id="ps-store-count" style="font-size:22px;font-weight:700;color:#1E3A5F;margin-top:4px;">0</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -988,19 +1083,17 @@
         // Custom order: Pending+Unassigned first, then Dallas POC, Intake & Test, Deployment, then remaining No Selection Provided
         function getOwnershipOrder(data, phaseOrder) {
             const UNASSIGNED = 'No Selection Provided';
-            const OWNERSHIP_ORDER = ['Dallas VET', 'Intake & Test', 'Deployment', UNASSIGNED];
+            const OWNERSHIP_ORDER = ['Dallas Team', 'Intake & Test', 'Deployment', UNASSIGNED];
             const sections = []; // {ownership, phase, rows}
-
-            // 1. Pending + unassigned (null or "No Selection Provided") → always first
-            const pendingUnassigned = data.filter(r =>
-                r.Phase === 'Pending' && (!r['TDA Ownership'] || r['TDA Ownership'] === UNASSIGNED));
-            if (pendingUnassigned.length > 0) {
-                sections.push({ ownership: 'TDA Ownership - Currently No TDA Ownership', phase: 'Pending', rows: pendingUnassigned, isSpecial: false });
-            }
+            
+            // Separate Operating Model projects (title contains "Ops Model" or "Operation Model")
+            const opsModelPattern = /ops\s*model|operation\s*model/i;
+            const opsModelRows = data.filter(r => opsModelPattern.test(r['Initiative - Project Title'] || ''));
+            const nonOpsData = data.filter(r => !opsModelPattern.test(r['Initiative - Project Title'] || ''));
 
             // 2. Build ordered ownership list: defined order first, then any new values alphabetically
             const ownershipSet = new Set();
-            data.forEach(r => {
+            nonOpsData.forEach(r => {
                 const own = (r['TDA Ownership'] === '*Select Owner' || !r['TDA Ownership']) ? UNASSIGNED : r['TDA Ownership'];
                 r['TDA Ownership'] = own;
                 ownershipSet.add(own);
@@ -1012,9 +1105,7 @@
             // 3. For each ownership → for each phase → collect rows
             ownershipList.forEach(ownership => {
                 phaseOrder.forEach(phase => {
-                    // Skip the special Pending+unassigned group already handled
-                    if (phase === 'Pending' && ownership === UNASSIGNED) return;
-                    const rows = data.filter(r => {
+                    const rows = nonOpsData.filter(r => {
                         const own = r['TDA Ownership'] || UNASSIGNED;
                         return own === ownership && r.Phase === phase;
                     });
@@ -1024,6 +1115,12 @@
                     }
                 });
             });
+            
+            // 4. Add Operating Model group at the end
+            if (opsModelRows.length > 0) {
+                sections.push({ ownership: 'Operating Model', phase: '', rows: opsModelRows, isSpecial: false });
+            }
+            
             return sections;
         }
 
@@ -1081,16 +1178,16 @@
             // Determine which notes columns to show based on TDA Ownership
             const ownershipLabel = pageData.ownership || '';
             let noteColumns = [];
-            if (ownershipLabel.includes('Currently No TDA Ownership')) {
-                noteColumns = ['Dallas VET', 'Intake & Testing', 'Deployment'];
-            } else if (ownershipLabel === 'Dallas VET') {
-                noteColumns = ['Dallas VET'];
+            if (ownershipLabel.includes('Currently No TDA Ownership') || ownershipLabel === 'Operating Model') {
+                noteColumns = ['Dallas Team', 'Intake & Testing', 'Deployment'];
+            } else if (ownershipLabel === 'Dallas Team') {
+                noteColumns = ['Dallas Team'];
             } else if (ownershipLabel === 'Intake & Test' || ownershipLabel === 'Intake & Testing') {
                 noteColumns = ['Intake & Testing'];
             } else if (ownershipLabel === 'Deployment') {
                 noteColumns = ['Deployment'];
             } else {
-                noteColumns = ['Dallas VET', 'Intake & Testing', 'Deployment'];
+                noteColumns = ['Dallas Team', 'Intake & Testing', 'Deployment'];
             }
             
             const columns = [
@@ -1110,7 +1207,8 @@
             html += '</tr></thead><tbody>';
             
             pageData.rows.forEach(row => {
-                html += '<tr>';
+                const rowProjectId = row['Project ID'] || 0;
+                html += `<tr style="cursor:pointer;" onclick="openProjectSummary(${rowProjectId})">`;
                 columns.forEach(col => {
                     let value = row[col] ?? '';
                     let cellClass = '';
@@ -1195,10 +1293,18 @@
         function updateSummary(data) {
             document.getElementById('stat-projects').textContent = data.length;
             
-            const totalStores = data.reduce((sum, row) => {
-                return sum + (parseInt(row['# of Stores']) || 0);
-            }, 0);
-            document.getElementById('stat-stores').textContent = totalStores.toLocaleString();
+            // Team counts
+            const dallasTeam = data.filter(r => r['TDA Ownership'] === 'Dallas Team').length;
+            const intakeTest = data.filter(r => r['TDA Ownership'] === 'Intake & Test').length;
+            const deployment = data.filter(r => r['TDA Ownership'] === 'Deployment').length;
+            // Operating Model: "Ops Model" or "Operation Model" in title
+            const opsModelPattern = /ops\s*model|operation\s*model/i;
+            const opsModel = data.filter(r => opsModelPattern.test(r['Initiative - Project Title'] || '')).length;
+            
+            document.getElementById('stat-dallas-team').textContent = dallasTeam;
+            document.getElementById('stat-intake-test').textContent = intakeTest;
+            document.getElementById('stat-deployment').textContent = deployment;
+            document.getElementById('stat-ops-model').textContent = opsModel;
             
             let onTrack = 0;
             let atRisk = 0;
@@ -1217,6 +1323,153 @@
             document.getElementById('stat-at-risk').textContent = atRisk;
             document.getElementById('stat-off-track').textContent = offTrack;
             document.getElementById('stat-continuous').textContent = continuous;
+            
+            // Upcoming count — loaded from SIF/AIM data
+            loadUpcomingCount();
+        }
+        
+        // Load upcoming count from SIF/AIM endpoint
+        async function loadUpcomingCount() {
+            try {
+                const res = await fetch(`${API_BASE}/sif-aim`);
+                const result = await res.json();
+                if (result.success && result.data) {
+                    sifAimData = result.data;
+                    const upcomingCount = result.data.unique_upcoming_count ?? (result.data.upcoming || []).length;
+                    document.getElementById('stat-upcoming').textContent = upcomingCount;
+                    renderSifAimSections(result.data);
+                }
+            } catch (e) {
+                console.error('Error loading SIF/AIM data:', e);
+            }
+        }
+        
+        // Active metric filter state
+        let activeMetricFilter = null;
+        let sifAimData = null;
+        
+        // Filter dashboard by clicking metric boxes
+        function filterByMetric(metric) {
+            const cards = document.querySelectorAll('.stat-card');
+            
+            // Toggle off if same metric clicked again
+            if (activeMetricFilter === metric) {
+                activeMetricFilter = null;
+                cards.forEach(c => c.classList.remove('active'));
+                resetFilters();
+                loadData();
+                return;
+            }
+            
+            activeMetricFilter = metric;
+            cards.forEach(c => c.classList.remove('active'));
+            document.querySelector(`.stat-card[data-filter="${metric}"]`).classList.add('active');
+            
+            switch (metric) {
+                case 'total-active':
+                    resetFilters();
+                    loadData();
+                    break;
+                case 'upcoming':
+                    // Scroll to upcoming section
+                    const upcomingSection = document.getElementById('sif-aim-section');
+                    if (upcomingSection) upcomingSection.scrollIntoView({ behavior: 'smooth' });
+                    break;
+                case 'dallas-team':
+                    applyOwnershipFilter('Dallas Team');
+                    break;
+                case 'intake-test':
+                    applyOwnershipFilter('Intake & Test');
+                    break;
+                case 'deployment':
+                    applyOwnershipFilter('Deployment');
+                    break;
+                case 'ops-model':
+                    applyOpsModelFilter();
+                    break;
+                case 'on-track':
+                    applyHealthFilter('On Track');
+                    break;
+                case 'at-risk':
+                    applyHealthFilter('At Risk');
+                    break;
+                case 'off-track':
+                    applyHealthFilter('Off Track');
+                    break;
+                case 'continuous':
+                    applyHealthFilter('Continuous');
+                    break;
+            }
+        }
+        
+        // Apply ownership filter programmatically
+        function applyOwnershipFilter(ownership) {
+            // Uncheck all ownership checkboxes, then check only the target
+            const panel = document.getElementById('ownership-dropdown-panel');
+            panel.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                if (cb.dataset.selectAll) {
+                    cb.checked = false;
+                } else {
+                    cb.checked = (cb.value === ownership);
+                }
+            });
+            updateDropdownLabel('ownership-dropdown', tdaOwnerships.length);
+            // Reset other filters to all
+            resetFilterExcept('ownership');
+            loadData();
+        }
+        
+        // Apply health status filter programmatically
+        function applyHealthFilter(status) {
+            const panel = document.getElementById('health-dropdown-panel');
+            panel.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                if (cb.dataset.selectAll) {
+                    cb.checked = false;
+                } else {
+                    cb.checked = (cb.value === status);
+                }
+            });
+            updateDropdownLabel('health-dropdown', healthStatuses.length);
+            resetFilterExcept('health');
+            loadData();
+        }
+        
+        // Apply Operating Model filter (by title search)
+        function applyOpsModelFilter() {
+            // Filter by titles matching ops/operation model
+            const opsPattern = /ops\s*model|operation\s*model/i;
+            const matchingTitles = projectTitles.filter(t => opsPattern.test(t));
+            const panel = document.getElementById('title-dropdown-panel');
+            panel.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                if (cb.dataset.selectAll) {
+                    cb.checked = false;
+                } else {
+                    cb.checked = matchingTitles.includes(cb.value);
+                }
+            });
+            updateDropdownLabel('title-dropdown', projectTitles.length);
+            resetFilterExcept('title');
+            loadData();
+        }
+        
+        // Reset all filters except the specified one
+        function resetFilterExcept(except) {
+            if (except !== 'phase') {
+                document.querySelectorAll('#phase-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
+                updateDropdownLabel('phase-dropdown', phases.length);
+            }
+            if (except !== 'health') {
+                document.querySelectorAll('#health-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
+                updateDropdownLabel('health-dropdown', healthStatuses.length);
+            }
+            if (except !== 'ownership') {
+                document.querySelectorAll('#ownership-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
+                updateDropdownLabel('ownership-dropdown', tdaOwnerships.length);
+            }
+            if (except !== 'title') {
+                document.querySelectorAll('#title-dropdown-panel input[type="checkbox"]').forEach(cb => cb.checked = true);
+                updateDropdownLabel('title-dropdown', projectTitles.length);
+            }
         }
 // Update record count
         function updateRecordCount(count) {
@@ -1375,16 +1628,16 @@
                         // Determine which notes columns to show based on TDA Ownership
                         const ownershipLabel = ownershipKey || '';
                         let noteColumns = [];
-                        if (ownershipLabel.includes('Currently No TDA Ownership')) {
-                            noteColumns = ['Dallas VET', 'Intake & Testing', 'Deployment'];
-                        } else if (ownershipLabel === 'Dallas VET') {
-                            noteColumns = ['Dallas VET'];
+                        if (ownershipLabel.includes('Currently No TDA Ownership') || ownershipLabel === 'Operating Model') {
+                            noteColumns = ['Dallas Team', 'Intake & Testing', 'Deployment'];
+                        } else if (ownershipLabel === 'Dallas Team') {
+                            noteColumns = ['Dallas Team'];
                         } else if (ownershipLabel === 'Intake & Test' || ownershipLabel === 'Intake & Testing') {
                             noteColumns = ['Intake & Testing'];
                         } else if (ownershipLabel === 'Deployment') {
                             noteColumns = ['Deployment'];
                         } else {
-                            noteColumns = ['Dallas VET', 'Intake & Testing', 'Deployment'];
+                            noteColumns = ['Dallas Team', 'Intake & Testing', 'Deployment'];
                         }
                         const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', ...noteColumns];
                         let html = `<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
@@ -1619,7 +1872,7 @@
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Health Status</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Phase</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;"># of Stores</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Dallas VET</th>
+                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Dallas Team</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Intake & Testing</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Deployment</th>
                         </tr>
@@ -1641,7 +1894,7 @@
                 let testRow = document.createElement('tr');
                 testRow.style.cssText = 'border: 1px solid #ddd;';
                 
-                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas VET', 'Intake & Testing', 'Deployment'];
+                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas Team', 'Intake & Testing', 'Deployment'];
                 columns.forEach(col => {
                     const td = document.createElement('td');
                     td.style.cssText = 'padding: 8px; border: 1px solid #ddd; word-wrap: break-word; white-space: normal;';
@@ -1790,6 +2043,188 @@
 
     <script>
         // Feedback functions
+        // ═══════════════════════════════════════════════════════════
+        // SIF/AIM Sections Rendering
+        // ═══════════════════════════════════════════════════════════
+        function renderSifAimSections(data) {
+            // Upcoming table — deduplicate by project_id + meeting + date
+            const upcomingWrapper = document.getElementById('sif-aim-upcoming-wrapper');
+            const upcoming = data.upcoming || [];
+            
+            // Deduplicate: keep only unique (project_id, meeting, date) combinations
+            const seen = new Set();
+            const dedupedUpcoming = [];
+            upcoming.forEach(item => {
+                const key = `${item.project_id || ''}_${item.meeting || ''}_${item.date || ''}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    dedupedUpcoming.push(item);
+                }
+            });
+            
+            if (dedupedUpcoming.length === 0) {
+                upcomingWrapper.innerHTML = '<div class="empty-state" style="padding:24px;">No upcoming SIF/AIM meetings scheduled.</div>';
+            } else {
+                let html = '<table><thead><tr><th>Project Title</th><th>Meeting</th><th>Scheduled Date</th></tr></thead><tbody>';
+                dedupedUpcoming.forEach(item => {
+                    const badgeClass = item.meeting === 'AIM' ? 'badge-at-risk' : 'badge-on-track';
+                    const badgeColor = item.meeting === 'AIM' ? 'background:#FFC107;color:#000;' : 'background:#3B82F6;color:#fff;';
+                    html += `<tr style="cursor:pointer;" onclick="openProjectSummaryByTitle('${(item.title || '').replace(/'/g, "\\'")}', ${item.project_id || 0})">`;
+                    html += `<td>${item.title}</td>`;
+                    html += `<td><span class="badge" style="${badgeColor}font-weight:700;padding:4px 12px;border-radius:4px;">${item.meeting}</span></td>`;
+                    html += `<td>${formatDate(item.date)}</td>`;
+                    html += `</tr>`;
+                });
+                html += '</tbody></table>';
+                upcomingWrapper.innerHTML = html;
+            }
+            
+            // Recent actions table
+            const recentWrapper = document.getElementById('sif-aim-recent-wrapper');
+            const recent = data.recent_actions || [];
+            document.getElementById('recent-count').textContent = recent.length;
+            if (recent.length === 0) {
+                recentWrapper.innerHTML = '<div class="empty-state" style="padding:24px;">No SIF/AIM actions in the prior 21 days.</div>';
+            } else {
+                let html = '<table><thead><tr><th>Initiative Title</th><th>Meeting</th><th>Date</th><th>Comment</th></tr></thead><tbody>';
+                recent.forEach(item => {
+                    const badgeColor = item.meeting === 'AIM' ? 'background:#FFC107;color:#000;' : 'background:#3B82F6;color:#fff;';
+                    html += `<tr>`;
+                    html += `<td>${item.title}</td>`;
+                    html += `<td><span class="badge" style="${badgeColor}font-weight:700;padding:4px 12px;border-radius:4px;">${item.meeting}</span></td>`;
+                    html += `<td>${formatDate(item.date)}</td>`;
+                    html += `<td>${item.note || ''}</td>`;
+                    html += `</tr>`;
+                });
+                html += '</tbody></table>';
+                recentWrapper.innerHTML = html;
+            }
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // Project Summary Detail View
+        // ═══════════════════════════════════════════════════════════
+        function openProjectSummary(projectId) {
+            if (!projectId) return;
+            const modal = document.getElementById('project-summary-modal');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Show loading state
+            document.getElementById('ps-title').textContent = 'Loading...';
+            document.getElementById('ps-team').textContent = '';
+            document.getElementById('ps-owner').textContent = '';
+            document.getElementById('ps-description').textContent = '';
+            document.getElementById('ps-insights-content').innerHTML = '';
+            document.getElementById('ps-updates-content').innerHTML = '';
+            document.getElementById('ps-timeline').innerHTML = '';
+            document.getElementById('ps-metrics-content').innerHTML = '';
+            document.getElementById('ps-store-count').textContent = '0';
+            
+            // Fetch detail from API
+            fetch(`${API_BASE}/project-detail/${encodeURIComponent(projectId)}`)
+                .then(res => res.json())
+                .then(result => {
+                    if (result.success && result.project) {
+                        renderProjectSummary(result.project);
+                    } else {
+                        document.getElementById('ps-title').textContent = 'Project not found';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading project detail:', err);
+                    document.getElementById('ps-title').textContent = 'Error loading project';
+                });
+        }
+        
+        function openProjectSummaryByTitle(title, projectId) {
+            if (projectId) {
+                openProjectSummary(projectId);
+            }
+        }
+        
+        function closeProjectSummary() {
+            document.getElementById('project-summary-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeProjectSummary();
+        });
+        
+        function renderProjectSummary(project) {
+            document.getElementById('ps-title').textContent = project.title || 'Untitled';
+            document.getElementById('ps-team').textContent = project.team || project.store_area || 'N/A';
+            document.getElementById('ps-owner').textContent = project.owner || 'N/A';
+            document.getElementById('ps-description').textContent = project.summary || 'No description available.';
+            document.getElementById('ps-store-count').textContent = project.store_count || 0;
+            
+            // Insights content (using team notes as subsections)
+            let insightsHtml = '';
+            if (project.dallas_team_notes && project.dallas_team_notes !== 'N/A') {
+                insightsHtml += `<div style="margin-bottom:16px;"><strong style="color:#1E3A5F;font-style:italic;">Dallas Team Notes</strong><ul style="margin:6px 0 0 16px;">${project.dallas_team_notes.split(/[.;]/).filter(s=>s.trim()).map(s=>`<li>${s.trim()}</li>`).join('')}</ul></div>`;
+            }
+            if (project.intake_testing_notes && project.intake_testing_notes !== 'N/A') {
+                insightsHtml += `<div style="margin-bottom:16px;"><strong style="color:#1E3A5F;font-style:italic;">Intake & Testing</strong><ul style="margin:6px 0 0 16px;">${project.intake_testing_notes.split(/[.;]/).filter(s=>s.trim()).map(s=>`<li>${s.trim()}</li>`).join('')}</ul></div>`;
+            }
+            if (project.deployment_notes && project.deployment_notes !== 'N/A') {
+                insightsHtml += `<div style="margin-bottom:16px;"><strong style="color:#1E3A5F;font-style:italic;">Deployment</strong><ul style="margin:6px 0 0 16px;">${project.deployment_notes.split(/[.;]/).filter(s=>s.trim()).map(s=>`<li>${s.trim()}</li>`).join('')}</ul></div>`;
+            }
+            if (!insightsHtml) insightsHtml = '<p style="color:#6B7280;">No insights data available.</p>';
+            document.getElementById('ps-insights-content').innerHTML = insightsHtml;
+            
+            // Updates
+            const updateHtml = project.latest_update
+                ? `<ul style="margin:0 0 0 16px;">${project.latest_update.split(/[.;]/).filter(s=>s.trim()).map(s=>`<li>${s.trim()}</li>`).join('')}</ul>`
+                : '<p style="color:#6B7280;">No recent updates.</p>';
+            document.getElementById('ps-updates-content').innerHTML = updateHtml;
+            
+            // Timeline
+            let timelineHtml = '<div style="border-left:3px solid #FFC220;padding-left:16px;">';
+            if (project.start_date) {
+                timelineHtml += `<div style="margin-bottom:12px;"><div style="font-weight:700;color:#1E3A5F;">Start Date</div><div style="font-size:12px;color:#6B7280;">${formatDate(project.start_date)}</div></div>`;
+            }
+            if (project.sif_date) {
+                timelineHtml += `<div style="margin-bottom:12px;"><div style="font-weight:700;color:#1E3A5F;">⭐ SIF Meeting</div><div style="font-size:12px;color:#6B7280;">${formatDate(project.sif_date)}</div></div>`;
+            }
+            if (project.aim_date) {
+                timelineHtml += `<div style="margin-bottom:12px;"><div style="font-weight:700;color:#1E3A5F;">⭐ AIM Meeting</div><div style="font-size:12px;color:#6B7280;">${formatDate(project.aim_date)}</div></div>`;
+            }
+            if (project.end_date) {
+                timelineHtml += `<div style="margin-bottom:12px;"><div style="font-weight:700;color:#1E3A5F;">Target Completion</div><div style="font-size:12px;color:#6B7280;">${formatDate(project.end_date)}</div></div>`;
+            }
+            if (!project.start_date && !project.sif_date && !project.aim_date && !project.end_date) {
+                timelineHtml += '<p style="color:#6B7280;font-size:13px;">No timeline data available.</p>';
+            }
+            timelineHtml += '</div>';
+            document.getElementById('ps-timeline').innerHTML = timelineHtml;
+            
+            // Metrics
+            const metrics = project.metrics || [];
+            if (metrics.length === 0) {
+                document.getElementById('ps-metrics-content').innerHTML = '<p style="color:#6B7280;font-size:12px;">No metrics data available.</p>';
+            } else {
+                let metricsHtml = '<table style="width:100%;font-size:13px;border-collapse:collapse;">';
+                metricsHtml += '<thead><tr style="border-bottom:1px solid #E5E7EB;"><th style="text-align:left;padding:4px 0;font-weight:600;">Metric</th><th style="text-align:right;padding:4px 0;">Actual</th><th style="text-align:right;padding:4px 0;">Lift</th></tr></thead><tbody>';
+                metrics.forEach(m => {
+                    const liftVal = m.lift || '';
+                    const isPositive = !liftVal.startsWith('-');
+                    const liftColor = liftVal ? (isPositive ? '#16A34A' : '#DC2626') : '#6B7280';
+                    const liftArrow = liftVal ? (isPositive ? '▲' : '▼') : '';
+                    metricsHtml += `<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:6px 0;">${m.metric_name}</td><td style="text-align:right;padding:6px 0;">${m.actual !== null ? m.actual : '-'}</td><td style="text-align:right;padding:6px 0;color:${liftColor};font-weight:600;">${liftArrow} ${liftVal}</td></tr>`;
+                });
+                metricsHtml += '</tbody></table>';
+                document.getElementById('ps-metrics-content').innerHTML = metricsHtml;
+            }
+        }
+
         function openFeedback() {
             document.getElementById('feedback-modal').style.display = 'flex';
         }

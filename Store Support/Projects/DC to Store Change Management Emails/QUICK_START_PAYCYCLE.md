@@ -5,6 +5,9 @@
 **Time Required:** 10-15 minutes  
 **Difficulty:** Easy (no coding required)
 
+**⚠️ IMPORTANT:** Current snapshots use SYNTHETIC TEST DATA. Real production data from SDL starts May 1, 2026.  
+See `DATA_SOURCE_CLARIFICATION.md` for details.
+
 ---
 
 ## 🎯 OPTION A: Simple (5 minutes) ✅ RECOMMENDED FOR FIRST TEST

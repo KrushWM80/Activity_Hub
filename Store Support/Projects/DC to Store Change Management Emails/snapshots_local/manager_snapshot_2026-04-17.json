@@ -1,0 +1,78 @@
+{
+  "generation_time": "2026-04-17T08:00:00",
+  "date": "2026-04-17",
+  "managers": [
+    {
+      "location_id": "100",
+      "location_name": "Rogers, AR",
+      "role": "Store Manager",
+      "manager_name": "JAMES RICHARDSON",
+      "location_type": "Store",
+      "market": "ARKANSAS",
+      "region": "SOUTHEAST"
+    },
+    {
+      "location_id": "103",
+      "location_name": "Bentonville, AR",
+      "role": "Store Manager",
+      "manager_name": "LISA ANDERSON",
+      "location_type": "Store",
+      "market": "ARKANSAS",
+      "region": "SOUTHEAST"
+    },
+    {
+      "location_id": "108",
+      "location_name": "Fort Smith, AR",
+      "role": "Store Manager",
+      "manager_name": "MARK STEPHENS",
+      "location_type": "Store",
+      "market": "ARKANSAS",
+      "region": "SOUTH"
+    },
+    {
+      "location_id": "121",
+      "location_name": "Little Rock, AR",
+      "role": "Store Manager",
+      "manager_name": "PATRICIA LOPEZ",
+      "location_type": "Store",
+      "market": "ARKANSAS",
+      "region": "SOUTH"
+    },
+    {
+      "location_id": "123",
+      "location_name": "Hot Springs, AR",
+      "role": "Store Manager",
+      "manager_name": "ROBERT WILLIAMS",
+      "location_type": "Store",
+      "market": "ARKANSAS",
+      "region": "SOUTH"
+    },
+    {
+      "location_id": "125",
+      "location_name": "Texarkana, AR",
+      "role": "Store Manager",
+      "manager_name": "JENNIFER MARTINEZ",
+      "location_type": "Store",
+      "market": "TEXAS",
+      "region": "SOUTH"
+    },
+    {
+      "location_id": "130",
+      "location_name": "Pine Bluff, AR",
+      "role": "Store Manager",
+      "manager_name": "DAVID BROWN",
+      "location_type": "Store",
+      "market": "ARKANSAS",
+      "region": "SOUTH"
+    },
+    {
+      "location_id": "136",
+      "location_name": "Fayetteville, AR",
+      "role": "Store Manager",
+      "manager_name": "SUSAN TAYLOR",
+      "location_type": "Store",
+      "market": "ARKANSAS",
+      "region": "NORTHWEST"
+    }
+  ]
+}

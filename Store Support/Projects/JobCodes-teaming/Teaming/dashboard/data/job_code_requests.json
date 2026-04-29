@@ -1,98 +1,153 @@
 [
   {
-    "id": 1777412525801,
-    "job_code": "All",
+    "id": 1777410999999,
+    "job_codes": [
+      "1-0-040407",
+      "1-0-040413",
+      "1-0-40225",
+      "1-0-40267",
+      "1-0-40296",
+      "1-0-40301"
+    ],
     "request_type": "job_code_update",
     "status": "pending",
     "requested_by": "krush",
     "requested_by_name": "Kendall Rush",
-    "requested_at": "2026-04-28T16:42:05.801454",
-    "reason": "Test - Fashion Job Code Update.",
-    "notes": "Submitted from New Request form by Kendall Rush",
+    "requested_at": "2026-04-29T14:30:00.000000",
+    "description": "Testing consolidated job code request - 6 codes in ONE request, not multiple",
+    "comments": [
+      {
+        "timestamp": "2026-04-29T12:58:52.382949",
+        "author": "admin",
+        "author_name": "Administrator",
+        "text": "This job code request looks good. Approving for implementation.",
+        "is_internal": false
+      },
+      {
+        "timestamp": "2026-04-29T13:14:22.277858",
+        "author": "admin",
+        "author_name": "Administrator",
+        "text": "Need to review - Test",
+        "is_internal": false
+      }
+    ],
+    "history": [
+      {
+        "timestamp": "2026-04-29T12:57:34.725694",
+        "changed_by": "admin",
+        "changed_by_name": "Administrator",
+        "field": "status",
+        "old_value": "pending",
+        "new_value": "approved"
+      },
+      {
+        "timestamp": "2026-04-29T13:14:30.229420",
+        "changed_by": "admin",
+        "changed_by_name": "Administrator",
+        "field": "status",
+        "old_value": "approved",
+        "new_value": "pending"
+      }
+    ],
+    "request_source": "test_data"
+  },
+  {
+    "id": 1777492231345,
+    "request_type": "Job Code - new_job_code",
+    "reason": "new_job_code",
+    "status": "pending",
+    "requested_by": "admin",
+    "requested_by_name": "Administrator",
+    "requested_at": "2026-04-29T14:50:31.345716",
+    "description": "Job Code Request",
+    "notes": "",
+    "comments": [],
+    "history": [],
     "request_source": "new_request_form"
   },
   {
-    "id": 1777412525803,
-    "job_code": "1-0-40349",
-    "request_type": "job_code_update",
+    "id": 1777492330971,
+    "request_type": "Job Code - Custom reason: Need to add exception to payroll system",
+    "reason": "other",
     "status": "pending",
-    "requested_by": "krush",
-    "requested_by_name": "Kendall Rush",
-    "requested_at": "2026-04-28T16:42:05.803106",
-    "reason": "Test - Fashion Job Code Update.",
-    "notes": "Submitted from New Request form by Kendall Rush",
+    "requested_by": "admin",
+    "requested_by_name": "Administrator",
+    "requested_at": "2026-04-29T14:52:10.971617",
+    "description": "Job Code Request",
+    "notes": "This is a special case that needs review",
+    "comments": [],
+    "history": [],
     "request_source": "new_request_form"
   },
   {
-    "id": 1777412525814,
-    "job_code": "1-23-101",
-    "request_type": "job_code_update",
+    "id": 1777492718882,
+    "job_codes": [
+      "1-0-040407",
+      "1-0-040413"
+    ],
+    "request_type": "Teaming - update_teaming",
+    "reason": "update_teaming",
+    "teams": [
+      "Operations",
+      "Finance"
+    ],
     "status": "pending",
-    "requested_by": "krush",
-    "requested_by_name": "Kendall Rush",
-    "requested_at": "2026-04-28T16:42:05.814029",
-    "reason": "Test - Fashion Job Code Update.",
-    "notes": "Submitted from New Request form by Kendall Rush",
+    "requested_by": "admin",
+    "requested_by_name": "Administrator",
+    "requested_at": "2026-04-29T14:58:38.882977",
+    "description": "Assign these job codes to Operations and Finance teams",
+    "notes": "",
+    "comments": [],
+    "history": [],
     "request_source": "new_request_form"
   },
   {
-    "id": 1777412525821,
-    "job_code": "1-23-201",
-    "request_type": "job_code_update",
+    "id": 1777493800748,
+    "request_type": "Job Code - update_job_code",
+    "reason": "update_job_code",
     "status": "pending",
-    "requested_by": "krush",
-    "requested_by_name": "Kendall Rush",
-    "requested_at": "2026-04-28T16:42:05.821034",
-    "reason": "Test - Fashion Job Code Update.",
-    "notes": "Submitted from New Request form by Kendall Rush",
+    "requested_by": "admin",
+    "requested_by_name": "Administrator",
+    "requested_at": "2026-04-29T15:16:40.748633",
+    "description": "Update Job Code(s): 1-0-040407, 1-0-040413, 1-0-40225",
+    "notes": "",
+    "comments": [],
+    "history": [],
     "request_source": "new_request_form"
   },
   {
-    "id": 1777412525829,
-    "job_code": "1-27-238",
-    "request_type": "job_code_update",
+    "id": 1777494411047,
+    "job_codes": [
+      "1-0-040407"
+    ],
+    "request_type": "Teaming - update_teaming",
+    "reason": "update_teaming",
+    "teams": [
+      "Auto Care Center",
+      "Deli/Bakery"
+    ],
     "status": "pending",
-    "requested_by": "krush",
-    "requested_by_name": "Kendall Rush",
-    "requested_at": "2026-04-28T16:42:05.829205",
-    "reason": "Test - Fashion Job Code Update.",
-    "notes": "Submitted from New Request form by Kendall Rush",
+    "requested_by": "admin",
+    "requested_by_name": "Administrator",
+    "requested_at": "2026-04-29T15:26:51.047416",
+    "description": "Update teaming for 1-0-040407 to: Auto Care Center, Deli/Bakery",
+    "notes": "",
+    "comments": [],
+    "history": [],
     "request_source": "new_request_form"
   },
   {
-    "id": 1777412525836,
-    "job_code": "1-625-7400",
-    "request_type": "job_code_update",
+    "id": 1777495035087,
+    "request_type": "Teaming - We need special seasonal staffing review for holidays",
+    "reason": "other",
     "status": "pending",
-    "requested_by": "krush",
-    "requested_by_name": "Kendall Rush",
-    "requested_at": "2026-04-28T16:42:05.836592",
-    "reason": "Test - Fashion Job Code Update.",
-    "notes": "Submitted from New Request form by Kendall Rush",
-    "request_source": "new_request_form"
-  },
-  {
-    "id": 1777412525844,
-    "job_code": "1-625-7420",
-    "request_type": "job_code_update",
-    "status": "pending",
-    "requested_by": "krush",
-    "requested_by_name": "Kendall Rush",
-    "requested_at": "2026-04-28T16:42:05.844073",
-    "reason": "Test - Fashion Job Code Update.",
-    "notes": "Submitted from New Request form by Kendall Rush",
-    "request_source": "new_request_form"
-  },
-  {
-    "id": 1777412525851,
-    "job_code": "1-993-1075",
-    "request_type": "job_code_update",
-    "status": "pending",
-    "requested_by": "krush",
-    "requested_by_name": "Kendall Rush",
-    "requested_at": "2026-04-28T16:42:05.851783",
-    "reason": "Test - Fashion Job Code Update.",
-    "notes": "Submitted from New Request form by Kendall Rush",
-    "request_source": "new_request_form"
+    "requested_by": "admin",
+    "requested_by_name": "Administrator",
+    "requested_at": "2026-04-29T15:37:15.087075",
+    "notes": "",
+    "comments": [],
+    "history": [],
+    "request_source": "new_request_form",
+    "description": "Teaming Request"
   }
 ]

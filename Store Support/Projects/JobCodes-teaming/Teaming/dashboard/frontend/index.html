@@ -594,7 +594,7 @@
                     <div class="text-center mb-5">
                         <h1 class="display-4 mb-3"><i class="bi bi-house-door"></i> Welcome</h1>
                         <p class="lead text-muted">Select which module you'd like to work with</p>
-                        <button class="btn btn-success btn-lg mt-3" onclick="openNewRequestModal()">
+                        <button class="btn btn-success btn-lg mt-3" onclick="openSubmitNewRequestModal()">
                             <i class="bi bi-plus-circle"></i> Submit New Request
                         </button>
                     </div>
@@ -776,8 +776,8 @@
                                 <button class="btn btn-outline-secondary btn-sm me-2" onclick="refreshJobCodesMaster()">
                                     <i class="bi bi-arrow-clockwise"></i> Refresh
                                 </button>
-                                <button class="btn btn-walmart btn-sm" onclick="openCreateJobCodeModal()">
-                                    <i class="bi bi-plus-circle"></i> Create Job Code
+                                <button class="btn btn-walmart btn-sm" onclick="openSubmitNewRequestModal()">
+                                    <i class="bi bi-plus-circle"></i> Submit New Request
                                 </button>
                             </div>
                         </div>
@@ -1077,10 +1077,10 @@
                                     <table class="table table-hover mb-0">
                                         <thead class="table-light">
                                             <tr>
+                                                <th>Job Code Count</th>
                                                 <th>Request Type</th>
-                                                <th>Job Code</th>
-                                                <th>Job Title</th>
-                                                <th>Category</th>
+                                                <th>Description</th>
+                                                <th>Status</th>
                                                 <th>Requested By</th>
                                                 <th>Date</th>
                                                 <th>Actions</th>
@@ -1494,88 +1494,140 @@
 
     <!-- Create/Edit Job Code Request Modal -->
     <div class="modal fade" id="jobCodeRequestModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> <span id="requestModalTitle">Create New Job Code</span></h5>
+                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Submit New Request</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="jobCodeRequestForm">
                         <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> Your request will be sent to administrators for review and approval.
+                            <i class="bi bi-info-circle"></i> Your request will be sent to administrators for review and approval. They will contact you if additional details are needed.
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">SMART Job Code <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="reqSmartCode" required placeholder="e.g., 1-202-2104">
+                        
+                        <!-- Request Type Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Request Type <span class="text-danger">*</span></label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="requestType" id="typeJobCode" value="job_code" onchange="updateRequestForm()" required>
+                                <label class="btn btn-outline-primary" for="typeJobCode">
+                                    <i class="bi bi-code-square"></i> Job Code
+                                </label>
+                                <input type="radio" class="btn-check" name="requestType" id="typeTeaming" value="teaming" onchange="updateRequestForm()">
+                                <label class="btn btn-outline-primary" for="typeTeaming">
+                                    <i class="bi bi-people"></i> Teaming
+                                </label>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Workday Job Code</label>
-                                <input type="text" class="form-control" id="reqWorkdayCode" placeholder="e.g., US-01-0202-002104">
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Job Title <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="reqJobTitle" required placeholder="e.g., Food & Consumables Coach">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Category <span class="text-danger">*</span></label>
-                                <select class="form-select" id="reqCategory" required>
+                        </div>
+
+                        <!-- Job Code Request Fields (Simplified) -->
+                        <div id="jobCodeFields" class="hidden">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Request Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="jobCodeReason" onchange="updateRequestForm()">
                                     <option value="">-- Select --</option>
-                                    <option value="Hourly">Hourly</option>
-                                    <option value="Salary">Salary</option>
-                                    <option value="Both">Both</option>
+                                    <option value="new_job_code">New Job Code</option>
+                                    <option value="update_job_code">Update a Job Code</option>
+                                    <option value="other">Other</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Workgroup <span class="text-danger">*</span></label>
-                                <select class="form-select" id="reqWorkgroup" required>
-                                    <option value="">-- Select Workgroup --</option>
-                                </select>
+                            
+                            <!-- New Job Code Fields -->
+                            <div id="newJobCodeFields" class="hidden">
+                                <!-- No special fields needed for new job code -->
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Team <span class="text-danger">*</span></label>
-                                <select class="form-select" id="reqTeam" required>
-                                    <option value="">-- Select Team --</option>
-                                </select>
+                            
+                            <!-- Update Job Code Fields (with multi-select search) -->
+                            <div id="updateJobCodeFields" class="hidden">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Select Job Code(s) to Update <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control mb-2" id="jobCodeSearchInput" placeholder="Search job codes...">
+                                    <div id="jobCodeSearchResults" class="border rounded p-2" style="max-height: 250px; overflow-y: auto;">
+                                        <!-- Results will be populated here -->
+                                    </div>
+                                    <div class="mt-2">
+                                        <small>Selected: <span id="selectedJobCodesCount">0</span> job codes</small>
+                                        <input type="hidden" id="updateJobCodesSelected" value="">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Job Family</label>
-                                <select class="form-select" id="reqJobFamily">
-                                    <option value="">-- Select Job Family --</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">PG Level</label>
-                                <select class="form-select" id="reqPGLevel">
-                                    <option value="">-- Select PG Level --</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Supervisor?</label>
-                                <select class="form-select" id="reqSupervisor">
-                                    <option value="">--</option>
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Reports to Title</label>
-                                <input type="text" class="form-control" id="reqReportsTo" placeholder="e.g., Store Manager">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Position Mgmt or Job Mgmt</label>
-                                <select class="form-select" id="reqMgmtType">
-                                    <option value="">--</option>
-                                    <option value="PM">Position Management (PM)</option>
-                                    <option value="JM">Job Management (JM)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Reason for Request <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="reqReason" rows="3" required placeholder="Explain why this job code is needed or what changes are required..."></textarea>
+                            
+                            <!-- Other Reason -->
+                            <div id="otherReasonFieldJobCode" class="mb-3 hidden">
+                                <label class="form-label">Please specify the reason <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="otherReasonTextJobCode" rows="2" placeholder="Describe the specific reason..."></textarea>
                             </div>
                         </div>
+
+                        <!-- Teaming Request Fields -->
+                        <div id="teamingFields" class="hidden">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Request Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="teamingReason" onchange="updateRequestForm()">
+                                    <option value="">-- Select --</option>
+                                    <option value="update_teaming">Update Teaming</option>
+                                    <option value="missing_teaming">Missing Teaming</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Update Teaming Fields -->
+                            <div id="updateTeamingFields" class="hidden">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Select Job Code <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control mb-2" id="teamingJobCodeSearch" placeholder="Search and select job code...">
+                                    <div id="teamingJobCodeResults" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                                        <!-- Results will be populated here -->
+                                    </div>
+                                    <input type="hidden" id="selectedTeamingJobCode" value="">
+                                    <div class="mt-2">
+                                        <small>Selected: <strong id="selectedTeamingJobCodeDisplay">None</strong></small>
+                                        <div id="currentTeamingDisplay" class="text-muted small mt-1"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Select Team to Assign <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="teamingTeamsSelect">
+                                        <option value="">-- Select Team --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Missing Teaming Fields -->
+                            <div id="missingTeamingFields" class="hidden">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Select Job Code with Missing Teaming <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control mb-2" id="missingTeamingJobCodeSearch" placeholder="Search job codes with missing teaming...">
+                                    <div id="missingTeamingJobCodeResults" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                                        <!-- Results will be populated here -->
+                                    </div>
+                                    <input type="hidden" id="selectedMissingTeamingJobCode" value="">
+                                    <div class="mt-2">
+                                        <small>Selected: <strong id="selectedMissingTeamingJobCodeDisplay">None</strong></small>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Assign Team <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="missingTeamingTeamsSelect">
+                                        <option value="">-- Select Team --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Other Reason (basic) -->
+                            <div id="otherReasonFieldTeaming" class="mb-3 hidden">
+                                <label class="form-label">Please specify the reason <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="otherReasonTextTeaming" rows="2" placeholder="Describe the specific reason..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- General Notes -->
+                        <div class="mb-3">
+                            <label class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="reqNotes" rows="2" placeholder="Any additional information..."></textarea>
+                        </div>
+
                         <button type="submit" class="btn btn-walmart w-100">Submit Request</button>
                     </form>
                 </div>
@@ -3201,31 +3253,28 @@ ${sourcesList}
                 }
                 
                 tbody.innerHTML = data.requests.map(req => {
-                    const requestType = req.request_type === 'create' ? 
-                        '<span class="badge bg-success">New</span>' : 
-                        '<span class="badge bg-warning">Update</span>';
-                    const changes = req.changes || {};
-                    const smartCode = changes['SMART Job Code'] || req.smart_job_code || '-';
-                    const jobTitle = changes['Job Title'] || req.job_title || '-';
-                    const category = changes['Category'] || '-';
+                    // Handle both old (single job_code) and new (job_codes array) format
+                    const jobCodes = req.job_codes || (req.job_code ? [req.job_code] : []);
+                    const jobCodeCount = jobCodes.length;
+                    
+                    // Get request type from request_type field
+                    const requestType = req.request_type || 'Job Code Request';
+                    
+                    const description = (req.description || '').substring(0, 50);
+                    const status = req.status || 'pending';
+                    const statusBadgeClass = status === 'pending' ? 'bg-warning' : status === 'approved' ? 'bg-success' : 'bg-danger';
                     
                     return `
                     <tr>
-                        <td>${requestType}</td>
-                        <td><strong>${smartCode}</strong></td>
-                        <td>${jobTitle}</td>
-                        <td>${category}</td>
-                        <td>${req.requested_by}</td>
+                        <td><strong>${jobCodeCount}</strong></td>
+                        <td><span class="badge bg-secondary">${requestType}</span></td>
+                        <td>${description}${(req.description || '').length > 50 ? '...' : ''}</td>
+                        <td><span class="badge ${statusBadgeClass}">${status}</span></td>
+                        <td>${req.requested_by_name || req.requested_by}</td>
                         <td>${new Date(req.requested_at).toLocaleDateString()}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary me-1" onclick="showJobCodeRequestDetail(${req.id})" title="View Details">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-success me-1" onclick="approveJobCodeRequest(${req.id})" title="Approve">
-                                <i class="bi bi-check-circle"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="rejectJobCodeRequest(${req.id})" title="Reject">
-                                <i class="bi bi-x-circle"></i>
+                            <button class="btn btn-sm btn-outline-primary" onclick="showAdminJobCodeRequestDetail(${req.id})" title="View & Edit">
+                                <i class="bi bi-eye"></i> View
                             </button>
                         </td>
                     </tr>
@@ -3234,6 +3283,81 @@ ${sourcesList}
             } catch (error) {
                 console.error('Failed to load job code requests:', error);
                 showToast('Failed to load job code requests', 'error');
+            }
+        }
+        
+        async function showAdminJobCodeRequestDetail(requestId) {
+            try {
+                const data = await api('/job-codes-master/requests');
+                const request = data.requests.find(r => r.id === requestId);
+                
+                if (!request) {
+                    showToast('Request not found', 'error');
+                    return;
+                }
+                
+                const jobCodes = request.job_codes || [];
+                const jobCodesHtml = jobCodes.map(code => `<span class="badge bg-info me-1 mb-1">${code}</span>`).join('');
+                
+                const commentsHtml = (request.comments || []).map(comment => `
+                    <div class="card mb-2">
+                        <div class="card-body py-2">
+                            <small class="text-muted">${comment.author} - ${new Date(comment.timestamp).toLocaleString()}</small>
+                            <p class="mb-0 mt-1">${comment.text}</p>
+                        </div>
+                    </div>
+                `).join('');
+                
+                const historyHtml = (request.history || []).map(entry => `
+                    <div class="small mb-1">
+                        <strong>${entry.field}:</strong> ${entry.old_value || entry.from || 'N/A'} → ${entry.new_value || entry.to} 
+                        <span class="text-muted">${new Date(entry.timestamp).toLocaleString()}</span>
+                    </div>
+                `).join('');
+                
+                const detailsHtml = `
+                    <div class="mb-3">
+                        <strong>Request Type:</strong> ${request.request_type === 'job_code_update' ? 'Update Existing Job Code' : 'Job Code Request'}<br>
+                        <strong>Requested By:</strong> ${request.requested_by_name || request.requested_by}<br>
+                        <strong>Date:</strong> ${new Date(request.requested_at).toLocaleString()}<br>
+                        <strong>Reason:</strong> ${request.description || 'Not provided'}
+                    </div>
+                    <hr>
+                    <h6>Job Codes:</h6>
+                    <div class="mb-3">${jobCodesHtml || '<span class="text-muted">None</span>'}</div>
+                    <hr>
+                    <div class="mb-3">
+                        <label for="statusSelect_${requestId}" class="form-label"><strong>Status:</strong></label>
+                        <select id="statusSelect_${requestId}" class="form-select" value="${request.status}">
+                            <option value="pending">Pending</option>
+                            <option value="in_review">In Review</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="commentText_${requestId}" class="form-label"><strong>Add Comment:</strong></label>
+                        <textarea id="commentText_${requestId}" class="form-control" rows="2" placeholder="Enter your comment..."></textarea>
+                        <button class="btn btn-sm btn-secondary mt-2" onclick="saveJobCodeComment(${requestId})">Add Comment</button>
+                    </div>
+                    ${commentsHtml ? `<hr><h6>Comments:</h6>${commentsHtml}` : ''}
+                    ${historyHtml ? `<hr><h6>Change History:</h6>${historyHtml}` : ''}
+                `;
+                
+                // Show in modal
+                const modalBody = document.getElementById('jobCodeRequestDetailContent');
+                if (modalBody) {
+                    modalBody.innerHTML = detailsHtml;
+                    const saveBtn = document.getElementById('jobCodeSaveChangesBtn');
+                    if (saveBtn) saveBtn.style.display = 'block';
+                    saveBtn.onclick = () => saveJobCodeRequestChanges(requestId);
+                    
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('jobCodeRequestDetailModal')) || new bootstrap.Modal(document.getElementById('jobCodeRequestDetailModal'));
+                    modal.show();
+                }
+            } catch (error) {
+                console.error('Failed to show admin request detail:', error);
+                showToast('Failed to load request details', 'error');
             }
         }
         
@@ -3337,6 +3461,55 @@ ${sourcesList}
             } catch (error) {
                 console.error('Failed to show request detail:', error);
                 showToast('Failed to load request details', 'error');
+            }
+        }
+        
+        async function saveJobCodeRequestChanges(requestId) {
+            try {
+                const statusSelect = document.getElementById(`statusSelect_${requestId}`);
+                const newStatus = statusSelect ? statusSelect.value : 'pending';
+                
+                await api(`/job-codes-master/requests/${requestId}/update-status`, {
+                    method: 'POST',
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                showToast('Request status updated');
+                loadAdminJobCodeRequests();
+                
+                // Refresh detail view
+                setTimeout(() => showAdminJobCodeRequestDetail(requestId), 500);
+            } catch (error) {
+                console.error('Failed to save changes:', error);
+                showToast('Failed to save changes', 'error');
+            }
+        }
+        
+        async function saveJobCodeComment(requestId) {
+            try {
+                const commentText = document.getElementById(`commentText_${requestId}`)?.value || '';
+                
+                if (!commentText.trim()) {
+                    showToast('Please enter a comment', 'warning');
+                    return;
+                }
+                
+                await api(`/job-codes-master/requests/${requestId}/add-comment`, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        text: commentText
+                    })
+                });
+                
+                showToast('Comment added');
+                const textarea = document.getElementById(`commentText_${requestId}`);
+                if (textarea) textarea.value = '';
+                
+                // Refresh detail view
+                setTimeout(() => showAdminJobCodeRequestDetail(requestId), 500);
+            } catch (error) {
+                console.error('Failed to add comment:', error);
+                showToast('Failed to add comment', 'error');
             }
         }
         
@@ -3836,32 +4009,62 @@ ${sourcesList}
             showToast('Job codes refreshed');
         }
         
-        function populateJobCodeDropdowns() {
-            // Get unique values for dropdowns
-            const workgroups = [...new Set(jobCodesMaster.map(jc => jc['Workgroup']).filter(Boolean))].sort();
-            const teams = [...new Set(jobCodesMaster.map(jc => jc['Team']).filter(Boolean))].sort();
-            const jobFamilies = [...new Set(jobCodesMaster.map(jc => jc['Job Family']).filter(Boolean))].sort();
-            const pgLevels = [...new Set(jobCodesMaster.map(jc => jc['PG Level']).filter(Boolean))].sort();
-            
-            // Populate Workgroup dropdown
-            const workgroupSelect = document.getElementById('reqWorkgroup');
-            workgroupSelect.innerHTML = '<option value="">-- Select Workgroup --</option>' +
-                workgroups.map(w => `<option value="${w}">${w}</option>`).join('');
-            
-            // Populate Team dropdown
-            const teamSelect = document.getElementById('reqTeam');
-            teamSelect.innerHTML = '<option value="">-- Select Team --</option>' +
-                teams.map(t => `<option value="${t}">${t}</option>`).join('');
-            
-            // Populate Job Family dropdown
-            const jobFamilySelect = document.getElementById('reqJobFamily');
-            jobFamilySelect.innerHTML = '<option value="">-- Select Job Family --</option>' +
-                jobFamilies.map(jf => `<option value="${jf}">${jf}</option>`).join('');
-            
-            // Populate PG Level dropdown
-            const pgLevelSelect = document.getElementById('reqPGLevel');
-            pgLevelSelect.innerHTML = '<option value="">-- Select PG Level --</option>' +
-                pgLevels.map(pg => `<option value="${pg}">${pg}</option>`).join('');
+        async function populateJobCodeDropdowns() {
+            try {
+                // Fetch teams and workgroups from API
+                const teamsResponse = await api('/teams');
+                const teamsData = teamsResponse.teams || [];
+                
+                // Extract unique workgroups and teams
+                const workgroupsSet = new Set();
+                const teamsSet = new Set();
+                
+                teamsData.forEach(item => {
+                    if (item.workgroupName && item.workgroupName.trim()) {
+                        workgroupsSet.add(item.workgroupName);
+                    }
+                    if (item.teamName && item.teamName.trim()) {
+                        teamsSet.add(item.teamName);
+                    }
+                });
+                
+                const workgroups = Array.from(workgroupsSet).sort();
+                const teams = Array.from(teamsSet).sort();
+                
+                // Get unique values for Job Family and PG Level from jobCodesMaster
+                const jobFamilies = [...new Set(jobCodesMaster.map(jc => jc['Job Family']).filter(Boolean))].sort();
+                const pgLevels = [...new Set(jobCodesMaster.map(jc => jc['PG Level']).filter(Boolean))].sort();
+                
+                // Populate Workgroup dropdown
+                const workgroupSelect = document.getElementById('reqWorkgroup');
+                if (workgroupSelect) {
+                    workgroupSelect.innerHTML = '<option value="">-- Select Workgroup --</option>' +
+                        workgroups.map(w => `<option value="${w}">${w}</option>`).join('');
+                }
+                
+                // Populate Team dropdown
+                const teamSelect = document.getElementById('reqTeam');
+                if (teamSelect) {
+                    teamSelect.innerHTML = '<option value="">-- Select Team --</option>' +
+                        teams.map(t => `<option value="${t}">${t}</option>`).join('');
+                }
+                
+                // Populate Job Family dropdown
+                const jobFamilySelect = document.getElementById('reqJobFamily');
+                if (jobFamilySelect) {
+                    jobFamilySelect.innerHTML = '<option value="">-- Select Job Family --</option>' +
+                        jobFamilies.map(jf => `<option value="${jf}">${jf}</option>`).join('');
+                }
+                
+                // Populate PG Level dropdown
+                const pgLevelSelect = document.getElementById('reqPGLevel');
+                if (pgLevelSelect) {
+                    pgLevelSelect.innerHTML = '<option value="">-- Select PG Level --</option>' +
+                        pgLevels.map(pg => `<option value="${pg}">${pg}</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Error populating dropdowns:', error);
+            }
         }
         
         function sortJobCodesMasterTable(field) {
@@ -4014,13 +4217,343 @@ ${sourcesList}
             modal.show();
         }
 
-        function openCreateJobCodeModal() {
-            document.getElementById('requestModalTitle').textContent = 'Create New Job Code';
+        async function openSubmitNewRequestModal() {
             document.getElementById('jobCodeRequestForm').reset();
-            document.getElementById('reqSmartCode').readOnly = false;
+            document.getElementById('jobCodeFields').classList.add('hidden');
+            document.getElementById('teamingFields').classList.add('hidden');
+            document.getElementById('otherReasonFieldJobCode').classList.add('hidden');
+            document.getElementById('otherReasonFieldTeaming').classList.add('hidden');
+            document.getElementById('newJobCodeFields').classList.add('hidden');
+            document.getElementById('updateJobCodeFields').classList.add('hidden');
+            document.getElementById('updateTeamingFields').classList.add('hidden');
+            document.getElementById('missingTeamingFields').classList.add('hidden');
+            document.getElementById('jobCodeSearchResults').innerHTML = '';
+            document.getElementById('updateJobCodesSelected').value = '';
+            document.getElementById('selectedJobCodesCount').textContent = '0';
+            document.getElementById('teamingJobCodeResults').innerHTML = '';
+            document.getElementById('selectedTeamingJobCode').value = '';
+            document.getElementById('selectedTeamingJobCodeDisplay').textContent = 'None';
+            document.getElementById('currentTeamingDisplay').innerHTML = '';
+            document.getElementById('missingTeamingJobCodeResults').innerHTML = '';
+            document.getElementById('selectedMissingTeamingJobCode').value = '';
+            document.getElementById('selectedMissingTeamingJobCodeDisplay').textContent = 'None';
+            document.getElementById('typeJobCode').checked = false;
+            document.getElementById('typeTeaming').checked = false;
             
             const modal = new bootstrap.Modal(document.getElementById('jobCodeRequestModal'));
             modal.show();
+        }
+        
+        function updateRequestForm() {
+            const requestType = document.querySelector('input[name="requestType"]:checked')?.value;
+            const jobCodeFields = document.getElementById('jobCodeFields');
+            const teamingFields = document.getElementById('teamingFields');
+            
+            if (requestType === 'job_code') {
+                jobCodeFields.classList.remove('hidden');
+                teamingFields.classList.add('hidden');
+                
+                // Show/hide sub-sections based on reason
+                const reason = document.getElementById('jobCodeReason').value;
+                updateJobCodeReasonFields(reason);
+            } else if (requestType === 'teaming') {
+                jobCodeFields.classList.add('hidden');
+                teamingFields.classList.remove('hidden');
+                
+                // Show/hide sub-sections based on reason
+                const reason = document.getElementById('teamingReason').value;
+                updateTeamingReasonFields(reason);
+            } else {
+                jobCodeFields.classList.add('hidden');
+                teamingFields.classList.add('hidden');
+            }
+        }
+        
+        function updateJobCodeReasonFields(reason) {
+            const newJobCodeFields = document.getElementById('newJobCodeFields');
+            const updateJobCodeFields = document.getElementById('updateJobCodeFields');
+            const otherReasonField = document.getElementById('otherReasonFieldJobCode');
+            
+            // Hide all by default
+            newJobCodeFields.classList.add('hidden');
+            updateJobCodeFields.classList.add('hidden');
+            otherReasonField.classList.add('hidden');
+            
+            if (reason === 'new_job_code') {
+                newJobCodeFields.classList.remove('hidden');
+            } else if (reason === 'update_job_code') {
+                updateJobCodeFields.classList.remove('hidden');
+                loadJobCodesForSearch();
+            } else if (reason === 'other') {
+                otherReasonField.classList.remove('hidden');
+            }
+        }
+        
+        function updateTeamingReasonFields(reason) {
+            const updateTeamingFields = document.getElementById('updateTeamingFields');
+            const missingTeamingFields = document.getElementById('missingTeamingFields');
+            const otherReasonField = document.getElementById('otherReasonFieldTeaming');
+            
+            // Hide all by default
+            updateTeamingFields.classList.add('hidden');
+            missingTeamingFields.classList.add('hidden');
+            otherReasonField.classList.add('hidden');
+            
+            if (reason === 'update_teaming') {
+                updateTeamingFields.classList.remove('hidden');
+                loadTeamsForSelect();
+                initializeTeamingJobCodeSearch();
+            } else if (reason === 'missing_teaming') {
+                missingTeamingFields.classList.remove('hidden');
+                loadTeamsForSelect();
+                initializeMissingTeamingJobCodeSearch();
+            } else if (reason === 'other') {
+                otherReasonField.classList.remove('hidden');
+            }
+        }
+        
+        // Multi-select job code search for Update Job Code
+        async function loadJobCodesForSearch() {
+            const searchInput = document.getElementById('jobCodeSearchInput');
+            const resultsContainer = document.getElementById('jobCodeSearchResults');
+            
+            // Show sample job codes and set up search
+            if (jobCodesMaster.length === 0) {
+                await loadJobCodesMaster();
+            }
+            
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                renderJobCodeSearchResults(searchTerm, resultsContainer);
+            });
+            
+            // Show initial results
+            renderJobCodeSearchResults('', resultsContainer);
+        }
+        
+        function renderJobCodeSearchResults(searchTerm, container) {
+            const filtered = jobCodesMaster.filter(jc => {
+                const code = jc['SMART Job Code'] || '';
+                const title = jc['Job Title'] || '';
+                const category = jc['Category'] || '';
+                return code.toLowerCase().includes(searchTerm) ||
+                       title.toLowerCase().includes(searchTerm) ||
+                       category.toLowerCase().includes(searchTerm);
+            }).slice(0, 50); // Limit to 50 results
+            
+            const selectedCodes = (document.getElementById('updateJobCodesSelected').value || '').split(',').filter(c => c);
+            
+            container.innerHTML = filtered.map(jc => {
+                const code = jc['SMART Job Code'];
+                const title = jc['Job Title'];
+                const isSelected = selectedCodes.includes(code);
+                return `
+                    <div class="form-check">
+                        <input class="form-check-input job-code-checkbox" type="checkbox" 
+                               id="jc_${code}" value="${code}" ${isSelected ? 'checked' : ''}
+                               onchange="updateSelectedJobCodes()">
+                        <label class="form-check-label" for="jc_${code}">
+                            <strong>${code}</strong> - ${title}
+                        </label>
+                    </div>
+                `;
+            }).join('');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-muted small">No job codes found</p>';
+            }
+        }
+        
+        function updateSelectedJobCodes() {
+            const checkboxes = document.querySelectorAll('.job-code-checkbox:checked');
+            const selectedCodes = Array.from(checkboxes).map(cb => cb.value);
+            document.getElementById('updateJobCodesSelected').value = selectedCodes.join(',');
+            document.getElementById('selectedJobCodesCount').textContent = selectedCodes.length;
+        }
+        
+        // Teaming job code search for Update Teaming
+        async function initializeTeamingJobCodeSearch() {
+            // Make sure job codes are loaded
+            if (!jobCodesMaster || jobCodesMaster.length === 0) {
+                await loadJobCodesMaster();
+            }
+            
+            const searchInput = document.getElementById('teamingJobCodeSearch');
+            const resultsContainer = document.getElementById('teamingJobCodeResults');
+            
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                renderTeamingJobCodeResults(searchTerm, resultsContainer);
+            });
+        }
+        
+        function renderTeamingJobCodeResults(searchTerm, container) {
+            const filtered = jobCodesMaster.filter(jc => {
+                const code = jc['SMART Job Code'] || '';
+                const title = jc['Job Title'] || '';
+                return code.toLowerCase().includes(searchTerm) ||
+                       title.toLowerCase().includes(searchTerm);
+            }).slice(0, 30);
+            
+            const selectedCode = document.getElementById('selectedTeamingJobCode').value;
+            
+            container.innerHTML = filtered.map(jc => {
+                const code = jc['SMART Job Code'];
+                const title = jc['Job Title'];
+                const currentTeam = jc['Team'] || '-';
+                const isSelected = selectedCode === code;
+                const teamDisplay = currentTeam && currentTeam !== '-' ? 
+                    `<span class="badge bg-info">Current: ${currentTeam}</span>` : 
+                    `<span class="badge bg-warning text-dark">No Team Assigned</span>`;
+                return `
+                    <div class="form-check" style="padding: 8px; border-bottom: 1px solid #eee;">
+                        <input class="form-check-input" type="radio" 
+                               name="teamingJobCodeRadio" id="tjc_${code}" value="${code}" 
+                               ${isSelected ? 'checked' : ''}
+                               onchange="selectTeamingJobCode('${code}', '${title}')">
+                        <label class="form-check-label" for="tjc_${code}" style="margin-left: 5px;">
+                            <strong>${code}</strong> - ${title}
+                            <br><small class="text-muted">${teamDisplay}</small>
+                        </label>
+                    </div>
+                `;
+            }).join('');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-muted small">No job codes found</p>';
+            }
+        }
+        
+        function selectTeamingJobCode(code, title) {
+            document.getElementById('selectedTeamingJobCode').value = code;
+            document.getElementById('selectedTeamingJobCodeDisplay').textContent = `${code} - ${title}`;
+            
+            // Clear search and close results
+            document.getElementById('teamingJobCodeSearch').value = '';
+            document.getElementById('teamingJobCodeResults').innerHTML = '';
+            
+            // Load current teaming for this job code
+            loadCurrentTeamingForJobCode(code);
+        }
+        
+        async function loadCurrentTeamingForJobCode(jobCode) {
+            try {
+                // In a real scenario, fetch from API. For now, show placeholder
+                const display = document.getElementById('currentTeamingDisplay');
+                display.innerHTML = '<em>Loading current teaming...</em>';
+                
+                // TODO: Fetch from API if available
+                // For now, just show the job code is selected
+                display.innerHTML = '<small class="text-muted">Ready to assign new team</small>';
+            } catch (error) {
+                console.error('Error loading current teaming:', error);
+            }
+        }
+        
+        function selectMissingTeamingJobCode(code, title) {
+            document.getElementById('selectedMissingTeamingJobCode').value = code;
+            document.getElementById('selectedMissingTeamingJobCodeDisplay').textContent = `${code} - ${title}`;
+            
+            // Clear search and close results
+            document.getElementById('missingTeamingJobCodeSearch').value = '';
+            document.getElementById('missingTeamingJobCodeResults').innerHTML = '';
+        }
+        
+        // Load teams for select dropdown
+        async function loadTeamsForSelect() {
+            try {
+                const response = await api('/teams');
+                const teamsList = response.teams || [];
+                const uniqueTeams = [...new Set(teamsList.map(t => t.teamName || t.name || t))].sort();
+                
+                const select = document.getElementById('teamingTeamsSelect');
+                select.innerHTML = '<option value="">-- Select Team --</option>' + 
+                    uniqueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
+                    
+                // Also populate missing teaming teams select (single select now)
+                const missingSelect = document.getElementById('missingTeamingTeamsSelect');
+                missingSelect.innerHTML = '<option value="">-- Select Team --</option>' + 
+                    uniqueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading teams:', error);
+            }
+        }
+        
+        async function initializeMissingTeamingJobCodeSearch() {
+            // Make sure job codes are loaded
+            if (!jobCodesMaster || jobCodesMaster.length === 0) {
+                await loadJobCodesMaster();
+            }
+            
+            const searchInput = document.getElementById('missingTeamingJobCodeSearch');
+            const resultsContainer = document.getElementById('missingTeamingJobCodeResults');
+            
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                renderMissingTeamingJobCodeResults(searchTerm, resultsContainer);
+            });
+        }
+        
+        function renderMissingTeamingJobCodeResults(searchTerm, container) {
+            // Filter job codes - show ONLY those with missing teaming (no teams assigned)
+            const filtered = jobCodesMaster.filter(jc => {
+                const code = jc['SMART Job Code'] || '';
+                const title = jc['Job Title'] || '';
+                const team = jc['Team'] || '';
+                
+                // Only include if:
+                // 1. Matches search term
+                // 2. Has NO team assigned (empty or dash)
+                const hasNoTeam = !team || team.trim() === '' || team === '-';
+                const matchesSearch = code.toLowerCase().includes(searchTerm) ||
+                       title.toLowerCase().includes(searchTerm);
+                
+                return matchesSearch && hasNoTeam;
+            }).slice(0, 30);
+            
+            const selectedCode = document.getElementById('selectedMissingTeamingJobCode').value;
+            
+            container.innerHTML = filtered.map(jc => {
+                const code = jc['SMART Job Code'];
+                const title = jc['Job Title'];
+                const isSelected = selectedCode === code;
+                const statusBadge = '<span class="badge bg-warning text-dark">Missing Teaming</span>';
+                return `
+                    <div class="form-check" style="padding: 8px; border-bottom: 1px solid #eee;">
+                        <input class="form-check-input" type="radio" 
+                               name="missingTeamingJobCodeRadio" id="mtjc_${code}" value="${code}" 
+                               ${isSelected ? 'checked' : ''}
+                               onchange="selectMissingTeamingJobCode('${code}', '${title}')">
+                        <label class="form-check-label" for="mtjc_${code}" style="margin-left: 5px;">
+                            <strong>${code}</strong> - ${title}
+                            <br><small class="text-muted">${statusBadge}</small>
+                        </label>
+                    </div>
+                `;
+            }).join('');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-muted small">No job codes with missing teaming found</p>';
+            }
+        }
+        
+        function toggleOtherReasonField() {
+            const requestType = document.querySelector('input[name="requestType"]:checked')?.value;
+            
+            if (requestType === 'job_code') {
+                updateJobCodeReasonFields(document.getElementById('jobCodeReason').value);
+            } else if (requestType === 'teaming') {
+                updateTeamingReasonFields(document.getElementById('teamingReason').value);
+            }
+        }
+        
+        function openCreateJobCodeModal() {
+            // Legacy function - now redirects to Submit New Request with Job Code type
+            openSubmitNewRequestModal();
+            setTimeout(() => {
+                document.getElementById('typeJobCode').checked = true;
+                updateRequestForm();
+            }, 100);
         }
 
         function requestJobCodeUpdate() {
@@ -4093,40 +4626,147 @@ ${sourcesList}
         document.getElementById('jobCodeRequestForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const isUpdate = document.getElementById('reqSmartCode').readOnly;
-            const changes = {
-                'SMART Job Code': document.getElementById('reqSmartCode').value,
-                'Workday Job Code': document.getElementById('reqWorkdayCode').value,
-                'Job Title': document.getElementById('reqJobTitle').value,
-                'Category': document.getElementById('reqCategory').value,
-                'Workgroup': document.getElementById('reqWorkgroup').value,
-                'Team': document.getElementById('reqTeam').value,
-                'Job Family': document.getElementById('reqJobFamily').value,
-                'PG Level': document.getElementById('reqPGLevel').value,
-                'Supervisor?': document.getElementById('reqSupervisor').value,
-                'Reports to Title': document.getElementById('reqReportsTo').value,
-                'Position Mgmt or Job Mgmt': document.getElementById('reqMgmtType').value
+            const requestType = document.querySelector('input[name="requestType"]:checked')?.value;
+            if (!requestType) {
+                showToast('Please select a request type', 'error');
+                return;
+            }
+            
+            let requestData = {
+                request_type: requestType,
+                submitter_name: currentUser.name,
+                submitter_email: currentUser.email,
+                notes: document.getElementById('reqNotes').value || ''
             };
+            
+            if (requestType === 'job_code') {
+                const reason = document.getElementById('jobCodeReason').value;
+                if (!reason) {
+                    showToast('Please select a request reason', 'error');
+                    return;
+                }
+                
+                // Handle different job code reasons
+                if (reason === 'new_job_code') {
+                    // New Job Code - no special fields
+                    let actualRequestType = 'Job Code - new_job_code';
+                    requestData.request_type = actualRequestType;
+                    requestData.reason = reason;
+                    requestData.description = 'New Job Code Request';
+                    
+                } else if (reason === 'update_job_code') {
+                    // Update Job Code - requires multi-select job codes
+                    const selectedCodes = document.getElementById('updateJobCodesSelected').value;
+                    if (!selectedCodes.trim()) {
+                        showToast('Please select at least one job code to update', 'error');
+                        return;
+                    }
+                    
+                    let actualRequestType = 'Job Code - update_job_code';
+                    requestData.request_type = actualRequestType;
+                    requestData.reason = reason;
+                    requestData.job_codes = selectedCodes.split(',').map(c => c.trim()).filter(c => c);
+                    requestData.description = 'Update Job Code(s): ' + requestData.job_codes.join(', ');
+                    
+                } else if (reason === 'other') {
+                    // Other - custom reason
+                    const otherText = document.getElementById('otherReasonTextJobCode').value;
+                    if (!otherText.trim()) {
+                        showToast('Please specify the reason', 'error');
+                        return;
+                    }
+                    let actualRequestType = 'Job Code - ' + otherText;
+                    requestData.request_type = actualRequestType;
+                    requestData.reason = reason;
+                    requestData.description = 'Job Code Request';
+                }
+                
+            } else if (requestType === 'teaming') {
+                const reason = document.getElementById('teamingReason').value;
+                if (!reason) {
+                    showToast('Please select a request reason', 'error');
+                    return;
+                }
+                
+                if (reason === 'update_teaming') {
+                    // Update Teaming - requires job code and single team
+                    const selectedJobCode = document.getElementById('selectedTeamingJobCode').value;
+                    const teamsSelect = document.getElementById('teamingTeamsSelect');
+                    const selectedTeam = teamsSelect.value;
+                    
+                    if (!selectedJobCode.trim()) {
+                        showToast('Please select a job code', 'error');
+                        return;
+                    }
+                    if (!selectedTeam) {
+                        showToast('Please select a team', 'error');
+                        return;
+                    }
+                    
+                    let actualRequestType = 'Teaming - update_teaming';
+                    requestData.request_type = actualRequestType;
+                    requestData.reason = reason;
+                    requestData.job_codes = [selectedJobCode];
+                    requestData.teams = [selectedTeam];
+                    requestData.description = `Update teaming for ${selectedJobCode} to: ${selectedTeam}`;
+                    
+                } else if (reason === 'missing_teaming') {
+                    // Missing Teaming - requires job code and single team
+                    const selectedJobCode = document.getElementById('selectedMissingTeamingJobCode').value;
+                    const teamsSelect = document.getElementById('missingTeamingTeamsSelect');
+                    const selectedTeam = teamsSelect.value;
+                    
+                    if (!selectedJobCode.trim()) {
+                        showToast('Please select a job code with missing teaming', 'error');
+                        return;
+                    }
+                    if (!selectedTeam) {
+                        showToast('Please select a team to assign', 'error');
+                        return;
+                    }
+                    
+                    let actualRequestType = 'Teaming - missing_teaming';
+                    requestData.request_type = actualRequestType;
+                    requestData.reason = reason;
+                    requestData.job_codes = [selectedJobCode];
+                    requestData.teams = [selectedTeam];
+                    requestData.description = `Assign missing teaming for ${selectedJobCode} to: ${selectedTeam}`;
+                    
+                } else if (reason === 'other') {
+                    // Other - custom reason (no job codes, teams, description needed)
+                    const otherText = document.getElementById('otherReasonTextTeaming').value;
+                    if (!otherText.trim()) {
+                        showToast('Please specify the reason', 'error');
+                        return;
+                    }
+                    let actualRequestType = 'Teaming - ' + otherText;
+                    requestData.request_type = actualRequestType;
+                    requestData.reason = reason;
+                    requestData.description = 'Teaming Request';
+                }
+            }
             
             showLoading();
             try {
-                await api('/job-codes-master/request', {
+                const response = await api('/submit-new-request', {
                     method: 'POST',
-                    body: JSON.stringify({
-                        type: isUpdate ? 'update' : 'create',
-                        job_code: changes['SMART Job Code'],
-                        changes: changes,
-                        reason: document.getElementById('reqReason').value
-                    })
+                    body: JSON.stringify(requestData)
                 });
                 
-                showToast(isUpdate ? 'Update request submitted successfully!' : 'Job code creation request submitted!', 'success');
+                showToast('Request submitted successfully!', 'success');
                 bootstrap.Modal.getInstance(document.getElementById('jobCodeRequestModal')).hide();
                 document.getElementById('jobCodeRequestForm').reset();
                 
-                // Load requests to update pending count and refresh display
+                // Reset hidden fields
+                document.getElementById('updateJobCodesSelected').value = '';
+                document.getElementById('selectedTeamingJobCode').value = '';
+                document.getElementById('selectedMissingTeamingJobCode').value = '';
+                document.getElementById('selectedJobCodesCount').textContent = '0';
+                
+                // Refresh relevant data
                 await loadJobCodeRequests();
                 await loadJobCodesMaster();
+                await loadAdminData();
             } catch (error) {
                 showToast('Failed to submit request: ' + error.message, 'error');
             }
@@ -4710,6 +5350,29 @@ ${sourcesList}
                 <div style="font-size: 3rem; margin-bottom: 16px;">âœ…</div>
                 <h3 style="margin: 0 0 12px; font-weight: 600; color: #1a202c;">Thank You!</h3>
                 <p style="color: #718096; margin: 0;">Your feedback has been submitted successfully and will help us improve.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Code Request Detail Modal -->
+    <div class="modal fade" id="jobCodeRequestDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Job Code Request Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="jobCodeRequestDetailContent">
+                        <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="jobCodeSaveChangesBtn" onclick="saveJobCodeRequestChanges()" style="display:none;">
+                        <i class="bi bi-check-circle"></i> Save Changes
+                    </button>
+                </div>
             </div>
         </div>
     </div>

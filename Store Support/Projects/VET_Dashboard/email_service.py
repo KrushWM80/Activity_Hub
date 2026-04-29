@@ -97,7 +97,7 @@ class VETEmailService:
             <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
                 <tr>
                     <td style="background-color: #0071ce; border-radius: 6px; padding: 10px 24px; text-align: center;">
-                        <a href="http://localhost:5001/Dallas_Team_Report" style="color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; display: inline-block;">Go to Dashboard</a>
+                        <a href="http://weus42608431466:5001/Dallas_Team_Report" style="color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; display: inline-block;">Go to Dashboard</a>
                     </td>
                 </tr>
             </table>
