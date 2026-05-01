@@ -85,5 +85,13 @@
     "email": "krushak.mishra@walmart.com",
     "approved": true,
     "registered": "2026-04-20T13:42:41.438767"
+  },
+  "kristine.torres": {
+    "password_hash": "",
+    "role": "user",
+    "name": "Kristine Torres",
+    "email": "kristine.torres@walmart.com",
+    "approved": true,
+    "registered": "2026-04-30T15:07:51.042124"
   }
 }

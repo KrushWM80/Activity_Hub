@@ -555,6 +555,230 @@
             cursor: not-allowed;
         }
 
+        .project-summary-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.55);
+            overflow-y: auto;
+            padding: 28px 18px 40px;
+        }
+
+        .project-summary-card {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #f8fbff;
+            border-radius: 22px;
+            box-shadow: 0 32px 90px rgba(15, 23, 42, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: none;
+            background: #ffffff;
+            color: #1E3A5F;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .project-summary-header {
+            background: linear-gradient(135deg, #1E3A8A 0%, #0071CE 100%);
+            padding: 32px 36px 22px;
+            color: white;
+        }
+
+        .ps-topline {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 14px;
+            font-weight: 700;
+        }
+
+        .ps-title {
+            font-size: 32px;
+            line-height: 1.05;
+            margin: 0;
+            font-weight: 800;
+            max-width: 920px;
+        }
+
+        .ps-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 13px;
+        }
+
+        .ps-meta-pill {
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+            padding: 10px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ps-description {
+            margin: 0;
+            background: white;
+            color: #1E3A5F;
+            padding: 22px 24px;
+            border-radius: 18px;
+            border-left: 6px solid #3B82F6;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+            font-size: 15px;
+            line-height: 1.8;
+            margin-top: -18px;
+        }
+
+        .project-summary-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            padding: 26px 32px 32px;
+        }
+
+        .ps-left,
+        .ps-right {
+            display: grid;
+            gap: 24px;
+        }
+
+        .section-card,
+        .store-count-card {
+            background: white;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        .section-heading {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #1E3A5F;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        .section-content {
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.75;
+        }
+
+        .store-count-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #6B7280;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .store-count-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: #1E3A5F;
+        }
+
+        .timeline-event {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .timeline-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #1E3A8A;
+            display: grid;
+            place-items: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .timeline-text {
+            display: grid;
+            gap: 6px;
+        }
+
+        .timeline-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1E3A5F;
+        }
+
+        .timeline-value {
+            font-size: 12px;
+            color: #64748B;
+            line-height: 1.6;
+        }
+
+        .metric-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 14px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-name {
+            font-size: 13px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .metric-value,
+        .metric-lift {
+            font-size: 13px;
+            color: #334155;
+            text-align: right;
+        }
+
+        .metric-lift.positive {
+            color: #107C10;
+        }
+
+        .metric-lift.negative {
+            color: #DC2626;
+        }
+
+        @media (max-width: 1000px) {
+            .project-summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header-content {
@@ -758,47 +982,42 @@
         </div>
 
         <!-- Project Summary Modal -->
-        <div id="project-summary-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:rgba(0,0,0,0.5);overflow-y:auto;padding:40px 20px;">
-            <div style="max-width:1200px;margin:0 auto;background:#EFF6FF;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;">
-                <!-- Close button -->
-                <button onclick="closeProjectSummary()" style="position:absolute;top:16px;right:16px;background:#1E3A8A;color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;">×</button>
-                <!-- Header bar -->
-                <div style="background:#1E3A8A;padding:20px 32px;border-radius:12px 12px 0 0;">
-                    <h2 id="ps-title" style="color:white;font-size:24px;margin:0;font-weight:700;"></h2>
-                    <div style="display:flex;gap:24px;margin-top:8px;color:#93C5FD;font-size:14px;">
-                        <span>Team: <strong id="ps-team" style="color:white;"></strong></span>
-                        <span>Owner: <strong id="ps-owner" style="color:white;"></strong></span>
+        <div id="project-summary-modal" class="project-summary-modal">
+            <div class="project-summary-card">
+                <button class="modal-close" onclick="closeProjectSummary()">×</button>
+                <div class="project-summary-header">
+                    <div class="ps-topline">Project Summary</div>
+                    <h2 id="ps-title" class="ps-title"></h2>
+                    <div class="ps-meta-row">
+                        <span class="ps-meta-pill">Team: <strong id="ps-team"></strong></span>
+                        <span class="ps-meta-pill">Owner: <strong id="ps-owner"></strong></span>
+                        <span class="ps-meta-pill" id="ps-phase-pill"></span>
                     </div>
+                    <p id="ps-description" class="ps-description"></p>
                 </div>
-                <!-- Description -->
-                <div style="padding:20px 32px 0;">
-                    <p id="ps-description" style="color:#1E3A5F;font-size:14px;line-height:1.6;margin:0;background:#DBEAFE;padding:12px 16px;border-radius:8px;border-left:4px solid #3B82F6;"></p>
-                </div>
-                <!-- Body -->
-                <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;padding:24px 32px;">
-                    <!-- Left Panel: Insights -->
-                    <div style="background:white;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-                        <h3 style="color:#1E3A5F;font-family:Georgia,serif;font-style:italic;font-size:18px;margin:0 0 16px;border-bottom:2px solid #E5E7EB;padding-bottom:8px;">Insights-</h3>
-                        <div id="ps-insights-content" style="font-size:14px;color:#374151;line-height:1.7;"></div>
-                        
-                        <h3 style="color:#1E3A5F;font-family:Georgia,serif;font-style:italic;font-size:18px;margin:24px 0 12px;border-bottom:2px solid #E5E7EB;padding-bottom:8px;">Updates-</h3>
-                        <div id="ps-updates-content" style="font-size:14px;color:#374151;line-height:1.7;"></div>
+                <div class="project-summary-grid">
+                    <div class="ps-left">
+                        <div class="section-card">
+                            <div class="section-heading">Insights</div>
+                            <div id="ps-insights-content" class="section-content"></div>
+                        </div>
+                        <div class="section-card">
+                            <div class="section-heading">Updates</div>
+                            <div id="ps-updates-content" class="section-content"></div>
+                        </div>
                     </div>
-                    <!-- Right Panel: Timeline + Metrics -->
-                    <div style="display:flex;flex-direction:column;gap:16px;">
-                        <!-- Timeline -->
-                        <div style="background:white;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-                            <div id="ps-timeline" style="font-size:13px;color:#374151;"></div>
+                    <div class="ps-right">
+                        <div class="section-card">
+                            <div class="section-heading">Timeline</div>
+                            <div id="ps-timeline" class="section-content"></div>
                         </div>
-                        <!-- Metrics -->
-                        <div style="background:white;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-                            <h4 style="color:#1E3A5F;font-family:Georgia,serif;font-style:italic;font-size:16px;margin:0 0 12px;letter-spacing:2px;">Metrics-</h4>
-                            <div id="ps-metrics-content" style="font-size:13px;"></div>
+                        <div class="section-card">
+                            <div class="section-heading">Metrics</div>
+                            <div id="ps-metrics-content" class="section-content"></div>
                         </div>
-                        <!-- Store Count -->
-                        <div style="background:white;border-radius:8px;padding:16px 20px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-                            <div style="font-size:12px;color:#6B7280;font-weight:600;">Store Count</div>
-                            <div id="ps-store-count" style="font-size:22px;font-weight:700;color:#1E3A5F;margin-top:4px;">0</div>
+                        <div class="store-count-card">
+                            <div class="store-count-title">Store Count</div>
+                            <div id="ps-store-count" class="store-count-value">0</div>
                         </div>
                     </div>
                 </div>
@@ -1839,113 +2058,11 @@
          * Ensures readability - content-aware pagination
          */
         function packRowsIntoPages(dataToCapture) {
-            const MAX_SLIDE_HEIGHT = 720;
-            const TITLE_HEIGHT = 60;
-            const TABLE_HEADER_HEIGHT = 50;
-            const PADDING_MARGINS = 30;
-            const AVAILABLE_HEIGHT = MAX_SLIDE_HEIGHT - TITLE_HEIGHT - TABLE_HEADER_HEIGHT - PADDING_MARGINS;  // ~580px
-            
-            // Create hidden measurement container with proper styling
-            const container = document.createElement('div');
-            container.style.position = 'absolute';
-            container.style.visibility = 'hidden';
-            container.style.width = '1280px';
-            container.style.top = '0';
-            container.style.left = '0';
-            
-            // Create table with header for measurement
-            container.innerHTML = `
-                <table style="
-                    border-collapse: collapse;
-                    width: 100%;
-                    font-family: var(--font-family);
-                    font-size: var(--font-size-base);
-                    line-height: 1.5;
-                ">
-                    <thead>
-                        <tr style="
-                            background-color: #f0f0f0;
-                            border-bottom: 2px solid #999;
-                            height: ${TABLE_HEADER_HEIGHT}px;
-                        ">
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Initiative - Project Title</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Health Status</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Phase</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;"># of Stores</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Dallas Team</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Intake & Testing</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Deployment</th>
-                        </tr>
-                    </thead>
-                    <tbody id="measurement-tbody"></tbody>
-                </table>
-            `;
-            document.body.appendChild(container);
-            
             const pages = [];
-            let currentPageRows = [];
-            let currentPageHeight = 0;
-            const tbody = container.querySelector('#measurement-tbody');
-            
-            for (let i = 0; i < dataToCapture.length; i++) {
-                const row = dataToCapture[i];
-                
-                // Create a test row with proper styling
-                let testRow = document.createElement('tr');
-                testRow.style.cssText = 'border: 1px solid #ddd;';
-                
-                const columns = ['Initiative - Project Title', 'Health Status', 'Phase', '# of Stores', 'Dallas Team', 'Intake & Testing', 'Deployment'];
-                columns.forEach(col => {
-                    const td = document.createElement('td');
-                    td.style.cssText = 'padding: 8px; border: 1px solid #ddd; word-wrap: break-word; white-space: normal;';
-                    
-                    let value = row[col] ?? '';
-                    if (col === 'Health Status' || col === 'Phase' || col === '# of Stores') {
-                        td.style.fontWeight = '600';
-                    }
-                    if (col === 'Initiative - Project Title' && row['Project ID']) {
-                        const a = document.createElement('a');
-                        a.href = `https://hoops.wal-mart.com/intake-hub/projects/${row['Project ID']}`;
-                        a.target = '_blank';
-                        a.style.cssText = 'color: #0071CE; text-decoration: none; font-weight: 500;';
-                        a.textContent = String(value);
-                        td.appendChild(a);
-                    } else {
-                        td.textContent = String(value);
-                    }
-                    testRow.appendChild(td);
-                });
-                
-                // Add to tbody temporarily to measure
-                tbody.appendChild(testRow);
-                
-                // Get the measured height
-                const rowHeight = testRow.offsetHeight;
-                
-                // Check if this row fits on current page
-                if (currentPageHeight + rowHeight > AVAILABLE_HEIGHT && currentPageRows.length > 0) {
-                    // Row doesn't fit, save current page and start new one
-                    pages.push([...currentPageRows]);
-                    currentPageRows = [row];
-                    currentPageHeight = rowHeight;
-                } else {
-                    // Row fits on current page
-                    currentPageRows.push(row);
-                    currentPageHeight += rowHeight;
-                }
-                
-                // Remove test row from tbody for next measurement
-                tbody.removeChild(testRow);
+            const pageSize = ITEMS_PER_PAGE || 10;
+            for (let i = 0; i < dataToCapture.length; i += pageSize) {
+                pages.push(dataToCapture.slice(i, i + pageSize));
             }
-            
-            // Add last page
-            if (currentPageRows.length > 0) {
-                pages.push(currentPageRows);
-            }
-            
-            // Cleanup
-            document.body.removeChild(container);
-            
             return pages;
         }
 
@@ -2082,12 +2199,21 @@
             // Recent actions table
             const recentWrapper = document.getElementById('sif-aim-recent-wrapper');
             const recent = data.recent_actions || [];
-            document.getElementById('recent-count').textContent = recent.length;
-            if (recent.length === 0) {
+            const recentUnique = [];
+            const seenRecent = new Set();
+            recent.forEach(item => {
+                const key = `${item.project_id || ''}_${item.meeting || ''}_${item.date || ''}`;
+                if (!seenRecent.has(key)) {
+                    seenRecent.add(key);
+                    recentUnique.push(item);
+                }
+            });
+            document.getElementById('recent-count').textContent = recentUnique.length;
+            if (recentUnique.length === 0) {
                 recentWrapper.innerHTML = '<div class="empty-state" style="padding:24px;">No SIF/AIM actions in the prior 21 days.</div>';
             } else {
                 let html = '<table><thead><tr><th>Initiative Title</th><th>Meeting</th><th>Date</th><th>Comment</th></tr></thead><tbody>';
-                recent.forEach(item => {
+                recentUnique.forEach(item => {
                     const badgeColor = item.meeting === 'AIM' ? 'background:#FFC107;color:#000;' : 'background:#3B82F6;color:#fff;';
                     html += `<tr>`;
                     html += `<td>${item.title}</td>`;
@@ -2146,6 +2272,36 @@
         function openProjectSummaryByTitle(title, projectId) {
             if (projectId) {
                 openProjectSummary(projectId);
+                return;
+            }
+            const match = allData.find(r => String(r['Initiative - Project Title'] || '').trim().toLowerCase() === String(title || '').trim().toLowerCase());
+            if (match && match['Project ID']) {
+                openProjectSummary(match['Project ID']);
+            } else {
+                // fallback: open modal with title only if data is available
+                if (match) {
+                    const modal = document.getElementById('project-summary-modal');
+                    modal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                    renderProjectSummary({
+                        title: match['Initiative - Project Title'],
+                        team: match['TDA Ownership'],
+                        owner: 'N/A',
+                        phase: match['Phase'],
+                        health_status: match['Health Status'],
+                        summary: match['Dallas Team'] || match['Intake & Testing'] || match['Deployment'] || 'No summary available.',
+                        latest_update: '',
+                        store_count: match['# of Stores'],
+                        dallas_team_notes: match['Dallas Team'],
+                        intake_testing_notes: match['Intake & Testing'],
+                        deployment_notes: match['Deployment'],
+                        sif_date: null,
+                        aim_date: null,
+                        start_date: null,
+                        end_date: null,
+                        metrics: []
+                    });
+                }
             }
         }
         
@@ -2163,65 +2319,68 @@
             document.getElementById('ps-title').textContent = project.title || 'Untitled';
             document.getElementById('ps-team').textContent = project.team || project.store_area || 'N/A';
             document.getElementById('ps-owner').textContent = project.owner || 'N/A';
-            document.getElementById('ps-description').textContent = project.summary || 'No description available.';
+            document.getElementById('ps-phase-pill').textContent = project.phase ? `Phase: ${project.phase}` : '';
+            document.getElementById('ps-description').textContent = project.summary || project.dallas_team_notes || project.intake_testing_notes || project.deployment_notes || 'No summary available.';
             document.getElementById('ps-store-count').textContent = project.store_count || 0;
-            
-            // Insights content (using team notes as subsections)
-            let insightsHtml = '';
-            if (project.dallas_team_notes && project.dallas_team_notes !== 'N/A') {
-                insightsHtml += `<div style="margin-bottom:16px;"><strong style="color:#1E3A5F;font-style:italic;">Dallas Team Notes</strong><ul style="margin:6px 0 0 16px;">${project.dallas_team_notes.split(/[.;]/).filter(s=>s.trim()).map(s=>`<li>${s.trim()}</li>`).join('')}</ul></div>`;
+
+            function buildSection(title, text) {
+                if (!text || text === 'N/A') return '';
+                const items = text.split(/[.;]\s*/).map(s => s.trim()).filter(Boolean);
+                if (!items.length) return '';
+                return `
+                    <div style="margin-bottom:18px;">
+                        <div style="font-size:14px; font-weight:700; color:#1E3A5F; margin-bottom:12px;">${title}</div>
+                        <ul style="margin:0; padding-left:18px; color:#334155; line-height:1.8;">${items.map(item => `<li style="margin-bottom:10px;">${item}</li>`).join('')}</ul>
+                    </div>`;
             }
-            if (project.intake_testing_notes && project.intake_testing_notes !== 'N/A') {
-                insightsHtml += `<div style="margin-bottom:16px;"><strong style="color:#1E3A5F;font-style:italic;">Intake & Testing</strong><ul style="margin:6px 0 0 16px;">${project.intake_testing_notes.split(/[.;]/).filter(s=>s.trim()).map(s=>`<li>${s.trim()}</li>`).join('')}</ul></div>`;
-            }
-            if (project.deployment_notes && project.deployment_notes !== 'N/A') {
-                insightsHtml += `<div style="margin-bottom:16px;"><strong style="color:#1E3A5F;font-style:italic;">Deployment</strong><ul style="margin:6px 0 0 16px;">${project.deployment_notes.split(/[.;]/).filter(s=>s.trim()).map(s=>`<li>${s.trim()}</li>`).join('')}</ul></div>`;
-            }
-            if (!insightsHtml) insightsHtml = '<p style="color:#6B7280;">No insights data available.</p>';
-            document.getElementById('ps-insights-content').innerHTML = insightsHtml;
-            
-            // Updates
+
+            const insightsHtml = buildSection('POC & Pre - Test Insights', project.dallas_team_notes)
+                + buildSection('Enhancements Needed', project.intake_testing_notes)
+                + buildSection('Test / Expansion Insights', project.deployment_notes);
+            document.getElementById('ps-insights-content').innerHTML = insightsHtml || '<p style="color:#64748B;">No insights data available.</p>';
+
             const updateHtml = project.latest_update
-                ? `<ul style="margin:0 0 0 16px;">${project.latest_update.split(/[.;]/).filter(s=>s.trim()).map(s=>`<li>${s.trim()}</li>`).join('')}</ul>`
-                : '<p style="color:#6B7280;">No recent updates.</p>';
+                ? `<ul style="margin:0; padding-left:18px; color:#334155; line-height:1.8;">${project.latest_update.split(/[.;]\s*/).filter(s => s.trim()).map(s => `<li style="margin-bottom:10px;">${s.trim()}</li>`).join('')}</ul>`
+                : '<p style="color:#64748B;">No recent updates.</p>';
             document.getElementById('ps-updates-content').innerHTML = updateHtml;
-            
-            // Timeline
-            let timelineHtml = '<div style="border-left:3px solid #FFC220;padding-left:16px;">';
-            if (project.start_date) {
-                timelineHtml += `<div style="margin-bottom:12px;"><div style="font-weight:700;color:#1E3A5F;">Start Date</div><div style="font-size:12px;color:#6B7280;">${formatDate(project.start_date)}</div></div>`;
+
+            const timelineEvents = [];
+            if (project.start_date) timelineEvents.push({ label: 'Start Date', value: formatDate(project.start_date) });
+            if (project.sif_date) timelineEvents.push({ label: 'SIF Meeting', value: formatDate(project.sif_date) });
+            if (project.aim_date) timelineEvents.push({ label: 'AIM Meeting', value: formatDate(project.aim_date) });
+            if (project.end_date) timelineEvents.push({ label: 'Target Completion', value: formatDate(project.end_date) });
+
+            if (timelineEvents.length === 0) {
+                document.getElementById('ps-timeline').innerHTML = '<p style="color:#64748B;font-size:13px;">No timeline data available.</p>';
+            } else {
+                document.getElementById('ps-timeline').innerHTML = timelineEvents.map((event, index) => `
+                    <div class="timeline-event">
+                        <div class="timeline-dot">${index + 1}</div>
+                        <div class="timeline-text">
+                            <div class="timeline-label">${event.label}</div>
+                            <div class="timeline-value">${event.value}</div>
+                        </div>
+                    </div>
+                `).join('');
             }
-            if (project.sif_date) {
-                timelineHtml += `<div style="margin-bottom:12px;"><div style="font-weight:700;color:#1E3A5F;">⭐ SIF Meeting</div><div style="font-size:12px;color:#6B7280;">${formatDate(project.sif_date)}</div></div>`;
-            }
-            if (project.aim_date) {
-                timelineHtml += `<div style="margin-bottom:12px;"><div style="font-weight:700;color:#1E3A5F;">⭐ AIM Meeting</div><div style="font-size:12px;color:#6B7280;">${formatDate(project.aim_date)}</div></div>`;
-            }
-            if (project.end_date) {
-                timelineHtml += `<div style="margin-bottom:12px;"><div style="font-weight:700;color:#1E3A5F;">Target Completion</div><div style="font-size:12px;color:#6B7280;">${formatDate(project.end_date)}</div></div>`;
-            }
-            if (!project.start_date && !project.sif_date && !project.aim_date && !project.end_date) {
-                timelineHtml += '<p style="color:#6B7280;font-size:13px;">No timeline data available.</p>';
-            }
-            timelineHtml += '</div>';
-            document.getElementById('ps-timeline').innerHTML = timelineHtml;
-            
-            // Metrics
+
             const metrics = project.metrics || [];
             if (metrics.length === 0) {
-                document.getElementById('ps-metrics-content').innerHTML = '<p style="color:#6B7280;font-size:12px;">No metrics data available.</p>';
+                document.getElementById('ps-metrics-content').innerHTML = '<p style="color:#64748B;font-size:13px;">No metrics data available.</p>';
             } else {
-                let metricsHtml = '<table style="width:100%;font-size:13px;border-collapse:collapse;">';
-                metricsHtml += '<thead><tr style="border-bottom:1px solid #E5E7EB;"><th style="text-align:left;padding:4px 0;font-weight:600;">Metric</th><th style="text-align:right;padding:4px 0;">Actual</th><th style="text-align:right;padding:4px 0;">Lift</th></tr></thead><tbody>';
-                metrics.forEach(m => {
+                document.getElementById('ps-metrics-content').innerHTML = metrics.map(m => {
                     const liftVal = m.lift || '';
-                    const isPositive = !liftVal.startsWith('-');
-                    const liftColor = liftVal ? (isPositive ? '#16A34A' : '#DC2626') : '#6B7280';
+                    const isPositive = liftVal ? !String(liftVal).trim().startsWith('-') : false;
+                    const liftClass = liftVal ? (isPositive ? 'positive' : 'negative') : '';
                     const liftArrow = liftVal ? (isPositive ? '▲' : '▼') : '';
-                    metricsHtml += `<tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:6px 0;">${m.metric_name}</td><td style="text-align:right;padding:6px 0;">${m.actual !== null ? m.actual : '-'}</td><td style="text-align:right;padding:6px 0;color:${liftColor};font-weight:600;">${liftArrow} ${liftVal}</td></tr>`;
-                });
-                metricsHtml += '</tbody></table>';
-                document.getElementById('ps-metrics-content').innerHTML = metricsHtml;
+                    return `
+                        <div class="metric-row">
+                            <div class="metric-name">${m.metric_name}</div>
+                            <div class="metric-value">${m.actual !== null && m.actual !== undefined ? m.actual : '-'}</div>
+                            <div class="metric-lift ${liftClass}">${liftArrow} ${liftVal}</div>
+                        </div>
+                    `;
+                }).join('');
             }
         }
 

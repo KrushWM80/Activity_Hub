@@ -10,7 +10,7 @@
 | **Job Codes Dashboard** | 8080 | http://10.97.114.181:8080/static/index.html# | FastAPI | netstat :8080 |
 | **Projects in Stores** | 8001 | http://10.97.114.181:8001/ | Teaming | netstat :8001 |
 | **TDA Insights** | 5000 | http://localhost:5000/dashboard.html | Flask | netstat :5000 |
-| **AMP Store Dashboard** | 8081 | http://localhost:8081/ | Flask | HTTP GET verification |
+| **AMP Store Dashboard** | 8081 | http://weus42608431466:8081/ | Flask | HTTP GET verification |
 | **Zorro Podcast Server** | 8888 | http://localhost:8888/ | HTTP | netstat :8888 |
 | **V.E.T. Dashboard** | 5001 | http://localhost:5001/vet_dashboard.html | Flask | netstat :5001 |
 | **Store Meeting Planner** | 8090 | http://localhost:8090/ | FastAPI | netstat :8090 |

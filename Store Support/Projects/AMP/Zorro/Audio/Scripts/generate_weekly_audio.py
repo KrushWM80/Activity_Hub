@@ -286,14 +286,6 @@ def extract_summarized_text(raw_text):
     # Within each paragraph, preserve single newlines (title + body on separate lines)
     paragraphs = [re.sub(r'\n', '\n\n', p) if '\n' in p else p for p in paragraphs]
     text = '\n\n'.join(paragraphs)
-    # Truncate at reasonable length for TTS
-    if len(text) > 2000:
-        # Try to cut at a sentence boundary
-        cut = text[:2000].rfind('. ')
-        if cut > 400:
-            text = text[:cut + 1]
-        else:
-            text = text[:2000] + '...'
     return text
 
 
@@ -315,6 +307,29 @@ def fetch_week_events(client, week, fy):
     ])
     rows = list(client.query(query, job_config=job_config).result())
     logger.info(f"Found {len(rows)} Weekly Messages events for FY{fy} Week {week}")
+    return rows
+
+
+def fetch_total_excl_events(client, week, fy):
+    """Query AMP ALL 2 for all relevant Merchant Messages excluding Draft/Denied/Expired."""
+    query = """
+    SELECT DISTINCT event_id, Store_Area, Title, Headline, Dept, Message_Type, Status
+    FROM `wmt-assetprotection-prod.Store_Support_Dev.Output - AMP ALL 2`
+    WHERE FY = @fy AND WM_Week = @week
+      AND Message_Type = 'Merchant Message'
+      AND Business_Area != 'AMP PR Merchandise'
+      AND Status NOT LIKE '%Denied%'
+      AND Status NOT LIKE '%Expired%'
+      AND Status != 'Draft - Pending'
+    ORDER BY Store_Area, Title
+    """
+    from google.cloud.bigquery import ScalarQueryParameter, QueryJobConfig
+    job_config = QueryJobConfig(query_parameters=[
+        ScalarQueryParameter("fy", "INT64", fy),
+        ScalarQueryParameter("week", "STRING", str(week)),
+    ])
+    rows = list(client.query(query, job_config=job_config).result())
+    logger.info(f"Found {len(rows)} total excluded Merchant Messages for FY{fy} Week {week}")
     return rows
 
 
@@ -606,25 +621,35 @@ def fetch_and_cache_bq_data(week, fy):
     logger.info(f"=== Phase 1: BQ Data Fetch — FY{fy} Week {week} ===")
 
     # Step 1: Fetch Weekly Messages events with No Comms status
-    logger.info("Step 1: Fetching Weekly Messages from AMP ALL 2...")
+    logger.info("Step 1: Fetching Weekly Messages (No Comms) from AMP ALL 2...")
     events = fetch_week_events(client, week, fy)
     if not events:
         return {'error': f"No Weekly Messages with No Comm status found for FY{fy} Week {week}"}
 
-    # Step 2: Fetch message bodies from Cosmos
-    logger.info("Step 2: Fetching message bodies from Cosmos...")
-    event_ids = [r.event_id for r in events]
-    msg_map = fetch_message_bodies(client, event_ids)
+    # Step 1b: ALSO fetch all total-excl-denied Merchant Messages (for email missing-summary report)
+    logger.info("Step 1b: Fetching ALL total-excl-denied Merchant Messages from AMP ALL 2...")
+    total_all_events = fetch_total_excl_events(client, week, fy)
+    if not total_all_events:
+        logger.warning("No total-excl-denied events found; using No Comms events only")
+        total_all_events = events
 
-    # Step 3: Extract Summarized text
-    logger.info("Step 3: Extracting Summarized text...")
+    # Step 2: Fetch message bodies from Cosmos for BOTH No Comms AND total-excl-denied
+    logger.info("Step 2: Fetching message bodies from Cosmos for all events...")
+    no_comms_ids = [r.event_id for r in events]
+    total_event_ids = [r.event_id for r in total_all_events]
+    all_event_ids = list(set(no_comms_ids + total_event_ids))  # Union of both sets
+    msg_map = fetch_message_bodies(client, all_event_ids)
+    logger.info(f"Fetched message bodies for {len(all_event_ids)} unique events")
+
+    # Step 3: Extract Summarized text from No Comms events (for audio synthesis)
+    logger.info("Step 3: Extracting Summarized text from No Comms events...")
     events_with_summaries = []
-    events_without = []
+    no_comms_without = set()
 
     for row in events:
         eid = row.event_id
         if eid not in msg_map:
-            events_without.append({'event_id': eid, 'title': row.Title, 'area': row.Store_Area, 'status': row.Status})
+            no_comms_without.add(eid)
             continue
 
         raw_text = html_to_text(msg_map[eid])
@@ -639,7 +664,29 @@ def fetch_and_cache_bq_data(week, fy):
                 'summary_text': summary,
             })
         else:
+            no_comms_without.add(eid)
+
+    logger.info(f"No Comms events: {len(events)}, with summaries: {len(events_with_summaries)}, without: {len(no_comms_without)}")
+
+    # Step 4: Extract Summarized text from ALL total-excl-denied events (for email missing-summary list)
+    logger.info("Step 4: Extracting missing-summary events from ALL total-excl-denied events...")
+    events_without = []
+    total_all_event_map = {r.event_id: r for r in total_all_events}
+
+    for eid in total_event_ids:
+        if eid not in msg_map:
+            # No message body found
+            row = total_all_event_map[eid]
             events_without.append({'event_id': eid, 'title': row.Title, 'area': row.Store_Area, 'status': row.Status})
+        else:
+            raw_text = html_to_text(msg_map[eid])
+            summary = extract_summarized_text(raw_text)
+            if not summary:
+                # Has message body but no Summarized text
+                row = total_all_event_map[eid]
+                events_without.append({'event_id': eid, 'title': row.Title, 'area': row.Store_Area, 'status': row.Status})
+
+    logger.info(f"Total excl. Draft/Denied/Expired: {len(total_all_events)}, missing summaries: {len(events_without)}")
 
     # Count by status
     review_no_comm = sum(1 for r in events if 'Review for Publish' in (r.Status or ''))

@@ -38,7 +38,7 @@ python -m http.server 8080
 
 ### Step 4: Open Dashboard
 
-Open browser: **http://localhost:8080**
+Open browser: **http://localhost:8081**
 
 You should see:
 - ✅ Green "✅ Connected to BigQuery" status
@@ -264,7 +264,7 @@ Invoke-WebRequest http://localhost:5000/api/amp-filters | ConvertFrom-Json
 1. ✅ Install dependencies: `pip install -r requirements.txt`
 2. ✅ Start backend: `python amp_backend_server.py`
 3. ✅ Start dashboard: `python -m http.server 8080`
-4. ✅ Open browser: `http://localhost:8080`
+4. ✅ Open browser: `http://localhost:8081`
 5. ✅ Verify data loads and is live
 6. ✅ Test filters and metrics
 7. ✅ Check console for any errors

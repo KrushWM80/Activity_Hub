@@ -13,6 +13,7 @@
 | **Live Services** | Running services, ports, auto-start tasks, adding new services | [Live Services & Automation](#️-live-services--automation) |
 | **System Overview** | High-level project understanding | [Architecture Overview](#-architecture-overview) |
 | **Dependencies Map** | Component relationships & imports | [See Dependencies](DEPENDENCIES-MAP.md) |
+| **URL Reference** | Complete production, development, and test URLs | [URL Reference System](../URL_REFERENCE_SYSTEM.md) |
 | **Module Guide** | Detailed module documentation | [Module Reference](#-module-reference-guide) |
 | **Job Codes Admin** | Consolidated requests, status updates, comments, audit trail | [Job Codes Teaming Dashboard](#4-job-codes-teaming-dashboard) |
 | **Configuration** | Role management, access, links | [Configuration Files](#-configuration-reference) |
@@ -426,7 +427,7 @@ From an **admin terminal** (Win+X → Terminal Admin):
 | VET Dashboard | 5001 | http://localhost:5001/vet_dashboard.html | `Automation/start_vet_dashboard_24_7.bat` |
 | Projects in Stores | 8001 | http://localhost:8001 | `Automation/start_projects_in_stores_24_7.bat` |
 | Job Codes Dashboard | 8080 | http://10.97.114.181:8080 | `Automation/start_jobcodes_server_24_7.bat` |
-| AMP Store Dashboard | 8081 | http://localhost:8081 | `Automation/start_store_dashboard_24_7.bat` |
+| AMP Store Dashboard | 8081 | http://weus42608431466:8081 | `Automation/start_store_dashboard_24_7.bat` |
 | Store Meeting Planner | 8090 | http://weus42608431466:8090/StoreMeetingPlanner | `Automation/start_meeting_planner_24_7.bat` |
 | Zorro Audio Hub | 8888 | http://weus42608431466:8888/Zorro/Audio_Message_Hub | `Automation/start_zorro_24_7.bat` |
 | Activity Hub | 8088 | http://weus42608431466:8088/activity-hub/ | `Automation/start_activity_hub_24_7.bat` |

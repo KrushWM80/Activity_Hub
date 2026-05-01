@@ -81,7 +81,7 @@ python amp_backend_server.py
 python -m http.server 8080
 ```
 
-**Open browser**: `http://localhost:8080`
+**Open browser**: `http://localhost:8081`
 
 ---
 
@@ -175,7 +175,7 @@ See BACKEND_QUICKSTART.md for full documentation.
 ## ✨ What's Next
 
 1. Run the 3-step launch (above)
-2. Open http://localhost:8080
+2. Open http://localhost:8081
 3. Verify green status ✅
 4. Check data loads (should be real, not sample)
 5. Test filters

@@ -58,7 +58,7 @@ def build_status_email_html(week, fy, cache_data):
     events_without = cache_data.get('events_without_summary', [])
 
     generated_at = datetime.now().strftime("%B %d, %Y at %I:%M %p")
-    missing_count = event_count - summarized_count
+    missing_count = total_excl - summarized_count
 
     # Format BQ timestamp
     bq_ts_display = ''

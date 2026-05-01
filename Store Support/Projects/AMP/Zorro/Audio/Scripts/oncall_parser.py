@@ -2,7 +2,7 @@
 """
 On-Call Calendar Parser
 ========================
-Parses the U.S. Comm On Call Planner from Outlook calendar.
+Parses the U.S. Comm On Call Planner from shared Outlook calendar.
 Calendar entries follow the pattern: "{Name} On Call" spanning Friday-to-Friday.
 
 Used by:
@@ -17,9 +17,10 @@ logger = logging.getLogger('weekly_audio')
 
 
 def get_oncall_from_calendar(target_date=None):
-    """Find the on-call person from calendar for the given date.
+    """Find the on-call person from U.S. Comm - On Call Planner calendar.
 
-    Searches for calendar items matching '{Name} On Call' that span the target date.
+    Searches the shared 'U.S. Comm - On Call Planner' calendar for entries
+    matching '{Name} On Call' that span the target date.
     Default target: the coming Friday (or today if already Friday).
 
     Returns:
@@ -32,7 +33,20 @@ def get_oncall_from_calendar(target_date=None):
     try:
         outlook = win32com.client.Dispatch('Outlook.Application')
         ns = outlook.GetNamespace('MAPI')
-        cal = ns.GetDefaultFolder(9)  # olFolderCalendar
+
+        # Find the shared calendar 'U.S. Comm - On Call Planner'
+        cal = None
+        for folder in ns.Folders:
+            try:
+                if folder.Name == 'U.S. Comm - On Call Planner':
+                    cal = folder.Folders['Calendar']
+                    break
+            except:
+                continue
+
+        if cal is None:
+            logger.warning("Could not find 'U.S. Comm - On Call Planner' calendar")
+            return None
 
         # Default: find the coming Friday (or today if already Friday)
         if target_date is None:

@@ -18,9 +18,9 @@ Plus existing services:
 ### Access From Your Computer (Localhost)
 ```
 TDA Insights:             http://localhost:5000/dashboard.html
-Store Dashboard:          http://localhost:8081/
-Zorro Audio Generator:    http://localhost:8888/create-audio
-Zorro Index:              http://localhost:8888/
+Store Dashboard:          http://weus42608431466:8081/
+Zorro Audio Generator:    http://weus42608431466:8888/create-audio
+Zorro Index:              http://weus42608431466:8888/
 ```
 
 ### Access From Network (Use IP)

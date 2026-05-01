@@ -289,17 +289,35 @@ def get_sif_aim_data():
         upcoming.sort(key=lambda x: x['date'])
         recent_actions.sort(key=lambda x: x['date'], reverse=True)
         
-        unique_upcoming = set()
-        for entry in upcoming:
-            key = entry.get('project_id') if entry.get('project_id') else entry.get('title', '')
-            unique_upcoming.add(key)
-        unique_upcoming_count = len(unique_upcoming)
+        # Deduplicate upcoming and recent action rows by project, meeting, and date
+        def dedupe_rows(rows):
+            seen = set()
+            deduped = []
+            for entry in rows:
+                key = (entry.get('project_id') or 0, entry.get('meeting') or '', entry.get('date') or '')
+                if key not in seen:
+                    seen.add(key)
+                    deduped.append(entry)
+            return deduped
+        
+        upcoming = dedupe_rows(upcoming)
+        recent_actions = dedupe_rows(recent_actions)
+        
+        unique_upcoming_count = len({
+            (entry.get('project_id') or 0, entry.get('meeting') or '', entry.get('date') or '')
+            for entry in upcoming
+        })
+        unique_recent_count = len({
+            (entry.get('project_id') or 0, entry.get('meeting') or '', entry.get('date') or '')
+            for entry in recent_actions
+        })
         
         print(f"[OK] SIF/AIM data: {len(upcoming)} upcoming, {len(recent_actions)} recent actions")
         return {
             'upcoming': upcoming,
             'recent_actions': recent_actions,
-            'unique_upcoming_count': unique_upcoming_count
+            'unique_upcoming_count': unique_upcoming_count,
+            'unique_recent_count': unique_recent_count
         }
     except Exception as e:
         print(f"[WARN] SIF/AIM query failed (column may not exist yet): {e}")
@@ -328,121 +346,144 @@ def refresh_data():
 
 def get_project_detail(project_id_str):
     """Fetch detailed project info for the Project Summary view"""
-    if not BQ_AVAILABLE:
+    if not project_id_str:
         return None
     try:
         from urllib.parse import unquote_plus
-        project_id_str = unquote_plus(project_id_str)
-        client = get_bigquery_client()
-        if not client:
-            return None
-        
-        # Query project detail from Intake Accel Council Data
-        query = f"""
-        SELECT
-            Project_Title,
-            CAST(Intake_Card_Nbr AS INT64) as Project_ID,
-            Owner,
-            Store_Area,
-            Phase,
-            Health_Update,
-            COALESCE(PRESENTATION_SUMMARY, OVERVIEW, '') as Summary,
-            COALESCE(Project_Update, '') as Latest_Update,
-            Count_of_Stores,
-            SIF_Date,
-            AIM_Date,
-            Meeting_Type,
-            PROJECT_START_DATE,
-            PROJECT_END_DATE,
-            TDA_Ownership,
-            Dallas_POC,
-            Intake_n_Testing,
-            Deployment
-        FROM `{BQ_PROJECT}.{BQ_DATASET}.Output - Intake Accel Council Data`
-        WHERE CAST(Intake_Card_Nbr AS STRING) = '{project_id_str}'
-          AND COALESCE(CAST(Is_Duplicate_Row AS STRING), '') != 'Yes'
-        LIMIT 1
-        """
-        
-        query_job = client.query(query)
-        results = list(query_job.result())
-        
-        if not results:
-            # Try matching by title from TDA data
-            for row in DATA:
-                if str(row.get('Project ID', '')) == project_id_str:
-                    return {
-                        'title': row.get('Initiative - Project Title', ''),
-                        'project_id': row.get('Project ID', 0),
-                        'owner': 'N/A',
-                        'team': row.get('TDA Ownership', ''),
-                        'phase': row.get('Phase', ''),
-                        'health_status': row.get('Health Status', ''),
-                        'summary': '',
-                        'latest_update': '',
-                        'store_count': row.get('# of Stores', 0),
-                        'dallas_team_notes': row.get('Dallas Team', ''),
-                        'intake_testing_notes': row.get('Intake & Testing', ''),
-                        'deployment_notes': row.get('Deployment', ''),
-                        'sif_date': None,
-                        'aim_date': None,
-                        'start_date': None,
-                        'end_date': None,
-                        'metrics': []
-                    }
-            return None
-        
-        row = results[0]
-        project_id = row['Project_ID'] or 0
-        
-        # Fetch metrics from Project_Metric_Lift
-        metrics = []
+        project_id_str = unquote_plus(project_id_str).strip()
+    except Exception:
+        project_id_str = str(project_id_str).strip()
+
+    detail = None
+    if BQ_AVAILABLE:
         try:
-            metrics_query = f"""
-            SELECT Metric_Name, Metric_Type, Actual, Expected, Impact, Lift, Start_Date, End_Date
-            FROM `{BQ_PROJECT}.Store_Support.Project_Metric_Lift`
-            WHERE Project_ID = {project_id}
-            ORDER BY Metric_Name
-            """
-            metrics_job = client.query(metrics_query)
-            for mrow in metrics_job.result():
-                metrics.append({
-                    'metric_name': mrow['Metric_Name'] or '',
-                    'metric_type': mrow['Metric_Type'] or '',
-                    'actual': float(mrow['Actual']) if mrow['Actual'] is not None else None,
-                    'expected': float(mrow['Expected']) if mrow['Expected'] is not None else None,
-                    'impact': float(mrow['Impact']) if mrow['Impact'] is not None else None,
-                    'lift': mrow['Lift'] or '',
-                    'start_date': str(mrow['Start_Date']) if mrow['Start_Date'] else None,
-                    'end_date': str(mrow['End_Date']) if mrow['End_Date'] else None
-                })
-        except Exception as me:
-            print(f"[WARN] Metrics query failed: {me}")
-        
-        detail = {
-            'title': row['Project_Title'] or '',
-            'project_id': project_id,
-            'owner': row['Owner'] or 'N/A',
-            'team': _normalize_ownership(row['TDA_Ownership']),
-            'store_area': row['Store_Area'] or '',
-            'phase': _normalize_phase(row['Phase'] or ''),
-            'health_status': row['Health_Update'] or '',
-            'summary': row['Summary'] or '',
-            'latest_update': row['Latest_Update'] or '',
-            'store_count': row['Count_of_Stores'] or 0,
-            'dallas_team_notes': row['Dallas_POC'] or '',
-            'intake_testing_notes': row['Intake_n_Testing'] or '',
-            'deployment_notes': row['Deployment'] or '',
-            'sif_date': str(row['SIF_Date']) if row['SIF_Date'] else None,
-            'aim_date': str(row['AIM_Date']) if row['AIM_Date'] else None,
-            'start_date': str(row['PROJECT_START_DATE']) if row['PROJECT_START_DATE'] else None,
-            'end_date': str(row['PROJECT_END_DATE']) if row['PROJECT_END_DATE'] else None,
-            'metrics': metrics
-        }
-        return detail
-    except Exception as e:
-        print(f"[ERROR] Project detail query failed: {e}")
-        return None
+            client = get_bigquery_client()
+            if client:
+                # Query project detail from Intake Accel Council Data
+                query = f"""
+                SELECT
+                    Project_Title,
+                    CAST(Intake_Card_Nbr AS INT64) as Project_ID,
+                    Owner,
+                    Store_Area,
+                    Phase,
+                    Health_Update,
+                    COALESCE(PRESENTATION_SUMMARY, OVERVIEW, '') as Summary,
+                    COALESCE(Project_Update, '') as Latest_Update,
+                    Count_of_Stores,
+                    SIF_Date,
+                    AIM_Date,
+                    Meeting_Type,
+                    PROJECT_START_DATE,
+                    PROJECT_END_DATE,
+                    TDA_Ownership,
+                    Dallas_Vet as Dallas_Vet,
+                    Intake_n_Testing,
+                    Deployment
+                FROM `{BQ_PROJECT}.{BQ_DATASET}.Output - Intake Accel Council Data`
+                WHERE CAST(Intake_Card_Nbr AS STRING) = '{project_id_str}'
+                  AND COALESCE(CAST(Is_Duplicate_Row AS STRING), '') != 'Yes'
+                LIMIT 1
+                """
+                query_job = client.query(query)
+                results = list(query_job.result())
+                if results:
+                    row = results[0]
+                    project_id = row['Project_ID'] or 0
+                    metrics = []
+                    if project_id:
+                        try:
+                            metrics_query = f"""
+                            SELECT Metric_Name, Metric_Type, Actual, Expected, Impact, Lift, Start_Date, End_Date
+                            FROM `{BQ_PROJECT}.Store_Support.Project_Metric_Lift`
+                            WHERE Project_ID = {project_id}
+                            ORDER BY Metric_Name
+                            """
+                            metrics_job = client.query(metrics_query)
+                            for mrow in metrics_job.result():
+                                metrics.append({
+                                    'metric_name': mrow['Metric_Name'] or '',
+                                    'metric_type': mrow['Metric_Type'] or '',
+                                    'actual': float(mrow['Actual']) if mrow['Actual'] is not None else None,
+                                    'expected': float(mrow['Expected']) if mrow['Expected'] is not None else None,
+                                    'impact': float(mrow['Impact']) if mrow['Impact'] is not None else None,
+                                    'lift': mrow['Lift'] or '',
+                                    'start_date': str(mrow['Start_Date']) if mrow['Start_Date'] else None,
+                                    'end_date': str(mrow['End_Date']) if mrow['End_Date'] else None
+                                })
+                        except Exception as me:
+                            print(f"[WARN] Metrics query failed: {me}")
+                    detail = {
+                        'title': row['Project_Title'] or '',
+                        'project_id': project_id,
+                        'owner': row['Owner'] or 'N/A',
+                        'team': _normalize_ownership(row['TDA_Ownership']),
+                        'store_area': row['Store_Area'] or '',
+                        'phase': _normalize_phase(row['Phase'] or ''),
+                        'health_status': row['Health_Update'] or '',
+                        'summary': row['Summary'] or '',
+                        'latest_update': row['Latest_Update'] or '',
+                        'store_count': row['Count_of_Stores'] or 0,
+                        'dallas_team_notes': row['Dallas_Vet'] or '',
+                        'intake_testing_notes': row['Intake_n_Testing'] or '',
+                        'deployment_notes': row['Deployment'] or '',
+                        'sif_date': str(row['SIF_Date']) if row['SIF_Date'] else None,
+                        'aim_date': str(row['AIM_Date']) if row['AIM_Date'] else None,
+                        'start_date': str(row['PROJECT_START_DATE']) if row['PROJECT_START_DATE'] else None,
+                        'end_date': str(row['PROJECT_END_DATE']) if row['PROJECT_END_DATE'] else None,
+                        'metrics': metrics
+                    }
+                    return detail
+        except Exception as e:
+            print(f"[WARN] Project detail query failed for '{project_id_str}': {e}")
+
+    # Fallback to cached dashboard data if BQ detail is unavailable
+    for row in DATA:
+        if str(row.get('Project ID', '')).strip() == project_id_str:
+            return {
+                'title': row.get('Initiative - Project Title', ''),
+                'project_id': row.get('Project ID', 0),
+                'owner': 'N/A',
+                'team': row.get('TDA Ownership', ''),
+                'phase': row.get('Phase', ''),
+                'health_status': row.get('Health Status', ''),
+                'summary': '',
+                'latest_update': '',
+                'store_count': row.get('# of Stores', 0),
+                'dallas_team_notes': row.get('Dallas Team', ''),
+                'intake_testing_notes': row.get('Intake & Testing', ''),
+                'deployment_notes': row.get('Deployment', ''),
+                'sif_date': None,
+                'aim_date': None,
+                'start_date': None,
+                'end_date': None,
+                'metrics': []
+            }
+
+    # Last resort: search by exact title match
+    for row in DATA:
+        if str(row.get('Initiative - Project Title', '')).strip().lower() == project_id_str.lower():
+            return {
+                'title': row.get('Initiative - Project Title', ''),
+                'project_id': row.get('Project ID', 0),
+                'owner': 'N/A',
+                'team': row.get('TDA Ownership', ''),
+                'phase': row.get('Phase', ''),
+                'health_status': row.get('Health Status', ''),
+                'summary': '',
+                'latest_update': '',
+                'store_count': row.get('# of Stores', 0),
+                'dallas_team_notes': row.get('Dallas Team', ''),
+                'intake_testing_notes': row.get('Intake & Testing', ''),
+                'deployment_notes': row.get('Deployment', ''),
+                'sif_date': None,
+                'aim_date': None,
+                'start_date': None,
+                'end_date': None,
+                'metrics': []
+            }
+
+    return None
 def generate_minimal_pptx(phase=None):
     """Generate a PPTX file with data organized by phase"""
     pptx_buffer = io.BytesIO()

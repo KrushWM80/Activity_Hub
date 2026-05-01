@@ -44,7 +44,7 @@ If the port, entry point, or bat file changes, update ALL of:
 ### Method 1: Double-click the batch file
 **File:** `start-server.bat`  
 **Action:** Double-click to start server  
-**URL:** http://localhost:8080
+**URL:** http://localhost:8081
 
 ### Method 2: PowerShell
 ```powershell
@@ -155,4 +155,4 @@ const data = await fetchAMPData();
 
 ---
 
-**Server is now running!** Open http://localhost:8080 to view the dashboard.
+**Server is now running!** Open http://localhost:8081 to view the dashboard.

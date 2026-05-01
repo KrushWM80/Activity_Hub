@@ -91,17 +91,18 @@ function Get-SystemStatus {
         $status.Port8090Listening = $true
     }
     
-    # Check Job Codes Backend Task
-    $jobCodesTask = Get-ScheduledTask -TaskName "JobCodes-Backend-Server" -ErrorAction SilentlyContinue
-    $status.JobCodesBackendTask = $null -ne $jobCodesTask
+    # Check Job Codes Backend Task (CIM-free using schtasks)
+    $jobCodesTaskOutput = schtasks /query /tn "JobCodes-Backend-Server" /fo LIST 2>$null
+    $status.JobCodesBackendTask = $LASTEXITCODE -eq 0
     
-    # Check TDA Weekly Email Task
-    $tdaWeeklyTask = Get-ScheduledTask -TaskName "Activity_Hub_TDA_Weekly_Email" -ErrorAction SilentlyContinue
-    $status.TDAWeeklyEmailTask = $null -ne $tdaWeeklyTask
+    # Check TDA Weekly Email Task (CIM-free using schtasks)
+    $tdaWeeklyTaskOutput = schtasks /query /tn "Activity_Hub_TDA_Weekly_Email" /fo LIST 2>$null
+    $status.TDAWeeklyEmailTask = $LASTEXITCODE -eq 0
     
-    # Check DC Manager Tasks
-    $dcTasks = Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object {$_.TaskName -like "DC-EMAIL-PC-*"}
-    $status.DCTasksCount = if ($dcTasks) { $dcTasks.Count } else { 0 }
+    # Check DC Manager Tasks (CIM-free using schtasks)
+    $dcTasksOutput = schtasks /query /fo LIST | findstr /i "DC-EMAIL-PC-" 2>$null
+    $dcTasksCount = if ($dcTasksOutput) { ($dcTasksOutput | Measure-Object -Line).Lines } else { 0 }
+    $status.DCTasksCount = $dcTasksCount
 
     # Check for pending reboot / Windows Update
     $rebootPending = $false
@@ -291,12 +292,66 @@ function Build-StatusEmail {
 
     <div class="section">
         <h3>Access Points</h3>
-        <ul>
-            <li><strong>Projects in Stores:</strong> http://10.97.114.181:8001/</li>
-            <li><strong>Job Codes Dashboard:</strong> http://10.97.114.181:8080/static/index.html#</li>
-            <li><strong>TDA Insights:</strong> http://localhost:5000/dashboard.html</li>
-            <li><strong>AMP Store Dashboard:</strong> http://weus42608431466:8081/StoreActivityandCommunications</li>
-            <li><strong>Audio Message Hub:</strong> http://weus42608431466:8888/Zorro/Audio_Message_Hub</li>
+        <table>
+            <tr>
+                <th>Service</th>
+                <th>Local (Dev)</th>
+                <th>Network (IP)</th>
+                <th>Production (Hostname)</th>
+            </tr>
+            <tr>
+                <td><strong>TDA Insights</strong></td>
+                <td>http://localhost:5000/tda-initiatives-insights</td>
+                <td>http://10.97.114.181:5000/tda-initiatives-insights</td>
+                <td>http://weus42608431466:5000/tda-initiatives-insights</td>
+            </tr>
+            <tr>
+                <td><strong>VET Dashboard</strong></td>
+                <td>http://localhost:5001/Dallas_Team_Report</td>
+                <td>http://10.97.114.181:5001/Dallas_Team_Report</td>
+                <td>http://weus42608431466:5001/Dallas_Team_Report</td>
+            </tr>
+            <tr>
+                <td><strong>Projects in Stores</strong></td>
+                <td>http://localhost:8002/</td>
+                <td>http://10.97.114.181:8001/</td>
+                <td>http://weus42608431466.homeoffice.wal-mart.com:8001/</td>
+            </tr>
+            <tr>
+                <td><strong>Job Codes Dashboard</strong></td>
+                <td>http://localhost:8080/Aligned#</td>
+                <td>http://10.97.114.181:8080/Aligned#</td>
+                <td>http://weus42608431466:8080/Aligned#</td>
+            </tr>
+            <tr>
+                <td><strong>AMP Store Dashboard</strong></td>
+                <td>http://localhost:8081/</td>
+                <td>http://10.97.114.181:8081/</td>
+                <td>http://weus42608431466:8081/StoreActivityandCommunications</td>
+            </tr>
+            <tr>
+                <td><strong>Activity Hub</strong></td>
+                <td>http://localhost:8088/activity-hub/</td>
+                <td>http://10.97.114.181:8088/activity-hub/</td>
+                <td>http://weus42608431466:8088/activity-hub/for-you</td>
+            </tr>
+            <tr>
+                <td><strong>Store Meeting Planner</strong></td>
+                <td>http://localhost:8090/StoreMeetingPlanner</td>
+                <td>http://10.97.114.181:8090/StoreMeetingPlanner</td>
+                <td>http://weus42608431466:8090/StoreMeetingPlanner</td>
+            </tr>
+            <tr>
+                <td><strong>Zorro Audio Hub</strong></td>
+                <td>http://localhost:8888/Zorro/AudioMessageHub</td>
+                <td>http://10.97.114.181:8888/Zorro/AudioMessageHub</td>
+                <td>http://weus42608431466:8888/Zorro/AudioMessageHub</td>
+            </tr>
+        </table>
+        <p style="font-size: 11px; margin-top: 10px; color: #666;">
+            <strong>URL Guidelines:</strong> Use <em>Local</em> for development, <em>Network (IP)</em> for team testing (⚠️ DHCP changes), <em>Production (Hostname)</em> for standard access and automation.
+        </p>
+    </div>
             <li><strong>V.E.T. Dashboard:</strong> http://localhost:5001/vet_dashboard.html</li>
             <li><strong>Store Meeting Planner:</strong> http://localhost:8090/</li>
             <li><strong>Note:</strong> Use desktop name for Store Dashboard and Audio Message Hub. Use IP address for Job Codes &amp; Projects. Use localhost for TDA and Meeting Planner.</li>
@@ -334,10 +389,10 @@ function Check-And-RestartJobCodes {
         Write-Host "⚠ Job Codes is offline - attempting automatic restart..." -ForegroundColor Yellow
         
         try {
-            # Trigger the JobCodes-Backend-Server task to run immediately
-            $jobCodesTask = Get-ScheduledTask -TaskName "JobCodes-Backend-Server" -ErrorAction SilentlyContinue
-            if ($jobCodesTask) {
-                Start-ScheduledTask -TaskName "JobCodes-Backend-Server" -ErrorAction SilentlyContinue
+            # Trigger the JobCodes-Backend-Server task to run immediately (CIM-free)
+            $jobCodesTaskCheck = schtasks /query /tn "JobCodes-Backend-Server" /fo LIST 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                schtasks /run /tn "JobCodes-Backend-Server" 2>$null
                 Write-Host "✓ Triggered JobCodes-Backend-Server task" -ForegroundColor Green
                 
                 # Wait 3 seconds for process to start

@@ -1,34 +1,38 @@
 {
   "week": 14,
   "fy": 2027,
-  "cached_at": "2026-04-29T06:00:20.813024",
-  "bq_last_updated": "2026-04-28T23:19:52.121000+00:00",
-  "event_count": 20,
-  "review_no_comm_count": 20,
+  "cached_at": "2026-05-01T09:00:13.388513",
+  "bq_last_updated": "2026-04-30T16:47:34.535000+00:00",
+  "event_count": 48,
+  "review_no_comm_count": 48,
   "status_breakdown": [
     {
       "status": "Draft - Pending",
-      "count": 2
+      "count": 1
     },
     {
       "status": "Awaiting Comms Approval - Pending",
-      "count": 9
+      "count": 1
     },
     {
-      "status": "Awaiting Comms Approval - In Progress",
+      "status": "Awaiting Comms Approval - Ready to Review",
       "count": 1
     },
     {
       "status": "Awaiting Business Review - Pending",
-      "count": 5
+      "count": 3
     },
     {
       "status": "Awaiting Legal Approval - Pending",
       "count": 1
     },
     {
+      "status": "ATC final review - Pending",
+      "count": 4
+    },
+    {
       "status": "Review for Publish review - Pending",
-      "count": 9
+      "count": 2
     },
     {
       "status": "Expired - Pending",
@@ -36,19 +40,15 @@
     },
     {
       "status": "Review for Publish review - No Comms",
-      "count": 20
-    },
-    {
-      "status": "Awaiting Comms Approval - On Hold",
-      "count": 1
+      "count": 48
     },
     {
       "status": "Expired - Future Send",
       "count": 1
     }
   ],
-  "total_excl_denied": 46,
-  "summarized_count": 20,
+  "total_excl_denied": 60,
+  "summarized_count": 48,
   "events_with_summaries": [
     {
       "event_id": "e2b173da-dc9d-4c43-a51d-30a9046e829f",
@@ -58,11 +58,53 @@
       "summary_text": "Department 95 and Backroom: Starting May 3,\u00a0Keurig Dr Pepper orders will move to system-generated ordering through GRS, aligning with standard grocery processes. Early execution is critical, as the system takes two to three weeks to stabilize, so accurate on-hands, team alignment, and not refusing orders will directly impact in-stock. This applies to KDP company-owned stores only, with reps continuing to support and adjust as needed."
     },
     {
+      "event_id": "5b078461-04fc-42ef-8e64-b5505a71a6c7",
+      "store_area": "Asset Protection",
+      "title": "May/June Profit Protection Framework Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Profit Protection is expanding into more modulars through June. Use the lookup tool to confirm whether it applies to your store, then unlock the identified categories and set modulars as drawn, using the required AP fixtures where noted."
+    },
+    {
+      "event_id": "92433df9-5167-4e2b-ae23-12a6109f5f9f",
+      "store_area": "Auto Care",
+      "title": "Dept. 10: ACC Filters Modular Transition Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 10: This update walks stores through the oil and air filters modular transition, including\u00a0DSL labeling steps, FRAM consolidation, upright air filter merchandising and support resources ahead of the Week 37 Reset."
+    },
+    {
+      "event_id": "4fcf5f6b-cd4f-4951-86c0-fe6124cf950f",
+      "store_area": "Auto Care",
+      "title": "Dept. 12: New 8 oz Paint Sample Tray",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 12: Paint sample display tray stocked with 8 oz paint samples that can be tinted for customers. Use the tinting and shaking instructions that match your store\u2019s software."
+    },
+    {
+      "event_id": "bb6f093b-f23f-448b-ab5c-04e28802a898",
+      "store_area": "Auto Care",
+      "title": "Dept. 12: Week 15 Modular Expansion",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 12: Week 15 Bath, Kitchen and Plumbing modular relay changes include space updates and 31 new items launching, including nationally branded items and filtered shower heads."
+    },
+    {
       "event_id": "7612a232-e22c-4c2d-a416-5eb16fe5b874",
       "store_area": "Backroom and Claims",
       "title": "Backroom: Join the DSD Office Hours for Real-Time Support",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Backroom: DSD Office Hours provide fast, direct support for Direct Store Delivery issues by connecting stores with key partners every other Tuesday. The next session is May 12 from 2:00 to 3:00 p.m. Central on Teams, with ongoing sessions available for continued support."
+    },
+    {
+      "event_id": "2ad7a39f-5643-4d64-9d59-607866ea597f",
+      "store_area": "Backroom and Claims",
+      "title": "D8: National Pet Month Signage",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "For National Pet Month, stores will receive in\u2011store signage highlighting pet savings, services, and convenience across Pet and Floor Care. Signage arrives starting May 2 and should be set May 1 through June 1 in designated Pet and Floor Care locations."
+    },
+    {
+      "event_id": "66338314-1d71-41ca-bf1c-8a834b47cc50",
+      "store_area": "Backroom and Claims",
+      "title": "Dept. 46: Olive & June x Star Wars Sidekick Feature",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "An exclusive Olive & June\u00a0x Star Wars Nail Care sidekick is arriving in select Dept. 46 locations for Star Wars Day. Stores should place the display in a high\u2011visibility, easy\u2011to\u2011find location and keep it well maintained to drive engagement and sales."
     },
     {
       "event_id": "97d1a03e-76e4-46e8-a980-2d08dc5ffc23",
@@ -77,6 +119,27 @@
       "title": "Dept. 40: Pusher Kits for Upcoming Mods",
       "status": "Review for Publish review - No Comms",
       "summary_text": "In department 40, modular resets are beginning over the next couple of weeks which include foot care, vitamins, and digestive wellness. To make sure modulars are set to the most current planograms and deliver the best customer experience, please have teams order pushers as needed. Review the message for fixture order numbers."
+    },
+    {
+      "event_id": "48f0edfe-83d0-4c8d-ab9c-df0d206acc14",
+      "store_area": "Consumables",
+      "title": "Dept. 79: Little Nest Travel Pillow and Blanket\u00a0",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Select stores are featuring the Little Nest Travel Pillow and Blanket for Toddlers in Dept. 79, set on a four-way fixture and live as of Week 10 (April 4\u201310). This Q1 feature adds a fun, seasonal brand to help make the department a go\u2011to destination for customers shopping for toddler travel essentials."
+    },
+    {
+      "event_id": "f7a598f5-42fc-45c5-9e14-35298de76e11",
+      "store_area": "Consumables",
+      "title": "The Scoop on Cat. 89 - Pet Grooming",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Two new Earth Rated pet grooming wipes, the 100\u2011count and new XL 50\u2011count, are now available in Category 89, offering strong value and everyday clean\u2011up convenience for pet parents. Correct placement and visibility are key to helping drive sales and awareness in stores."
+    },
+    {
+      "event_id": "af6d8009-09f3-437b-8612-1d9ad0d617ec",
+      "store_area": "Entertainment",
+      "title": "Dept. 67: Pre-Filled Helium Balloon Program",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 67: Pre-filled helium balloon sales depend on store inflation and strong seasonal execution to meet minimum sales expectations and support in-store helium fills."
     },
     {
       "event_id": "5f4c87f1-adb8-49d7-9d65-da1ec413582f",
@@ -100,6 +163,13 @@
       "summary_text": "Department 23: Beginning in week 14, NFL,\u00a0NCAA, NBA\u00a0and NHL\u00a0product will be removed from Team Sports modulars to allow for sell-down.\u00a0While these categories are exiting the modular, not all items will receive markdowns immediately. Stores may continue to see select NCAA, NBA\u00a0and NHL styles at full price\u00a0during this period."
     },
     {
+      "event_id": "52eabc45-2ad6-4abb-b848-06f9fb2d36fd",
+      "store_area": "Fashion",
+      "title": "Dept. 25: Is Your Shoelace Modular Set Correctly?",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 25: In week 8, stores set a sidekick modular containing USA Made shoelaces and shoe accessories (category 90, section 1).\u00a0Make sure this modular is set correctly with laces seven across. If they cannot fit seven across due to the size of the Digital Shelf Labels (DSL), they will need to choose a smaller DSL."
+    },
+    {
       "event_id": "1577ea52-f26e-4bf3-a59f-0b4df37a8cc4",
       "store_area": "Fashion",
       "title": "Dept. 29: Recall\u00a0Period Company ",
@@ -121,11 +191,32 @@
       "summary_text": "There has been a delay of the Jewelry Planogram booklets. Stores should start receiving them at the end of this week or next week. To keep a consistent and elevated presentation in stores, use the interim merchandise guidance in this message."
     },
     {
+      "event_id": "2c5d96e0-008d-4116-a365-f9aeef6cbe5c",
+      "store_area": "Fashion",
+      "title": "Fashion: Your Q2 Summer Beacon Graphic is Arriving!",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Fashion Department: Stores should be watching for their Q2 Fashion Summer Beacon Graphic. Once it arrives, the Winston Retail will install it."
+    },
+    {
       "event_id": "dae13f9c-c834-48f7-99f3-36cf4f0a48aa",
       "store_area": "Food",
       "title": "Dept. 92: ARIH Brand Is Launching at Walmart",
       "status": "Review for Publish review - No Comms",
       "summary_text": "The ARIH brand launched in Walmart stores on Friday, April 24. What is the ARIH Brand? A new global Korean fusion food and beverage brand launched this month\u00a0in collaboration with the K-pop group BTS. This launch is supported by four merchandising programs in select stores and online."
+    },
+    {
+      "event_id": "506de4cf-28e4-4fec-9597-d63e17b50727",
+      "store_area": "Food",
+      "title": "Dept. 92: Gluten Free Modular Reset Is Coming",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 92: Stores should set the Dry Grocery Gluten Free modular this week."
+    },
+    {
+      "event_id": "29ad1fb2-e468-4047-ac6e-96fa1ddd8b80",
+      "store_area": "Food",
+      "title": "Dept. 92: Mac & Cheese and Kids Meals Modular Reset This week",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 92: Stores should set the Dry Grocery Mac & Cheese and Kids Meals modulars this week."
     },
     {
       "event_id": "b206e114-b5c8-4d2c-8d47-cac0d99241bd",
@@ -149,11 +240,25 @@
       "summary_text": "Lay's Potato Chips is the official sponsor for FIFA and they are launching new flavors to drive sales and excitement with your customers. Stores should take action based on Saturday, May 2, feature plans."
     },
     {
+      "event_id": "dfa11811-9b09-4334-926e-a4a98a211428",
+      "store_area": "Food",
+      "title": "Dept. 95: New Modern Iced Tea Items Are Arriving This Week",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 95: Modern Iced Tea items are being added to the week 14 Ready to Drink modular reset."
+    },
+    {
       "event_id": "1fb2a010-bade-4cff-996b-2d1dcd38130b",
       "store_area": "Food",
       "title": "Dept. 95: Q2 $1 Bin - $1 Poppi Minis",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Department 95: Starting week 14 (May 2-8) and running through week 26 (July 25-31), $1\u00a0poppi minis will be available in the $1 bin program."
+    },
+    {
+      "event_id": "b822f11f-66af-494d-846b-a8e4163a18d9",
+      "store_area": "Food",
+      "title": "Dept. 95: Snapple 6pk Fight Hunger Message ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Department 95: Walmart and Snapple are activating the annual Fight Hunger campaign in partnership with Feeding America and local food banks.\u00a0To support this campaign, select stores should complete a 6-pack Snapple display that is outlined in FSS."
     },
     {
       "event_id": "50f6bc26-3cbe-4e82-b000-c7f72cf0801a",
@@ -170,11 +275,95 @@
       "summary_text": "Department 92: This is the final week of fight hunger spark change. Associates should continue to follow the program guidelines to finish strong."
     },
     {
+      "event_id": "b512aad9-2bfb-45b7-ab8b-cbd8fc537a86",
+      "store_area": "Food",
+      "title": "Great Value Lunch Meat Rollbacks",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "As an ongoing commitment to server customers continues, offering quality products at incredible prices, expect to see some amazing Rollbacks in department 97 on select\u00a0Great Value lunch meats land this week. Be sure to show customers the value and thank you and your teams for all that you do to make our stores America's best place to shop!"
+    },
+    {
+      "event_id": "47360fb4-e98b-4130-bc06-233103c3a309",
+      "store_area": "Fresh",
+      "title": "Bakery Trainer Store Support",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Soon, Bakery Trainers from one of our suppliers will visit stores soon to strengthen bakery routines, fine tune process execution, build associate skills, in an effort to elevate the overall customer experience. Trainers will take a hands on approach and work side-by-side with Bakery associates, Team Leads, and Coaches on the\u00a0salesfloor to reinforce baking, decorating, general in-store production routines and standards for quality, food safety, and consistency. Afterward, they\u2019ll recap with store leadership on observations and next steps. Please partner during the visit, ensure teams are available, and attend the post-visit recap."
+    },
+    {
+      "event_id": "e64d311d-38aa-44c9-b743-2d788520997e",
+      "store_area": "Fresh",
+      "title": "Dept. 81: WK14 Bread Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In department 81, Commercial Bread, ensure teams work clean and continue setting the buns and rolls modulars this week. Expect to see changes as Sam's Choice and Sara Lee brands transition. Keep these key items full to help support your historical summer buns and rolls volume. Set, price and show the value on key Rollbacks to help boost sales Keep tortilla Rollbacks full and priced correctly to support Cinco de Mayo on Tuesday! Follow this quick store checklist to win in Commercial Bread!"
+    },
+    {
+      "event_id": "7c99c7b7-b57a-4975-84ad-abd23e0e8a56",
+      "store_area": "Fresh",
+      "title": "Dept. 93: Summer ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "May holidays will drive Meat demand. For Cinco de Mayo, expect lifts in ground beef. For Mother\u2019s Day and Memorial Day expect them in steaks, ribs, lobster and snow crab. Act now to win summer grilling. Ensure department 93 precision modulars are reviewed and right-sized; unplug holes and correct on-hands to improve flow and reduce waste. Deep-clean cases and fixtures before stocking. Check product temps across the department daily. Finally, use the Store Feature Order Tool now to place feature orders; remember items have a 10-21 day lead time."
+    },
+    {
+      "event_id": "25461289-13a5-4076-8eb2-d1557519c3a7",
+      "store_area": "Fresh",
+      "title": "Dept. 94: Produce Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In department 94, Produce, from now through week 17 (May 2\u201329), stores serviced by six impacted DCs will see iceberg lettuce shortages: about 60% fill on core SKUs and 0% on select salad kits. Fill gaps with adjacent items and face out top sellers. Weather is tightening asparagus and tomato supply through week 19\u2014verify on-hands and repurpose salsa bins for bulk tomatoes. Mother\u2019s Day floral is in: confirm receipts, complete price changes, continue to condense action-alley displays while updating aisle locations and pick gently. Stone fruit season starts May 4, cherries run through June 24 and watermelons are coming."
+    },
+    {
+      "event_id": "7532201d-294c-4cf0-9387-b804c791c4a6",
+      "store_area": "Fresh",
+      "title": "Dept. 98: Spring Sell-Through Acceleration\\n\\nSpecial Bulletin",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "In department 98 Fresh Bakery, win Mother\u2019s Day sales by following the approved decorating guidance, keeping the department full, fresh and clean, tables stocked with best-sellers and focus on key items such as angel food items and carrot, cheese and white cakes all week. Order donut ingredients now to stay in stock and avoid gaps. Drive value and volume with Rollbacks! Feature and flag Marketside mini muffin, 28 count cookies and angle food items."
+    },
+    {
       "event_id": "70be0944-4865-43a1-ad08-3af8a5a5f364",
       "store_area": "Fresh",
       "title": "Summer Grilling Basket Launch Plan",
       "status": "Review for Publish review - No Comms",
       "summary_text": "In Fresh, the Summer Grilling Basket program launches May 4 and sets through July 5, offering a family-of-8 meal solution for under $5 per person. New this year: 10 of 13 items are consolidated in one shoppable location between the frozen and refrigerated bunker endcaps and includes supporting sidekick fixtures and a 4-way to deliver a strong in-store grilling statement and elevate the customer experience!\u00a0 Ensure the grilling 4-way, bunkers, endcaps and sidekicks are set to plan, items stocked, high standards are maintained and the Summer Grilling Basket signing kit is in place through July 5."
+    },
+    {
+      "event_id": "8759e83b-1212-4e54-bc26-0789d1c93843",
+      "store_area": "Frontend",
+      "title": "OnePay Credit Card:  New signing kit arrives this week\\n",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "OnePay Credit Card and OnePay Later Loans signing arrives in stores this week to boost customer awareness and make it easy to learn more or apply via QR codes. Kits will be delivered to your back room; please stage boxes by the Anderson bin immediately. Starting next week, Anderson reps will install signage across key departments\u2014no associate labor required. These payment options help customers earn rewards or finance larger purchases with predictable payments."
+    },
+    {
+      "event_id": "b438cb9e-19b9-4b66-b475-822de4b95929",
+      "store_area": "Hardlines",
+      "title": "Dept. 11: Tool World Remerch Update and Bundled Firewood Reminder",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 11: Prep Tool World for May markdowns and the Week 17 reset, and order bundled firewood by the pallet to avoid over-orders."
+    },
+    {
+      "event_id": "00cd245a-deef-455e-b428-ff04fa69de13",
+      "store_area": "Hardlines",
+      "title": "Dept. 9: Do Not Discard Easton Pant PDQs",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 9: Do not discard Easton Pant\u00a0PDQs. Keep existing PDQs on the shelf until replacement inventory arrives, as pants will ship without PDQs for the next several months."
+    },
+    {
+      "event_id": "d1ee6a52-1770-4041-b3f2-43b3b4e5c21a",
+      "store_area": "Home",
+      "title": "Home: Mainstays Kids Brand Launch \u2013 Key Updates  ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Home Department: It is week 14, and time for stores to set the modular for the Mainstays Kids. A clean, on-time set is the key to winning your customer and capturing the full basket."
+    },
+    {
+      "event_id": "86dbc05f-cb27-4b3d-93be-96d908300061",
+      "store_area": "Seasonal",
+      "title": "America 250 Signing Kit Now Available!",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Seasonal department: America 250 Signing Kit now available to order through Bunzl. There is a video link available in this AMP activity."
+    },
+    {
+      "event_id": "55502c26-ceac-4866-860e-4dd1faca1e38",
+      "store_area": "Total Store",
+      "title": "AI Tip of the Week: Drive AI Adoption in Your Store",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Drive AI Adoption in Your Facility.\n\nWhen teams build small, repeatable practices, they are\u00a0more likely to adopt tools that improve efficiency and decision-making.\n\nThis approach focuses on helping leaders and associates use AI tools like ChatGPT and Gemini in practical, everyday ways. It provides two guided prompts. One for managers and one for people and learning leaders.\n\nManagers are guided to identify barriers to AI adoption, create a short development plan, define real use cases and set clear accountability.\n\nPeople and learning leaders focus on designing quick, practical training, making AI approachable, reinforcing learning, and measuring success.\n\nThe goal is simple: build confidence, drive consistent usage, and make AI a natural part of daily work."
     },
     {
       "event_id": "bbf004aa-5136-4ee2-a214-9c4fdff20433",
@@ -184,6 +373,13 @@
       "summary_text": "Total Store: Associate to Driver applications are open May 2-8. Selected associates begin training August 10 and receive a Private Fleet driver offer upon graduation. Have associates review the toolkit before applying."
     },
     {
+      "event_id": "3bc1ccb7-bab0-49a1-8341-c85d23293bc8",
+      "store_area": "Total Store",
+      "title": "Dept. 16/56: Mother\u2019s Day Plants and Patio Rollbacks",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 16/D56: Week 14 Mother\u2019s Day plant and orchid arrivals plus patio rollback\u00a0signage."
+    },
+    {
       "event_id": "ecadfc2e-d68d-4997-811a-c2001108d308",
       "store_area": "Total Store",
       "title": "Week 14 - Total Fresh: Prep for May Fresh Cost Inventory",
@@ -191,5 +387,12 @@
       "summary_text": "May's Fresh Cost Inventory will be conducted on Tuesday, May 26. To prepare, staff up, check the Inventory Tracking Report, follow guidance provided in the Fresh Better Way guide and reach out with questions."
     }
   ],
-  "events_without_summary": []
+  "events_without_summary": [
+    {
+      "event_id": "817db40e-6310-487f-bd3a-71e01ad14385",
+      "title": "Fresh Alive@5 is Moving to Fresh Teams",
+      "area": "Fresh",
+      "status": "Awaiting Business Review - Pending"
+    }
+  ]
 }
