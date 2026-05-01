@@ -561,28 +561,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Iframe Embedding Styles */
-        .iframe-wrapper {
-            position: fixed;
-            top: 88px; /* header height */
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 50;
-            background: var(--gray-100);
-            display: none;
-        }
-
-        .iframe-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .iframe-wrapper.active {
-            display: block;
-        }
-
         /* Link Management Widgets */
         .link-badge {
             display: inline-block;
@@ -1170,6 +1148,104 @@
             transform: rotate(45deg);
         }
 
+        .dashboard-action-btn {
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .dashboard-action-btn:hover {
+            border-color: var(--walmart-blue);
+            background: var(--walmart-blue-lightest);
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            --gray-100: #1A202C;
+            --gray-300: #2D3748;
+            --gray-600: #A0AEC0;
+            --gray-700: #CBD5E0;
+            --gray-900: #F7FAFC;
+            --white: #2D3748;
+            background-color: #1A202C;
+            color: #F7FAFC;
+        }
+        body.dark-mode .header {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+        }
+        body.dark-mode .header .nav-item { color: #fff; }
+        body.dark-mode .header .nav-item.active { background: rgba(255,255,255,0.2); }
+        body.dark-mode .header .user-section { color: #fff; }
+        body.dark-mode .header h1 { color: #fff; }
+        body.dark-mode .widget {
+            background: #2D3748;
+            border-color: #4A5568;
+        }
+        body.dark-mode .widget-header {
+            background: linear-gradient(135deg, #2D3748, #1A202C);
+        }
+        body.dark-mode .settings-gear,
+        body.dark-mode .dashboard-action-btn {
+            background: #2D3748;
+            border-color: #4A5568;
+            color: #F7FAFC;
+        }
+        body.dark-mode .quick-links-sidebar {
+            background: #2D3748;
+            border-color: #4A5568;
+        }
+        body.dark-mode .metric-card {
+            background: #1A202C;
+        }
+
+        /* Feedback Modal */
+        .fy-feedback-modal {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 380px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow: hidden;
+        }
+        .fy-feedback-modal.active { display: block; animation: fySlideUp 0.3s ease; }
+        @keyframes fySlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .fy-feedback-header { background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%); color: #fff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .fy-feedback-header h3 { font-size: 1rem; margin: 0; }
+        .fy-feedback-close { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; }
+        .fy-feedback-body { padding: 1.5rem; }
+        .fy-fb-step { display: none; }
+        .fy-fb-step.active { display: block; }
+        .fy-fb-categories { display: flex; flex-direction: column; gap: 0.75rem; }
+        .fy-fb-cat { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: #F7FAFC; border: 2px solid transparent; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .fy-fb-cat:hover { background: #E2E8F0; }
+        .fy-fb-cat.selected { border-color: #3B82F6; background: #DBEAFE; }
+        .fy-fb-cat input { display: none; }
+        .fy-fb-cat span { font-size: 1.2rem; }
+        .fy-fb-rating { display: flex; justify-content: space-between; margin: 1.5rem 0; }
+        .fy-fb-rate { display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 0.5rem; border-radius: 8px; transition: all 0.2s; }
+        .fy-fb-rate:hover { background: #F7FAFC; }
+        .fy-fb-rate.selected { background: #DBEAFE; }
+        .fy-fb-rate input { display: none; }
+        .fy-fb-rate .r-emoji { font-size: 1.75rem; margin-bottom: 0.25rem; }
+        .fy-fb-rate .r-label { font-size: 0.7rem; color: #718096; }
+        .fy-fb-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+        .fy-fb-btn-next { flex: 1; background: #1E3A8A; color: #fff; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 500; cursor: pointer; }
+        .fy-fb-btn-next:hover { background: #3B82F6; }
+        .fy-fb-btn-back { background: #F7FAFC; color: #4A5568; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; }
+        .fy-fb-success { text-align: center; padding: 2rem 1rem; }
+
         .gear-dropdown {
             display: none;
             position: absolute;
@@ -1537,12 +1613,9 @@
                 <h1>Activity Hub</h1>
             </div>
             <nav class="nav-items">
-                <a href="/activity-hub/for-you" class="nav-item active" data-view="dashboard">For You</a>
-                <a href="/activity-hub/projects" class="nav-item" data-embed="iframe" data-url="http://weus42608431466:8088/activity-hub/projects">Projects</a>
+                <a href="/activity-hub/for-you" class="nav-item active">For You</a>
+                <a href="/activity-hub/projects" class="nav-item">Projects</a>
                 <a href="/activity-hub/reporting" class="nav-item">Reporting</a>
-                <a href="/activity-hub/teams" class="nav-item">Teams</a>
-                <a href="/activity-hub/my-work" class="nav-item">My Work</a>
-                <a href="/activity-hub/settings" class="nav-item">Settings</a>
                 <a href="/activity-hub/admin" class="nav-item" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);">🔒 Admin</a>
             </nav>
             <div class="user-section">
@@ -1555,15 +1628,12 @@
         </div>
     </header>
 
-    <!-- Embedded Content Iframe -->
-    <div id="iframe-content" class="iframe-wrapper">
-        <iframe id="embedded-frame" src="" title="Embedded Content"></iframe>
-    </div>
-
     <!-- Main Content -->
     <div id="dashboard-content" class="main-container">
         <!-- Settings Gear -->
         <div class="dashboard-header">
+            <button class="dashboard-action-btn" onclick="toggleFYFeedback()" title="Send Feedback">💬</button>
+            <button class="dashboard-action-btn" onclick="toggleDarkMode()" title="Toggle Light/Dark Mode">🌙</button>
             <button class="settings-gear" onclick="toggleGearDropdown()" title="Page Settings">⚙️</button>
             <div id="gearDropdown" class="gear-dropdown">
                 <div class="gear-dropdown-item" onclick="forYouEnterEditMode()">✏️ Edit For You Page</div>
@@ -2460,46 +2530,58 @@
                 });
             });
 
-            // Navigation items
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function(e) {
-                    const href = this.getAttribute('href');
-                    const dataEmbed = this.getAttribute('data-embed');
-                    const dataView = this.getAttribute('data-view');
-                    const dataUrl = this.getAttribute('data-url');
-                    
-                    // Handle iframe embedding (Projects)
-                    if (dataEmbed === 'iframe' && dataUrl) {
-                        e.preventDefault();
-                        // Update URL in address bar
-                        window.history.pushState({page: 'projects'}, 'Projects', href);
-                        
-                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                        this.classList.add('active');
-                        
-                        // Hide dashboard, show iframe
-                        document.getElementById('dashboard-content').style.display = 'none';
-                        document.getElementById('iframe-content').classList.add('active');
-                        document.getElementById('embedded-frame').src = dataUrl;
-                    }
-                    // Handle returning to dashboard view (For You)
-                    else if (dataView === 'dashboard') {
-                        e.preventDefault();
-                        // Update URL in address bar
-                        window.history.pushState({page: 'dashboard'}, 'For You', href);
-                        
-                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                        this.classList.add('active');
-                        
-                        // Show dashboard, hide iframe
-                        document.getElementById('dashboard-content').style.display = 'block';
-                        document.getElementById('iframe-content').classList.remove('active');
-                        document.getElementById('embedded-frame').src = '';
-                    }
-                    // All other nav items navigate to their href (real routes)
-                });
+            // Navigation items — all use standard <a href> navigation, no iframes
+        }
+
+        // ──────────────────────────────────────────────
+        // Dark Mode Toggle
+        // ──────────────────────────────────────────────
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('activity-hub-dark-mode', isDark ? 'true' : 'false');
+            const btn = document.querySelector('.dashboard-action-btn[title="Toggle Light/Dark Mode"]');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        if (localStorage.getItem('activity-hub-dark-mode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.addEventListener('DOMContentLoaded', function() {
+                const btn = document.querySelector('.dashboard-action-btn[title="Toggle Light/Dark Mode"]');
+                if (btn) btn.textContent = '☀️';
             });
         }
+
+        // ──────────────────────────────────────────────
+        // Feedback Modal (For You Page)
+        // ──────────────────────────────────────────────
+        function toggleFYFeedback() { document.getElementById('fyFeedbackModal').classList.toggle('active'); }
+        function fyFbNext() {
+            if (!document.querySelector('input[name="fy-fb-category"]:checked')) { alert('Please select a category'); return; }
+            document.getElementById('fy-fb-step1').classList.remove('active');
+            document.getElementById('fy-fb-step2').classList.add('active');
+        }
+        function fyFbBack() { document.getElementById('fy-fb-step2').classList.remove('active'); document.getElementById('fy-fb-step1').classList.add('active'); }
+        function fyFbSubmit() {
+            const rating = document.querySelector('input[name="fy-fb-rating"]:checked');
+            if (!rating) { alert('Please select a rating'); return; }
+            let list = []; try { list = JSON.parse(localStorage.getItem('activity-hub-feedback') || '[]'); } catch {}
+            list.push({ source: 'For You', category: document.querySelector('input[name="fy-fb-category"]:checked').value, rating: parseInt(rating.value), comments: document.getElementById('fyFbComments').value.trim(), submittedAt: new Date().toISOString(), submittedBy: 'Current User' });
+            localStorage.setItem('activity-hub-feedback', JSON.stringify(list));
+            document.getElementById('fy-fb-step2').classList.remove('active');
+            document.getElementById('fy-fb-step3').classList.add('active');
+        }
+        function fyFbReset() {
+            document.querySelectorAll('.fy-fb-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('fy-fb-step1').classList.add('active');
+            document.querySelectorAll('input[name="fy-fb-category"], input[name="fy-fb-rating"]').forEach(i => i.checked = false);
+            document.getElementById('fyFbComments').value = '';
+            document.querySelectorAll('.fy-fb-cat, .fy-fb-rate').forEach(el => el.classList.remove('selected'));
+            toggleFYFeedback();
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.fy-fb-cat').forEach(c => { c.addEventListener('click', function() { document.querySelectorAll('.fy-fb-cat').forEach(x => x.classList.remove('selected')); this.classList.add('selected'); }); });
+            document.querySelectorAll('.fy-fb-rate').forEach(r => { r.addEventListener('click', function() { document.querySelectorAll('.fy-fb-rate').forEach(x => x.classList.remove('selected')); this.classList.add('selected'); }); });
+        });
 
         // Link Management Modal Functions
         // Initialize user links storage — load from localStorage if saved
@@ -3062,5 +3144,39 @@
     <script src="/Admin/Widgets/widget-registry.js"></script>
     <script src="/Admin/Widgets/widget-storage.js"></script>
     <script src="/Admin/Widgets/widget-page-utils.js"></script>
+
+    <!-- Feedback Modal -->
+    <div id="fyFeedbackModal" class="fy-feedback-modal">
+        <div class="fy-feedback-header"><h3>💬 Send Feedback</h3><button class="fy-feedback-close" onclick="toggleFYFeedback()">×</button></div>
+        <div class="fy-feedback-body">
+            <div id="fy-fb-step1" class="fy-fb-step active">
+                <p style="margin-bottom: 1rem; color: #718096;">What area would you like to give feedback on?</p>
+                <div class="fy-fb-categories">
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Dashboard UI"><span>🎨</span> Dashboard UI</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Widgets"><span>🧩</span> Widgets</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Navigation"><span>🧭</span> Navigation</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Links"><span>🔗</span> Links</label>
+                    <label class="fy-fb-cat"><input type="radio" name="fy-fb-category" value="Other"><span>💡</span> Other</label>
+                </div>
+                <div class="fy-fb-actions"><button class="fy-fb-btn-next" onclick="fyFbNext()">Next →</button></div>
+            </div>
+            <div id="fy-fb-step2" class="fy-fb-step">
+                <p style="margin-bottom: 0.5rem; color: #718096;">How would you rate this aspect?</p>
+                <div class="fy-fb-rating">
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="1"><span class="r-emoji">😞</span><span class="r-label">Poor</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="2"><span class="r-emoji">😐</span><span class="r-label">Fair</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="3"><span class="r-emoji">😊</span><span class="r-label">Good</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="4"><span class="r-emoji">😄</span><span class="r-label">Great</span></label>
+                    <label class="fy-fb-rate"><input type="radio" name="fy-fb-rating" value="5"><span class="r-emoji">🤩</span><span class="r-label">Excellent</span></label>
+                </div>
+                <div style="margin-bottom: 0.75rem;"><label style="font-size: 0.85rem; font-weight: 500; color: #4A5568; display: block; margin-bottom: 4px;">Comments (optional)</label><textarea id="fyFbComments" style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.9rem; font-family: inherit; resize: vertical;" placeholder="Tell us more..."></textarea></div>
+                <p style="font-size: 0.7rem; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 0.3rem 0.5rem; margin-bottom: 0.5rem;">🔒 Do not enter payment card information.</p>
+                <div class="fy-fb-actions"><button class="fy-fb-btn-back" onclick="fyFbBack()">← Back</button><button class="fy-fb-btn-next" onclick="fyFbSubmit()">Submit</button></div>
+            </div>
+            <div id="fy-fb-step3" class="fy-fb-step">
+                <div style="text-align: center; padding: 2rem 1rem;"><div style="font-size: 3rem; margin-bottom: 1rem;">✅</div><h3 style="margin-bottom: 0.5rem;">Thank You!</h3><p style="color: #718096;">Your feedback has been submitted.</p><button class="fy-fb-btn-next" style="margin-top: 1.5rem;" onclick="fyFbReset()">Close</button></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

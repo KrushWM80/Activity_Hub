@@ -1,0 +1,61 @@
+jobCode,deptNumber,divNumber,full_job_code,roleTitle,teamName,teamId,workgroupName,workgroupId,status,impact_count,requested_by,requested_at,sample_worker,sample_worker_store
+101,10,1,1-10-101,Auto Care Ctr DM,Fuel,1000319,Fuel,1000215,pending,1,System Administrator,2026-04-20T14:33:39.472091,Rodolfo Berrios Otarola,2449
+201,5,1,1-5-201,Auto Care Center TA,Fuel,1000319,Fuel,1000215,pending,1,System Administrator,2026-04-20T14:33:39.472100,ALEYSHA AGOSTO,2240
+4205,38,10,10-38-4205,Unknown,Fuel,1000319,Fuel,1000215,pending,1,System Administrator,2026-04-20T14:33:39.472103,Gustavo Alzuru,5315
+814330,0,5,5-0-814330,Unknown,Fuel,1000319,Fuel,1000215,pending,1,System Administrator,2026-04-20T14:33:39.472105,Andrew Aguillon Langley,9050
+902343,0,5,5-0-902343,Unknown,Fuel,1000319,Fuel,1000215,pending,1,System Administrator,2026-04-20T14:33:39.472106,Nancy Aguilar,9050
+40206,0,6,6-0-40206,Unknown,Fuel,1000319,Fuel,1000215,pending,1,System Administrator,2026-04-20T14:33:39.472108,Jared Wright,1248
+101,23,1,1-23-101,Auto Care Ctr DM,Fashion,1000282,General Merchandise,1000216,pending,1,System Administrator,2026-04-20T14:33:39.472111,Sandra Acevedo,2067
+201,23,1,1-23-201,Auto Care Center TA,Fashion,1000282,General Merchandise,1000216,pending,1,System Administrator,2026-04-20T14:33:39.472113,CHRISTIAN ACEVEDO VELAZQUEZ,2085
+238,27,1,1-27-238,Unknown,Fashion,1000282,General Merchandise,1000216,pending,1,System Administrator,2026-04-20T14:33:39.472114,JANINE ADRIAN,5111
+101,32,11,11-32-101,Auto Care Ctr DM,Fashion,1000282,General Merchandise,1000216,pending,1,System Administrator,2026-04-20T14:33:39.472118,Diana Aponte Lopez,2346
+201,32,11,11-32-201,Auto Care Center TA,Fashion,1000282,General Merchandise,1000216,pending,1,System Administrator,2026-04-20T14:33:39.472119,IVANA ADORNO,1822
+301,190,1,1-190-301,Unknown,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472123,FELIX GONZALEZ,476
+201,192,1,1-192-201,Auto Care Center TA,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472124,CARLOS ALICEA,2072
+201,80,24,24-80-201,Auto Care Center TA,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472125,nan nan,3693
+101,93,24,24-93-101,Auto Care Ctr DM,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472126,Carlos Arenas Vazquez,5802
+201,93,24,24-93-201,Auto Care Center TA,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472127,KENNETH ACEVEDO,2240
+915,93,24,24-93-915,Unknown,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472128,MANUEL AGOSTO,2423
+101,94,25,25-94-101,Auto Care Ctr DM,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472129,Miguel Caraballo,3693
+201,94,25,25-94-201,Auto Care Center TA,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472130,BRADLEY ADAMES TORRES,1854
+1010,90,26,26-90-1010,Unknown,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472132,Ivelisse Aviles,1854
+4690,90,26,26-90-4690,Unknown,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472133,SEBASTHIAN ALICEA RODRIGUEZ,5793
+101,98,27,27-98-101,Auto Care Ctr DM,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472134,Ivan Antigua Garcia,5803
+981,98,27,27-98-981,Unknown,Food/Consumables,1000318,Food & Consumables,1000214,pending,1,System Administrator,2026-04-20T14:33:39.472136,JAILENE AGOSTO MALPICA,2423
+40407,0,1,1-0-040407,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472138,THOMAS CHAMBERS,3493
+40413,0,1,1-0-040413,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472139,Robin Johnson,1042
+40225,0,1,1-0-40225,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472140,Blaise Mutchler,7368
+40267,0,1,1-0-40267,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472142,ZAMIRA ABIERNO CALIL,3417
+40296,0,1,1-0-40296,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472143,Thomas Aaron,2008
+40301,0,1,1-0-40301,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472144,Dawn Almonte,283
+40321,0,1,1-0-40321,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472145,Nina Ardis,2926
+40338,0,1,1-0-40338,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472146,Robert Bates,5148
+40339,0,1,1-0-40339,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472147,Tim Barnhart,3286
+40342,0,1,1-0-40342,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472149,LA ABDULLAH,2786
+40344,0,1,1-0-40344,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472150,nan nan,6967
+40345,0,1,1-0-40345,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472151,Lazaro Hernandez,3046
+40346,0,1,1-0-40346,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472152,ZAMIRA ABIERNO CALIL,5034
+40347,0,1,1-0-40347,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472153,Donovan Johnson,5706
+40348,0,1,1-0-40348,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472154,Ronald Austin,3207
+40349,0,1,1-0-40349,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472155,FARAHNAZ ABASYAR,2247
+40386,0,1,1-0-40386,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472156,Maricela Arvizu,3267
+40403,0,1,1-0-40403,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472157,Nicholas Adessa,3207
+40404,0,1,1-0-40404,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472158,YAMAN AADI,2807
+40405,0,1,1-0-40405,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472159,JENNIFER A DOLVILLE,5131
+40406,0,1,1-0-40406,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472160,ERAY ABA,1999
+40407,0,1,1-0-40407,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472161,nan nan,2534
+40409,0,1,1-0-40409,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472163,Chad Caldwell,2003
+40410,0,1,1-0-40410,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472164,Jennifer Phillips,644
+40413,0,1,1-0-40413,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472165,RAMIZ ABDULWAHED,4538
+40419,0,1,1-0-40419,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472166,YAMAN AADI,2807
+40420,0,1,1-0-40420,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472167,Irina Alvarado,6397
+40421,0,1,1-0-40421,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472168,ERAY ABA,1999
+40422,0,1,1-0-40422,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472169,Yzaidelis Montes De Oca Resto,3280
+40423,0,1,1-0-40423,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472170,RUBI ACOSTA,1565
+40546,0,1,1-0-40546,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472171,John Whiteman,968
+40547,0,1,1-0-40547,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472172,Michelle Domineck,3205
+814893,0,1,1-0-814893,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472173,Dwayne Allen,2832
+44701,0,10,10-0-44701,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472174,Lynette Echevarria,3716
+813042,0,44,44-0-813042,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472175,Mike Bray,10657
+40556,0,6,6-0-40556,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472176,AMMAR ABU-HAMDA,3278
+40432,0,71,71-0-40432,Unknown,Management,1111111,,,pending,1,System Administrator,2026-04-20T14:33:39.472177,Chase Abel,3894

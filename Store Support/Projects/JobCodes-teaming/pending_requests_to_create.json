@@ -1,0 +1,640 @@
+[
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-0-40225",
+      "1-0-40345",
+      "1-0-40349",
+      "1-0-40409",
+      "1-0-40410",
+      "1-0-40419",
+      "1-0-40422",
+      "1-0-40547",
+      "6-0-40206"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052060",
+    "description": "Auto-generated teaming assignment: 9 job codes assigned to Management team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052064",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-202-2104",
+      "1-46-501",
+      "1-615-7200",
+      "1-615-7400",
+      "1-615-7410"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052103",
+    "description": "Auto-generated teaming assignment: 5 job codes assigned to Food/Consumables team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052107",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-203-2003",
+      "1-990-502",
+      "1-990-505",
+      "1-990-7210",
+      "1-990-7410"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052132",
+    "description": "Auto-generated teaming assignment: 5 job codes assigned to Front End Checkout team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052135",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-27-237"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052163",
+    "description": "Auto-generated teaming assignment: 1 job codes assigned to Apparel team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052167",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-600-7200",
+      "1-600-7300",
+      "1-600-7400"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052198",
+    "description": "Auto-generated teaming assignment: 3 job codes assigned to Meat/Produce team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052199",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-600-7210",
+      "1-695-7500",
+      "1-930-745",
+      "1-931-465",
+      "1-996-7400",
+      "1-996-754",
+      "1-996-782"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052224",
+    "description": "Auto-generated teaming assignment: 7 job codes assigned to Asset Protection team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052228",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-600-7220",
+      "1-600-7320",
+      "1-600-7420",
+      "27-98-983"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052251",
+    "description": "Auto-generated teaming assignment: 4 job codes assigned to Deli/Bakery team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052253",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-600-7421"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052274",
+    "description": "Auto-generated teaming assignment: 1 job codes assigned to Fresh team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052276",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-610-7210",
+      "1-640-7412"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052297",
+    "description": "Auto-generated teaming assignment: 2 job codes assigned to Seasonal team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052299",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-610-7310",
+      "1-610-7410",
+      "1-695-7510"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052319",
+    "description": "Auto-generated teaming assignment: 3 job codes assigned to Salesfloor team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052321",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-615-7210",
+      "1-695-7520",
+      "1-695-7530",
+      "1-695-7540",
+      "1-695-7550"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052344",
+    "description": "Auto-generated teaming assignment: 5 job codes assigned to Stocking Day team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052348",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-615-7310",
+      "1-655-7400"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052378",
+    "description": "Auto-generated teaming assignment: 2 job codes assigned to Health & Beauty team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052380",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-620-7200",
+      "1-660-7400"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052403",
+    "description": "Auto-generated teaming assignment: 2 job codes assigned to Home team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052405",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-625-7200",
+      "1-625-7400",
+      "1-625-7420"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052425",
+    "description": "Auto-generated teaming assignment: 3 job codes assigned to Fashion team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052427",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-630-7200",
+      "1-630-7300",
+      "1-930-1461",
+      "1-930-1471",
+      "1-930-1481",
+      "1-936-1451",
+      "1-936-1452",
+      "1-995-3470",
+      "1-995-711"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052448",
+    "description": "Auto-generated teaming assignment: 9 job codes assigned to Digital team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052450",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-630-7210",
+      "1-630-7410",
+      "1-635-7230",
+      "1-635-7240",
+      "1-635-7340",
+      "1-635-7440",
+      "1-995-710"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052472",
+    "description": "Auto-generated teaming assignment: 7 job codes assigned to Stocking ON team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052473",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-635-7441"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052499",
+    "description": "Auto-generated teaming assignment: 1 job codes assigned to Stocking team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052500",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-640-7200",
+      "1-640-7411"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052522",
+    "description": "Auto-generated teaming assignment: 2 job codes assigned to Hardlines team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052523",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-640-7210",
+      "1-640-7410"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052544",
+    "description": "Auto-generated teaming assignment: 2 job codes assigned to Entertainment team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052546",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-910-7250",
+      "1-980-530",
+      "1-980-711",
+      "1-990-3303",
+      "1-990-7310"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052569",
+    "description": "Auto-generated teaming assignment: 5 job codes assigned to Front End Service team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052570",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-930-3400"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052591",
+    "description": "Auto-generated teaming assignment: 1 job codes assigned to Digtial team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052594",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "1-998-150",
+      "1-998-151"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052614",
+    "description": "Auto-generated teaming assignment: 2 job codes assigned to Remodel team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052616",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "59-645-7210",
+      "59-65-265"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052637",
+    "description": "Auto-generated teaming assignment: 2 job codes assigned to Fuel team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052638",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "6-10-201",
+      "6-37-814",
+      "6-37-815",
+      "6-37-823"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052657",
+    "description": "Auto-generated teaming assignment: 4 job codes assigned to Auto Care Center team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052658",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  },
+  {
+    "id": 1777671005052,
+    "job_codes": [
+      "71-76-624"
+    ],
+    "request_type": "job_code_update",
+    "status": "pending",
+    "requested_by": "system",
+    "requested_by_name": "System Auto-Assignment",
+    "requested_at": "2026-05-01T16:30:05.052678",
+    "description": "Auto-generated teaming assignment: 1 job codes assigned to Academy team based on Master table role matching",
+    "comments": [],
+    "history": [
+      {
+        "timestamp": "2026-05-01T16:30:05.052680",
+        "changed_by": "system",
+        "changed_by_name": "System Auto-Assignment",
+        "field": "status",
+        "old_value": null,
+        "new_value": "pending"
+      }
+    ]
+  }
+]

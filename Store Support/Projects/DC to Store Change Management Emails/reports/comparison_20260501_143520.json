@@ -1,0 +1,17 @@
+{
+  "test_date": "2026-05-01T14:35:20.107383",
+  "purpose": "Validate ELM data consistency and real manager changes",
+  "comparison": {
+    "date_1": "2026-04-17",
+    "date_2": "2026-05-01",
+    "source": "ELM BigQuery (catalog_location_views.division_view)"
+  },
+  "statistics": {
+    "locations_april_17": 5645,
+    "locations_may_1": 5645,
+    "new_locations": 0,
+    "removed_locations": 0,
+    "manager_changes": 0
+  },
+  "manager_changes": []
+}

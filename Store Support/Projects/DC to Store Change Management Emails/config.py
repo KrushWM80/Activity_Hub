@@ -57,13 +57,13 @@ VPN_RETRY_INTERVAL_HOURS = 1  # Check every hour
 EMAIL_ENABLED = True  # Set to True to enable email notifications
 EMAIL_METHOD = "MSGRAPH"  # Options: "MSGRAPH" (Microsoft Graph), "HERMES" (future)
 
-# Test mode - send all emails to these addresses instead of distribution lists
-TEST_MODE = True
+# Test mode - controls EMAIL DISTRIBUTION only, NOT data source
+# TEST_MODE=True: REAL SDL data → Kendall only (validation)
+# TEST_MODE=False: REAL SDL data → DC leadership (production)
+TEST_MODE = False  # For manual testing, set to True
 TEST_EMAILS = [
-    "Kristine.Torres@walmart.com",
-    "Matthew.Farnworth@walmart.com",
-    "Kendall.Rush@walmart.com"
-]  # Test recipients during testing phase
+    "Kendall.Rush@walmart.com"  # Test recipient only (single validation user)
+]  # ALWAYS uses REAL SDL data - only distribution changes
 TEST_EMAIL = TEST_EMAILS[0]  # Backward compatibility
 
 # Distribution lists per role type (will be used when TEST_MODE = False)

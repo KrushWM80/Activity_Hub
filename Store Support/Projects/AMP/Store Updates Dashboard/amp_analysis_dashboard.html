@@ -3334,7 +3334,6 @@
  let totalStores = 0;
  let engagementRates = []; // Array of per-activity engagement rates
  let uniqueAutofeedIds = new Set(); // Track unique AMP_IDs for autofeeds
- let majorityActivityCount = 0; // Count activities with 2000+ stores
  
  // Calculate totals from API data
  apiData.forEach(row => {
@@ -3351,11 +3350,6 @@
  // Track unique autofeed activity IDs
  if (messageType === 'Autofeeds' && ampId) {
  uniqueAutofeedIds.add(ampId);
- }
- 
- // Count activities with 2000+ stores
- if (stores >= 2000) {
- majorityActivityCount++;
  }
  
  // Per-activity engagement = (Clicks / Users) * 100
@@ -3376,9 +3370,6 @@
  // Unique Autofeeds = count of distinct AMP_IDs with Message_Type = 'Autofeeds'
  const uniqueAutofeeds = uniqueAutofeedIds.size;
  
- // Majority Activities = activities with 2000+ stores
- const majorityActivities = majorityActivityCount;
- 
  // Avg Clicks = Total Clicks / Total Activities
  const avgClicks = recordCount > 0 ? Math.round(totalClicks / recordCount) : 0;
  
@@ -3392,9 +3383,25 @@
  ? (engagementRates.reduce((a, b) => a + b, 0) / engagementRates.length).toFixed(1)
  : 0;
  
+ // Fetch majority activities count from dedicated endpoint (not from paginated data)
+ const currentWeeks = new URLSearchParams(window.location.search).get('weeks') || 
+ document.getElementById('filterWeek')?.value || '13';
+ const currentFY = new URLSearchParams(window.location.search).get('fy') || 
+ document.getElementById('filterFY')?.value || '2027';
+ 
+ fetch(`/api/amp-majority?fy=${currentFY}&weeks=${currentWeeks}&threshold=2000`)
+ .then(response => response.json())
+ .then(data => {
+ const majorityActivities = data.majority_activities || 0;
+ document.getElementById('majorityActivities').textContent = majorityActivities.toLocaleString();
+ })
+ .catch(error => {
+ console.warn('Error fetching majority count:', error);
+ document.getElementById('majorityActivities').textContent = '0';
+ });
+ 
  document.getElementById('recordCount').textContent = recordCount.toLocaleString();
  document.getElementById('uniqueAutofeeds').textContent = uniqueAutofeeds.toLocaleString();
- document.getElementById('majorityActivities').textContent = majorityActivities.toLocaleString();
  document.getElementById('storeHigh').textContent = storeHigh.toLocaleString();
  document.getElementById('storeLow').textContent = storeLow.toLocaleString();
  document.getElementById('storeAvg').textContent = storeAvg;

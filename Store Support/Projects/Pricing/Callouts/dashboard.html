@@ -595,13 +595,14 @@
 
             <!-- CALLOUTS TABLE -->
             <div class="card">
-                <div class="card-header"><span class="card-icon">📋</span>Callouts for Selected Week</div>
+                <div class="card-header"><span class="card-icon">📋</span>Call Outs Log</div>
                 <div class="card-body">
                     <div class="table-container">
                         <table id="calloutsTable">
                             <thead>
                                 <tr>
-                                    <th>Title</th>
+                                    <th>FY</th>
+                                    <th>WM WK</th>
                                     <th>Content</th>
                                     <th>Created</th>
                                     <th>Actions</th>
@@ -609,7 +610,7 @@
                             </thead>
                             <tbody id="calloutsTableBody">
                                 <tr>
-                                    <td colspan="4" class="empty-state">
+                                    <td colspan="5" class="empty-state">
                                         <div class="empty-icon">📭</div>
                                         <div>No callouts yet. Add one above!</div>
                                     </td>
@@ -662,6 +663,28 @@
         </div>
     </div>
 
+    <!-- EDIT CALLOUT MODAL -->
+    <div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <h2 style="margin-top: 0; margin-bottom: 20px; color: #1e3a8a; font-size: 18px;">Edit Callout</h2>
+            
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: bold; color: #1e3a8a; margin-bottom: 6px;">Title (Optional)</label>
+                <input type="text" id="editTitleInput" class="form-input" placeholder="Enter callout title" style="width: 100%; box-sizing: border-box;">
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: bold; color: #1e3a8a; margin-bottom: 6px;">Content *</label>
+                <textarea id="editContentInput" class="form-input" placeholder="Enter callout details" style="width: 100%; box-sizing: border-box; min-height: 120px; font-family: Arial, sans-serif; resize: vertical;"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeEditModal()" style="min-width: 100px;">Cancel</button>
+                <button class="btn btn-primary" onclick="saveEditCallout()" style="min-width: 100px;">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ═══════════════════════════════════════════════════════════════════
         // STATE
@@ -682,15 +705,17 @@
         });
 
         async function initializeDashboard() {
-            // Fetch FY and Weeks
+            // Fetch FY
             await loadFiscalYears();
-            await loadWeeks();
             
-            // Set defaults
+            // Set FY default
             if (currentFY) {
                 selectedFY = currentFY;
                 document.getElementById('fyFilter').value = currentFY;
             }
+            
+            // Load weeks for selected FY
+            await loadWeeks();
             
             // Load CURRENT week (from Cal_Dim_Data)
             const currentWeek = await getCurrentWeek();
@@ -712,6 +737,18 @@
             document.getElementById('weekFilter').addEventListener('change', (e) => {
                 selectedWeek = parseInt(e.target.value);
                 loadCallouts();
+            });
+
+            // Modal keyboard shortcuts
+            document.getElementById('editTitleInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveEditCallout();
+                }
+            });
+            document.getElementById('editTitleInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeEditModal();
+                }
             });
         }
 
@@ -827,13 +864,15 @@
                 const data = await response.json();
 
                 const tbody = document.getElementById('calloutsTableBody');
-                if (data && data.success && Array.isArray(data.callouts) && data.callouts.length > 0) {
-                    tbody.innerHTML = data.callouts.map(c => `
+                if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+                    tbody.innerHTML = data.data.map(c => `
                         <tr>
-                            <td><strong>${escapeHtml(c.title || 'Untitled')}</strong></td>
+                            <td><strong>${String(c.fiscal_year || data.fiscal_year || 2027).slice(-2)}</strong></td>
+                            <td><strong>${c.wm_week}</strong></td>
                             <td>${escapeHtml(c.content || '').substring(0, 100)}...</td>
                             <td>${formatDate(c.created_date)}</td>
                             <td>
+                                <button class="btn btn-primary btn-small" onclick="editCallout('${c.id}', '${escapeHtml(c.title).replace(/'/g, "\\'\'")}', '${escapeHtml(c.content).replace(/'/g, "\\'")}')" style="margin-right: 4px;">Edit</button>
                                 <button class="btn btn-danger btn-small" onclick="deleteCallout('${c.id}')">Delete</button>
                             </td>
                         </tr>
@@ -841,7 +880,7 @@
                 } else {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="4" class="empty-state">
+                            <td colspan="5" class="empty-state">
                                 <div class="empty-icon">📭</div>
                                 <div>No callouts yet. Add one above!</div>
                             </td>
@@ -853,11 +892,55 @@
                 const tbody = document.getElementById('calloutsTableBody');
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="4" class="empty-state" style="color: #e53e3e;">
+                        <td colspan="5" class="empty-state" style="color: #e53e3e;">
                             <div>Error loading callouts. Please try again.</div>
                         </td>
                     </tr>
                 `;
+            }
+        }
+
+        async function editCallout(calloutId, calloutTitle, calloutContent) {
+            window.currentEditCalloutId = calloutId;
+            document.getElementById('editTitleInput').value = calloutTitle || '';
+            document.getElementById('editContentInput').value = calloutContent || '';
+            document.getElementById('editModal').style.display = 'flex';
+            document.getElementById('editTitleInput').focus();
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('editTitleInput').value = '';
+            document.getElementById('editContentInput').value = '';
+        }
+
+        async function saveEditCallout() {
+            const newTitle = document.getElementById('editTitleInput').value.trim();
+            const newContent = document.getElementById('editContentInput').value.trim();
+            
+            if (!newContent) {
+                alert('Content cannot be empty');
+                return;
+            }
+
+            const calloutId = window.currentEditCalloutId;
+            try {
+                const response = await fetch(`/api/callouts/${calloutId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: newTitle || 'Untitled', content: newContent })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    closeEditModal();
+                    loadCallouts();
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('Error updating callout:', error);
+                alert('Failed to update callout. Please try again.');
             }
         }
 
@@ -867,11 +950,20 @@
             try {
                 const response = await fetch(`/api/callouts/${calloutId}`, { method: 'DELETE' });
                 const data = await response.json();
+                
                 if (data.success) {
                     loadCallouts();
+                } else {
+                    // Check for streaming buffer error
+                    if (response.status === 409) {
+                        alert('⏰ Callout is too new. Please wait a few seconds before deleting.');
+                    } else {
+                        alert(`Error: ${data.error}`);
+                    }
                 }
             } catch (error) {
                 console.error('Error deleting callout:', error);
+                alert('Failed to delete callout. Please try again.');
             }
         }
 

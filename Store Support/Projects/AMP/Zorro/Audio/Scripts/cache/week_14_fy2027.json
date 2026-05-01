@@ -1,54 +1,34 @@
 {
   "week": 14,
   "fy": 2027,
-  "cached_at": "2026-05-01T09:00:13.388513",
-  "bq_last_updated": "2026-04-30T16:47:34.535000+00:00",
-  "event_count": 48,
-  "review_no_comm_count": 48,
+  "cached_at": "2026-05-01T15:18:13.429916",
+  "bq_last_updated": "2026-05-01T19:51:07.129000+00:00",
+  "event_count": 61,
+  "review_no_comm_count": 61,
   "status_breakdown": [
     {
       "status": "Draft - Pending",
       "count": 1
     },
     {
-      "status": "Awaiting Comms Approval - Pending",
+      "status": "Denied - Pending",
       "count": 1
-    },
-    {
-      "status": "Awaiting Comms Approval - Ready to Review",
-      "count": 1
-    },
-    {
-      "status": "Awaiting Business Review - Pending",
-      "count": 3
-    },
-    {
-      "status": "Awaiting Legal Approval - Pending",
-      "count": 1
-    },
-    {
-      "status": "ATC final review - Pending",
-      "count": 4
-    },
-    {
-      "status": "Review for Publish review - Pending",
-      "count": 2
     },
     {
       "status": "Expired - Pending",
-      "count": 2
+      "count": 4
     },
     {
       "status": "Review for Publish review - No Comms",
-      "count": 48
+      "count": 61
     },
     {
       "status": "Expired - Future Send",
       "count": 1
     }
   ],
-  "total_excl_denied": 60,
-  "summarized_count": 48,
+  "total_excl_denied": 61,
+  "summarized_count": 61,
   "events_with_summaries": [
     {
       "event_id": "e2b173da-dc9d-4c43-a51d-30a9046e829f",
@@ -63,6 +43,13 @@
       "title": "May/June Profit Protection Framework Update",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Profit Protection is expanding into more modulars through June. Use the lookup tool to confirm whether it applies to your store, then unlock the identified categories and set modulars as drawn, using the required AP fixtures where noted."
+    },
+    {
+      "event_id": "a4e28b7b-b10c-4e54-8c5b-8e0d76dfa4e6",
+      "store_area": "Asset Protection",
+      "title": "Promo Pricing on CB300D Call Boxes Bundles",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Asset Protection:\u00a0Promotional pricing for the CB300D Call Box 6-pack bundle is available through\u00a0Dec. 31, offering an opportunity to expand or replace coverage in secured locking case areas. Call boxes improve customer assistance by alerting associates when help is needed, with ordering recommended to address any current coverage gaps before the promotion ends."
     },
     {
       "event_id": "92433df9-5167-4e2b-ae23-12a6109f5f9f",
@@ -135,11 +122,53 @@
       "summary_text": "Two new Earth Rated pet grooming wipes, the 100\u2011count and new XL 50\u2011count, are now available in Category 89, offering strong value and everyday clean\u2011up convenience for pet parents. Correct placement and visibility are key to helping drive sales and awareness in stores."
     },
     {
+      "event_id": "a87743cb-396b-4a2d-8ccc-9004be3125e2",
+      "store_area": "Digital",
+      "title": "Final Week for Mother\u2019s Day \u2013 Don\u2019t Miss These Key Updates",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: This final week before Mother\u2019s Day, you should stay focused on high-demand items like floral, greeting cards, beauty, fragrances and sweets. Keep floral fresh and properly staged, make gift features easy to shop, and be ready for increased evening delivery orders as last-minute shoppers place orders online."
+    },
+    {
+      "event_id": "580d7035-64b1-476c-a158-3f9b02dae2a8",
+      "store_area": "Digital",
+      "title": "InHome Driver Safety \u2013 May Focus Messages",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: May\u2019s InHome Driver safety focus highlights motorcycle awareness and safe following distance. Leaders should reinforce key habits like checking mirrors, watching blind spots, giving motorcycles extra space and maintaining at least four seconds of following distance to help drivers stay safe on the road."
+    },
+    {
+      "event_id": "b068da5d-a89b-4ddf-af62-d529777c77a5",
+      "store_area": "Digital",
+      "title": "New Lytx Severe Weather Alerts",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: Starting this week, Lytx in-cab devices will provide real-time severe weather alerts to InHome drivers, and store leaders will receive email notifications when vans are in impacted areas. The system works automatically and helps drivers and leaders make safer decisions during severe weather. Teams should continue following existing inclement weather guidance, even if Lytx doesn't send an alert."
+    },
+    {
+      "event_id": "4e80b9e6-31e4-4927-8681-1410dd5f9432",
+      "store_area": "Digital",
+      "title": "Return Unused InHome Phones",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: Check for any inactive or unused InHome phones and return them promptly. Partner with Claims to print a return label, then ship the devices to Walmart Mobility using the Secure Mobile Trade-in site."
+    },
+    {
+      "event_id": "1b80e1d4-5b09-41dd-b4cb-2cdb81de9630",
+      "store_area": "Digital",
+      "title": "Share The Love This Mother\u2019s Day",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Store Fulfillment: Starting May 9, stores will hand out Mother\u2019s Day cards to customers and members during pickup and delivery orders while supplies last. Each store will receive 500 cards, and stores may also choose to hand out flowers (following the normal store use process) to make the day extra special."
+    },
+    {
       "event_id": "af6d8009-09f3-437b-8612-1d9ad0d617ec",
       "store_area": "Entertainment",
       "title": "Dept. 67: Pre-Filled Helium Balloon Program",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Dept. 67: Pre-filled helium balloon sales depend on store inflation and strong seasonal execution to meet minimum sales expectations and support in-store helium fills."
+    },
+    {
+      "event_id": "429c2721-1df4-4460-aeb6-bfa522136811",
+      "store_area": "Entertainment",
+      "title": "Dept. 72: Cut the Cord Cover Letter Correction",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 72: Disregard the cover letter instruction to remove or destroy\u00a0Roku signage, and keep Roku displays and backing in place as shown on the floorplan."
     },
     {
       "event_id": "5f4c87f1-adb8-49d7-9d65-da1ec413582f",
@@ -196,6 +225,20 @@
       "title": "Fashion: Your Q2 Summer Beacon Graphic is Arriving!",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Fashion Department: Stores should be watching for their Q2 Fashion Summer Beacon Graphic. Once it arrives, the Winston Retail will install it."
+    },
+    {
+      "event_id": "4e79c749-5a21-46c4-8994-c67ff945794f",
+      "store_area": "Fashion",
+      "title": "Fashion: Your Summer Guides are Here! ",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Your Q2 summer visual merchandising guides are now live on Better Way! These guides provide store-ready direction for seasonal fashion from shop layouts and volume drivers to new mannequin-styling looks and trend highlights, covering women\u2019s elevated brands and men\u2019s\u00a0activewear, core and Free Assembly. Access these guides and review during SWAS planning to drive a consistent, inspiring experience and sales."
+    },
+    {
+      "event_id": "d75daf31-5e7f-40bd-b341-99b4bd49f54d",
+      "store_area": "Food",
+      "title": "Dept. 91: Frozen Modular Update",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Frozen has multiple sales drivers right now. The\u00a0Walmart-exclusive 6\u20137 Chicken Nugget is a limited-time item with May feature space reserved\u2014get it to the floor fast, don\u2019t hold in the backroom, and don\u2019t mark down. In Dept. 91, keep pizza boxes upright and front-facing to lift sales 10\u201315%. Execute Home Office features to drive sales and basket. Set new ice cream novelties, reset Breakfast modulars with GV bowls, and stay in-stock on Banquet pot pies and key Rollbacks."
     },
     {
       "event_id": "dae13f9c-c834-48f7-99f3-36cf4f0a48aa",
@@ -317,6 +360,13 @@
       "summary_text": "In department 98 Fresh Bakery, win Mother\u2019s Day sales by following the approved decorating guidance, keeping the department full, fresh and clean, tables stocked with best-sellers and focus on key items such as angel food items and carrot, cheese and white cakes all week. Order donut ingredients now to stay in stock and avoid gaps. Drive value and volume with Rollbacks! Feature and flag Marketside mini muffin, 28 count cookies and angle food items."
     },
     {
+      "event_id": "f9f23454-f6a9-49f5-b2bc-c5dd6b5b8e35",
+      "store_area": "Fresh",
+      "title": "May Food Safety Focus Points",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "It's time for May Food Safety Focus Points. Make sure to check dented cans, prevent flies, verify safe receiving, and pre-chill cold items to keep them cold. Please review the guidance and stay food-safe every day."
+    },
+    {
       "event_id": "70be0944-4865-43a1-ad08-3af8a5a5f364",
       "store_area": "Fresh",
       "title": "Summer Grilling Basket Launch Plan",
@@ -352,11 +402,25 @@
       "summary_text": "Home Department: It is week 14, and time for stores to set the modular for the Mainstays Kids. A clean, on-time set is the key to winning your customer and capturing the full basket."
     },
     {
+      "event_id": "a22cac43-ae4b-4bd5-9b85-a13ba04c380b",
+      "store_area": "People",
+      "title": "Q2 Key Event Dates Published",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Second quarter key event dates finalized. The Walmart U.S. store key event dates have been finalized. They are. Sunday, May 10, Saturday, May 23, Sunday, May 24, Monday, May 25, Sunday, June 21, Friday, July 3, Saturday, July 4 and Sunday, July 5.\n\nManagers should access the second quarter key event date calendar and enter your store number to view all dates, then print and post the calendar in a highly visible area for associates.\n\nReminder that absences on key event dates result in double absence occurrences."
+    },
+    {
       "event_id": "86dbc05f-cb27-4b3d-93be-96d908300061",
       "store_area": "Seasonal",
       "title": "America 250 Signing Kit Now Available!",
       "status": "Review for Publish review - No Comms",
       "summary_text": "Seasonal department: America 250 Signing Kit now available to order through Bunzl. There is a video link available in this AMP activity."
+    },
+    {
+      "event_id": "c240a640-0927-460d-bb47-40b46810826e",
+      "store_area": "Seasonal",
+      "title": "Dept. 18/67: Graduation Season Is Around the Corner!",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "Dept. 18/67: Prioritize getting seasonal celebrations fully set and customer-ready for peak early-May demand while staying on track for upcoming Patriotic and Father\u2019s Day transitions."
     },
     {
       "event_id": "55502c26-ceac-4866-860e-4dd1faca1e38",
@@ -380,6 +444,13 @@
       "summary_text": "Dept. 16/D56: Week 14 Mother\u2019s Day plant and orchid arrivals plus patio rollback\u00a0signage."
     },
     {
+      "event_id": "302d97d3-05ad-4385-94dd-bc07e34e6e01",
+      "store_area": "Total Store",
+      "title": "Heat-Related Illness Safety",
+      "status": "Review for Publish review - No Comms",
+      "summary_text": "With hot weather conditions increasing the risk of heat-related illness, it's crucial for your teams to prepare by following safety tips like drinking water, resting in the shade and ventilating enclosed spaces. Associates should always look out for each other and report any symptoms immediately to a manager."
+    },
+    {
       "event_id": "ecadfc2e-d68d-4997-811a-c2001108d308",
       "store_area": "Total Store",
       "title": "Week 14 - Total Fresh: Prep for May Fresh Cost Inventory",
@@ -387,12 +458,5 @@
       "summary_text": "May's Fresh Cost Inventory will be conducted on Tuesday, May 26. To prepare, staff up, check the Inventory Tracking Report, follow guidance provided in the Fresh Better Way guide and reach out with questions."
     }
   ],
-  "events_without_summary": [
-    {
-      "event_id": "817db40e-6310-487f-bd3a-71e01ad14385",
-      "title": "Fresh Alive@5 is Moving to Fresh Teams",
-      "area": "Fresh",
-      "status": "Awaiting Business Review - Pending"
-    }
-  ]
+  "events_without_summary": []
 }

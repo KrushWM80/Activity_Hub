@@ -194,6 +194,70 @@ def get_amp_data():
         }), 500
 
 
+@app.route('/api/amp-majority', methods=['GET'])
+def get_amp_majority():
+    """Count activities with majority store reach (>= 2000 stores)"""
+    try:
+        if not client:
+            return jsonify({'error': 'BigQuery connection not available'}), 503
+
+        fy = request.args.get('fy', '2027')
+        weeks_param = request.args.get('weeks', '13').strip()
+        threshold = int(request.args.get('threshold', 2000))
+        
+        # Handle "current" week
+        if weeks_param.lower() == 'current':
+            today = datetime.now()
+            if today.month >= 2:
+                fy_start = datetime(today.year, 2, 1)
+            else:
+                fy_start = datetime(today.year - 1, 2, 1)
+            current_week = ((today - fy_start).days // 7) + 1
+            weeks_list = str(current_week)
+        else:
+            # Parse numeric weeks
+            weeks_list = ', '.join(weeks_param.split(','))
+        
+        query = f"""
+            SELECT COUNT(*) as majority_count
+            FROM (
+                SELECT 
+                    event_id,
+                    MAX(COALESCE(Store_Cnt, 0)) as max_stores
+                FROM `{PROJECT_ID}.{DATASET_ID}.{TABLE_ID}`
+                WHERE FY = CAST({fy} AS INT64)
+                    AND Week IN ({weeks_list})
+                    AND Activity_Title IS NOT NULL
+                    AND Activity_Type IS NOT NULL
+                    AND COALESCE(Status, Message_Status) = 'Published - Published'
+                GROUP BY event_id
+                HAVING MAX(COALESCE(Store_Cnt, 0)) >= {threshold}
+            )
+        """
+        
+        result = client.query(query).result()
+        row = next(result)
+        majority_count = row['majority_count'] or 0
+        
+        logger.info(f"✅ Majority activities (>= {threshold} stores): {majority_count}")
+        
+        return jsonify({
+            'success': True,
+            'majority_activities': majority_count,
+            'threshold': threshold,
+            'weeks': weeks_param,
+            'fy': fy,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+    
+    except Exception as e:
+        logger.error(f"❌ Error fetching majority count: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 @app.route('/api/amp-metrics', methods=['GET'])
 def get_amp_metrics():
     """

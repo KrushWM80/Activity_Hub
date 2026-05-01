@@ -22,13 +22,13 @@ SEND_FROM_NAME = "ATC Team Support - Manager Change Notifications"
 # Use BCC for all recipients (privacy and prevents reply-all)
 USE_BCC = True
 
-# Test mode - send all emails to these recipients for validation
-TEST_MODE = False  # Set to False when ready for production
+# Test mode - controls EMAIL DISTRIBUTION only, NOT data source
+# TEST_MODE=True: REAL SDL data → Kendall only (validation)
+# TEST_MODE=False: REAL SDL data → DC leadership (production)
+TEST_MODE = False  # Set to True for manual testing only
 TEST_RECIPIENTS = [
-    "Kristine.Torres@walmart.com",
-    "Matthew.Farnworth@walmart.com",
-    "Kendall.Rush@walmart.com"
-]  # 3-person test group
+    "Kendall.Rush@walmart.com"  # Single test recipient for validation
+]  # ALWAYS uses REAL SDL data - only distribution changes
 TEST_RECIPIENT = TEST_RECIPIENTS[0]  # Backward compatibility
 
 # ============================================================================

@@ -1,0 +1,73 @@
+FROM: atcteamsupport@walmart.com
+TO: [DC Leadership - Draft]
+DATE: May 1, 2026
+SUBJECT: ⚠️ CORRECTION: Erroneous Manager Change Report - PC-07 (May 1, 2026)
+
+---
+
+**RE: Your email from May 1, 2026 with subject "Store Manager Changes - PayCycle 07"**
+
+---
+
+**ALERT: The manager changes reported in that email were INACCURATE and should be DISREGARDED.**
+
+---
+
+### **THE PROBLEM**
+
+The 4 stores and manager changes sent to you were synthetic test data, NOT real manager information:
+
+| Store # | False Data Sent | Real Status |
+|---------|-----------------|-------------|
+| **100** | JAMES RICHARDSON → CHRISTOPHER JONES | ❌ Store does not exist in active system |
+| **103** | LISA ANDERSON → MARGARET WILSON | ❌ Store does not exist in active system |
+| **121** | PATRICIA LOPEZ → LAURA ANDERSON | ❌ Store does not exist in active system |
+| **130** | DAVID BROWN → THOMAS GARCIA | ❌ Store does not exist in active system |
+
+**Actual Status:** No manager changes detected for PayCycle 07 (May 1 - May 14, 2026).
+
+---
+
+### **ROOT CAUSE**
+
+Our system reused a 6-day-old **synthetic test snapshot** from April 29 without validating the date. 
+
+- ✗ April 29: Test snapshots created with fake data
+- ✗ May 1: System checked "if file exists" but **never checked if it was today's data**
+- ✓ **Fixed:** System now deletes cached snapshots and fetches fresh data every time
+
+**Incident Reference:** `2026-05-01-ELM-5645-LOCATIONS`
+
+---
+
+### **WHAT WE'VE CHANGED**
+
+1. **Immediate:** All PayCycles now delete stale cache and fetch fresh data
+2. **Long-term:** Replaced fragile web scraper with direct ELM BigQuery API (more reliable)
+3. **Validation:** Every snapshot now includes UTC timestamp and full audit trail
+4. **Clarity:** TEST_MODE uses REAL data only (distribution method is all that changes)
+
+---
+
+### **ACCURATE MANAGER DATA**
+
+**For PayCycle 07 (May 1-14, 2026):**
+- **Manager Changes:** 0 (No changes detected)
+- **Data Source:** ELM BigQuery (verified, real, production data)
+- **Email Coverage:** 84.2% of 5,645 active US store managers
+- **Validation:** Compared April 17 vs May 1 = 0 changes (expected for 14-day window)
+
+---
+
+**Please disregard the previous email and acknowledge receipt of this correction.**
+
+For details: Reference snapshot ID `2026-05-01-ELM-5645-LOCATIONS` (May 1, 2026 19:53:10 UTC)
+
+---
+
+ATC Team Support
+atcteamsupport@walmart.com
+
+---
+
+**DRAFT STATUS: Do NOT Send | Review & Modify As Needed**

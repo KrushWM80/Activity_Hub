@@ -93,10 +93,9 @@ def run_for_today():
     dow = today.strftime('%A')   # Monday, Tuesday, …
 
     logger.info("=" * 70)
-    logger.info(f"ACTIVITY HUB EMAIL SCHEDULER — {today.strftime('%A %B %d, %Y %I:%M %p')}")
+    logger.info(f"ACTIVITY HUB EMAIL SCHEDULER - {today.strftime('%A %B %d, %Y %I:%M %p')}")
     logger.info(f"TEST MODE: {TEST_MODE}")
     if TEST_MODE:
-        logger.info(f"  All emails → {TEST_RECIPIENT}")
         logger.info(f"  Owners:       {TEST_OWNERS}")
         logger.info(f"  Directors:    {TEST_DIRECTORS}")
         logger.info(f"  Sr Directors: {TEST_SR_DIRECTORS}")

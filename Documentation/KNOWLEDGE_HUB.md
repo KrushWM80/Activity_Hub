@@ -1522,6 +1522,7 @@ All pages use **exactly 4 nav links** with standard `<a href>` full-page navigat
 | April 16, 2026 | First round of edits to `activity-hub-demo.html` disappeared | OneDrive sync overwrote with older version | Re-applied all edits |
 | April 17, 2026 | `activity-hub-demo.html` fully reverted (Teams/MyWork/Settings back, iframe back, dark mode/feedback gone) | Another session worked from cached/older version | Re-applied nav cleanup, iframe removal, dark mode, feedback |
 | April 17, 2026 | `admin-dashboard.html` lost dark mode + page-action-btn styles | Nav fix accidentally removed other session's additions | Restored dark mode CSS, JS, page-title-actions HTML |
+| May 1, 2026 | `activity-hub-demo.html` fully reverted AGAIN (5th occurrence) | OneDrive sync overwrote with older version | Re-applied all 7 fixes (nav, iframe removal, dark mode, feedback) |
 
 ---
 

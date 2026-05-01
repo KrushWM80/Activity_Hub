@@ -2,8 +2,11 @@
 """
 On-Call Calendar Parser
 ========================
-Parses the U.S. Comm On Call Planner from shared Outlook calendar.
+Parses the U.S. Comm On Call Planner shared Outlook calendar for on-call entries.
 Calendar entries follow the pattern: "{Name} On Call" spanning Friday-to-Friday.
+
+The organizer of each calendar entry is the on-call person.
+This organizer's email is extracted directly from the calendar event.
 
 Used by:
   - send_daily_status_email.py (Friday CC)
@@ -14,6 +17,28 @@ import logging
 from datetime import datetime, timedelta
 
 logger = logging.getLogger('weekly_audio')
+
+
+def get_organizer_email(calendar_item):
+    """Get the organizer's email from a calendar item.
+    
+    Args:
+        calendar_item: Outlook calendar item object
+    
+    Returns:
+        Organizer email address, or None if not available
+    """
+    try:
+        organizer = calendar_item.Organizer
+        if hasattr(organizer, 'Address'):
+            email = organizer.Address
+            if email:
+                logger.info(f"Calendar organizer email: {email}")
+                return email
+    except Exception as e:
+        logger.warning(f"Could not extract organizer email: {e}")
+    
+    return None
 
 
 def get_oncall_from_calendar(target_date=None):
@@ -80,11 +105,12 @@ def get_oncall_from_calendar(target_date=None):
                     continue
 
                 full_name = match.group(1).strip()
-                parts = full_name.split()
-                if len(parts) >= 2:
-                    email = f"{parts[0]}.{parts[-1]}@walmart.com"
-                else:
-                    email = f"{full_name.replace(' ', '.')}@walmart.com"
+                
+                # Get organizer email from calendar item (the organizer IS the on-call person)
+                email = get_organizer_email(item)
+                if not email:
+                    logger.warning(f"Could not get organizer email for calendar entry: {full_name}")
+                    continue
 
                 phone = getattr(item, 'Location', '') or ''
 
@@ -105,7 +131,7 @@ def get_oncall_from_calendar(target_date=None):
                     'end': str(item_end),
                 }
                 candidates.append((start_d, entry, spans))
-                logger.info(f"On-call candidate: {full_name} ({item_start} - {item_end}), spans target={spans}")
+                logger.info(f"On-call candidate: {full_name} ({email}) ({item_start} - {item_end}), spans target={spans}")
             except Exception:
                 continue
 

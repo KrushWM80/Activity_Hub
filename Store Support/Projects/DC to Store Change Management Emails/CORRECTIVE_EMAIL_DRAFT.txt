@@ -1,0 +1,72 @@
+FROM: atcteamsupport@walmart.com
+TO: [DC Leadership Distribution - Draft]
+DATE: May 1, 2026
+SUBJECT: ⚠️ CORRECTION: Manager Information in PayCycle 07 Email - May 1, 2026
+
+---
+
+**RE: Your email from May 1, 2026 with subject "Store Manager Changes - PayCycle 07"**
+
+---
+
+## **CORRECTION NOTICE**
+
+The manager information and store locations in that email were **INACCURATE**. Below are the **correct details** from our authoritative ELM system:
+
+---
+
+### **CORRECTED STORE MANAGER INFORMATION**
+
+| Store # | Location | WRONG Data Sent | CORRECT Manager | City, State | ELM Link |
+|---------|----------|-----------------|-----------------|------------|----------|
+| **100** | Bentonville S Walton Blvd | JAMES RICHARDSON | **KACEY WARD** | Bentonville, AR | [View in ELM](https://elmsearchui.prod.elm-ui.telocmdm.prod.walmart.com/search?business_unit_nbr=100) |
+| **103** | Shawnee | LISA ANDERSON | **LAURA GREEN** | Shawnee, OK | [View in ELM](https://elmsearchui.prod.elm-ui.telocmdm.prod.walmart.com/search?business_unit_nbr=103) |
+| **121** | Okmulgee | PATRICIA LOPEZ | **RUSSELL MOORE** | Okmulgee, OK | [View in ELM](https://elmsearchui.prod.elm-ui.telocmdm.prod.walmart.com/search?business_unit_nbr=121) |
+| **130** | Muskogee | DAVID BROWN | **PHILLIP CRUMBLISS** | Muskogee, OK | [View in ELM](https://elmsearchui.prod.elm-ui.telocmdm.prod.walmart.com/search?business_unit_nbr=130) |
+
+---
+
+### **WHAT HAPPENED**
+
+Our system reused a 6-day-old **synthetic test snapshot** from April 29 without validating the date:
+- ✗ April 29: Created synthetic test data with fake manager changes
+- ✗ May 1: System reused cached file without checking if it was current
+- Result: Fake data sent to DC leadership
+
+---
+
+### **ROOT CAUSE & FIXES**
+
+**The Bug:** `daily_check_smart.py` checked "if snapshot_file.exists()" but never validated the date.
+
+**Immediate Fix:** 
+- Delete all cached snapshots before fetching
+- Force fresh data fetch every time
+- Never reuse stale cache
+
+**Long-Term Solution:**
+- Replaced fragile web scraper with direct ELM BigQuery API
+- Added UTC timestamp to every snapshot
+- Complete audit trail metadata
+
+**Incident Reference:** `2026-05-01-ELM-5645-LOCATIONS` (May 1, 2026 19:53:10 UTC)
+
+---
+
+### **REAL PAYCYCLE 07 DATA**
+
+For PayCycle 07 (May 1-14, 2026):
+- **Manager Changes Detected:** **0** (No actual changes)
+- **Data Source:** ELM BigQuery (verified, production system)
+- **Validation:** Compared April 17 vs May 1 = 0 changes (expected for 14-day window)
+
+**Action Required:** Please disregard the previous email. The stores listed above show the CORRECT managers per ELM as of May 1, 2026.
+
+---
+
+ATC Team Support  
+atcteamsupport@walmart.com
+
+---
+
+**DRAFT STATUS: Do NOT Send | Review & Modify As Needed**

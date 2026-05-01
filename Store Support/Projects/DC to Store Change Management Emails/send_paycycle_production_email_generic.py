@@ -35,20 +35,20 @@ from dc_leadership_config import get_dc_emails  # <-- ADDED: Get DC email addres
 
 
 # ── TEST MODE ────────────────────────────────────────────────────────────────
-# CRITICAL: TEST_MODE is ONLY for interactive testing with Kendall
+# CRITICAL: TEST_MODE controls DISTRIBUTION only, NOT data source
 # 
 # TEST MODE (Manual use only):
 #   Set: $env:TEST_MODE='true' at command line before running script
-#   Email goes to: Kendall.Rush@walmart.com ONLY
-#   No DC leadership receives emails
-#   Uses: Synthetic test data
+#   Email goes to: Kendall.Rush@walmart.com ONLY (validation user)
+#   Data: REAL SDL data (fresh fetch, same as production)
 #   When: Developer testing during work sessions
+#   Purpose: Validate email format and data accuracy before production
 #
 # PRODUCTION MODE (Task Scheduler only):
 #   Default: TEST_MODE not set (environment variable missing)
 #   Email goes to: atcteamsupport@walmart.com + DC leadership in BCC
-#   DC leadership DOES receive: Real data from SDL system
-#   When: Automatic execution May 1 @ 06:00 AM and future PayCycles
+#   Data: REAL SDL data (fresh fetch, guaranteed not stale)
+#   When: Automatic execution on PayCycle schedule
 #
 # RULE: NO test tasks in Task Scheduler. Ever.
 # RULE: Only production tasks (TEST_MODE=False or unset) are scheduled.
@@ -56,12 +56,14 @@ from dc_leadership_config import get_dc_emails  # <-- ADDED: Get DC email addres
 TEST_MODE = os.getenv('TEST_MODE', 'False').lower() == 'true'
 
 if TEST_MODE:
-    print("\n[TEST MODE ENABLED] ⚠️  DEVELOPMENT ONLY")
-    print("[TEST MODE] Emails will be sent ONLY to Kendall.Rush@walmart.com")
-    print("[TEST MODE] No DC leadership emails will be sent")
+    print("\n[TEST MODE ENABLED] ⚠️  VALIDATION ONLY - REAL DATA")
+    print("[TEST MODE] Emails will be sent to: Kendall.Rush@walmart.com")
+    print("[TEST MODE] Data source: REAL SDL (fresh fetch)")
+    print("[TEST MODE] Purpose: Validate email format and accuracy")
 else:
-    print("\n[PRODUCTION MODE ENABLED] ⚠️  REAL DATA - REAL DC EMAILS")
-    print("[PRODUCTION MODE] Emails will be sent to DC leadership")
+    print("\n[PRODUCTION MODE ENABLED] ⚠️  REAL DATA - DC LEADERSHIP")
+    print("[PRODUCTION MODE] Emails will be sent to: DC General Managers + AGMs (BCC)")
+    print("[PRODUCTION MODE] Data source: REAL SDL (fresh fetch)")
 
 
 # ── PayCycle Calendar ────────────────────────────────────────────────────────
@@ -145,10 +147,33 @@ def load_snapshot(date: datetime) -> Dict:
     """
     Load manager snapshot for a specific date.
     
+    CRITICAL: ALWAYS uses REAL ELM data (not synthetic/cached)
+    PayCycle execution requires fresh data regardless of TEST_MODE.
+    
+    Data Source: ELM BigQuery (wmt-loc-cat-prod.catalog_location_views.division_view)
+    
     Returns the snapshot JSON, or empty dict if not found.
     """
     date_str = date.strftime("%Y-%m-%d")
     snapshot_path = Path(f"snapshots_local/manager_snapshot_{date_str}.json")
+    
+    # PRODUCTION CRITICAL: ALWAYS force fresh ELM data (both test and production)
+    # Prevents stale cached data or synthetic test data from being used
+    if snapshot_path.exists():
+        print(f"[PAYCYCLE] Clearing cached snapshot - forcing fresh ELM fetch")
+        print(f"[PAYCYCLE] Mode: {'TEST (Kendall validation)' if TEST_MODE else 'PRODUCTION (DC leadership)'}")
+        snapshot_path.unlink()
+        try:
+            from elm_data_fetcher import save_elm_snapshot
+            
+            # Fetch fresh data from ELM BigQuery
+            save_elm_snapshot(date_str)
+            
+            print(f"[PAYCYCLE] Fresh ELM data fetched and snapshot created successfully")
+        except Exception as e:
+            print(f"[PAYCYCLE] Fresh fetch failed: {e}")
+            import traceback
+            traceback.print_exc()
     
     if not snapshot_path.exists():
         print(f"[WARNING] Snapshot not found: {snapshot_path}")

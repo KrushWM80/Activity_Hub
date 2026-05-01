@@ -245,8 +245,8 @@ def build_status_email_html(week, fy, cache_data):
 
 # ── Email Sender ────────────────────────────────────────────────────────────
 
-def send_status_email(week, fy, html_body, to_recipients, cc_recipients=None):
-    """Send the status email via Outlook COM with retry logic."""
+def send_status_email(week, fy, html_body, to_recipients, cc_recipients=None, draft=False):
+    """Send the status email via Outlook COM with retry logic, or save as draft."""
     import pythoncom
     import time
 
@@ -256,31 +256,40 @@ def send_status_email(week, fy, html_body, to_recipients, cc_recipients=None):
         pythoncom.CoInitialize()
         import win32com.client
 
-        max_retries = 4
-        for attempt in range(max_retries):
-            try:
-                outlook = win32com.client.Dispatch('Outlook.Application')
-                mail = outlook.CreateItem(0)
-                mail.To = '; '.join(to_recipients)
-                if cc_recipients:
-                    mail.CC = '; '.join(cc_recipients)
-                mail.Subject = subject
-                mail.HTMLBody = html_body
-                mail.Send()
-                logger.info(f"Email sent — TO: {', '.join(to_recipients)}"
-                            f"{' CC: ' + ', '.join(cc_recipients) if cc_recipients else ''}")
-                return {'success': True, 'message': f'Email sent to {", ".join(to_recipients)}'}
-            except pythoncom.com_error as ce:
-                if ce.args[0] == -2147418111 and attempt < max_retries - 1:
-                    wait = 2 * (attempt + 1)
-                    logger.warning(f"Outlook busy, retrying in {wait}s (attempt {attempt + 1}/{max_retries})...")
-                    time.sleep(wait)
-                else:
-                    raise
+        outlook = win32com.client.Dispatch('Outlook.Application')
+        mail = outlook.CreateItem(0)
+        mail.To = '; '.join(to_recipients)
+        if cc_recipients:
+            mail.CC = '; '.join(cc_recipients)
+        mail.Subject = subject
+        mail.HTMLBody = html_body
+
+        if draft:
+            # Save as draft instead of sending
+            mail.Save()
+            logger.info(f"Draft saved — TO: {', '.join(to_recipients)}"
+                        f"{' CC: ' + ', '.join(cc_recipients) if cc_recipients else ''}")
+            return {'success': True, 'message': f'Draft saved for {", ".join(to_recipients)}'}
+        else:
+            # Send the email with retry logic
+            max_retries = 4
+            for attempt in range(max_retries):
+                try:
+                    mail.Send()
+                    logger.info(f"Email sent — TO: {', '.join(to_recipients)}"
+                                f"{' CC: ' + ', '.join(cc_recipients) if cc_recipients else ''}")
+                    return {'success': True, 'message': f'Email sent to {", ".join(to_recipients)}'}
+                except pythoncom.com_error as ce:
+                    if ce.args[0] == -2147418111 and attempt < max_retries - 1:
+                        wait = 2 * (attempt + 1)
+                        logger.warning(f"Outlook busy, retrying in {wait}s (attempt {attempt + 1}/{max_retries})...")
+                        time.sleep(wait)
+                    else:
+                        raise
     except ImportError:
         return {'success': False, 'error': 'pywin32 not installed. Run: pip install pywin32'}
     except Exception as e:
-        logger.error(f"Email send failed: {e}")
+        logger.error(f"Email {'draft save' if draft else 'send'} failed: {e}")
         return {'success': False, 'error': str(e)}
     finally:
         try:
@@ -294,6 +303,7 @@ def send_status_email(week, fy, html_body, to_recipients, cc_recipients=None):
 def main():
     parser = argparse.ArgumentParser(description="Send daily Weekly Messages Audio status email")
     parser.add_argument("--test", action="store_true", help="Send to kendall.rush only (no CC)")
+    parser.add_argument("--draft", action="store_true", help="Save as draft instead of sending (for Friday email preview)")
     parser.add_argument("--week", type=int, default=None, help="Override WM week")
     parser.add_argument("--fy", type=int, default=None, help="Override fiscal year")
     args = parser.parse_args()
@@ -355,8 +365,8 @@ def main():
             except Exception as e:
                 logger.warning(f"On-call lookup failed: {e}")
 
-    # Send
-    result = send_status_email(week, fy, html_body, to, cc)
+    # Send or save as draft
+    result = send_status_email(week, fy, html_body, to, cc, draft=args.draft)
     if result.get('success'):
         logger.info(f"Done: {result['message']}")
     else:

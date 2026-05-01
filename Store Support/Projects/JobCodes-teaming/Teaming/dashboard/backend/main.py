@@ -44,7 +44,7 @@ else:
 # ============================================================
 
 HOST = "0.0.0.0"
-PORT = 8080
+PORT = 8082
 DEBUG = True
 
 # Email Configuration - Using Walmart Internal SMTP
@@ -1560,7 +1560,7 @@ async def request_update(request: Request):
 async def export_comprehensive_requests(request: Request):
     """Export approved comprehensive teaming requests in MyWalmart Excel template format"""
     user = require_auth(request)
-    if user['role'] != 'admin':
+    if not user_has_admin_access(user):
         raise HTTPException(status_code=403, detail="Admin access required")
     
     requests_list = load_requests()
@@ -1630,7 +1630,7 @@ async def get_requests(request: Request, status: Optional[str] = None):
         requests_list = load_requests()
         
         # Non-admins can only see their own requests
-        if user["role"] != "admin":
+        if not user_has_admin_access(user):
             requests_list = [r for r in requests_list if r["requested_by"] == user["username"]]
         
         if status:
@@ -1656,7 +1656,7 @@ async def update_request(request_id: int, request: Request):
     requests_list = load_requests()
     for req in requests_list:
         if req["id"] == request_id:
-            is_admin = user.get("role") == "admin"
+            is_admin = user_has_admin_access(user)
             is_owner = req["requested_by"] == user["username"]
             
             # Initialize audit log if not present
@@ -1776,7 +1776,7 @@ async def delete_request(request_id: int, request: Request):
     requests_list = load_requests()
     for i, req in enumerate(requests_list):
         if req["id"] == request_id:
-            is_admin = user.get("role") == "admin"
+            is_admin = user_has_admin_access(user)
             is_owner = req["requested_by"] == user["username"]
             
             if is_admin or (is_owner and req["status"] == "pending"):

@@ -31,11 +31,6 @@ from email.mime.multipart import MIMEMultipart
 from xml.sax.saxutils import escape
 from flask import Flask, render_template, request, jsonify
 from google.cloud import bigquery
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.edge.service import Service
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 SCRIPT_DIR = Path(__file__).parent
@@ -165,91 +160,60 @@ def init_tables():
 
 def capture_dashboard_screenshot(wm_week):
     """
-    Capture Tableau Future Price Changes dashboard screenshot using Selenium.
+    Load latest Tableau dashboard screenshot from local images folder.
     
-    Simple approach: Open browser with user profile, navigate, wait 10s, capture.
-    No complex waits or element detection — just force capture after fixed timeout.
+    Checks ../Images for the most recent PNG/JPG file,
+    converts it to base64, and returns for email embedding.
     """
-    driver = None
     try:
-        logger.info(f'Capturing Tableau dashboard for WK{wm_week}...')
+        # Path to images folder (../Images from Callouts folder)
+        images_folder = Path(SCRIPT_DIR).parent / 'Images'
         
-        # Setup Edge with your authenticated user profile
-        edge_options = webdriver.EdgeOptions()
-        user_profile = os.path.expanduser('~\\AppData\\Local\\Microsoft\\Edge\\User Data')
-        edge_options.add_argument(f'--user-data-dir={user_profile}')
-        edge_options.add_argument('--disable-dev-shm-usage')
-        edge_options.add_argument('--no-sandbox')
+        logger.info(f'Looking for dashboard image in: {images_folder}')
         
-        # Create driver
-        edge_executable = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-        service = Service(edge_executable)
-        driver = webdriver.Edge(service=service, options=edge_options)
-        
-        logger.info(f'Opening Tableau dashboard...')
-        driver.set_page_load_timeout(15)  # 15s page load timeout
-        driver.get(DASHBOARD_URL)
-        
-        # Simple fixed wait - no element detection complexity
-        logger.info('Waiting 10 seconds for rendering...')
-        import time
-        time.sleep(10)
-        
-        # Capture screenshot
-        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
-            screenshot_path = f.name
-        
-        logger.info(f'Taking screenshot...')
-        driver.save_screenshot(screenshot_path)
-        
-        if Path(screenshot_path).exists():
-            file_size = Path(screenshot_path).stat().st_size
-            logger.info(f'Screenshot: {file_size:,} bytes')
-            
-            if file_size > 50000:
-                logger.info('Valid screenshot captured')
-                with open(screenshot_path, 'rb') as f:
-                    screenshot_base64 = base64.b64encode(f.read()).decode('ascii')
-                return screenshot_base64
-            else:
-                logger.warning(f'Screenshot too small ({file_size:,} bytes) - returning None')
-                return None
-        else:
-            logger.warning('Screenshot file not created')
+        if not images_folder.exists():
+            logger.warning(f'Images folder does not exist: {images_folder}')
             return None
+        
+        # Find all image files (png, jpg, jpeg)
+        image_files = list(images_folder.glob('*.png')) + \
+                      list(images_folder.glob('*.jpg')) + \
+                      list(images_folder.glob('*.jpeg'))
+        
+        if not image_files:
+            logger.warning('No image files found in images folder')
+            return None
+        
+        # Get the most recently modified image
+        latest_image = max(image_files, key=lambda p: p.stat().st_mtime)
+        file_size = latest_image.stat().st_size
+        
+        logger.info(f'Using latest image: {latest_image.name} ({file_size:,} bytes)')
+        
+        # Read and encode to base64
+        with open(latest_image, 'rb') as f:
+            image_data = f.read()
+            screenshot_base64 = base64.b64encode(image_data).decode('ascii')
+        
+        logger.info(f'Image encoded to base64 for email embedding')
+        return screenshot_base64
     
     except Exception as e:
-        logger.error(f'Screenshot error: {e}')
+        logger.error(f'Error loading dashboard image: {e}')
         return None
-    
-    finally:
-        if driver:
-            try:
-                driver.quit()
-            except:
-                pass
 
 def build_callout_email_html(callouts, wm_week, screenshot_base64=None):
     """Build HTML email with callouts for the week - matches official template."""
     
     # Build callouts section
     if callouts:
-        callouts_html = '<table style="width:100%; border-collapse:collapse; margin: 15px 0;">'
-        callouts_html += '<thead style="background:#f0f0f0;"><tr>'
-        callouts_html += '<th style="padding:10px; text-align:left; border:1px solid #ddd; font-weight:600;">Title</th>'
-        callouts_html += '<th style="padding:10px; text-align:left; border:1px solid #ddd; font-weight:600;">Details</th>'
-        callouts_html += '</tr></thead><tbody>'
+        callouts_html = '<div style="margin: 15px 0;">'
         
-        for i, callout in enumerate(callouts):
-            bg = '#ffffff' if i % 2 == 0 else '#fafafa'
-            title = escape(callout.get('title') or '(No title)')
+        for callout in callouts:
             content = escape(callout.get('content') or '')
-            callouts_html += f'''<tr style="background:{bg};">
-                <td style="padding:10px; border:1px solid #ddd; font-weight:600;">{title}</td>
-                <td style="padding:10px; border:1px solid #ddd;">{content}</td>
-            </tr>'''
+            callouts_html += f'''<p style="margin:10px 0; padding:10px; background:#f9f9f9; border-left:4px solid #FFCC00; border-radius:2px;">{content}</p>'''
         
-        callouts_html += '</tbody></table>'
+        callouts_html += '</div>'
     else:
         callouts_html = '<p style="color:#666; margin:15px 0;">There are no Callouts this week.</p>'
     
@@ -356,9 +320,21 @@ def dashboard_pricing_callouts():
 
 @app.route('/api/callouts/<int:wm_week>', methods=['GET'])
 def get_callouts(wm_week):
-    """Fetch callouts for a specific WM week."""
+    """Fetch callouts for a specific WM week with current fiscal year."""
     try:
         client = get_bq_client()
+        
+        # Get current fiscal year from today's date
+        current_fy_query = f"""
+        SELECT FISCAL_YEAR_NBR
+        FROM `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE_CAL_DIM}`
+        WHERE CALENDAR_DATE = CURRENT_DATE()
+        LIMIT 1
+        """
+        current_fy_results = list(client.query(current_fy_query).result())
+        fiscal_year = int(current_fy_results[0]['FISCAL_YEAR_NBR']) if current_fy_results else 2027
+        
+        # Get callouts
         query = f"""
         SELECT 
             id, wm_week, title, content, created_date, created_by, 
@@ -373,12 +349,14 @@ def get_callouts(wm_week):
         results = client.query(query, job_config=job_config).result()
         callouts = [dict(row) for row in results]
         
-        # Convert timestamps to ISO format strings
+        # Add fiscal year and convert timestamps to ISO format strings
         for c in callouts:
+            c['fiscal_year'] = fiscal_year
             c['created_date'] = c['created_date'].isoformat() if c['created_date'] else None
             c['last_modified_date'] = c['last_modified_date'].isoformat() if c['last_modified_date'] else None
         
-        return jsonify({"success": True, "data": callouts})
+        logger.info(f"✓ Fetched {len(callouts)} callouts for WK{wm_week} (FY {fiscal_year})")
+        return jsonify({"success": True, "data": callouts, "fiscal_year": fiscal_year})
     except Exception as e:
         logger.error(f"Error fetching callouts for WK{wm_week}: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
@@ -398,7 +376,7 @@ def create_callout():
         
         # Generate ID
         callout_id = f"callout_{wm_week}_{int(datetime.now().timestamp())}"
-        now = datetime.utcnow()
+        now = datetime.utcnow().isoformat()
         
         client = get_bq_client()
         table = client.get_table(f"{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE_CALLOUTS}")
@@ -430,24 +408,36 @@ def update_callout(callout_id):
         title = data.get('title', '').strip()
         content = data.get('content', '').strip()
         
-        if not title or not content:
-            return jsonify({"success": False, "error": "Missing required fields"}), 400
+        # Title is required; content is optional
+        if not title:
+            return jsonify({"success": False, "error": "Title is required"}), 400
         
         now = datetime.utcnow()
         client = get_bq_client()
-        query = f"""
-        UPDATE `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE_CALLOUTS}`
-        SET title = @title, content = @content, last_modified_date = @now
-        WHERE id = @id
-        """
-        job_config = bigquery.QueryJobConfig(
-            query_parameters=[
+        
+        # Build dynamic UPDATE query - only update content if provided
+        if content:
+            set_clause = "SET title = @title, content = @content, last_modified_date = @now"
+            params = [
                 bigquery.ScalarQueryParameter("title", "STRING", title),
                 bigquery.ScalarQueryParameter("content", "STRING", content),
                 bigquery.ScalarQueryParameter("now", "TIMESTAMP", now),
                 bigquery.ScalarQueryParameter("id", "STRING", callout_id),
             ]
-        )
+        else:
+            set_clause = "SET title = @title, last_modified_date = @now"
+            params = [
+                bigquery.ScalarQueryParameter("title", "STRING", title),
+                bigquery.ScalarQueryParameter("now", "TIMESTAMP", now),
+                bigquery.ScalarQueryParameter("id", "STRING", callout_id),
+            ]
+        
+        query = f"""
+        UPDATE `{BQ_PROJECT}.{BQ_DATASET}.{BQ_TABLE_CALLOUTS}`
+        {set_clause}
+        WHERE id = @id
+        """
+        job_config = bigquery.QueryJobConfig(query_parameters=params)
         client.query(query, job_config=job_config).result()
         
         logger.info(f"✓ Updated callout {callout_id}")
@@ -458,7 +448,7 @@ def update_callout(callout_id):
 
 @app.route('/api/callouts/<callout_id>', methods=['DELETE'])
 def delete_callout(callout_id):
-    """Delete (soft) a callout."""
+    """Delete (soft) a callout by setting status to archived."""
     try:
         client = get_bq_client()
         query = f"""
@@ -474,8 +464,17 @@ def delete_callout(callout_id):
         logger.info(f"✓ Archived callout {callout_id}")
         return jsonify({"success": True})
     except Exception as e:
-        logger.error(f"Error deleting callout {callout_id}: {e}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        error_msg = str(e)
+        logger.error(f"Error deleting callout {callout_id}: {error_msg}")
+        
+        # Handle streaming buffer error - data was recently inserted
+        if "streaming buffer" in error_msg.lower():
+            return jsonify({
+                "success": False, 
+                "error": "Callout is too new. Please wait a few seconds before deleting."
+            }), 409  # 409 Conflict
+        
+        return jsonify({"success": False, "error": error_msg}), 500
 
 # ─── API Routes: Email Recipients ────────────────────────────────────────────
 
