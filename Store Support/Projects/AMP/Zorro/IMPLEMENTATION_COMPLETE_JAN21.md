@@ -285,7 +285,7 @@ redis>=5.0.0
 ⚠️ **NOTE**: This project uses **Walmart Media Studio API** (Google Veo models), NOT OpenAI. However, an unused OpenAI API key was found in `.env` and should be removed:
 
 ```
-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
+[REDACTED - key has been revoked]
 ```
 
 **Steps:**
